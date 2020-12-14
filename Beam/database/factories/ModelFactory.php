@@ -66,7 +66,7 @@ $factory->define(\App\SegmentRule::class, function (Faker\Generator $faker) {
         'timespan' => 1440 * $faker->numberBetween(1, 7),
         'fields' => [
             [
-                'key' => 'utm_campaign',
+                'key' => 'rtm_campaign',
                 'value' => null,
             ]
         ],

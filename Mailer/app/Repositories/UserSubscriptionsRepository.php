@@ -110,7 +110,7 @@ class UserSubscriptionsRepository extends Repository
         }
     }
 
-    public function unsubscribeUser(ActiveRow $mailType, $userId, $email, $utmParams = [])
+    public function unsubscribeUser(ActiveRow $mailType, $userId, $email, $rtmParams = [])
     {
         // TODO: check for userId also when searching for actual subscription
         $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch();
@@ -122,19 +122,19 @@ class UserSubscriptionsRepository extends Repository
                     'created_at' => new DateTime(),
                     'updated_at' => new DateTime(),
                     'subscribed' => false,
-                ] + $utmParams);
+                ] + $rtmParams);
         } else {
             if ($actual->subscribed) {
                 $this->getTable()->where([
                     'user_id' => $userId,
                     'mail_type_id' => $mailType->id,
-                ])->update(['subscribed' => false, 'updated_at' => new DateTime()] + $utmParams);
+                ])->update(['subscribed' => false, 'updated_at' => new DateTime()] + $rtmParams);
                 $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
             }
         }
     }
 
-    public function unsubscribeEmail(ActiveRow $mailType, $email, $utmParams = [])
+    public function unsubscribeEmail(ActiveRow $mailType, $email, $rtmParams = [])
     {
         $actual = $this->getTable()->where([
             'user_email' => $email,
@@ -149,7 +149,7 @@ class UserSubscriptionsRepository extends Repository
         $this->update($actual, [
                 'subscribed' => false,
                 'updated_at' => new DateTime(),
-            ] + $utmParams);
+            ] + $rtmParams);
         
         $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
     }
@@ -167,11 +167,11 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_id' => $userId, 'mail_type_id' => $mailType->id, 'user_email' => $email])->limit(1)->fetch();
     }
 
-    public function unsubscribeUserVariant(ActiveRow $userSubscription, ActiveRow $variant, $utmParams = [])
+    public function unsubscribeUserVariant(ActiveRow $userSubscription, ActiveRow $variant, $rtmParams = [])
     {
         $this->userSubscriptionVariantsRepository->removeSubscribedVariant($userSubscription, $variant->id);
         if ($this->userSubscriptionVariantsRepository->subscribedVariants($userSubscription)->count('*') == 0) {
-            $this->unSubscribeUser($userSubscription->mail_type, $userSubscription->user_id, $userSubscription->user_email, $utmParams);
+            $this->unSubscribeUser($userSubscription->mail_type, $userSubscription->user_id, $userSubscription->user_email, $rtmParams);
         }
     }
 

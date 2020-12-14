@@ -8,7 +8,6 @@ use App\CampaignBanner;
 use App\Contracts\SegmentAggregator;
 use App\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;

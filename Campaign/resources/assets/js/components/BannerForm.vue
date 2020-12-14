@@ -150,7 +150,7 @@
                                     <label for="target_url" class="fg-label">Target URL</label>
                                     <input v-model="targetUrl" class="form-control fg-input" name="target_url" type="text" id="target_url">
                                 </div>
-                                <div><small>UTM params will be automatically appended to this link.</small></div>
+                                <div><small>RTM (REMP's UTM) params will be automatically appended to this link.</small></div>
                             </div>
 
                             <div class="input-group fg-float m-t-30">
@@ -161,7 +161,7 @@
                                     <small class="help-block">Custom JS is run as a function with single a function parameter <i>params</i>.
                                         Object <i>params</i> contains several properties of the banner you can access.
                                         <span data-toggle="tooltip"
-                                              data-original-title="properties: utmMedium, utmCampaign, utmContent, bannerVariant"
+                                              data-original-title="properties: rtmMedium, rtmCampaign, rtmContent, rtmVariant"
                                               class="glyphicon glyphicon-question-sign"></span>
                                     </small>
                                 </div>
@@ -534,7 +534,7 @@
             cssIncludes: null,
             manualEventsTracking: null,
 
-            fieldParamsMessage: "UTM params will be automatically appended to every link in this field.<br> If you want to add custom parameter to specific link: add data-param-* attribute. e.g.: data-param-foo=\"baz\""
+            fieldParamsMessage: "RTM (REMP's UTM) params will be automatically appended to every link in this field.<br> If you want to add custom parameter to specific link: add data-param-* attribute. e.g.: data-param-foo=\"baz\""
         }),
         computed: {
             isOverlay: function() {

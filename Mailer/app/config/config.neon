@@ -148,7 +148,7 @@ services:
 	contentGenerator:
 		class: Remp\MailerModule\Models\ContentGenerator\ContentGenerator
 		setup:
-		    - register(Remp\MailerModule\Models\ContentGenerator\Replace\AnchorUtmReplace())
+		    - register(Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace())
 
 	mailFactory:
 		class: Remp\MailerModule\Models\Sender\MailerFactory

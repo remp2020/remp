@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
+use Nette\Utils\Strings;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
@@ -69,11 +70,25 @@ class UnSubscribeHandler extends BaseHandler
                 return new JsonApiResponse(200, ['status' => 'ok']);
             }
 
-            $this->userSubscriptionsRepository->unsubscribeUserVariant($userSubscription, $variant, $payload['utm_params'] ?? []);
+            $this->userSubscriptionsRepository->unsubscribeUserVariant($userSubscription, $variant, $this->getRtmParams($payload));
         } else {
-            $this->userSubscriptionsRepository->unsubscribeUser($list, $payload['user_id'], $payload['email'], $payload['utm_params'] ?? []);
+            $this->userSubscriptionsRepository->unsubscribeUser($list, $payload['user_id'], $payload['email'], $this->getRtmParams($payload));
         }
 
         return new JsonApiResponse(200, ['status' => 'ok']);
+    }
+
+    // function that primary loads rtm parameters but fallbacks to utm if rtm are not present
+    private function getRtmParams($payload)
+    {
+        $rtmParams = [];
+        foreach ($payload['rtm_params'] ?? $payload['utm_params'] ?? [] as $key => $value) {
+            if (Strings::startsWith($key, 'utm_')) {
+                $rtmParams['rtm_' . substr($key, 4)] = $value;
+            } else {
+                $rtmParams[$key] = $value;
+            }
+        }
+        return $rtmParams;
     }
 }

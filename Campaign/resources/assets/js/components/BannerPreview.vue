@@ -370,16 +370,16 @@
             },
             addUrlParams: function(url, linkParams) {
                 let separator = url.indexOf("?") === -1 ? "?" : "&";
-                url =  url + separator + "utm_source=remp_campaign" +
-                    "&utm_medium=" + encodeURIComponent(this.displayType);
+                url =  url + separator + "rtm_source=remp_campaign" +
+                    "&rtm_medium=" + encodeURIComponent(this.displayType);
                 if (this.campaignUuid) {
-                    url += "&utm_campaign=" + encodeURIComponent(this.campaignUuid);
+                    url += "&rtm_campaign=" + encodeURIComponent(this.campaignUuid);
                 }
                 if (this.uuid) {
-                    url += "&utm_content=" + encodeURIComponent(this.uuid);
+                    url += "&rtm_content=" + encodeURIComponent(this.uuid);
                 }
                 if (this.variantUuid) {
-                    url += "&banner_variant=" + encodeURIComponent(this.variantUuid);
+                    url += "&rtm_variant=" + encodeURIComponent(this.variantUuid);
                 }
 
                 if (this.urlParams) {
@@ -428,11 +428,11 @@
                     return true;
                 }
                 this.trackEvent("banner", "close", null, null, {
-                    "utm_source": "remp_campaign",
-                    "utm_medium": this.displayType,
-                    "utm_campaign": this.campaignUuid,
-                    "utm_content": this.uuid,
-                    "banner_variant": this.variantUuid
+                    "rtm_source": "remp_campaign",
+                    "rtm_medium": this.displayType,
+                    "rtm_campaign": this.campaignUuid,
+                    "rtm_content": this.uuid,
+                    "rtm_variant": this.variantUuid
                 });
                 this.closeTracked = true;
             },
@@ -441,11 +441,11 @@
                     return true;
                 }
                 this.trackEvent("banner", "click", null, null, {
-                    "utm_source": "remp_campaign",
-                    "utm_medium": this.displayType,
-                    "utm_campaign": this.campaignUuid,
-                    "utm_content": this.uuid,
-                    "banner_variant": this.variantUuid
+                    "rtm_source": "remp_campaign",
+                    "rtm_medium": this.displayType,
+                    "rtm_campaign": this.campaignUuid,
+                    "rtm_content": this.uuid,
+                    "rtm_variant": this.variantUuid
                 });
                 this.clickTracked = true;
                 if (hideBanner) {
@@ -491,10 +491,15 @@
             },
             paramsForCustomJavascript: function () {
                 return {
+                    "rtmMedium": this.displayType,
+                    "rtmCampaign": this.campaignUuid,
+                    "rtmContent": this.uuid,
+                    "rtmVariant": this.variantUuid,
+                    // kept for backward-compatibility reasons
                     "utmMedium": this.displayType,
                     "utmCampaign": this.campaignUuid,
                     "utmContent": this.uuid,
-                    "bannerVariant": this.variantUuid
+                    "bannerVariant": this.variantUuid,
                 }
             }
         }

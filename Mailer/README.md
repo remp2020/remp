@@ -216,7 +216,7 @@ that helps to shape the final HTML of *email*.
                 'intro' => $values->intro,
                 'footer' => $values->footer,
                 'items' => $items,
-                'utm_campaign' => $values->utm_campaign,
+                'rtm_campaign' => $values->rtm_campaign,
             ];
   
             $engine = $this->engineFactory->engine();
@@ -261,7 +261,7 @@ mirror fields added in `generateForm()` method. They are utilized when calling [
                 new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
                 new InputParam(InputParam::TYPE_POST, 'articles', InputParam::REQUIRED),
                 new InputParam(InputParam::TYPE_POST, 'footer', InputParam::REQUIRED),
-                new InputParam(InputParam::TYPE_POST, 'utm_campaign', InputParam::REQUIRED),
+                new InputParam(InputParam::TYPE_POST, 'rtm_campaign', InputParam::REQUIRED),
                 new InputParam(InputParam::TYPE_POST, 'intro', InputParam::REQUIRED)
             ];
         }
@@ -686,17 +686,17 @@ Response:
 
 API call unsubscribes email address from the given newsletter.
 
-Endpoint accepts an optional array of UTM parameters. Every link in email send by Mailer contain UTM parameters
+Endpoint accepts an optional array of RTM (REMP's UTM) parameters. Every link in email send by Mailer contain RTM parameters
 referencing to the specific instance of sent email. If user unsubscribes via specific email, your frontend will also
-receive special UTM parameters, that can be passed to this API call. For instance link to unsubscribe from our daily
+receive special RTM parameters, that can be passed to this API call. For instance link to unsubscribe from our daily
 newsletter might look like this:
 
 ```
-https://predplatne.dennikn.sk/mail/mail-settings/un-subscribe-email/newsletter_daily?utm_source=newsletter_daily&utm_medium=email&utm_campaign=daily-newsletter-11.3.2019-personalized&utm_content=26026
+https://predplatne.dennikn.sk/mail/mail-settings/un-subscribe-email/newsletter_daily?rtm_source=newsletter_daily&rtm_medium=email&rtm_campaign=daily-newsletter-11.3.2019-personalized&rtm_content=26026
 ```
 
-The `newsletter_daily` stands for *newsletter list code*. UTM parameters reference specific *email* and specific *batch*
-which generated this email. If you won't provide/pass these UTM parameters, statistics related to unsubscribe rate
+The `newsletter_daily` stands for *newsletter list code*. RTM parameters reference specific *email* and specific *batch*
+which generated this email. If you won't provide/pass these RTM parameters, statistics related to unsubscribe rate
 of emails won't be available. 
 
 ##### *Headers:*
@@ -719,8 +719,15 @@ of emails won't be available.
     // optional 
     "variant_id": 1, // Integer;  ID of newsletter variant to unsubscribe
     
-    // optional UTM parameters for tracking "what" made the user unsubscribe
-    "utm_params": { // Object; optional UTM parameters for pairing which email caused the user to unsubscribe. UTM params are generated into the email links automatically.
+    // optional RTM parameters for tracking "what" made the user unsubscribe
+    "rtm_params": { // Object; optional RTM parameters for pairing which email caused the user to unsubscribe. RTM params are generated into the email links automatically.
+        "rtm_source": "newsletter_daily",
+        "rtm_medium": "email",
+        "rtm_campaign": "daily-newsletter-11.3.2019-personalized",
+        "rtm_content": "26026"
+    },
+    
+    "utm_params": { // (Deprecated) Fallback if no RTM parameters are found 
         "utm_source": "newsletter_daily",
         "utm_medium": "email",
         "utm_campaign": "daily-newsletter-11.3.2019-personalized",
@@ -741,11 +748,11 @@ curl -X POST \
 	"user_id": 12,
 	"list_id": 1,
 	"variant_id": 1,
-	"utm_params": {
-		"utm_source": "newsletter_daily",
-		"utm_medium": "email",
-		"utm_campaign": "daily-newsletter-11.3.2019-personalized",
-		"utm_content": "26026"
+	"rtm_params": {
+		"rtm_source": "newsletter_daily",
+		"rtm_medium": "email",
+		"rtm_campaign": "daily-newsletter-11.3.2019-personalized",
+		"rtm_content": "26026"
 	}
 }'
 ```
@@ -788,8 +795,15 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
 
       "subscribe": false, // Boolean; indicates if you want to subscribe or unsubscribe user
 
-      // optional UTM parameters used only if `subscribe:false` for tracking "what" made the user unsubscribe
-      "utm_params": { // Object; optional UTM parameters for pairing which email caused the user to unsubscribe. UTM params are generated into the email links automatically.
+      // optional RTM parameters used only if `subscribe:false` for tracking "what" made the user unsubscribe
+      "rtm_params": { // Object; optional RTM parameters for pairing which email caused the user to unsubscribe. RTM params are generated into the email links automatically.
+        "rtm_source": "newsletter_daily",
+        "rtm_medium": "email",
+        "rtm_campaign": "daily-newsletter-11.3.2019-personalized",
+        "rtm_content": "26026"
+      },
+      
+      "utm_params": { // Fallback to UTM - deprecated option, will be removed
         "utm_source": "newsletter_daily",
         "utm_medium": "email",
         "utm_campaign": "daily-newsletter-11.3.2019-personalized",
@@ -811,7 +825,8 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
 | list_id | *Integer* | yes _(use list_id or list_code)_ | ID of mail list. |
 | list_code | *String* | yes _(use list_id or list_code)_ | Code of mail list. |
 | variant_id | *Integer* | no | Optional ID of variant. |
-| utm_params | *Integer* | no | Optional UTM parameters for pairing which email caused the user to unsubscribe. |
+| rtm_params | *Object* | no | Optional RTM parameters for pairing which email caused the user to unsubscribe. |
+| utm_params | *Object* | no | (Deprecated) UTM parameters are deprecated, but if no RTM paramters are found, system will try to use these. |
 
 
 ##### *Example:*
@@ -841,11 +856,11 @@ curl -X POST \
             "user_id": 3,
             "subscribe": false,
             "list_id": 3,
-            "utm_params": {
-              "utm_source": "newsletter_daily",
-              "utm_medium": "email",
-              "utm_campaign": "daily-newsletter-11.3.2019-personalized",
-              "utm_content": "26026"
+            "rtm_params": {
+              "rtm_source": "newsletter_daily",
+              "rtm_medium": "email",
+              "rtm_campaign": "daily-newsletter-11.3.2019-personalized",
+              "rtm_content": "26026"
             }
           }
         ]
@@ -1535,7 +1550,7 @@ curl -X POST \
   http://mailer.remp.press/api/v1/mailers/generate-mail \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'source_template_id=17&articles=https%3A%2F%2Fdennikn.sk%2F1405858%2Fkedysi-bojovala-za-mier-v-severnom-irsku-teraz-chce-zastavit-brexit%2F%3Fref%3Dtit%0Ahttps%3A%2F%2Fdennikn.sk%2F1406263%2Fpodpora-caputovej-je-tazky-hriech-tvrdil-arcibiskup-predstavitelia-cirkvi-odsudili-aj-radicovu-pred-desiatimi-rokmi%2F%3Fref%3Dtit&footer=%20&intro=%20&utm_campaign=%20'
+  -d 'source_template_id=17&articles=https%3A%2F%2Fdennikn.sk%2F1405858%2Fkedysi-bojovala-za-mier-v-severnom-irsku-teraz-chce-zastavit-brexit%2F%3Fref%3Dtit%0Ahttps%3A%2F%2Fdennikn.sk%2F1406263%2Fpodpora-caputovej-je-tazky-hriech-tvrdil-arcibiskup-predstavitelia-cirkvi-odsudili-aj-radicovu-pred-desiatimi-rokmi%2F%3Fref%3Dtit&footer=%20&intro=%20&rtm_campaign=%20'
 ```
 
 Response:

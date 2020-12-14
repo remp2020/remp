@@ -239,7 +239,7 @@ final class JobPresenter extends BasePresenter
         foreach ($job->related('mail_job_batch') as $batch) {
             $batchUnsubscribeStats[$batch->id] = $this->userSubscriptionsRepository->getTable()
                 ->where([
-                    'utm_content' => (string) $batch->id,
+                    'rtm_content' => (string) $batch->id,
                     'subscribed' => false,
                 ])
                 ->count('*');

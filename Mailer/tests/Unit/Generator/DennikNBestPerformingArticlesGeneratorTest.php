@@ -330,9 +330,9 @@ TEMPLATE;
                     rempConfig.tracker.explicit_referer_medium = ref;
                 }
 
-                // Mail Gun emails are tracked using utm_medium parameters
-                var utmMedium = getUriParam("utm_medium");
-                if (utmMedium !== undefined && utmMedium === 'email') {
+                // Mail Gun emails are tracked using rtm_medium parameters
+                var rtmMedium = getUriParam("rtm_medium");
+                if (rtmMedium !== undefined && rtmMedium === 'email') {
                     rempConfig.tracker.explicit_referer_medium = "email";
                 }
 

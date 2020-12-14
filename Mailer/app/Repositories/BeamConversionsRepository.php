@@ -7,23 +7,18 @@ use Nette\Caching\IStorage;
 use Nette\Database\Context;
 use Remp\Journal\ListRequest;
 use Remp\MailerModule\Models\Beam\JournalFactory;
-use Remp\MailerModule\Models\Users\IUser;
 
 class BeamConversionsRepository extends Repository implements IConversionsRepository
 {
     private $journal;
 
-    private $userBase;
-
     public function __construct(
         Context $database,
         JournalFactory $journalFactory,
-        IUser $userBase,
         IStorage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
         $this->journal = $journalFactory->getClient();
-        $this->userBase = $userBase;
     }
 
     public function getBatchTemplatesConversions(array $batchIds, array $mailTemplateCodes): array
@@ -32,27 +27,30 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
             return [];
         }
 
+        $purchases = [];
+
+        // RTM + UTM fallback (to be removed)
         $request = (new ListRequest('commerce'))
-            ->addSelect("step", "utm_campaign", "utm_content", "user_id", "token", "time")
+            ->addSelect("step", "rtm_campaign", "rtm_content", "utm_campaign", "utm_content", "user_id", "token", "time")
             ->addFilter('step', 'purchase')
-            ->addFilter('utm_campaign', ...$mailTemplateCodes)
-            ->addFilter('utm_content', ...array_map('strval', $batchIds))
-            ->addGroup('utm_campaign', 'utm_content');
+            ->addFilter('rtm_campaign', ...$mailTemplateCodes) // condition translated to (RTM or UTM) on Segments API
+            ->addFilter('rtm_content', ...$batchIds);
 
         $result = $this->journal->list($request);
-
-        $purchases = [];
         foreach ($result as $record) {
-            if (empty($record->tags->utm_content)) {
+            $rtmContent = $record->tags->rtm_content ?? $record->tags->utm_content ?? null;
+            $rtmCampaign = $record->tags->rtm_campaign ?? $record->tags->utm_campaign ?? null;
+
+            if (empty($rtmContent)) {
                 // skip conversions without batch reference
                 continue;
             }
-            if (empty($record->tags->utm_campaign)) {
+            if (empty($rtmCampaign)) {
                 // skip conversions without campaign (without reference to mail_template)
                 continue;
             }
             foreach ($record->commerces as $purchase) {
-                $purchases[$record->tags->utm_content][$record->tags->utm_campaign][$purchase->user->id] = $purchase->system->time;
+                $purchases[$rtmContent][$rtmCampaign][$purchase->user->id] = $purchase->system->time;
             }
         }
 
@@ -61,26 +59,30 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
 
     public function getNonBatchTemplateConversions(array $mailTemplateCodes): array
     {
+        $purchases = [];
+
+        // RTM + UTM fallback (to be removed)
         $request = (new ListRequest('commerce'))
-            ->addSelect("step", "utm_campaign", "utm_content", "user_id", "token", "time")
+            ->addSelect("step", "rtm_campaign", "rtm_content", "utm_campaign", "utm_content", "user_id", "token", "time")
             ->addFilter('step', 'purchase')
-            ->addFilter('utm_campaign', ...$mailTemplateCodes)
-            ->addGroup('utm_campaign');
+            ->addFilter('rtm_campaign', ...$mailTemplateCodes); // condition translated to (RTM or UTM) on Segments API
 
         $result = $this->journal->list($request);
 
-        $purchases = [];
         foreach ($result as $record) {
-            if (!empty($record->tags->utm_content) && is_numeric($record->tags->utm_content)) {
+            $rtmContent = $record->tags->rtm_content ?? $record->tags->utm_content ?? null;
+            $rtmCampaign = $record->tags->rtm_campaign ?? $record->tags->utm_campaign ?? null;
+
+            if (!empty($rtmContent) && is_numeric($rtmContent)) {
                 // skip all batch-related conversions, but keep conversions referencing other type of campaigns (e.g. banner)
                 continue;
             }
-            if (empty($record->tags->utm_campaign)) {
+            if (empty($rtmCampaign)) {
                 // skip conversions without campaign (without reference to mail_template)
                 continue;
             }
             foreach ($record->commerces as $purchase) {
-                $purchases[$record->tags->utm_campaign][$purchase->user->id] = $purchase->system->time;
+                $purchases[$rtmCampaign][$purchase->user->id] = $purchase->system->time;
             }
         }
 

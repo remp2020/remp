@@ -68,7 +68,7 @@
                                 <label for="target_url_secondary" class="fg-label">Target URL for secondary button</label>
                                 <input v-model="targetUrlSecondary" class="form-control fg-input remp-banner-text-input" name="target_url_secondary" id="target_url_secondary">
                             </div>
-                            <div><small>If not set, secondary button disappears. <br>UTM params will be automatically appended to this link.</small></div>
+                            <div><small>If not set, secondary button disappears. <br>RTM (REMP's UTM) params will be automatically appended to this link.</small></div>
                         </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">
