@@ -49,7 +49,7 @@ class StatsRequest implements StatsContract
 
     public function forVariant($variantId) : StatsRequest
     {
-        $this->filterBy("banner_variant", $variantId);
+        $this->filterBy("rtm_variant", $variantId);
         return $this;
     }
 
