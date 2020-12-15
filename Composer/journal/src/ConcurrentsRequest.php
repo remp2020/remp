@@ -12,10 +12,10 @@ class ConcurrentsRequest
 
     protected $timeAfter;
 
-    public function addInverseFilter(string $tag, string ...$values)
+    public function addInverseFilter(string $tag, ...$values)
     {
         foreach ($values as &$v) {
-            $v = strval($v);
+            $v = (string) $v;
         }
         $this->filterBy[] = [
             "tag" => $tag,
@@ -24,10 +24,10 @@ class ConcurrentsRequest
         ];
     }
 
-    public function addFilter(string $tag, string ...$values)
+    public function addFilter(string $tag, ...$values)
     {
         foreach ($values as &$v) {
-            $v = strval($v);
+            $v = (string) $v;
         }
         $this->filterBy[] = [
             "tag" => $tag,

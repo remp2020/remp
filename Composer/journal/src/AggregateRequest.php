@@ -29,10 +29,10 @@ class AggregateRequest
         $this->action = $action;
     }
 
-    public function addInverseFilter(string $tag, string ...$values): AggregateRequest
+    public function addInverseFilter(string $tag, ...$values): AggregateRequest
     {
         foreach ($values as &$v) {
-            $v = strval($v);
+            $v = (string) $v;
         }
         $this->filterBy[] = [
             "tag" => $tag,
@@ -42,10 +42,10 @@ class AggregateRequest
         return $this;
     }
 
-    public function addFilter(string $tag, string ...$values): AggregateRequest
+    public function addFilter(string $tag, ...$values): AggregateRequest
     {
         foreach ($values as &$v) {
-            $v = strval($v);
+            $v = (string) $v;
         }
         $this->filterBy[] = [
             "tag" => $tag,
