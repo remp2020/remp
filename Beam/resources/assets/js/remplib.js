@@ -686,6 +686,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "id": remplib.getUserId(),
                 "browser_id": remplib.getBrowserId(),
                 "subscriber": remplib.isUserSubscriber(),
+                "product_ids": remplib.getProductIds(),
                 "url": window.location.href,
                 "referer": document.referrer,
                 "user_agent": window.navigator.userAgent,
