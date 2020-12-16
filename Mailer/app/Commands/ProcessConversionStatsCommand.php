@@ -114,12 +114,12 @@ class ProcessConversionStatsCommand extends Command
         $mailTemplateCodes = [];
 
         foreach ($batchTemplates as $batchTemplate) {
-            $jobBatchIds[$batchTemplate->mail_job_batch_id] = true;
-            $mailTemplateCodes[$batchTemplate->mail_template->code] = true;
+            $jobBatchIds[$batchTemplate->mail_job_batch_id] = (string) $batchTemplate->mail_job_batch_id;
+            $mailTemplateCodes[$batchTemplate->mail_template->code] = $batchTemplate->mail_template->code;
         }
         $batchTemplatesConversions = $this->conversionsRepository->getBatchTemplatesConversions(
-            array_keys($jobBatchIds),
-            array_keys($mailTemplateCodes)
+            array_values($jobBatchIds),
+            array_values($mailTemplateCodes)
         );
 
         /** @var ActiveRow $batchTemplate */
@@ -183,10 +183,10 @@ class ProcessConversionStatsCommand extends Command
         $mailTemplateCodes = [];
 
         foreach ($templates as $template) {
-            $mailTemplateCodes[$template->code] = true;
+            $mailTemplateCodes[$template->code] = $template->code;
         }
         $nonBatchTemplatesConversions = $this->conversionsRepository->getNonBatchTemplateConversions(
-            array_keys($mailTemplateCodes)
+            array_values($mailTemplateCodes)
         );
 
         /** @var ActiveRow $template */

@@ -25,6 +25,7 @@ When deploying this release, **you have to deploy the Segments/Journal app first
 - Fixed bug on job edit form causing error when loading the form.
 - Fixed conversion stats processing if there are no templates/batches to process.
 - Fixed rendering issues of 4xx pages when invalid page was requested.
+- Fixed conversion stats processing type-related issues.
 
 ### [Beam]
 
