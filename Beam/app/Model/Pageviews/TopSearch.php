@@ -75,7 +75,7 @@ class TopSearch
             });
         };
 
-        return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopAuthorsFunc, 'name');
+        return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopAuthorsFunc);
     }
 
     public function topPostTags($timeFrom, $limit, string $sectionValueType = null, ?array $sectionValues = null, ?string $contentType = null)
@@ -109,8 +109,7 @@ class TopSearch
             });
         };
 
-        // TODO: currently tags may not have external_id, using 'name' as key attribute
-        return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopPostTagsFunc, 'name');
+        return $this->queryTopPageviewItemsByDays($timeFrom, $limit, $getTopPostTagsFunc);
     }
 
     private function addSectionsCondition(Builder $articlePageviewsQuery, string $type, array $values)
@@ -131,7 +130,7 @@ class TopSearch
     }
 
     // split query by days (due to speed)
-    private function queryTopPageviewItemsByDays(Carbon $timeFrom, $limit, callable $queryFunction, $keyAttribute = 'external_id')
+    private function queryTopPageviewItemsByDays(Carbon $timeFrom, $limit, callable $queryFunction)
     {
         $timeTo = (clone $timeFrom)->modify('+1 day');
         $now = Carbon::now();
@@ -145,12 +144,12 @@ class TopSearch
         while ($timeTo < $now) {
             $items = $queryFunction($timeFrom, $timeTo, $limit * 2);
             foreach ($items as $item) {
-                if (!isset($results[$item->$keyAttribute])) {
-                    $results[$item->$keyAttribute] = $item;
+                if (!isset($results[$item->external_id])) {
+                    $results[$item->external_id] = $item;
                     continue;
                 }
 
-                $results[$item->$keyAttribute]->pageviews += $item->pageviews;
+                $results[$item->external_id]->pageviews += $item->pageviews;
             }
 
             $timeFrom->modify('+1 day');

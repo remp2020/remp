@@ -28,6 +28,7 @@ When deploying this release, **you have to deploy the Segments/Journal app first
 
 ### [Beam]
 
+- **BREAKING**: API endpoints to get "top" tags or authors now utilize their `external_id` to filter the data. Please make sure you already use `/api/v2/articles/upsert` to populate article information.
 - Fixed scenario in JS library when fallback `cookie` value expiration was not updated with the main `local_storage` expiration.
 - [Tracker]: Added new parameter `commerce_session_id` to `track/commerce` endpoint of API tracker. remp/crm#1559
 - Added new identifier `commerce_session_id` into `remplib.js` to identify unique commerce process. remp/crm#1559 
