@@ -36,7 +36,7 @@ class Client
         } catch (ConnectException $connectException) {
             throw new Exception("could not connect to CRM: {$connectException->getMessage()}");
         } catch (ClientException $clientException) {
-            $body = Json::decode($clientException->getResponse()->getBody(), Json::FORCE_ARRAY);
+            $body = Json::decode($clientException->getResponse()->getBody()->getContents(), Json::FORCE_ARRAY);
             if (isset($body['code']) && $body['code'] === 'user_not_found') {
                 throw new UserNotFoundException("Unable to find user: {$clientException->getMessage()}");
             }

@@ -72,7 +72,7 @@ class RemoteUser
                 'headers' => ['Authorization' => 'Bearer ' . $token],
             ]);
         } catch (ClientException $clientException) {
-            $data = json_decode($clientException->getResponse()->getBody());
+            $data = json_decode($clientException->getResponse()->getBody()->getContents());
             return ['status' => 'error', 'error' => 'auth error', 'message' => $data->message];
         } catch (ConnectException $connectException) {
             return ['status' => 'error', 'error' => 'unavailable server', 'message' => 'Cannot connect to auth server'];
