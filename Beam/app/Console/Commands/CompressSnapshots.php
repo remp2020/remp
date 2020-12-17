@@ -61,7 +61,7 @@ class CompressSnapshots extends Command
 
                 $excludedTimePoints = array_map(function (string $zuluTimeString) {
                     return Carbon::parse($zuluTimeString);
-                }, $timePoints->toExclude);
+                }, $timePoints->getExcludedPoints());
 
                 foreach (array_chunk($excludedTimePoints, 200) as $excludedTimePointsChunk) {
                     $deletedCount = ArticleViewsSnapshot::deleteForTimes($excludedTimePointsChunk);

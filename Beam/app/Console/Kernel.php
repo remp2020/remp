@@ -42,8 +42,8 @@ class Kernel extends ConsoleKernel
 
         // Related commands are put into private functions
 
-        $this->aggregations($schedule);
         $this->concurrentsSnapshots($schedule);
+        $this->aggregations($schedule);
         $this->authorSegments($schedule);
 
         // All other unrelated commands
@@ -68,6 +68,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(SnapshotArticlesViews::COMMAND)
             ->everyMinute()
+            ->runInBackground()
             ->withoutOverlapping(5)
             ->appendOutputTo(storage_path('logs/snapshot_articles_views.log'));
 
@@ -108,23 +109,23 @@ class Kernel extends ConsoleKernel
         // Aggregates current hour (may not be completed yet)
         $schedule->command(AggregatePageviewLoadJob::COMMAND, ["--now='+1 hour'"])
             ->everyMinute()
+            ->runInBackground()
             ->withoutOverlapping(20)
             ->appendOutputTo(storage_path('logs/aggregate_pageview_load.log'));
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND, ["--now='+1 hour'"])
             ->everyMinute()
+            ->runInBackground()
             ->withoutOverlapping(20)
             ->appendOutputTo(storage_path('logs/aggregate_pageview_timespent.log'));
 
         // Aggregates last full hour only once
         $schedule->command(AggregatePageviewLoadJob::COMMAND)
             ->hourlyAt(1) // 1 minute after, so we make sure previous hour is completed
-            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/aggregate_pageview_load.log'));
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND)
             ->hourlyAt(1) //
-            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/aggregate_pageview_timespent.log'));
         
         $schedule->command(ProcessPageviewSessions::COMMAND)

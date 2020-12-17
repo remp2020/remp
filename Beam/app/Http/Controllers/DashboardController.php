@@ -23,7 +23,6 @@ use Remp\Journal\AggregateRequest;
 use Remp\Journal\ConcurrentsRequest;
 use Remp\Journal\JournalContract;
 use Remp\Journal\JournalException;
-use Remp\Journal\ListRequest;
 
 class DashboardController extends Controller
 {
