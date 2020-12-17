@@ -49,11 +49,11 @@ class SnapshotHelperTest extends TestCase
         $timePoints = $this->snapshotHelpers->timePoints($start, (clone $start)->addMinutes(20), 5);
 
         foreach ($shouldBeExcluded as $item) {
-            $this->assertTrue(in_array($item->time->toIso8601ZuluString(), $timePoints->toExclude));
+            $this->assertTrue(in_array($item->time->toIso8601ZuluString(), $timePoints->getExcludedPoints()));
         }
 
         foreach ($shouldBeKept as $item) {
-            $this->assertFalse(in_array($item->time->toIso8601ZuluString(), $timePoints->toExclude));
+            $this->assertFalse(in_array($item->time->toIso8601ZuluString(), $timePoints->getExcludedPoints()));
         }
     }
 }

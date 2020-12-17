@@ -38,6 +38,8 @@ When deploying this release, **you have to deploy the Segments/Journal app first
 - [Tracker]: UTM to RTM parameters transition. remp/remp#779
 - Removed statically set `memory_limit` configuration within some memory-extensive commands. remp/remp#788
 - Added support for configurable memory limit for each command via `COMMANDS_MEMORY_LIMITS` environment variable. See [`.env.example`](Beam/.env.example) for more information. remp/remp#788
+- Improved dashboard graph - snapshots of concurrent data are mapped to fixed time points to avoid displaying glitches in graph. remp/remp#763
+- Changed scheduled aggregation and snapshotting command calls to be non-blocking (so they don't wait for each other to be executed). remp/remp#763
 
 ## [0.16.0] - 2020-12-07
 
