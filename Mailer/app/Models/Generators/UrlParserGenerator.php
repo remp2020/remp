@@ -97,9 +97,9 @@ class UrlParserGenerator implements IGenerator
             'intro' => $values['intro'],
             'footer' => $values['footer'],
             'items' => $items,
-            'rtm_campaign' => $values->rtm_campaign,
+            'rtm_campaign' => $values['rtm_campaign'],
             // UTM Fallback -- will be removed
-            'utm_campaign' => $values->rtm_campaign,
+            'utm_campaign' => $values['rtm_campaign'],
         ];
 
         $engine = $this->engineFactory->engine();
