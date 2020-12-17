@@ -70,7 +70,7 @@ class MailCreateTemplateHandler extends BaseHandler
             $params['subject'],
             $params['template_text'],
             $params['template_html'],
-            $params['mail_layout_id'],
+            (int) $params['mail_layout_id'],
             $mailType->id,
             null,
             $extras

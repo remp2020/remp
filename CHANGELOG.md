@@ -26,6 +26,7 @@ When deploying this release, **you have to deploy the Segments/Journal app first
 - Fixed conversion stats processing if there are no templates/batches to process.
 - Fixed rendering issues of 4xx pages when invalid page was requested.
 - Fixed conversion stats processing type-related issues.
+- Fixed `mail_layout_id` type-related issues in `/api/v1/mailers/templates` API.
 
 ### [Beam]
 
