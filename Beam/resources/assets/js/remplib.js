@@ -91,8 +91,8 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (typeof config.userSubscribed !== 'undefined' && config.userSubscribed !== null) {
                 remplib.userSubscribed = config.userSubscribed;
             }
-            if (config.productIds instanceof Array) {
-                remplib.productIds = config.productIds;
+            if (config.subscriptionIds instanceof Array) {
+                remplib.subscriptionIds = config.subscriptionIds;
             }
             if (typeof config.browserId !== 'undefined' && config.browserId !== null) {
                 remplib.browserId = config.browserId;
@@ -686,7 +686,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "id": remplib.getUserId(),
                 "browser_id": remplib.getBrowserId(),
                 "subscriber": remplib.isUserSubscriber(),
-                "product_ids": remplib.getProductIds(),
+                "subscription_ids": remplib.getSubscriptionIds(),
                 "url": window.location.href,
                 "referer": document.referrer,
                 "user_agent": window.navigator.userAgent,
