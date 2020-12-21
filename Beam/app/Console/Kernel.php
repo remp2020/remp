@@ -17,6 +17,7 @@ use App\Console\Commands\SnapshotArticlesViews;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Schema;
+use Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -36,7 +37,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        if (!Schema::hasTable("migrations")) {
+        try {
+            if (!Schema::hasTable("migrations")) {
+                return;
+            }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
             return;
         }
 
