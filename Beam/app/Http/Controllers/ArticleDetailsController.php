@@ -55,7 +55,7 @@ class ArticleDetailsController extends Controller
             $request->addFilter('derived_referer_medium', 'internal');
         });
 
-        $data['colors'] = Colors::abTestVariantTagsToColors($data['tags']);
+        $data['colors'] = array_values(Colors::assignColorsToVariantTags($data['tags']));
 
         $tagToColor = [];
         for ($i = 0, $iMax = count($data['tags']); $i < $iMax; $i++) {
@@ -175,7 +175,7 @@ class ArticleDetailsController extends Controller
                 throw new \Exception("unknown pageviews data source {$this->pageviewGraphDataSource}");
         }
 
-        $data['colors'] = Colors::refererMediumTagsToColors($data['tags']);
+        $data['colors'] = array_values(Colors::assignColorsToMediumRefers($data['tags']));
         $data['events'] = [];
 
         $eventOptions = $request->get('events', []);
@@ -259,7 +259,7 @@ class ArticleDetailsController extends Controller
             ];
         }
 
-        $colors = Colors::generalTagsToColors(array_keys($tags), true);
+        $colors = Colors::assignColorsToGeneralTags(array_keys($tags));
         foreach ($events as $event) {
             $eventItem->color = $colors[$event->title];
         }
@@ -407,7 +407,7 @@ class ArticleDetailsController extends Controller
                 'dataFrom' => $request->input('data_from', 'today - 30 days'),
                 'dataTo' => $request->input('data_to', 'now'),
                 'mediums' => $mediums,
-                'mediumColors' => Colors::refererMediumTagsToColors($mediums, true),
+                'mediumColors' => Colors::assignColorsToMediumRefers($mediums),
                 'visitedFrom' => $request->input('visited_from', 'today - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
                 'snapshotsDataSource' => $this->pageviewGraphDataSource === 'snapshots',
