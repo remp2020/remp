@@ -100,7 +100,7 @@ class GoogleAnalyticsReportingController extends Controller
             'intervalMinutes' => $intervalMinutes,
             'results' => $results,
             'tags' => $tags,
-            'colors' => Colors::generalTagsToColors($tags)
+            'colors' => array_values(Colors::assignColorsToGeneralTags($tags))
         ]);
     }
 }
