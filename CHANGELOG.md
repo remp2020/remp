@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added caching of colors order in dashboard (order is first assigned according to predefined order and number of traffic per each referer medium). remp/remp#719
+
 ## [0.17.0] - 2020-12-21
 
 ### Important
