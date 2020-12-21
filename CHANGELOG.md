@@ -2,10 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/). Instead of change type headers, we use module names.
 
 ## [Unreleased]
+
+## [0.17.0] - 2020-12-21
 
 ### Important
 
@@ -496,6 +497,9 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
+[Unreleased]: https://github.com/remp2020/remp/compare/0.17.0...master
+[0.17.0]: https://github.com/remp2020/remp/compare/0.16.0...0.17.0
+[0.16.0]: https://github.com/remp2020/remp/compare/0.15.0...0.16.0
 [0.15.0]: https://github.com/remp2020/remp/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/remp2020/remp/compare/0.13.0...0.14.0
 [0.13.0]: https://github.com/remp2020/remp/compare/0.12.0...0.13.0
