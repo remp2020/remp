@@ -9,6 +9,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Carbon;
 use Schema;
+use Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -30,10 +31,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        if (!Schema::hasTable("migrations")) {
-            return;
-        }
-
         // Collect campaign stats if Beam Journal is configured
         $beamJournalConfigured = !empty(config('services.remp.beam.segments_addr'));
         if ($beamJournalConfigured) {

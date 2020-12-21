@@ -40,6 +40,10 @@ When deploying this release, **you have to deploy the Segments/Journal app first
 - Added support for configurable memory limit for each command via `COMMANDS_MEMORY_LIMITS` environment variable. See [`.env.example`](Beam/.env.example) for more information. remp/remp#788
 - Improved dashboard graph - snapshots of concurrent data are mapped to fixed time points to avoid displaying glitches in graph. remp/remp#763
 - Changed scheduled aggregation and snapshotting command calls to be non-blocking (so they don't wait for each other to be executed). remp/remp#763
+- Command `composer install` now works without DB connection (removed check for `migrations` table)
+
+### [Campaign]
+- Command `composer install` now works without DB connection (removed check for `migrations` table)
 
 ## [0.16.0] - 2020-12-07
 
