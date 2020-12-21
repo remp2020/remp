@@ -31,15 +31,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        try {
-            if (!Schema::hasTable("migrations")) {
-                return;
-            }
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return;
-        }
-
         // Collect campaign stats if Beam Journal is configured
         $beamJournalConfigured = !empty(config('services.remp.beam.segments_addr'));
         if ($beamJournalConfigured) {

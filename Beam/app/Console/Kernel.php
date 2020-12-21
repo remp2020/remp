@@ -37,15 +37,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        try {
-            if (!Schema::hasTable("migrations")) {
-                return;
-            }
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            return;
-        }
-
         // Related commands are put into private functions
 
         $this->concurrentsSnapshots($schedule);
