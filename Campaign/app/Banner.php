@@ -24,6 +24,7 @@ class Banner extends Model implements Searchable
     const TEMPLATE_COLLAPSIBLE_BAR = 'collapsible_bar';
     const TEMPLATE_SHORT_MESSAGE = 'short_message';
     const TEMPLATE_OVERLAY_TWO_BUTTONS_SIGNATURE = 'overlay_two_buttons_signature';
+    const TEMPLATE_NEWSLETTER_RECTANGLE = 'newsletter_rectangle';
 
     protected $fillable = [
         'name',
@@ -161,6 +162,11 @@ class Banner extends Model implements Searchable
         return $this->hasOne(ShortMessageTemplate::class);
     }
 
+    public function newsletterRectangleTemplate()
+    {
+        return $this->hasOne(NewsletterRectangleTemplate::class);
+    }
+
     /**
      * Returns name of the banner to template relation
      *
@@ -186,6 +192,8 @@ class Banner extends Model implements Searchable
                 return 'htmlOverlayTemplate';
             case self::TEMPLATE_OVERLAY_TWO_BUTTONS_SIGNATURE:
                 return 'overlayTwoButtonsSignatureTemplate';
+            case self::TEMPLATE_NEWSLETTER_RECTANGLE:
+                return 'newsletterRectangleTemplate';
             default:
                 throw new \Exception('Unhandled banner template access: ' . $this->template);
         }

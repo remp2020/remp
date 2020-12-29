@@ -137,6 +137,17 @@ class BannerRequest extends FormRequest
                         'background_color' => 'required',
                     ]);
                     break;
+                case Banner::TEMPLATE_NEWSLETTER_RECTANGLE:
+                    $templateValidator = Validator::make($this->all(), [
+                        'newsletter_id' => 'string|required',
+                        'btn_submit' => 'string|required',
+                        'title' => 'string|nullable',
+                        'text' => 'string|nullable',
+                        'success' => 'string|nullable',
+                        'failure' => 'string|nullable',
+                        'terms' => 'string|nullable',
+                    ]);
+                    break;
                 default:
                     throw new \Exception('unhandled template type: ' . $templateType);
             }

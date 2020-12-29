@@ -39,7 +39,15 @@
         background-size: 80%;
         background-position: center;
     }
+
+    &.newsletter-rectangle {
+        background-image: url('../img/newsletter_rectangle.png');
+        background-size: 80%;
+        background-position: center;
+    }
 }
+
+
 
 .modal {
     .card-header {
@@ -54,6 +62,11 @@
     .modal-body {
         background-color: #edecec;
         padding-top: 15px;
+    }
+
+    .disabled .card-body {
+        opacity: 0.33;
+        filter: grayscale(100%);
     }
 }
 
