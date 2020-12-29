@@ -247,8 +247,11 @@ export default {
     },
     methods: {
         _campaignVariable: function (name) {
+            if (!remplib.campaign) {
+                return null;
+            }
             if (remplib.campaign.variables && remplib.campaign.variables.hasOwnProperty(name)) {
-              return remplib.campaign.variables[name].value();
+                return remplib.campaign.variables[name].value();
             }
             throw new Error("REMPLIB: unable to display banner, configured extra parameter is missing: " + name);
         },
