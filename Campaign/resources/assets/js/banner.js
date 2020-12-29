@@ -142,6 +142,32 @@ window.remplib = window.remplib || {};
                 }
             }
 
+            if (banner.template === 'newsletter_rectangle' ) {
+                banner.newsletterRectangleTemplate = {
+                    id: model['newsletter_rectangle_template']['id'] || null,
+                    newsletterId: model['newsletter_rectangle_template']['newsletter_id'] || null,
+                    btnSubmit: model['newsletter_rectangle_template']['btn_submit'] || null,
+                    title: model['newsletter_rectangle_template']['title'] || null,
+                    text: model['newsletter_rectangle_template']['text'] || null,
+                    success: model['newsletter_rectangle_template']['success'] || null,
+                    failure: model['newsletter_rectangle_template']['failure'] || null,
+                    textColor: model['newsletter_rectangle_template']['text_color'] || null,
+                    backgroundColor: model['newsletter_rectangle_template']['background_color'] || null,
+                    buttonBackgroundColor: model['newsletter_rectangle_template']['button_background_color'] || null,
+                    buttonTextColor: model['newsletter_rectangle_template']['button_text_color'] || null,
+                    width: model['newsletter_rectangle_template']['width'] || null,
+                    height: model['newsletter_rectangle_template']['height'] || null,
+                    terms: model['newsletter_rectangle_template']['terms'] || null,
+                    endpoint: model['newsletter_rectangle_template']['endpoint'] || null,
+                    useXhr: model['newsletter_rectangle_template']['use_xhr'] || null,
+                    requestBody: model['newsletter_rectangle_template']['request_body'] || null,
+                    requestHeaders: model['newsletter_rectangle_template']['request_headers'] || null,
+                    paramsTransposition: model['newsletter_rectangle_template']['params_transposition'] || null,
+                    paramsExtra: model['newsletter_rectangle_template']['params_extra'] || null,
+                    rempMailerAddr: model['newsletter_rectangle_template']['remp_mailer_addr'] || null,
+                }
+            }
+
             return banner;
         },
 

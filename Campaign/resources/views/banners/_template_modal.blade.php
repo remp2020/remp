@@ -115,6 +115,34 @@
                             </a>
                         </div>
                     </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            @if(config('newsletter_banners.endpoint') != '')
+                                <a href="{{ route('banners.create', ['template' => \App\Banner::TEMPLATE_NEWSLETTER_RECTANGLE]) }}">
+                                    <div class="card-header">
+                                        <h4 class="text-center">Newsletter Rectangle</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="preview">
+                                            <div class="preview newsletter-rectangle"></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            @else
+                                <a href="javascript:" class="disabled" title="Newsletter banner is not configured. Please find instructions in 'Newsletter Banner' section of `Campaign/README.md`.">
+                                    <div class="card-header">
+                                        <h4 class="text-center">Newsletter Rectangle</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="preview">
+                                            <div class="preview newsletter-rectangle"></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

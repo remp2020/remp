@@ -116,7 +116,8 @@ class BannerController extends Controller
             'overlayTwoButtonsSignatureTemplate',
             'barTemplate',
             'collapsibleBarTemplate',
-            'shortMessageTemplate'
+            'shortMessageTemplate',
+            'newsletterRectangleTemplate'
         );
         $banner = $sourceBanner->replicate();
 

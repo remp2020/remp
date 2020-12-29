@@ -421,3 +421,57 @@ Returns:
 ## MaxMind - GeoIP2 Lite
 
 This product includes GeoLite2 data created by MaxMind, available from [http://www.maxmind.com](http://www.maxmind.com).
+
+## Newsletter Banner
+
+This banner type allows you to directly collect newsletter subscribers.
+
+In most cases you are going to need your own API proxy, since most newsletter APIs (including REMP CRM) make use of private tokens that should not be exposed to client. In case your newsletter API does not require such, you might not need a proxy. 
+
+### Setup
+
+All configuration options are set via `.env`, refer to [`.env.example`](.env.example) for full list of available options.
+
+### API requirements
+
+Newsletter API is required to respond with proper HTTP response code. On both success and failure, there is and custom event emitted. See next section for details. 
+
+### Custom Events
+
+Custom events `rempNewsletterSubscribeError` or `rempNewsletterSubscribeSuccess` are available if requests are configured with XHR. Events are fired on `form` element. Event contains following items in `detail` prop:
+
+| field      | type     | description  |
+|------------|----------|--------------|
+| `type`     | *String* | `response` - if there is a valid XHR response <br>`exception` - for general error, e.g. connection error |
+| `response` | *Object* | `fetch` response object, applicable for `response` type |
+| `message`  | *String* | error message, applicable for `exception` type |
+
+#### Error handling example
+
+```javascript
+window.addEventListener("rempNewsletterSubscribeFailure", function(event){
+    if (event.detail && event.detail.type === 'response'){
+        const response = event.detail.response;
+        console.warn('HTTP Status Code:', response.status);
+        
+        // to retrieve body use `json()` or `text()` depending on your API implemetation
+        response.json().then(function(data) {
+            console.warn(data);
+        });
+    }
+
+    if (event.detail && event.detail.type === 'exception') {
+        console.warn(event.detail.message);
+    }
+});
+```
+
+### RTM tracking
+
+Following params are added to every request or links (e.g. T&C): 
+
+- rtm_source: `"remp_campaign"` => always same string
+- rtm_medium: `displayType` => overlay or inline
+- rtm_campaign: `campaignUuid` => campaign id
+- rtm_content: `uuid` => banner id
+- banner_variant: `variantUuid` => banner variant id (in campaign)
