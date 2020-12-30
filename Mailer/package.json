@@ -23,7 +23,7 @@
     "bootstrap-select": "^1.13.18",
     "chart.js": "^2.9.3",
     "codemirror": "^5.45.0",
-    "datatables.net": "^1.10.19",
+    "datatables.net": "^1.10.22",
     "datatables.net-buttons": "^1.6.1",
     "datatables.net-responsive": "^2.2.3",
     "datatables.net-rowgroup": "^1.1.0",
