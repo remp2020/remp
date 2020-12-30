@@ -7,6 +7,8 @@ let mix = require('laravel-mix').webpackConfig({
     }
 }).version();
 
+require('laravel-mix-polyfill');
+
 if (process.env.REMP_TARGET === 'iota') {
     // we're not using mix.extract() due to issues with splitting of banner.js + vue.js; basically we need not to have manifest.js
     mix
@@ -23,6 +25,12 @@ if (process.env.REMP_TARGET === 'iota') {
             resourceRoot: "/assets/lib/"
         })
         .js("resources/assets/js/remplib.js", "js/remplib.js")
+        .polyfill({
+            enabled: true,
+            useBuiltIns: "usage",
+            targets: {"ie": 11},
+            debug: false,
+        });
 
 } else {
     mix

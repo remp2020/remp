@@ -9,10 +9,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added caching of colors order in dashboard (order is first assigned according to predefined order and number of traffic per each referer medium). remp/remp#719
+- Added missing IE11 polyfill to support `Promise` in IE11. remp/remp#795
 
 ### [Campaign]
 
 - Added *Newsletter rectangle* banner type to allow subscription to newsletter directly from within the banner. Further configuration and backend proxy is necessary to use the feature. Refer to README and `.env.example` for additional info. remp/remp#618
+- Added missing IE11 polyfill to support `Promise` in IE11. remp/remp#795
 
 ## [0.17.0] - 2020-12-21
 

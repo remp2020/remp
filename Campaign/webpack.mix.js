@@ -7,6 +7,8 @@ let mix = require('laravel-mix').webpackConfig({
     }
 }).version();
 
+require('laravel-mix-polyfill');
+
 if (process.env.REMP_TARGET === 'lib') {
     // we're not using mix.extract() due to issues with splitting of banner.js + vue.js; basically we need not to have manifest.js
     mix
@@ -17,6 +19,12 @@ if (process.env.REMP_TARGET === 'lib') {
         .js("resources/assets/js/banner.js", "js/banner.js")
         .js("resources/assets/js/remplib.js", "js/remplib.js")
         .js("resources/assets/js/bannerSelector.js", "js/bannerSelector.js")
+        .polyfill({
+            enabled: true,
+            useBuiltIns: "usage",
+            targets: {"ie": 11},
+            debug: false,
+        });
 } else {
     mix
         .options({
