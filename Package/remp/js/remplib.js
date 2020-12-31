@@ -8,7 +8,7 @@ export default {
 
     userSubscribed: null,
 
-    productIds: [],
+    subscriptionIds: [],
 
     browserId: null,
 
@@ -42,8 +42,8 @@ export default {
         return this.userSubscribed;
     },
 
-    getProductIds: function() {
-        return this.productIds;
+    getSubscriptionIds: function() {
+        return this.subscriptionIds;
     },
 
     getBrowserId: function() {
