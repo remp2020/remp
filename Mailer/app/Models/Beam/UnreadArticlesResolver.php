@@ -59,6 +59,64 @@ class UnreadArticlesResolver
         }
     }
 
+    public function resolveMailParameters(string $templateCode, int $userId, array $parameters): array
+    {
+        if (!array_key_exists($templateCode, $this->templates)) {
+            $item = new \stdClass();
+            $item->timespan = $parameters['timespan'];
+            $item->articlesCount = $parameters['articles_count'];
+            $item->criteria = $parameters['criteria'];
+            $item->ignoreAuthors = $parameters['ignore_authors'] ?? [];
+            $this->templates[$templateCode] = $item;
+        }
+
+        $results = $this->beamClient->unreadArticles(
+            $item->timespan,
+            $item->articlesCount,
+            $item->criteria,
+            [$userId],
+            $item->ignoreAuthors
+        );
+
+        $userUrls = $results[$userId] ?? [];
+        if (count($userUrls) < $parameters['articles_count']) {
+            throw new UserUnreadArticlesResolveException(
+                "Template $templateCode requires {$parameters['articles_count']} unread articles, user #{$userId} has only {$userUrls}, unable to send personalized email."
+            );
+        }
+
+        $params = [];
+        $headlineTitle = null;
+
+        foreach ($userUrls as $i => $url) {
+            if (!array_key_exists($url, $this->articlesMeta)) {
+                $meta = $this->content->fetchUrlMeta($url);
+                if (!$meta) {
+                    throw new UserUnreadArticlesResolveException(
+                "Unable to fetch meta for url {$url} when resolving article parameters for userId: {$userId}, templateCode: {$templateCode}")
+                    ;
+                }
+                $this->articlesMeta[$url] = $meta;
+            }
+
+            $meta = $this->articlesMeta[$url];
+
+            $counter = $i + 1;
+
+            $params["article_{$counter}_title"] = $meta->getTitle();
+            $params["article_{$counter}_description"] = $meta->getDescription();
+            $params["article_{$counter}_image"] = $meta->getImage();
+            $params["article_{$counter}_href_url"] = $url;
+
+            if (!$headlineTitle) {
+                $headlineTitle = $meta->getTitle();
+            }
+        }
+        $params['headline_title'] = $headlineTitle;
+
+        return $params;
+    }
+
     private function checkValidParameters(string $templateCode, int $userId): void
     {
         // check enough parameters were resolved for template

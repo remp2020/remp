@@ -60,7 +60,7 @@ class BatchEmailGenerator
     {
         $this->mailJobQueueRepository->clearBatch($batch);
 
-        $batchInsert = 1000;
+        $batchInsert = 200;
         $insert = [];
         $processed = 0;
 
@@ -88,7 +88,7 @@ class BatchEmailGenerator
                         'params' => json_encode($user) // forward all user attributes to template params
                     ];
                     ++$processed;
-                    if ($processed == $batchInsert) {
+                    if ($processed === $batchInsert) {
                         $processed = 0;
                         $this->mailJobQueueRepository->multiInsert($insert);
                         $insert = [];
@@ -162,7 +162,7 @@ class BatchEmailGenerator
         $lastId = PHP_INT_MIN;
         $limit = 1000;
 
-        $userJobOptions = [];
+        $jobsCount = 0;
         for ($i = 0; $i <= ceil($totalQueueSize / $limit); $i++) {
             $queueJobs = (clone $queueJobsSelection)
                 ->where('id > ?', $lastId)
@@ -170,7 +170,7 @@ class BatchEmailGenerator
 
             /** @var ActiveRow $queueJob */
             foreach ($queueJobs as $queueJob) {
-                $template = $queueJob->ref('mail_templates', 'mail_template_id');
+                $template = $queueJob->mail_template;
                 $userId = $userMap[$queueJob->email];
                 $jobOptions = [
                     'email' => $queueJob->email,
@@ -186,16 +186,39 @@ class BatchEmailGenerator
                     $extrasHandler = $extras['handler'] ?? null;
 
                     if ($extrasHandler === self::BEAM_UNREAD_ARTICLES_RESOLVER) {
-                        $jobOptions['handler'] = $extrasHandler;
-                        $parameters = $extras['parameters'] ?? false;
-                        if ($parameters) {
-                            $this->unreadArticlesResolver->addToResolve($template->code, $userId, $parameters);
+                        if (isset($extras['parameters'])) {
+                            try {
+                                $additionalParams = $this->unreadArticlesResolver->resolveMailParameters(
+                                    $jobOptions['code'],
+                                    $userId,
+                                    $extras['parameters']
+                                );
+                                foreach ($additionalParams as $name => $value) {
+                                    $jobOptions['params'][$name] = $value;
+                                }
+                            } catch (UserUnreadArticlesResolveException $exception) {
+                                // just log and continue to next user
+                                $this->logger->log(LogLevel::ERROR, $exception->getMessage());
+                                continue;
+                            }
                         }
                     } elseif ($extrasHandler !== null) {
                         $this->logger->log(LogLevel::ERROR, "Unknown extras handler: {$extrasHandler}");
                     }
                 }
-                $userJobOptions[$userId] = $jobOptions;
+
+                $result = $this->mailCache->addJob(
+                    $userId,
+                    $jobOptions['email'],
+                    $jobOptions['code'],
+                    $jobOptions['mail_batch_id'],
+                    $jobOptions['context'],
+                    $jobOptions['params']
+                );
+                if ($result !== false) {
+                    $jobsCount++;
+                }
+
                 $lastId = $queueJob->id;
             }
         }
@@ -203,34 +226,6 @@ class BatchEmailGenerator
         // Resolve all dynamic parameters at once
         $this->unreadArticlesResolver->resolve();
 
-        $jobsCount = 0;
-        foreach ($userJobOptions as $userId => $jobOptions) {
-            if ($jobOptions['handler'] ?? null === self::BEAM_UNREAD_ARTICLES_RESOLVER) {
-                try {
-                    $additionalParams = $this->unreadArticlesResolver->getMailParameters($jobOptions['code'], $userId);
-                    foreach ($additionalParams as $name => $value) {
-                        $jobOptions['params'][$name] = $value;
-                    }
-                } catch (UserUnreadArticlesResolveException $exception) {
-                    // just log and continue to next user
-                    $this->logger->log(LogLevel::ERROR, $exception->getMessage());
-                    continue;
-                }
-            }
-
-            $result = $this->mailCache->addJob(
-                $userId,
-                $jobOptions['email'],
-                $jobOptions['code'],
-                $jobOptions['mail_batch_id'],
-                $jobOptions['context'],
-                $jobOptions['params']
-            );
-
-            if ($result !== false) {
-                $jobsCount++;
-            }
-        }
         $this->logger->info('Jobs inserted into mail cache', ['jobsCount' => $jobsCount]);
 
         $priority = $this->batchesRepository->getBatchPriority($batch);
