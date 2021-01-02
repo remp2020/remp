@@ -71,11 +71,11 @@ class UnreadArticlesResolver
         }
 
         $results = $this->beamClient->unreadArticles(
-            $item->timespan,
-            $item->articlesCount,
-            $item->criteria,
+            $parameters['timespan'],
+            $parameters['articles_count'],
+            $parameters['criteria'],
             [$userId],
-            $item->ignoreAuthors
+            $parameters['ignore_authors']
         );
 
         $userUrls = $results[$userId] ?? [];
@@ -93,8 +93,8 @@ class UnreadArticlesResolver
                 $meta = $this->content->fetchUrlMeta($url);
                 if (!$meta) {
                     throw new UserUnreadArticlesResolveException(
-                "Unable to fetch meta for url {$url} when resolving article parameters for userId: {$userId}, templateCode: {$templateCode}")
-                    ;
+                        "Unable to fetch meta for url {$url} when resolving article parameters for userId: {$userId}, templateCode: {$templateCode}"
+                    );
                 }
                 $this->articlesMeta[$url] = $meta;
             }
