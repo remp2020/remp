@@ -223,9 +223,6 @@ class BatchEmailGenerator
             }
         }
 
-        // Resolve all dynamic parameters at once
-        $this->unreadArticlesResolver->resolve();
-
         $this->logger->info('Jobs inserted into mail cache', ['jobsCount' => $jobsCount]);
 
         $priority = $this->batchesRepository->getBatchPriority($batch);
