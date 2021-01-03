@@ -161,16 +161,17 @@ class BatchEmailGenerator
         $totalQueueSize = (clone $queueJobsSelection)->count('*');
         $lastId = PHP_INT_MIN;
         $limit = 1000;
-
         $jobsCount = 0;
-        for ($i = 0; $i <= ceil($totalQueueSize / $limit); $i++) {
+
+        for ($i = 0, $iMax = ceil($totalQueueSize / $limit); $i <= $iMax; $i++) {
+            $userJobOptions = [];
             $queueJobs = (clone $queueJobsSelection)
                 ->where('id > ?', $lastId)
                 ->limit($limit);
 
             /** @var ActiveRow $queueJob */
             foreach ($queueJobs as $queueJob) {
-                $template = $queueJob->mail_template;
+                $template = $queueJob->ref('mail_templates', 'mail_template_id');
                 $userId = $userMap[$queueJob->email];
                 $jobOptions = [
                     'email' => $queueJob->email,
@@ -180,30 +181,40 @@ class BatchEmailGenerator
                     'params' => json_decode($queueJob->params, true) ?? []
                 ];
 
-                // Resolve dynamic parameters (specified by 'extras')
+                // Retrieve dynamic parameters (specified by 'extras')
                 if ($template->extras) {
                     $extras = json_decode($template->extras, true);
                     $extrasHandler = $extras['handler'] ?? null;
 
+                    // Unread articles are resolved for multiple users at once, add them to resolver queue
                     if ($extrasHandler === self::BEAM_UNREAD_ARTICLES_RESOLVER) {
-                        if (isset($extras['parameters'])) {
-                            try {
-                                $additionalParams = $this->unreadArticlesResolver->resolveMailParameters(
-                                    $jobOptions['code'],
-                                    $userId,
-                                    $extras['parameters']
-                                );
-                                foreach ($additionalParams as $name => $value) {
-                                    $jobOptions['params'][$name] = $value;
-                                }
-                            } catch (UserUnreadArticlesResolveException $exception) {
-                                // just log and continue to next user
-                                $this->logger->log(LogLevel::ERROR, $exception->getMessage());
-                                continue;
-                            }
+                        $jobOptions['handler'] = $extrasHandler;
+                        $parameters = $extras['parameters'] ?? false;
+                        if ($parameters) {
+                            $this->unreadArticlesResolver->addToResolveQueue($template->code, $userId, $parameters);
                         }
                     } elseif ($extrasHandler !== null) {
                         $this->logger->log(LogLevel::ERROR, "Unknown extras handler: {$extrasHandler}");
+                    }
+                }
+                $userJobOptions[$userId] = $jobOptions;
+                $lastId = $queueJob->id;
+            }
+
+            // Resolve dynamic parameters for given jobs at once
+            $this->unreadArticlesResolver->resolve();
+
+            foreach ($userJobOptions as $userId => $jobOptions) {
+                if ($jobOptions['handler'] ?? null === self::BEAM_UNREAD_ARTICLES_RESOLVER) {
+                    try {
+                        $additionalParams = $this->unreadArticlesResolver->getResolvedMailParameters($jobOptions['code'], $userId);
+                        foreach ($additionalParams as $name => $value) {
+                            $jobOptions['params'][$name] = $value;
+                        }
+                    } catch (UserUnreadArticlesResolveException $exception) {
+                        // just log and continue to next user
+                        $this->logger->log(LogLevel::ERROR, $exception->getMessage());
+                        continue;
                     }
                 }
 
@@ -215,11 +226,10 @@ class BatchEmailGenerator
                     $jobOptions['context'],
                     $jobOptions['params']
                 );
+
                 if ($result !== false) {
                     $jobsCount++;
                 }
-
-                $lastId = $queueJob->id;
             }
         }
 

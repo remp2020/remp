@@ -9,6 +9,8 @@ class UnreadArticlesResolver
 {
     private $templates = [];
 
+    private $requiredTemplateArticlesCount = [];
+
     private $results = [];
 
     private $articlesMeta = [];
@@ -25,7 +27,7 @@ class UnreadArticlesResolver
         $this->content = $content;
     }
 
-    public function addToResolve(string $templateCode, int $userId, array $parameters): void
+    public function addToResolveQueue(string $templateCode, int $userId, array $parameters): void
     {
         if (!array_key_exists($templateCode, $this->templates)) {
             $item = new \stdClass();
@@ -36,10 +38,19 @@ class UnreadArticlesResolver
             $item->userIds = [];
             $this->templates[$templateCode] = $item;
         }
-
+        // $this->templates queue is cleaned after each resolve, therefore store number of required articles
+        // in an additional property - so we can check later that enough parameters are resolved for each template
+        if (!array_key_exists($templateCode, $this->requiredTemplateArticlesCount)) {
+            $this->requiredTemplateArticlesCount[$templateCode] = $parameters['articles_count'];
+        }
         $this->templates[$templateCode]->userIds[] = $userId;
     }
 
+    /**
+     * Resolves all parameters added to resolve queue (and subsequently empties the queue)
+     * Resolved parameters can be retrieved using getResolvedMailParameters() method
+     * @throws \Exception
+     */
     public function resolve(): void
     {
         foreach ($this->templates as $templateCode => $item) {
@@ -57,78 +68,10 @@ class UnreadArticlesResolver
                 }
             }
         }
+        $this->templates = [];
     }
 
-    public function resolveMailParameters(string $templateCode, int $userId, array $parameters): array
-    {
-        if (!array_key_exists($templateCode, $this->templates)) {
-            $item = new \stdClass();
-            $item->timespan = $parameters['timespan'];
-            $item->articlesCount = $parameters['articles_count'];
-            $item->criteria = $parameters['criteria'];
-            $item->ignoreAuthors = $parameters['ignore_authors'] ?? [];
-            $this->templates[$templateCode] = $item;
-        }
-
-        $results = $this->beamClient->unreadArticles(
-            $parameters['timespan'],
-            $parameters['articles_count'],
-            $parameters['criteria'],
-            [$userId],
-            $parameters['ignore_authors']
-        );
-
-        $userUrls = $results[$userId] ?? [];
-        if (count($userUrls) < $parameters['articles_count']) {
-            throw new UserUnreadArticlesResolveException(
-                "Template $templateCode requires {$parameters['articles_count']} unread articles, user #{$userId} has only {$userUrls}, unable to send personalized email."
-            );
-        }
-
-        $params = [];
-        $headlineTitle = null;
-
-        foreach ($userUrls as $i => $url) {
-            if (!array_key_exists($url, $this->articlesMeta)) {
-                $meta = $this->content->fetchUrlMeta($url);
-                if (!$meta) {
-                    throw new UserUnreadArticlesResolveException(
-                        "Unable to fetch meta for url {$url} when resolving article parameters for userId: {$userId}, templateCode: {$templateCode}"
-                    );
-                }
-                $this->articlesMeta[$url] = $meta;
-            }
-
-            $meta = $this->articlesMeta[$url];
-
-            $counter = $i + 1;
-
-            $params["article_{$counter}_title"] = $meta->getTitle();
-            $params["article_{$counter}_description"] = $meta->getDescription();
-            $params["article_{$counter}_image"] = $meta->getImage();
-            $params["article_{$counter}_href_url"] = $url;
-
-            if (!$headlineTitle) {
-                $headlineTitle = $meta->getTitle();
-            }
-        }
-        $params['headline_title'] = $headlineTitle;
-
-        return $params;
-    }
-
-    private function checkValidParameters(string $templateCode, int $userId): void
-    {
-        // check enough parameters were resolved for template
-        $requiredArticleCount = (int) $this->templates[$templateCode]->articlesCount;
-        $userArticleCount = count($this->results[$templateCode][$userId]);
-
-        if ($userArticleCount < $requiredArticleCount) {
-            throw new UserUnreadArticlesResolveException("Template $templateCode requires $requiredArticleCount unread articles, user #$userId has only $userArticleCount, unable to send personalized email.");
-        }
-    }
-
-    public function getMailParameters(string $templateCode, int $userId): array
+    public function getResolvedMailParameters(string $templateCode, int $userId): array
     {
         $this->checkValidParameters($templateCode, $userId);
 
@@ -161,5 +104,16 @@ class UnreadArticlesResolver
         $params['headline_title'] = $headlineTitle;
 
         return $params;
+    }
+
+    private function checkValidParameters(string $templateCode, int $userId): void
+    {
+        // check enough parameters were resolved for template
+        $requiredArticleCount = (int) $this->requiredTemplateArticlesCount[$templateCode];
+        $userArticleCount = count($this->results[$templateCode][$userId]);
+
+        if ($userArticleCount < $requiredArticleCount) {
+            throw new UserUnreadArticlesResolveException("Template $templateCode requires $requiredArticleCount unread articles, user #$userId has only $userArticleCount, unable to send personalized email.");
+        }
     }
 }
