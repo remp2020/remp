@@ -8,6 +8,8 @@ export default {
 
     userSubscribed: null,
 
+    subscriptionIds: [],
+
     browserId: null,
 
     rempSessionIDKey: "remp_session_id",
@@ -38,6 +40,10 @@ export default {
 
     isUserSubscriber: function() {
         return this.userSubscribed;
+    },
+
+    getSubscriptionIds: function() {
+        return this.subscriptionIds;
     },
 
     getBrowserId: function() {

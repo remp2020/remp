@@ -48,21 +48,22 @@ type Pageview struct {
 	UTMMedium   string `json:"utm_medium"`
 	UTMContent  string `json:"utm_content"`
 
-	Token        string    `json:"token"`
-	Time         time.Time `json:"time"`
-	IP           string    `json:"ip"`
-	UserID       string    `json:"user_id"`
-	URL          string    `json:"url"`
-	UserAgent    string    `json:"user_agent"`
-	BrowserID    string    `json:"browser_id"`
-	SessionID    string    `json:"remp_session_id"`
-	Referer      string    `json:"referer"`
-	Cookies      bool      `json:"cookies"`
-	SignedIn     bool      `json:"signed_in"`
-	Subscriber   bool      `json:"subscriber"`
-	WindowWidth  int       `json:"window_width"`
-	WindowHeight int       `json:"window_height"`
-	Timespent    int       `json:"timespent"`
+	Token           string    `json:"token"`
+	Time            time.Time `json:"time"`
+	IP              string    `json:"ip"`
+	UserID          string    `json:"user_id"`
+	URL             string    `json:"url"`
+	UserAgent       string    `json:"user_agent"`
+	BrowserID       string    `json:"browser_id"`
+	SessionID       string    `json:"remp_session_id"`
+	Referer         string    `json:"referer"`
+	Cookies         bool      `json:"cookies"`
+	SignedIn        bool      `json:"signed_in"`
+	Subscriber      bool      `json:"subscriber"`
+	SubscriptionIDs []string  `json:"subscription_ids"`
+	WindowWidth     int       `json:"window_width"`
+	WindowHeight    int       `json:"window_height"`
+	Timespent       int       `json:"timespent"`
 }
 
 // PageviewRow represents one row of grouped list.

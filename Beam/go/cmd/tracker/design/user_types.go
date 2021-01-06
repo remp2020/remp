@@ -8,6 +8,7 @@ import (
 var User = Type("User", func() {
 	Attribute("id", String, "ID of logged user")
 	Attribute("subscriber", Boolean, "Flag whether user is subscriber (has paid for access)")
+	Attribute("subscription_ids", ArrayOf(String), "List of currently active subscription IDs granting user access")
 	Attribute("browser_id", String, "Anonymized ID of user's browser")
 	Attribute("url", String, "URL of the content/conversion point", func() {
 		Format("uri")
