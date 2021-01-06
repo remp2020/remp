@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added *Newsletter rectangle* banner type to allow subscription to newsletter directly from within the banner. Further configuration and backend proxy is necessary to use the feature. Refer to README and `.env.example` for additional info. remp/remp#618
 - Added missing IE11 polyfill to support `Promise` in IE11. remp/remp#795
 
+### [Mailer]
+
+- Fixed issue with Twitter embeds caused by the external library. remp/remp#796
+
 ## [0.17.0] - 2020-12-21
 
 ### Important
