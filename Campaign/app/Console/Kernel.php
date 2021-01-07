@@ -36,7 +36,7 @@ class Kernel extends ConsoleKernel
         if ($beamJournalConfigured) {
             $schedule->command(AggregateCampaignStats::COMMAND)
                 ->everyMinute()
-                ->withoutOverlapping()
+                ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
                 ->appendOutputTo(storage_path('logs/aggregate_campaign_stats.log'));
         }
 
@@ -56,11 +56,11 @@ class Kernel extends ConsoleKernel
                 foreach ($campaign->segments as $campaignSegment) {
                     $schedule->job(new CacheSegmentJob($campaignSegment, true))
                         ->hourly()
-                        ->withoutOverlapping();
+                        ->withoutOverlapping(config('system.commands_overlapping_expires_at'));
 
                     $schedule->job(new CacheSegmentJob($campaignSegment, false))
                         ->everyMinute()
-                        ->withoutOverlapping();
+                        ->withoutOverlapping(config('system.commands_overlapping_expires_at'));
                 }
             }
         } catch (\PDOException $e) {
