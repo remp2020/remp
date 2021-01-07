@@ -53,7 +53,7 @@ class Kernel extends ConsoleKernel
         // or other unexpected event
         $schedule->command(AggregateConversionEvents::COMMAND)
             ->dailyAt('3:30')
-            ->withoutOverlapping()
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/aggregate_conversion_events.log'));
     }
 
@@ -66,12 +66,12 @@ class Kernel extends ConsoleKernel
         $schedule->command(SnapshotArticlesViews::COMMAND)
             ->everyMinute()
             ->runInBackground()
-            ->withoutOverlapping(5)
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/snapshot_articles_views.log'));
 
         $schedule->command(CompressSnapshots::COMMAND)
             ->dailyAt('02:30')
-            ->withoutOverlapping()
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/compress_snapshots.log'));
     }
 
@@ -83,17 +83,17 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(AggregateArticlesViews::COMMAND, ['--skip-temp-aggregation'])
             ->dailyAt('01:00')
-            ->withoutOverlapping()
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/aggregate_article_views.log'));
 
         $schedule->command(ComputeAuthorsSegments::COMMAND)
             ->dailyAt('02:00')
-            ->withoutOverlapping()
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/compute_author_segments.log'));
 
         $schedule->command(ComputeSectionSegments::COMMAND)
             ->dailyAt('03:00')
-            ->withoutOverlapping()
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/compute_section_segments.log'));
     }
 
@@ -107,13 +107,13 @@ class Kernel extends ConsoleKernel
         $schedule->command(AggregatePageviewLoadJob::COMMAND, ["--now='+1 hour'"])
             ->everyMinute()
             ->runInBackground()
-            ->withoutOverlapping(20)
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/aggregate_pageview_load.log'));
 
         $schedule->command(AggregatePageviewTimespentJob::COMMAND, ["--now='+1 hour'"])
             ->everyMinute()
             ->runInBackground()
-            ->withoutOverlapping(20)
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/aggregate_pageview_timespent.log'));
 
         // Aggregates last full hour only once
@@ -127,17 +127,17 @@ class Kernel extends ConsoleKernel
         
         $schedule->command(ProcessPageviewSessions::COMMAND)
             ->everyFiveMinutes()
-            ->withoutOverlapping()
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/process_pageview_sessions.log'));
 
         $schedule->command(DeleteOldAggregations::COMMAND)
             ->dailyAt('00:10')
-            ->withoutOverlapping()
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/delete_old_aggregations.log'));
 
         $schedule->command(CompressAggregations::COMMAND)
             ->dailyAt('00:20')
-            ->withoutOverlapping()
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/compress_aggregations.log'));
     }
 
