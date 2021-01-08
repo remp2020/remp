@@ -72,6 +72,6 @@ return [
     |
     */
 
-    'params_extra' => explode(",", env('NEWSLETTER_BANNER_PARAMS_EXTRA')),
+    'params_extra' => env('NEWSLETTER_BANNER_PARAMS_EXTRA') ? explode(",", env('NEWSLETTER_BANNER_PARAMS_EXTRA')) : [],
 
 ];
