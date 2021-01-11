@@ -27,6 +27,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed issue with Twitter embeds caused by the external library. remp/remp#796
 
+### [Mailer]
+
+- Added option to show mail template by code in `TemplatePresenter->showByCode` method. remp/crm#1626
+
 ## [0.17.0] - 2020-12-21
 
 ### Important

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use Http\Discovery\Exception\NotFoundException;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
@@ -153,6 +154,15 @@ final class TemplatePresenter extends BasePresenter
         }
 
         $this->template->mailTemplate = $template;
+    }
+
+    public function actionShowByCode(): void
+    {
+        $template = $this->templatesRepository->getByCode($this->params['id']);
+        if (!$template) {
+            throw new NotFoundException('', 404);
+        }
+        $this->redirect('show', ['id' => $template->id]);
     }
 
     public function createComponentDataTableLogs(IDataTableFactory $dataTableFactory): DataTable
