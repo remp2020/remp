@@ -156,9 +156,9 @@ final class TemplatePresenter extends BasePresenter
         $this->template->mailTemplate = $template;
     }
 
-    public function actionShowByCode(): void
+    public function actionShowByCode($id): void
     {
-        $template = $this->templatesRepository->getByCode($this->params['id']);
+        $template = $this->templatesRepository->getByCode($id);
         if (!$template) {
             throw new NotFoundException('', 404);
         }
