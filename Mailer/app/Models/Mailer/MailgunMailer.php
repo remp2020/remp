@@ -69,14 +69,24 @@ class MailgunMailer extends Mailer
             }
             $to[] = $email;
         }
-        foreach ($recipientVariablesHeader as $email => $variables) {
+
+        $messageIdHeader = "%recipient.message_id%";
+        foreach ($recipientVariablesHeader as $key => $variables) {
             $messageId = sprintf(
                 "remp_mailer_%s_%s@%s",
                 microtime(true),
                 Random::generate(16),
                 $this->option('domain')
             );
-            $recipientVariablesHeader[$email]['message_id'] = $messageId;
+
+            if (!is_array($variables)) {
+                // single email sending, header contains array of params for single address, we can set the header directly
+                $messageIdHeader = $messageId;
+                break;
+            }
+
+            // batch sending, header contains array of params per each email address in batch
+            $recipientVariablesHeader[$key]['message_id'] = $messageId;
         }
 
         $attachments = [];
@@ -104,7 +114,7 @@ class MailgunMailer extends Mailer
             'attachment' => $attachments,
             'recipient-variables' => Json::encode($recipientVariablesHeader),
             'h:Precedence' => 'bulk', // https://blog.returnpath.com/precedence/
-            'h:Message-ID' => '%recipient.message_id%',
+            'h:Message-ID' => $messageIdHeader,
         ];
         if ($tag) {
             $data['o:tag'] = $tag;
