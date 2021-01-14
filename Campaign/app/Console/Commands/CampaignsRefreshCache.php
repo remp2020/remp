@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Banner;
+use App\Contracts\SegmentAggregator;
 use Illuminate\Console\Command;
 use App\Campaign;
 
@@ -23,13 +24,19 @@ class CampaignsRefreshCache extends Command
     protected $description = 'Removes cached campaigns and banners and cache the latest version immediately.';
 
     /**
+     * @var SegmentAggregator
+     */
+    private $segmentAggregator;
+
+    /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(SegmentAggregator $segmentAggregator)
     {
         parent::__construct();
+        $this->segmentAggregator = $segmentAggregator;
     }
 
     /**
@@ -39,6 +46,9 @@ class CampaignsRefreshCache extends Command
      */
     public function handle()
     {
+        // serialize segment aggregator (for showtime.php)
+        $this->segmentAggregator->serializeToRedis();
+
         $activeCampaignIds = Campaign::refreshActiveCampaignsCache();
 
         foreach (Campaign::whereIn('id', $activeCampaignIds)->get() as $campaign) {

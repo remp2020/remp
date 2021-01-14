@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added *Newsletter rectangle* banner type to allow subscription to newsletter directly from within the banner. Further configuration and backend proxy is necessary to use the feature. Refer to README and `.env.example` for additional info. remp/remp#618
 - Added missing IE11 polyfill to support `Promise` in IE11. remp/remp#795
 - Added optional env variable `COMMANDS_OVERLAPPING_EXPIRES_AT` which controls overlaping expiration and changed default commands without overlaping expiration to 15 minutes instead of 24 hours. remp/remp#768
+- Moved caching of `SegmentAggregator` (required in `showtime.php`) to HTTP middleware and `CampaignsRefreshCache` command. Done to avoid caching when running `composer install` and its hooks (such as `artisan package:discover`). remp/remp#798
 
 ### [Sso]
 

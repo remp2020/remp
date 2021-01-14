@@ -46,6 +46,39 @@ php artisan db:seed
 - MySQL ^5.7.8
 - Redis ^3.2
 
+### Deployment
+
+#### Commands
+
+For application to function properly you need to run `php artisan campaigns:refresh-cache` command every time the application change is deployed or application configuration (such as `.env`) is changed.
+
+#### Schedule
+
+For application to function properly you need to add Laravel's schedule running into your crontab:
+
+```
+* * * * * php artisan schedule:run >> storage/logs/schedule.log 2>&1
+```
+
+Laravel's scheduler currently includes:
+
+*CacheSegmentJob*:
+
+- Triggered hourly and forced to refresh cache segments.
+
+*AggregateCampaignStats*:
+
+- Triggered every minute, saves statistics about ongoing campaings from Beam Journal (if configured).
+
+#### Queue
+
+For application to function properly, you also need to have Laravel's queue worker running as a daemon. Please follow the
+official documentation's [guidelines](https://laravel.com/docs/5.4/queues#running-the-queue-worker).
+
+```bash
+php artisan queue:work
+```
+
 ### Admin integration with CMS/CRM
 
 ##### Javascript snippet
@@ -254,33 +287,6 @@ Its integration with Campaign tool is optional, but provides ability to see camp
 Information on how to set up Journal API can be found in the [documentation](../Beam/go/cmd/segments/README.md) or in the REMP installation [guidelines](https://gist.github.com/rootpd/9f771b5a5bbb0b0d9a70321cec710511#beam). 
 
 Once Journal API is running, you can enable its integration by pointing `REMP_SEGMENTS_ADDR` to Journal API URL in `.env` configuration file.
-
-### Schedule
-
-For application to function properly you need to add Laravel's schedule running into your crontab:
-
-```
-* * * * * php artisan schedule:run >> storage/logs/schedule.log 2>&1
-```
-
-Laravel's scheduler currently includes:
-
-*CacheSegmentJob*:
-
-- Triggered hourly and forced to refresh cache segments.
-
-*AggregateCampaignStats*:
-
-- Triggered every minute, saves statistics about ongoing campaings from Beam Journal (if configured).
-
-### Queue
-
-For application to function properly, you also need to have Laravel's queue worker running as a daemon. Please follow the
-official documentation's [guidelines](https://laravel.com/docs/5.4/queues#running-the-queue-worker).
-
-```bash
-php artisan queue:work
-```
 
 Laravel's queue currently includes
 

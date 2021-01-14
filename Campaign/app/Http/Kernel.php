@@ -2,7 +2,6 @@
 
 namespace App\Http;
 
-use App\Http\Middleware\JsonApiMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
@@ -21,6 +20,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\ConvertStringBooleans::class,
+        \App\Http\Middleware\SerializeSegmentAggregator::class,
     ];
 
     /**
