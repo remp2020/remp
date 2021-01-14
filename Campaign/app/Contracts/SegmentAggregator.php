@@ -5,10 +5,14 @@ namespace App\Contracts;
 use App\CampaignSegment;
 use Illuminate\Support\Collection;
 use Illuminate\Queue\SerializableClosure;
+use Predis\Client;
+use Redis;
 
 class SegmentAggregator implements SegmentContract
 {
     const TAG = 'segments';
+
+    private const SEGMENT_AGGREGATOR_REDIS_KEY = 'segment_aggregator';
 
     /** @var SegmentContract[] */
     private $contracts = [];
@@ -96,10 +100,31 @@ class SegmentAggregator implements SegmentContract
         return $this->errors;
     }
 
-    public function getSerializableClosure(): SerializableClosure
+    /**
+     * SegmentAggregator contains Guzzle clients which have properties defined as closures.
+     * It's not possible to serialize closures in plain PHP, but Laravel provides a workaround.
+     * This will store a function returning segmentAggregator into the redis which can be later
+     * used in plain PHP to bypass Laravel initialization just to get the aggregator.
+     */
+    public function serializeToRedis()
     {
-        return new SerializableClosure(function () {
+        $serializableClosure = new SerializableClosure(function () {
             return $this;
         });
+        Redis::set(self::SEGMENT_AGGREGATOR_REDIS_KEY, serialize($serializableClosure));
+
+        $dimensionMap = app(\App\Models\Dimension\Map::class);
+        $positionsMap = app(\App\Models\Position\Map::class);
+        $alignmentsMap = app(\App\Models\Alignment\Map::class);
+
+        Redis::set(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY, $dimensionMap->dimensions()->toJson());
+        Redis::set(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY, $positionsMap->positions()->toJson());
+        Redis::set(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY, $alignmentsMap->alignments()->toJson());
+    }
+
+    public static function unserializeFromRedis(Client $redisClient): ?SegmentAggregator
+    {
+        $serializedClosure = $redisClient->get(self::SEGMENT_AGGREGATOR_REDIS_KEY);
+        return $serializedClosure ? unserialize($serializedClosure)() : null;
     }
 }

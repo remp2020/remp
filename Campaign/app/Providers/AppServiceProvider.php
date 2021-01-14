@@ -13,13 +13,12 @@ use Predis\ClientInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
-    const SEGMENT_AGGREGATOR_REDIS_KEY = 'segment_aggregator';
     /**
-     * Bootstrap any application services.
+     * Register any application services.
      *
      * @return void
      */
-    public function boot()
+    public function register()
     {
         $dimensionMap = new \App\Models\Dimension\Map(config('banners.dimensions'));
         $positionsMap = new \App\Models\Position\Map(config('banners.positions'));
@@ -41,28 +40,19 @@ class AppServiceProvider extends ServiceProvider
             return new LazyGeoReader(config("services.maxmind.database"));
         });
 
-
-        $this->bindObservers();
-
-        $segmentAggregator = new SegmentAggregator($this->app->tagged(SegmentAggregator::TAG));
-        $this->app->bind(SegmentAggregator::class, function (Application $app) use ($segmentAggregator) {
-            return $segmentAggregator;
+        $this->app->bind(SegmentAggregator::class, function (Application $app) {
+            return new SegmentAggregator($app->tagged(SegmentAggregator::TAG));
         });
+    }
 
-        /** @var \Illuminate\Http\Request $request */
-        $request = $this->app->request;
-        if (strpos($request->path(), 'showtime') === false) {
-            // SegmentAggregator contains Guzzle clients which have properties defined as closures.
-            // It's not possible to serialize closures in plain PHP, but Laravel provides a workaround.
-            // This will store a function returning segmentAggregator into the redis which can be later
-            // used in plain PHP to bypass Laravel initialization just to get the aggregator.
-            $serializableSegmentAggregator = $segmentAggregator->getSerializableClosure();
-            Redis::set(self::SEGMENT_AGGREGATOR_REDIS_KEY, serialize($serializableSegmentAggregator));
-
-            Redis::set(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY, $dimensionMap->dimensions()->toJson());
-            Redis::set(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY, $positionsMap->positions()->toJson());
-            Redis::set(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY, $alignmentsMap->alignments()->toJson());
-        }
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->bindObservers();
 
         Paginator::useBootstrapThree();
 
@@ -76,14 +66,5 @@ class AppServiceProvider extends ServiceProvider
         \App\CampaignBanner::observe(\App\Observers\CampaignBanner::class);
         \App\CampaignSegment::observe(\App\Observers\CampaignSegment::class);
         \App\Schedule::observe(\App\Observers\Schedule::class);
-    }
-
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
     }
 }

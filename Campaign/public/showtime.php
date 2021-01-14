@@ -4,6 +4,7 @@ use Airbrake\MonologHandler;
 use App\Banner;
 use App\Campaign;
 use App\CampaignBanner;
+use App\Contracts\SegmentAggregator;
 use App\Http\Showtime\LazyDeviceDetector;
 use App\Http\Showtime\LazyGeoReader;
 use App\Http\Showtime\Showtime;
@@ -260,10 +261,10 @@ $redis = new \Predis\Client([
 
 $showtimeResponse = new PlainPhpShowtimeResponse();
 
-/** @var \App\Contracts\SegmentAggregator $segmentAggregator */
-$segmentAggregator = unserialize($redis->get(\App\Providers\AppServiceProvider::SEGMENT_AGGREGATOR_REDIS_KEY))();
+$segmentAggregator = SegmentAggregator::unserializeFromRedis($redis);
 if (!$segmentAggregator) {
-    $showtimeResponse->error($callback, 500, ['unable to get cached segment aggregator']);
+    $logger->error("unable to get cached segment aggregator, have you run 'campaigns:refresh-cache' command?");
+    $showtimeResponse->error($callback, 500, ['Internal error, application might not have been correctly initialized.']);
 }
 
 $deviceDetector = new LazyDeviceDetector($redis);
