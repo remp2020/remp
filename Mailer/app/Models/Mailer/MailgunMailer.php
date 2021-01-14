@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Models\Mailer;
 use Mailgun\Mailgun;
 use Nette\Mail\Message;
 use Nette\Utils\Json;
+use Nette\Utils\Random;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
 
 class MailgunMailer extends Mailer
@@ -68,6 +69,15 @@ class MailgunMailer extends Mailer
             }
             $to[] = $email;
         }
+        foreach ($recipientVariablesHeader as $email => $variables) {
+            $messageId = sprintf(
+                "remp_mailer_%s_%s@%s",
+                microtime(true),
+                Random::generate(16),
+                $this->option('domain')
+            );
+            $recipientVariablesHeader[$email]['message_id'] = $messageId;
+        }
 
         $attachments = [];
         foreach ($message->getAttachments() as $attachment) {
@@ -92,8 +102,9 @@ class MailgunMailer extends Mailer
             'text' => $message->getBody(),
             'html' => $message->getHtmlBody(),
             'attachment' => $attachments,
-            'recipient-variables' => $message->getHeader('X-Mailer-Template-Params'),
+            'recipient-variables' => Json::encode($recipientVariablesHeader),
             'h:Precedence' => 'bulk', // https://blog.returnpath.com/precedence/
+            'h:Message-ID' => '%recipient.message_id%',
         ];
         if ($tag) {
             $data['o:tag'] = $tag;

@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-## [0.17.1] - 2021-01-14
+- Added support for custom Message-ID headers in Mailer in Mailgun implementation. Mailgun reused same Message-ID for all emails within one batch which could cause unexpected behavior. remp/remp#801
+
+## [0.18.0] - 2021-01-14
 
 ### [Beam]
 
