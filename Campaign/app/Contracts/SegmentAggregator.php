@@ -6,7 +6,7 @@ use App\CampaignSegment;
 use Illuminate\Support\Collection;
 use Illuminate\Queue\SerializableClosure;
 use Predis\Client;
-use Redis;
+use Illuminate\Support\Facades\Redis;
 
 class SegmentAggregator implements SegmentContract
 {
