@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\User;
+use App\Models\User;
 use Closure;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;

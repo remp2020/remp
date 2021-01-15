@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\EmailWhitelist;
-use App\GoogleUser;
+use App\Models\GoogleUser;
 use App\Http\Controllers\Controller;
 use App\UrlHelper;
-use App\User;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use JWTAuth;

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\ApiToken;
+use App\Models\ApiToken;
 use App\UrlHelper;
-use App\User;
+use App\Models\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,6 +29,13 @@ class AuthController extends Controller
         }
 
         if ($user = session()->get(User::USER_SUBJECT_SESSION_KEY)) {
+            // Old class (kept for compatibility reasons)
+            if ($user instanceof \App\User) {
+                // reload correct type
+                $user = User::where('email', $user->email)->first();
+                session()->put(User::USER_SUBJECT_SESSION_KEY, $user);
+            }
+
             try {
                 $token = $auth->fromSubject($user);
                 $redirectUrl = $urlHelper->appendQueryParams($successUrl, [

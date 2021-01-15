@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\ApiToken;
+use App\Models\ApiToken;
 use App\Http\Requests\ApiTokenRequest;
 use App\Http\Resources\ApiTokenResource;
 use Yajra\DataTables\DataTables;
