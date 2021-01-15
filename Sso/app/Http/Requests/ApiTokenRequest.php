@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\ApiToken;
+use App\Models\ApiToken;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ApiTokenRequest extends FormRequest
