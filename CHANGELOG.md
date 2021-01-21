@@ -6,7 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
 - Added support for custom Message-ID headers in Mailer in Mailgun implementation. Mailgun reused same Message-ID for all emails within one batch which could cause unexpected behavior. remp/remp#801
+- Fixed type-related issue with Mailgun event daemon processor which caused synchronization not to work.
 
 ### [Sso]
 

@@ -76,7 +76,7 @@ class MailgunEventsCommand extends Command
             /** @var Event $event */
             foreach ($events as $event) {
                 $userVariables = $event->getUserVariables();
-                $date = $event->getEventDate();
+                $date = DateTime::from($event->getEventDate());
                 if ($date > $latestEventTime) {
                     $latestEventTime = $date;
                 }
