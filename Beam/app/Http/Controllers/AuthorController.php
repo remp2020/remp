@@ -6,6 +6,7 @@ use App\Article;
 use App\ArticleAuthor;
 use App\Author;
 use App\Conversion;
+use App\Http\Requests\TopAuthorsSearchRequest;
 use App\Http\Requests\TopSearchRequest;
 use App\Http\Resources\AuthorResource;
 use App\Model\Pageviews\TopSearch;
@@ -353,7 +354,7 @@ class AuthorController extends Controller
             ->make(true);
     }
 
-    public function topAuthors(TopSearchRequest $request, TopSearch $topSearch)
+    public function topAuthors(TopAuthorsSearchRequest $request, TopSearch $topSearch)
     {
         $limit = $request->json('limit');
         $timeFrom = Carbon::parse($request->json('from'));

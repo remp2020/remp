@@ -23,8 +23,28 @@ class TagController extends Controller
             $sectionValueType = 'name';
             $sectionValues = $sections['name'];
         }
+
+        $authors = $request->json('authors');
+        $authorValueType = null;
+        $authorValues = null;
+        if (isset($authors['external_id'])) {
+            $authorValueType = 'external_id';
+            $authorValues = $authors['external_id'];
+        } elseif (isset($authors['name'])) {
+            $authorValueType = 'name';
+            $authorValues = $authors['name'];
+        }
+
         $contentType = $request->json('content_type');
 
-        return response()->json($topSearch->topPostTags($timeFrom, $limit, $sectionValueType, $sectionValues, $contentType));
+        return response()->json($topSearch->topPostTags(
+            $timeFrom,
+            $limit,
+            $sectionValueType,
+            $sectionValues,
+            $authorValueType,
+            $authorValues,
+            $contentType
+        ));
     }
 }
