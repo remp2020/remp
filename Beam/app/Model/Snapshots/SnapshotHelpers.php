@@ -60,6 +60,37 @@ class SnapshotHelpers
     }
 
     /**
+     * Load concurrents histogram for given interval
+     * Concurrents counts are grouped by time, referer_medium
+     * TODO: add caching
+     *
+     * @param JournalInterval $interval
+     * @param array           $externalArticleIds
+     *
+     * @return ArticleViewsSnapshot[]
+     */
+    public function concurrentArticlesHistograms(
+        JournalInterval $interval,
+        array $externalArticleIds
+    ) {
+        /** @var Carbon $from */
+        $from = $interval->timeAfter->tz('UTC');
+        /** @var Carbon $to */
+        $to = $interval->timeBefore->tz('UTC');
+
+        $q = DB::table(ArticleViewsSnapshot::getTableName())
+            ->select('time', 'external_article_id', DB::raw('sum(count) as count'), DB::raw('UNIX_TIMESTAMP(time) as timestamp'))
+            ->where('time', '>=', $from)
+            ->where('time', '<=', $to)
+            ->whereIn('external_article_id', $externalArticleIds)
+            ->groupBy(['time', 'external_article_id'])
+            ->orderBy('external_article_id')
+            ->orderBy('time');
+
+        return $q->get();
+    }
+
+    /**
      * Computes lowest time point (present in DB) per each $intervalMinutes window, in [$from, $to] interval
      *
      * @param Carbon        $from (including)
@@ -77,7 +108,7 @@ class SnapshotHelpers
         bool $addLastMinute = false,
         callable $conditions = null
     ): SnapshotTimePoints {
-    
+
         $q = DB::table(ArticleViewsSnapshot::getTableName())
             ->select('time')
             ->where('time', '>=', $from)

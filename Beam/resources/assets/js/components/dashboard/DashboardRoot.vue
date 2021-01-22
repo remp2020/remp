@@ -42,6 +42,11 @@
                                            class="icon-header zmdi zmdi-accounts zmdi-hc-fw"></i>
                                     </th>
                                     <th style="text-align: left">Article</th>
+                                    <th style="width: 14%; text-align: left">
+                                        <i data-toggle="tooltip"
+                                           data-original-title="Pageviews trend"
+                                           class="icon-header zmdi zmdi-trending-up zmdi-hc-fw"></i>
+                                    </th>
                                     <th style="width: 7%; text-align: left">
                                         <i data-toggle="tooltip"
                                            data-original-title="Engaged Time"
@@ -88,6 +93,10 @@
                                             <small>{{ article.published_at | relativeDate }}</small>
                                         </template>
                                     </td>
+                                    <td v-if="!article.landing_page && article.chartData" :id="`sparkline-${article.external_article_id}`">
+                                        <sparkline-chart :chart-container-id="`sparkline-${article.external_article_id}`" :chart-data="article.chartData"></sparkline-chart>
+                                    </td>
+                                    <td v-else></td>
                                     <td>
                                         {{ article.avg_timespent_string || '' }}
                                     </td>
@@ -180,6 +189,7 @@
     import Options from './Options.vue'
     import axios from 'axios'
     import DashboardGraph from "./DashboardGraph";
+    import SparklineChart from "./SparklineChart";
 
     let props = {
         articlesUrl: {
@@ -218,7 +228,7 @@
         }
     }
 
-    const REFRESH_DATA_TIMEOUT_MS = 7000
+    const REFRESH_DATA_TIMEOUT_MS = 20000
     let loadDataTimer = null
 
     function conversionsCountColor(count, options) {
@@ -257,7 +267,7 @@
 
     export default {
         name: "dashboard-root",
-        components: {DashboardGraph, AnimatedInteger, Options },
+        components: {SparklineChart, DashboardGraph, AnimatedInteger, Options },
         props: props,
         created() {
             document.addEventListener('visibilitychange', this.visibilityChanged)
@@ -331,7 +341,7 @@
                         this.error = error
                         this.loading = false;
                     })
-            }
+            },
         },
         filters: {
             relativeDate(value) {

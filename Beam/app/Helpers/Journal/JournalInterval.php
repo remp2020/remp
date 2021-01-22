@@ -48,6 +48,12 @@ class JournalInterval
                 $this->intervalText = '20m';
                 $this->intervalMinutes = 20;
                 break;
+            case '1day':
+                $this->timeBefore = Carbon::now($tz);
+                $this->timeAfter = $this->timeBefore->copy()->subDay();
+                $this->intervalText = '20m';
+                $this->intervalMinutes = 20;
+                break;
             case '7days':
                 $this->timeAfter = Carbon::today($tz)->subDays(6);
                 $this->timeBefore = Carbon::now($tz);
@@ -71,7 +77,7 @@ class JournalInterval
                 $this->intervalMinutes = $intervalMinutes;
                 break;
             default:
-                throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,7days,30days,all] values, instead '$interval' provided");
+                throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,1day,7days,30days,all] values, instead '$interval' provided");
         }
     }
 

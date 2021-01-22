@@ -531,6 +531,18 @@ class DashboardController extends Controller
         $topPages = [];
         $i = 0;
         $totalConcurrents = 0;
+        $tz = new \DateTimeZone('UTC');
+        $journalInterval = new JournalInterval($tz, '1day');
+
+        $articleQuery = Article::whereIn(
+            'external_id',
+            array_filter($records->pluck('tags.article_id')->toArray())
+        );
+
+        $articles = [];
+        foreach ($articleQuery->get() as $article) {
+            $articles[$article->external_id] = $article;
+        }
         foreach ($records as $record) {
             $totalConcurrents += $record->count;
 
@@ -546,7 +558,7 @@ class DashboardController extends Controller
                 $obj->title = 'Landing page';
                 $obj->landing_page = true;
             } else {
-                $article = Article::where('external_id', $record->tags->article_id)->first();
+                $article = $articles[$record->tags->article_id] ?? null;
                 if (!$article) {
                     continue;
                 }
@@ -554,12 +566,15 @@ class DashboardController extends Controller
                 $obj->landing_page = false;
                 $obj->title = $article->title;
                 $obj->published_at = $article->published_at->toAtomString();
-                $obj->conversions_count = $article->conversions->count();
+                $obj->conversions_count = (clone $article)->conversions->count();
                 $obj->article = $article;
             }
             $topPages[] = $obj;
             $i++;
         }
+
+        // Add chart data into top articles
+        $topPages = $this->addOverviewChartData($topPages, $journalInterval);
 
         // Top articles without landing page(s)
         $topArticles = collect($topPages)->filter(function ($item) {
@@ -577,7 +592,6 @@ class DashboardController extends Controller
         $externalIdsToAbTestFlags = $this->journalHelper->abTestFlagsForArticles($topArticles, Carbon::now()->subMinutes(5));
 
         $threeMonthsAgo = Carbon::now()->subMonths(3);
-
         foreach ($topPages as $item) {
             if ($item->external_article_id) {
                 $secondsTimespent = $externalIdsToTimespent->get($item->external_article_id, 0);
@@ -601,5 +615,147 @@ class DashboardController extends Controller
             'articles' => $topPages,
             'totalConcurrents' => $totalConcurrents,
         ]);
+    }
+
+    /**
+     * @param \stdClass[] $topPages
+     * @param JournalInterval $journalInterval
+     * @return \stdClass[]
+     * @throws \Exception
+     */
+    private function addOverviewChartData(array $topPages, JournalInterval $journalInterval)
+    {
+        $articleIds = array_filter(array_pluck($topPages, 'article.external_id'));
+        //no articles present in the topPages
+        if (empty($articleIds)) {
+            return $topPages;
+        }
+
+        $currentDataSource = config('beam.pageview_graph_data_source');
+
+        switch ($currentDataSource) {
+            case 'snapshots':
+                $articlesChartData = $this->getOverviewChartDataFromSnapshots($articleIds, $journalInterval);
+                break;
+            case 'journal':
+                $articlesChartData = $this->getOverviewChartDataFromJournal($articleIds, $journalInterval);
+                break;
+            default:
+                throw new \Exception("unknown pageviews data source {$currentDataSource}");
+        }
+
+        //add chart data into topPages object
+        $topPages = array_map(function ($topPage) use ($articlesChartData) {
+            if (!isset($topPage->article) || !isset($articlesChartData[$topPage->article->external_id])) {
+                return $topPage;
+            }
+            $topPage->chartData = $articlesChartData[$topPage->article->external_id];
+
+            return $topPage;
+        }, $topPages);
+
+        return $topPages;
+    }
+
+    private function getOverviewChartDataFromSnapshots(array $articleIds, JournalInterval $journalInterval)
+    {
+        $records = $this->snapshotHelpers->concurrentArticlesHistograms($journalInterval, $articleIds);
+        $recordsByArticleId = $records->groupBy('external_article_id');
+
+        $resultsSkeleton = $this->prefillOverviewResults($journalInterval);
+        $articlesChartData = [];
+
+        // use zero-value timePoints as a base so we don't need to worry about missing snapshot values later
+        $articleSkeleton = $this->createArticleSkeleton($resultsSkeleton);
+
+        foreach ($recordsByArticleId as $articleId => $items) {
+            $timePointToMatch = reset($resultsSkeleton)['Date'];
+            $results = $articleSkeleton;
+
+            foreach ($items as $item) {
+                if ($item->timestamp < $resultsSkeleton[$timePointToMatch]['Timestamp']) {
+                    // skip all the data items earlier that the current $timePoint
+                    continue;
+                }
+
+                // move $timePoint iterator forward until it matches item's timestamp
+                do {
+                    $timePointToSet = $timePointToMatch;
+                    $timePointToMatch = next($resultsSkeleton)['Date'];
+                } while ($timePointToMatch && $item->timestamp >= $resultsSkeleton[$timePointToMatch]['Timestamp']);
+
+                // found the $timePoint, set the snapshot value
+                $results[$timePointToSet] = [
+                    't' => $resultsSkeleton[$timePointToSet]['Timestamp'],
+                    'c' => (int) $item->count,
+                ];
+
+                if (!$timePointToMatch) {
+                    break;
+                }
+            }
+
+            $articlesChartData[$articleId] = array_values($results);
+        }
+
+        return $articlesChartData;
+    }
+
+    private function getOverviewChartDataFromJournal(array $articleIds, JournalInterval $journalInterval)
+    {
+        $journalRequest = (new AggregateRequest('pageviews', 'load'))
+            ->addFilter('article_id', ...$articleIds)
+            ->addGroup('article_id')
+            ->setTime($journalInterval->timeAfter, $journalInterval->timeBefore)
+            ->setTimeHistogram($journalInterval->intervalText);
+
+        $pageviewRecords = collect($this->journal->count($journalRequest));
+        $resultsSkeleton = $this->prefillOverviewResults($journalInterval);
+        $articleSkeleton = $this->createArticleSkeleton($resultsSkeleton);
+        $articlesChartData = [];
+
+        foreach ($pageviewRecords as $pageviewRecord) {
+            if (!isset($pageviewRecord->time_histogram)) {
+                continue;
+            }
+
+            $results = $articleSkeleton;
+            foreach ($pageviewRecord->time_histogram as $timeValue) {
+                $results[$timeValue->time]['c'] += $timeValue->value;
+            }
+            $articlesChartData[$pageviewRecord->tags->article_id] = array_values($results);
+        }
+
+        return $articlesChartData;
+    }
+
+    private function prefillOverviewResults(JournalInterval $journalInterval)
+    {
+        $timeIterator = JournalHelpers::getTimeIterator($journalInterval->timeAfter, $journalInterval->intervalMinutes);
+        $results = [];
+
+        while ($timeIterator->lessThan($journalInterval->timeBefore)) {
+            $zuluDate = $timeIterator->toIso8601ZuluString();
+            $results[$zuluDate]['Count'] = 0;
+            $results[$zuluDate]['Date'] = $zuluDate;
+            $results[$zuluDate]['Timestamp'] = $timeIterator->timestamp;
+
+            $timeIterator->addMinutes($journalInterval->intervalMinutes);
+        }
+
+        return $results;
+    }
+
+    private function createArticleSkeleton(array $resultsSkeleton)
+    {
+        $articleSkeleton = [];
+        foreach ($resultsSkeleton as $timePoint => $skeleton) {
+            $articleSkeleton[$timePoint] = [
+                't' => $skeleton['Timestamp'],
+                'c' => 0,
+            ];
+        }
+
+        return $articleSkeleton;
     }
 }
