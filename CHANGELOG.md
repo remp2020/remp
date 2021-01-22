@@ -187,6 +187,10 @@ When deploying this release, **you have to deploy the Segments/Journal app first
 
 - Added prevention of overlapping run of SnapshotArticlesViews command, which may have caused incorrect numbers in Beam dashboard concurrents graph.
 - Added `browser_id` to Commerce model to expose it in commerce-related responses of Segments API.
+- Most read articles endpoint in `DashboardController` now returns data for article pageviews sparkline chart as well. remp/remp#540
+- Added new interval option (1day) into `JournalInterval` helper class. remp/remp#540
+- Pageview sparkline chart data are being retrieved from journal(default) or snapshots, based on `PAGEVIEW_GRAPH_DATA_SOURCE` env variable. remp/remp#540
+- Added new column for pageview charts into dashboard articles overview table. remp/remp#540
 
 ### [Campaign]
 
