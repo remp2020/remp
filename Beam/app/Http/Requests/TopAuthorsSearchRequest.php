@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TopSearchRequest extends FormRequest
+class TopAuthorsSearchRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -38,18 +38,6 @@ class TopSearchRequest extends FormRequest
             'sections.external_id.*' => 'string',
             'sections.name' => 'array',
             'sections.name.*' => 'string',
-            'authors' => ['array', function ($attr, $value, $fail) {
-                if (array_has($value, ['external_id', 'name'])) {
-                    $fail("You can not have both 'external_id' and 'name' arrays specified in authors filter");
-                }
-                if (!array_key_exists('external_id', $value) && !array_key_exists('name', $value)) {
-                    $fail("You have to specify either 'external_id' or 'name' array in authors filter");
-                }
-            }],
-            'authors.external_id' => 'array',
-            'authors.external_id.*' => 'string',
-            'authors.name' => 'array',
-            'authors.name.*' => 'string',
             'content_type' => 'string',
         ];
     }
