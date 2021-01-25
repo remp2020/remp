@@ -411,9 +411,11 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 	for {
 		results, err := scroll.Do(pDB.DB.Context)
 		if err == io.EOF {
+			scroll.Clear(pDB.DB.Context)
 			break
 		}
 		if err != nil {
+			scroll.Clear(pDB.DB.Context)
 			return nil, errors.Wrap(err, "error while reading list data from elastic")
 		}
 

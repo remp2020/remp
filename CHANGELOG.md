@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added option to filter top articles and top tags by author. remp/remp#803
 - [Segments]: Improved live caching of segments, avoiding queries that are not necessary to execute.
+- [Segments]: Explicitly closing open Elastic scrolls once we don't need them anymore, since they're expensive to maintain for Elastic.
 
 ### [Mailer]
 
