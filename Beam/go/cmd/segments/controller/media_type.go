@@ -90,7 +90,7 @@ func (s *Segment) ToMediaType() (*app.Segment, error) {
 		ID:    s.ID,
 		Code:  s.Code,
 		Name:  s.Name,
-		Group: (*SegmentGroup)(&s.Group).ToMediaType(),
+		Group: (*SegmentGroup)(s.Group).ToMediaType(),
 	}
 
 	if s.Criteria.Valid {
@@ -122,7 +122,7 @@ func (s *Segment) ToTinyMediaType() *app.SegmentTiny {
 		ID:    s.ID,
 		Code:  s.Code,
 		Name:  s.Name,
-		Group: (*SegmentGroup)(&s.Group).ToMediaType(),
+		Group: (*SegmentGroup)(s.Group).ToMediaType(),
 	}
 }
 
@@ -133,7 +133,7 @@ func (s *Segment) ToExtendedMediaType(segmentURL string) *app.SegmentExtended {
 		ID:    s.ID,
 		Code:  s.Code,
 		Name:  s.Name,
-		Group: (*SegmentGroup)(&s.Group).ToMediaType(),
+		Group: (*SegmentGroup)(s.Group).ToMediaType(),
 		URL:   &url,
 	}
 }
@@ -146,7 +146,7 @@ func (s *Segment) ToSegmenterMediaType() (*app.SegmentSegmenter, error) {
 		Code:      s.Code,
 		Name:      s.Name,
 		TableName: &tn,
-		Group:     (*SegmentGroup)(&s.Group).ToMediaType(),
+		Group:     (*SegmentGroup)(s.Group).ToMediaType(),
 		GroupID:   &s.Group.ID,
 	}
 

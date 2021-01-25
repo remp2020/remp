@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	ruleSegmentType     = "rule"
 	explicitSegmentType = "explicit"
 )
 
@@ -71,7 +72,7 @@ type Segment struct {
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 
-	Group SegmentGroup  `db:"segment_group"`
+	Group *SegmentGroup `db:"segment_group"`
 	Rules []SegmentRule `db:"segment_rules"`
 }
 
@@ -543,9 +544,24 @@ func (sDB *SegmentDB) ruleUsers(sr SegmentRule, now time.Time, ro RuleOverrides,
 // Cache stores the segments in memory.
 func (sDB *SegmentDB) Cache() error {
 	sm := make(map[string]*Segment)
-	sc := SegmentCollection{}
 
-	err := sDB.MySQL.Select(&sc, "SELECT * FROM segments WHERE active = 1")
+	// prepare map of all active segment groups
+	sgc := SegmentGroupCollection{}
+	err := sDB.MySQL.Select(&sgc, "SELECT segment_groups.* FROM segment_groups INNER JOIN segments ON segment_group_id = segment_groups.id WHERE segments.active = 1")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil
+		}
+		return errors.Wrap(err, "unable to cache segment groups from MySQL")
+	}
+	sgm := make(map[int]*SegmentGroup)
+	for _, sg := range sgc {
+		sgm[sg.ID] = sg
+	}
+
+	// load all active segments with groups and rules
+	sc := SegmentCollection{}
+	err = sDB.MySQL.Select(&sc, "SELECT * FROM segments WHERE active = 1")
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
@@ -554,20 +570,28 @@ func (sDB *SegmentDB) Cache() error {
 	}
 
 	for _, s := range sc {
+		sg, ok := sgm[s.SegmentGroupID]
+		if !ok {
+			sg = &SegmentGroup{}
+			err = sDB.MySQL.Get(sg, "SELECT * FROM segment_groups WHERE id = ?", s.SegmentGroupID)
+			if err != nil {
+				return errors.Wrap(err, fmt.Sprintf("unable to get related segment group for segment [%d]", s.ID))
+			}
+			sgm[s.SegmentGroupID] = sg
+		}
+		s.Group = sg
+	}
+
+	for _, s := range sc {
+		if s.Group.Type != ruleSegmentType {
+			// don't try to load rules for segments not working with rules
+			continue
+		}
 		src, err := sDB.loadSegmentRules(s)
 		if err != nil {
 			return err
 		}
 		s.Rules = src
-	}
-
-	for _, s := range sc {
-		src := SegmentGroup{}
-		err = sDB.MySQL.Get(&src, "SELECT * FROM segment_groups WHERE id = ?", s.SegmentGroupID)
-		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("unable to get related segment group for segment [%d]", s.ID))
-		}
-		s.Group = src
 	}
 
 	old := sDB.Segments

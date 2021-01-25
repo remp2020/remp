@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added option to filter top articles and top tags by author. remp/remp#803
+- [Segments]: Improved live caching of segments, avoiding queries that are not necessary to execute.
 
 ### [Mailer]
 
