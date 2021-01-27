@@ -181,7 +181,7 @@ class ArticleDetailsController extends Controller
         $eventOptions = $request->get('events', []);
         if (in_array('conversions', $eventOptions, false)) {
             $conversions = $article->conversions()
-                ->whereBetween('paid_at', [$journalInterval->timeAfter->tz('UTC'), $journalInterval->timeBefore->tz('UTC')])
+                ->whereBetween('paid_at', [$journalInterval->timeAfter, $journalInterval->timeBefore])
                 ->get();
 
             foreach ($conversions as $conversion) {
@@ -424,8 +424,8 @@ class ArticleDetailsController extends Controller
         $orderOptions = $request->input('order');
         $draw = $request->input('draw');
 
-        $visitedTo = Carbon::parse($request->input('visited_to'), $request->input('tz'))->tz('UTC');
-        $visitedFrom = Carbon::parse($request->input('visited_from'), $request->input('tz'))->tz('UTC');
+        $visitedTo = Carbon::parse($request->input('visited_to'), $request->input('tz'));
+        $visitedFrom = Carbon::parse($request->input('visited_from'), $request->input('tz'));
 
         $ar = (new AggregateRequest('pageviews', 'load'))
             ->setTime($visitedFrom, $visitedTo)

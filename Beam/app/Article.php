@@ -404,4 +404,12 @@ SQL;
         }
         return $this->journalHelpers;
     }
+
+    // TODO: possibly remove after update to Laravel 8 (when upsert is available) or move to BaseModel class.
+    protected function asDateTime($value)
+    {
+        $dateTime = parent::asDateTime($value);
+        $dateTime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+        return $dateTime;
+    }
 }

@@ -98,19 +98,19 @@ class ArticleController extends Controller
             ->groupBy(['articles.id', 'articles.title', 'articles.url', 'articles.published_at']);
 
         if ($request->input('published_from')) {
-            $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC');
+            $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'));
             $articlesQuery->where('published_at', '>=', $publishedFrom);
         }
         if ($request->input('published_to')) {
-            $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC');
+            $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'));
             $articlesQuery->where('published_at', '<=', $publishedTo);
         }
         if ($request->input('conversion_from')) {
-            $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC');
+            $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'));
             $articlesQuery->where('paid_at', '>=', $conversionFrom);
         }
         if ($request->input('conversion_to')) {
-            $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC');
+            $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'));
             $articlesQuery->where('paid_at', '<=', $conversionTo);
         }
         $token = $this->tokenProvider->getToken();
@@ -255,10 +255,10 @@ class ArticleController extends Controller
             ->with(['authors', 'sections', 'tags']);
 
         if ($request->input('published_from')) {
-            $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz'))->tz('UTC'));
+            $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz')));
         }
         if ($request->input('published_to')) {
-            $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz'))->tz('UTC'));
+            $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz')));
         }
         $token = $this->tokenProvider->getToken();
         if ($token) {
@@ -386,7 +386,7 @@ class ArticleController extends Controller
         foreach ($request->get('articles', []) as $a) {
             // When saving to DB, Eloquent strips timezone information,
             // therefore convert to UTC
-            $a['published_at'] = Carbon::parse($a['published_at'])->tz('UTC');
+            $a['published_at'] = Carbon::parse($a['published_at']);
             $a['content_type'] = $a['content_type'] ?? Article::DEFAULT_CONTENT_TYPE;
             $article = Article::upsert($a);
 
@@ -481,7 +481,7 @@ class ArticleController extends Controller
         foreach ($request->get('articles', []) as $a) {
             // When saving to DB, Eloquent strips timezone information,
             // therefore convert to UTC
-            $a['published_at'] = Carbon::parse($a['published_at'])->tz('UTC');
+            $a['published_at'] = Carbon::parse($a['published_at']);
             $a['content_type'] = $a['content_type'] ?? Article::DEFAULT_CONTENT_TYPE;
             $article = Article::upsert($a);
 

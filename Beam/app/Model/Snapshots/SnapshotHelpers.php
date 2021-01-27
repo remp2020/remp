@@ -24,9 +24,9 @@ class SnapshotHelpers
     public function concurrentsHistogram(JournalInterval $interval, $externalArticleId = null, bool $addLastMinute = false)
     {
         /** @var Carbon $from */
-        $from = $interval->timeAfter->tz('UTC');
+        $from = $interval->timeAfter;
         /** @var Carbon $to */
-        $to = $interval->timeBefore->tz('UTC');
+        $to = $interval->timeBefore;
 
         $timePoints = $this->timePoints($from, $to, $interval->intervalMinutes, $addLastMinute, function (Builder $query) use ($externalArticleId) {
             if ($externalArticleId) {
@@ -74,9 +74,9 @@ class SnapshotHelpers
         array $externalArticleIds
     ) {
         /** @var Carbon $from */
-        $from = $interval->timeAfter->tz('UTC');
+        $from = $interval->timeAfter;
         /** @var Carbon $to */
-        $to = $interval->timeBefore->tz('UTC');
+        $to = $interval->timeBefore;
 
         $q = DB::table(ArticleViewsSnapshot::getTableName())
             ->select('time', 'external_article_id', DB::raw('sum(count) as count'), DB::raw('UNIX_TIMESTAMP(time) as timestamp'))
