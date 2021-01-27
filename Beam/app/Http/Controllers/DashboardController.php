@@ -130,10 +130,10 @@ class DashboardController extends Controller
         $interval = $request->get('interval');
         $journalInterval = new JournalInterval($tz, $interval, null, ['today', '7days', '30days']);
 
-        $from = $journalInterval->timeAfter->tz('UTC');
-        $to = $journalInterval->timeBefore->tz('UTC');
+        $from = $journalInterval->timeAfter;
+        $to = $journalInterval->timeBefore;
 
-        $toNextDayStart = (clone $to)->tz($tz)->addDay()->startOfDay()->tz('UTC');
+        $toNextDayStart = (clone $to)->tz($tz)->addDay()->startOfDay();
         $intervalMinutes = $journalInterval->intervalMinutes;
 
         $currentData = $this->snapshotHelpers->concurrentsHistogram($journalInterval, null, true);
@@ -153,7 +153,7 @@ class DashboardController extends Controller
                 $shadowTo = $toNextDayStart->copy()->subWeeks($i);
 
                 // If there was a time shift, remember time needs to be adjusted by the timezone difference
-                $diff = $shadowFrom->tz('utc')->diff($from->tz('utc'));
+                $diff = $shadowFrom->diff($from);
                 $hourDifference = $diff->invert === 0 ? $diff->h : - $diff->h;
 
                 $shadowInterval = clone $journalInterval;
@@ -280,7 +280,7 @@ class DashboardController extends Controller
         $interval = $request->get('interval');
         [$timeBefore, $timeAfter, $intervalText, $intervalMinutes] = $this->getJournalParameters($interval, $tz);
 
-        $endOfDay = (clone $timeAfter)->tz($tz)->endOfDay()->tz('UTC');
+        $endOfDay = (clone $timeAfter)->tz($tz)->endOfDay();
 
         $journalRequest = new AggregateRequest('pageviews', 'load');
         $journalRequest->setTimeAfter($timeAfter);
@@ -308,7 +308,7 @@ class DashboardController extends Controller
                 $to = (clone $timeBefore)->subWeeks($i);
 
                 // If there was a time shift, remember time needs to be adjusted by the timezone difference
-                $diff = $from->tz('utc')->diff($timeAfter->tz('utc'));
+                $diff = $from->diff($timeAfter);
                 $hourDifference = $diff->invert === 0 ? $diff->h : - $diff->h;
 
                 foreach ($this->pageviewRecordsBasedOnRefererMedium($from, $to, $intervalText) as $record) {

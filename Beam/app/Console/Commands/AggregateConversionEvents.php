@@ -210,7 +210,7 @@ class AggregateConversionEvents extends Command
                 $article = Article::where('external_id', $item->article->id)->first();
 
                 if ($article) {
-                    $time = Carbon::parse($item->system->time)->tz('UTC');
+                    $time = Carbon::parse($item->system->time);
                     $timeToConversion = $conversion->paid_at->diffInMinutes($time);
 
                     $toSave[] = [
@@ -253,7 +253,7 @@ class AggregateConversionEvents extends Command
 
                     $processedIds[$item->id] = true;
 
-                    $time = Carbon::parse($item->system->time)->tz('UTC');
+                    $time = Carbon::parse($item->system->time);
                     $timeToConversion = $conversion->paid_at->diffInMinutes($time);
 
                     $step = $item->step;
@@ -309,7 +309,7 @@ class AggregateConversionEvents extends Command
 
                     $processedIds[$item->id] = true;
 
-                    $time = Carbon::parse($item->system->time)->tz('UTC');
+                    $time = Carbon::parse($item->system->time);
                     $timeToConversion = $conversion->paid_at->diffInMinutes($time);
 
                     $toSave[] = [

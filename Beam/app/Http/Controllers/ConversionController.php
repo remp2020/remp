@@ -43,10 +43,10 @@ class ConversionController extends Controller
             ->join('articles', 'articles.id', '=', 'conversions.article_id');
 
         if ($request->input('conversion_from')) {
-            $conversions->where('paid_at', '>=', Carbon::parse($request->input('conversion_from'), $request->input('tz'))->tz('UTC'));
+            $conversions->where('paid_at', '>=', Carbon::parse($request->input('conversion_from'), $request->input('tz')));
         }
         if ($request->input('conversion_to')) {
-            $conversions->where('paid_at', '<=', Carbon::parse($request->input('conversion_to'), $request->input('tz'))->tz('UTC'));
+            $conversions->where('paid_at', '<=', Carbon::parse($request->input('conversion_to'), $request->input('tz')));
         }
 
         return $datatables->of($conversions)
@@ -187,7 +187,7 @@ class ConversionController extends Controller
         foreach ($request->get('conversions', []) as $c) {
             // When saving to DB, Eloquent strips timezone information,
             // therefore convert to UTC
-            $c['paid_at'] = Carbon::parse($c['paid_at'])->tz('UTC');
+            $c['paid_at'] = Carbon::parse($c['paid_at']);
             $conversion = Conversion::firstOrNew([
                 'transaction_id' => $c['transaction_id'],
             ]);
