@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Segments]: Improved live caching of segments, avoiding queries that are not necessary to execute.
 - [Segments]: Explicitly closing open Elastic scrolls once we don't need them anymore, since they're expensive to maintain for Elastic.
 
+### [Campaign]
+
+- Fixed possible issue with campaign stats A/B test evaluation if variant had 100% conversion rate.
+
 ### [Mailer]
 
 - Added support for custom Message-ID headers in Mailer in Mailgun implementation. Mailgun reused same Message-ID for all emails within one batch which could cause unexpected behavior. remp/remp#801

@@ -35,6 +35,11 @@ class Machine
             $simulatedData = [];
 
             foreach ($this->levers as $lever => $arm) {
+                if ($arm->getAttempts() === $arm->getRewards()) {
+                    $simulatedData[$lever] = 1;
+                    continue;
+                }
+
                 // get random variates
                 $beta = new Beta($arm->getRewards(), $arm->getAttempts() - $arm->getRewards());
                 $simulatedData[$lever] = $beta->rand();
