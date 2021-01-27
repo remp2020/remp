@@ -681,7 +681,7 @@ class DashboardController extends Controller
                 // move $timePoint iterator forward until it matches item's timestamp
                 do {
                     $timePointToSet = $timePointToMatch;
-                    $timePointToMatch = next($resultsSkeleton)['Date'];
+                    $timePointToMatch = next($resultsSkeleton)['Date'] ?? null;
                 } while ($timePointToMatch && $item->timestamp >= $resultsSkeleton[$timePointToMatch]['Timestamp']);
 
                 // found the $timePoint, set the snapshot value
