@@ -56,9 +56,7 @@ class StatsController extends Controller
             }
         }
 
-        $utcFrom = (clone $from)->tz('UTC');
-        $utcTo = (clone $to)->tz('UTC');
-        [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $utcFrom, $utcTo);
+        [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $from, $to);
         $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $tz);
 
         foreach ($variantsData as $uuid => $variantData) {

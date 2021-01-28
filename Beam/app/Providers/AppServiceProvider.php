@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Database\MySqlConnection;
 use App\Http\Resources\SearchResource;
 use App\Model\Property\SelectedProperty;
 use App\Model\Config\ConversionRateConfig;
@@ -10,6 +9,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Remp\LaravelHelpers\Database\MySqlConnection;
 
 class AppServiceProvider extends ServiceProvider
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Database;
+namespace Remp\LaravelHelpers\Database;
 
 use DateTimeInterface;
 
