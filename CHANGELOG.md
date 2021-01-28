@@ -6,15 +6,39 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Important
+
+We have identified possibly incorrectly stored values in `timestamp` columns of Beam/Campaign/SSO applications.
+
+This issue could have occurred if your database time_zone was not set to the UTC and used any other local timezone. All features worked correctly, but the underlying date was not stored correctly and issues could have emerged later.
+
+If you're not sure if your database is in UTC, follow these steps to verify and fix the issue. Otherwise you could see incorrect dates in the app after the update to this version. 
+
+1. Check whether your database is configured in UTC. Please run following query in Beam:
+    ```sql
+    select published_at, convert_tz(published_at, '+00:00', @@session.time_zone) from articles order by published_at desc limit 1;
+    ```
+    The result will look like this:
+    ```
+    +---------------------+---------------------------------------------------------+
+    | published_at        | convert_tz(published_at, '+00:00', @@session.time_zone) |
+    +---------------------+---------------------------------------------------------+
+    | 2021-01-25 14:01:04 | 2021-01-25 15:01:04                                     |
+    ```
+
+2. If the two dates are the same, your DB uses UTC and you're fine. Otherwise, proceed to this tutorial: https://gist.github.com/rootpd/c5e04612e47c80a10635a0477a4afa8e.
+
 ### [Beam]
 
 - Added option to filter top articles and top tags by author. remp/remp#803
 - [Segments]: Improved live caching of segments, avoiding queries that are not necessary to execute.
 - [Segments]: Explicitly closing open Elastic scrolls once we don't need them anymore, since they're expensive to maintain for Elastic.
+- Added explicit DB connection time zone to enforce UTC communication between application and database. remp/remp#809
 
 ### [Campaign]
 
 - Fixed possible issue with campaign stats A/B test evaluation if variant had 100% conversion rate.
+- Added explicit DB connection time zone to enforce UTC communication between application and database. remp/remp#809
 
 ### [Mailer]
 
@@ -24,6 +48,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Sso]
 
 - Models from `\App` namespace moved to `App\Models` (compatibility with current Laravel conventions).
+- Added explicit DB connection time zone to enforce UTC communication between application and database. remp/remp#809
 
 ## [0.18.0] - 2021-01-14
 
