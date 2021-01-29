@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use Nette\Database\Context;
+use Nette\Utils\Random;
 use PDOException;
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Repositories\BatchesRepository;
@@ -95,6 +96,7 @@ class BaseFeatureTestCase extends TestCase
             $this->jobQueueRepository,
             $this->batchesRepository,
             $this->listsRepository,
+            $this->mailLogsRepository,
             $this->listVariantsRepository,
             $this->listCategoriesRepository,
             $this->userSubscriptionsRepository,
@@ -119,18 +121,33 @@ SET FOREIGN_KEY_CHECKS=1;
         return $this->container->getByType($className);
     }
 
-    protected function createBatch($template, $mailTypeVariant = null, $context = null)
+    protected function createJob($context, $mailTypeVariant = null, $segmentCode = 'segment', $segmentProvider = 'provider')
     {
-        $mailJob = $this->jobsRepository->add('segment', 'provider', $context, $mailTypeVariant);
-        $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
+        return $this->jobsRepository->add($segmentCode, $segmentProvider, $context, $mailTypeVariant);
+    }
+
+    protected function createBatch($mailJob, $template, $maxEmailsCount = null)
+    {
+        $batch = $this->batchesRepository->add($mailJob->id, $maxEmailsCount, null, BatchesRepository::METHOD_RANDOM);
+        $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
         return $batch;
     }
 
-    protected function createTemplate($layout, $mailType)
+    protected function createJobAndBatch($template, $mailTypeVariant = null, $context = null)
     {
-        return $this->templatesRepository->add('name', 'code', '', 'from@sample.com', 'SUBJECT', 'test', 'test', $layout->id, $mailType->id);
+        $mailJob = $this->createJob($context, $mailTypeVariant);
+        return $this->createBatch($mailJob, $template);
+    }
+
+    protected function createTemplate($layout, $mailType, $code = null)
+    {
+        if (!$code) {
+            $code = 'template_' . Random::generate(15);
+        }
+
+        return $this->templatesRepository->add('name', $code, '', 'from@sample.com', 'SUBJECT', 'test', 'test', $layout->id, $mailType->id);
     }
 
     protected function createMailLayout()

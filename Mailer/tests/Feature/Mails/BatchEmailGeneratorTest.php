@@ -8,6 +8,7 @@ use Remp\MailerModule\Models\Job\MailCache;
 use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Models\Users\IUser;
 use Tests\Feature\BaseFeatureTestCase;
+use Tests\Feature\TestUserProvider;
 
 class BatchEmailGeneratorTest extends BaseFeatureTestCase
 {
@@ -56,7 +57,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $layout = $this->createMailLayout();
         $template = $this->createTemplate($layout, $mailType);
-        $batch = $this->createBatch($template, $mailTypeVariant1);
+        $batch = $this->createJobAndBatch($template, $mailTypeVariant1);
 
         $userList = $this->generateUsers(4);
 
@@ -88,63 +89,103 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $this->assertEquals(2, $this->jobQueueRepository->totalCount());
     }
 
-    public function testFiltering()
+    public function testFiltering2()
     {
+        // TUNE-UP test size (>=220)
+        $allUsersCount = 200;
+        $halfUsersCount = $allUsersCount / 2;
+
         // Prepare data
-        $userList = $this->generateUsers(1000);
+        $allUsersList = $this->generateUsers($allUsersCount);
+        $userProvider = new TestUserProvider($allUsersList);
+        $users1 = array_slice($allUsersList, 0, $halfUsersCount, true);
+        $users2 = array_slice($allUsersList, $halfUsersCount, null, true);
 
-        $aggregator = $this->createConfiguredMock(Aggregator::class, [
-            'users' => array_keys($userList)
+        $aggregator1 = $this->createConfiguredMock(Aggregator::class, [
+            'users' => array_keys($users1)
         ]);
-
-        $context = 'some_context';
-
+        $aggregator2 = $this->createConfiguredMock(Aggregator::class, [
+            'users' => array_keys($users2)
+        ]);
         $layout = $this->createMailLayout();
         $mailType = $this->createMailTypeWithCategory();
-        $template = $this->createTemplate($layout, $mailType);
-        $batch = $this->createBatch($template, null, $context);
 
-        $numberOfSubscribedUsers = 50;
 
-        for ($i = 1; $i <= $numberOfSubscribedUsers; $i++) {
-            $item = $userList[$i];
+        // Test simple job with 1 batch
+        $template1 = $this->createTemplate($layout, $mailType);
+        $batch1 = $this->createJobAndBatch($template1, null, 'context1');
+
+        // Subscriber users
+        $subscribedUsers1 = array_slice($users1, 0, 100);
+        foreach ($subscribedUsers1 as $item) {
             $this->userSubscriptionsRepository->subscribeUser($mailType, $item['id'], $item['email']);
         }
 
-        $userProvider = $this->createMock(IUser::class);
-        $userProvider->method('list')->will($this->onConsecutiveCalls($userList, []));
+        $generator1 = $this->getGenerator($aggregator1, $userProvider);
+        $userMap1 = [];
+
+        // Push all user emails into queue
+        $generator1->insertUsersIntoJobQueue($batch1, $userMap1);
+        $this->assertEquals(count($users1), $this->jobQueueCount($batch1, $template1));
+
+        // Filter those that won't be sent
+        $generator1->filterQueue($batch1);
+        $this->assertEquals(count($subscribedUsers1), $this->jobQueueCount($batch1, $template1));
+
+
+        ////////////
+        // Now create another job with two batches
+        ////////////
+        $context2 = 'context2';
+
+        $template2_1 = $this->createTemplate($layout, $mailType);
+        $template2_2 = $this->createTemplate($layout, $mailType);
+
+        $job2 = $this->createJob($context2);
+        $batch2_1_maxEmailsCount = 20;
+        $batch2_1 = $this->createBatch($job2, $template2_1, $batch2_1_maxEmailsCount);
+        $batch2_2 = $this->createBatch($job2, $template2_2);
+
+        $subscribedUsers2 = array_slice($users2, 0, 100);
+        foreach ($subscribedUsers2 as $item) {
+            $this->userSubscriptionsRepository->subscribeUser($mailType, $item['id'], $item['email']);
+        }
 
         // Simulate some users have already received the same email (create mail_logs entries with same context)
-        $numberOfUserWhoAlreadyReceivedEmail = 7;
-        for ($i = 1; $i <= $numberOfUserWhoAlreadyReceivedEmail; $i++) {
-            $item = $userList[$i];
+        $alreadyReceivedEmailUsers2 = array_slice($users2, 0, 7);
+        foreach ($alreadyReceivedEmailUsers2 as $item) {
             $this->mailLogsRepository->add(
                 $item['email'],
-                $template->subject,
-                $template->id,
-                $batch->mail_job_id,
-                $batch->id,
+                $template2_2->subject,
+                $template2_2->id,
+                $batch2_2->mail_job_id,
+                $batch2_2->id,
                 null,
                 null,
-                $context
+                $context2
             );
         }
 
-        // Test generator
-        $generator = $this->getGenerator($aggregator, $userProvider);
+        $userMap2 = [];
 
-        $userMap = [];
+        $generator2 = $this->getGenerator($aggregator2, $userProvider);
+        // Process first batch
+        $generator2->insertUsersIntoJobQueue($batch2_1, $userMap2);
+        $generator2->filterQueue($batch2_1);
+        $this->assertEquals($batch2_1_maxEmailsCount, $this->jobQueueCount($batch2_1, $template2_1));
 
-        // Push all user emails into queue
-        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        // Process second batch
+        $generator2->insertUsersIntoJobQueue($batch2_2, $userMap2);
+        $generator2->filterQueue($batch2_2);
+        $batch2_2_expectedEmailsCount = count($subscribedUsers2) - $batch2_1_maxEmailsCount - count($alreadyReceivedEmailUsers2);
+        $this->assertEquals($batch2_2_expectedEmailsCount, $this->jobQueueCount($batch2_2, $template2_2));
+    }
 
-        $this->assertEquals(count($userList), $this->jobQueueRepository->totalCount());
-
-        // Filter those that won't be sent
-        $generator->filterQueue($batch);
-
-        $expectedJobQueueCount = $numberOfSubscribedUsers - $numberOfUserWhoAlreadyReceivedEmail;
-
-        $this->assertEquals($expectedJobQueueCount, $this->jobQueueRepository->totalCount());
+    private function jobQueueCount($batch, $template): int
+    {
+        return $this->jobQueueRepository->getTable()->where([
+            'mail_batch_id' => $batch->id,
+            'mail_template_id' => $template->id,
+        ])->count('*');
     }
 }
