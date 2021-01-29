@@ -14,6 +14,7 @@ use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
+use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository;
@@ -58,6 +59,9 @@ class BaseFeatureTestCase extends TestCase
     /** @var UserSubscriptionVariantsRepository */
     protected $userSubscriptionVariantsRepository;
 
+    /** @var LogsRepository */
+    protected $mailLogsRepository;
+
     protected function setUp(): void
     {
         $this->container = $GLOBALS['container'];
@@ -68,6 +72,7 @@ class BaseFeatureTestCase extends TestCase
         $this->templatesRepository = $this->inject(TemplatesRepository::class);
         $this->layoutsRepository = $this->inject(LayoutsRepository::class);
         $this->jobQueueRepository = $this->inject(JobQueueRepository::class);
+        $this->mailLogsRepository = $this->inject(LogsRepository::class);
         $this->batchesRepository = $this->inject(BatchesRepository::class);
         $this->listsRepository = $this->inject(ListsRepository::class);
         $this->listVariantsRepository = $this->inject(ListVariantsRepository::class);
@@ -114,9 +119,9 @@ SET FOREIGN_KEY_CHECKS=1;
         return $this->container->getByType($className);
     }
 
-    protected function createBatch($template, $mailTypeVariant = null)
+    protected function createBatch($template, $mailTypeVariant = null, $context = null)
     {
-        $mailJob = $this->jobsRepository->add('segment', 'provider', null, $mailTypeVariant);
+        $mailJob = $this->jobsRepository->add('segment', 'provider', $context, $mailTypeVariant);
         $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
         $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);

@@ -97,10 +97,12 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             'users' => array_keys($userList)
         ]);
 
+        $context = 'some_context';
+
         $layout = $this->createMailLayout();
         $mailType = $this->createMailTypeWithCategory();
         $template = $this->createTemplate($layout, $mailType);
-        $batch = $this->createBatch($template);
+        $batch = $this->createBatch($template, null, $context);
 
         $numberOfSubscribedUsers = 50;
 
@@ -111,6 +113,22 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $userProvider = $this->createMock(IUser::class);
         $userProvider->method('list')->will($this->onConsecutiveCalls($userList, []));
+
+        // Simulate some users have already received the same email (create mail_logs entries with same context)
+        $numberOfUserWhoAlreadyReceivedEmail = 7;
+        for ($i = 1; $i <= $numberOfUserWhoAlreadyReceivedEmail; $i++) {
+            $item = $userList[$i];
+            $this->mailLogsRepository->add(
+                $item['email'],
+                $template->subject,
+                $template->id,
+                $batch->mail_job_id,
+                $batch->id,
+                null,
+                null,
+                $context
+            );
+        }
 
         // Test generator
         $generator = $this->getGenerator($aggregator, $userProvider);
@@ -125,6 +143,8 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         // Filter those that won't be sent
         $generator->filterQueue($batch);
 
-        $this->assertEquals($numberOfSubscribedUsers, $this->jobQueueRepository->totalCount());
+        $expectedJobQueueCount = $numberOfSubscribedUsers - $numberOfUserWhoAlreadyReceivedEmail;
+
+        $this->assertEquals($expectedJobQueueCount, $this->jobQueueRepository->totalCount());
     }
 }

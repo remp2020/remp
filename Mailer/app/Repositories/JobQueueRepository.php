@@ -127,9 +127,11 @@ SQL;
 
     public function removeAlreadySentContext(ActiveRow $batch, string $context): void
     {
-        $query = "DELETE FROM mail_job_queue WHERE mail_job_queue.mail_batch_id = {$batch->id} AND mail_job_queue.email IN (
-  SELECT email FROM mail_logs WHERE context = '$context')";
-        $this->getDatabase()->query($query);
+        $sql = <<<SQL
+DELETE q.*
+  FROM mail_job_queue q JOIN mail_logs ml ON q.mail_batch_id = ? AND q.email = ml.email AND ml.context = ?
+SQL;
+        $this->getDatabase()->query($sql, $batch->id, $context);
 
         $query = "DELETE mjq1.* 
             FROM mail_job_queue mjq1 
