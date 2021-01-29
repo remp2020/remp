@@ -234,6 +234,20 @@
                             'orderable' => false,
                             'priority' => 1,
                         ],
+                        'first_conversion_source_count' => [
+                            'header' => 'first conversion source count',
+                            'searchable' => false,
+                            'priority' => 1,
+                            'render' => 'number',
+                            'className' => 'text-right',
+                        ],
+                        'last_conversion_source_count' => [
+                            'header' => 'last conversion source count',
+                            'searchable' => false,
+                            'priority' => 1,
+                            'render' => 'number',
+                            'className' => 'text-right',
+                        ],
                         'visits_count' => [
                             'header' => 'visits count',
                             'searchable' => false,

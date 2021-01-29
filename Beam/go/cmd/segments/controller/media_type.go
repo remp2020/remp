@@ -524,6 +524,15 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	if p.Referer != "" {
 		pageview.User.Referer = &p.Referer
 	}
+	if p.DerivedRefererMedium != "" {
+		pageview.User.DerivedRefererMedium = &p.DerivedRefererMedium
+	}
+	if p.DerivedRefererSource != "" {
+		pageview.User.DerivedRefererSource = &p.DerivedRefererSource
+	}
+	if p.DerivedRefererHostWithPath != "" {
+		pageview.User.DerivedRefererHostWithPath = &p.DerivedRefererHostWithPath
+	}
 	if p.BrowserID != "" {
 		pageview.User.BrowserID = &p.BrowserID
 	}

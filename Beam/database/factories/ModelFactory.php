@@ -212,3 +212,17 @@ $factory->define(\App\Model\ArticleViewsSnapshot::class, function (Faker\Generat
         'count' => $faker->numberBetween(1, 1000)
     ];
 });
+
+$factory->define(\App\Model\ConversionCommerceEvent::class, function (Faker\Generator $faker) {
+    $steps = ['checkout', 'payment', 'purchase', 'refund'];
+
+    return [
+        'time' => Carbon::now(),
+        'step' => $steps[array_rand($steps)],
+        'minutes_to_conversion' => $faker->numberBetween(1, 1000),
+        'event_prior_conversion' => $faker->numberBetween(1, 10),
+        'funnel_id' => $faker->numberBetween(1, 10),
+        'amount' => $faker->numberBetween(5, 20),
+        'currency' => $faker->randomElement(['EUR','USD']),
+    ];
+});

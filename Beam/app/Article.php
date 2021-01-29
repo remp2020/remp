@@ -5,10 +5,12 @@ namespace App;
 use App\Helpers\Journal\JournalHelpers;
 use App\Model\ArticleTitle;
 use App\Model\Config\ConversionRateConfig;
+use App\Model\ConversionSource;
 use App\Model\Tag;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
@@ -83,6 +85,11 @@ class Article extends Model implements Searchable
     public function conversions()
     {
         return $this->hasMany(Conversion::class);
+    }
+
+    public function conversionSources()
+    {
+        return $this->hasManyThrough(ConversionSource::class, Conversion::class);
     }
 
     public function pageviews()
