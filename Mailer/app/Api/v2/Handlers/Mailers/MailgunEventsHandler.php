@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Api\v2\Handlers\Mailers;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Remp\MailerModule\Hermes\HermesMessage;
+use Remp\MailerModule\Hermes\RedisDriver;
 use Remp\MailerModule\Models\Mailer\MailgunMailer;
 use Remp\MailerModule\Models\Sender;
 use Tomaj\Hermes\Emitter;
@@ -73,7 +74,7 @@ class MailgunEventsHandler extends BaseHandler
             'timestamp' => $params['event-data']['timestamp'],
             'event' => $params['event-data']['event'],
             'reason' => $params['event-data']['reason'] ?? null,
-        ]));
+        ]), RedisDriver::PRIORITY_LOW);
 
         return new JsonApiResponse(200, ['status' => 'ok']);
     }

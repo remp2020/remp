@@ -7,7 +7,6 @@ use Predis\Client;
 
 class HermesTasksQueue
 {
-    const TASKS_KEY = 'hermes_tasks';
     const STATS_KEY = 'hermes_stats';
 
     /** @var Client */
@@ -43,14 +42,14 @@ class HermesTasksQueue
     }
 
     // Tasks
-    public function addTask(string $task, float $executeAt): bool
+    public function addTask(string $key, string $task, float $executeAt): bool
     {
-        return $this->connect()->zadd(static::TASKS_KEY, [$task => $executeAt]) > 0;
+        return $this->connect()->zadd($key, [$task => $executeAt]) > 0;
     }
 
-    public function getTask(): ?array
+    public function getTask(string $key): ?array
     {
-        $task = $this->connect()->zrangebyscore(static::TASKS_KEY, 0, time(), [
+        $task = $this->connect()->zrangebyscore($key, 0, time(), [
             'LIMIT' => [
                 'OFFSET' => 0,
                 'COUNT' => 1,
@@ -58,18 +57,13 @@ class HermesTasksQueue
         ]);
 
         if (!empty($task)) {
-            $result = $this->connect()->zrem(static::TASKS_KEY, $task);
+            $result = $this->connect()->zrem($key, $task);
             if ($result == 1) {
                 return $task;
             }
         }
 
         return null;
-    }
-
-    public function getAllTask(): array
-    {
-        return $this->connect()->zrange(static::TASKS_KEY, 0, -1, ['withscores' => true]);
     }
 
     // Stats

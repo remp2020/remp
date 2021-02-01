@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
+use Remp\MailerModule\Hermes\RedisDriver;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,7 +29,7 @@ class HeartbeatCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->emitter->emit(new Message('heartbeat', ['executed' => time()]));
+        $this->emitter->emit(new Message('heartbeat', ['executed' => time()]), RedisDriver::PRIORITY_MEDIUM);
         return 0;
     }
 }

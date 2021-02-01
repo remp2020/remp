@@ -51,8 +51,14 @@ If you're not sure if your database is in UTC, follow these steps to verify and 
 
 ### [Mailer]
 
+- **BREAKING**: Service `hermesRestart` was renamed to `hermesShutdown` to correctly indicate its behavior.
+  - If you used it in your configuration, please replace the usage of `hermesRestart` to `hermesShutdown`.
+  - Replace the use of `Tomaj\Hermes\Restart\RedisRestart` to `Tomaj\Hermes\Shutdown\RedisShutdown`.
+  - Replace the use of `Tomaj\Hermes\Restart\SharedFileRestart` to `Tomaj\Hermes\Shutdown\SharedFileShutdown`.
 - Added support for custom Message-ID headers in Mailer in Mailgun implementation. Mailgun reused same Message-ID for all emails within one batch which could cause unexpected behavior. remp/remp#801
 - Fixed type-related issue with Mailgun event daemon processor which caused synchronization not to work.
+- Added support for Hermes message priorities. See `app/config/config.local.neon.example` for example use of registering multiple priority queues for Hermes.
+
 
 ### [Sso]
 

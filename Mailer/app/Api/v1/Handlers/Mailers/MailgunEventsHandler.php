@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
 use Remp\MailerModule\Hermes\HermesMessage;
+use Remp\MailerModule\Hermes\RedisDriver;
 use Remp\MailerModule\Models\Mailer\MailgunMailer;
 use Remp\MailerModule\Models\Sender;
 use Tomaj\Hermes\Emitter;
@@ -49,7 +50,7 @@ class MailgunEventsHandler extends BaseHandler
             'timestamp' => $params['timestamp'],
             'event' => $params['event'],
             'reason' => null,
-        ]));
+        ]), RedisDriver::PRIORITY_LOW);
 
         return new JsonApiResponse(200, ['status' => 'ok']);
     }
