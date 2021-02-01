@@ -8,9 +8,11 @@ use Nette\Http\Response;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Remp\MailerModule\Api\JsonValidationTrait;
+use Remp\MailerModule\Hermes\RedisDriver;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
+use Tomaj\Hermes\Dispatcher;
 use Tomaj\Hermes\Emitter;
 use Tomaj\Hermes\Message;
 use Tomaj\NetteApi\Handlers\BaseHandler;
@@ -93,7 +95,7 @@ class SendEmailHandler extends BaseHandler
             'params' => $payload['params'] ?? [],
             'context' => $payload['context'] ?? null,
             'attachments' => $payload['attachments'] ?? [],
-        ], null, null, $executeAt));
+        ], null, null, $executeAt), RedisDriver::PRIORITY_HIGH);
 
         return new JsonApiResponse(Response::S202_ACCEPTED, ['status' => 'ok', 'message' => "Email was scheduled to be sent."]);
     }

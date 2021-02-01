@@ -7,6 +7,7 @@ use DateTimeZone;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Components\DataTable\DataTable;
+use Remp\MailerModule\Hermes\RedisDriver;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\IDataTableFactory;
@@ -19,6 +20,7 @@ use Remp\MailerModule\Repositories\MailTemplateStatsRepository;
 use Remp\MailerModule\Repositories\MailTypeStatsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
+use Tomaj\Hermes\Dispatcher;
 use Tomaj\Hermes\Emitter;
 use Nette\Utils\DateTime;
 use DateInterval;
@@ -400,7 +402,7 @@ final class ListPresenter extends BasePresenter
         $this->listFormFactory->onCreate = function ($list) use ($presenter) {
             $this->emitter->emit(new HermesMessage('list-created', [
                 'list_id' => $list->id,
-            ]));
+            ]), RedisDriver::PRIORITY_HIGH);
 
             $presenter->flashMessage('Newsletter list was created');
             $presenter->redirect('Show', $list->id);
@@ -409,7 +411,7 @@ final class ListPresenter extends BasePresenter
         $this->listFormFactory->onUpdate = function ($list) use ($presenter) {
             $this->emitter->emit(new HermesMessage('list-updated', [
                 'list_id' => $list->id,
-            ]));
+            ]), RedisDriver::PRIORITY_HIGH);
 
             $presenter->flashMessage('Newsletter list was updated');
             $presenter->redirect('Edit', $list->id);

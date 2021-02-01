@@ -83,7 +83,7 @@ services:
 	mailWorkerCommand:
 		class: Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger)
 		setup:
-			- setRestartInterface(@hermesRestart)
+			- setShutdownInterface(@hermesShutdown)
 
 	templateEngine:
 		class: Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory
@@ -120,12 +120,18 @@ services:
 	dateFormatterFactory:
 		class: Remp\MailerModule\Models\DateFormatterFactory(%locale%, %timezone%)
 
-	# restart hermes and mail worker through hermes_restart key in redis (override in local config with second string argument if you want to change key)
-	hermesRestart: Tomaj\Hermes\Restart\RedisRestart(@redisCache::client())
+	# shutdown hermes and mail worker through hermes_shutdown key in redis (override in local config with second string argument if you want to change key)
+	hermesShutdown: Tomaj\Hermes\Shutdown\PredisShutdown(@redisCache::client())
+	hermesRedisDriver:
+	    class: Remp\MailerModule\Hermes\RedisDriver
+	    setup:
+	        - setupPriorityQueue('hermes_tasks_high', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_HIGH)
+	        - setupPriorityQueue('hermes_tasks', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_MEDIUM)
+	        - setupPriorityQueue('hermes_tasks_low', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_LOW)
 	hermesDispatcher:
-		class: Tomaj\Hermes\Dispatcher(Remp\MailerModule\Hermes\RedisDriver(), @hermesLogger, @hermesRestart)
+		class: Tomaj\Hermes\Dispatcher(@hermesRedisDriver, @hermesLogger, @hermesShutdown)
 	hermesEmitter:
-		class: Tomaj\Hermes\Emitter(Remp\MailerModule\Hermes\RedisDriver(), @hermesLogger)
+		class: Tomaj\Hermes\Emitter(@hermesRedisDriver, @hermesLogger)
 	- Remp\MailerModule\Hermes\HermesTasksQueue(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Repositories\HermesTasksRepository
 

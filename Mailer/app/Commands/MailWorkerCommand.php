@@ -24,7 +24,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
-use Tomaj\Hermes\Restart\RestartInterface;
+use Tomaj\Hermes\Shutdown\ShutdownInterface;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -58,8 +58,8 @@ class MailWorkerCommand extends Command
 
     private $logger;
 
-    /** @var RestartInterface */
-    private $restart;
+    /** @var ShutdownInterface */
+    private $shutdown;
 
     /** @var DateTime */
     private $startTime;
@@ -92,12 +92,13 @@ class MailWorkerCommand extends Command
     }
 
     /**
-     * Set implementation of RestartInterface which should handle graceful shutdowns.
-     * @param RestartInterface $restart
+     * Set implementation of ShutdownInterface which should handle graceful shutdowns.
+     *
+     * @param ShutdownInterface $shutdown
      */
-    public function setRestartInterface(RestartInterface $restart): void
+    public function setShutdownInterface(ShutdownInterface $shutdown): void
     {
-        $this->restart = $restart;
+        $this->shutdown = $shutdown;
     }
 
     /**
@@ -131,9 +132,9 @@ class MailWorkerCommand extends Command
 
         while (true) {
             // graceful shutdown check
-            if ($this->restart && $this->restart->shouldRestart($this->startTime)) {
+            if ($this->shutdown && $this->shutdown->shouldShutdown($this->startTime)) {
                 $now = (new DateTime())->format(DATE_RFC3339);
-                $msg = "Exiting mail worker: restart instruction received '{$now}'.";
+                $msg = "Exiting mail worker: shutdown instruction received '{$now}'.";
                 $output->write("\n<comment>{$msg}</comment>\n");
                 $this->logger->info($msg);
                 return 0;

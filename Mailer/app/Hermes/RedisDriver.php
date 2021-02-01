@@ -6,13 +6,22 @@ namespace Remp\MailerModule\Hermes;
 use Closure;
 use Remp\MailerModule\Repositories\HermesTasksRepository;
 use Tomaj\Hermes\Driver\DriverInterface;
-use Tomaj\Hermes\Driver\RestartTrait;
+use Tomaj\Hermes\Driver\MaxItemsTrait;
+use Tomaj\Hermes\Driver\ShutdownTrait;
+use Tomaj\Hermes\Driver\UnknownPriorityException;
 use Tomaj\Hermes\MessageInterface;
 use Tomaj\Hermes\MessageSerializer;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 class RedisDriver implements DriverInterface
 {
-    use RestartTrait;
+    use ShutdownTrait;
+    use MaxItemsTrait;
+
+    public const PRIORITY_LOW = 100;
+    public const PRIORITY_MEDIUM = 200;
+    public const PRIORITY_HIGH = 300;
 
     private $tasksRepository;
 
@@ -22,6 +31,9 @@ class RedisDriver implements DriverInterface
 
     private $sleepTime = 5;
 
+    /** @var array<int, string>  */
+    private $queues = [];
+
     public function __construct(HermesTasksRepository $tasksRepository, HermesTasksQueue $tasksQueue)
     {
         $this->tasksRepository = $tasksRepository;
@@ -29,7 +41,31 @@ class RedisDriver implements DriverInterface
         $this->serializer = new MessageSerializer();
     }
 
-    public function send(MessageInterface $message): bool
+    public function setupPriorityQueue(string $name, int $priority): void
+    {
+        $this->queues[$priority] = $name;
+    }
+
+    public function setupSleepTime(int $sleepTime): void
+    {
+        $this->sleepTime = $sleepTime;
+    }
+
+    /**
+     * @param int $priority
+     * @return string
+     *
+     * @throws UnknownPriorityException
+     */
+    private function getKey(int $priority): string
+    {
+        if (!isset($this->queues[$priority])) {
+            throw new UnknownPriorityException("Unknown priority {$priority}");
+        }
+        return $this->queues[$priority];
+    }
+
+    public function send(MessageInterface $message, int $priority = self::PRIORITY_MEDIUM): bool
     {
         $task = $this->serializer->serialize($message);
         $executeAt = 0;
@@ -37,7 +73,7 @@ class RedisDriver implements DriverInterface
             $executeAt = $message->getExecuteAt();
         }
 
-        $result = $this->tasksQueue->addTask($task, $executeAt);
+        $result = $this->tasksQueue->addTask($this->getKey($priority), $task, $executeAt);
         if ($result) {
             $this->tasksQueue->incrementType($message->getType());
         }
@@ -45,18 +81,40 @@ class RedisDriver implements DriverInterface
         return $result;
     }
 
-    public function wait(Closure $callback): void
+    public function wait(Closure $callback, array $priorities = []): void
     {
-        while (true) {
-            $this->checkRestart();
+        $queues = $this->queues;
+        krsort($queues, SORT_NUMERIC);
 
-            $message = $this->tasksQueue->getTask();
-            if ($message !== null) {
+        while (true) {
+            $this->checkShutdown();
+            if (!$this->shouldProcessNext()) {
+                break;
+            }
+            $message = null;
+
+            foreach ($queues as $priority => $name) {
+                if (count($priorities) > 0 && !in_array($priority, $priorities, true)) {
+                    continue;
+                }
+
+                $key = $this->getKey($priority);
+
+                $message = $this->tasksQueue->getTask($key);
+                if ($message === null) {
+                    continue;
+                }
+
                 $hermesMessage = $this->serializer->unserialize($message[0]);
                 $this->tasksQueue->decrementType($hermesMessage->getType());
                 if ($hermesMessage->getExecuteAt() > time()) {
-                    $this->send($hermesMessage);
-                    continue;
+                    // This is probably not happening. Verifying with extra logs.
+                    Debugger::log(
+                        'RedisDriver received message with future execution time: ' . $hermesMessage->getExecuteAt(),
+                        ILogger::WARNING
+                    );
+                    $this->send($hermesMessage, $priority);
+                    break;
                 }
 
                 $result = $callback($hermesMessage);
@@ -66,7 +124,11 @@ class RedisDriver implements DriverInterface
                         HermesTasksRepository::STATE_ERROR
                     );
                 }
-            } else {
+                $this->incrementProcessedItems();
+                break;
+            }
+
+            if ($message === null) {
                 sleep($this->sleepTime);
             }
         }
