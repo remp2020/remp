@@ -43,11 +43,13 @@ a.newsletter-rectangle-preview-close::after {
     line-height: 26px;
     font-weight: bold;
     margin-bottom: 15px;
+    margin-top: 18px;
 }
 
 .newsletter-rectangle-text {
     margin-bottom: 15px;
     white-space: pre-line;
+    font-size: 16px;
 }
 
 .newsletter-rectangle-form-label {
