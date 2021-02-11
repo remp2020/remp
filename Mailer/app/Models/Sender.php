@@ -147,7 +147,7 @@ class Sender
         $this->params = array_merge($this->params, $recipient['params'] ?? []);
 
         if (isset($_ENV['UNSUBSCRIBE_URL'])) {
-            $this->params['unsubscribe'] = str_replace($_ENV['UNSUBSCRIBE_URL'], '%type%', $this->template->mail_type->code) . $this->params['autologin'];
+            $this->params['unsubscribe'] = str_replace('%type%', $this->template->mail_type->code, $_ENV['UNSUBSCRIBE_URL']) . $this->params['autologin'];
         }
         if (isset($_ENV['SETTINGS_URL'])) {
             $this->params['settings'] = $_ENV['SETTINGS_URL'] . $this->params['autologin'];
