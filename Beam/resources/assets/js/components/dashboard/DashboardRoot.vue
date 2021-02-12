@@ -42,22 +42,23 @@
                                            class="icon-header zmdi zmdi-accounts zmdi-hc-fw"></i>
                                     </th>
                                     <th style="text-align: left">Article</th>
-                                    <th style="width: 14%; text-align: left">
+                                    <th id="pageviews-chart-column" style="text-align: center">
                                         <i data-toggle="tooltip"
                                            data-original-title="Pageviews trend"
                                            class="icon-header zmdi zmdi-trending-up zmdi-hc-fw"></i>
+                                        <span style="position: relative; bottom: 2px; text-transform: lowercase">24 hours</span>
                                     </th>
-                                    <th style="width: 7%; text-align: left">
+                                    <th style="width: 7%; text-align: center">
                                         <i data-toggle="tooltip"
                                            data-original-title="Engaged Time"
                                            class="icon-header zmdi zmdi-time zmdi-hc-fw"></i>
                                     </th>
-                                    <th style="width: 7%; text-align: left">
+                                    <th style="width: 7%; text-align: center">
                                         <span data-toggle="tooltip"
                                               :data-original-title="conversionRateDescription"
                                               class="icon-header">%</span>
                                     </th>
-                                    <th style="width: 7%; text-align: left">
+                                    <th style="width: 7%; text-align: center">
                                         <i data-toggle="tooltip"
                                            data-original-title="Total conversions"
                                            class="icon-header zmdi zmdi-money zmdi-hc-fw"></i>
@@ -97,15 +98,15 @@
                                         <sparkline-chart :chart-container-id="`sparkline-${article.external_article_id}`" :chart-data="article.chartData"></sparkline-chart>
                                     </td>
                                     <td v-else></td>
-                                    <td>
+                                    <td style="text-align: center">
                                         {{ article.avg_timespent_string || '' }}
                                     </td>
-                                    <td v-if="!article.landing_page && article.conversion_rate"
+                                    <td style="text-align: center" v-if="!article.landing_page && article.conversion_rate"
                                         :class="article.conversion_rate_color">
                                         {{ article.conversion_rate }}
                                     </td>
                                     <td v-else></td>
-                                    <td v-if="!article.landing_page && article.conversions_count"
+                                    <td style="text-align: center" v-if="!article.landing_page && article.conversions_count"
                                         :class="article.conversions_count_color">
                                         {{ article.conversions_count | formatNumber }}
                                     </td>
@@ -180,6 +181,18 @@
 
     span.ab-test.image {
         background: #28f16f;
+    }
+
+    @media (max-width: 500px) {
+        #pageviews-chart-column {
+            min-width: 150px;
+        }
+    }
+
+    @media (min-width: 501px) {
+        #pageviews-chart-column {
+            width: 14%;
+        }
     }
 
 </style>
