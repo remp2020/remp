@@ -163,7 +163,7 @@
                             return html[0].data.replace(/(\r\n|\n|\r)/gm,"");
                         },
                         body: function (data, row, column, node) {
-                            var $dateItem = $(node).find('.datatable-date-render-item');
+                            var $dateItem = $(node).find('.datatable-exportable-item');
 
                             if ($dateItem.length) {
                                 return $dateItem.attr('title');
