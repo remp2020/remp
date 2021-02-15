@@ -185,13 +185,13 @@
 
     @media (max-width: 500px) {
         #pageviews-chart-column {
-            min-width: 150px;
+            min-width: 50px;
         }
     }
 
     @media (min-width: 501px) {
         #pageviews-chart-column {
-            width: 14%;
+            width: 12%;
         }
     }
 
