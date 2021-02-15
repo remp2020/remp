@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Forms;
 use Nette\Application\UI\Form;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
+use Remp\MailerModule\Models\Sender\MailerFactory;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 
@@ -19,15 +20,19 @@ class ListFormFactory
     /** @var ListCategoriesRepository */
     private $listCategoriesRepository;
 
+    private $mailerFactory;
+
     public $onCreate;
     public $onUpdate;
 
     public function __construct(
         ListsRepository $listsRepository,
-        ListCategoriesRepository $listCategoriesRepository
+        ListCategoriesRepository $listCategoriesRepository,
+        MailerFactory $mailerFactory
     ) {
         $this->listsRepository = $listsRepository;
         $this->listCategoriesRepository = $listCategoriesRepository;
+        $this->mailerFactory = $mailerFactory;
     }
 
     public function create(?int $id = null): Form
@@ -59,6 +64,15 @@ class ListFormFactory
 
         $codeInput = $form->addText('code', 'Code')
             ->setRequired("Field 'Code' is required.");
+
+        $mailers = [];
+        $availableMailers =  $this->mailerFactory->getAvailableMailers();
+        array_walk($availableMailers, function ($mailer, $name) use (&$mailers) {
+            $mailers[$name] = get_class($mailer);
+        });
+
+        $form->addSelect('mailer_alias', 'Sending mailer', $mailers)
+            ->setPrompt('Using default mailer set in configuration');
 
         if ($list !== null) {
             $codeInput->setDisabled(true);

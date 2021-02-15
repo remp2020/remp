@@ -62,7 +62,8 @@ class ConfigFormFactory
             ->setDefaultValue($configs[$defaultMailerKey]['value'])
             ->setOption('configOverridden', isset($overriddenConfigs[$defaultMailerKey])
                 ? "{$defaultMailerKey}: {$this->localConfig->value($defaultMailerKey)}"
-                : false);
+                : false)
+            ->setOption('description', 'Can be overwriten in newsletter list detail.');
 
         unset($configs[$defaultMailerKey]); // remove to avoid double populating in internal section lower.
 
