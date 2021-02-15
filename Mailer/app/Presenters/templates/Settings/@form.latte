@@ -12,15 +12,15 @@
                         {input $input, class => 'form-control fg-input'}
                         {label $input, class => 'fg-label' /}
                     </div>
-                    {if $description = $input->getOption('description')}
-                        <div class="small">{$description}</div>
-                    {/if}
                     <div n:if="$input instanceof Nette\Forms\Controls\SelectBox" class="row">
                         <div class="col-sm-12">
                             {label $input /}
                             {input $input, class => 'selectpicker'}
                         </div>
                     </div>
+                    {if $description = $input->getOption('description')}
+                        <small class="help-block">{$description}</small>
+                    {/if}
                     {if $configOverridden = $input->getOption('configOverridden')}
                         <div class="small text-warning">
                             <i class="zmdi zmdi-alert-triangle"></i>

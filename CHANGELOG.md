@@ -59,6 +59,7 @@ If you're not sure if your database is in UTC, follow these steps to verify and 
 - Fixed type-related issue with Mailgun event daemon processor which caused synchronization not to work.
 - Added support for Hermes message priorities. See `app/config/config.local.neon.example` for example use of registering multiple priority queues for Hermes.
 - Fixed injection of `UNSUBSCRIBE_URL` environment variable into the email parameters. Sender was injecting only name of the newsletter list instead of the whole `UNSUBSCRIBE_URL` with `%type%` replaced with the actual newsletter list code. remp2020/remp#87
+- Added option to configure which mailer to use for each mail type (list) separately. remp/remp#793
 
 ### [Sso]
 
