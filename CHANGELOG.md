@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added new function remplib.tracker.setArticle to allow setting article information to REMP JS tracking script after the script was already initialized. remp/crm#1635
+- Added new optional parameter `includeStorageParams` for internal function `addSystemUserParams` to allow `trackCheckout` function gets stored tracking parameters. remp/crm#1617
+
 ## [0.19.0] - 2021-02-16
 
 ### Important

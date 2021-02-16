@@ -20,15 +20,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
  
         _: [],
 
-        article: {
-            id: null,
-            author_id: null,
-            category: null,
-            locked: null,
-            tags: [],
-            variants: {},
-            elementFn: function() { return null },
-        },
+        article: null,
 
         refererMedium: null,
 
@@ -98,35 +90,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 remplib.browserId = config.browserId;
             }
 
-            if (typeof config.article === 'object') {
-                if (typeof config.article.id === 'undefined' || config.article.id === null) {
-                    throw "remplib: configuration tracker.article.id invalid or missing: " + config.article.id
-                }
-                this.article.id = config.article.id;
-                if (typeof config.article.campaign_id !== 'undefined') {
-                    this.article.campaign_id = config.article.campaign_id;
-                }
-                if (typeof config.article.author_id !== 'undefined') {
-                    this.article.author_id = config.article.author_id;
-                }
-                if (typeof config.article.category !== 'undefined') {
-                    this.article.category = config.article.category;
-                }
-                if (config.article.tags instanceof Array) {
-                    this.article.tags = config.article.tags;
-                }
-                if (typeof config.article.variants !== 'undefined') {
-                    this.article.variants = config.article.variants;
-                }
-                if (typeof config.article.locked !== 'undefined') {
-                    this.article.locked = config.article.locked;
-                }
-                if (typeof config.article.elementFn !== 'undefined') {
-                    this.article.elementFn = config.article.elementFn
-                }
-            } else {
-                this.article = null;
-            }
+            this.setArticle(config.article);
 
             let refererMediumType = typeof config.tracker.refererMedium;
             // "explicit_referer_medium" config option is deprecated and was renamed to "refererMedium", checking both for compatibility reasons
@@ -234,6 +198,46 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
 
             this.initialized = true;
+        },
+
+        setArticle: function(article) {
+            if (typeof article === 'object') {
+                if (typeof article.id === 'undefined' || article.id === null) {
+                    throw "remplib: tracker.article.id invalid or missing: " + article.id
+                }
+
+                this.article = {
+                    id: article.id,
+                    author_id: null,
+                    category: null,
+                    locked: null,
+                    tags: [],
+                    variants: {},
+                    elementFn: function() { return null },
+                };
+
+                if (typeof article.campaign_id !== 'undefined') {
+                    this.article.campaign_id = article.campaign_id;
+                }
+                if (typeof article.author_id !== 'undefined') {
+                    this.article.author_id = article.author_id;
+                }
+                if (typeof article.category !== 'undefined') {
+                    this.article.category = article.category;
+                }
+                if (article.tags instanceof Array) {
+                    this.article.tags = article.tags;
+                }
+                if (typeof article.variants !== 'undefined') {
+                    this.article.variants = article.variants;
+                }
+                if (typeof article.locked !== 'undefined') {
+                    this.article.locked = article.locked;
+                }
+                if (typeof article.elementFn !== 'undefined') {
+                    this.article.elementFn = article.elementFn
+                }
+            }
         },
 
         syncSegmentRulesCache: function(e) {
@@ -453,7 +457,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             this.dispatchEvent("pageview", "timespent", params);
         },
 
-        trackCheckout: function(funnelId) {
+        trackCheckout: function(funnelId, includeStorageParams = false) {
             var params = {
                 "step": "checkout",
                 "article": this.article,
@@ -463,7 +467,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 "remp_commerce_id": remplib.uuidv4(),
                 "commerce_session_id": remplib.generateCommerceSessionID(),
             };
-            params = this.addSystemUserParams(params);
+            params = this.addSystemUserParams(params, includeStorageParams);
             this.post(this.url + "/track/commerce", params);
             this.dispatchEvent("commerce", "checkout", params);
         },
@@ -657,7 +661,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         checkWebsocketsSupport: function() {
             remplib.tracker.websocketsSupported = 'WebSocket' in window || false;
         },
-        addSystemUserParams: function(params) {
+        addSystemUserParams: function(params, includeStorageParams = false) {
             const d = new Date();
             params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
 
@@ -666,19 +670,19 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
             if (this.utmBackwardCompatibilityEnabled) {
                 source = {
-                    "rtm_source": this.getParam("rtm_source") !== null ? this.getParam("rtm_source") : this.getParam("utm_source"),
-                    "rtm_medium": this.getParam("rtm_medium") !== null ? this.getParam("rtm_medium") : this.getParam("utm_medium"),
-                    "rtm_campaign": this.getParam("rtm_campaign") !== null ? this.getParam("rtm_campaign") : this.getParam("utm_campaign"),
-                    "rtm_content": this.getParam("rtm_content") !== null ? this.getParam("rtm_content") : this.getParam("utm_content"),
-                    "rtm_variant": this.getParam("rtm_variant") !== null ? this.getParam("rtm_variant") : this.getParam("banner_variant"),
+                    "rtm_source": this.getParam("rtm_source", includeStorageParams) !== null ? this.getParam("rtm_source", includeStorageParams) : this.getParam("utm_source", includeStorageParams),
+                    "rtm_medium": this.getParam("rtm_medium", includeStorageParams) !== null ? this.getParam("rtm_medium", includeStorageParams) : this.getParam("utm_medium", includeStorageParams),
+                    "rtm_campaign": this.getParam("rtm_campaign", includeStorageParams) !== null ? this.getParam("rtm_campaign", includeStorageParams) : this.getParam("utm_campaign", includeStorageParams),
+                    "rtm_content": this.getParam("rtm_content", includeStorageParams) !== null ? this.getParam("rtm_content", includeStorageParams) : this.getParam("utm_content", includeStorageParams),
+                    "rtm_variant": this.getParam("rtm_variant", includeStorageParams) !== null ? this.getParam("rtm_variant", includeStorageParams) : this.getParam("banner_variant", includeStorageParams),
                 };
             } else {
                 source = {
-                    "rtm_source": this.getParam("rtm_source"),
-                    "rtm_medium": this.getParam("rtm_medium"),
-                    "rtm_campaign": this.getParam("rtm_campaign"),
-                    "rtm_content": this.getParam("rtm_content"),
-                    "rtm_variant": this.getParam("rtm_variant"),
+                    "rtm_source": this.getParam("rtm_source", includeStorageParams),
+                    "rtm_medium": this.getParam("rtm_medium", includeStorageParams),
+                    "rtm_campaign": this.getParam("rtm_campaign", includeStorageParams),
+                    "rtm_content": this.getParam("rtm_content", includeStorageParams),
+                    "rtm_variant": this.getParam("rtm_variant", includeStorageParams),
                 };
             }
 
