@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.19.0] - 2021-02-16
+
 ### Important
 
 We have identified possibly incorrectly stored values in `timestamp` columns of Beam/Campaign/SSO applications.
