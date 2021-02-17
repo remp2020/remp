@@ -1378,8 +1378,9 @@ _**Warning:** Previously, `utm_` prefix was used instead of `rtm_` (and `banner_
 To turn it off manually, add the following setting: `rempConfig.tracker.utmBackwardCompatibilityEnabled = false`._
   
 
-If the *source* is not provided, JS library tries to load the values from local storage which were stored last time
-they appeared in the visited URL.
+If the *source* is not provided, JS library tries to load the values from the visited URL.
+
+Information about *article* is sent by default if has been provided within the initialization. You are able to change it before the tracking with function `remplib.tracker.setArticle({id: ...})`.
 
 Here's the list of supported tracking methods:
 
@@ -1390,10 +1391,11 @@ Here's the list of supported tracking methods:
     * `fields`: Extra metadata you want to track with event (e.g. `{foo: bar}`)).
     * `source`: Object with utm parameters (e.g. `{ utm_campaign: "foo" }`). 
     
-* `remplib.tracker.trackCheckout(funnelId)`: tracks checkout commerce event - indicating that user is summarizing the order 
+* `remplib.tracker.trackCheckout(funnelId, includeStorageParams)`: tracks checkout commerce event - indicating that user is summarizing the order 
     * `funnelId`: Reference to funnel bringing user to checkout page. You can use IDs if your system contains referencable
     funnels or string keys otherwise. If your system doesn't support funnels and you don't need to differentiate them,
     use `"default"`.
+    * `includeStorageParams`: Optional boolean flag indicates whether `source` params from local storage should be used.
     
 * `remplib.tracker.trackCheckoutWithSource: function(funnelId, article, source)`: tracks checkout commerce event with custom article source - indicating that user is summarizing his order 
 	* `funnelId`: Reference to funnel bringing user to checkout page. You can use IDs if your system contains
