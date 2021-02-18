@@ -1,4 +1,6 @@
-let mix = require('laravel-mix').webpackConfig({
+const mix = require('laravel-mix')
+
+mix.webpackConfig({
     resolve: {
         symlinks: false,
     },
@@ -14,7 +16,10 @@ if (process.env.REMP_TARGET === 'lib') {
     mix
         .options({
             publicPath: "public/assets/lib/",
-            resourceRoot: "/assets/lib/"
+            resourceRoot: "/assets/lib/",
+            postCss: [
+                require('autoprefixer'),
+            ],
         })
         .js("resources/assets/js/banner.js", "js/banner.js")
         .js("resources/assets/js/remplib.js", "js/remplib.js")
@@ -29,18 +34,14 @@ if (process.env.REMP_TARGET === 'lib') {
     mix
         .options({
             publicPath: "public/assets/vendor/",
-            resourceRoot: "/assets/vendor/"
+            resourceRoot: "/assets/vendor/",
+            postCss: [
+                require('autoprefixer'),
+            ],
         })
         .js("resources/assets/js/app.js", "js/app.js")
         .js("resources/assets/js/banner.js", "js/banner.js")
         .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
         .sass("resources/assets/sass/app.scss", "css/app.css")
-        .extract()
-        .autoload({
-            "jquery": ['$', 'jQuery'],
-            "node-waves": ["Waves"],
-            "autosize": ["autosize"],
-            "vue": ["Vue"],
-            "moment": ["Moment"]
-        });
+        .extract();
 }

@@ -1,4 +1,6 @@
-let mix = require('laravel-mix').webpackConfig({
+const mix = require('laravel-mix');
+
+mix.webpackConfig({
     resolve: {
         symlinks: false,
     },
@@ -14,7 +16,10 @@ if (process.env.REMP_TARGET === 'iota') {
     mix
         .options({
             publicPath: "public/assets/iota/",
-            resourceRoot: "/assets/iota/"
+            resourceRoot: "/assets/iota/",
+            postCss: [
+                require('autoprefixer'),
+            ],
         })
         .js("resources/assets/js/iota.js", "js/iota.js")
 } else if (process.env.REMP_TARGET === 'lib') {
@@ -22,7 +27,10 @@ if (process.env.REMP_TARGET === 'iota') {
     mix
         .options({
             publicPath: "public/assets/lib/",
-            resourceRoot: "/assets/lib/"
+            resourceRoot: "/assets/lib/",
+            postCss: [
+                require('autoprefixer'),
+            ],
         })
         .js("resources/assets/js/remplib.js", "js/remplib.js")
         .polyfill({
@@ -36,18 +44,14 @@ if (process.env.REMP_TARGET === 'iota') {
     mix
         .options({
             publicPath: "public/assets/vendor/",
-            resourceRoot: "/assets/vendor/"
+            resourceRoot: "/assets/vendor/",
+            postCss: [
+                require('autoprefixer'),
+            ],
         })
         .js("resources/assets/js/app.js", "js/app.js")
         .js("resources/assets/js/remplib.js", "js/remplib.js")
         .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
         .sass("resources/assets/sass/app.scss", "css/app.css")
-        .extract()
-        .autoload({
-            "jquery": ['$', 'jQuery'],
-            "node-waves": ["Waves"],
-            "autosize": ["autosize"],
-            "vue": ["Vue"],
-            "moment": ["Moment"]
-        });
+        .extract();
 }

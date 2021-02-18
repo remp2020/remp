@@ -1,5 +1,5 @@
-let mix = require("laravel-mix");
-let publicPath = "www/assets/vendor/";
+const mix = require("laravel-mix");
+const publicPath = "www/assets/vendor/";
 
 mix
     .webpackConfig({
@@ -12,17 +12,13 @@ mix
     })
     .options({
         publicPath: publicPath,
-        resourceRoot: "/assets/vendor/"
+        resourceRoot: "/assets/vendor/",
+        postCss: [
+            require('autoprefixer'),
+        ],
     })
     .js("resources/js/app.js", "js/app.js")
     .sass("resources/sass/vendor.scss", "css/vendor.css")
     .sass("resources/sass/app.scss", "css/app.css")
     .extract()
-    .autoload({
-        "jquery": ['$', 'jQuery'],
-        "node-waves": ["Waves"],
-        "vue": ["Vue"],
-        "moment": ["Moment"],
-        "salvattore": ["salvattore"],
-    })
     .version();

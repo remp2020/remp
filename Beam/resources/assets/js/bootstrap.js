@@ -1,33 +1,13 @@
-var global = require('global');
+const global = require('global');
 
-require('datatables.net');
-require('datatables.net-rowgroup');
-require('datatables.net-responsive');
-
-require('datatables.net-buttons/js/dataTables.buttons.min');
-require('datatables.net-buttons/js/buttons.colVis.min');
-require('datatables.net-buttons/js/buttons.flash.min');
-require('datatables.net-buttons/js/buttons.html5.min');
-require('datatables.net-buttons/js/buttons.print.min');
-
+// vendor libraries we need to use outside of JS files
 global.$ = global.jQuery = require('jquery');
-
-require('bootstrap');
-require('bootstrap-select');
-require('bootstrap-notify');
-
-require('eonasdan-bootstrap-datetimepicker');
-require('jquery-placeholder');
-
-global.autosize = require('autosize');
-
 global.Vue = require('vue');
-
 global.moment = require('moment');
+global.autosize = require('autosize');
+global.Waves = require('node-waves');
 
-Vue.use(require("vuex"));
-require("./filters");
-
+// components used within blade templates
 global.RuleOcurrences = require("./components/RuleOcurrences.vue").default;
 global.RecurrenceSelector = require("./components/RecurrenceSelector.vue").default;
 global.DashboardRoot = require("./components/dashboard/DashboardRoot.vue").default;
@@ -44,3 +24,23 @@ global.$.ajaxSetup({
     headers:
         { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
 });
+
+require('bootstrap');
+require('bootstrap-select');
+require('bootstrap-notify');
+
+require('datatables.net');
+require('datatables.net-rowgroup');
+require('datatables.net-responsive');
+
+require('datatables.net-buttons/js/dataTables.buttons.min');
+require('datatables.net-buttons/js/buttons.colVis.min');
+require('datatables.net-buttons/js/buttons.flash.min');
+require('datatables.net-buttons/js/buttons.html5.min');
+require('datatables.net-buttons/js/buttons.print.min');
+
+require('eonasdan-bootstrap-datetimepicker');
+require('jquery-placeholder');
+
+require("vuex");
+require("./filters");
