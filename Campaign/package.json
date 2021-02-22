@@ -29,7 +29,7 @@
     "bootstrap-select": "^1.13.9",
     "chart.js": "^2.9.3",
     "core-js": "^3.8.1",
-    "datatables.net": "^1.10.19",
+    "datatables.net": "^1.10.22",
     "datatables.net-responsive": "^2.2.3",
     "datatables.net-rowgroup": "^1.1.0",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
