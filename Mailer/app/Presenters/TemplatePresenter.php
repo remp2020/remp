@@ -130,7 +130,7 @@ final class TemplatePresenter extends BasePresenter
         foreach ($templates as $template) {
             $editUrl = $this->link('Edit', $template->id);
             $result['data'][] = [
-                [
+                'actions' => [
                     'show' => $this->link('Show', $template->id),
                     'edit' => $this->link('Edit', $template->id),
                     'duplicate' => $this->link('Duplicate!', $template->id),
