@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed bug for some banner templates if the saved text was too long. remp/remp#819
+- Fixed text warping in campaign form segments list. remp/remp#584
 
 ## [0.19.0] - 2021-02-16
 

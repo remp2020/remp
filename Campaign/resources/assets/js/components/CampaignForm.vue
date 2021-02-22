@@ -208,10 +208,9 @@
                                             <div class="col-md-12">
                                                 <div class="row m-b-10" v-for="(segment,i) in segments" v-if="segment.inclusive == undefined || segment.inclusive" style="line-height: 25px">
                                                     <div class="col-md-12 text-left">
-                                                        {{ segmentMap[segment.code] }}
-                                                        <div class="pull-left m-r-20">
+                                                        <div class="pull-left m-r-10">
                                                             <span v-on:click="removeSegment(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment" style="font-size:1em">&times;</span>
-                                                        </div>
+                                                        </div> {{ segmentMap[segment.code] }}
                                                     </div>
                                                 </div>
                                             </div>
