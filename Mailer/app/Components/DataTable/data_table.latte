@@ -61,13 +61,16 @@
     $(function() {
         $.fn.dataTable.ext.errMode = 'none';
         var dataTable = $('#{$tableId|noescape}').on('error.dt', function(e, settings, techNote, message) {
-            $.notify({
-                message: settings.jqXHR.responseJSON.error
-            }, {
-                allow_dismiss: false,
-                type: 'danger'
-            });
+            if (typeof settings.jqXHR.responseJSON.error !== 'undefined') {
+                $.notify({
+                    message: settings.jqXHR.responseJSON.error
+                }, {
+                    allow_dismiss: false,
+                    type: 'danger'
+                });
+            }
 
+            console.warn('DataTables:', message);
         }).DataTable({
             'responsive': true,
             'columns': [
@@ -90,6 +93,7 @@
                 {/foreach}
                 {if !empty($rowActions)}
                 {
+                    data: 'actions',
                     name: 'actions',
                     orderable: false,
                     render: $.fn.dataTables.render.actions({json_encode($rowActions)|noescape}, {

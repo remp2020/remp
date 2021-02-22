@@ -1,18 +1,20 @@
 {
-  "licenses": [{
-    "type": "MIT",
-    "url": "https://github.com/remp2020/remp/blob/master/LICENSE.md"
-  }],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/remp2020/remp/blob/master/LICENSE.md"
+    }
+  ],
   "private": true,
   "scripts": {
-    "dev": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch-poll": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "hot": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "production": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+    "dev": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch-poll": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "engines": {
-    "node": ">=8.6"
+    "node": ">=12"
   },
   "dependencies": {
     "acorn": "^7.4.0",
@@ -31,7 +33,7 @@
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "global": "^4.3.2",
     "google-material-color": "^1.3.1",
-    "jquery": "3.2.1",
+    "jquery": "3.5.1",
     "jquery-placeholder": "^2.3.1",
     "jquery-typeahead": "^2.11.0",
     "lodash": "^4.17.20",
@@ -44,18 +46,14 @@
     "rison": "^0.1.1",
     "salvattore": "^1.0.9",
     "trumbowyg": "^2.21.0",
-    "vue": "^2.6.10",
-    "vue-loader": "^15.9.3",
-    "vue-template-compiler": "^2.6.10"
+    "vue": "^2.6.10"
   },
   "devDependencies": {
-    "cross-env": "^5.2.0",
-    "laravel-mix": "^4.0.15",
-    "resolve-url-loader": "^2.3.2",
+    "cross-env": "^7.0",
+    "laravel-mix": "^5.0",
+    "resolve-url-loader": "^3.1",
     "sass": "^1.17.4",
-    "sass-loader": "^7.1.0"
-  },
-  "resolutions": {
-    "jquery-typeahead/jquery": "3.2.1"
+    "sass-loader": "^10.0",
+    "vue-template-compiler": "^2.6.10"
   }
 }

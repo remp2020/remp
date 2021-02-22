@@ -1,32 +1,14 @@
-var global = require('global');
+const global = require('global');
 
-require('datatables.net');
-require('datatables.net-rowgroup');
-require('datatables.net-responsive');
-
+// vendor libraries we need to use outside of JS files
 global.$ = global.jQuery = require('jquery');
-
-require('bootstrap');
-require('bootstrap-select');
-require('bootstrap-notify');
-
-require('eonasdan-bootstrap-datetimepicker');
-require('jquery-placeholder');
-require('./farbtastic');
-
-global.autosize = require('autosize');
-
 global.Vue = require('vue');
-
 global.moment = require('moment');
-
+global.autosize = require('autosize');
+global.Waves = require('node-waves');
 global.salvattore = require("salvattore");
-
-global.Chart = require("chart.js");
-
-global.Waves = require("node-waves");
-
 global.noUiSlider = require("nouislider/distribute/nouislider.js");
+global.Chart = require("chart.js");
 
 global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue").default;
 global.Toggle = require("remp/js/components/Toggle.vue").default;
@@ -37,3 +19,15 @@ global.$.ajaxSetup({
     headers:
         { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
 });
+
+require('bootstrap');
+require('bootstrap-select');
+require('bootstrap-notify');
+
+require('datatables.net');
+require('datatables.net-rowgroup');
+require('datatables.net-responsive');
+
+require('eonasdan-bootstrap-datetimepicker');
+require('jquery-placeholder');
+require('./farbtastic');

@@ -88,8 +88,8 @@ services:
 	templateEngine:
 		class: Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory
 		setup:
-		    - register('twig', Remp\MailerModule\Models\ContentGenerator\Engine\TwigEngine())
-		    - defaultEngine('twig')
+			- register('twig', Remp\MailerModule\Models\ContentGenerator\Engine\TwigEngine())
+			- defaultEngine('twig')
 
 	console:
 		class: Symfony\Component\Console\Application
@@ -123,11 +123,11 @@ services:
 	# shutdown hermes and mail worker through hermes_shutdown key in redis (override in local config with second string argument if you want to change key)
 	hermesShutdown: Tomaj\Hermes\Shutdown\PredisShutdown(@redisCache::client())
 	hermesRedisDriver:
-	    class: Remp\MailerModule\Hermes\RedisDriver
-	    setup:
-	        - setupPriorityQueue('hermes_tasks_high', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_HIGH)
-	        - setupPriorityQueue('hermes_tasks', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_MEDIUM)
-	        - setupPriorityQueue('hermes_tasks_low', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_LOW)
+		class: Remp\MailerModule\Hermes\RedisDriver
+		setup:
+			- setupPriorityQueue('hermes_tasks_high', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_HIGH)
+			- setupPriorityQueue('hermes_tasks', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_MEDIUM)
+			- setupPriorityQueue('hermes_tasks_low', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_LOW)
 	hermesDispatcher:
 		class: Tomaj\Hermes\Dispatcher(@hermesRedisDriver, @hermesLogger, @hermesShutdown)
 	hermesEmitter:
@@ -154,7 +154,7 @@ services:
 	contentGenerator:
 		class: Remp\MailerModule\Models\ContentGenerator\ContentGenerator
 		setup:
-		    - register(Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace())
+			- register(Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace())
 
 	mailFactory:
 		class: Remp\MailerModule\Models\Sender\MailerFactory

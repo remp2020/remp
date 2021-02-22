@@ -1,27 +1,26 @@
 {
   "private": true,
   "scripts": {
-    "dev": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch-poll": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "hot": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "dev": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch-poll": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
     "production": "node_modules/npm-run-all/bin/npm-run-all/index.js web-production lib-production",
-    "web-production": "node node_modules/cross-env/dist/bin/cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "lib-dev": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "lib-watch": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "lib-watch-poll": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "lib-hot": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "lib-production": "node node_modules/cross-env/dist/bin/cross-env REMP_TARGET=lib NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "web-production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-dev": "cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-watch": "cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-watch-poll": "cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-hot": "cross-env REMP_TARGET=lib NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "lib-production": "cross-env REMP_TARGET=lib NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "all-dev": "node_modules/npm-run-all/bin/npm-run-all/index.js dev lib-dev",
     "all-watch": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch",
     "all-watch-poll": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch-poll lib-watch-poll",
     "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch"
   },
   "engines": {
-    "node": ">=8.6"
+    "node": ">=12"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.12.1",
     "acorn": "^7.4.0",
     "animate.css": "^3.7.0",
     "autosize": "^4.0.2",
@@ -36,9 +35,9 @@
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "global": "^4.3.2",
     "google-material-color": "^1.3.1",
-    "jquery": "3.2.1",
+    "jquery": "3.5.1",
     "jquery-placeholder": "^2.3.1",
-    "jquery-typeahead": "^2.11.0",
+    "jquery-typeahead": "^2.11",
     "laravel-mix-polyfill": "^2.0.0",
     "lodash": "^4.17.20",
     "material-design-iconic-font": "^2.2.0",
@@ -50,20 +49,16 @@
     "rison": "^0.1.1",
     "salvattore": "^1.0.9",
     "vue": "^2.6.10",
-    "vue-loader": "^13.7.3",
     "vue-slide-up-down": "^1.7.2",
     "vue-template-compiler": "^2.6.10"
   },
-  "resolutions": {
-    "jquery-typeahead/jquery": "3.2.1"
-  },
   "devDependencies": {
-    "axios": "^0.18.0",
-    "cross-env": "^5.2.0",
-    "laravel-mix": "^4.0.15",
+    "axios": "^0.21.1",
+    "cross-env": "^7.0",
+    "laravel-mix": "^5.0",
     "npm-run-all": "^4.1.5",
-    "resolve-url-loader": "2.3.1",
-    "sass": "^1.17.4",
-    "sass-loader": "^7.1.0"
+    "resolve-url-loader": "^3.1",
+    "sass": "^1.32",
+    "sass-loader": "^10.0"
   }
 }

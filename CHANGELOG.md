@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- **BREAKING**: All applications now require Node 12+. Please schedule update of Node accordingly.
+
 ### [Beam]
 
 - Added new function remplib.tracker.setArticle to allow setting article information to REMP JS tracking script after the script was already initialized. remp/crm#1635
