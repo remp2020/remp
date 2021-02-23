@@ -47,7 +47,8 @@ class TemplatesRepository extends Repository
         int $layoutId,
         int $typeId,
         ?bool $clickTracking = null,
-        ?string $extras = null
+        ?string $extras = null,
+        bool $attachmentsEnabled = true
     ) {
         if ($this->exists($code)) {
             throw new TemplatesCodeNotUniqueException("Template code [$code] is already used.");
@@ -67,7 +68,8 @@ class TemplatesRepository extends Repository
             'mail_type_id' => $typeId,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
-            'extras' => $extras
+            'extras' => $extras,
+            'attachments_enabled' => $attachmentsEnabled
         ]);
 
         if (is_numeric($result)) {

@@ -1406,6 +1406,7 @@ Gets list of available email templates.
 
 | Name | Value | Required | Description |
 | --- |---| --- | --- |
+| codes | *String[]* | no | If provided, list only email templates for given mail_template codes.
 | mail_type_codes | *String[]* | no | If provided, list only email templates for given mail_type codes. 
 | with_mail_types | *Boolean* | no | If true, each returned email template contains additional parameters about assigned mail_type.
 
@@ -1427,6 +1428,7 @@ Response:
         "code": "reset_password",
         "name": "Password reset",
         "mail_type_code": "system",
+        "attachments_enabled": true,
         "mail_type": {
             "code": "system",
             "title": "System emails",

@@ -22,14 +22,19 @@ class MailTemplatesListingHandler extends BaseHandler
     public function params()
     {
         return [
+            new InputParam(InputParam::TYPE_GET, 'codes', InputParam::OPTIONAL, null, true),
             new InputParam(InputParam::TYPE_GET, 'mail_type_codes', InputParam::OPTIONAL, null, true),
-            new InputParam(InputParam::TYPE_GET, 'with_mail_types', InputParam::OPTIONAL),
+            new InputParam(InputParam::TYPE_GET, 'with_mail_types', InputParam::OPTIONAL)
         ];
     }
 
     public function handle($params)
     {
         $results = $this->templatesRepository->all();
+
+        if (isset($params['codes'])) {
+            $results->where(['mail_templates.code' => $params['codes']]);
+        }
 
         if (isset($params['mail_type_codes'])) {
             $results->where(['mail_type.code' => $params['mail_type_codes']]);
@@ -44,6 +49,7 @@ class MailTemplatesListingHandler extends BaseHandler
                 'name' => $row->name,
                 'description' => $row->description,
                 'mail_type_code' => $row->mail_type->code,
+                'attachments_enabled' => $row->attachments_enabled
             ];
             if ($withMailTypes) {
                 $item['mail_type'] = [
