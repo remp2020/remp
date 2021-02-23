@@ -60,11 +60,6 @@
     100% { opacity: 1; transform: translate(0px,0px) }
 }
 
-.remp-banner a:before, .remp-banner a:after,
-.remp-banner div:before, .remp-banner div:after {
-    content: none;
-}
-
 .remp-banner-text-input {
     /* Different fonts display accent characters in different ways,
      * e.g. putting 'ACUTE ACCENT' unicode char as a accent character on the following letter, therefore treating it as a normal letter accent.
