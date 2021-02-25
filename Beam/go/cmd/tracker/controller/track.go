@@ -135,10 +135,7 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 		return ctx.NotFound()
 	}
 
-	tags := map[string]string{
-		"category": ctx.Payload.Category,
-		"action":   ctx.Payload.Action,
-	}
+	tags := map[string]string{}
 	if ctx.Payload.RempEventID != nil {
 		tags["remp_event_id"] = *ctx.Payload.RempEventID
 	} else {
@@ -160,6 +157,10 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	}
 
 	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
+
+	tags["category"] = ctx.Payload.Category
+	tags["action"] = ctx.Payload.Action
+
 	if err := c.pushInternal(model.TableEvents, ctx.Payload.System.Time, tags, fields); err != nil {
 		return err
 	}
@@ -186,9 +187,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		return ctx.NotFound()
 	}
 
-	tags := map[string]string{
-		"category": model.CategoryPageview,
-	}
+	tags := map[string]string{}
 	fields := map[string]interface{}{}
 
 	var measurement string
@@ -235,6 +234,8 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	} else {
 		fields[model.FlagArticle] = false
 	}
+
+	tags["category"] = model.CategoryPageview
 
 	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
 	if err := c.pushInternal(measurement, ctx.Payload.System.Time, tags, fields); err != nil {
