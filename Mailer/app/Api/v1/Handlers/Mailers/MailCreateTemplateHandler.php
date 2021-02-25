@@ -38,6 +38,7 @@ class MailCreateTemplateHandler extends BaseHandler
             new InputParam(InputParam::TYPE_POST, 'subject', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'template_text', InputParam::REQUIRED),
             new InputParam(InputParam::TYPE_POST, 'template_html', InputParam::REQUIRED),
+            new InputParam(InputParam::TYPE_POST, 'click_tracking', InputParam::OPTIONAL),
             new InputParam(InputParam::TYPE_POST, 'extras', InputParam::OPTIONAL),
         ];
     }
@@ -51,9 +52,17 @@ class MailCreateTemplateHandler extends BaseHandler
         }
 
         $mailType = $this->listsRepository->findBy('code', $params['mail_type_code']);
-
         if (!$mailType) {
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'mail_type_code not found']);
+        }
+
+        $clickTracking = null;
+        if (isset($params['click_tracking'])) {
+            $clickTracking = filter_var(
+                $params['click_tracking'] ?? null,
+                FILTER_VALIDATE_BOOLEAN,
+                FILTER_NULL_ON_FAILURE
+            );
         }
 
         $extras = $params['extras'] ?? null;
@@ -72,11 +81,15 @@ class MailCreateTemplateHandler extends BaseHandler
             $params['template_html'],
             (int) $params['mail_layout_id'],
             $mailType->id,
-            null,
+            $clickTracking,
             $extras
         );
 
-        return new JsonApiResponse(200, ['status' => 'ok', 'id' => $template->id]);
+        return new JsonApiResponse(200, [
+            'status' => 'ok',
+            'id' => $template->id,
+            'code' => $template->code,
+        ]);
     }
 
     private function isJson($string)
