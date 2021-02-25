@@ -1463,6 +1463,7 @@ Creates new email template. Endpoint complements creation of template via web in
 | subject | *String* | yes | Email subject. |
 | template_text | *String* | yes | Text version used as a fallback by email clients. |
 | template_html | *String* | yes | HTML (primary) version of email that people will see. HTML version is being previewed in the form for creation of new email. |
+| click_tracking | *Boolean* | no | Boolean flag to determine whether click tracking should be attempted on created template. If not provided, system's default settings is used. |
 | extras | *String* | no | JSON-encoded arbitrary metadata used internally for email personalization and just-in-time (per-user when sending) email content injection |
 
 ##### *Example:*
@@ -1480,7 +1481,8 @@ Response:
 ```json5
 {
     "status": "ok",
-    "id": 24832 // Integer; ID of created email
+    "id": 24832, // Integer; ID of created email
+    "code": "20161108_breaking_news_trump_elected_president" // String; code of created email
 }
 ```
 

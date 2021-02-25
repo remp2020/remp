@@ -9,7 +9,8 @@ services:
 
   campaign:
     environment:
-      XDEBUG_CONFIG: "remote_host=172.17.0.1" # find the ip of your host machine within docker network
+      XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
+      PHP_IDE_CONFIG: "serverName=campaign.remp.press"
 
     # add these volumes only after initial installation (containers would override each others cache otherwise)
     #volumes:
@@ -18,7 +19,8 @@ services:
 
   mailer:
     environment:
-      XDEBUG_CONFIG: "remote_host=172.17.0.1" # find the ip of your host machine within docker network
+      XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
+      PHP_IDE_CONFIG: "serverName=mailer.remp.press"
 
     # add these volumes only after initial installation (containers would override each others cache otherwise)
     #volumes:
@@ -27,7 +29,8 @@ services:
 
   beam:
     environment:
-      XDEBUG_CONFIG: "remote_host=172.17.0.1" # find the ip of your host machine within docker network
+      XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
+      PHP_IDE_CONFIG: "serverName=beam.remp.press"
 
     # add these volumes only after initial installation (containers would override each others cache otherwise)
     #volumes:
@@ -36,7 +39,8 @@ services:
 
   sso:
     environment:
-      XDEBUG_CONFIG: "remote_host=172.17.0.1" # find the ip of your host machine within docker network
+      XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
+      PHP_IDE_CONFIG: "serverName=sso.remp.press"
 
     # add these volumes only after initial installation (containers would override each others cache otherwise)
     #volumes:

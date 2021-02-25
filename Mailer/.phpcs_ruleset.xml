@@ -8,7 +8,6 @@
     <!-- do not sniff migrations, assets and Tyzden's migration_scripts -->
     <arg name="ignore" value="*/migrations/*" />
 
-
     <!-- RULESET ################################################ -->
     <!-- use PSR2 as base for rules -->
     <rule ref="PSR2" />
