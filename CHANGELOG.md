@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed bug for some banner templates if the saved text was too long. remp/remp#819
 - Fixed text warping in campaign form segments list. remp/remp#584
+- Added emitting of `remp:showtimeReady` JS event when all banners from showtime were processed. Event can be used when you want to run your implementation after the showtime asynchronous execution. remp/web#1393 
 
 ### [Mailer]
 

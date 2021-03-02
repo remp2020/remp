@@ -57,20 +57,43 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             },
             processResponse: function(result) {
                 if (!result["success"]) {
+                    window.dispatchEvent(
+                        new CustomEvent("remp:showtimeReady")
+                    );
                     return;
                 }
-                for (let exec = result.data || [], c = 0; c < exec.length; c++) {
-                    try {
-                        let fn = new Function(exec[c]);
-                        setTimeout(fn(), 0);
-                    } catch (u) {
-                        console.error("campaign showtime error:", u)
-                    }
-                }
-                let event = new CustomEvent("campaign_showtime", {
+
+                // deprecated
+                window.dispatchEvent(new CustomEvent("campaign_showtime", {
                     detail: result.providerData,
-                });
-                window.dispatchEvent(event);
+                }));
+
+                let promises = [];
+                for (let exec = result.data || [], c = 0; c < exec.length; c++) {
+                    let fn = new Function(exec[c]);
+                    promises.push(
+                        new Promise(function (resolve, reject) {
+                            try {
+                                fn();
+                                return resolve(true);
+                            } catch (u) {
+                                console.error("remplib: campaign showtime error:", u)
+                                reject("campaign showtime error: " + u)
+                            }
+                        }, 500)
+                    );
+                }
+
+                Promise.all(promises).then((res) => {
+                    window.dispatchEvent(
+                        new CustomEvent("remp:showtimeReady")
+                    );
+                }).catch(() => {
+                    window.dispatchEvent(
+                        new CustomEvent("remp:showtimeError")
+                    );
+                });;
+
                 remplib.campaign.incrementPageviewCountForCampaigns(result.activeCampaignIds);
             },
         },
