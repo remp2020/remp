@@ -87,6 +87,11 @@ var run = function() {
                 banner.show = false;
             }, banner.closeTimeout);
         }
+
+        if (typeof resolve !== "undefined") {
+            resolve(true);
+        }
+
         remplib.campaign.handleBannerDisplayed(banner.campaignUuid, banner.uuid, banner.variantUuid);
     }, banner.displayDelay);
 };

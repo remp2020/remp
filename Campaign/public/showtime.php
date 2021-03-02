@@ -202,6 +202,10 @@ var run = function() {
             remplib.campaign.handleBannerDisplayed(banner.campaignUuid, banner.uuid, banner.variantUuid);    
         }
         
+        if (typeof resolve !== "undefined") {
+            resolve(true);    
+        }
+        
     }, banner.displayDelay);
 };
 

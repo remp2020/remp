@@ -70,12 +70,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
                 let promises = [];
                 for (let exec = result.data || [], c = 0; c < exec.length; c++) {
-                    let fn = new Function(exec[c]);
+                    let fn = new Function('resolve', exec[c]);
                     promises.push(
                         new Promise(function (resolve, reject) {
                             try {
-                                fn();
-                                return resolve(true);
+                                fn(resolve);
                             } catch (u) {
                                 console.error("remplib: campaign showtime error:", u)
                                 reject("campaign showtime error: " + u)

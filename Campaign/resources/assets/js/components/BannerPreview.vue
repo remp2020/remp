@@ -461,8 +461,8 @@
                 return str;
             },
             closed: function() {
-				this.visible = false;
-				this.$parent.$emit('values-changed', [
+                this.visible = false;
+                this.$parent.$emit('values-changed', [
                     {key: "show", val: false}
                 ]);
                 if (this.manualEventsTracking || this.closeTracked) {
@@ -515,19 +515,17 @@
             runCustomJavascript: function (js) {
                 let that = this;
                 this.$nextTick(() => {
-                    setTimeout(function() {
-                        try {
-                            // Evaluating JS code using Function with passed params object
-                            // https://stackoverflow.com/questions/49125059/how-to-pass-parameters-to-an-eval-based-function-injavascript
-                            let body = 'function(params) { ' + js + ' }';
-                            let wrap = s => "{ return " + body + " };";
-                            let func = new Function(wrap(body));
-                            func.call(null).call(null, that.paramsForCustomJavascript());
-                        } catch(err) {
-                            console.warn("unable to execute custom banner JS:", js);
-                            console.warn(err);
-                        }
-                    }, 0);
+                      try {
+                          // Evaluating JS code using Function with passed params object
+                          // https://stackoverflow.com/questions/49125059/how-to-pass-parameters-to-an-eval-based-function-injavascript
+                          let body = 'function(params) { ' + js + ' }';
+                          let wrap = s => "{ return " + body + " };";
+                          let func = new Function(wrap(body));
+                          func.call(null).call(null, that.paramsForCustomJavascript());
+                      } catch(err) {
+                          console.warn("unable to execute custom banner JS:", js);
+                          console.warn(err);
+                      }
                 }, this)
             },
             paramsForCustomJavascript: function () {
