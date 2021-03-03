@@ -1,6 +1,6 @@
-FROM remp/telegraf:1.10.4
+FROM remp/telegraf:1.17.3
 
-ENV DOCKERIZE_VERSION v0.6.0
+ENV DOCKERIZE_VERSION v0.6.1
 
 RUN apk update
 RUN apk add ca-certificates

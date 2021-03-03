@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Project
 
 - **BREAKING**: All applications now require Node 12+. Please schedule update of Node accordingly.
+- Updated docker image of Telegraf to the currently latest 1.17.3.
 
 ### [Beam]
 
