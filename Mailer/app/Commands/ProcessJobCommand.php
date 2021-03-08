@@ -28,17 +28,14 @@ class ProcessJobCommand extends Command
         $this->batchEmailGenerator = $batchEmailGenerator;
     }
 
-    /**
-     * Configure command
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mail:process-job')
             ->setDescription('Process job command')
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         ini_set('memory_limit', '256M');
         $output->writeln(sprintf('%s <info>Mail process job</info>', DateTime::from('now')));
@@ -77,6 +74,7 @@ class ProcessJobCommand extends Command
         $output->writeln('');
         $output->writeln('Done');
         $output->writeln('');
-        return 0;
+
+        return Command::SUCCESS;
     }
 }

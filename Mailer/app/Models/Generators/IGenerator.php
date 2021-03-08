@@ -51,7 +51,7 @@ interface IGenerator
      * Generates parameters for generator from arbitrary object (e.g. WP article dump)
      * Each generator can define its own rules
      *
-     * @param $data
+     * @param \stdClass $data
      * @return ?ArrayHash
      */
     public function preprocessParameters($data): ?ArrayHash;

@@ -9,6 +9,7 @@ use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\PostInputParam;
 
 class GenericBestPerformingArticlesGenerator implements IGenerator
 {
@@ -33,10 +34,9 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
     public function generateForm(Form $form): void
     {
         $form->addTextArea('articles', 'List of articles')
-            ->setAttribute('rows', 4)
-            ->setOption('description', 'Insert Url of every article - each on separate line')
-            ->getControlPrototype()
-            ->setAttribute('class', 'form-control html-editor');
+            ->setHtmlAttribute('rows', 4)
+            ->setHtmlAttribute('class', 'form-control html-editor')
+            ->setOption('description', 'Insert Url of every article - each on separate line');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
@@ -60,10 +60,10 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'dynamic', InputParam::OPTIONAL),
-            new InputParam(InputParam::TYPE_POST, 'articles', InputParam::OPTIONAL),
-            new InputParam(InputParam::TYPE_POST, 'articles_count', InputParam::OPTIONAL)
+            (new PostInputParam('source_template_id'))->isRequired(),
+            new PostInputParam('dynamic'),
+            new PostInputParam('articles'),
+            new PostInputParam('articles_count'),
         ];
     }
 

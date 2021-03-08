@@ -10,13 +10,15 @@ use Remp\MailerModule\Models\Sender\MailerFactory;
 
 final class SettingsPresenter extends BasePresenter
 {
-    /** @var MailerFactory */
     private $mailerFactory;
 
-    public function __construct(MailerFactory $mailerFactory)
+    private $configFormFactory;
+
+    public function __construct(MailerFactory $mailerFactory, ConfigFormFactory $configFormFactory)
     {
         parent::__construct();
         $this->mailerFactory = $mailerFactory;
+        $this->configFormFactory = $configFormFactory;
     }
 
     public function renderDefault(): void
@@ -31,11 +33,11 @@ final class SettingsPresenter extends BasePresenter
         $this->template->requiredFields = $requiredFields;
     }
 
-    public function createComponentConfigForm(ConfigFormFactory $configFormFactory): Form
+    public function createComponentConfigForm(): Form
     {
-        $form = $configFormFactory->create();
+        $form = $this->configFormFactory->create();
 
-        $configFormFactory->onSuccess = function () {
+        $this->configFormFactory->onSuccess = function () {
             $this->flashMessage('Config was updated.');
             $this->redirect('Settings:default');
         };

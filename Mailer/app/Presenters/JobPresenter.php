@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\ILatteFactory;
+use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory;
@@ -62,6 +63,8 @@ final class JobPresenter extends BasePresenter
 
     private $listsRepository;
 
+    private $dataTableFactory;
+
     public function __construct(
         JobsRepository $jobsRepository,
         JobFormFactory $jobFormFactory,
@@ -76,9 +79,10 @@ final class JobPresenter extends BasePresenter
         Aggregator $segmentAggregator,
         MailCache $mailCache,
         JobQueueRepository $jobQueueRepository,
-        ILatteFactory $latteFactory,
+        LatteFactory $latteFactory,
         LinkGenerator $linkGenerator,
-        ListsRepository $listsRepository
+        ListsRepository $listsRepository,
+        IDataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
@@ -97,13 +101,14 @@ final class JobPresenter extends BasePresenter
         $this->latteFactory = $latteFactory;
         $this->linkGenerator = $linkGenerator;
         $this->listsRepository = $listsRepository;
+        $this->dataTableFactory = $dataTableFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
+    public function createComponentDataTableDefault()
     {
         $mailTypePairs = $this->listsRepository->all()->fetchPairs('id', 'title');
 
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('defaultJsonData'))
             ->setColSetting('created_at', [
@@ -171,7 +176,7 @@ final class JobPresenter extends BasePresenter
             ->count('*');
 
         $jobs = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, (int)$request['length'], (int)$request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, intval($request['length']), intval($request['start']))
             ->fetchAll();
 
         $result = [
@@ -370,7 +375,7 @@ final class JobPresenter extends BasePresenter
 
     public function createComponentNewBatchForm()
     {
-        $form = $this->newBatchFormFactory->create(isset($this->params['id']) ? (int)$this->params['id'] : null);
+        $form = $this->newBatchFormFactory->create(isset($this->params['id']) ? intval($this->params['id']) : null);
 
         $this->newBatchFormFactory->onSuccess = function ($job) {
             $this->flashMessage('Batch was added');

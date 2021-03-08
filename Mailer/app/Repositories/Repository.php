@@ -3,28 +3,23 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use Nette\Caching\Storage;
 use Nette\Utils\DateTime;
-use Nette\Caching\IStorage;
 use Nette\Database\Context;
-use Remp\MailerModule\Repositories\AuditLogRepository;
 
 class Repository
 {
-    /** @var Context */
     protected $database;
 
-    /** @var AuditLogRepository */
     protected $auditLogRepository;
 
-    /** @var string */
     protected $tableName = 'undefined';
 
-    /** @var IStorage */
     protected $cacheStorage;
 
     public function __construct(
         Context $database,
-        IStorage $cacheStorage = null
+        Storage $cacheStorage = null
     ) {
         $this->database = $database;
         $this->cacheStorage = $cacheStorage;
@@ -35,12 +30,12 @@ class Repository
         return new Selection($this->database, $this->database->getConventions(), $this->tableName, $this->cacheStorage);
     }
 
-    public function find($id)
+    public function find($id): ?ActiveRow
     {
         return $this->getTable()->where(['id' => $id])->fetch();
     }
 
-    public function findBy(string $column, string $value)
+    public function findBy(string $column, string $value): ?ActiveRow
     {
         return $this->getTable()->where([$column => $value])->fetch();
     }

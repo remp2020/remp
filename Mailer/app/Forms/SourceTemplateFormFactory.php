@@ -51,12 +51,12 @@ class SourceTemplateFormFactory implements IFormFactory
             ->setRequired("Field 'Generator' is required.");
 
         $form->addTextArea('content_text', 'Text')
-            ->setAttribute('rows', 20)
+            ->setHtmlAttribute('rows', 20)
             ->getControlPrototype()
             ->addAttributes(['class' => 'ace', 'data-lang' => 'text']);
 
         $form->addTextArea('content_html', 'HTML')
-            ->setAttribute('rows', 60)
+            ->setHtmlAttribute('rows', 60)
             ->getControlPrototype()
             ->addAttributes(['class' => 'ace', 'data-lang' => 'html']);
 

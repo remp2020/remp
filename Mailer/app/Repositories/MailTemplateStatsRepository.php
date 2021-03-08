@@ -4,13 +4,12 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories;
 
 class MailTemplateStatsRepository extends Repository
 {
     protected $tableName = 'mail_template_stats';
 
-    public function byDateAndMailTemplateId(DateTime $date, int $id)
+    public function byDateAndMailTemplateId(DateTime $date, int $id): ActiveRow
     {
         return $this->getTable()
             ->where('mail_template_id', $id)
@@ -18,28 +17,25 @@ class MailTemplateStatsRepository extends Repository
             ->fetch();
     }
 
-    public function byMailTemplateId(int $id)
+    public function byMailTemplateId(int $id): Selection
     {
         return $this->getTable()
             ->where('mail_template_id', $id);
     }
 
-    public function byMailTypeId(int $id)
+    public function byMailTypeId(int $id): Selection
     {
         return $this->getTable()
             ->where('mail_template.mail_type_id', $id)
             ->group('mail_template.mail_type_id');
     }
 
-    /**
-     * @return \Remp\MailerModule\Repositories\Selection
-     */
-    public function all()
+    public function all(): Selection
     {
         return $this->getTable();
     }
 
-    public function getMailTypeGraphData(int $mailTypeId, DateTime $from, DateTime $to)
+    public function getMailTypeGraphData(int $mailTypeId, DateTime $from, DateTime $to): Selection
     {
         return $this->getTable()
             ->select('
@@ -56,7 +52,7 @@ class MailTemplateStatsRepository extends Repository
             ->order('label_date DESC');
     }
 
-    public function getAllMailTemplatesGraphData(DateTime $from, DateTime $to)
+    public function getAllMailTemplatesGraphData(DateTime $from, DateTime $to): Selection
     {
         return $this->getTable()
             ->select('
@@ -68,7 +64,7 @@ class MailTemplateStatsRepository extends Repository
             ->group('date');
     }
 
-    public function getTemplatesGraphDataGroupedByMailType(DateTime $from, DateTime $to)
+    public function getTemplatesGraphDataGroupedByMailType(DateTime $from, DateTime $to): Selection
     {
         return $this->getTable()
             ->select('

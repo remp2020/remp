@@ -9,7 +9,7 @@ use Nette\Utils\Validators;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
-use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\PostInputParam;
 
 class MinutaDigestGenerator implements IGenerator
 {
@@ -49,8 +49,8 @@ class MinutaDigestGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'posts', InputParam::REQUIRED)
+            (new PostInputParam('source_template_id'))->isRequired(),
+            (new PostInputParam('posts'))->isRequired(),
         ];
     }
 
@@ -81,10 +81,10 @@ class MinutaDigestGenerator implements IGenerator
     public function generateForm(Form $form): void
     {
         $form->addTextArea('posts', 'List of posts')
-            ->setAttribute('rows', 4)
+            ->setHtmlAttribute('rows', 4)
             ->setOption('description', 'Insert URLs for Minutky - each on separate line')
             ->getControlPrototype()
-            ->setAttribute('class', 'form-control html-editor');
+            ->setHtmlAttribute('class', 'form-control html-editor');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }

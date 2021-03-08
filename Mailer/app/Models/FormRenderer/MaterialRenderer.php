@@ -73,7 +73,7 @@ class MaterialRenderer extends DefaultFormRenderer
      * @param string|null $mode 'begin', 'errors', 'ownerrors', 'body', 'end' or empty to render all
      * @return string
      */
-    public function render(Form $form, $mode = null)
+    public function render(Form $form, string $mode = null): string
     {
         foreach ($form->getControls() as $control) {
             if ($control instanceof Button) {
@@ -93,7 +93,7 @@ class MaterialRenderer extends DefaultFormRenderer
         return parent::render($form, $mode);
     }
 
-    public function renderControl(IControl $control)
+    public function renderControl(IControl $control): Html
     {
         if ($control instanceof Checkbox) {
             $el = Html::el("div", [
@@ -114,7 +114,7 @@ class MaterialRenderer extends DefaultFormRenderer
      * @param IControl $control
      * @return string
      */
-    public function renderPair(IControl $control)
+    public function renderPair(IControl $control): string
     {
         $outer = $pair = $this->getWrapper('pair container');
 

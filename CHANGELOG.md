@@ -26,6 +26,32 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Updated underlying Nette framework to the latest version (3.1).
+  - In `app/config/config.local.neon` replace `class` keyword with `factory`.
+  - If you implemented your own authenticators:
+    - interface `IAuthenticator` should be replaced in favor of `\Nette\Security\Authenticator`
+    - interface `\Nette\Http\UserStorage` should be replaced in favor of `\Nette\Bridges\SecurityHttp\SessionStorage`
+    - interface `Nette\Security\Identity` should be replaced in favor of `Nette\Security\SimpleIdentity`.
+  - If you implemented your own API handlers:
+    - API handler registration method (the one called in the config) changed from `addApiHandler` to `addApi`
+    - API handler parameter definition changed. If you implement your own handlers, change the definition based on the following examples:
+      ```php
+      [
+          new InputParam(InputParam::TYPE_POST, 'name', InputParam::REQUIRED),
+          new InputParam(InputParam::TYPE_GET, 'mail_type_codes', InputParam::OPTIONAL, null, true),
+          new InputParam(InputParam::TYPE_POST_RAW, 'raw'),
+      ];
+      ```
+      
+      ```php
+      [
+          (new PostInputParam('name'))->isRequired(),
+          (new GetInputParam('mail_type_codes'))->isMulti(),
+          new RawInputParam('raw'),
+      ];
+      ```
+    - API handle `handle` method signature changed to `handle(array $params): ResponseInterface`.
+  - Configuration of form control html attributes changed from `setAttribute` to `setHtmlAttribute`.
 - Added new `codes` parameter to `GET /api/v1/mailers/templates` API endpoint. Parameter is used to list email templates for given mail_template codes. remp/remp#814
 - Added `click_tracking` parameter to `POST /api/v1/mailers/templates` to define whether click tracking should be enabled/disabled/use default for created template. remp/remp#824
 

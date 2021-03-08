@@ -6,7 +6,7 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Utils\DateTime;
 use DateInterval;
 use IntlDateFormatter;
-use Remp\MailerModule\Models\DateFormatterFactory;
+use Remp\MailerModule\Models\Formatters\DateFormatterFactory;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\MailTemplateStatsRepository;

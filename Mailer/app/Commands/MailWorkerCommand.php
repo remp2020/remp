@@ -10,6 +10,7 @@ use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Events\MailSentEvent;
 use Remp\MailerModule\Models\Job\MailCache;
 use Remp\MailerModule\Repositories\BatchesRepository;
@@ -101,10 +102,7 @@ class MailWorkerCommand extends Command
         $this->shutdown = $shutdown;
     }
 
-    /**
-     * Configure command
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('worker:mail')
             ->setDescription('Start worker sending mails')
@@ -117,7 +115,7 @@ class MailWorkerCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // store when command was started
         $this->startTime = new DateTime();
@@ -311,17 +309,17 @@ class MailWorkerCommand extends Command
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
-    private function cacheJobs($jobs, $batchId)
+    private function cacheJobs(array $jobs, int $batchId): void
     {
         foreach ($jobs as $job) {
             $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batchId, $job->context, (array) ($job->params ?? []));
         }
     }
 
-    private function filterAlreadySentJobs($jobs, $batch)
+    private function filterAlreadySentJobs(array $jobs, ActiveRow $batch)
     {
         $emailsByTemplateCodes = [];
         $jobsByEmails = [];

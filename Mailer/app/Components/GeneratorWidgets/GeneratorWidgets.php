@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Components\GeneratorWidgets;
 
+use Nette\Application\IPresenter;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
@@ -21,25 +22,20 @@ class GeneratorWidgets extends BaseControl
         GeneratorWidgetsManager $widgetsManager,
         SourceTemplatesRepository $sourceTemplatesRepository
     ) {
-        parent::__construct();
-
         $this->sourceTemplateId = $sourceTemplateId;
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->widgetsManager = $widgetsManager;
-    }
 
-    protected function attached($presenter): void
-    {
-        parent::attached($presenter);
-
-        $allWidgets = $this->widgetsManager->getAllWidgets();
-        foreach ($allWidgets as $generator => $widgets) {
-            foreach ($widgets as $widget) {
-                if (!$this->getComponent($widget->identifier(), false)) {
-                    $this->addComponent($widget, $widget->identifier());
+        $this->monitor(IPresenter::class, function (IPresenter $presenter): void {
+            $allWidgets = $this->widgetsManager->getAllWidgets();
+            foreach ($allWidgets as $generator => $widgets) {
+                foreach ($widgets as $widget) {
+                    if (!$this->getComponent($widget->identifier(), false)) {
+                        $this->addComponent($widget, $widget->identifier());
+                    }
                 }
             }
-        }
+        });
     }
 
     public function render(array $params): void

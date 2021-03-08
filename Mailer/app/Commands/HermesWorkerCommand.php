@@ -22,7 +22,7 @@ class HermesWorkerCommand extends Command
         $this->dispatcher = $dispatcher;
     }
 
-    public function add($type, HandlerInterface $handler)
+    public function add(string $type, HandlerInterface $handler): void
     {
         // we store the handlers too so we can print list of them later; dispatcher doesn't provide a list method
         if (!isset($this->handlers[$type])) {
@@ -31,7 +31,7 @@ class HermesWorkerCommand extends Command
         $this->handlers[$type][] = $handler;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('worker:hermes')
             ->setDescription('Start hermes offline worker')
@@ -43,7 +43,7 @@ class HermesWorkerCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('');
         $output->writeln('<info>***** REMP MAILER HERMES WORKER *****</info>');
@@ -73,6 +73,6 @@ class HermesWorkerCommand extends Command
         $output->writeln('');
 
         $this->dispatcher->handle();
-        return 0;
+        return Command::SUCCESS;
     }
 }

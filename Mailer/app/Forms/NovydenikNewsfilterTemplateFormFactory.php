@@ -71,7 +71,7 @@ class NovydenikNewsfilterTemplateFormFactory
             ->setRequired("Field 'Type' is required.");
 
         $form->addText('from', 'Sender')
-            ->setAttribute('placeholder', 'e.g. info@domain.com')
+            ->setHtmlAttribute('placeholder', 'e.g. info@domain.com')
             ->setRequired("Field 'Sender' is required.");
 
         $form->addText('subject', 'Subject')

@@ -12,24 +12,26 @@ use Remp\MailerModule\Repositories\LayoutsRepository;
 
 final class LayoutPresenter extends BasePresenter
 {
-    /** @var LayoutsRepository */
     private $layoutsRepository;
 
-    /** @var LayoutFormFactory */
     private $layoutFormFactory;
+
+    private $dataTableFactory;
 
     public function __construct(
         LayoutsRepository $layoutsRepository,
-        LayoutFormFactory $layoutFormFactory
+        LayoutFormFactory $layoutFormFactory,
+        IDataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
         $this->layoutFormFactory = $layoutFormFactory;
+        $this->dataTableFactory = $dataTableFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableDefault(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setColSetting('name', [
                 'priority' => 1,
@@ -53,7 +55,7 @@ final class LayoutPresenter extends BasePresenter
                 ->count('*');
 
         $layouts = $this->layoutsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['length'], (int)$request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], intval($request['length']), intval($request['start']))
             ->fetchAll();
 
         $result = [

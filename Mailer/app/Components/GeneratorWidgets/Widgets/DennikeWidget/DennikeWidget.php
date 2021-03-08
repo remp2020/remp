@@ -23,27 +23,26 @@ class DennikeWidget extends BaseControl implements IGeneratorWidget
 
     private $layoutsRepository;
 
-    private $templatesRepository;
-
     private $session;
 
     private $listsRepository;
 
     private $contentGenerator;
 
+    private $dennikeTemplateFormFactory;
+
     public function __construct(
         Session $session,
         LayoutsRepository $layoutsRepository,
-        TemplatesRepository $templatesRepository,
         ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator
+        ContentGenerator $contentGenerator,
+        DennikeTemplateFormFactory $dennikeTemplateFormFactory
     ) {
-        parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
-        $this->templatesRepository = $templatesRepository;
         $this->session = $session;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
+        $this->dennikeTemplateFormFactory = $dennikeTemplateFormFactory;
     }
 
     public function identifier(): string
@@ -65,10 +64,10 @@ class DennikeWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentDennikeTemplateForm(DennikeTemplateFormFactory $dennikeTemplateFormFactory): Form
+    public function createComponentDennikeTemplateForm(): Form
     {
-        $form = $dennikeTemplateFormFactory->create();
-        $dennikeTemplateFormFactory->onSave = function () {
+        $form = $this->dennikeTemplateFormFactory->create();
+        $this->dennikeTemplateFormFactory->onSave = function () {
             $this->getPresenter()->flashMessage("Dennike batches were created and run.");
             $this->getPresenter()->redirect("Job:Default");
         };

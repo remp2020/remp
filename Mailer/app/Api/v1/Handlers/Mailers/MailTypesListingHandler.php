@@ -7,8 +7,10 @@ use Nette\Http\Response;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
+use Tomaj\NetteApi\Params\GetInputParam;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailTypesListingHandler extends BaseHandler
 {
@@ -22,15 +24,15 @@ class MailTypesListingHandler extends BaseHandler
         $this->listsRepository = $listsRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_GET, 'code', InputParam::OPTIONAL),
-            new InputParam(InputParam::TYPE_GET, 'public_listing', InputParam::OPTIONAL)
+            new GetInputParam('code'),
+            new GetInputParam('public_listing'),
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $results = $this->listsRepository->all();
 

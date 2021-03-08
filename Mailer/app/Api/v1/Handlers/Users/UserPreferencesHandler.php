@@ -10,7 +10,9 @@ use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class UserPreferencesHandler extends BaseHandler
 {
@@ -29,15 +31,15 @@ class UserPreferencesHandler extends BaseHandler
         $this->userSubscriptionVariantsRepository = $userSubscriptionVariantsRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST_RAW, 'raw')
+            new RawInputParam('raw'),
         ];
     }
 
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $payload = $this->validateInput($params['raw'], __DIR__ . '/user-preferences.schema.json');
 

@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories\ActiveRow;
-use Remp\MailerModule\Repositories;
-use Remp\MailerModule\Repositories\Selection;
 
 class TemplatesRepository extends Repository
 {
@@ -14,12 +11,12 @@ class TemplatesRepository extends Repository
 
     protected $dataTableSearchable = ['name', 'code', 'description', 'subject', 'mail_body_text', 'mail_body_html'];
 
-    public function all()
+    public function all(): Selection
     {
         return $this->getTable()->order('created_at DESC');
     }
 
-    public function pairs($listId)
+    public function pairs(int $listId): array
     {
         return $this->all()->select('id, name')->where(['mail_type_id' => $listId])->fetchPairs('id', 'name');
     }
@@ -49,7 +46,7 @@ class TemplatesRepository extends Repository
         ?bool $clickTracking = null,
         ?string $extras = null,
         bool $attachmentsEnabled = true
-    ) {
+    ): ActiveRow {
         if ($this->exists($code)) {
             throw new TemplatesCodeNotUniqueException("Template code [$code] is already used.");
         }
@@ -132,17 +129,7 @@ class TemplatesRepository extends Repository
         return $code;
     }
 
-    /**
-     * @param $query
-     * @param $order
-     * @param $orderDirection
-     * @param null $listIds
-     * @param null $limit
-     * @param null $offset
-     *
-     * @return Selection
-     */
-    public function tableFilter($query, $order, $orderDirection, $listIds = null, $limit = null, $offset = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, ?array $listId = null, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
@@ -156,9 +143,9 @@ class TemplatesRepository extends Repository
             $selection->whereOr($where);
         }
 
-        if ($listIds !== null) {
+        if ($listId !== null) {
             $selection->where([
-                'mail_type_id' => $listIds
+                'mail_type_id' => $listId
             ]);
         }
 
@@ -169,7 +156,7 @@ class TemplatesRepository extends Repository
         return $selection;
     }
 
-    public function search(string $term, int $limit): array
+    public function search(string $term, int $limit)
     {
         $searchable = ['code', 'name', 'subject', 'description'];
         foreach ($searchable as $column) {

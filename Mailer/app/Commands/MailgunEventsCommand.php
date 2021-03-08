@@ -35,17 +35,14 @@ class MailgunEventsCommand extends Command
         $this->logsRepository = $logsRepository;
     }
 
-    /**
-     * Configure command
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mailgun:events')
             ->setDescription('Syncs latest mailgun events with local log')
             ->addArgument('now', InputArgument::OPTIONAL, 'Offset from "now" of the first event to be processed in seconds', '30');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $nowOffset = $input->getArgument('now');
 
@@ -114,12 +111,11 @@ class MailgunEventsCommand extends Command
             $eventResponse = $this->mailgun->mailer()->events()->nextPage($eventResponse);
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     private function getEvents(DateTime $begin, DateTime $end): EventResponse
     {
-        /** @var EventResponse $eventResponse */
         return $this->mailgun->mailer()->events()->get($this->mailgun->option('domain'), [
             'ascending' => true,
             'begin' => $begin->getTimestamp(),

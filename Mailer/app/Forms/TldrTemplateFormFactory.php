@@ -71,7 +71,7 @@ class TldrTemplateFormFactory
             ->setRequired("Field 'Type' is required.");
 
         $form->addText('from', 'Sender')
-            ->setAttribute('placeholder', 'e.g. info@domain.com')
+            ->setHtmlAttribute('placeholder', 'e.g. info@domain.com')
             ->setRequired("Field 'Sender' is required.");
 
         $form->addText('subject', 'Subject')
@@ -152,7 +152,8 @@ class TldrTemplateFormFactory
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
 
             $batchStatus = BatchesRepository::STATUS_READY;
-            if ($form['generate_emails_jobs_created']->isSubmittedBy()) {
+
+            if ($form->getComponent('generate_emails_jobs_created')->isSubmittedBy()) {
                 $batchStatus = BatchesRepository::STATUS_CREATED;
             }
 

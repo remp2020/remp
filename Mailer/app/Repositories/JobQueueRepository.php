@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
-use Nette\Database\Table\Selection;
-use Remp\MailerModule\Repositories\ActiveRow;
-use Remp\MailerModule\Repositories;
-
 class JobQueueRepository extends Repository
 {
     protected $tableName = 'mail_job_queue';
@@ -38,7 +34,7 @@ class JobQueueRepository extends Repository
         return $this->getTable()->where(['mail_batch_id' => $batch->id])->delete();
     }
 
-    public function stripEmails(ActiveRow $batch, $leaveEmails)
+    public function stripEmails(ActiveRow $batch, $leaveEmails): void
     {
         if (!$leaveEmails) {
             return;
@@ -99,7 +95,7 @@ SQL;
         }
     }
 
-    public function removeOtherVariants(ActiveRow $batch, int $variantId)
+    public function removeOtherVariants(ActiveRow $batch, int $variantId): void
     {
         $sql = <<<SQL
 
@@ -143,7 +139,7 @@ SQL;
         $this->getDatabase()->query($query);
     }
 
-    public function getBatchEmails(ActiveRow $mailBatch, $lastId, $count = null): Selection
+    public function getBatchEmails(ActiveRow $mailBatch, int $lastId, $count = null): Selection
     {
         $selection = $this->getTable()->where(['id > ?' => $lastId, 'mail_batch_id' => $mailBatch->id])->order('id ASC');
         if ($count !== null) {
@@ -153,7 +149,7 @@ SQL;
         return $selection;
     }
 
-    public function getJob(string $email, int $batchId)
+    public function getJob(string $email, int $batchId): ?ActiveRow
     {
         return $this->getTable()->where(['email' => $email, 'mail_batch_id' => $batchId])->limit(1)->fetch();
     }

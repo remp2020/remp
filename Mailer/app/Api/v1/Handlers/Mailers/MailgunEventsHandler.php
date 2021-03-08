@@ -10,7 +10,9 @@ use Remp\MailerModule\Models\Sender;
 use Tomaj\Hermes\Emitter;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\PostInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailgunEventsHandler extends BaseHandler
 {
@@ -25,19 +27,19 @@ class MailgunEventsHandler extends BaseHandler
         $this->emitter = $emitter;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'mail_sender_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'timestamp', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'token', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'signature', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'recipient', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'event', InputParam::REQUIRED),
+            (new PostInputParam('mail_sender_id'))->isRequired(),
+            (new PostInputParam('timestamp'))->isRequired(),
+            (new PostInputParam('token'))->isRequired(),
+            (new PostInputParam('signature'))->isRequired(),
+            (new PostInputParam('recipient'))->isRequired(),
+            (new PostInputParam('event'))->isRequired(),
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $mailer = $this->sender->getMailer(MailgunMailer::ALIAS);
 

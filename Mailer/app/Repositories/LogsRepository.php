@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories;
-use Remp\MailerModule\Repositories\Selection;
 
 class LogsRepository extends Repository
 {
@@ -29,19 +27,19 @@ class LogsRepository extends Repository
         'suppress-unsubscribe' => 'hard_bounced_at',
     ];
 
-    public function allForEmail(string $email)
+    public function allForEmail(string $email): Selection
     {
         return $this->getTable()->where('email', $email);
     }
 
-    public function add(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null)
+    public function add(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null): ActiveRow
     {
         return $this->insert(
             $this->getInsertData($email, $subject, $templateId, $jobId, $batchId, $mailSenderId, $attachmentSize, $context)
         );
     }
 
-    public function getInsertData(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null)
+    public function getInsertData(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null): array
     {
         return [
             'email' => $email,
@@ -57,22 +55,22 @@ class LogsRepository extends Repository
         ];
     }
 
-    public function getEmailLogs($email)
+    public function getEmailLogs(string $email): Selection
     {
         return $this->getTable()->where('email', $email)->order('created_at DESC');
     }
 
-    public function getJobLogs($jobId)
+    public function getJobLogs(int $jobId): Selection
     {
         return $this->getTable()->where('mail_job_id', $jobId)->order('created_at DESC');
     }
 
-    public function findBySenderId($sender_id)
+    public function findBySenderId(string $senderId): ?ActiveRow
     {
-        return $this->getTable()->where('mail_sender_id', $sender_id)->limit(1)->fetch();
+        return $this->getTable()->where('mail_sender_id', $senderId)->limit(1)->fetch();
     }
 
-    public function getBatchTemplateStats($batchTemplate)
+    public function getBatchTemplateStats(ActiveRow $batchTemplate): ?ActiveRow
     {
         $columns = [
             'mail_job_batch_id',
@@ -94,7 +92,7 @@ class LogsRepository extends Repository
             ->fetch();
     }
 
-    public function getNonBatchTemplateStats($templateIds)
+    public function getNonBatchTemplateStats(array $templateIds): ?ActiveRow
     {
         $columns = [
             'COUNT(created_at) AS sent',
@@ -116,16 +114,7 @@ class LogsRepository extends Repository
             ->fetch();
     }
 
-    /**
-     * @param string $query
-     * @param string $order
-     * @param string $orderDirection
-     * @param int|null $limit
-     * @param int|null $offset
-     * @param int|null $templateId
-     * @return Selection
-     */
-    public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null, ?int $templateId = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null, ?int $templateId = null): Selection
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
@@ -150,23 +139,23 @@ class LogsRepository extends Repository
         return $selection;
     }
 
-    public function alreadySentForJob($email, $jobId)
+    public function alreadySentForJob(string $email, int $jobId): bool
     {
         return $this->getTable()->where([
-                'mail_logs.mail_job_id' => $jobId,
-                'mail_logs.email' => $email
-            ])->count('*') > 0;
+            'mail_logs.mail_job_id' => $jobId,
+            'mail_logs.email' => $email
+        ])->count('*') > 0;
     }
 
-    public function alreadySentForEmail($mailTemplateCode, $email)
+    public function alreadySentForEmail(string $mailTemplateCode, string $email): bool
     {
         return $this->getTable()->where([
-                'mail_logs.email' => $email,
-                'mail_template.code' => $mailTemplateCode
-            ])->count('*') > 0;
+            'mail_logs.email' => $email,
+            'mail_template.code' => $mailTemplateCode
+        ])->count('*') > 0;
     }
 
-    public function filterAlreadySent($emails, $mailTemplateCode, $jobId, $context = null)
+    public function filterAlreadySent(array $emails, string $mailTemplateCode, int $jobId, ?string $context = null): array
     {
         $query = $this->getTable()->where([
             'mail_logs.email' => $emails,
@@ -188,26 +177,18 @@ class LogsRepository extends Repository
         return array_diff($emails, $alreadySentEmails);
     }
 
-    public function alreadySentContext($context): bool
+    public function alreadySentContext(string $context): bool
     {
         return $this->getTable()->where([
             'mail_logs.context' => $context,
         ])->count('*') > 0;
     }
 
-    /**
-     * @return string[]
-     */
     public function mappedEvents(): array
     {
         return array_keys($this->eventMap);
     }
 
-    /**
-     * @param string $externalEvent
-     * @param null|string $reason
-     * @return string|null
-     */
     public function mapEvent(string $externalEvent, ?string $reason): ?string
     {
         if (!isset($this->eventMap[$externalEvent])) {

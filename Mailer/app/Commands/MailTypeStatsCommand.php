@@ -37,13 +37,13 @@ class MailTypeStatsCommand extends Command
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mail:subscriber-stats')
             ->setDescription('Run mail type stats update');
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('');
         $output->writeln('<info>***** UPDATING MAIL TYPE STATS *****</info>');
@@ -68,6 +68,7 @@ class MailTypeStatsCommand extends Command
         $output->writeln('');
         $output->writeln('Done');
         $output->writeln('');
-        return 0;
+
+        return Command::SUCCESS;
     }
 }

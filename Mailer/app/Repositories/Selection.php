@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
-use Nette\Caching\IStorage;
-use Nette\Database\Context;
-use Nette\Database\IConventions;
+use Nette;
+use Nette\Caching\Storage;
+use Nette\Database\Conventions;
+use Nette\Database\Explorer;
 use Nette\Database\Table\Selection as NetteSelection;
 
 class Selection extends NetteSelection
@@ -13,24 +14,44 @@ class Selection extends NetteSelection
     /**
      * @inheritdoc
      */
-    final public function __construct(Context $context, IConventions $conventions, $tableName, IStorage $cacheStorage = null)
-    {
-        parent::__construct($context, $conventions, $tableName, $cacheStorage);
+    public function __construct(
+        Explorer $explorer,
+        Conventions $conventions,
+        string $tableName,
+        Storage $cacheStorage = null
+    ) {
+        parent::__construct($explorer, $conventions, $tableName, $cacheStorage);
     }
 
     /**
      * @inheritdoc
      */
-    public function createSelectionInstance($table = null)
+    public function createSelectionInstance(string $table = null): NetteSelection
     {
-        return new self($this->context, $this->conventions, $table ?: $this->name, $this->cache ? $this->cache->getStorage() : null);
+        return new self(
+            $this->context,
+            $this->conventions,
+            $table ?: $this->name,
+            $this->cache ? $this->cache->getStorage() : null
+        );
     }
 
     /**
      * @inheritdoc
      */
-    public function createRow(array $row): ActiveRow
+    public function createRow(array $row): Nette\Database\Table\ActiveRow
     {
         return new ActiveRow($row, $this);
+    }
+
+    public function insert(iterable $data): ActiveRow
+    {
+        return parent::insert($data);
+    }
+
+    // not sure if we need this
+    public function insertMulti(iterable $data): int
+    {
+        return parent::insert($data);
     }
 }

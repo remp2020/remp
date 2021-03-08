@@ -10,7 +10,9 @@ use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class UnSubscribeHandler extends BaseHandler
 {
@@ -33,15 +35,14 @@ class UnSubscribeHandler extends BaseHandler
         $this->listVariantsRepository = $listVariantsRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST_RAW, 'raw')
+            new RawInputParam('raw'),
         ];
     }
 
-
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $payload = $this->validateInput($params['raw'], __DIR__ . '/unsubscribe.schema.json');
 

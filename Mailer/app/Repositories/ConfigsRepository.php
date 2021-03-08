@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories\ActiveRow;
-use Remp\MailerModule\Repositories;
 
 class ConfigsRepository extends Repository
 {
@@ -16,11 +14,11 @@ class ConfigsRepository extends Repository
         return $this->getTable()->order('sorting ASC');
     }
 
-    public function add($name, $display_name, $value, $description, $type)
+    public function add(string $name, string $displayName, $value, ?string $description, string $type): ActiveRow
     {
         $result = $this->insert([
             'name' => $name,
-            'display_name' => $display_name,
+            'display_name' => $displayName,
             'value' => $value,
             'description' => $description,
             'type' => $type,
@@ -35,12 +33,12 @@ class ConfigsRepository extends Repository
         return $result;
     }
 
-    public function loadAllAutoload()
+    public function loadAllAutoload(): Selection
     {
         return $this->getTable()->where('autoload', true)->order('sorting');
     }
 
-    public function loadByName($name)
+    public function loadByName(string $name): ?ActiveRow
     {
         return $this->getTable()->where('name', $name)->fetch();
     }

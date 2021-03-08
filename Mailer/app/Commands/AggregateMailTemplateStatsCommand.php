@@ -33,14 +33,14 @@ class AggregateMailTemplateStatsCommand extends Command
         $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mail:aggregate-mail-template-stats')
             ->addArgument('date', InputArgument::OPTIONAL, 'Date which to aggregate in Y-m-d format.')
             ->setDescription('Process template stats based on batch stats and mail logs');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $date = $input->getArgument('date');
 
@@ -111,6 +111,6 @@ class AggregateMailTemplateStatsCommand extends Command
             $output->writeln('<info>OK!</info> (no data)');
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }
