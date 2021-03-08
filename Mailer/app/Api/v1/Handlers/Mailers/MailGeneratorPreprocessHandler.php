@@ -9,6 +9,7 @@ use Remp\MailerModule\Models\Generators\PreprocessException;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailGeneratorPreprocessHandler extends BaseHandler
 {
@@ -27,7 +28,7 @@ class MailGeneratorPreprocessHandler extends BaseHandler
         $this->linkGenerator = $linkGenerator;
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $json = file_get_contents("php://input");
         if (empty($json)) {

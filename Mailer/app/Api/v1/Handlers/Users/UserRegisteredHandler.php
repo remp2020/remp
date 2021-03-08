@@ -8,8 +8,9 @@ use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Remp\MailerModule\Models\Users\IUser;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\PostInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class UserRegisteredHandler extends BaseHandler
 {
@@ -30,15 +31,15 @@ class UserRegisteredHandler extends BaseHandler
         $this->listsRepository = $listsRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'email', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'user_id', InputParam::REQUIRED),
+            (new PostInputParam('email'))->isRequired(),
+            (new PostInputParam('user_id'))->isRequired(),
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $lists = $this->listsRepository->all();
 

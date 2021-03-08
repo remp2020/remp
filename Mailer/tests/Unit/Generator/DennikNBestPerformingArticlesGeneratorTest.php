@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Generator;
 
+use Nette\Database\Table\Selection;
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\GenericBestPerformingArticlesGenerator;
 use Remp\MailerModule\Models\PageMeta\Content\DenniknContent;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
 class DennikNBestPerformingArticlesGeneratorTest extends TestCase
@@ -45,7 +47,7 @@ TEMPLATE;
         ];
 
         $this->sourceTemplateRepository = $this->createConfiguredMock(SourceTemplatesRepository::class, [
-            'find' => (object) $mailSourceTemplate
+            'find' => new ActiveRow($mailSourceTemplate, $this->createMock(Selection::class))
         ]);
 
         $this->engineFactory = $GLOBALS['container']->getByType(EngineFactory::class);

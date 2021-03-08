@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
-use Nette\Caching\IStorage;
-use Nette\Database\Context;
-use Nette\Database\Table\Selection;
-use Remp\MailerModule\Repositories;
 use Nette\Utils\DateTime;
 
 class SourceTemplatesRepository extends Repository
@@ -15,12 +11,12 @@ class SourceTemplatesRepository extends Repository
 
     protected $dataTableSearchable = ['title'];
 
-    public function all()
+    public function all(): Selection
     {
         return $this->getTable()->select('*')->order('sorting DESC');
     }
 
-    public function add($title, $code, $generator, $html, $text, $sorting = 100)
+    public function add(string $title, string $code, string $generator, string $html, string $text, int $sorting = 100): ActiveRow
     {
         return $this->insert([
             'title' => $title,

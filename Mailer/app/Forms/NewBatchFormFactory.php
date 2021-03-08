@@ -120,6 +120,8 @@ class NewBatchFormFactory
         if (!$values['job_id']) {
             $segment = explode('::', $values['segment_code']);
             $values['job_id'] = $this->jobsRepository->add($segment[1], $segment[0])->id;
+        } else {
+            $values['job_id'] = intval($values['job_id']);
         }
 
         $batch = $this->batchesRepository->add(

@@ -19,7 +19,6 @@ class MissingConfiguration extends Control
         ConfigsRepository $configsRepository,
         MailerFactory $mailerFactory
     ) {
-        parent::__construct();
         $this->configsRepository = $configsRepository;
         $this->mailerFactory = $mailerFactory;
     }

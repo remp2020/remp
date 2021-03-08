@@ -9,7 +9,9 @@ use Nette\Utils\JsonException;
 use Remp\MailerModule\Models\Auth\AutoLogin;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class CheckTokenHandler extends BaseHandler
 {
@@ -23,14 +25,14 @@ class CheckTokenHandler extends BaseHandler
         $this->autoLogin = $autoLogin;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST_RAW, 'raw')
+            new RawInputParam('raw'),
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         try {
             $data = Json::decode($params['raw'], Json::FORCE_ARRAY);

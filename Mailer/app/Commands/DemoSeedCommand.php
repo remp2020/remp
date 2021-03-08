@@ -36,13 +36,13 @@ class DemoSeedCommand extends Command
         $this->listCategoriesRepository = $listCategoriesRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('demo:seed')
             ->setDescription('Seed database with demo values');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('');
         $output->writeln('<info>***** DEMO SEEDER *****</info>');
@@ -140,6 +140,7 @@ HTML;
             );
         }
         $output->writeln('<info>OK!</info>');
-        return 0;
+
+        return Command::SUCCESS;
     }
 }

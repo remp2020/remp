@@ -8,7 +8,9 @@ use Remp\MailerModule\Api\v1\Handlers\Mailers\Traits\ParseLogFilterConditionsTra
 use Remp\MailerModule\Repositories\LogsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class LogsCountPerStatusHandler extends BaseHandler
 {
@@ -24,14 +26,14 @@ class LogsCountPerStatusHandler extends BaseHandler
         $this->logsRepository = $logsRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST_RAW, 'raw')
+            new RawInputParam('raw')
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $payload = $this->validateInput($params['raw'], __DIR__ . '/logs-count-per-status.schema.json');
 

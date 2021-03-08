@@ -23,27 +23,26 @@ class TldrWidget extends BaseControl implements IGeneratorWidget
 
     private $layoutsRepository;
 
-    private $templatesRepository;
-
     private $session;
 
     private $listsRepository;
 
     private $contentGenerator;
 
+    private $tldrTemplateFormFactory;
+
     public function __construct(
         Session $session,
         LayoutsRepository $layoutsRepository,
-        TemplatesRepository $templatesRepository,
         ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator
+        ContentGenerator $contentGenerator,
+        TldrTemplateFormFactory $tldrTemplateFormFactory
     ) {
-        parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
-        $this->templatesRepository = $templatesRepository;
         $this->session = $session;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
+        $this->tldrTemplateFormFactory = $tldrTemplateFormFactory;
     }
 
     public function identifier(): string
@@ -65,10 +64,10 @@ class TldrWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentTldrTemplateForm(TldrTemplateFormFactory $tldrTemplateFormFactory): Form
+    public function createComponentTldrTemplateForm(): Form
     {
-        $form = $tldrTemplateFormFactory->create();
-        $tldrTemplateFormFactory->onSave = function () {
+        $form = $this->tldrTemplateFormFactory->create();
+        $this->tldrTemplateFormFactory->onSave = function () {
             $this->getPresenter()->flashMessage("Tl;dr batches were created and run.");
             $this->getPresenter()->redirect("Job:Default");
         };

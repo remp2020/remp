@@ -15,12 +15,12 @@ class SsoTokenRepository implements BearerTokenRepositoryInterface
         $this->client = $client;
     }
 
-    public function validToken($token)
+    public function validToken(string $token): bool
     {
         return $this->client->validToken($token);
     }
 
-    public function ipRestrictions($token)
+    public function ipRestrictions(string $token): string
     {
         return '*';
     }

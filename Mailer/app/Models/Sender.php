@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models;
 
-use Nette\Mail\IMailer;
 use Nette\Mail\Message;
 use Nette\Utils\AssertionException;
 use Remp\MailerModule\Models\Config\ConfigNotExistsException;
@@ -350,7 +349,8 @@ class Sender
     /**
      * @param null|string $alias - If $alias is null, default mailer is returned.
      * @return Mailer
-     * @throws MailerNotExistsException|ConfigNotExistsException
+     * @throws MailerNotExistsException
+     * @throws ConfigNotExistsException
      */
     public function getMailer($alias = null): Mailer
     {

@@ -7,9 +7,6 @@ use Exception;
 use Nette\Utils\DateTime;
 use Nette\Caching\IStorage;
 use Nette\Database\Context;
-use Remp\MailerModule\Repositories\ActiveRow;
-use Nette\Database\Table\Selection;
-use Remp\MailerModule\Repositories;
 
 class JobsRepository extends Repository
 {
@@ -33,12 +30,12 @@ class JobsRepository extends Repository
         $this->batchesRepository = $batchesRepository;
     }
 
-    public function all()
+    public function all(): Selection
     {
         return $this->getTable()->order('mail_jobs.created_at DESC');
     }
 
-    public function add(string $segmentCode, string $segmentProvider, ?string $context = null, ?ActiveRow $mailTypeVariant = null)
+    public function add(string $segmentCode, string $segmentProvider, ?string $context = null, ?ActiveRow $mailTypeVariant = null): ?ActiveRow
     {
         $data = [
             'segment_code' => $segmentCode,
@@ -47,22 +44,13 @@ class JobsRepository extends Repository
             'status' => static::STATUS_NEW,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
-            'mail_type_variant_id' => $mailTypeVariant->id ?? null
+            'mail_type_variant_id' => $mailTypeVariant ? $mailTypeVariant->id : null
         ];
 
         return $this->insert($data);
     }
 
-    /**
-     * @param string $query
-     * @param string $order
-     * @param string $orderDirection
-     * @param array $listIds
-     * @param int|null $limit
-     * @param int|null $offset
-     * @return Selection
-     */
-    public function tableFilter(string $query, string $order, string $orderDirection, array $listIds = [], ?int $limit = null, ?int $offset = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, array $listIds = [], ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));

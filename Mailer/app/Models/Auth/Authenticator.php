@@ -6,10 +6,11 @@ namespace Remp\MailerModule\Models\Auth;
 use Nette\Application\LinkGenerator;
 use Nette\Http\IResponse;
 use Nette\Security\AuthenticationException;
-use Nette\Security\IAuthenticator;
-use Nette\Security\Identity;
+use Nette\Security\Authenticator as NetteAuthenticator;
+use Nette\Security\IIdentity;
+use Nette\Security\SimpleIdentity;
 
-class Authenticator implements IAuthenticator
+class Authenticator implements NetteAuthenticator
 {
     /** @var RemoteUser */
     private $remoteUser;
@@ -30,23 +31,26 @@ class Authenticator implements IAuthenticator
         $this->linkGenerator = $linkGenerator;
     }
 
-    public function authenticate(array $credentials): Identity
+    public function authenticate(string $user, string $password): IIdentity
     {
-        if (empty(array_filter($credentials))) {
+        if ($user === "" && $password === "") {
             $link = $this->linkGenerator->link('Mailer:Sign:In');
             $this->response->redirect($link);
             exit();
         }
 
-        [$email, $password] = $credentials;
-
-        $result = $this->remoteUser->remoteLogin($email, $password);
-        if ($result['status'] == 'error') {
+        $result = $this->remoteUser->remoteLogin($user, $password);
+        if ($result['status'] === 'error') {
             throw new AuthenticationException($result['message']);
         }
 
         $user = $result['data']['user'];
 
-        return new Identity($user['id'], 'admin', ['email' => $user['email'], 'token' => $result['data']['access']['token'], 'first_name' => $user['first_name'], 'last_name' => $user['last_name']]);
+        return new SimpleIdentity($user['id'], 'admin', [
+            'email' => $user['email'],
+            'token' => $result['data']['access']['token'],
+            'first_name' => $user['first_name'],
+            'last_name' => $user['last_name']
+        ]);
     }
 }

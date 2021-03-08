@@ -93,7 +93,7 @@ class TemplateFormFactory implements IFormFactory
         ]);
 
         $form->addTextArea('mail_body_text', 'Text version')
-            ->setAttribute('rows', 3);
+            ->setHtmlAttribute('rows', 3);
 
         $form->addTextArea('mail_body_html', 'HTML version');
 
@@ -117,7 +117,8 @@ class TemplateFormFactory implements IFormFactory
     {
         // decide if user wants to save or save and leave
         $buttonSubmitted = self::FORM_ACTION_SAVE;
-        /** @var $buttonSaveClose SubmitButton */
+
+        /** @var SubmitButton $buttonSaveClose */
         $buttonSaveClose = $form[self::FORM_ACTION_SAVE_CLOSE];
         if ($buttonSaveClose->isSubmittedBy()) {
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;

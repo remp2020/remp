@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailTypeCategoriesHandler extends BaseHandler
 {
@@ -18,7 +19,7 @@ class MailTypeCategoriesHandler extends BaseHandler
         $this->categoriesRepository = $categoriesRepository;
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $categories = $this->categoriesRepository->all()->fetchAll();
 

@@ -5,8 +5,10 @@ namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
+use Tomaj\NetteApi\Params\GetInputParam;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailTemplatesListingHandler extends BaseHandler
 {
@@ -19,16 +21,16 @@ class MailTemplatesListingHandler extends BaseHandler
         $this->templatesRepository = $templatesRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_GET, 'codes', InputParam::OPTIONAL, null, true),
-            new InputParam(InputParam::TYPE_GET, 'mail_type_codes', InputParam::OPTIONAL, null, true),
-            new InputParam(InputParam::TYPE_GET, 'with_mail_types', InputParam::OPTIONAL)
+            (new GetInputParam('codes'))->isMulti(),
+            (new GetInputParam('mail_type_codes'))->isMulti(),
+            new GetInputParam('with_mail_types'),
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $results = $this->templatesRepository->all();
 

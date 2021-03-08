@@ -23,27 +23,26 @@ class NovydenikNewsfilterWidget extends BaseControl implements IGeneratorWidget
 
     private $layoutsRepository;
 
-    private $templatesRepository;
-
     private $session;
 
     private $listsRepository;
 
     private $contentGenerator;
 
+    private $newsfilterTemplateFormFactory;
+
     public function __construct(
         Session $session,
         LayoutsRepository $layoutsRepository,
-        TemplatesRepository $templatesRepository,
         ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator
+        ContentGenerator $contentGenerator,
+        NovydenikNewsfilterTemplateFormFactory $newsfilterTemplateFormFactory
     ) {
-        parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
-        $this->templatesRepository = $templatesRepository;
         $this->session = $session;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
+        $this->newsfilterTemplateFormFactory = $newsfilterTemplateFormFactory;
     }
 
     public function identifier(): string
@@ -65,10 +64,10 @@ class NovydenikNewsfilterWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentNewsfilterTemplateForm(NovydenikNewsfilterTemplateFormFactory $newsfilterTemplateFormFactory): Form
+    public function createComponentNewsfilterTemplateForm(): Form
     {
-        $form = $newsfilterTemplateFormFactory->create();
-        $newsfilterTemplateFormFactory->onSave = function () {
+        $form = $this->newsfilterTemplateFormFactory->create();
+        $this->newsfilterTemplateFormFactory->onSave = function () {
             $this->getPresenter()->flashMessage("Newsfilter batches were created and run.");
             $this->getPresenter()->redirect("Job:Default");
         };

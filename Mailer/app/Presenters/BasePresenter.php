@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
-use Kdyby\Autowired\AutowireComponentFactories;
-use Kdyby\Autowired\AutowireProperties;
 use Nette\Application\UI\Presenter;
 use Remp\MailerModule\Components\MissingConfiguration\IMissingConfigurationFactory;
 use Remp\MailerModule\Components\MissingConfiguration\MissingConfiguration;
@@ -13,19 +11,18 @@ use Remp\MailerModule\Forms\IFormFactory;
 
 abstract class BasePresenter extends Presenter
 {
-    use AutowireProperties;
-    use AutowireComponentFactories;
-
     /** @var EnvironmentConfig @inject */
     public $environmentConfig;
 
+    /** @var IMissingConfigurationFactory @inject */
+    public $missingConfigurationFactory;
 
     public function startup(): void
     {
         parent::startup();
 
         if (!$this->getUser()->isLoggedIn()) {
-            $this->getUser()->login(null, null);
+            $this->getUser()->login("", "");
         }
 
         $this->template->currentUser = $this->getUser();
@@ -50,9 +47,8 @@ abstract class BasePresenter extends Presenter
         }
     }
 
-    public function createComponentMissingConfiguration(
-        IMissingConfigurationFactory $missingConfigurationFactory
-    ): MissingConfiguration {
-        return $missingConfigurationFactory->create();
+    public function createComponentMissingConfiguration(): MissingConfiguration
+    {
+        return $this->missingConfigurationFactory->create();
     }
 }

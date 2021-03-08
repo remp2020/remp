@@ -37,6 +37,8 @@ final class TemplatePresenter extends BasePresenter
 
     private $contentGenerator;
 
+    private $dataTableFactory;
+
     public function __construct(
         TemplatesRepository $templatesRepository,
         LogsRepository $logsRepository,
@@ -44,7 +46,8 @@ final class TemplatePresenter extends BasePresenter
         TemplateTestFormFactory $templateTestFormFactory,
         LayoutsRepository $layoutsRepository,
         ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator
+        ContentGenerator $contentGenerator,
+        IDataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->templatesRepository = $templatesRepository;
@@ -54,13 +57,14 @@ final class TemplatePresenter extends BasePresenter
         $this->layoutsRepository = $layoutsRepository;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
+        $this->dataTableFactory = $dataTableFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableDefault(): DataTable
     {
         $mailTypePairs = $this->listsRepository->all()->fetchPairs('id', 'title');
 
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setColSetting('created_at', [
                 'header' => 'created at',
@@ -117,7 +121,7 @@ final class TemplatePresenter extends BasePresenter
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, (int)$request['length'], (int)$request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, intval($request['length']), intval($request['start']))
             ->fetchAll();
 
         $result = [
@@ -200,11 +204,11 @@ final class TemplatePresenter extends BasePresenter
         $request = $this->request->getParameters();
 
         $logsCount = $this->logsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null, (int)$request['templateId'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null, intval($request['templateId']))
             ->count('*');
 
         $logs = $this->logsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['length'], (int)$request['start'], (int)$request['templateId'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], intval($request['length']), intval($request['start']), intval($request['templateId']))
             ->fetchAll();
 
         $result = [
@@ -299,7 +303,7 @@ final class TemplatePresenter extends BasePresenter
 
     public function createComponentTemplateTestForm(): Form
     {
-        $form = $this->templateTestFormFactory->create((int)$this->params['id']);
+        $form = $this->templateTestFormFactory->create(intval($this->params['id']));
 
         $presenter = $this;
         $this->templateTestFormFactory->onSuccess = function ($template) use ($presenter) {

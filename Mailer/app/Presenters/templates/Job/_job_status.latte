@@ -1,3 +1,6 @@
 {foreach $job->related('mail_job_batch_templates')->order('mail_job_batch_templates.weight') as $jobBatchTemplate}
-    <div><span class="badge m-r-5 palette-Cyan-700 bg">{$jobBatchTemplate->mail_job_batch->status|upper}</span> <a n:href="Mailer:Template:Show $jobBatchTemplate->template_id">{$jobBatchTemplate->template->name}</a></div>
+    <div>
+        <span class="badge m-r-5 palette-Cyan-700 bg">{$jobBatchTemplate->mail_job_batch->status|upper}</span>
+        <a n:href="Mailer:Template:Show $jobBatchTemplate->mail_template_id">{$jobBatchTemplate->template->name}</a>
+    </div>
 {/foreach}

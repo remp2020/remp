@@ -28,14 +28,14 @@ class ProcessJobStatsCommand extends Command
         $this->batchTemplatesRepository = $batchTemplatesRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mail:job-stats')
             ->setDescription('Process job stats based on mail logs')
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('');
         $output->writeln('<info>***** UPDATE EMAIL JOB STATS *****</info>');
@@ -78,6 +78,7 @@ class ProcessJobStatsCommand extends Command
         $output->writeln('');
         $output->writeln('Done');
         $output->writeln('');
-        return 0;
+
+        return Command::SUCCESS;
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Models\ContentGenerator;
 
 use Nette\Database\IRow;
-use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\ContentGenerator\Replace\IReplace;
 

@@ -20,16 +20,16 @@ class HeartbeatCommand extends Command
         $this->emitter = $emitter;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('application:heartbeat')
             ->setDescription('Run heartbeat hermes worker')
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->emitter->emit(new Message('heartbeat', ['executed' => time()]), RedisDriver::PRIORITY_MEDIUM);
-        return 0;
+        return Command::SUCCESS;
     }
 }

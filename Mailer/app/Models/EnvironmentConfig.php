@@ -37,6 +37,15 @@ class EnvironmentConfig
         return $val;
     }
 
+    public function getInt(string $key): ?int
+    {
+        $val = $this->get($key);
+        if ($val === null) {
+            return $val;
+        }
+        return intval($val);
+    }
+
     public function getDsn(): string
     {
         $port = $this->get('DB_PORT');

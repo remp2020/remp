@@ -5,7 +5,6 @@ namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
-use Remp\MailerModule\Repositories;
 use Tomaj\Hermes\MessageInterface;
 
 class HermesTasksRepository extends Repository
@@ -15,9 +14,10 @@ class HermesTasksRepository extends Repository
 
     protected $tableName = 'hermes_tasks';
 
-    public function add(MessageInterface $message, string $state)
+
+    public function add(MessageInterface $message, string $state): ActiveRow
     {
-        $createdAt = DateTime::from((int)$message->getCreated());
+        $createdAt = DateTime::from(intval($message->getCreated()));
 
         return $this->insert([
             'message_id' => $message->getId(),
@@ -31,7 +31,7 @@ class HermesTasksRepository extends Repository
         ]);
     }
 
-    public function getStateCounts()
+    public function getStateCounts(): array
     {
         return $this->getTable()->group('state, type')->select('state, type, count(*) AS count')->order('count DESC');
     }
