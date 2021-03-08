@@ -28,7 +28,7 @@ class MailGeneratorHandler extends BaseHandler
     public function params(): array
     {
         return [
-            (new PostInputParam('source_template_id'))->isRequired()
+            (new PostInputParam('source_template_id'))->setRequired()
         ];
     }
 

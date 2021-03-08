@@ -24,8 +24,8 @@ class MailTemplatesListingHandler extends BaseHandler
     public function params(): array
     {
         return [
-            (new GetInputParam('codes'))->isMulti(),
-            (new GetInputParam('mail_type_codes'))->isMulti(),
+            (new GetInputParam('codes'))->setMulti(),
+            (new GetInputParam('mail_type_codes'))->setMulti(),
             new GetInputParam('with_mail_types'),
         ];
     }

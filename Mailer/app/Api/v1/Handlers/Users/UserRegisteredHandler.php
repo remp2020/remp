@@ -34,8 +34,8 @@ class UserRegisteredHandler extends BaseHandler
     public function params(): array
     {
         return [
-            (new PostInputParam('email'))->isRequired(),
-            (new PostInputParam('user_id'))->isRequired(),
+            (new PostInputParam('email'))->setRequired(),
+            (new PostInputParam('user_id'))->setRequired(),
         ];
     }
 

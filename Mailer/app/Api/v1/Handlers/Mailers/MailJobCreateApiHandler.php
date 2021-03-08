@@ -40,9 +40,9 @@ class MailJobCreateApiHandler extends BaseHandler
     public function params(): array
     {
         return [
-            (new PostInputParam('segment_code'))->isRequired(),
-            (new PostInputParam('segment_provider'))->isRequired(),
-            (new PostInputParam('template_id'))->isRequired(),
+            (new PostInputParam('segment_code'))->setRequired(),
+            (new PostInputParam('segment_provider'))->setRequired(),
+            (new PostInputParam('template_id'))->setRequired(),
         ];
     }
 

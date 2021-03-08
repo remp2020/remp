@@ -48,14 +48,14 @@ class MediaBriefingGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('source_template_id'))->isRequired(),
-            (new PostInputParam('mediabriefing_html'))->isRequired(),
-            (new PostInputParam('url'))->isRequired(),
-            (new PostInputParam('title'))->isRequired(),
+            (new PostInputParam('source_template_id'))->setRequired(),
+            (new PostInputParam('mediabriefing_html'))->setRequired(),
+            (new PostInputParam('url'))->setRequired(),
+            (new PostInputParam('title'))->setRequired(),
             (new PostInputParam('sub_title')),
             (new PostInputParam('image_url')),
             (new PostInputParam('image_title')),
-            (new PostInputParam('from'))->isRequired(),
+            (new PostInputParam('from'))->setRequired(),
         ];
     }
 

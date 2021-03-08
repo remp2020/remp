@@ -46,14 +46,14 @@ class TldrGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('source_template_id'))->isRequired(),
-            (new PostInputParam('tldr_html'))->isRequired(),
-            (new PostInputParam('url'))->isRequired(),
-            (new PostInputParam('title'))->isRequired(),
-            (new PostInputParam('sub_title'))->isRequired(),
-            (new PostInputParam('image_url'))->isRequired(),
-            (new PostInputParam('image_title'))->isRequired(),
-            (new PostInputParam('from'))->isRequired(),
+            (new PostInputParam('source_template_id'))->setRequired(),
+            (new PostInputParam('tldr_html'))->setRequired(),
+            (new PostInputParam('url'))->setRequired(),
+            (new PostInputParam('title'))->setRequired(),
+            (new PostInputParam('sub_title'))->setRequired(),
+            (new PostInputParam('image_url'))->setRequired(),
+            (new PostInputParam('image_title'))->setRequired(),
+            (new PostInputParam('from'))->setRequired(),
         ];
     }
 

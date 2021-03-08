@@ -45,8 +45,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
       
       ```php
       [
-          (new PostInputParam('name'))->isRequired(),
-          (new GetInputParam('mail_type_codes'))->isMulti(),
+          (new PostInputParam('name'))->setRequired(),
+          (new GetInputParam('mail_type_codes'))->setMulti(),
           new RawInputParam('raw'),
       ];
       ```

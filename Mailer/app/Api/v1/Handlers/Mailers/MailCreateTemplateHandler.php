@@ -31,15 +31,15 @@ class MailCreateTemplateHandler extends BaseHandler
     public function params(): array
     {
         return [
-            (new PostInputParam('name'))->isRequired(),
-            (new PostInputParam('code'))->isRequired(),
-            (new PostInputParam('description'))->isRequired(),
+            (new PostInputParam('name'))->setRequired(),
+            (new PostInputParam('code'))->setRequired(),
+            (new PostInputParam('description'))->setRequired(),
             (new PostInputParam('mail_layout_id')),
-            (new PostInputParam('mail_type_code'))->isRequired(),
-            (new PostInputParam('from'))->isRequired(),
-            (new PostInputParam('subject'))->isRequired(),
-            (new PostInputParam('template_text'))->isRequired(),
-            (new PostInputParam('template_html'))->isRequired(),
+            (new PostInputParam('mail_type_code'))->setRequired(),
+            (new PostInputParam('from'))->setRequired(),
+            (new PostInputParam('subject'))->setRequired(),
+            (new PostInputParam('template_text'))->setRequired(),
+            (new PostInputParam('template_html'))->setRequired(),
             (new PostInputParam('click_tracking')),
             (new PostInputParam('extras')),
         ];

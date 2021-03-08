@@ -24,8 +24,8 @@ class EmailChangedHandler extends BaseHandler
     public function params(): array
     {
         return [
-            (new PostInputParam('original_email'))->isRequired(),
-            (new PostInputParam('new_email'))->isRequired(),
+            (new PostInputParam('original_email'))->setRequired(),
+            (new PostInputParam('new_email'))->setRequired(),
         ];
     }
 

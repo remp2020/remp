@@ -60,8 +60,8 @@ class DennikNBestPerformingArticlesGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('source_template_id'))->isRequired(),
-            (new PostInputParam('articles'))->isRequired(),
+            (new PostInputParam('source_template_id'))->setRequired(),
+            (new PostInputParam('articles'))->setRequired(),
         ];
     }
 

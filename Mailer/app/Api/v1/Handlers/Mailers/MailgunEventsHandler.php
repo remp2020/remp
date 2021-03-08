@@ -30,12 +30,12 @@ class MailgunEventsHandler extends BaseHandler
     public function params(): array
     {
         return [
-            (new PostInputParam('mail_sender_id'))->isRequired(),
-            (new PostInputParam('timestamp'))->isRequired(),
-            (new PostInputParam('token'))->isRequired(),
-            (new PostInputParam('signature'))->isRequired(),
-            (new PostInputParam('recipient'))->isRequired(),
-            (new PostInputParam('event'))->isRequired(),
+            (new PostInputParam('mail_sender_id'))->setRequired(),
+            (new PostInputParam('timestamp'))->setRequired(),
+            (new PostInputParam('token'))->setRequired(),
+            (new PostInputParam('signature'))->setRequired(),
+            (new PostInputParam('recipient'))->setRequired(),
+            (new PostInputParam('event'))->setRequired(),
         ];
     }
 
