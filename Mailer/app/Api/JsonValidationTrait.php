@@ -22,7 +22,7 @@ trait JsonValidationTrait
         }
 
         try {
-            $payload = Json::decode($request, true);
+            $payload = Json::decode($request, Json::FORCE_ARRAY);
         } catch (JsonException $e) {
             Debugger::log($e->getMessage());
             $this->errorResponse = new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'error', 'message' => "Malformed JSON: " . $e->getMessage()]);
