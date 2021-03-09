@@ -365,7 +365,7 @@ final class JobPresenter extends BasePresenter
             $this[$sourceForm][$sourceField]
                 ->setDefaultValue($listId);
             $this[$sourceForm][$targetField]
-                ->setItems($this->templatesRepository->pairs($listId));
+                ->setItems($this->templatesRepository->pairs((int) $listId));
         } else {
             $this[$sourceForm][$sourceField]
                 ->setDefaultValue(null);
