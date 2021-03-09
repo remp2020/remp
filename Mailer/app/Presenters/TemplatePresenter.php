@@ -39,6 +39,8 @@ final class TemplatePresenter extends BasePresenter
 
     private $dataTableFactory;
 
+    private $sendingStatsFactory;
+
     public function __construct(
         TemplatesRepository $templatesRepository,
         LogsRepository $logsRepository,
@@ -47,7 +49,8 @@ final class TemplatePresenter extends BasePresenter
         LayoutsRepository $layoutsRepository,
         ListsRepository $listsRepository,
         ContentGenerator $contentGenerator,
-        IDataTableFactory $dataTableFactory
+        IDataTableFactory $dataTableFactory,
+        ISendingStatsFactory $sendingStatsFactory
     ) {
         parent::__construct();
         $this->templatesRepository = $templatesRepository;
@@ -58,6 +61,7 @@ final class TemplatePresenter extends BasePresenter
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
         $this->dataTableFactory = $dataTableFactory;
+        $this->sendingStatsFactory = $sendingStatsFactory;
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -169,9 +173,9 @@ final class TemplatePresenter extends BasePresenter
         $this->redirect('show', ['id' => $template->id]);
     }
 
-    public function createComponentDataTableLogs(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableLogs(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('logJsonData'))
             ->setColSetting('created_at', [
@@ -314,9 +318,9 @@ final class TemplatePresenter extends BasePresenter
         return $form;
     }
 
-    protected function createComponentTemplateStats(ISendingStatsFactory $factory): Control
+    protected function createComponentTemplateStats(): Control
     {
-        $templateStats = $factory->create();
+        $templateStats = $this->sendingStatsFactory->create();
 
         if (isset($this->params['id'])) {
             $template = $this->templatesRepository->find($this->params['id']);

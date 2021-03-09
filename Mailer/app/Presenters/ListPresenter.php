@@ -248,9 +248,9 @@ final class ListPresenter extends BasePresenter
         $this->template->list = $list;
     }
 
-    public function createComponentDataTableTemplates(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableTemplates(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('templateJsonData'))
             ->setColSetting('created_at', [
@@ -512,7 +512,7 @@ final class ListPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        $data = $this->mailTemplateStatsRepository->getMailTypeGraphData((int)$id, $from, $to)->fetchAll();
+        $data = $this->mailTemplateStatsRepository->getMailTypeGraphData((int) $id, $from, $to)->fetchAll();
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
@@ -569,9 +569,9 @@ final class ListPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        $unsubscibedData = $this->userSubscriptionsRepository->getMailTypeGraphData($id, $from, $to)
+        $unsubscribedData = $this->userSubscriptionsRepository->getMailTypeGraphData((int) $id, $from, $to)
             ->fetchAll();
-        foreach ($unsubscibedData as $unsubscibedDataRow) {
+        foreach ($unsubscribedData as $unsubscibedDataRow) {
             $foundAt = array_search(
                 $unsubscibedDataRow->label_date->format($dateFormat),
                 $labels,
