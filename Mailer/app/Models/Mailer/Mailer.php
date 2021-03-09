@@ -9,9 +9,9 @@ use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Config\ConfigNotExistsException;
 use Remp\MailerModule\Repositories\ConfigsRepository;
 
-abstract class Mailer implements IMailer
+abstract class Mailer implements \Nette\Mail\Mailer
 {
-    public const ALIAS = null;
+    public const ALIAS = "";
 
     /** @var ConfigsRepository */
     protected $configsRepository;

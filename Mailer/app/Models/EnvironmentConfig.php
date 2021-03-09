@@ -43,7 +43,7 @@ class EnvironmentConfig
         if ($val === null) {
             return $val;
         }
-        return intval($val);
+        return (int)$val;
     }
 
     public function getDsn(): string

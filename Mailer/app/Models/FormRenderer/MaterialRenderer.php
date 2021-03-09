@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\FormRenderer;
 
+use Nette\Forms\Control;
 use Nette\Forms\Controls\Button;
 use Nette\Forms\Controls\Checkbox;
 use Nette\Forms\Controls\CheckboxList;
@@ -93,7 +94,7 @@ class MaterialRenderer extends DefaultFormRenderer
         return parent::render($form, $mode);
     }
 
-    public function renderControl(IControl $control): Html
+    public function renderControl(Control $control): Html
     {
         if ($control instanceof Checkbox) {
             $el = Html::el("div", [
@@ -114,7 +115,7 @@ class MaterialRenderer extends DefaultFormRenderer
      * @param IControl $control
      * @return string
      */
-    public function renderPair(IControl $control): string
+    public function renderPair(Control $control): string
     {
         $outer = $pair = $this->getWrapper('pair container');
 

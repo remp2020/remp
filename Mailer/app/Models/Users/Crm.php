@@ -44,7 +44,7 @@ class Crm implements IUser
         }
 
         try {
-            $result = Json::decode($response->getBody(), Json::FORCE_ARRAY);
+            $result = Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
             $response = null;
             return $result['users'];
         } catch (JsonException $e) {

@@ -65,6 +65,10 @@ final class JobPresenter extends BasePresenter
 
     private $dataTableFactory;
 
+    private $sendingStatsFactory;
+
+    private $batchExperimentEvaluationFactory;
+
     public function __construct(
         JobsRepository $jobsRepository,
         JobFormFactory $jobFormFactory,
@@ -82,7 +86,9 @@ final class JobPresenter extends BasePresenter
         LatteFactory $latteFactory,
         LinkGenerator $linkGenerator,
         ListsRepository $listsRepository,
-        IDataTableFactory $dataTableFactory
+        IDataTableFactory $dataTableFactory,
+        ISendingStatsFactory $sendingStatsFactory,
+        IBatchExperimentEvaluationFactory $batchExperimentEvaluationFactory
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
@@ -102,6 +108,8 @@ final class JobPresenter extends BasePresenter
         $this->linkGenerator = $linkGenerator;
         $this->listsRepository = $listsRepository;
         $this->dataTableFactory = $dataTableFactory;
+        $this->sendingStatsFactory = $sendingStatsFactory;
+        $this->batchExperimentEvaluationFactory = $batchExperimentEvaluationFactory;
     }
 
     public function createComponentDataTableDefault()
@@ -176,7 +184,7 @@ final class JobPresenter extends BasePresenter
             ->count('*');
 
         $jobs = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, intval($request['length']), intval($request['start']))
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
@@ -375,7 +383,7 @@ final class JobPresenter extends BasePresenter
 
     public function createComponentNewBatchForm()
     {
-        $form = $this->newBatchFormFactory->create(isset($this->params['id']) ? intval($this->params['id']) : null);
+        $form = $this->newBatchFormFactory->create(isset($this->params['id']) ? (int)$this->params['id'] : null);
 
         $this->newBatchFormFactory->onSuccess = function ($job) {
             $this->flashMessage('Batch was added');
@@ -418,10 +426,10 @@ final class JobPresenter extends BasePresenter
         });
     }
 
-    protected function createComponentTemplateStats(ISendingStatsFactory $factory)
+    protected function createComponentTemplateStats()
     {
-        return new Multiplier(function ($templateId) use ($factory) {
-            $templateStats = $factory->create();
+        return new Multiplier(function ($templateId) {
+            $templateStats = $this->sendingStatsFactory->create();
 
             $template = $this->templatesRepository->find($templateId);
             $templateStats->addTemplate($template);
@@ -431,10 +439,10 @@ final class JobPresenter extends BasePresenter
         });
     }
 
-    protected function createComponentJobBatchTemplateStats(ISendingStatsFactory $factory)
+    protected function createComponentJobBatchTemplateStats()
     {
-        return new Multiplier(function ($jobBatchTemplateId) use ($factory) {
-            $stats = $factory->create();
+        return new Multiplier(function ($jobBatchTemplateId) {
+            $stats = $this->sendingStatsFactory->create();
 
             $jobBatchTemplate = $this->batchTemplatesRepository->find($jobBatchTemplateId);
             $stats->addJobBatchTemplate($jobBatchTemplate);
@@ -444,9 +452,9 @@ final class JobPresenter extends BasePresenter
         });
     }
 
-    protected function createComponentJobStats(ISendingStatsFactory $factory)
+    protected function createComponentJobStats()
     {
-        $templateStats = $factory->create();
+        $templateStats = $this->sendingStatsFactory->create();
 
         $batches = $this->batchesRepository
             ->getTable()
@@ -462,8 +470,8 @@ final class JobPresenter extends BasePresenter
         return $templateStats;
     }
 
-    public function createComponentBatchExperimentEvaluation(IBatchExperimentEvaluationFactory $factory)
+    public function createComponentBatchExperimentEvaluation()
     {
-        return $factory->create();
+        return $this->batchExperimentEvaluationFactory->create();
     }
 }

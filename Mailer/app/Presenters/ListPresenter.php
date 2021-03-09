@@ -283,7 +283,7 @@ final class ListPresenter extends BasePresenter
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], [$request['listId']], intval($request['length']), intval($request['start']))
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], [$request['listId']], (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
@@ -418,7 +418,7 @@ final class ListPresenter extends BasePresenter
 
         // handle newsletter list category change
         if ($this['listForm']['mail_type_category_id']->getValue() !== $categoryId) {
-            $lists = $this->listsRepository->findByCategory(intval($categoryId));
+            $lists = $this->listsRepository->findByCategory((int)$categoryId);
             if ($listId = $this['listForm']['id']->getValue()) {
                 $lists = $lists->where('id != ?', $listId);
             }

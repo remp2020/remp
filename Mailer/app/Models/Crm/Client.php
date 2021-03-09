@@ -32,7 +32,7 @@ class Client
                 ],
             ]);
 
-            return Json::decode($response->getBody(), Json::FORCE_ARRAY);
+            return Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
         } catch (ConnectException $connectException) {
             throw new Exception("could not connect to CRM: {$connectException->getMessage()}");
         } catch (ClientException $clientException) {

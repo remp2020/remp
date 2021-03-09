@@ -99,11 +99,7 @@ class MailgunMailer extends Mailer
         }
 
         $tag = $message->getHeader('X-Mailer-Tag');
-
-        $clickTracking = null;
-        if ($message->getHeader('X-Mailer-Click-Tracking') !== null) {
-            $clickTracking = $message->getHeader('X-Mailer-Click-Tracking');
-        }
+        $clickTracking = $message->getHeader('X-Mailer-Click-Tracking') ?? null;
 
         $data = [
             'from' => $from,

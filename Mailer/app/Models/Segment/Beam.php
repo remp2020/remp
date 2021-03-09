@@ -61,7 +61,7 @@ class Beam implements ISegment
                 'query' => $query,
             ]);
 
-            return Json::decode($response->getBody(), Json::FORCE_ARRAY);
+            return Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
         } catch (ConnectException $connectException) {
             throw new SegmentException("Could not connect to Segment:{$url} endpoint: {$connectException->getMessage()}");
         }

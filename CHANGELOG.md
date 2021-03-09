@@ -28,10 +28,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **BREAKING**: Updated underlying Nette framework to the latest version (3.1).
   - In `app/config/config.local.neon` replace `class` keyword with `factory`.
+  - If you implemented your own mailers:
+    - Interface `Nette\Mail\IMailer` should be replaced in favor of `Nette\Mail\Mailer`.
   - If you implemented your own authenticators:
-    - interface `IAuthenticator` should be replaced in favor of `\Nette\Security\Authenticator`
-    - interface `\Nette\Http\UserStorage` should be replaced in favor of `\Nette\Bridges\SecurityHttp\SessionStorage`
-    - interface `Nette\Security\Identity` should be replaced in favor of `Nette\Security\SimpleIdentity`.
+    - Interface `Nette\Security\IAuthenticator` should be replaced in favor of `Nette\Security\Authenticator`.
+    - Interface `Nette\Http\UserStorage` should be replaced in favor of `Nette\Bridges\SecurityHttp\SessionStorage`.
+    - Interface `Nette\Security\Identity` should be replaced in favor of `Nette\Security\SimpleIdentity`.
   - If you implemented your own API handlers:
     - API handler registration method (the one called in the config) changed from `addApiHandler` to `addApi`
     - API handler parameter definition changed. If you implement your own handlers, change the definition based on the following examples:

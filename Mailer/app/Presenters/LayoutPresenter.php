@@ -55,7 +55,7 @@ final class LayoutPresenter extends BasePresenter
                 ->count('*');
 
         $layouts = $this->layoutsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], intval($request['length']), intval($request['start']))
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [

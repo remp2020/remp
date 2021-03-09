@@ -78,7 +78,7 @@ class RemoteUser
             return ['status' => 'error', 'error' => 'unavailable server', 'message' => 'Cannot connect to auth server'];
         }
 
-        $responseData = json_decode($response->getBody(), true);
+        $responseData = json_decode($response->getBody()->getContents(), true);
 
         return $responseData['user'];
     }

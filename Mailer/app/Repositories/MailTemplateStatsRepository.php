@@ -9,7 +9,7 @@ class MailTemplateStatsRepository extends Repository
 {
     protected $tableName = 'mail_template_stats';
 
-    public function byDateAndMailTemplateId(DateTime $date, int $id): ActiveRow
+    public function byDateAndMailTemplateId(DateTime $date, int $id): ?ActiveRow
     {
         return $this->getTable()
             ->where('mail_template_id', $id)
