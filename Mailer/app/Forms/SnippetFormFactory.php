@@ -8,20 +8,19 @@ use Nette\Forms\Controls\SubmitButton;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Forms\Rules\StringValidator;
-use Remp\MailerModule\Repositories\SnippetRepository;
+use Remp\MailerModule\Repositories\SnippetsRepository;
 
 class SnippetFormFactory implements IFormFactory
 {
     use SmartObject;
 
-    /** @var SnippetRepository */
     private $snippetRepository;
 
     public $onCreate;
 
     public $onUpdate;
 
-    public function __construct(SnippetRepository $snippetRepository)
+    public function __construct(SnippetsRepository $snippetRepository)
     {
         $this->snippetRepository = $snippetRepository;
     }

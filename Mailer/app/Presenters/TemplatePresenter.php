@@ -19,7 +19,7 @@ use Remp\MailerModule\Forms\TemplateTestFormFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
-use Remp\MailerModule\Repositories\SnippetRepository;
+use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
 final class TemplatePresenter extends BasePresenter
@@ -50,7 +50,7 @@ final class TemplatePresenter extends BasePresenter
         TemplateFormFactory $templateFormFactory,
         TemplateTestFormFactory $templateTestFormFactory,
         LayoutsRepository $layoutsRepository,
-        SnippetRepository $snippetRepository,
+        SnippetsRepository $snippetRepository,
         ListsRepository $listsRepository,
         ContentGenerator $contentGenerator,
         IDataTableFactory $dataTableFactory,

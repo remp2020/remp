@@ -8,7 +8,7 @@ use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
-use Remp\MailerModule\Repositories\SnippetRepository;
+use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,7 +31,7 @@ class DemoSeedCommand extends Command
     public function __construct(
         LayoutsRepository $layoutsRepository,
         TemplatesRepository $templatesRepository,
-        SnippetRepository $snippetRepository,
+        SnippetsRepository $snippetRepository,
         ListsRepository $listsRepository,
         ListCategoriesRepository $listCategoriesRepository
     ) {

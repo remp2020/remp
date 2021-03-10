@@ -6,7 +6,7 @@ namespace Remp\MailerModule\Repositories;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Models\Traits\SlugTrait;
 
-class SnippetRepository extends Repository
+class SnippetsRepository extends Repository
 {
     use SlugTrait;
 

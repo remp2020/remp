@@ -243,7 +243,7 @@ services:
 	- Remp\MailerModule\Repositories\LogsRepository
 	- Remp\MailerModule\Repositories\LogConversionsRepository
 	- Remp\MailerModule\Repositories\LayoutsRepository
-	- Remp\MailerModule\Repositories\SnippetRepository
+	- Remp\MailerModule\Repositories\SnippetsRepository
 	- Remp\MailerModule\Repositories\ListsRepository
 	- Remp\MailerModule\Repositories\ListCategoriesRepository
 	- Remp\MailerModule\Repositories\ListVariantsRepository

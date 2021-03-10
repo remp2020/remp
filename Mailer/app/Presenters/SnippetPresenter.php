@@ -8,28 +8,30 @@ use Nette\Application\UI\Form;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\IDataTableFactory;
 use Remp\MailerModule\Forms\SnippetFormFactory;
-use Remp\MailerModule\Repositories\SnippetRepository;
+use Remp\MailerModule\Repositories\SnippetsRepository;
 
 final class SnippetPresenter extends BasePresenter
 {
-    /** @var SnippetRepository */
     private $snippetRepository;
 
-    /** @var SnippetFormFactory */
     private $snippetFormFactory;
 
+    private $dataTableFactory;
+
     public function __construct(
-        SnippetRepository $snippetRepository,
-        SnippetFormFactory $snippetFormFactory
+        SnippetsRepository $snippetRepository,
+        SnippetFormFactory $snippetFormFactory,
+        IDataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->snippetRepository = $snippetRepository;
         $this->snippetFormFactory = $snippetFormFactory;
+        $this->dataTableFactory = $dataTableFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableDefault(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setColSetting('name', [
                 'priority' => 1,
