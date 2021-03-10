@@ -3,59 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Article;
-use App\ArticleTag;
+use App\ArticleSection;
 use App\Author;
 use App\Conversion;
 use App\Http\Request;
-use App\Http\Requests\TopSearchRequest;
-use App\Http\Resources\TagResource;
-use App\Model\Pageviews\TopSearch;
+use App\Http\Resources\SectionResource;
 use App\Model\Tag;
 use App\Section;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 use Html;
 
-class TagController extends Controller
+class SectionController extends Controller
 {
     public function index(Request $request)
     {
         return response()->format([
-            'html' => view('tags.index', [
-                'tags' => Tag::all()->pluck('name', 'id'),
+            'html' => view('sections.index', [
+                'sections' => Section::all()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->input('conversion_to', 'now'),
             ]),
-            'json' => TagResource::collection(Tag::paginate()),
+            'json' => SectionResource::collection(Section::paginate()),
         ]);
     }
 
-    public function show(Tag $tag, Request $request)
+    public function show(Section $section, Request $request)
     {
         return response()->format([
-            'html' => view('tags.show', [
-                'tag' => $tag,
+            'html' => view('sections.show', [
+                'section' => $section,
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
-                'sections' => Section::all()->pluck('name', 'id'),
                 'authors' => Author::all()->pluck('name', 'id'),
-                'publishedFrom' => $request->input('published_from', 'today - 30 days'),
+                'tags' => Tag::all()->pluck('name', 'id'),
+                'publishedFrom' => $request->input('published_from', 'today - 2 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
-                'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
+                'conversionFrom' => $request->input('conversion_from', 'today - 2 days'),
                 'conversionTo' => $request->input('conversion_to', 'now'),
             ]),
-            'json' => new TagResource($tag),
+            'json' => new SectionResource($section),
         ]);
     }
 
-    public function dtTags(Request $request, DataTables $datatables)
+    public function dtSections(Request $request, DataTables $datatables)
     {
         $cols = [
-            'tags.id',
-            'tags.name',
+            'sections.id',
+            'sections.name',
             'COALESCE(articles_count, 0) AS articles_count',
             'COALESCE(conversions_count, 0) AS conversions_count',
             'COALESCE(conversions_amount, 0) AS conversions_amount',
@@ -70,24 +68,24 @@ class TagController extends Controller
             'COALESCE(timespent_subscribers / pageviews_subscribers, 0) AS avg_timespent_subscribers',
         ];
 
-        $tagArticlesQuery = ArticleTag::selectRaw(implode(',', [
-            'tag_id',
+        $sectionArticlesQuery = ArticleSection::selectRaw(implode(',', [
+            'section_id',
             'COUNT(*) as articles_count'
         ]))
-            ->leftJoin('articles', 'article_tag.article_id', '=', 'articles.id')
-            ->groupBy('tag_id');
+            ->leftJoin('articles', 'article_section.article_id', '=', 'articles.id')
+            ->groupBy('section_id');
 
         $conversionsQuery = Conversion::selectRaw(implode(',', [
-            'tag_id',
+            'section_id',
             'count(distinct conversions.id) as conversions_count',
             'sum(conversions.amount) as conversions_amount',
         ]))
-            ->leftJoin('article_tag', 'conversions.article_id', '=', 'article_tag.article_id')
-            ->leftJoin('articles', 'article_tag.article_id', '=', 'articles.id')
-            ->groupBy('tag_id');
+            ->leftJoin('article_section', 'conversions.article_id', '=', 'article_section.article_id')
+            ->leftJoin('articles', 'article_section.article_id', '=', 'articles.id')
+            ->groupBy('section_id');
 
         $pageviewsQuery = Article::selectRaw(implode(',', [
-            'tag_id',
+            'section_id',
             'COALESCE(SUM(pageviews_all), 0) AS pageviews_all',
             'COALESCE(SUM(pageviews_signed_in), 0) AS pageviews_signed_in',
             'COALESCE(SUM(pageviews_subscribers), 0) AS pageviews_subscribers',
@@ -95,22 +93,23 @@ class TagController extends Controller
             'COALESCE(SUM(timespent_signed_in), 0) AS timespent_signed_in',
             'COALESCE(SUM(timespent_subscribers), 0) AS timespent_subscribers',
         ]))
-            ->leftJoin('article_tag', 'articles.id', '=', 'article_tag.article_id')
-            ->groupBy('tag_id');
+            ->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id')
+            ->groupBy('section_id');
 
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'));
-            $tagArticlesQuery->where('published_at', '>=', $publishedFrom);
+            $sectionArticlesQuery->where('published_at', '>=', $publishedFrom);
             $conversionsQuery->where('published_at', '>=', $publishedFrom);
             $pageviewsQuery->where('published_at', '>=', $publishedFrom);
         }
 
         if ($request->input('published_to')) {
             $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'));
-            $tagArticlesQuery->where('published_at', '<=', $publishedTo);
+            $sectionArticlesQuery->where('published_at', '<=', $publishedTo);
             $conversionsQuery->where('published_at', '<=', $publishedTo);
             $pageviewsQuery->where('published_at', '<=', $publishedTo);
         }
+
         if ($request->input('conversion_from')) {
             $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'));
             $conversionsQuery->where('paid_at', '>=', $conversionFrom);
@@ -120,18 +119,18 @@ class TagController extends Controller
             $conversionsQuery->where('paid_at', '<=', $conversionTo);
         }
 
-        $tags = Tag::selectRaw(implode(",", $cols))
-            ->leftJoin(DB::raw("({$tagArticlesQuery->toSql()}) as aa"), 'tags.id', '=', 'aa.tag_id')->addBinding($tagArticlesQuery->getBindings())
-            ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'tags.id', '=', 'c.tag_id')->addBinding($conversionsQuery->getBindings())
-            ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'tags.id', '=', 'pv.tag_id')->addBinding($pageviewsQuery->getBindings())
-            ->groupBy(['tags.name', 'tags.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all',
+        $sections = Section::selectRaw(implode(",", $cols))
+            ->leftJoin(DB::raw("({$sectionArticlesQuery->toSql()}) as aa"), 'sections.id', '=', 'aa.section_id')->addBinding($sectionArticlesQuery->getBindings())
+            ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'sections.id', '=', 'c.section_id')->addBinding($conversionsQuery->getBindings())
+            ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'sections.id', '=', 'pv.section_id')->addBinding($pageviewsQuery->getBindings())
+            ->groupBy(['sections.name', 'sections.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all',
                 'pageviews_signed_in', 'pageviews_subscribers', 'timespent_all', 'timespent_signed_in', 'timespent_subscribers']);
 
         $conversionsQuery = \DB::table('conversions')
-            ->selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, article_tag.tag_id')
-            ->join('article_tag', 'conversions.article_id', '=', 'article_tag.article_id')
-            ->join('articles', 'article_tag.article_id', '=', 'articles.id')
-            ->groupBy(['article_tag.tag_id', 'conversions.currency']);
+            ->selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, article_section.section_id')
+            ->join('article_section', 'conversions.article_id', '=', 'article_section.article_id')
+            ->join('articles', 'article_section.article_id', '=', 'articles.id')
+            ->groupBy(['article_section.section_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
             $conversionsQuery->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz')));
@@ -151,30 +150,30 @@ class TagController extends Controller
         $conversionAmounts = [];
         $conversionCounts = [];
         foreach ($conversionsQuery->get() as $record) {
-            $conversionAmounts[$record->tag_id][$record->currency] = $record->sum;
-            $conversionCounts[$record->tag_id] = $record->count;
+            $conversionAmounts[$record->section_id][$record->currency] = $record->sum;
+            $conversionCounts[$record->section_id] = $record->count;
         }
 
-        return $datatables->of($tags)
-            ->addColumn('name', function (Tag $tag) {
-                return Html::linkRoute('tags.show', $tag->name, $tag);
+        return $datatables->of($sections)
+            ->addColumn('name', function (Section $section) {
+                return Html::linkRoute('sections.show', $section->name, $section);
             })
             ->filterColumn('name', function (Builder $query, $value) {
-                $tagIds = explode(',', $value);
-                $query->where(function (Builder $query) use ($tagIds, $value) {
-                    $query->where('tags.name', 'like', '%' . $value . '%')
-                        ->orWhereIn('tags.id', $tagIds);
+                $sectionIds = explode(',', $value);
+                $query->where(function (Builder $query) use ($sectionIds, $value) {
+                    $query->where('sections.name', 'like', '%' . $value . '%')
+                        ->orWhereIn('sections.id', $sectionIds);
                 });
             })
-            ->addColumn('conversions_count', function (Tag $tag) use ($conversionCounts) {
-                return $conversionCounts[$tag->id] ?? 0;
+            ->addColumn('conversions_count', function (Section $section) use ($conversionCounts) {
+                return $conversionCounts[$section->id] ?? 0;
             })
-            ->addColumn('conversions_amount', function (Tag $tag) use ($conversionAmounts) {
-                if (!isset($conversionAmounts[$tag->id])) {
+            ->addColumn('conversions_amount', function (Section $section) use ($conversionAmounts) {
+                if (!isset($conversionAmounts[$section->id])) {
                     return 0;
                 }
                 $amounts = [];
-                foreach ($conversionAmounts[$tag->id] as $currency => $c) {
+                foreach ($conversionAmounts[$section->id] as $currency => $c) {
                     $c = round($c, 2);
                     $amounts[] = "{$c} {$currency}";
                 }
@@ -185,8 +184,10 @@ class TagController extends Controller
             ->make(true);
     }
 
-    public function dtArticles(Tag $tag, Request $request, Datatables $datatables)
+    public function dtArticles(Section $section, Request $request, Datatables $datatables)
     {
+        ini_set('memory_limit', '512M');
+
         // main articles query to fetch list of all articles with related metadata
         $articles = Article::selectRaw(implode(',', [
             "articles.id",
@@ -205,11 +206,11 @@ class TagController extends Controller
             'timespent_subscribers / pageviews_subscribers as avg_timespent_subscribers',
         ]))
             ->with(['authors', 'sections', 'tags'])
-            ->join('article_tag', 'articles.id', '=', 'article_tag.article_id')
-            ->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id')
+            ->join('article_section', 'articles.id', '=', 'article_section.article_id')
             ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
+            ->leftJoin('article_tag', 'articles.id', '=', 'article_tag.article_id')
             ->where([
-                'article_tag.tag_id' => $tag->id
+                'article_section.section_id' => $section->id
             ])
             ->groupBy(['articles.id', 'articles.title', 'articles.published_at', 'articles.url', "articles.pageviews_all",
                 "articles.pageviews_signed_in", "articles.pageviews_subscribers", "articles.timespent_all",
@@ -219,10 +220,10 @@ class TagController extends Controller
         // filtering query (used as subquery - joins were messing with counts and sums) to fetch matching conversions
         $conversionsFilter = \DB::table('conversions')
             ->distinct()
-            ->join('article_tag', 'conversions.article_id', '=', 'article_tag.article_id')
-            ->join('articles', 'articles.id', '=', 'article_tag.article_id')
+            ->join('article_section', 'conversions.article_id', '=', 'article_section.article_id')
+            ->join('articles', 'articles.id', '=', 'article_section.article_id')
             ->where([
-                'article_tag.tag_id' => $tag->id
+                'article_section.section_id' => $section->id
             ]);
         // adding conditions to queries based on request inputs
         if ($request->input('published_from')) {
@@ -328,19 +329,19 @@ class TagController extends Controller
                 $values = explode(',', $value);
                 $query->whereIn('articles.content_type', $values);
             })
-            ->filterColumn('sections[, ].name', function (Builder $query, $value) {
-                $values = explode(',', $value);
-                $filterQuery = \DB::table('sections')
-                    ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
-                    ->whereIn('article_section.author_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
-            })
             ->filterColumn('authors[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);
                 $filterQuery = \DB::table('authors')
                     ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
                     ->whereIn('article_author.author_id', $values);
+                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
+            })
+            ->filterColumn('tags[, ].name', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $filterQuery = \DB::table('tags')
+                    ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
+                    ->whereIn('article_tag.tag_id', $values);
                 $articleIds = $filterQuery->pluck('articles.id')->toArray();
                 $query->whereIn('articles.id', $articleIds);
             })
@@ -351,45 +352,5 @@ class TagController extends Controller
             ->orderColumn('conversions_sum', 'conversions_sum $1')
             ->orderColumn('conversions_avg', 'conversions_avg $1')
             ->make(true);
-    }
-
-    public function topTags(TopSearchRequest $request, TopSearch $topSearch)
-    {
-        $limit = $request->json('limit');
-        $timeFrom = Carbon::parse($request->json('from'));
-
-        $sections = $request->json('sections');
-        $sectionValueType = null;
-        $sectionValues = null;
-        if (isset($sections['external_id'])) {
-            $sectionValueType = 'external_id';
-            $sectionValues = $sections['external_id'];
-        } elseif (isset($sections['name'])) {
-            $sectionValueType = 'name';
-            $sectionValues = $sections['name'];
-        }
-
-        $authors = $request->json('authors');
-        $authorValueType = null;
-        $authorValues = null;
-        if (isset($authors['external_id'])) {
-            $authorValueType = 'external_id';
-            $authorValues = $authors['external_id'];
-        } elseif (isset($authors['name'])) {
-            $authorValueType = 'name';
-            $authorValues = $authors['name'];
-        }
-
-        $contentType = $request->json('content_type');
-
-        return response()->json($topSearch->topPostTags(
-            $timeFrom,
-            $limit,
-            $sectionValueType,
-            $sectionValues,
-            $authorValueType,
-            $authorValues,
-            $contentType
-        ));
     }
 }
