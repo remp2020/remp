@@ -295,7 +295,7 @@ final class JobPresenter extends BasePresenter
         $this->batchTemplatesRepository->delete($batchTemplate);
 
         $this->flashMessage('Email was removed');
-        $this->redirect('Show', $batchTemplate->job_id);
+        $this->redirect('Show', $batchTemplate->mail_job_id);
     }
 
     public function handleSetBatchReady($id)
@@ -304,7 +304,7 @@ final class JobPresenter extends BasePresenter
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
 
         $this->flashMessage('Status of batch was changed.');
-        $this->redirect('Show', $batch->job_id);
+        $this->redirect('Show', $batch->mail_job_id);
     }
 
     public function handleSetBatchSend($id)
@@ -315,7 +315,7 @@ final class JobPresenter extends BasePresenter
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_SENDING]);
 
         $this->flashMessage('Status of batch was changed.');
-        $this->redirect('Show', $batch->job_id);
+        $this->redirect('Show', $batch->mail_job_id);
     }
 
     public function handleSetBatchUserStop($id)
@@ -325,7 +325,7 @@ final class JobPresenter extends BasePresenter
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_USER_STOP]);
 
         $this->flashMessage('Status of batch was changed.');
-        $this->redirect('Show', $batch->job_id);
+        $this->redirect('Show', $batch->mail_job_id);
     }
 
     public function handleSetBatchCreated($id)
@@ -334,7 +334,7 @@ final class JobPresenter extends BasePresenter
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_CREATED]);
 
         $this->flashMessage('Status of batch was changed.');
-        $this->redirect('Show', $batch->job_id);
+        $this->redirect('Show', $batch->mail_job_id);
     }
 
     public function handleRemoveBatch($id)
@@ -346,7 +346,7 @@ final class JobPresenter extends BasePresenter
         ])->count('*');
         if ($sentCount > 0) {
             $this->flashMessage('Batch was not removed, some emails were already sent');
-            $this->redirect('Show', $batch->job_id);
+            $this->redirect('Show', $batch->mail_job_id);
         }
 
         $this->batchTemplatesRepository->deleteByBatchId($batch->id);
@@ -355,7 +355,7 @@ final class JobPresenter extends BasePresenter
         $this->batchesRepository->delete($batch);
 
         $this->flashMessage('Batch was removed.');
-        $this->redirect('Show', $batch->job_id);
+        $this->redirect('Show', $batch->mail_job_id);
     }
 
     public function handleTemplatesByListId($listId, $sourceForm, $sourceField, $targetField, $snippet = null)
