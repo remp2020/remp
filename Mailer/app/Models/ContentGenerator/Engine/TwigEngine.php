@@ -9,10 +9,9 @@ class TwigEngine implements IEngine
 {
     public function render(string $content, array $params = []): string
     {
-        $loader = new ArrayLoader([
-            'index.html' => $content,
-        ]);
-
+        $templates = $params['snippets'] ?? [];
+        $templates['index.html'] = $content;
+        $loader = new ArrayLoader($templates);
         $twig = new Environment($loader);
 
         return $twig->render('index.html', $params);

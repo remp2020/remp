@@ -56,6 +56,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Configuration of form control html attributes changed from `setAttribute` to `setHtmlAttribute`.
 - Added new `codes` parameter to `GET /api/v1/mailers/templates` API endpoint. Parameter is used to list email templates for given mail_template codes. remp/remp#814
 - Added `click_tracking` parameter to `POST /api/v1/mailers/templates` to define whether click tracking should be enabled/disabled/use default for created template. remp/remp#824
+- Added *snippets* which are independent part of emails that can be included across all templates, layouts and other snippets. remp/remp#550
 
 ## [0.19.0] - 2021-02-16
 

@@ -1,0 +1,15 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Snippets</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2 n:block="title">Add new snippet <small></small></h2>
+    </div>
+    <div class="card-body card-padding">
+        {include '@form.latte'}
+    </div>
+</div>

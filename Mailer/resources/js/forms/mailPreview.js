@@ -2,6 +2,7 @@ import MailPreview from '../components/MailPreview.vue';
 import icons from "trumbowyg/dist/ui/icons.svg";
 import "trumbowyg/dist/ui/trumbowyg.css"
 import "trumbowyg/dist/trumbowyg.js";
+import "./trumbowyg-snippets-plugin.js";
 
 $.trumbowyg.svgPath = icons;
 
@@ -42,10 +43,26 @@ window.remplib = typeof(remplib) === 'undefined' ? {} : window.remplib;
             });
         },
         trumbowyg: (element) => {
+            let buttons = $.trumbowyg.defaultOptions.btns;
+            let plugins = {};
+            const snippetsData = $(element).data('snippets')
+
+            if (snippetsData) {
+                buttons.push([['snippets']]);
+                for (const item in snippetsData) {
+                    // let html = `<div contentEditable="false">{{ include('${snippetsData[item].name}') }}</div>`;
+                    let html = `{{ include('${snippetsData[item].code}') }}`;
+                    snippetsData[item].html = html;
+                }
+                plugins.snippets = snippetsData;
+            }
+
             return $(element).trumbowyg({
                 semanticKeepAttributes: true,
                 semantic: false,
                 autogrow: true,
+                btns: buttons,
+                plugins: plugins,
             });
         },
 
@@ -63,13 +80,13 @@ window.remplib = typeof(remplib) === 'undefined' ? {} : window.remplib;
                 data: function() {
                     return {
                         "htmlContent": initialContent,
-                        "htmlLayout": getLayoutTemplate(),
+                        "htmlLayout": getLayoutTemplate().layout_html,
                     }
                 },
                 render: h => h(MailPreview),
             });
             mailLayoutSelect.addEventListener('change', function(e) {
-                vue.htmlLayout = getLayoutTemplate();
+                vue.htmlLayout = getLayoutTemplate().layout_html;
                 $('body').trigger('preview:change');
             });
             return vue;
