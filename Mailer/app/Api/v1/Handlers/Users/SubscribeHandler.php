@@ -10,8 +10,9 @@ use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class SubscribeHandler extends BaseHandler
 {
@@ -35,14 +36,14 @@ class SubscribeHandler extends BaseHandler
         $this->listVariantsRepository = $listVariantsRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST_RAW, 'raw')
+            new RawInputParam('raw'),
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $payload = $this->validateInput($params['raw'], __DIR__ . '/subscribe.schema.json');
 
@@ -77,11 +78,11 @@ class SubscribeHandler extends BaseHandler
     /**
      * Validate and load list from $payload
      *
-     * @param $payload
+     * @param array $payload
      * @return ActiveRow $list - Returns mail list entity.
      * @throws InvalidApiInputParamException - Thrown if list_id or list_code are invalid (code 400) or if list is not found (code 404).
      */
-    protected function getList($payload): ActiveRow
+    protected function getList(array $payload): ActiveRow
     {
         if (isset($payload['list_code'])) {
             $list = $this->listsRepository->findByCode($payload['list_code'])->fetch();

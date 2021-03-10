@@ -5,9 +5,7 @@ namespace Remp\MailerModule\Repositories;
 
 use Nette\Caching\IStorage;
 use Nette\Database\Context;
-use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories;
 
 class UserSubscriptionsRepository extends Repository
 {
@@ -30,27 +28,27 @@ class UserSubscriptionsRepository extends Repository
         return parent::update($row, $data);
     }
 
-    public function findByUserId($userId)
+    public function findByUserId(int $userId): array
     {
         return $this->getTable()->where(['user_id' => $userId])->fetchAll();
     }
 
-    public function findByEmail($email)
+    public function findByEmail(string $email): array
     {
         return $this->getTable()->where(['user_email' => $email])->fetchAll();
     }
 
-    public function findByEmailList($email, $listId)
+    public function findByEmailList(string $email, int $listId): ?ActiveRow
     {
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $listId])->fetch();
     }
 
-    public function isEmailSubscribed($email, $typeId)
+    public function isEmailSubscribed(string $email, int $typeId): bool
     {
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $typeId, 'subscribed' => true])->count('*') > 0;
     }
 
-    public function isEmailUnsubscribed($email, $typeId)
+    public function isEmailUnsubscribed(string $email, int $typeId): bool
     {
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $typeId, 'subscribed' => false])->count('*') > 0;
     }
@@ -60,7 +58,7 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_id' => $userId, 'mail_type_id' => $mailTypeId, 'subscribed' => false])->count('*') > 0;
     }
 
-    public function filterSubscribedEmails(array $emails, $typeId)
+    public function filterSubscribedEmails(array $emails, int $typeId): array
     {
         return $this->getTable()->where([
             'user_email' => $emails,
@@ -69,7 +67,7 @@ class UserSubscriptionsRepository extends Repository
         ])->select('user_email')->fetchPairs('user_email', 'user_email');
     }
 
-    public function subscribeUser(ActiveRow $mailType, $userId, $email, $variantId = null)
+    public function subscribeUser(ActiveRow $mailType, int $userId, string $email, int $variantId = null): void
     {
         if ($variantId == null) {
             $variantId = $mailType->default_variant_id;
@@ -110,7 +108,7 @@ class UserSubscriptionsRepository extends Repository
         }
     }
 
-    public function unsubscribeUser(ActiveRow $mailType, $userId, $email, $rtmParams = [])
+    public function unsubscribeUser(ActiveRow $mailType, int $userId, string $email, array $rtmParams = []): void
     {
         // TODO: check for userId also when searching for actual subscription
         $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch();
@@ -134,7 +132,7 @@ class UserSubscriptionsRepository extends Repository
         }
     }
 
-    public function unsubscribeEmail(ActiveRow $mailType, $email, $rtmParams = [])
+    public function unsubscribeEmail(ActiveRow $mailType, string $email, array $rtmParams = []): void
     {
         $actual = $this->getTable()->where([
             'user_email' => $email,
@@ -154,7 +152,7 @@ class UserSubscriptionsRepository extends Repository
         $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
     }
 
-    public function getAllSubscribersDataForMailTypes(array $mailTypeIds)
+    public function getAllSubscribersDataForMailTypes(array $mailTypeIds): Selection
     {
         return $this->getTable()
             ->select('COUNT(*) AS count, mail_type_id, subscribed')
@@ -162,12 +160,12 @@ class UserSubscriptionsRepository extends Repository
             ->group('mail_type_id, subscribed');
     }
 
-    public function getUserSubscription(ActiveRow $mailType, $userId, $email)
+    public function getUserSubscription(ActiveRow $mailType, int $userId, string $email): ?ActiveRow
     {
         return $this->getTable()->where(['user_id' => $userId, 'mail_type_id' => $mailType->id, 'user_email' => $email])->limit(1)->fetch();
     }
 
-    public function unsubscribeUserVariant(ActiveRow $userSubscription, ActiveRow $variant, $rtmParams = [])
+    public function unsubscribeUserVariant(ActiveRow $userSubscription, ActiveRow $variant, array $rtmParams = []): void
     {
         $this->userSubscriptionVariantsRepository->removeSubscribedVariant($userSubscription, $variant->id);
         if ($this->userSubscriptionVariantsRepository->subscribedVariants($userSubscription)->count('*') == 0) {
@@ -175,7 +173,7 @@ class UserSubscriptionsRepository extends Repository
         }
     }
 
-    public function getMailTypeGraphData($mailTypeId, \DateTime $from, \DateTime $to)
+    public function getMailTypeGraphData(int $mailTypeId, \DateTime $from, \DateTime $to): Selection
     {
         return $this->getTable()
             ->select('

@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\ILatteFactory;
+use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory;
@@ -62,6 +63,12 @@ final class JobPresenter extends BasePresenter
 
     private $listsRepository;
 
+    private $dataTableFactory;
+
+    private $sendingStatsFactory;
+
+    private $batchExperimentEvaluationFactory;
+
     public function __construct(
         JobsRepository $jobsRepository,
         JobFormFactory $jobFormFactory,
@@ -76,9 +83,12 @@ final class JobPresenter extends BasePresenter
         Aggregator $segmentAggregator,
         MailCache $mailCache,
         JobQueueRepository $jobQueueRepository,
-        ILatteFactory $latteFactory,
+        LatteFactory $latteFactory,
         LinkGenerator $linkGenerator,
-        ListsRepository $listsRepository
+        ListsRepository $listsRepository,
+        IDataTableFactory $dataTableFactory,
+        ISendingStatsFactory $sendingStatsFactory,
+        IBatchExperimentEvaluationFactory $batchExperimentEvaluationFactory
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
@@ -97,13 +107,16 @@ final class JobPresenter extends BasePresenter
         $this->latteFactory = $latteFactory;
         $this->linkGenerator = $linkGenerator;
         $this->listsRepository = $listsRepository;
+        $this->dataTableFactory = $dataTableFactory;
+        $this->sendingStatsFactory = $sendingStatsFactory;
+        $this->batchExperimentEvaluationFactory = $batchExperimentEvaluationFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory)
+    public function createComponentDataTableDefault()
     {
         $mailTypePairs = $this->listsRepository->all()->fetchPairs('id', 'title');
 
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('defaultJsonData'))
             ->setColSetting('created_at', [
@@ -352,7 +365,7 @@ final class JobPresenter extends BasePresenter
             $this[$sourceForm][$sourceField]
                 ->setDefaultValue($listId);
             $this[$sourceForm][$targetField]
-                ->setItems($this->templatesRepository->pairs($listId));
+                ->setItems($this->templatesRepository->pairs((int) $listId));
         } else {
             $this[$sourceForm][$sourceField]
                 ->setDefaultValue(null);
@@ -413,10 +426,10 @@ final class JobPresenter extends BasePresenter
         });
     }
 
-    protected function createComponentTemplateStats(ISendingStatsFactory $factory)
+    protected function createComponentTemplateStats()
     {
-        return new Multiplier(function ($templateId) use ($factory) {
-            $templateStats = $factory->create();
+        return new Multiplier(function ($templateId) {
+            $templateStats = $this->sendingStatsFactory->create();
 
             $template = $this->templatesRepository->find($templateId);
             $templateStats->addTemplate($template);
@@ -426,10 +439,10 @@ final class JobPresenter extends BasePresenter
         });
     }
 
-    protected function createComponentJobBatchTemplateStats(ISendingStatsFactory $factory)
+    protected function createComponentJobBatchTemplateStats()
     {
-        return new Multiplier(function ($jobBatchTemplateId) use ($factory) {
-            $stats = $factory->create();
+        return new Multiplier(function ($jobBatchTemplateId) {
+            $stats = $this->sendingStatsFactory->create();
 
             $jobBatchTemplate = $this->batchTemplatesRepository->find($jobBatchTemplateId);
             $stats->addJobBatchTemplate($jobBatchTemplate);
@@ -439,9 +452,9 @@ final class JobPresenter extends BasePresenter
         });
     }
 
-    protected function createComponentJobStats(ISendingStatsFactory $factory)
+    protected function createComponentJobStats()
     {
-        $templateStats = $factory->create();
+        $templateStats = $this->sendingStatsFactory->create();
 
         $batches = $this->batchesRepository
             ->getTable()
@@ -457,8 +470,8 @@ final class JobPresenter extends BasePresenter
         return $templateStats;
     }
 
-    public function createComponentBatchExperimentEvaluation(IBatchExperimentEvaluationFactory $factory)
+    public function createComponentBatchExperimentEvaluation()
     {
-        return $factory->create();
+        return $this->batchExperimentEvaluationFactory->create();
     }
 }

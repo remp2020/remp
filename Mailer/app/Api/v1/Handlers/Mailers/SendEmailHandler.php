@@ -17,7 +17,9 @@ use Tomaj\Hermes\Emitter;
 use Tomaj\Hermes\Message;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 use Tracy\Debugger;
 
 class SendEmailHandler extends BaseHandler
@@ -45,14 +47,14 @@ class SendEmailHandler extends BaseHandler
         $this->hermesEmitter = $hermesEmitter;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST_RAW, 'raw')
+            new RawInputParam('raw')
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $payload = $this->validateInput($params['raw'], __DIR__ . '/email.schema.json');
         if ($this->hasErrorResponse()) {

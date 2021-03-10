@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Api\v1\Handlers\Segments;
 use Remp\MailerModule\Models\Segment\Aggregator;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class SegmentsListingHandler extends BaseHandler
 {
@@ -17,7 +18,7 @@ class SegmentsListingHandler extends BaseHandler
         $this->aggregator = $aggregator;
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $output = [];
         foreach ($this->aggregator->list() as $segment) {

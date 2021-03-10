@@ -10,19 +10,22 @@ use Remp\MailerModule\Repositories\LogsRepository;
 
 final class LogPresenter extends BasePresenter
 {
-    /** @var LogsRepository */
     private $logsRepository;
 
+    private $dataTableFactory;
+
     public function __construct(
-        LogsRepository $logsRepository
+        LogsRepository $logsRepository,
+        IDataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->logsRepository = $logsRepository;
+        $this->dataTableFactory = $dataTableFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableDefault(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setColSetting('created_at', [
                 'header' => 'sent at',

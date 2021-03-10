@@ -10,6 +10,7 @@ use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\PostInputParam;
 
 class MinutaAlertGenerator implements IGenerator
 {
@@ -45,8 +46,8 @@ class MinutaAlertGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'post', InputParam::REQUIRED)
+            (new PostInputParam('source_template_id'))->setRequired(),
+            (new PostInputParam('post'))->setRequired(),
         ];
     }
 

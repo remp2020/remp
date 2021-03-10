@@ -6,7 +6,9 @@ namespace Remp\MailerModule\Api\v1\Handlers\Users;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\PostInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class EmailChangedHandler extends BaseHandler
 {
@@ -19,15 +21,15 @@ class EmailChangedHandler extends BaseHandler
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'original_email', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'new_email', InputParam::REQUIRED),
+            (new PostInputParam('original_email'))->setRequired(),
+            (new PostInputParam('new_email'))->setRequired(),
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $originalEmail = $params['original_email'];
         $newEmail = $params['new_email'];

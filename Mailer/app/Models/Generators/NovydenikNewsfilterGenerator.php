@@ -10,6 +10,7 @@ use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\PostInputParam;
 
 class NovydenikNewsfilterGenerator implements IGenerator
 {
@@ -46,12 +47,12 @@ class NovydenikNewsfilterGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'newsfilter_html', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'editor', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'summary', InputParam::OPTIONAL),
-            new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
+            (new PostInputParam('source_template_id'))->setRequired(),
+            (new PostInputParam('newsfilter_html'))->setRequired(),
+            (new PostInputParam('title'))->setRequired(),
+            (new PostInputParam('editor'))->setRequired(),
+            (new PostInputParam('summary'))->setRequired(),
+            (new PostInputParam('from'))->setRequired(),
         ];
     }
 
@@ -220,12 +221,12 @@ class NovydenikNewsfilterGenerator implements IGenerator
             ->setRequired("Field 'Editor' is required.");
 
         $form->addTextArea('summary', 'Summary')
-            ->setAttribute('rows', 3)
+            ->setHtmlAttribute('rows', 3)
             ->setRequired("Field 'Summary' is required.");
 
         $form->addTextArea('newsfilter_html', 'HTML')
-            ->setAttribute('rows', 20)
-            ->setAttribute('class', 'form-control html-editor')
+            ->setHtmlAttribute('rows', 20)
+            ->setHtmlAttribute('class', 'form-control html-editor')
             ->getControlPrototype();
 
         $form->addHidden('article_id');
@@ -244,7 +245,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
     }
 
     /**
-     * @param $data object containing WP article data
+     * @param \stdClass $data containing WP article data
      * @return ArrayHash with data to fill the form with
      */
     public function preprocessParameters($data): ?ArrayHash

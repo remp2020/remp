@@ -23,27 +23,26 @@ class MediaBriefingWidget extends BaseControl implements IGeneratorWidget
 
     private $layoutsRepository;
 
-    private $templatesRepository;
-
     private $session;
 
     private $listsRepository;
 
     private $contentGenerator;
 
+    private $mediaBriefingTemplateFormFactory;
+
     public function __construct(
         Session $session,
         LayoutsRepository $layoutsRepository,
-        TemplatesRepository $templatesRepository,
         ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator
+        ContentGenerator $contentGenerator,
+        MediaBriefingTemplateFormFactory $mediaBriefingTemplateFormFactory
     ) {
-        parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
-        $this->templatesRepository = $templatesRepository;
         $this->session = $session;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
+        $this->mediaBriefingTemplateFormFactory = $mediaBriefingTemplateFormFactory;
     }
 
     public function identifier(): string
@@ -65,10 +64,10 @@ class MediaBriefingWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentMediaBriefingTemplateForm(MediaBriefingTemplateFormFactory $mediaBriefingTemplateFormFactory): Form
+    public function createComponentMediaBriefingTemplateForm(): Form
     {
-        $form = $mediaBriefingTemplateFormFactory->create();
-        $mediaBriefingTemplateFormFactory->onSave = function () {
+        $form = $this->mediaBriefingTemplateFormFactory->create();
+        $this->mediaBriefingTemplateFormFactory->onSave = function () {
             $this->getPresenter()->flashMessage("MediaBriefing batches were created and run.");
             $this->getPresenter()->redirect("Job:Default");
         };

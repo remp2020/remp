@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
-use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories;
-use Remp\MailerModule\Repositories\Selection;
 
 class ListsRepository extends Repository
 {
@@ -14,7 +11,7 @@ class ListsRepository extends Repository
 
     protected $dataTableSearchable = ['code', 'title', 'description'];
 
-    public function all()
+    public function all(): Selection
     {
         return $this->getTable()->order('sorting ASC');
     }
@@ -32,7 +29,7 @@ class ListsRepository extends Repository
         ?string $previewUrl = null,
         ?string $imageUrl = null,
         bool $publicListing = true
-    ) {
+    ): ActiveRow {
         $result = $this->insert([
             'mail_type_category_id' => $categoryId,
             'priority' => $priority,
@@ -86,20 +83,17 @@ class ListsRepository extends Repository
         )->update(['sorting+=' => 1]);
     }
 
-    public function findByCode(string $code)
+    public function findByCode(string $code): Selection
     {
         return $this->getTable()->where(['code' => $code]);
     }
 
-    public function findByCategory(int $categoryId)
+    public function findByCategory(int $categoryId): Selection
     {
         return $this->getTable()->where(['mail_type_category_id' => $categoryId]);
     }
 
-    /**
-     * @return Selection
-     */
-    public function tableFilter()
+    public function tableFilter(): Selection
     {
         return $this->getTable()->order('mail_type_category.sorting, mail_types.sorting');
     }

@@ -5,7 +5,6 @@ namespace Remp\MailerModule\Repositories;
 
 use Nette\Database\Context;
 use Nette\Security\IUserStorage;
-use Remp\MailerModule\Repositories;
 
 class AuditLogRepository extends Repository
 {

@@ -17,7 +17,7 @@ services:
             - setupLockLink("Registration", "https://www.demosite.com/registration")
 
     unsubscribeDroppedHandler:
-        class: Remp\MailerModule\Hermes\UnsubscribeDroppedHandler
+        factory: Remp\MailerModule\Hermes\UnsubscribeDroppedHandler
         setup:
             - setThreshold(3) # number of dropped emails before unsubscribing user
 
@@ -53,7 +53,7 @@ services:
 
 #    - Remp\MailerModule\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
 #    eventDispatcher:
-#        class: League\Event\EventDispatcher
+#        factory: League\Event\EventDispatcher
 #        setup:
 #            - subscribeTo(Remp\MailerModule\Events\MailSentEvent, Remp\MailerModule\Events\MailSentEventHandler())
 

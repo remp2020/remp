@@ -25,50 +25,41 @@ use Tomaj\Hermes\Emitter;
 use Nette\Utils\DateTime;
 use DateInterval;
 use IntlDateFormatter;
-use Remp\MailerModule\Models\DateFormatterFactory;
+use Remp\MailerModule\Models\Formatters\DateFormatterFactory;
 
 final class ListPresenter extends BasePresenter
 {
-    /** @var ListsRepository */
     private $listsRepository;
 
-    /** @var TemplatesRepository */
     private $templatesRepository;
 
-    /** @var MailTypeStatsRepository */
     private $mailTypeStatsRepository;
 
-    /** @var MailTemplateStatsRepository */
     private $mailTemplateStatsRepository;
-
-    /** @var BatchTemplatesRepository */
-    private $batchTemplatesRepository;
 
     private $userSubscriptionsRepository;
 
-    /** @var ListFormFactory */
     private $listFormFactory;
 
-    /** @var ListVariantsRepository */
     private $listVariantsRepository;
 
-    /** @var IntlDateFormatter */
     private $dateFormatter;
 
-    /** @var Emitter */
     private $emitter;
+
+    private $dataTableFactory;
 
     public function __construct(
         ListsRepository $listsRepository,
         TemplatesRepository $templatesRepository,
         MailTypeStatsRepository $mailTypeStatsRepository,
         MailTemplateStatsRepository $mailTemplateStatsRepository,
-        BatchTemplatesRepository $batchTemplatesRepository,
         UserSubscriptionsRepository $userSubscriptionsRepository,
         DateFormatterFactory $dateFormatterFactory,
         ListFormFactory $listFormFactory,
         ListVariantsRepository $listVariantsRepository,
-        Emitter $emitter
+        Emitter $emitter,
+        IDataTableFactory $dataTableFactory
     ) {
         parent::__construct();
 
@@ -79,16 +70,16 @@ final class ListPresenter extends BasePresenter
         $this->templatesRepository = $templatesRepository;
         $this->mailTypeStatsRepository = $mailTypeStatsRepository;
         $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
-        $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->listFormFactory = $listFormFactory;
         $this->listVariantsRepository = $listVariantsRepository;
         $this->emitter = $emitter;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
+        $this->dataTableFactory = $dataTableFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableDefault(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setColSetting('category', [
                 'visible' => false,
@@ -257,9 +248,9 @@ final class ListPresenter extends BasePresenter
         $this->template->list = $list;
     }
 
-    public function createComponentDataTableTemplates(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableTemplates(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('templateJsonData'))
             ->setColSetting('created_at', [
@@ -288,11 +279,11 @@ final class ListPresenter extends BasePresenter
         $request = $this->request->getParameters();
 
         $templatesCount = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], [$request['listId']])
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $request['listId'], $request['length'], $request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], [$request['listId']], (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
@@ -323,9 +314,9 @@ final class ListPresenter extends BasePresenter
         $this->presenter->sendJson($result);
     }
 
-    public function createComponentDataTableVariants(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableVariants(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('variantsJsonData'))
             ->setColSetting('title', [
@@ -521,7 +512,7 @@ final class ListPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        $data = $this->mailTemplateStatsRepository->getMailTypeGraphData((int)$id, $from, $to)->fetchAll();
+        $data = $this->mailTemplateStatsRepository->getMailTypeGraphData((int) $id, $from, $to)->fetchAll();
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
@@ -578,9 +569,9 @@ final class ListPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        $unsubscibedData = $this->userSubscriptionsRepository->getMailTypeGraphData($id, $from, $to)
+        $unsubscribedData = $this->userSubscriptionsRepository->getMailTypeGraphData((int) $id, $from, $to)
             ->fetchAll();
-        foreach ($unsubscibedData as $unsubscibedDataRow) {
+        foreach ($unsubscribedData as $unsubscibedDataRow) {
             $foundAt = array_search(
                 $unsubscibedDataRow->label_date->format($dateFormat),
                 $labels,

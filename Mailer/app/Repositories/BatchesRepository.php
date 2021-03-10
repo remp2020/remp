@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
-use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories;
 
 class BatchesRepository extends Repository
 {
@@ -30,7 +28,7 @@ class BatchesRepository extends Repository
 
     protected $tableName = 'mail_job_batch';
 
-    public function add(int $jobId, int $emailCount = null, string $startAt = null, string $method = 'random')
+    public function add(int $jobId, int $emailCount = null, string $startAt = null, string $method = 'random'): ActiveRow
     {
         $result = $this->insert([
             'mail_job_id' => $jobId,
@@ -48,19 +46,19 @@ class BatchesRepository extends Repository
         return $result;
     }
 
-    public function addTemplate(ActiveRow $batch, ActiveRow $template, int $weight = 100)
+    public function addTemplate(ActiveRow $batch, ActiveRow $template, int $weight = 100): ActiveRow
     {
-        $this->database->table('mail_job_batch_templates')->insert([
+        $row = $this->database->table('mail_job_batch_templates')->insert([
             'mail_job_id' => $batch->mail_job_id,
             'mail_job_batch_id' => $batch->id,
             'mail_template_id' => $template->id,
             'weight' => $weight,
             'created_at' => new DateTime(),
         ]);
+        return new ActiveRow($row->toArray(), $row->getTable());
     }
 
-
-    public function getBatchReady()
+    public function getBatchReady(): ?ActiveRow
     {
         return $this->getTable()->select('*')->where([
             'status' => self::STATUS_READY,
@@ -68,7 +66,7 @@ class BatchesRepository extends Repository
         ])->limit(1)->fetch();
     }
 
-    public function getBatchToSend()
+    public function getBatchToSend(): ?ActiveRow
     {
         return $this->getTable()
             ->select('mail_job_batch.*')
@@ -80,12 +78,12 @@ class BatchesRepository extends Repository
             ->fetch();
     }
 
-    public function getBatchPriority(ActiveRow $batch)
+    public function getBatchPriority(ActiveRow $batch): int
     {
         return $batch->related('mail_job_batch_templates')->fetch()->mail_template->mail_type->priority;
     }
 
-    public function getInProgressBatches(int $limit)
+    public function getInProgressBatches(int $limit): Selection
     {
         return $this->getTable()
             ->where([
@@ -100,7 +98,7 @@ class BatchesRepository extends Repository
             ->limit($limit);
     }
 
-    public function getLastDoneBatches(int $limit)
+    public function getLastDoneBatches(int $limit): Selection
     {
         return $this->getTable()
             ->where([
@@ -112,12 +110,11 @@ class BatchesRepository extends Repository
             ->limit($limit);
     }
 
-    public function notEditableBatches(int $jobId)
+    public function notEditableBatches(int $jobId): Selection
     {
         return $this->getTable()
             ->select('*')
             ->where(['mail_job_id' => $jobId])
-            ->where(['status NOT IN' => self::EDITABLE_STATUSES])
-            ;
+            ->where(['status NOT IN' => self::EDITABLE_STATUSES]);
     }
 }

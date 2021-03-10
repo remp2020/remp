@@ -9,8 +9,8 @@ use Remp\MailerModule\Components\GeneratorWidgets\Widgets\DennikeWidget\DennikeW
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
-use Tomaj\NetteApi\Params\InputParam;
 use GuzzleHttp\Client;
+use Tomaj\NetteApi\Params\PostInputParam;
 
 class DennikeGenerator implements IGenerator
 {
@@ -47,15 +47,15 @@ class DennikeGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'dennike_html', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'url', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'title', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'sub_title', InputParam::OPTIONAL),
-            new InputParam(InputParam::TYPE_POST, 'author', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'image_url', InputParam::OPTIONAL),
-            new InputParam(InputParam::TYPE_POST, 'image_title', InputParam::OPTIONAL),
-            new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
+            (new PostInputParam('source_template_id'))->setRequired(),
+            (new PostInputParam('dennike_html'))->setRequired(),
+            (new PostInputParam('url'))->setRequired(),
+            (new PostInputParam('title'))->setRequired(),
+            (new PostInputParam('sub_title')),
+            (new PostInputParam('author')),
+            (new PostInputParam('image_url')),
+            (new PostInputParam('image_title')),
+            (new PostInputParam('from'))->setRequired(),
         ];
     }
 
@@ -258,8 +258,8 @@ class DennikeGenerator implements IGenerator
             ->setRequired("Field 'Dennik E URL' is required.");
 
         $form->addTextArea('dennike_html', 'HTML')
-            ->setAttribute('rows', 20)
-            ->setAttribute('class', 'form-control html-editor')
+            ->setHtmlAttribute('rows', 20)
+            ->setHtmlAttribute('class', 'form-control html-editor')
             ->getControlPrototype();
 
         $form->addHidden('article_id');
@@ -278,7 +278,7 @@ class DennikeGenerator implements IGenerator
     }
 
     /**
-     * @param $data object containing WP article data
+     * @param \stdClass $data containing WP article data
      * @return ArrayHash with data to fill the form with
      */
     public function preprocessParameters($data): ?ArrayHash

@@ -2,13 +2,13 @@
 
 namespace Remp\NetteSso\Security;
 
-use Nette\Http\UrlScript;
-use Nette\Security\IAuthenticator;
+use Nette\Http\Url;
 use Nette\Http\IRequest;
 use Nette\Http\IResponse;
+use Nette\Security\IIdentity;
 use Nette\Security\Identity;
 
-class Authenticator implements IAuthenticator
+class Authenticator implements \Nette\Security\Authenticator
 {
     private $client;
 
@@ -28,15 +28,15 @@ class Authenticator implements IAuthenticator
 
     /**
      * @param array $credentials Only present due to interface limitations, please use empty array.
-     * @return Identity
+     * @return IIdentity
      */
-    public function authenticate(array $credentials)
+    function authenticate(string $user, string $password): IIdentity
     {
         $token = $this->request->getQuery('token');
         try {
             $result = $this->client->introspect($token);
         } catch (SsoExpiredException $e) {
-            $redirectUrl = new UrlScript($e->redirect);
+            $redirectUrl = new Url($e->redirect);
             $redirectUrl->setQueryParameter('successUrl', $this->request->getUrl()->getAbsoluteUrl());
             $redirectUrl->setQueryParameter('errorUrl', $this->errorUrl);
             $this->response->redirect($redirectUrl->getAbsoluteUrl());

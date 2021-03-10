@@ -6,7 +6,6 @@ namespace Remp\MailerModule\Models\Segment;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\StreamInterface;
-use Remp\MailerModule\Repositories\ActiveRow;
 
 class Crm implements ISegment
 {

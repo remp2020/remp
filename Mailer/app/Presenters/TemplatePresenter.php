@@ -40,6 +40,10 @@ final class TemplatePresenter extends BasePresenter
 
     private $contentGenerator;
 
+    private $dataTableFactory;
+
+    private $sendingStatsFactory;
+
     public function __construct(
         TemplatesRepository $templatesRepository,
         LogsRepository $logsRepository,
@@ -48,7 +52,9 @@ final class TemplatePresenter extends BasePresenter
         LayoutsRepository $layoutsRepository,
         SnippetRepository $snippetRepository,
         ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator
+        ContentGenerator $contentGenerator,
+        IDataTableFactory $dataTableFactory,
+        ISendingStatsFactory $sendingStatsFactory
     ) {
         parent::__construct();
         $this->templatesRepository = $templatesRepository;
@@ -59,13 +65,15 @@ final class TemplatePresenter extends BasePresenter
         $this->snippetRepository = $snippetRepository;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
+        $this->dataTableFactory = $dataTableFactory;
+        $this->sendingStatsFactory = $sendingStatsFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableDefault(): DataTable
     {
         $mailTypePairs = $this->listsRepository->all()->fetchPairs('id', 'title');
 
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setColSetting('created_at', [
                 'header' => 'created at',
@@ -173,9 +181,9 @@ final class TemplatePresenter extends BasePresenter
         $this->redirect('show', ['id' => $template->id]);
     }
 
-    public function createComponentDataTableLogs(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableLogs(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setSourceUrl($this->link('logJsonData'))
             ->setColSetting('created_at', [
@@ -322,9 +330,9 @@ final class TemplatePresenter extends BasePresenter
         return $form;
     }
 
-    protected function createComponentTemplateStats(ISendingStatsFactory $factory): Control
+    protected function createComponentTemplateStats(): Control
     {
-        $templateStats = $factory->create();
+        $templateStats = $this->sendingStatsFactory->create();
 
         if (isset($this->params['id'])) {
             $template = $this->templatesRepository->find($this->params['id']);

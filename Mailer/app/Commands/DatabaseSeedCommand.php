@@ -29,13 +29,13 @@ class DatabaseSeedCommand extends Command
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('db:seed')
             ->setDescription('Seed database with required values');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('');
         $output->writeln('<info>***** APPLICATION SEEDER *****</info>');
@@ -132,6 +132,7 @@ class DatabaseSeedCommand extends Command
         }
 
         $output->writeln('<info>OK!</info>');
-        return 0;
+
+        return Command::SUCCESS;
     }
 }

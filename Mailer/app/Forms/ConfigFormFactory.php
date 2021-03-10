@@ -9,7 +9,6 @@ use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Config\LocalConfig;
-use Remp\MailerModule\Models\Mailer\Mailer;
 use Remp\MailerModule\Repositories\ConfigsRepository;
 use Remp\MailerModule\Models\Sender\MailerFactory;
 
@@ -117,7 +116,7 @@ class ConfigFormFactory
                         break;
                     case Config::TYPE_HTML:
                         $othersContainer->addTextArea($config['name'], $config['display_name'])
-                            ->setAttribute('rows', 15)
+                            ->setHtmlAttribute('rows', 15)
                             ->setDefaultValue($config['value'])
                             ->getControlPrototype()
                             ->addAttributes(['class' => 'html-editor']);

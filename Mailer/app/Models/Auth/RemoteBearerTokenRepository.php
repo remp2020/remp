@@ -21,7 +21,7 @@ class RemoteBearerTokenRepository implements BearerTokenRepositoryInterface
         ]);
     }
 
-    public function validToken($token)
+    public function validToken(string $token): bool
     {
         try {
             $response = $this->client->request('GET', self::ENDPOINT_CHECK_TOKEN, [
@@ -42,7 +42,7 @@ class RemoteBearerTokenRepository implements BearerTokenRepositoryInterface
         return $response->getStatusCode() === 200;
     }
 
-    public function ipRestrictions($token)
+    public function ipRestrictions(string $token): string
     {
         return '*';
     }

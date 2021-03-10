@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories\ActiveRow;
-use Remp\MailerModule\Repositories;
 
 class ListVariantsRepository extends Repository
 {
@@ -24,12 +22,12 @@ class ListVariantsRepository extends Repository
         ]);
     }
 
-    public function findByIdAndMailTypeId(int $id, int $mailTypeID)
+    public function findByIdAndMailTypeId(int $id, int $mailTypeId): ?ActiveRow
     {
-        return $this->getTable()->where(['id' => $id, 'mail_type_id' => $mailTypeID])->fetch();
+        return $this->getTable()->where(['id' => $id, 'mail_type_id' => $mailTypeId])->fetch();
     }
 
-    public function tableFilter(string $query, string $order, string $orderDirection, ?int $listId = null, ?int $limit = null, ?int $offset = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, ?array $listId = null, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
             ->select('mail_type_variants.*, COUNT(:mail_user_subscription_variants.id) AS count')

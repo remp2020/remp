@@ -9,7 +9,9 @@ use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\PostInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailCreateTemplateHandler extends BaseHandler
 {
@@ -26,24 +28,24 @@ class MailCreateTemplateHandler extends BaseHandler
         $this->listsRepository = $listsRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'name', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'code', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'description', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'mail_layout_id', InputParam::OPTIONAL),
-            new InputParam(InputParam::TYPE_POST, 'mail_type_code', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'from', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'subject', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'template_text', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'template_html', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'click_tracking', InputParam::OPTIONAL),
-            new InputParam(InputParam::TYPE_POST, 'extras', InputParam::OPTIONAL),
+            (new PostInputParam('name'))->setRequired(),
+            (new PostInputParam('code'))->setRequired(),
+            (new PostInputParam('description'))->setRequired(),
+            (new PostInputParam('mail_layout_id')),
+            (new PostInputParam('mail_type_code'))->setRequired(),
+            (new PostInputParam('from'))->setRequired(),
+            (new PostInputParam('subject'))->setRequired(),
+            (new PostInputParam('template_text'))->setRequired(),
+            (new PostInputParam('template_html'))->setRequired(),
+            (new PostInputParam('click_tracking')),
+            (new PostInputParam('extras')),
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         // TODO - mail layouts are not identified by code
         if (!$params['mail_layout_id']) {

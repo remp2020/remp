@@ -43,7 +43,7 @@ class Client
                 ]
             ]);
 
-            return Json::decode($response->getBody(), Json::FORCE_ARRAY)['data'];
+            return Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY)['data'];
         } catch (ConnectException $connectException) {
             throw new Exception("could not connect to Beam: {$connectException->getMessage()}");
         } catch (ServerException $serverException) {

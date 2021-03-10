@@ -31,8 +31,6 @@ class SendingStats extends Control
         TemplatesRepository $templatesRepository,
         UserSubscriptionsRepository $userSubscriptionsRepository
     ) {
-        parent::__construct();
-
         $this->logsRepository = $mailLogsRepository;
         $this->templatesRepository = $templatesRepository;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;

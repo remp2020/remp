@@ -23,27 +23,26 @@ class MMSWidget extends BaseControl implements IGeneratorWidget
 
     private $layoutsRepository;
 
-    private $templatesRepository;
-
     private $session;
 
     private $listsRepository;
 
     private $contentGenerator;
 
+    private $mmsTemplateFormFactory;
+
     public function __construct(
         Session $session,
         LayoutsRepository $layoutsRepository,
-        TemplatesRepository $templatesRepository,
         ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator
+        ContentGenerator $contentGenerator,
+        MMSTemplateFormFactory $mmsTemplateFormFactory
     ) {
-        parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
-        $this->templatesRepository = $templatesRepository;
         $this->session = $session;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
+        $this->mmsTemplateFormFactory = $mmsTemplateFormFactory;
     }
 
     public function identifier(): string
@@ -65,10 +64,10 @@ class MMSWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentMMSTemplateForm(MMSTemplateFormFactory $mmsTemplateFormFactory): Form
+    public function createComponentMMSTemplateForm(): Form
     {
-        $form = $mmsTemplateFormFactory->create();
-        $mmsTemplateFormFactory->onSave = function () {
+        $form = $this->mmsTemplateFormFactory->create();
+        $this->mmsTemplateFormFactory->onSave = function () {
             $this->getPresenter()->flashMessage("Odkaz MMS batches were created and run.");
             $this->getPresenter()->redirect("Job:Default");
         };

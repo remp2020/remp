@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories;
 
 class MailTypeStatsRepository extends Repository
 {
@@ -13,7 +12,7 @@ class MailTypeStatsRepository extends Repository
     public function add(
         int $mailTypeId,
         int $subscribersCount
-    ) {
+    ): ActiveRow {
         return $this->getTable()->insert([
             'mail_type_id' => $mailTypeId,
             'created_at' => new DateTime(),
@@ -21,7 +20,7 @@ class MailTypeStatsRepository extends Repository
         ]);
     }
 
-    public function getDashboardDataGroupedByTypes(DateTime $from, DateTime $to)
+    public function getDashboardDataGroupedByTypes(DateTime $from, DateTime $to): array
     {
         return $this->getTable()
             ->select('mail_type_id, DATE(created_at) AS created_date, subscribers_count AS count')
@@ -35,7 +34,7 @@ class MailTypeStatsRepository extends Repository
             ->fetchAll();
     }
 
-    public function getDashboardDetailData($id, DateTime $from, DateTime $to)
+    public function getDashboardDetailData($id, DateTime $from, DateTime $to): array
     {
         return $this->getTable()
             ->select('SUM(subscribers_count) AS count, DATE(created_at) AS created_date')

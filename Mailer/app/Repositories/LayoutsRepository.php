@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories\ActiveRow;
-use Remp\MailerModule\Repositories;
-use Remp\MailerModule\Repositories\Selection;
 
 class LayoutsRepository extends Repository
 {
@@ -14,12 +11,12 @@ class LayoutsRepository extends Repository
 
     protected $dataTableSearchable = ['name', 'layout_text', 'layout_html'];
 
-    public function all()
+    public function all(): Selection
     {
         return $this->getTable()->order('name ASC');
     }
 
-    public function add(string $name, string $layoutText, string $layoutHtml)
+    public function add(string $name, string $layoutText, string $layoutHtml): ActiveRow
     {
         $result = $this->insert([
             'name' => $name,
@@ -42,15 +39,7 @@ class LayoutsRepository extends Repository
         return parent::update($row, $data);
     }
 
-    /**
-     * @param string $query
-     * @param string $order
-     * @param string $orderDirection
-     * @param int|null $limit
-     * @param int|null $offset
-     * @return Selection
-     */
-    public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null)
+    public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
@@ -63,7 +52,6 @@ class LayoutsRepository extends Repository
 
             $selection->whereOr($where);
         }
-
 
         if ($limit != null) {
             $selection->limit($limit, $offset);

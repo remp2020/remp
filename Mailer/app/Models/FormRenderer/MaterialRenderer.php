@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\FormRenderer;
 
+use Nette\Forms\Control;
 use Nette\Forms\Controls\Button;
 use Nette\Forms\Controls\Checkbox;
 use Nette\Forms\Controls\CheckboxList;
@@ -73,7 +74,7 @@ class MaterialRenderer extends DefaultFormRenderer
      * @param string|null $mode 'begin', 'errors', 'ownerrors', 'body', 'end' or empty to render all
      * @return string
      */
-    public function render(Form $form, $mode = null)
+    public function render(Form $form, string $mode = null): string
     {
         foreach ($form->getControls() as $control) {
             if ($control instanceof Button) {
@@ -93,7 +94,7 @@ class MaterialRenderer extends DefaultFormRenderer
         return parent::render($form, $mode);
     }
 
-    public function renderControl(IControl $control)
+    public function renderControl(Control $control): Html
     {
         if ($control instanceof Checkbox) {
             $el = Html::el("div", [
@@ -114,7 +115,7 @@ class MaterialRenderer extends DefaultFormRenderer
      * @param IControl $control
      * @return string
      */
-    public function renderPair(IControl $control)
+    public function renderPair(Control $control): string
     {
         $outer = $pair = $this->getWrapper('pair container');
 
@@ -127,7 +128,7 @@ class MaterialRenderer extends DefaultFormRenderer
 
         $pair->addHtml($this->renderMaterialLabel($control, $isTextInput));
         $pair->addHtml($this->renderControl($control));
-        $pair->class($this->getValue($control->isRequired() ? 'pair .required' : 'pair .optional'), true);
+        $pair->class($this->getValue($control->setRequired() ? 'pair .required' : 'pair .optional'), true);
         $pair->class($control->hasErrors() ? $this->getValue('pair .error') : null, true);
         $pair->class($control->getOption('class'), true);
         if (++$this->counter % 2) {
@@ -147,7 +148,7 @@ class MaterialRenderer extends DefaultFormRenderer
     {
         $label = $control->getLabel();
         if ($label instanceof Html) {
-            if ($control->isRequired()) {
+            if ($control->setRequired()) {
                 $label->class($this->getValue('control .required'), true);
             }
             if ($animatedLabel) {

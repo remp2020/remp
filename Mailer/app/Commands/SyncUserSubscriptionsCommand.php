@@ -30,16 +30,13 @@ class SyncUserSubscriptionsCommand extends Command
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
-    /**
-     * Configure command
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mail:sync-user-subscriptions')
             ->setDescription('Gets all users from user base and subscribes them to emails based on the auto_subscribe flags');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('');
         $output->writeln('<info>***** AUTO-SUBSCRIBING ALL USERS *****</info>');
@@ -82,6 +79,6 @@ class SyncUserSubscriptionsCommand extends Command
             $page++;
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

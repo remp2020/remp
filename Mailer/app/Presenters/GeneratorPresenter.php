@@ -18,18 +18,22 @@ final class GeneratorPresenter extends BasePresenter
 
     private $sourceTemplateFormFactory;
 
+    private $dataTableFactory;
+
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
-        SourceTemplateFormFactory $sourceTemplateFormFactory
+        SourceTemplateFormFactory $sourceTemplateFormFactory,
+        IDataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->sourceTemplateFormFactory = $sourceTemplateFormFactory;
+        $this->dataTableFactory = $dataTableFactory;
     }
 
-    public function createComponentDataTableDefault(IDataTableFactory $dataTableFactory): DataTable
+    public function createComponentDataTableDefault(): DataTable
     {
-        $dataTable = $dataTableFactory->create();
+        $dataTable = $this->dataTableFactory->create();
         $dataTable
             ->setColSetting('created_at', [
                 'header' => 'created at',
@@ -105,6 +109,7 @@ final class GeneratorPresenter extends BasePresenter
     public function createComponentMailSourceTemplateForm(): Form
     {
         $form = $this->sourceTemplateFormFactory->create(isset($this->params['id']) ? (int)$this->params['id'] : null);
+
         $this->sourceTemplateFormFactory->onUpdate = function ($form, $mailSourceTemplate, $buttonSubmitted) {
             $this->flashMessage('Source template was successfully updated');
             $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $mailSourceTemplate->id);

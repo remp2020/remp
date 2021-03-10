@@ -4,7 +4,7 @@ namespace Remp\NetteSso\Security;
 
 use Nette\Http\Session;
 
-class UserStorage extends \Nette\Http\UserStorage
+class UserStorage extends \Nette\Bridges\SecurityHttp\SessionStorage
 {
     private static $cached;
 
@@ -16,7 +16,7 @@ class UserStorage extends \Nette\Http\UserStorage
         $this->ssoClient = $ssoClient;
     }
 
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
         $parent = parent::isAuthenticated();
         if (!$parent) {

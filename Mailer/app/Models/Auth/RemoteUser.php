@@ -37,7 +37,7 @@ class RemoteUser
                 ],
             ]);
 
-            $responseData = Json::decode($response->getBody(), Json::FORCE_ARRAY);
+            $responseData = Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
         } catch (ClientException $clientException) {
             $data = json_decode($clientException->getResponse()->getBody()->getContents());
             return ['status' => 'error', 'error' => $data->error, 'message' => $data->message];
@@ -78,7 +78,7 @@ class RemoteUser
             return ['status' => 'error', 'error' => 'unavailable server', 'message' => 'Cannot connect to auth server'];
         }
 
-        $responseData = json_decode($response->getBody(), true);
+        $responseData = json_decode($response->getBody()->getContents(), true);
 
         return $responseData['user'];
     }

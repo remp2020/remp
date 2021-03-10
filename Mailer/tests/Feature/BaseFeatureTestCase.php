@@ -155,9 +155,27 @@ SET FOREIGN_KEY_CHECKS=1;
         return $this->layoutsRepository->add('layout', '', '');
     }
 
-    protected function createMailTypeWithCategory(string $categoryName = 'category', string $typeCode = 'code', string $typeName = 'name', bool $isPublic = true)
-    {
+    protected function createMailTypeWithCategory(
+        string $categoryName = 'category',
+        string $typeCode = 'code',
+        string $typeName = 'name',
+        bool $isPublic = true,
+        bool $publicListing = true
+    ) {
         $listCategory = $this->listCategoriesRepository->add($categoryName, 100);
-        return $this->listsRepository->add($listCategory->id, 1, $typeCode, $typeName, 1, true, false, $isPublic, 'XXX');
+        return $this->listsRepository->add(
+            $listCategory->id,
+            1,
+            $typeCode,
+            $typeName,
+            1,
+            true,
+            false,
+            $isPublic,
+            'XXX',
+            null,
+            null,
+            $publicListing
+        );
     }
 }

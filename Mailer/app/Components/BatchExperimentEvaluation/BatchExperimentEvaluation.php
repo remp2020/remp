@@ -14,7 +14,6 @@ class BatchExperimentEvaluation extends Control
 
     public function __construct(BatchesRepository $batchesRepository)
     {
-        parent::__construct();
         $this->batchesRepository = $batchesRepository;
     }
 

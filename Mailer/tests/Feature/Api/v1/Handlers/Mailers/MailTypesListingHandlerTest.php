@@ -19,10 +19,8 @@ class MailTypesListingHandlerTest extends BaseApiHandlerTestCase
 
     public function testListWithFilters()
     {
-        $this->markTestSkipped("Cannot filters `public_listing` because handler is using `filter_var` function");
-
-        $this->createMailTypeWithCategory("category1", "code1", "name1", true);
-        $this->createMailTypeWithCategory("category1", "code2", "name2", false);
+        $this->createMailTypeWithCategory("category1", "code1", "name1", true, true);
+        $this->createMailTypeWithCategory("category1", "code2", "name2", false, false);
 
         $params = ['public_listing' => 1];
         $handler = $this->getHandler(MailTypesListingHandler::class);
@@ -33,8 +31,8 @@ class MailTypesListingHandlerTest extends BaseApiHandlerTestCase
 
     public function testListWithCode()
     {
-        $this->createMailTypeWithCategory("category1", "code1", "name1", true);
-        $this->createMailTypeWithCategory("category1", "code2", "name2", false);
+        $this->createMailTypeWithCategory("category1", "code1", "name1");
+        $this->createMailTypeWithCategory("category1", "code2", "name2");
 
         $params = ['code' => 'code2'];
         $handler = $this->getHandler(MailTypesListingHandler::class);
@@ -45,8 +43,8 @@ class MailTypesListingHandlerTest extends BaseApiHandlerTestCase
 
     public function testListWithUnknownCode()
     {
-        $this->createMailTypeWithCategory("category1", "code1", "name1", true);
-        $this->createMailTypeWithCategory("category1", "code2", "name2", false);
+        $this->createMailTypeWithCategory("category1", "code1", "name1");
+        $this->createMailTypeWithCategory("category1", "code2", "name2");
 
         $params = ['code' => 'code3'];
         $handler = $this->getHandler(MailTypesListingHandler::class);

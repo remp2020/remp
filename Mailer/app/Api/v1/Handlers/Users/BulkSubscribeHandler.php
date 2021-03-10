@@ -10,7 +10,9 @@ use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 
 class BulkSubscribeHandler extends SubscribeHandler
 {
@@ -24,14 +26,14 @@ class BulkSubscribeHandler extends SubscribeHandler
         parent::__construct($userSubscriptionsRepository, $listsRepository, $listVariantsRepository);
     }
 
-    public function params()
+    public function params(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST_RAW, 'raw'),
+            new RawInputParam('raw'),
         ];
     }
 
-    public function handle($params)
+    public function handle(array $params): ResponseInterface
     {
         $payload = $this->validateInput($params['raw'], __DIR__ . '/bulk-subscribe.schema.json');
         if ($this->hasErrorResponse()) {

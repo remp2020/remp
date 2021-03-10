@@ -8,7 +8,7 @@ use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
-use Tomaj\NetteApi\Params\InputParam;
+use Tomaj\NetteApi\Params\PostInputParam;
 
 class UrlParserGenerator implements IGenerator
 {
@@ -33,20 +33,20 @@ class UrlParserGenerator implements IGenerator
     public function generateForm(Form $form): void
     {
         $form->addTextArea('intro', 'Intro text')
-            ->setAttribute('rows', 4)
+            ->setHtmlAttribute('rows', 4)
             ->getControlPrototype()
-            ->setAttribute('class', 'form-control html-editor');
+            ->setHtmlAttribute('class', 'form-control html-editor');
 
         $form->addTextArea('articles', 'Article')
-            ->setAttribute('rows', 7)
+            ->setHtmlAttribute('rows', 7)
             ->setOption('description', 'Paste article Urls. Each on separate line.')
             ->getControlPrototype()
-            ->setAttribute('class', 'form-control html-editor');
+            ->setHtmlAttribute('class', 'form-control html-editor');
 
         $form->addTextArea('footer', 'Footer text')
-            ->setAttribute('rows', 6)
+            ->setHtmlAttribute('rows', 6)
             ->getControlPrototype()
-            ->setAttribute('class', 'form-control html-editor');
+            ->setHtmlAttribute('class', 'form-control html-editor');
 
         $form->addText('rtm_campaign', 'RTM campaign');
 
@@ -71,11 +71,11 @@ class UrlParserGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            new InputParam(InputParam::TYPE_POST, 'source_template_id', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'articles', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'footer', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'rtm_campaign', InputParam::REQUIRED),
-            new InputParam(InputParam::TYPE_POST, 'intro', InputParam::REQUIRED)
+            (new PostInputParam('source_template_id'))->setRequired(),
+            (new PostInputParam('articles'))->setRequired(),
+            (new PostInputParam('footer'))->setRequired(),
+            (new PostInputParam('utm_campaign'))->setRequired(),
+            (new PostInputParam('intro'))->setRequired(),
         ];
     }
 

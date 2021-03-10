@@ -82,7 +82,7 @@ class ListFormFactory
             ->setRequired("Field 'Title' is required.");
 
         $form->addTextArea('description', 'Description')
-            ->setAttribute('rows', 3);
+            ->setHtmlAttribute('rows', 3);
 
         $form->addText('preview_url', 'Preview URL');
 

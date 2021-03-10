@@ -43,7 +43,7 @@ class DemoSeedCommand extends Command
         $this->listCategoriesRepository = $listCategoriesRepository;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('demo:seed')
             ->setDescription('Seed database with demo values')
@@ -56,7 +56,7 @@ class DemoSeedCommand extends Command
             ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $deleteSeedData = $input->getArgument('delete');
         if ($deleteSeedData === 'delete') {
@@ -94,7 +94,7 @@ class DemoSeedCommand extends Command
         $this->seedEmails($layout, $list);
         $output->writeln('<info>OK!</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     protected function seedListCategories()
