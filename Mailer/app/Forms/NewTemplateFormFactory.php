@@ -46,7 +46,7 @@ class NewTemplateFormFactory
             ->setPrompt('Select newsletter list');
 
         if (isset($_POST['mail_type_id'])) {
-            $templateList = $this->templatesRepository->pairs($_POST['mail_type_id']);
+            $templateList = $this->templatesRepository->pairs((int) $_POST['mail_type_id']);
         } else {
             $templateList = null;
         }

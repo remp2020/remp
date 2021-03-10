@@ -81,7 +81,7 @@ class NewBatchFormFactory
             ->setPrompt('Select newsletter list');
 
         if (isset($_POST['mail_type_id'])) {
-            $templateList = $this->templatesRepository->pairs($_POST['mail_type_id']);
+            $templateList = $this->templatesRepository->pairs((int) $_POST['mail_type_id']);
         } else {
             $templateList = null;
         }
@@ -93,7 +93,7 @@ class NewBatchFormFactory
             ->setPrompt('Select newsletter list');
 
         if (isset($_POST['b_mail_type_id'])) {
-            $templateList = $this->templatesRepository->pairs($_POST['b_mail_type_id']);
+            $templateList = $this->templatesRepository->pairs((int) $_POST['b_mail_type_id']);
         } else {
             $templateList = null;
         }
