@@ -166,6 +166,12 @@
             <li {!! route_active(['authors']) !!}>
                 <a href="{{ route('authors.index') }}" ><i class="zmdi zmdi-account-box"></i> Authors</a>
             </li>
+            <li {!! route_active(['sections']) !!}>
+                <a href="{{ route('sections.index') }}" ><i class="zmdi zmdi-collection-text"></i> Sections</a>
+            </li>
+            <li {!! route_active(['tags']) !!}>
+                <a href="{{ route('tags.index') }}" ><i class="zmdi zmdi-label"></i> Tags</a>
+            </li>
             <li {!! route_active(['visitors.devices', 'visitors.sources'], 'sub-menu', 'toggled') !!}>
                 <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-face"></i> Visitors</a>
                 <ul>
