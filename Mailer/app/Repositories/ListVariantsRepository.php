@@ -27,7 +27,7 @@ class ListVariantsRepository extends Repository
         return $this->getTable()->where(['id' => $id, 'mail_type_id' => $mailTypeId])->fetch();
     }
 
-    public function tableFilter(string $query, string $order, string $orderDirection, ?array $listId = null, ?int $limit = null, ?int $offset = null): Selection
+    public function tableFilter(string $query, string $order, string $orderDirection, ?array $listIds = null, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
             ->select('mail_type_variants.*, COUNT(:mail_user_subscription_variants.id) AS count')
@@ -47,9 +47,9 @@ class ListVariantsRepository extends Repository
             $selection->whereOr($where);
         }
 
-        if ($listId !== null) {
+        if ($listIds !== null) {
             $selection->where([
-                'mail_type_id' => $listId,
+                'mail_type_id' => $listIds,
             ]);
         }
 

@@ -349,7 +349,7 @@ final class ListPresenter extends BasePresenter
                 $request['search']['value'],
                 $request['columns'][$request['order'][0]['column']]['name'],
                 $request['order'][0]['dir'],
-                $listId
+                [$listId]
             )
             ->count('*');
 
@@ -358,7 +358,7 @@ final class ListPresenter extends BasePresenter
                 $request['search']['value'],
                 $request['columns'][$request['order'][0]['column']]['name'],
                 $request['order'][0]['dir'],
-                $listId,
+                [$listId],
                 $length,
                 $start
             );
