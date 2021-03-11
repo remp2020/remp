@@ -164,25 +164,26 @@ $.fn.dataTables = {
 
     selectFilters: function (column, filterData, state) {
         // create select box
-        var select = $('<select multiple class="selectpicker" data-live-search="true" data-live-search-normalize="true"></select>')
-            .appendTo( $(column.header()) )
+        let select = $('<select multiple class="selectpicker" data-live-search="true" data-live-search-normalize="true"></select>');
+        let selectEl = select.get(0);
+
+        // add select options
+        $.each(filterData, function (value, label) {
+            let optionEl = document.createElement("option");
+            optionEl.textContent = label;
+            optionEl.value = value;
+            selectEl.appendChild(optionEl);
+        });
+
+        // restore state and append to DOM
+        select.val(state[column.index()].search.search.split(","));
+        select.appendTo( $(column.header()) )
             .on( 'change', function() {
                 column
                     .search($(this).val())
                     .draw();
-            });
-
-        // restore state and set selected options
-        var searchValues = state[column.index()].search.search.split(",");
-        $.each(filterData, function (value, label) {
-            var newOption = $('<option value="'+value+'">'+label+'</option>');
-            if (searchValues.indexOf(value) !== -1) {
-                newOption.prop("selected", true);
-            }
-            select.append(newOption);
-        });
-
-        select.selectpicker();
+            })
+            .selectpicker();
     },
 
     upsertQueryStringParam(url, key, value) {

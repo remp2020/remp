@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **BREAKING**: All applications now require Node 12+. Please schedule update of Node accordingly.
 - Updated docker image of Telegraf to the currently latest 1.17.3.
+- Fixed occasional very slow initialization of grid filters causing whole grids to load slowly (tens of seconds).
 
 ### [Beam]
 
