@@ -76,7 +76,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
     }
 
     private function renderInternal(
-        Banner $banner,
+        ?Banner $banner,
         $variantUuid,
         $campaignUuid,
         $isControlGroup,
