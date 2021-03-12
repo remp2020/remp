@@ -68,7 +68,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
     }
 
     public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions): string {
-        return $this->renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->controlGroup, $alignments, $dimensions, $positions);
+        return $this->renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->control_group, $alignments, $dimensions, $positions);
     }
 
     public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions): string {

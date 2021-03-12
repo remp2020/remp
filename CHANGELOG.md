@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - **BREAKING**: Updated underlying Nette framework to the latest version (3.1).
+  - Update Composer to version 2.
   - In `app/config/config.local.neon` replace `class` keyword with `factory`.
   - If you implemented your own mailers:
     - Interface `Nette\Mail\IMailer` should be replaced in favor of `Nette\Mail\Mailer`.
