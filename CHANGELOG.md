@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added emitting of `remp:showtimeReady` JS event when all banners from showtime were processed. Event can be used when you want to run your implementation after the showtime asynchronous execution. remp/web#1393
 - Fixed - add missing track click to OverlayTwoButtonSignature banner preview template. remp/remp#797
 - Fixed broken control group tracking when showtime experiment (fast implementation) is used.
+- Fixed missing campaign_id in banners created by CampaignSeeder. remp/remp#838
 
 ### [Mailer]
 
