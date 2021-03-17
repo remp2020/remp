@@ -34,6 +34,7 @@ class NewsfilterGeneratorTest extends TestCase
     {
         $wpJson = <<<EOD
 {
+    "sender_email": "Jon Snow <user@example.com>",
     "post_authors": [
         {
             "user_url": "http:\/\/localhost\/dnwp\/wordpress\/autor\/ria-gehrerova\/",
@@ -72,6 +73,7 @@ EOD;
         $data = json_decode($wpJson);
 
         $output = $this->generator->preprocessParameters($data);
+        self::assertEquals("Jon Snow <user@example.com>", $output->from);
         self::assertEquals("Matej Sajfa Cifra: Mladí dnes chcú byť za pol roka slávni, mňa si v rádiu prvé štyri roky ani nevšimli", $output->title);
         self::assertEquals("Ria Gehrerová", $output->editor);
         self::assertEquals("http://localhost/dnwp/wordpress/1084435/matej-sajfa-cifra-mladi-dnes-chcu-byt-za-pol-roka-slavni-mna-si-v-radiu-prve-styri-roky-ani-nevsimli/", $output->url);

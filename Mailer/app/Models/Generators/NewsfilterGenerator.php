@@ -273,19 +273,31 @@ class NewsfilterGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
         }
         $output->editor = $data->post_authors[0]->display_name;
-        $output->from = "Denník N <info@dennikn.sk>";
+
+        if (isset($data->sender_email) && $data->sender_email) {
+            $output->from = $data->sender_email;
+        } else {
+            $output->from = "Denník N <info@dennikn.sk>";
+            foreach ($data->post_authors as $author) {
+                if ($author->user_email === "editori@dennikn.sk") {
+                    continue;
+                }
+
+                if ($author->user_email !== 'e@dennikn.sk') {
+                    $output->from = $author->display_name . ' Denník N <' . $author->user_email . '>';
+                } else {
+                    $output->from = $author->display_name . ' <' . $author->user_email . '>';
+                }
+                break;
+            }
+        }
+
         foreach ($data->post_authors as $author) {
             if ($author->user_email === "editori@dennikn.sk") {
                 continue;
             }
 
             $output->editor = $author->display_name;
-
-            if ($author->user_email !== 'e@dennikn.sk') {
-                $output->from = $author->display_name . ' Denník N <' . $author->user_email . '>';
-            } else {
-                $output->from = $author->display_name . ' <' . $author->user_email . '>';
-            }
             break;
         }
 
