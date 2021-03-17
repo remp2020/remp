@@ -42,15 +42,18 @@ class CampaignSeeder extends Seeder
 
         $campaignBanner = factory(\App\CampaignBanner::class)->create([
             'banner_id' => $banner->id,
+            'campaign_id' => $campaign->id,
         ]);
 
         $altCampaignBanner = factory(\App\CampaignBanner::class)->create([
             'banner_id' => $altBanner->id,
+            'campaign_id' => $campaign->id,
             'weight' => 2,
         ]);
 
         $controlGroup = factory(\App\CampaignBanner::class)->create([
             'banner_id' => null,
+            'campaign_id' => $campaign->id,
             'weight' => 3,
             'control_group' => 1,
             'proportion' => 0,
