@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added new optional parameter `includeStorageParams` for internal function `addSystemUserParams` to allow `trackCheckout` function gets stored tracking parameters. remp/crm#1617
 - [Tracker] Fixed possible overwrite of category when tracking pageview and event APIs with `category` key in tracked tags.
 - Added statistics and detail page for sections and tags. remp/remp#776
+- Fixed remplib initialization flow - there was a window where remplib wasn't yet initialized but public functions would be callable. These calls would cause errors.
 
 ### [Campaign]
 

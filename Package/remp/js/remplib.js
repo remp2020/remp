@@ -302,22 +302,16 @@ export default {
             app.run();
             return;
         }
-        for (let i=0; i < app._.length; i++) {
-            let cb = app._[i];
-            setTimeout((function() {
-                let cbf = cb[0];
-                let cbargs = cb[1];
-                return function() {
-                    if (cbf !== "run") {
-                        app[cbf].apply(app, cbargs);
-                    }
-                    app.initIterator = app.initIterator+1 || 1;
-                    if (app.initIterator === app._.length) {
-                        app.run();
-                    }
-                }
-            })(), 0);
+        while (app._.length) {
+            let cb = app._.shift();
+            let cbf = cb[0];
+            let cbargs = cb[1];
+
+            if (cbf !== "run") {
+                app[cbf].apply(app, cbargs);
+            }
         }
+        app.run();
     },
 
     applyPolyfills: function() {
