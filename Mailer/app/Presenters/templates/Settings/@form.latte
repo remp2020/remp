@@ -12,6 +12,10 @@
                         {input $input, class => 'form-control fg-input'}
                         {label $input, class => 'fg-label' /}
                     </div>
+                    <div n:if="$input instanceof Nette\Forms\Controls\TextArea" class="fg-line">
+                        {input $input, class => 'form-control fg-input auto-size', rows => 3}
+                        {label $input, class => 'fg-label' /}
+                    </div>
                     <div n:if="$input instanceof Nette\Forms\Controls\SelectBox" class="row">
                         <div class="col-sm-12">
                             {label $input /}
