@@ -62,6 +62,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added new `codes` parameter to `GET /api/v1/mailers/templates` API endpoint. Parameter is used to list email templates for given mail_template codes. remp/remp#814
 - Added `click_tracking` parameter to `POST /api/v1/mailers/templates` to define whether click tracking should be enabled/disabled/use default for created template. remp/remp#824
 - Added *snippets* which are independent part of emails that can be included across all templates, layouts and other snippets. remp/remp#550
+- Fixed email conversion matching and processing. Bug was introduced in `0.17.0` and caused no conversions to be matched with the emails. remp/remp#834
 
 ## [0.19.0] - 2021-02-16
 

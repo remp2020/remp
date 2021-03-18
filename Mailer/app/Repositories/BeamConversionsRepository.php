@@ -38,18 +38,19 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
 
         $result = $this->journal->list($request);
         foreach ($result as $record) {
-            $rtmContent = $record->tags->rtm_content ?? $record->tags->utm_content ?? null;
-            $rtmCampaign = $record->tags->rtm_campaign ?? $record->tags->utm_campaign ?? null;
-
-            if (empty($rtmContent)) {
-                // skip conversions without batch reference
-                continue;
-            }
-            if (empty($rtmCampaign)) {
-                // skip conversions without campaign (without reference to mail_template)
-                continue;
-            }
             foreach ($record->commerces as $purchase) {
+                $rtmContent = $purchase->source->rtm_content ?? $purchase->source->utm_content ?? null;
+                $rtmCampaign = $purchase->source->rtm_campaign ?? $purchase->source->utm_campaign ?? null;
+
+                if (empty($rtmContent)) {
+                    // skip conversions without batch reference
+                    continue;
+                }
+                if (empty($rtmCampaign)) {
+                    // skip conversions without campaign (without reference to mail_template)
+                    continue;
+                }
+
                 $purchases[$rtmContent][$rtmCampaign][$purchase->user->id] = $purchase->system->time;
             }
         }
@@ -70,18 +71,19 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
         $result = $this->journal->list($request);
 
         foreach ($result as $record) {
-            $rtmContent = $record->tags->rtm_content ?? $record->tags->utm_content ?? null;
-            $rtmCampaign = $record->tags->rtm_campaign ?? $record->tags->utm_campaign ?? null;
-
-            if (!empty($rtmContent) && is_numeric($rtmContent)) {
-                // skip all batch-related conversions, but keep conversions referencing other type of campaigns (e.g. banner)
-                continue;
-            }
-            if (empty($rtmCampaign)) {
-                // skip conversions without campaign (without reference to mail_template)
-                continue;
-            }
             foreach ($record->commerces as $purchase) {
+                $rtmContent = $purchase->source->rtm_content ?? $purchase->source->utm_content ?? null;
+                $rtmCampaign = $purchase->source->rtm_campaign ?? $purchase->source->utm_campaign ?? null;
+
+                if (!empty($rtmContent) && is_numeric($rtmContent)) {
+                    // skip all batch-related conversions, but keep conversions referencing other type of campaigns (e.g. banner)
+                    continue;
+                }
+                if (empty($rtmCampaign)) {
+                    // skip conversions without campaign (without reference to mail_template)
+                    continue;
+                }
+
                 $purchases[$rtmCampaign][$purchase->user->id] = $purchase->system->time;
             }
         }
