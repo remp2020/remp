@@ -63,7 +63,7 @@ final class DashboardPresenter extends BasePresenter
         );
 
         // init graph data set settings
-        $defaualtGraphSettings = [
+        $defaultGraphSettings = [
             'data' => array_fill(0, $numOfDays, 0),
             'backgroundColor' => '#FDECB7',
             'strokeColor' => '#FDECB7',
@@ -86,14 +86,14 @@ final class DashboardPresenter extends BasePresenter
             $typeDataSets[$mailType->id] = [
                 'id' => $mailType->id,
                 'label' => $mailType->title
-            ] + $defaualtGraphSettings;
+            ] + $defaultGraphSettings;
         }
 
         $typeSubscriberDataSets = $typeDataSets;
 
         $allSentMailsData = $this->mailTemplateStatsRepository->getAllMailTemplatesGraphData($from, $now);
 
-        $allSentEmailsDataSet = [] + $defaualtGraphSettings;
+        $allSentEmailsDataSet = [] + $defaultGraphSettings;
 
         // parse all sent mails data to chart.js format
         foreach ($allSentMailsData as $row) {
@@ -152,6 +152,15 @@ final class DashboardPresenter extends BasePresenter
             if ($foundAt !== false) {
                 $typeSubscriberDataSets[$row->mail_type_id]['data'][$foundAt] = $row->count;
                 $typeSubscriberDataSets[$row->mail_type_id]['count'] = $row->count;
+            }
+        }
+
+        // change subscriber data sets to start from zero because of graph readability
+        foreach ($typeSubscriberDataSets as $mailTypeId => $typeSubscriberDataSet) {
+            $minValue = min($typeSubscriberDataSet['data']);
+
+            foreach ($typeSubscriberDataSet['data'] as $key => $value) {
+                $typeSubscriberDataSets[$mailTypeId]['data'][$key] -= $minValue;
             }
         }
 
