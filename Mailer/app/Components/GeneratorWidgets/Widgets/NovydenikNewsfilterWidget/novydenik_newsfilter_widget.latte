@@ -13,6 +13,7 @@
                     'mail_layout_id': $('#' + {$control["newsfilterTemplateForm"]['mail_layout_id']->htmlId}).val(),
                     'locked_mail_layout_id': $('#' + {$control["newsfilterTemplateForm"]['locked_mail_layout_id']->htmlId}).val(),
                     'mail_type_id': $('#' + {$control["newsfilterTemplateForm"]['mail_type_id']->htmlId}).val(),
+                    'from': $('#' + {$control["newsfilterTemplateForm"]['from']->htmlId}).val(),
                     'subject': $('#' + {$control["newsfilterTemplateForm"]['subject']->htmlId}).val(),
                     'article_id': $('#' + {$control["newsfilterTemplateForm"]['article_id']->htmlId}).val()
                 },
@@ -81,7 +82,7 @@
 
                             <div class="form-group fg-float m-b-30">
                                 <div class="fg-line">
-                                    {input from, class => 'form-control fg-input'}
+                                    {input from, class => 'form-control fg-input', value => $from}
                                     {label from, class => 'fg-label'}
                                 </div>
                             </div>
