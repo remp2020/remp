@@ -257,6 +257,10 @@ class NovydenikNewsfilterGenerator implements IGenerator
         }
         $output->editor = $data->post_authors[0]->display_name;
 
+        if (isset($data->sender_email) && $data->sender_email) {
+            $output->from = $data->sender_email;
+        }
+
         if (!isset($data->post_title)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_title'");
         }
