@@ -64,6 +64,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added *snippets* which are independent part of emails that can be included across all templates, layouts and other snippets. remp/remp#550
 - Fixed email conversion matching and processing. Bug was introduced in `0.17.0` and caused no conversions to be matched with the emails. remp/remp#834
 - Added support for textarea in the settings page. remp/crm#1624.
+- Changed dashboard subscribers count chart readability. Instead of absolute counts the chart now displays gain/loses of subscribers compared to 30 days ago. remp/remp#701
+- Changed list detail subscribers count chart readability. Instead of absolute counts the chart now displays gain/loses of subscribers compared to 30 days ago. remp/remp#701
 
 ## [0.19.0] - 2021-02-16
 

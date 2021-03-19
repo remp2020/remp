@@ -221,6 +221,10 @@ final class ListPresenter extends BasePresenter
         ];
 
         $data = $this->mailTypeStatsRepository->getDashboardDetailData($id, $from, $now);
+        $minRow = reset($data);
+        foreach ($data as $row) {
+            $minRow = $row->count < $minRow->count ? $row : $minRow;
+        }
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
@@ -230,7 +234,7 @@ final class ListPresenter extends BasePresenter
             );
 
             if ($foundAt !== false) {
-                $dataSet['data'][$foundAt] = $row->count;
+                $dataSet['data'][$foundAt] = $row->count - $minRow->count;
             }
         }
 
