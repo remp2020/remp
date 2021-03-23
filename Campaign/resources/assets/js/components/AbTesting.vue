@@ -185,14 +185,19 @@
                 this.sliderEl.noUiSlider.set(a)
             },
             addEmptyVariant: function (event) {
-                let i = this.variants.length - 1;
-
-                while (!this.variants[i].proportion) i--;
-
-                this.variants[i].proportion = this.variants[i].proportion-10;
+                // lower proportion of the highest-proportion variant to compensate for new variant
+                let max = 0;
+                let maxIdx = 0;
+                this.variants.forEach((variant, idx) => {
+                    if (variant.proportion > max) {
+                        max = variant.proportion;
+                        maxIdx = idx;
+                    }
+                })
+                this.variants[maxIdx].proportion = this.variants[maxIdx].proportion-10;
 
                 // add empty variant before control group
-                this.variants.splice(i + 1, 0, {
+                this.variants.splice(this.variants.length - 1, 0, {
                     id: null,
                     variant: "Variant " + this.variantNumber,
                     proportion: 10,
