@@ -41,7 +41,7 @@
                     trumbowyg.execCmd('insertHTML', snippet.html);
                 },
                 hasIcon: false,
-                title: `${snippet.name} - [${snippet.code}]`
+                title: `${snippet.code}`
             });
             snippets.push('snippet_' + index);
         });

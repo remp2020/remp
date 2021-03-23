@@ -34,7 +34,7 @@ final class TemplatePresenter extends BasePresenter
 
     private $layoutsRepository;
 
-    private $snippetRepository;
+    private $snippetsRepository;
 
     private $listsRepository;
 
@@ -50,7 +50,7 @@ final class TemplatePresenter extends BasePresenter
         TemplateFormFactory $templateFormFactory,
         TemplateTestFormFactory $templateTestFormFactory,
         LayoutsRepository $layoutsRepository,
-        SnippetsRepository $snippetRepository,
+        SnippetsRepository $snippetsRepository,
         ListsRepository $listsRepository,
         ContentGenerator $contentGenerator,
         IDataTableFactory $dataTableFactory,
@@ -62,7 +62,7 @@ final class TemplatePresenter extends BasePresenter
         $this->templateFormFactory = $templateFormFactory;
         $this->templateTestFormFactory = $templateTestFormFactory;
         $this->layoutsRepository = $layoutsRepository;
-        $this->snippetRepository = $snippetRepository;
+        $this->snippetsRepository = $snippetsRepository;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
         $this->dataTableFactory = $dataTableFactory;
@@ -251,7 +251,7 @@ final class TemplatePresenter extends BasePresenter
     public function renderNew(): void
     {
         $layouts = $this->layoutsRepository->getTable()->fetchPairs('id', 'layout_html');
-        $snippets = $this->snippetRepository->getTable()->fetchAssoc('id');
+        $snippets = $this->snippetsRepository->getTable()->select('code')->group('code')->fetchAssoc('code');
 
         $this->template->layouts = $layouts;
         $this->template->snippets = $snippets;
@@ -265,7 +265,7 @@ final class TemplatePresenter extends BasePresenter
             throw new BadRequestException();
         }
         $layouts = $this->layoutsRepository->getTable()->fetchAssoc('id');
-        $snippets = $this->snippetRepository->getTable()->fetchAssoc('id');
+        $snippets = $this->snippetsRepository->getTable()->select('code')->group('code')->fetchAssoc('code');
 
         $this->template->mailTemplate = $template;
         $this->template->layouts = $layouts;
@@ -280,7 +280,7 @@ final class TemplatePresenter extends BasePresenter
             throw new BadRequestException();
         }
 
-        $snippets = $this->snippetRepository->getTable()->fetchPairs('code', 'html');
+        $snippets = $this->snippetsRepository->getSnippetsForMailType($template->mail_type_id)->fetchPairs('code', 'html');
         $mailContent = $this->contentGenerator->render(new GeneratorInput($template, ['snippets' => $snippets]));
         $this->template->content = ($type === 'html')
             ? $mailContent->html()

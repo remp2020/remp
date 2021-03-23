@@ -12,19 +12,19 @@ use Remp\MailerModule\Repositories\SnippetsRepository;
 
 final class SnippetPresenter extends BasePresenter
 {
-    private $snippetRepository;
+    private $snippetsRepository;
 
     private $snippetFormFactory;
 
     private $dataTableFactory;
 
     public function __construct(
-        SnippetsRepository $snippetRepository,
+        SnippetsRepository $snippetsRepository,
         SnippetFormFactory $snippetFormFactory,
         IDataTableFactory $dataTableFactory
     ) {
         parent::__construct();
-        $this->snippetRepository = $snippetRepository;
+        $this->snippetsRepository = $snippetsRepository;
         $this->snippetFormFactory = $snippetFormFactory;
         $this->dataTableFactory = $dataTableFactory;
     }
@@ -39,12 +39,19 @@ final class SnippetPresenter extends BasePresenter
             ->setColSetting('code', [
                 'priority' => 1,
             ])
+            ->setColSetting('mail_type_id', [
+                'header' => 'mail type',
+                'priority' => 1,
+            ])
             ->setColSetting('created_at', [
                 'header' => 'created at',
                 'render' => 'date',
                 'priority' => 2,
             ])
-            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit snippet');
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit snippet')
+            ->setRowAction('delete', 'palette-Red zmdi-delete', 'Delete snippet', [
+                'onclick' => 'return confirm(\'Are you sure you want to delete this item?\');'
+            ]);
 
         return $dataTable;
     }
@@ -56,28 +63,31 @@ final class SnippetPresenter extends BasePresenter
         $query = $request['search']['value'];
         $order = $request['columns'][$request['order'][0]['column']]['name'];
         $orderDir = $request['order'][0]['dir'];
-        $snippetsCount = $this->snippetRepository
+        $snippetsCount = $this->snippetsRepository
                 ->tableFilter($query, $order, $orderDir)
                 ->count('*');
 
-        $snippets = $this->snippetRepository
+        $snippets = $this->snippetsRepository
             ->tableFilter($query, $order, $orderDir, (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
-            'recordsTotal' => $this->snippetRepository->totalCount(),
+            'recordsTotal' => $this->snippetsRepository->totalCount(),
             'recordsFiltered' => $snippetsCount,
             'data' => []
         ];
 
         foreach ($snippets as $snippet) {
             $editUrl = $this->link('Edit', $snippet->id);
+            $deleteUrl = $this->link('Delete!', $snippet->id);
             $result['data'][] = [
                 'actions' => [
                     'edit' => $editUrl,
+                    'delete' => $deleteUrl
                 ],
                 "<a href='{$editUrl}'>{$snippet->name}</a>",
                 $snippet->code,
+                $snippet->mail_type->title ?? null,
                 $snippet->created_at,
             ];
         }
@@ -86,12 +96,20 @@ final class SnippetPresenter extends BasePresenter
 
     public function renderEdit($id): void
     {
-        $snippet = $this->snippetRepository->find($id);
+        $snippet = $this->snippetsRepository->find($id);
         if (!$snippet) {
             throw new BadRequestException();
         }
 
         $this->template->snippet = $snippet;
+    }
+
+    public function handleDelete($id): void
+    {
+        $snippet = $this->snippetsRepository->find($id);
+        $this->snippetsRepository->delete($snippet);
+        $this->flashMessage("Snippet {$snippet->name} was deleted.");
+        $this->redirect('default');
     }
 
     public function createComponentSnippetForm(): Form

@@ -67,6 +67,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for textarea in the settings page. remp/crm#1624.
 - Changed dashboard subscribers count chart readability. Instead of absolute counts the chart now displays gain/loses of subscribers compared to 30 days ago. remp/remp#701
 - Changed list detail subscribers count chart readability. Instead of absolute counts the chart now displays gain/loses of subscribers compared to 30 days ago. remp/remp#701
+- Added `mail_type` to *snippets* to define snippets with same `code` for different mail types. When rendering mail template that includes snippet, first it tries to match snippet with mail type of given template. If there is not specified snippet with mail type then it uses general snippet with no mail type included. remp/remp#816
 
 ## [0.19.0] - 2021-02-16
 

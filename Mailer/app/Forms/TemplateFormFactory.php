@@ -4,12 +4,16 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Database\Explorer;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Forms\Rules\FormRules;
+use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\TemplatesCodeNotUniqueException;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
@@ -30,14 +34,26 @@ class TemplateFormFactory implements IFormFactory
 
     public $onUpdate;
 
+    private $snippetsRepository;
+
+    private $contentGenerator;
+
+    private $database;
+
     public function __construct(
         TemplatesRepository $templatesRepository,
         LayoutsRepository $layoutsRepository,
-        ListsRepository $listsRepository
+        ListsRepository $listsRepository,
+        SnippetsRepository $snippetsRepository,
+        ContentGenerator $contentGenerator,
+        Explorer $database
     ) {
         $this->templatesRepository = $templatesRepository;
         $this->layoutsRepository = $layoutsRepository;
         $this->listsRepository = $listsRepository;
+        $this->snippetsRepository = $snippetsRepository;
+        $this->contentGenerator = $contentGenerator;
+        $this->database = $database;
     }
 
     public function create(?int $id = null): Form
@@ -129,11 +145,15 @@ class TemplateFormFactory implements IFormFactory
             $values['click_tracking'] = null;
         }
 
+        $this->database->beginTransaction();
+
         try {
+            $row = null;
+            $callback = null;
             if (!empty($values['id'])) {
                 $row = $this->templatesRepository->find($values['id']);
                 $this->templatesRepository->update($row, (array) $values);
-                ($this->onUpdate)($row, $buttonSubmitted);
+                $callback = $this->onUpdate;
             } else {
                 $row = $this->templatesRepository->add(
                     $values['name'],
@@ -147,10 +167,22 @@ class TemplateFormFactory implements IFormFactory
                     $values['mail_type_id'],
                     $values['click_tracking']
                 );
-                ($this->onCreate)($row, $buttonSubmitted);
+                $callback = $this->onCreate;
             }
+
+            $snippets = $this->snippetsRepository->getSnippetsForMailType($row->mail_type_id)->fetchPairs('code', 'html');
+            $this->contentGenerator->render(new GeneratorInput($row, ['snippets' => $snippets]));
         } catch (TemplatesCodeNotUniqueException $e) {
+            $this->database->rollback();
             $form['code']->addError($e->getMessage());
+            return;
+        } catch (\Exception $exception) {
+            $this->database->rollback();
+            $form->addError($exception->getMessage());
+            return;
         }
+
+        $this->database->commit();
+        ($callback)($row, $buttonSubmitted);
     }
 }
