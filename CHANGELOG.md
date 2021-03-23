@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.20.0] - 2021-03-23
+
 ### Project
 
 - **BREAKING**: All applications now require Node 12+. Please schedule update of Node accordingly.
@@ -18,14 +20,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added new optional parameter `includeStorageParams` for internal function `addSystemUserParams` to allow `trackCheckout` function gets stored tracking parameters. remp/crm#1617
 - [Tracker] Fixed possible overwrite of category when tracking pageview and event APIs with `category` key in tracked tags.
 - Added statistics and detail page for sections and tags. remp/remp#776
-- Fixed remplib initialization flow - there was a window where remplib wasn't yet initialized but public functions would be callable. These calls would cause errors.
+- Fixed remplib initialization flow - there was a window where remplib wasn't yet initialized but public functions would be callable. These calls would cause errors. remp/remp#856
 
 ### [Campaign]
 
 - Fixed bug for some banner templates if the saved text was too long. remp/remp#819
-- Fixed text warping in campaign form segments list. remp/remp#584
+- Fixed text warning in campaign form segments list. remp/remp#584
 - Added emitting of `remp:showtimeReady` JS event when all banners from showtime were processed. Event can be used when you want to run your implementation after the showtime asynchronous execution. remp/web#1393
-- Fixed - add missing track click to OverlayTwoButtonSignature banner preview template. remp/remp#797
+- Fixed missing click tracking in OverlayTwoButtonSignature banner preview template. remp/remp#797
 - Fixed broken control group tracking when showtime experiment (fast implementation) is used.
 - Fixed missing campaign_id in banners created by CampaignSeeder. remp/remp#838
 
@@ -654,7 +656,10 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.17.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.20.0...master
+[0.20.0]: https://github.com/remp2020/remp/compare/0.19.0...0.20.0
+[0.19.0]: https://github.com/remp2020/remp/compare/0.18.0...0.19.0
+[0.18.0]: https://github.com/remp2020/remp/compare/0.17.0...0.18.0
 [0.17.0]: https://github.com/remp2020/remp/compare/0.16.0...0.17.0
 [0.16.0]: https://github.com/remp2020/remp/compare/0.15.0...0.16.0
 [0.15.0]: https://github.com/remp2020/remp/compare/0.14.0...0.15.0
