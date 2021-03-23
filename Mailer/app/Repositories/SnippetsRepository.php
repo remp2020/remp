@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Models\Traits\SlugTrait;
 
@@ -19,7 +20,7 @@ class SnippetsRepository extends Repository
         return $this->getTable()->order('name ASC');
     }
 
-    public function add(string $name, string $code, string $layoutText, string $layoutHtml)
+    public function add(string $name, string $code, string $layoutText, string $layoutHtml, ?int $mailTypeId)
     {
         $this->assertSlug($code);
         $result = $this->insert([
@@ -29,6 +30,7 @@ class SnippetsRepository extends Repository
             'updated_at' => new DateTime(),
             'html' => $layoutHtml,
             'text' => $layoutText,
+            'mail_type_id' => $mailTypeId
         ]);
 
         if (is_numeric($result)) {
@@ -40,7 +42,7 @@ class SnippetsRepository extends Repository
 
     public function update(ActiveRow &$row, array $data): bool
     {
-        $params['updated_at'] = new DateTime();
+        $data['updated_at'] = new DateTime();
         return parent::update($row, $data);
     }
 
@@ -72,5 +74,27 @@ class SnippetsRepository extends Repository
         }
 
         return $selection;
+    }
+
+    public function getSnippetsForMailType($mailTypeId): Selection
+    {
+        $mailTypeSnippets = $this->getTable()->where('mail_type_id', $mailTypeId)->fetchPairs(null, 'code');
+
+        $where = [];
+        if (empty($mailTypeSnippets)) {
+            $where['mail_type_id'] = null;
+        } else {
+            $where['(code IN (?) AND mail_type_id = ?) OR (code NOT IN (?) AND mail_type_id IS NULL)'] = [$mailTypeSnippets, $mailTypeId, $mailTypeSnippets];
+        }
+
+        return $this->getTable()->where($where);
+    }
+
+    public function findByCodeAndMailType($code, $mailTypeId): ?ActiveRow
+    {
+        return $this->getTable()->where([
+            'code' => $code,
+            'mail_type_id' => $mailTypeId
+        ])->fetch();
     }
 }

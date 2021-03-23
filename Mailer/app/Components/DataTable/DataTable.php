@@ -56,13 +56,16 @@ class DataTable extends Control
         return $this;
     }
 
-    public function setRowAction(string $actionName, string $actionClass, string $actionTitle): self
+    public function setRowAction(string $actionName, string $actionClass, string $actionTitle, array $htmlAttributes = []): self
     {
-        $this->rowActions[] = [
+        $action = [
             'name' => $actionName,
             'class' => $actionClass,
-            'title' => $actionTitle,
+            'title' => $actionTitle
         ];
+        $action = array_merge($action, $htmlAttributes);
+
+        $this->rowActions[] = $action;
 
         return $this;
     }

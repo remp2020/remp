@@ -22,7 +22,7 @@ class DemoSeedCommand extends Command
 
     private $templatesRepository;
 
-    private $snippetRepository;
+    private $snippetsRepository;
 
     private $listsRepository;
 
@@ -38,7 +38,7 @@ class DemoSeedCommand extends Command
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
         $this->templatesRepository = $templatesRepository;
-        $this->snippetRepository = $snippetRepository;
+        $this->snippetsRepository = $snippetRepository;
         $this->listsRepository = $listsRepository;
         $this->listCategoriesRepository = $listCategoriesRepository;
     }
@@ -137,8 +137,8 @@ class DemoSeedCommand extends Command
     protected function seedSnippets()
     {
         /** @var ActiveRow $layout */
-        $snippet = $this->snippetRepository->findBy('code', 'demo-snippet');
-        $snippetEmail = $this->snippetRepository->findBy('code', 'demo-snippet-email');
+        $snippet = $this->snippetsRepository->findBy('code', 'demo-snippet');
+        $snippetEmail = $this->snippetsRepository->findBy('code', 'demo-snippet-email');
         if ($snippet && $snippetEmail) {
             return true;
         }
@@ -164,8 +164,8 @@ class DemoSeedCommand extends Command
             <p>Written by: <em>John Editor in Chief Doe</em></p>
             HTML;
 
-        $snippet = $this->snippetRepository->add('Demo snippet', 'demo-snippet', $snippetText, $snippetHtml);
-        $snippetEmail = $this->snippetRepository->add('Demo Snippet Email', 'demo-snippet-email', $emailSnippetText, $emailSnippetHtml);
+        $snippet = $this->snippetsRepository->add('Demo snippet', 'demo-snippet', $snippetText, $snippetHtml, null);
+        $snippetEmail = $this->snippetsRepository->add('Demo Snippet Email', 'demo-snippet-email', $emailSnippetText, $emailSnippetHtml, null);
 
         return true;
     }
@@ -256,11 +256,11 @@ class DemoSeedCommand extends Command
         if ($category = $this->listCategoriesRepository->findBy('title', 'Newsletters')) {
             $this->listCategoriesRepository->delete($category);
         }
-        if ($snippet = $this->snippetRepository->findBy('name', 'demo-snippet')) {
-            $this->snippetRepository->delete($snippet);
+        if ($snippet = $this->snippetsRepository->findBy('name', 'demo-snippet')) {
+            $this->snippetsRepository->delete($snippet);
         }
-        if ($snippetEmail = $this->snippetRepository->findBy('name', 'demo-snippet-email')) {
-            $this->snippetRepository->delete($snippetEmail);
+        if ($snippetEmail = $this->snippetsRepository->findBy('name', 'demo-snippet-email')) {
+            $this->snippetsRepository->delete($snippetEmail);
         }
     }
 }

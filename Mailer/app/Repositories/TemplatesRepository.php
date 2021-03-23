@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
 class TemplatesRepository extends Repository
 {
