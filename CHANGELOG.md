@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Fixed adding of new variant to the existing campaign. remp/remp#860
+
 ### [Mailer]
 
 - Added support for multiple mailers of the same class. Added optional `code` parameter to `Mailer` constructor to set unique code for mailer and differentiate between mailers of the same type. remp/remp#828
