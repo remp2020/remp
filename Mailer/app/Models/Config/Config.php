@@ -64,10 +64,10 @@ class Config
         throw new ConfigNotExistsException("Setting {$name} does not exists.");
     }
 
-    private function initAutoload(): void
+    public function initAutoload(bool $force = false): void
     {
         $cacheData = $this->cacheStorage->read('application_autoload_cache');
-        if ($cacheData) {
+        if (!$force && $cacheData) {
             $this->items = $cacheData;
         } else {
             $items = $this->configsRepository->loadAllAutoload();

@@ -21,7 +21,7 @@ class MailerFactory
 
     public function addMailer(Mailer $mailer): void
     {
-        $this->availableMailers[$mailer->getAlias()] = $mailer;
+        $this->availableMailers[$mailer->getMailerAlias()] = $mailer;
     }
 
     /**
@@ -48,5 +48,10 @@ class MailerFactory
     public function getAvailableMailers(): array
     {
         return $this->availableMailers;
+    }
+
+    public function getMailerByAliasAndCode($alias, $code): Mailer
+    {
+        return $this->getMailer(Mailer::buildAlias($alias, $code));
     }
 }

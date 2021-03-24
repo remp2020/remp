@@ -68,7 +68,7 @@ class ListFormFactory
         $mailers = [];
         $availableMailers =  $this->mailerFactory->getAvailableMailers();
         array_walk($availableMailers, function ($mailer, $name) use (&$mailers) {
-            $mailers[$name] = get_class($mailer);
+            $mailers[$name] = $mailer->getIdentifier();
         });
 
         $form->addSelect('mailer_alias', 'Sending mailer', $mailers)
