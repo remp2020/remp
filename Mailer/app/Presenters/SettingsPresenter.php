@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Forms\ConfigFormFactory;
+use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Mailer\Mailer;
 use Remp\MailerModule\Models\Sender\MailerFactory;
 
@@ -14,11 +15,14 @@ final class SettingsPresenter extends BasePresenter
 
     private $configFormFactory;
 
-    public function __construct(MailerFactory $mailerFactory, ConfigFormFactory $configFormFactory)
+    private $config;
+
+    public function __construct(MailerFactory $mailerFactory, ConfigFormFactory $configFormFactory, Config $config)
     {
         parent::__construct();
         $this->mailerFactory = $mailerFactory;
         $this->configFormFactory = $configFormFactory;
+        $this->config = $config;
     }
 
     public function renderDefault(): void
@@ -38,6 +42,9 @@ final class SettingsPresenter extends BasePresenter
         $form = $this->configFormFactory->create();
 
         $this->configFormFactory->onSuccess = function () {
+            // force sync all cached configs with db
+            $this->config->initAutoload(true);
+
             $this->flashMessage('Config was updated.');
             $this->redirect('Settings:default');
         };

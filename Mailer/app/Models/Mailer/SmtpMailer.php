@@ -41,10 +41,11 @@ class SmtpMailer extends Mailer
     ];
 
     public function __construct(
+        ?string $code = null,
         Config $config,
         ConfigsRepository $configsRepository
     ) {
-        parent::__construct($config, $configsRepository);
+        parent::__construct($code, $config, $configsRepository);
 
         // SMTP Mailer expects plain options
         $options = [];

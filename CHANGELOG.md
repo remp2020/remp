@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Added support for multiple mailers of the same class. Added optional `code` parameter to `Mailer` constructor to set unique code for mailer and differentiate between mailers of the same type. remp/remp#828
+- Added `code` option to `MailgunEventsCommand` to set up command for specific Mailgun mailer. remp/remp#828
+
 ## [0.20.0] - 2021-03-23
 
 ### Project

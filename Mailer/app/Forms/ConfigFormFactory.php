@@ -52,7 +52,7 @@ class ConfigFormFactory
         $mailers = [];
         $availableMailers =  $this->mailerFactory->getAvailableMailers();
         array_walk($availableMailers, function ($mailer, $name) use (&$mailers) {
-            $mailers[$name] = get_class($mailer);
+            $mailers[$name] = $mailer->getIdentifier();
         });
 
         $defaultMailerKey = 'default_mailer';
@@ -67,11 +67,10 @@ class ConfigFormFactory
         unset($configs[$defaultMailerKey]); // remove to avoid double populating in internal section lower.
 
         foreach ($this->mailerFactory->getAvailableMailers() as $mailer) {
-            $label = explode('\\', $mailers[$mailer->getAlias()]);
-            $mailerContainer = $settings->addContainer($label[count($label)-1]);
+            $mailerContainer = $settings->addContainer($mailer->getIdentifier());
 
             foreach ($mailer->getConfigs() as $name => $option) {
-                $key = $mailer->getAlias() . '_' . $name;
+                $key = $mailer->getMailerAlias() . '_' . $name;
                 $config = $configs[$key];
                 $configOverridden = isset($overriddenConfigs[$key])
                     ? "{$key}: {$this->localConfig->value($key)}"
@@ -87,8 +86,8 @@ class ConfigFormFactory
                 }
 
                 if ($item != null && $option['required']) {
-                    $item->addConditionOn($defaultMailer, Form::EQUAL, $mailer->getAlias())
-                        ->setRequired("Field {$name} is required when mailer {$mailers[$mailer->getAlias()]} is selected");
+                    $item->addConditionOn($defaultMailer, Form::EQUAL, $mailer->getMailerAlias())
+                        ->setRequired("Field {$name} is required when mailer {$mailers[$mailer->getMailerAlias()]} is selected");
                 }
 
                 unset($configs[$config['name']]);

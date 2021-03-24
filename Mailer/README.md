@@ -40,6 +40,21 @@ You can override any default config from
 
 ### Technical feature description
 
+#### Mailers setup
+
+You can setup multiple mailers to send emails with. Use `code` in `addMailer` function (see example) to differentiate between
+mailers of the same type. In the settings you have to provide necessary values for each mailer.
+
+* example setup of multiple mailers
+
+    ```neon
+    mailFactory:
+        setup:
+            - addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(), 'us')
+            - addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(), 'eu')
+    ```
+
+
 ##### Newsletter lists
 
 Lists represent categories of emails (newsletters). Their primary (and only) use case is to group single emails within 
@@ -2204,7 +2219,8 @@ services:
 ```
 
 Once it's ready, you can execute it by calling `php bin/command.php mailgun:events`. The name of the command
-(`mailgun:events`) is defined within your implementation, you can use any namespace and name you want. 
+(`mailgun:events`) is defined within your implementation, you can use any namespace and name you want. In case of multiple
+Mailgun mailers you can set option `code` to set up command for specific mailer. 
 
 ### Workers
 

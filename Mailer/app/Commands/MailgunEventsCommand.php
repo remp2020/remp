@@ -13,6 +13,7 @@ use Remp\MailerModule\Models\Sender\MailerFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MailgunEventsCommand extends Command
@@ -26,25 +27,31 @@ class MailgunEventsCommand extends Command
 
     private $logsRepository;
 
+    private $mailerFactory;
+
     public function __construct(
         MailerFactory $mailerFactory,
         LogsRepository $logsRepository
     ) {
         parent::__construct();
-        $this->mailgun = $mailerFactory->getMailer(MailgunMailer::ALIAS);
         $this->logsRepository = $logsRepository;
+        $this->mailerFactory = $mailerFactory;
     }
 
     protected function configure(): void
     {
         $this->setName('mailgun:events')
             ->setDescription('Syncs latest mailgun events with local log')
-            ->addArgument('now', InputArgument::OPTIONAL, 'Offset from "now" of the first event to be processed in seconds', '30');
+            ->addArgument('now', InputArgument::OPTIONAL, 'Offset from "now" of the first event to be processed in seconds', '30')
+            ->addOption('code', null, InputOption::VALUE_REQUIRED, 'Code of Mailgun mailer set in config', null);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $nowOffset = $input->getArgument('now');
+        $code = $input->getOption('code');
+
+        $this->mailgun = $this->mailerFactory->getMailerByAliasAndCode(MailgunMailer::ALIAS, $code);
 
         $output->writeln('');
         $output->writeln('<info>***** SYNCING MAILGUN EVENTS *****</info>');

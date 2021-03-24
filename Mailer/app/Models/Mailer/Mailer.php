@@ -21,19 +21,44 @@ abstract class Mailer implements \Nette\Mail\Mailer
 
     protected $options = [];
 
+    protected $code;
+
     public function __construct(
+        ?string $code = null,
         Config $config,
         ConfigsRepository $configsRepository
     ) {
+        $this->code = $code;
+
         $this->configsRepository = $configsRepository;
         $this->config = $config;
 
         $this->buildConfig();
     }
 
-    public function getAlias(): string
+    public function getMailerAlias(): string
     {
-        return str_replace('-', '_', Strings::webalize(static::ALIAS));
+        return self::buildAlias($this::ALIAS, $this->code);
+    }
+
+    public static function buildAlias($alias, $code)
+    {
+        $mailerAlias =  str_replace('-', '_', Strings::webalize($alias));
+        if (isset($code)) {
+            $mailerAlias .= '_' . $code;
+        }
+        return $mailerAlias;
+    }
+
+    public function getIdentifier(): string
+    {
+        $array = explode('\\', get_class($this));
+        $label = end($array);
+        if (isset($this->code)) {
+            $label .= '_' . $this->code;
+        }
+
+        return $label;
     }
 
     public function getConfigs(): array
@@ -55,7 +80,7 @@ abstract class Mailer implements \Nette\Mail\Mailer
     protected function buildConfig(): void
     {
         foreach ($this->options as $name => $definition) {
-            $configName = $this->getAlias() . '_' . $name;
+            $configName = $this->getConfigFieldName($name);
 
             try {
                 $this->options[$name]['value'] = $this->config->get($configName);
@@ -75,6 +100,11 @@ abstract class Mailer implements \Nette\Mail\Mailer
                 ];
             }
         }
+    }
+
+    private function getConfigFieldName(string $name): string
+    {
+        return $this->getMailerAlias() . '_' . $name;
     }
 
     public function isConfigured(): bool

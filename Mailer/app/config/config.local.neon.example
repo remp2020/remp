@@ -60,6 +60,12 @@ services:
     # If you're using Beam and want to use ProcessConversionStatsCommand, enable this repository (it's a dependency)
 #    - Remp\MailerModule\Repositories\BeamConversionsRepository
 
+    # Setup of multiple mailers of the same type
+#	mailFactory:
+#		setup:
+#			- addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(), 'us')
+#			- addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(), 'eu')
+
 # local_configs override DBs configs records.
 local_configs:
 

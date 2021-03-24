@@ -202,7 +202,7 @@ class Sender
         $mailer = $this->getMailer();
         if (!$mailer->supportsBatch()) {
             throw new MailerBatchException(
-                sprintf('attempted to send batch via %s mailer: not supported', $mailer->getAlias())
+                sprintf('attempted to send batch via %s mailer: not supported', $mailer->getMailerAlias())
             );
         }
 
