@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
+use Tomaj\NetteApi\Params\ParamInterface;
+
 class GeneratorParamsProcessor
 {
-    /** @var array(ParamInterface) */
+    /** @var ParamInterface[] */
     private $params;
 
     public function __construct(array $params)
@@ -17,8 +19,11 @@ class GeneratorParamsProcessor
     {
         $errors = [];
         foreach ($this->params as $param) {
-            if (!$param->isValid()) {
-                $errors[] = $param->getKey();
+            $result = $param->validate();
+            if (!$result->isOk()) {
+                foreach ($result->getErrors() as $error) {
+                    $errors[] = sprintf("%s: %s", $param->getKey(), $error);
+                }
             }
         }
         return $errors;
