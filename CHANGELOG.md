@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed broken aggregaton of pageviews data which didn't correctly aggregate anonymous pageview and timespent counts/sums. remp/remp#869
+  - Based on your current data retention setup, it's recommended to reaggregate the data after you release the fix (replace 1000 with the actul number of hours you want to reaggregate):
+    ```
+    for i in {0..1000} ; do php artisan pageviews:aggregate-pageviews --now="$i hours ago" ; done
+    for i in {0..1000} ; do php artisan pageviews:aggregate-timespent --now="$i hours ago" ; done
+    ```
+
 ### [Mailer]
 
 - Changed `MissingConfiguration` component to check configurations of all mailers used as sending mailers in newsletter lists besides default mailer. remp/remp#858

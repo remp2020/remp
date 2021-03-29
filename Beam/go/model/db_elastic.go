@@ -694,7 +694,9 @@ func (eDB *ElasticDB) resolveZeroValue(index, field string) (interface{}, error)
 	switch def {
 	case "text":
 		return "", nil
-	case "boolean", "date":
+	case "boolean":
+		return false, nil
+	case "date":
 		return nil, nil
 	case "long":
 		return 0, nil
