@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.21.0] - 2021-03-29
+
 ### [Campaign]
 
 - Fixed adding of new variant to the existing campaign. remp/remp#860
@@ -666,7 +668,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.20.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.21.0...master
+[0.21.0]: https://github.com/remp2020/remp/compare/0.20.0...0.21.0
 [0.20.0]: https://github.com/remp2020/remp/compare/0.19.0...0.20.0
 [0.19.0]: https://github.com/remp2020/remp/compare/0.18.0...0.19.0
 [0.18.0]: https://github.com/remp2020/remp/compare/0.17.0...0.18.0
