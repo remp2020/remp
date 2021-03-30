@@ -22,9 +22,10 @@
                             {input $input, class => 'selectpicker'}
                         </div>
                     </div>
-                    <div n:if="$input instanceof Nette\Forms\Controls\Checkbox" class="fg-checkbox">
-                        {label $input /}
-                        {input $input}
+                    <div n:if="$input instanceof Nette\Forms\Controls\Checkbox" class="toggle-switch" data-ts-color="cyan">
+                        {label $input:, class => 'ts-label'}
+                        {input $input:, hidden => 'hidden'}
+                        <label for="{$input->htmlId}" class="ts-helper"></label>
                     </div>
 
                     {if $description = $input->getOption('description')}
