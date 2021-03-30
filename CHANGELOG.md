@@ -6,11 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Changed `MissingConfiguration` component to check configurations of all mailers used as sending mailers in newsletter lists besides default mailer. remp/remp#858
+
 ## [0.21.1] - 2021-03-30
 
 ### [Mailer]
 
-- Fixed "template is not defined" errors during sending if snippets were used. remp/remp#871  
+- Fixed "template is not defined" errors during sending if snippets were used. remp/remp#871
 
 ## [0.21.0] - 2021-03-29
 
