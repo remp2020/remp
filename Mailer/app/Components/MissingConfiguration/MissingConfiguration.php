@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Components\MissingConfiguration;
 use Nette\Application\UI\Control;
 use Remp\MailerModule\Repositories\ConfigsRepository;
 use Remp\MailerModule\Models\Sender\MailerFactory;
+use Remp\MailerModule\Repositories\ListsRepository;
 
 class MissingConfiguration extends Control
 {
@@ -15,31 +16,43 @@ class MissingConfiguration extends Control
     /** @var MailerFactory */
     private $mailerFactory;
 
+    private $listsRepository;
+
     public function __construct(
         ConfigsRepository $configsRepository,
-        MailerFactory $mailerFactory
+        MailerFactory $mailerFactory,
+        ListsRepository $listsRepository
     ) {
         $this->configsRepository = $configsRepository;
         $this->mailerFactory = $mailerFactory;
+        $this->listsRepository = $listsRepository;
     }
 
     public function render(): void
     {
-        $defaultMailerSetting = $this->configsRepository->loadByName('default_mailer');
-        $mailerConfigured = false;
+        $this->template->link = $this->getPresenter()->link('Settings:default');
+        $this->template->setFile(__DIR__ . '/missing_configuration.latte');
 
+        $defaultMailerSetting = $this->configsRepository->loadByName('default_mailer');
         if ($defaultMailerSetting->value !== null) {
             $activeMailer = $this->mailerFactory->getMailer($defaultMailerSetting->value);
 
-            if ($mailerConfigured = $activeMailer->isConfigured()) {
+            if (!$activeMailer->isConfigured()) {
+                $this->template->mailerIdentifier = $activeMailer->getIdentifier();
+                $this->template->render();
                 return;
             }
         }
 
-        $this->template->link = $this->getPresenter()->link('Settings:default');
-        $this->template->missingConfigs = !$mailerConfigured;
+        $usedMailersAliases = $this->listsRepository->getUsedMailersAliases();
+        foreach ($usedMailersAliases as $mailerAlias) {
+            $mailer = $this->mailerFactory->getMailer($mailerAlias);
 
-        $this->template->setFile(__DIR__ . '/missing_configuration.latte');
-        $this->template->render();
+            if (!$mailer->isConfigured()) {
+                $this->template->mailerIdentifier = $mailer->getIdentifier();
+                $this->template->render();
+                return;
+            }
+        }
     }
 }

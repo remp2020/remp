@@ -112,4 +112,10 @@ class ListsRepository extends Repository
 
         return $results ?? [];
     }
+
+    public function getUsedMailersAliases(): array
+    {
+        return $this->getTable()->select('DISTINCT mailer_alias')
+            ->where('mailer_alias IS NOT NULL')->fetchPairs(null, 'mailer_alias');
+    }
 }
