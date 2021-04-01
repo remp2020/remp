@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed `MissingConfiguration` component to check configurations of all mailers used as sending mailers in newsletter lists besides default mailer. remp/remp#858
 - Fixed Bearer authorization in `/api/v1/users/logs` and `/api/v1/users/logs-count-per-status` API calls. remp/remp#865
 - Added support for checkbox in the settings page. remp/crm#1624
+- Fixed Mailer forms - all fields are required and couldn't be changed. remp/remp#837
+- Added UrlParserGenerator requires articles urls to be filled. remp/remp#837
 
 ## [0.21.1] - 2021-03-30
 

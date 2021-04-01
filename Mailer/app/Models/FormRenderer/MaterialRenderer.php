@@ -128,7 +128,7 @@ class MaterialRenderer extends DefaultFormRenderer
 
         $pair->addHtml($this->renderMaterialLabel($control, $isTextInput));
         $pair->addHtml($this->renderControl($control));
-        $pair->class($this->getValue($control->setRequired() ? 'pair .required' : 'pair .optional'), true);
+        $pair->class($this->getValue($control->isRequired() ? 'pair .required' : 'pair .optional'), true);
         $pair->class($control->hasErrors() ? $this->getValue('pair .error') : null, true);
         $pair->class($control->getOption('class'), true);
         if (++$this->counter % 2) {
@@ -148,7 +148,7 @@ class MaterialRenderer extends DefaultFormRenderer
     {
         $label = $control->getLabel();
         if ($label instanceof Html) {
-            if ($control->setRequired()) {
+            if ($control->isRequired()) {
                 $label->class($this->getValue('control .required'), true);
             }
             if ($animatedLabel) {
