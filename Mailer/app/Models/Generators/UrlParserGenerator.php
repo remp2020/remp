@@ -40,6 +40,7 @@ class UrlParserGenerator implements IGenerator
         $form->addTextArea('articles', 'Article')
             ->setHtmlAttribute('rows', 7)
             ->setOption('description', 'Paste article Urls. Each on separate line.')
+            ->setRequired(true)
             ->getControlPrototype()
             ->setHtmlAttribute('class', 'form-control html-editor');
 
