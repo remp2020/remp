@@ -31,7 +31,7 @@
             },
             created: function() {
                 this.$store.commit('changeSettings', {
-                    newGraph: {{ json_encode(config('beam.pageview_graph_data_source') === 'snapshots') }}
+                    newGraph: {{ @json(config('beam.pageview_graph_data_source') === 'snapshots') }}
                 });
             },
             store: DashboardStore,
@@ -39,8 +39,8 @@
                 articlesUrl: "{!! route('dashboard.articles.json') !!}",
                 timeHistogramUrl: "{!! route('dashboard.timeHistogram.json') !!}",
                 timeHistogramUrlNew: "{!! route('dashboard.timeHistogramNew.json') !!}",
-                options: {!! json_encode($options) !!},
-                externalEvents: {!! json_encode($externalEvents) !!},
+                options: {!! @json($options) !!},
+                externalEvents: {!! @json($externalEvents) !!},
                 conversionRateMultiplier: {!! $conversionRateMultiplier !!}
             }
         })

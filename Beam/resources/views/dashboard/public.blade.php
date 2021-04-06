@@ -25,7 +25,7 @@
             },
             created: function() {
                 this.$store.commit('changeSettings', {
-                    newGraph: {{ json_encode(config('beam.pageview_graph_data_source') === 'snapshots') }}
+                    newGraph: {{ @json(config('beam.pageview_graph_data_source') === 'snapshots') }}
                 })
             },
             provide: function() {
@@ -38,10 +38,10 @@
                 articlesUrl: "{!! route('public.articles.json') !!}",
                 timeHistogramUrl: "{!! route('public.timeHistogram.json') !!}",
                 timeHistogramUrlNew: "{!! route('public.timeHistogramNew.json') !!}",
-                options: {!! json_encode($options) !!},
-                accountPropertyTokens: {!! json_encode($accountPropertyTokens ?? false) !!},
+                options: {!! @json($options) !!},
+                accountPropertyTokens: {!! @json($accountPropertyTokens ?? false) !!},
                 csrfToken: {!!'"' . csrf_token() . '"'!!},
-                externalEvents: {!! json_encode($externalEvents) !!},
+                externalEvents: {!! @json($externalEvents) !!},
                 conversionRateMultiplier: {!! $conversionRateMultiplier !!}
             }
         })

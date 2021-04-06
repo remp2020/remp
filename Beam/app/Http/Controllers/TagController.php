@@ -25,10 +25,15 @@ class TagController extends Controller
         return response()->format([
             'html' => view('tags.index', [
                 'tags' => Tag::all()->pluck('name', 'id'),
+                'contentTypes' => array_merge(
+                    ['all'],
+                    Article::groupBy('content_type')->pluck('content_type')->toArray()
+                ),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->input('conversion_to', 'now'),
+                'contentType' => $request->input('content_type', 'all'),
             ]),
             'json' => TagResource::collection(Tag::paginate()),
         ]);
@@ -59,14 +64,17 @@ class TagController extends Controller
             'COALESCE(articles_count, 0) AS articles_count',
             'COALESCE(conversions_count, 0) AS conversions_count',
             'COALESCE(conversions_amount, 0) AS conversions_amount',
+
             'COALESCE(pageviews_all, 0) AS pageviews_all',
-            'COALESCE(pageviews_signed_in, 0) AS pageviews_signed_in',
+            'COALESCE(pageviews_not_subscribed, 0) AS pageviews_not_subscribed',
             'COALESCE(pageviews_subscribers, 0) AS pageviews_subscribers',
+
             'COALESCE(timespent_all, 0) AS timespent_all',
-            'COALESCE(timespent_signed_in, 0) AS timespent_signed_in',
+            'COALESCE(timespent_not_subscribed, 0) AS timespent_not_subscribed',
             'COALESCE(timespent_subscribers, 0) AS timespent_subscribers',
+
             'COALESCE(timespent_all / pageviews_all, 0) AS avg_timespent_all',
-            'COALESCE(timespent_signed_in / pageviews_signed_in, 0) AS avg_timespent_signed_in',
+            'COALESCE(timespent_not_subscribed / pageviews_not_subscribed, 0) AS avg_timespent_not_subscribed',
             'COALESCE(timespent_subscribers / pageviews_subscribers, 0) AS avg_timespent_subscribers',
         ];
 
@@ -76,6 +84,10 @@ class TagController extends Controller
         ]))
             ->leftJoin('articles', 'article_tag.article_id', '=', 'articles.id')
             ->groupBy('tag_id');
+
+        if ($request->input('content_type') && $request->input('content_type') !== 'all') {
+            $tagArticlesQuery->where('content_type', '=', $request->input('content_type'));
+        }
 
         $conversionsQuery = Conversion::selectRaw(implode(',', [
             'tag_id',
@@ -89,10 +101,10 @@ class TagController extends Controller
         $pageviewsQuery = Article::selectRaw(implode(',', [
             'tag_id',
             'COALESCE(SUM(pageviews_all), 0) AS pageviews_all',
-            'COALESCE(SUM(pageviews_signed_in), 0) AS pageviews_signed_in',
+            'COALESCE(SUM(pageviews_all) - SUM(pageviews_subscribers), 0) AS pageviews_not_subscribed',
             'COALESCE(SUM(pageviews_subscribers), 0) AS pageviews_subscribers',
             'COALESCE(SUM(timespent_all), 0) AS timespent_all',
-            'COALESCE(SUM(timespent_signed_in), 0) AS timespent_signed_in',
+            'COALESCE(SUM(timespent_all) - SUM(timespent_subscribers), 0) AS timespent_not_subscribed',
             'COALESCE(SUM(timespent_subscribers), 0) AS timespent_subscribers',
         ]))
             ->leftJoin('article_tag', 'articles.id', '=', 'article_tag.article_id')
@@ -125,13 +137,18 @@ class TagController extends Controller
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'tags.id', '=', 'c.tag_id')->addBinding($conversionsQuery->getBindings())
             ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'tags.id', '=', 'pv.tag_id')->addBinding($pageviewsQuery->getBindings())
             ->groupBy(['tags.name', 'tags.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all',
-                'pageviews_signed_in', 'pageviews_subscribers', 'timespent_all', 'timespent_signed_in', 'timespent_subscribers']);
+                'pageviews_not_subscribed', 'pageviews_subscribers', 'timespent_all', 'timespent_not_subscribed', 'timespent_subscribers']);
 
         $conversionsQuery = \DB::table('conversions')
             ->selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, article_tag.tag_id')
             ->join('article_tag', 'conversions.article_id', '=', 'article_tag.article_id')
             ->join('articles', 'article_tag.article_id', '=', 'articles.id')
             ->groupBy(['article_tag.tag_id', 'conversions.currency']);
+
+        if ($request->input('content_type') && $request->input('content_type') !== 'all') {
+            $conversionsQuery->where('content_type', '=', $request->input('content_type'));
+            $pageviewsQuery->where('content_type', '=', $request->input('content_type'));
+        }
 
         if ($request->input('published_from')) {
             $conversionsQuery->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz')));
