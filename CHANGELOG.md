@@ -9,9 +9,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed broken aggregaton of pageviews data which didn't correctly aggregate anonymous pageview and timespent counts/sums. remp/remp#869
-  - Based on your current data retention setup, it's recommended to reaggregate the data after you release the fix (replace 1000 with the actul number of hours you want to reaggregate):
+  - Based on your current data retention setup, it's recommended to reaggregate the data after you release the segments API fix (replace 1000 with the actual number of hours you want to reaggregate):
     ```
-    for i in {0..1000} ; do php artisan pageviews:aggregate-pageviews --now="$i hours ago" ; done
+    for i in {0..1000} ; do php artisan pageviews:aggregate-load --now="$i hours ago" ; done
     for i in {0..1000} ; do php artisan pageviews:aggregate-timespent --now="$i hours ago" ; done
     ```
 
@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for checkbox in the settings page. remp/crm#1624
 - Fixed Mailer forms - all fields are required and couldn't be changed. remp/remp#837
 - Added UrlParserGenerator requires articles urls to be filled. remp/remp#837
+- Fixed incompatible types warning in `ConfigsRepository`. remp/remp#874
 
 ## [0.21.1] - 2021-03-30
 
