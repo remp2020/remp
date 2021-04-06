@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.21.3] - 2021-04-06
+
+### [Mailer]
+
+- Fixed incompatible types warning in `SnippetsRepository`. remp/remp#874
+
 ## [0.21.2] - 2021-04-06
 
 ### [Beam]
@@ -694,7 +700,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.21.2...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.21.3...master
+[0.21.3]: https://github.com/remp2020/remp/compare/0.21.2...0.21.3
 [0.21.2]: https://github.com/remp2020/remp/compare/0.21.1...0.21.2
 [0.21.1]: https://github.com/remp2020/remp/compare/0.21.0...0.21.1
 [0.21.0]: https://github.com/remp2020/remp/compare/0.20.0...0.21.0
