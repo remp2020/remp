@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.21.2] - 2021-04-06
+
 ### [Beam]
 
 - Fixed broken aggregaton of pageviews data which didn't correctly aggregate anonymous pageview and timespent counts/sums. remp/remp#869
@@ -692,7 +694,9 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.21.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.21.2...master
+[0.21.2]: https://github.com/remp2020/remp/compare/0.21.1...0.21.2
+[0.21.1]: https://github.com/remp2020/remp/compare/0.21.0...0.21.1
 [0.21.0]: https://github.com/remp2020/remp/compare/0.20.0...0.21.0
 [0.20.0]: https://github.com/remp2020/remp/compare/0.19.0...0.20.0
 [0.19.0]: https://github.com/remp2020/remp/compare/0.18.0...0.19.0
