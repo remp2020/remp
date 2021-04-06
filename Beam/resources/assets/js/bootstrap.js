@@ -17,6 +17,7 @@ global.GoogleAnalyticsReportingHistogram = require("./components/dashboard/Googl
 global.DashboardStore = require("./components/dashboard/store.js").default;
 
 global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue").default;
+global.vSelect = require("remp/js/components/vSelect.vue").default;
 global.DateFormatter = require("remp/js/components/DateFormatter.vue").default;
 global.FormValidator = require("remp/js/components/FormValidator").default;
 

@@ -190,7 +190,7 @@
                 return {
                     url: "{!! route('articles.timeHistogram.json', $article->id) !!}",
                     variantsUrl: "{!! route('articles.variantsHistogram.json', $article->id) !!}",
-                    externalEvents: {!! json_encode($externalEvents) !!},
+                    externalEvents: {!! @json($externalEvents) !!},
                 }
             }
         })
@@ -212,7 +212,7 @@
                 <script>
                     $.fn.dataTables['render']['referer_medium'] = function () {
                         return function(data) {
-                            var colors = {!! json_encode($mediumColors) !!};
+                            var colors = {!! @json($mediumColors) !!};
                             return "<span style='font-size: 18px; color:" + colors[data] + "'>●</span> " + data;
                         }
                     };
