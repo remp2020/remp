@@ -8,7 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
-- Changed `MailgunEventHandler` to emit `email-dropped` Message when event `failed` with `severity=permanent` occurs. remp/remp#868
+- Changed `MailgunEventHandler` to emit `email-dropped` message when event `failed` with `severity=permanent` occurs. remp/remp#868
+- Fixed new email create bug throwing an error if "click tracking" was selected to non-default value. remp/remp#875
 
 ## [0.21.3] - 2021-04-06
 

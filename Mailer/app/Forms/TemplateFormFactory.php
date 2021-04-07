@@ -143,6 +143,8 @@ class TemplateFormFactory implements IFormFactory
         if ($values['click_tracking'] === "") {
             // handle null (default) selection
             $values['click_tracking'] = null;
+        } else {
+            $values['click_tracking'] = (bool) $values['click_tracking'];
         }
 
         $this->database->beginTransaction();
