@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.21.4] - 2021-04-07
+
 ### [Mailer]
 
 - Changed `MailgunEventHandler` to emit `email-dropped` message when event `failed` with `severity=permanent` occurs. remp/remp#868
@@ -705,7 +707,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.21.3...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.21.4...master
+[0.21.4]: https://github.com/remp2020/remp/compare/0.21.3...0.21.4
 [0.21.3]: https://github.com/remp2020/remp/compare/0.21.2...0.21.3
 [0.21.2]: https://github.com/remp2020/remp/compare/0.21.1...0.21.2
 [0.21.1]: https://github.com/remp2020/remp/compare/0.21.0...0.21.1
