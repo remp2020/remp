@@ -60,6 +60,10 @@ class MailgunEventHandler implements HandlerInterface
             $this->emitter->emit(new Message('email-dropped', ['email' => $log->email]), RedisDriver::PRIORITY_LOW);
         }
 
+        if ($payload['event'] === 'failed' && array_key_exists('severity', $payload) && $payload['severity'] === 'permanent') {
+            $this->emitter->emit(new Message('email-dropped', ['email' => $log->email]), RedisDriver::PRIORITY_LOW);
+        }
+
         return true;
     }
 }
