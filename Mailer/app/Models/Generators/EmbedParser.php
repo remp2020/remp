@@ -16,19 +16,20 @@ class EmbedParser
 
     private function fetch(string $url): ?array
     {
-        $embed = Embed::create($url);
-        $type = $embed->getType();
-        $image = $embed->getImage();
+        $embed = new Embed();
+        $embed = $embed->get($url);
 
-        // twitter provider returns type `rich` for both image and video
-        // so we have to check for type in og meta tags
-        if ($embed->getProviderName() === "Twitter") {
-            $type = $embed->getProviders()['opengraph']->getType();
+        $oEmbed = $embed->getOEmbed();
+        $type = $oEmbed->get('type');
+
+        $image = null;
+        if ($embed->image) {
+            $image = $embed->image->__toString();
         }
 
-        return ($embed->getUrl() === null) ? null : [
-            'link' => $embed->getUrl(),
-            'title' => $embed->getTitle(),
+        return ($embed->url === null) ? null : [
+            'link' => $embed->url->__toString(),
+            'title' => $embed->title ?? '',
             'image' => $image,
             'isVideo' => $type === 'video'
         ];
@@ -62,6 +63,8 @@ class EmbedParser
 
         if (!is_null($image)) {
             $html .= "<img src='{$image}' alt='{$title}' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:inline;'>";
+        } else {
+            $html .= "<span style='text-decoration: underline; color: #1F3F83;'>" . $link . "</span>";
         }
 
         return $html . "</a>" . PHP_EOL;
