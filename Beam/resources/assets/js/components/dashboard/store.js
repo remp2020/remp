@@ -15,20 +15,19 @@ export default new Vuex.Store({
             state.settings = Object.assign({}, state.settings, newSettings)
         }
     },
-    // Store state in URL fragment (assuming dashboard configuration state is kept short)
+    // Store state in URL query string (assuming dashboard configuration state is kept short)
     plugins: [createPersistedState({
         getState: function(key, storage, value) {
+            let url = new URL(window.location.href);
             try {
-                if (window.location.hash) {
-                    return rison.decode(window.location.hash.substring(1))
-                } else {
-                    return undefined
-                }
+                return rison.decode(url.searchParams.get('_'));
             } catch (err) {}
             return undefined
         },
         setState: function(key, state, storage) {
-            window.location.hash = rison.encode(state)
+            let url = new URL(window.location.href);
+            url.searchParams.set('_', rison.encode(state));
+            window.history.pushState({}, document.title, decodeURIComponent(url.toString()));
         }
     })],
 })
