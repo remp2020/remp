@@ -33,16 +33,16 @@ $.extend( $.fn.dataTable.defaults, {
         const stateParameters = getRelevantStateParameters(data);
         // encode current state to base64
         const state = rison.encode(stateParameters);
-        // get hash part of the url
-        let hashParams = new URLSearchParams(window.location.hash.substring(1));
-        // add encoded state into hash part of url
-        hashParams.set($(this).attr('id') + '_state', state);
-        // update url hash and perform url decoding, because urlsearchparams.toString method encodes it automatically
-        window.location.hash = decodeURIComponent(hashParams.toString());
+
+        let url = new URL(window.location.href);
+        url.searchParams.set($(this).attr('id') + '_state', state);
+
+        // update url and perform url decoding, because url.toString method encodes it automatically
+        window.history.pushState({}, document.title, decodeURIComponent(url.toString()));
     },
     stateLoadCallback: function (settings) {
-        const hash = new URLSearchParams(window.location.hash.substring(1));
-        let state = hash.get($(this).attr('id') + '_state');
+        const url = new URL(window.location.href);
+        let state = url.searchParams.get($(this).attr('id') + '_state');
 
         // check the current url to see if we've got a state to restore
         if (!state) {
