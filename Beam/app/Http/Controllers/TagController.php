@@ -110,6 +110,11 @@ class TagController extends Controller
             ->leftJoin('article_tag', 'articles.id', '=', 'article_tag.article_id')
             ->groupBy('tag_id');
 
+        if ($request->input('content_type') && $request->input('content_type') !== 'all') {
+            $pageviewsQuery->where('content_type', '=', $request->input('content_type'));
+            $conversionsQuery->where('content_type', '=', $request->input('content_type'));
+        }
+
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'));
             $tagArticlesQuery->where('published_at', '>=', $publishedFrom);
@@ -147,7 +152,6 @@ class TagController extends Controller
 
         if ($request->input('content_type') && $request->input('content_type') !== 'all') {
             $conversionsQuery->where('content_type', '=', $request->input('content_type'));
-            $pageviewsQuery->where('content_type', '=', $request->input('content_type'));
         }
 
         if ($request->input('published_from')) {

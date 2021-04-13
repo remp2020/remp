@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed pageviews and time spent stats in tags listing. remp/remp#776
+
 ## [0.21.4] - 2021-04-07
 
 ### [Mailer]
