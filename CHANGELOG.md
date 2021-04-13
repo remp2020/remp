@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.21.5] - 2021-04-13
+
 ### [Beam]
 
 - Fixed pageviews and time spent stats in tags listing. remp/remp#776
@@ -715,7 +717,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.21.4...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.21.5...master
+[0.21.5]: https://github.com/remp2020/remp/compare/0.21.4...0.21.5
 [0.21.4]: https://github.com/remp2020/remp/compare/0.21.3...0.21.4
 [0.21.3]: https://github.com/remp2020/remp/compare/0.21.2...0.21.3
 [0.21.2]: https://github.com/remp2020/remp/compare/0.21.1...0.21.2
