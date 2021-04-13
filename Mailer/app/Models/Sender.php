@@ -141,6 +141,7 @@ class Sender
         }
 
         $tokens = $this->autoLogin->createTokens([$recipient['email']]);
+        $this->params['email'] = $recipient['email'];
         $this->params['autologin'] = "?token={$tokens[$recipient['email']]}";
         $this->params = array_merge($this->params, $recipient['params'] ?? []);
         $this->params = array_merge($this->params, $this->generateServiceParams($this->params['autologin']));
@@ -247,6 +248,7 @@ class Sender
             $p = array_merge($this->params, $recipient['params'] ?? []);
             $p['mail_sender_id'] = md5($recipient['email'] . microtime(true));
             $p['autologin'] = "?token={$autologinTokens[$recipient['email']]}";
+            $p['email'] = $recipient['email'];
             $p = array_merge($p, $this->generateServiceParams($p['autologin']));
 
             [$transformedParams, $p] = $mailer->transformTemplateParams($p);
