@@ -143,13 +143,7 @@ class Sender
         $tokens = $this->autoLogin->createTokens([$recipient['email']]);
         $this->params['autologin'] = "?token={$tokens[$recipient['email']]}";
         $this->params = array_merge($this->params, $recipient['params'] ?? []);
-
-        if (isset($_ENV['UNSUBSCRIBE_URL'])) {
-            $this->params['unsubscribe'] = str_replace('%type%', $this->template->mail_type->code, $_ENV['UNSUBSCRIBE_URL']) . $this->params['autologin'];
-        }
-        if (isset($_ENV['SETTINGS_URL'])) {
-            $this->params['settings'] = $_ENV['SETTINGS_URL'] . $this->params['autologin'];
-        }
+        $this->params = array_merge($this->params, $this->generateServiceParams($this->params['autologin']));
 
         $mailer = $this->getMailer();
 
@@ -253,6 +247,7 @@ class Sender
             $p = array_merge($this->params, $recipient['params'] ?? []);
             $p['mail_sender_id'] = md5($recipient['email'] . microtime(true));
             $p['autologin'] = "?token={$autologinTokens[$recipient['email']]}";
+            $p = array_merge($p, $this->generateServiceParams($p['autologin']));
 
             [$transformedParams, $p] = $mailer->transformTemplateParams($p);
             $templateParams[$recipient['email']] = $p;
@@ -387,5 +382,17 @@ class Sender
     private function generateSubject(string $subjectTemplate, array  $params): string
     {
         return $this->engineFactory->engine()->render($subjectTemplate, $params);
+    }
+
+    private function generateServiceParams(?string $autologin)
+    {
+        $params = [];
+        if (isset($_ENV['UNSUBSCRIBE_URL'])) {
+            $params['unsubscribe'] = str_replace('%type%', $this->template->mail_type->code, $_ENV['UNSUBSCRIBE_URL']) . $autologin;
+        }
+        if (isset($_ENV['SETTINGS_URL'])) {
+            $params['settings'] = $_ENV['SETTINGS_URL'] . $autologin;
+        }
+        return $params;
     }
 }

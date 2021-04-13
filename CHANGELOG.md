@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed pageviews and time spent stats in tags listing. remp/remp#776
 
+### [Mailer]
+
+- Fixed unresolved `settings` and `unsubscribe` template variables if system was configured to use Mailgun mailer with batch sending. Please be aware that there's still known issue that the links do not receive tracking (RTM) params if batch sending is used. remp/remp#879
+
 ## [0.21.4] - 2021-04-07
 
 ### [Mailer]
