@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added `email` parameter to templates. Previously it could have been available by returning it via `IUser` interface in jobs, from now it's available everywhere. remp/remp#880
+- Fixed slow mailgun events hermes processing by adding missing `mail_sender_id` index. remp/remp#881
 
 ## [0.21.5] - 2021-04-13
 
