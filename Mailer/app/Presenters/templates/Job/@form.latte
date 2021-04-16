@@ -47,23 +47,15 @@
 
             <div class="row form-group m-t-30">
                 <div class="col-sm-12">
-                    <div class="fg-float">
-                        <div class="fg-line">
-                            {input email_count, class => 'form-control fg-input'}
-                            {label email_count, class => 'fg-label' /}
-                        </div>
-                    </div>
+                    {label email_count /}
+                    {input email_count, class => 'form-control fg-input'}
                 </div>
             </div>
 
             <div class="row form-group">
                 <div class="col-sm-12">
-                    <div class="fg-float">
-                        <div class="dtp-container fg-line">
-                            {input start_at, class => 'form-control date-time-picker'}
-                            {label start_at, class => 'fg-label' /}
-                        </div>
-                    </div>
+                    {label start_at/}
+                    {input start_at, class => 'form-control date-time-picker', autocomplete => 'off'}
                 </div>
             </div>
 
