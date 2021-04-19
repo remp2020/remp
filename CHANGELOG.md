@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `email` parameter to templates. Previously it could have been available by returning it via `IUser` interface in jobs, from now it's available everywhere. remp/remp#880
 - Fixed slow mailgun events hermes processing by adding missing `mail_sender_id` index. remp/remp#881
 - Added attribute `autocomplete=off` to `start_at` input field in `NewBatchForm`. remp/remp#854
+- Added `save_start` submit button to `NewBatchForm` to create new mail job batch and set its status to `ready`. remp/remp#855
 
 ## [0.21.5] - 2021-04-13
 
