@@ -21,6 +21,10 @@ interface SegmentContract
 
     public function cacheEnabled(CampaignSegment $campaignSegment): bool;
 
+    public function addUserToCache(CampaignSegment $campaignSegment, string $userId): bool;
+
+    public function removeUserFromCache(CampaignSegment $campaignSegment, string $userId): bool;
+
     /**
      * setCache stores and provides cache object for campaign segment providers.
      *

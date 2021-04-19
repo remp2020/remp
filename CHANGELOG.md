@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added `TagCategory` filter option to `/top` APIs. remp/remp#898
 
+### [Campaign]
+
+- Added API to temporary override user's presence in cached segment (next scheduled cache job loads list against segment query). remp/crm#1765
+
 ### [Mailer]
 
 - Removed unused table `hermes_tasks_old` created as backup when Hermes was updated to v2.1 _(see `HermesRetry` migration; commit [5fcd07ff](https://github.com/remp2020/remp/commit/5fcd07ffdda658334b0b990252eb94af0857b894))_.

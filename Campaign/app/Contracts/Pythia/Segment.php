@@ -137,6 +137,16 @@ class Segment implements SegmentContract
         return false;
     }
 
+    public function addUserToCache(CampaignSegment $campaignSegment, string $userId): bool
+    {
+        return false;
+    }
+
+    public function removeUserFromCache(CampaignSegment $campaignSegment, string $userId): bool
+    {
+        return false;
+    }
+
     public function setProviderData($cache): void
     {
         $this->cache = $cache;

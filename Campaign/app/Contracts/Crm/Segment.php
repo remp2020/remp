@@ -125,4 +125,14 @@ class Segment implements SegmentContract
     {
         return $this->providerData;
     }
+
+    public function addUserToCache(CampaignSegment $campaignSegment, string $userId): bool
+    {
+        return $this->redis->sadd(self::PROVIDER_ALIAS . '|' . $campaignSegment->code, [$userId]) ?: false;
+    }
+
+    public function removeUserFromCache(CampaignSegment $campaignSegment, string $userId): bool
+    {
+        return $this->redis->srem(self::PROVIDER_ALIAS . '|' . $campaignSegment->code, $userId) ?: false;
+    }
 }
