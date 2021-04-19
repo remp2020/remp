@@ -18,6 +18,8 @@ class NewBatchFormFactory
 {
     use SmartObject;
 
+    private const FORM_ACTION_SAVE_START = 'save_start';
+
     private $jobsRepository;
 
     private $batchesRepository;
@@ -111,6 +113,11 @@ class NewBatchFormFactory
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
 
+        $form->addSubmit(self::FORM_ACTION_SAVE_START, 'Save and start sending')
+            ->getControlPrototype()
+            ->setName('button')
+            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and start');
+
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;
     }
@@ -143,6 +150,11 @@ class NewBatchFormFactory
                 $batch->id,
                 $values['b_template_id']
             );
+        }
+
+        $buttonSaveStart = $form[self::FORM_ACTION_SAVE_START];
+        if ($buttonSaveStart->isSubmittedBy()) {
+            $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
         }
 
         ($this->onSuccess)($batch->job);
