@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- **BREAKING**: Bumping minimal version of PHP to 7.4. Version is enforced by Composer and any older version is not allowed anymore. Please upgrade PHP accordingly.
+
 ### [Campaign]
 
 - Added support for Sentry error logging. Airbrake is becoming obsolete and will be dropped in the future releases. remp/remp#888

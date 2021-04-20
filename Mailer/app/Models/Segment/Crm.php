@@ -34,8 +34,8 @@ class Crm implements ISegment
     {
         $response = $this->request(static::ENDPOINT_LIST);
 
+        $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
         try {
-            $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
             $segments = [];
             foreach (\JsonMachine\JsonMachine::fromStream($stream, "/segments") as $segment) {
                 $segments[] = [
@@ -56,8 +56,8 @@ class Crm implements ISegment
     {
         $response = $this->request(static::ENDPOINT_USERS, ['code' => $segment['code']]);
 
+        $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
         try {
-            $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
             $userIds = [];
             foreach (\JsonMachine\JsonMachine::fromStream($stream, "/users") as $user) {
                 $userIds[] = $user['id'];

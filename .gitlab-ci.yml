@@ -6,14 +6,6 @@ cache:
   paths:
     - bin/
 
-syntax:7.3:
-  stage: test
-  image: php:7.3-cli
-  tags:
-    - docker
-  script:
-    - make syntax
-
 syntax:7.4:
   stage: test
   image: php:7.4-cli
