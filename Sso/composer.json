@@ -49,6 +49,8 @@
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
+        "sentry/sentry-laravel": "^2.4",
+        "symfony/psr-http-message-bridge": "^1.0",
         "tymon/jwt-auth": "^1.0",
         "ukfast/laravel-health-check": "^1.5",
         "yajra/laravel-datatables-oracle": "v8.13.7"

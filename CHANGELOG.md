@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **BREAKING**: Bumping minimal version of PHP to 7.4. Version is enforced by Composer and any older version is not allowed anymore. Please upgrade PHP accordingly.
 
+### [Beam]
+
+- Added support for Sentry error logging. Airbrake is becoming obsolete and will be dropped in the future releases. remp/remp#888
+
 ### [Campaign]
 
 - Added support for Sentry error logging. Airbrake is becoming obsolete and will be dropped in the future releases. remp/remp#888
@@ -20,6 +24,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed slow mailgun events hermes processing by adding missing `mail_sender_id` index. remp/remp#881
 - Added attribute `autocomplete=off` to `start_at` input field in `NewBatchForm`. remp/remp#854
 - Added `save_start` submit button to `NewBatchForm` to create new mail job batch and set its status to `ready`. remp/remp#855
+
+### [Sso]
+
+- Added support for Sentry error logging. Airbrake is becoming obsolete and will be dropped in the future releases. remp/remp#888
 
 ## [0.21.5] - 2021-04-13
 
