@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Added support for Sentry error logging. Airbrake is becoming obsolete and will be dropped in the future releases. remp/remp#888
+
 ### [Mailer]
 
 - Added `email` parameter to templates. Previously it could have been available by returning it via `IUser` interface in jobs, from now it's available everywhere. remp/remp#880

@@ -37,6 +37,9 @@ class Handler extends ExceptionHandler
             $airbrakeNotifier = app(\Airbrake\Notifier::class);
             $airbrakeNotifier->notify($exception);
         }
+        if ($this->shouldReport($exception) && app()->bound('sentry')) {
+            app('sentry')->captureException($exception);
+        }
         parent::report($exception);
     }
 

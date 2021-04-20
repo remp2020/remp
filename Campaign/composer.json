@@ -41,7 +41,9 @@
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
         "remp/multi-armed-bandit": "*",
+        "sentry/sentry-laravel": "^2.4",
         "spatie/laravel-searchable": "1.2.3",
+        "symfony/psr-http-message-bridge": "^1.0",
         "tightenco/ziggy": "^0.6.9",
         "ukfast/laravel-health-check": "^1.5",
         "yajra/laravel-datatables-oracle": "^8.0"
