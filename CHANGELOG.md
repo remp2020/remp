@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed slow mailgun events hermes processing by adding missing `mail_sender_id` index. remp/remp#881
 - Added attribute `autocomplete=off` to `start_at` input field in `NewBatchForm`. remp/remp#854
 - Added `save_start` submit button to `NewBatchForm` to create new mail job batch and set its status to `ready`. remp/remp#855
+- Changed `MailWorkerCommand` to clean `mail_job_queue` table after all batch mail jobs are done. This change should help with email sending issues caused by possible database deadlock. remp/remp#886
 
 ### [Sso]
 
