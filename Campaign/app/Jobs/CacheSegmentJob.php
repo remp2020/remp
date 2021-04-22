@@ -46,7 +46,15 @@ class CacheSegmentJob implements ShouldQueue
             return;
         }
 
-        $users = $segmentAggregator->users($this->campaignSegment);
+        try {
+            $users = $segmentAggregator->users($this->campaignSegment);
+        } catch (\Exception $e) {
+            \Log::error('unable to cache users from segment', [
+                'provider' => $this->campaignSegment->provider,
+                'code' => $this->campaignSegment->code,
+            ]);
+            return;
+        }
 
         Redis::connection()->del([$this->key()]);
         if ($users->isNotEmpty()) {

@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Added support for Sentry error logging. Airbrake is becoming obsolete and will be dropped in the future releases. remp/remp#888
+- Fixed segment caching if there's an issue with listing of segment. remp/remp#891
 
 ### [Mailer]
 
