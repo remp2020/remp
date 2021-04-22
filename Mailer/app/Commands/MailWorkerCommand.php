@@ -5,7 +5,6 @@ namespace Remp\MailerModule\Commands;
 
 use League\Event\EventDispatcher;
 use Exception;
-use Nette\DI\Container;
 use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
@@ -16,7 +15,6 @@ use Remp\MailerModule\Models\Job\MailCache;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
-use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Models\Sender;
@@ -34,8 +32,6 @@ class MailWorkerCommand extends Command
     const MESSAGES_PER_BATCH = 200;
 
     private $applicationMailer;
-
-    private $mailJobsRepository;
 
     private $mailJobBatchRepository;
 
@@ -55,8 +51,6 @@ class MailWorkerCommand extends Command
 
     private $smtpErrors = 0;
 
-    private $container;
-
     private $logger;
 
     /** @var ShutdownInterface */
@@ -68,19 +62,16 @@ class MailWorkerCommand extends Command
     public function __construct(
         LoggerInterface $logger,
         Sender $applicationMailer,
-        JobsRepository $mailJobsRepository,
         BatchesRepository $mailJobBatchRepository,
         JobQueueRepository $mailJobQueueRepository,
         LogsRepository $mailLogRepository,
         TemplatesRepository $mailTemplatesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         MailCache $redis,
-        EventDispatcher $eventDispatcher,
-        Container $container
+        EventDispatcher $eventDispatcher
     ) {
         parent::__construct();
         $this->applicationMailer = $applicationMailer;
-        $this->mailJobsRepository = $mailJobsRepository;
         $this->mailJobBatchRepository = $mailJobBatchRepository;
         $this->mailJobQueueRepository = $mailJobQueueRepository;
         $this->mailLogRepository = $mailLogRepository;
@@ -88,7 +79,6 @@ class MailWorkerCommand extends Command
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailCache = $redis;
         $this->eventDispatcher = $eventDispatcher;
-        $this->container = $container;
         $this->logger = $logger;
     }
 
@@ -155,6 +145,7 @@ class MailWorkerCommand extends Command
                 $output->writeln("Queue <info>{$batch->id}</info> has no more jobs, cleaning up...");
                 $this->mailCache->removeQueue($batch->id);
                 $this->mailJobBatchRepository->update($batch, ['status' => BatchesRepository::STATUS_DONE]);
+                $this->mailJobQueueRepository->clearBatch($batch);
                 continue;
             }
 
@@ -216,15 +207,11 @@ class MailWorkerCommand extends Command
                         ->setJobId($batch->mail_job_id)
                         ->setBatchId($batch->id);
 
-                    $queueJobs = [];
                     $template = null;
 
                     $output->writeln(" * Processing $jobsCount jobs of template <info>{$templateCode}</info>, batch <info>{$batch->id}</info>");
                     $this->logger->info(" * Processing $jobsCount jobs of template <info>{$templateCode}</info>, batch <info>{$batch->id}</info>");
                     foreach ($jobs as $i => $job) {
-                        $queueJob = $this->mailJobQueueRepository->getJob($job->email, $batch->id);
-                        $queueJobs[$i] = $queueJob;
-
                         if (!$template) {
                             $template = $this->mailTemplateRepository->getByCode($job->templateCode);
                         }
@@ -262,8 +249,7 @@ class MailWorkerCommand extends Command
                         $output->writeln(" * $sentCount mail(s) of batch <info>{$batch->id}</info> sent");
                         $this->logger->info(" * $sentCount mail(s) of batch <info>{$batch->id}</info> sent");
 
-                        foreach ($jobs as $i => $job) {
-                            $this->mailJobQueueRepository->delete($queueJobs[$i]);
+                        foreach ($jobs as $job) {
                             $this->eventDispatcher->dispatch(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
                         }
 
@@ -291,6 +277,7 @@ class MailWorkerCommand extends Command
                     $first_email = $batch->first_email_sent_at ? new DateTime($batch->first_email_sent_at) : null;
                     $now = new DateTime();
 
+                    // update stats
                     $this->mailJobBatchRepository->update($batch, [
                         'first_email_sent_at' => $first_email,
                         'last_email_sent_at' => $now,
