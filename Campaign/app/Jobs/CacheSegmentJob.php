@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Redis;
+use Log;
 
 class CacheSegmentJob implements ShouldQueue
 {
@@ -49,11 +50,11 @@ class CacheSegmentJob implements ShouldQueue
         try {
             $users = $segmentAggregator->users($this->campaignSegment);
         } catch (\Exception $e) {
-            \Log::error('unable to cache users from segment', [
+            Log::error($e->getMessage(), [
                 'provider' => $this->campaignSegment->provider,
                 'code' => $this->campaignSegment->code,
             ]);
-            return;
+            throw $e;
         }
 
         Redis::connection()->del([$this->key()]);
