@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Sso]
 
 - Added support for Sentry error logging. Airbrake is becoming obsolete and will be dropped in the future releases. remp/remp#888
+- Added documentation for `JWT_EMAIL_PATTERN_WHITELIST` variable, fixed how email is validated against listed domains. remp/remp#848
 
 ## [0.21.5] - 2021-04-13
 

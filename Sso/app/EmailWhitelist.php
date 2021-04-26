@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Illuminate\Support\Str;
+
 class EmailWhitelist
 {
     private $disabled = false;
@@ -25,7 +27,7 @@ class EmailWhitelist
             return true;
         }
         foreach ($this->patterns as $pattern) {
-            if (strpos($email, $pattern) !== false) {
+            if (Str::endsWith($email, $pattern)) {
                 return true;
             }
         }
