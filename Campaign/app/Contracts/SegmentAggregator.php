@@ -96,6 +96,16 @@ class SegmentAggregator implements SegmentContract
             ->removeUserFromCache($campaignSegment, $userId);
     }
 
+    /**
+     * Key returns unique key under which the data for given campaignSegment are cached.
+     *
+     * @return string
+     */
+    public static function cacheKey(CampaignSegment $campaignSegment): string
+    {
+        return "{$campaignSegment->provider}|{$campaignSegment->code}";
+    }
+
     public function setProviderData($cache): void
     {
         foreach ($this->contracts as $provider => $contract) {

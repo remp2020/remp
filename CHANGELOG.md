@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
+- **BREAKING**: Moved key used for segment caching from `CacheSegmentJob` into `SegmentAggregator`. remp/crm#1765
 - Added API to temporary override user's presence in cached segment (next scheduled cache job loads list against segment query). remp/crm#1765
 
 ### [Mailer]
