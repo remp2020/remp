@@ -57,6 +57,23 @@ how to use them within the application.
 
 Note: The default configuration of all REMP tools has these libraries integrated and enabled.
 
+### Google provider
+
+Google SSO is supported by default. You may disable it by removing it from `auth.sso_providers` configuration.
+
+To specify which email is allowed to login, specify white list of emails or domains to `JWT_EMAIL_PATTERN_WHITELIST` variable.
+The variable may contain list of emails or domains (email is verified to end with the given pattern) separated by comma.
+
+#### Examples
+
+```dotenv
+# Allows any email from 'example.com' or 'testuser@gmail.com' to sign in
+JWT_EMAIL_PATTERN_WHITELIST=@example.com,testuser@gmail.com
+
+# Disables email validation (not recommended)
+JWT_EMAIL_PATTERN_WHITELIST=*
+```
+
 ### Custom providers
 
 In case you want to implement your own SSO provider, you need to:
@@ -90,25 +107,25 @@ get logged in.
 #### Required query parameters:
 
 * `succesUrl: string`
-  
+
   Url to which user is redirect after successful login attempt.
-  
+
   SSO appends *token* query parameter to the response. This token should be sent within
   `Authorization: Bearer %TOKEN%` header for all subsequent requests.
-  
+
 * `errorUrl: string`
 
   URL to which user is redirected after unsuccessful login attempt.
-  
+
   SSO appends *error* query parameter with error message explaining why the authentication
   was not successful.
-  
+
 ### GET /auth/introspect
 
 API endpoint for services to get user information based on the provided token.
-  
+
 #### Required headers:
-  
+
 * `Authorization: Bearer %TOKEN%`
 
 #### Success response:
@@ -129,11 +146,11 @@ HTTP status codes are based on RFC 6750.
 * `400 Bad Request`
   * `token_not_provided` error when no token is provided
 * `401 Unauthorized`
-  * `token_expired` error when token is expired; call `/auth/refresh` to refresh the token 
+  * `token_expired` error when token is expired; call `/auth/refresh` to refresh the token
   * `token_invalid` error when token is unparseable
 * `404 Not Found`
   * `user_not_found` error when user encoded within token is not found
-  
+
 ```
 {
   "code": String, // error code
@@ -141,14 +158,14 @@ HTTP status codes are based on RFC 6750.
   "redirect": String // SSO login URL to redirect user to
 }
 ```
-  
+
 ### POST /auth/refresh
 
 API endpoint for services to refresh the token in case it's expired. If `JWT_BLACKLIST_ENABLED`
 is set to `true` (default value), it automatically invalidates the old token.
 
 #### Required headers:
-  
+
 * `Authorization: Bearer %TOKEN%`
 
 #### Success response:
@@ -163,7 +180,7 @@ is set to `true` (default value), it automatically invalidates the old token.
 #### Error responses:
 
 * `400 Bad Request`
-  * `token_not_provided` error when no token is provided 
+  * `token_not_provided` error when no token is provided
   * `token_expired` error when token is expired and unrefreshable; default refresh timeout is 2 weeks
   * `token_invalid` error when token is unparseable
 * `404 Not Found`
@@ -181,9 +198,9 @@ is set to `true` (default value), it automatically invalidates the old token.
 
 API endpoint for services to validate provided API token. Endpoint simply returns whether token
 is usable or not and no additional info.
-  
+
 #### Required headers:
-  
+
 * `Authorization: Bearer %TOKEN%`
 
 #### Success response:
