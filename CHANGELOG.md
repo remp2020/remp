@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Fixed incorrect `updated_at` setting when subscribing user to the newsletter and updating newsletter. remp/remp#896
+
 ## [0.22.0] - 2021-04-28
 
 ### Project

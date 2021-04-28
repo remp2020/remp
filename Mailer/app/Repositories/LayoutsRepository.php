@@ -35,7 +35,7 @@ class LayoutsRepository extends Repository
 
     public function update(ActiveRow &$row, array $data): bool
     {
-        $params['updated_at'] = new DateTime();
+        $data['updated_at'] = new DateTime();
         return parent::update($row, $data);
     }
 
