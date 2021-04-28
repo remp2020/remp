@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.22.0] - 2021-04-28
+
 ### Project
 
 - **BREAKING**: Bumping minimal version of PHP to 7.4. Version is enforced by Composer and any older version is not allowed anymore. Please upgrade PHP accordingly.
@@ -743,7 +745,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.21.5...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.22.0...master
+[0.22.0]: https://github.com/remp2020/remp/compare/0.21.5...0.22.0
 [0.21.5]: https://github.com/remp2020/remp/compare/0.21.4...0.21.5
 [0.21.4]: https://github.com/remp2020/remp/compare/0.21.3...0.21.4
 [0.21.3]: https://github.com/remp2020/remp/compare/0.21.2...0.21.3
