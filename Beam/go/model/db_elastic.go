@@ -432,12 +432,17 @@ func (eDB *ElasticDB) uniqueRowCollectionFromAggregations(result *elastic.Search
 			}
 		} else {
 			avgAgg, ok := aggregations.Cardinality(targetAgg)
-			if !ok {
-				return nil
-			}
-
-			if avgAgg.Value != nil {
-				countValue = *avgAgg.Value
+			if ok {
+				if avgAgg.Value != nil {
+					countValue = *avgAgg.Value
+				}
+			} else {
+				// The aggregation was not resolved based on the all provided srcTags to group by.
+				// UnwrapAggregation uses "" as a placeholder value for the unresolved levels to make srcTags complete.
+				//
+				// Since elastic doesn't have the aggregate value available as a resolved aggregation,
+				// it should be save to use docCount available at the level we're currently at.
+				countValue = float64(count)
 			}
 		}
 

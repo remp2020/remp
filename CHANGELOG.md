@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed possibility of missing data in the Segments API unique count aggregation if the aggregation was not fully resolved - if one of the groupped fields was not set in the raw data. remp/remp#902
+
 ### [Mailer]
 
 - Fixed incorrect `updated_at` setting when subscribing user to the newsletter and updating newsletter. remp/remp#896
