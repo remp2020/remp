@@ -1,0 +1,18 @@
+parameters:
+	crm:
+		addr: @environmentConfig::get('CRM_ADDR')
+		api_token: @environmentConfig::get('CRM_API_TOKEN')
+	errbit:
+		send_errors: false
+		api_key: 63420e9df1e3f24dc30a29bffea1d016
+		host: errbit.tomaj.sk
+		port: 443
+		secure: true
+		environment_name: mailer/production
+		project_root: /data/web/remp2020.com/app/Mailer/current
+
+services:
+	- Remp\MailerModule\Models\Users\Dummy
+	segmentAgreggator:
+		setup:
+			- register(Remp\MailerModule\Models\Segment\Dummy())
