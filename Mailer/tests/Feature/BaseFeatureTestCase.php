@@ -175,6 +175,7 @@ SET FOREIGN_KEY_CHECKS=1;
             'XXX',
             null,
             null,
+            null,
             $publicListing
         );
     }

@@ -27,6 +27,7 @@ class ListsRepository extends Repository
         bool $isPublic,
         string $description,
         ?string $previewUrl = null,
+        ?string $pageUrl = null,
         ?string $imageUrl = null,
         bool $publicListing = true
     ): ActiveRow {
@@ -43,6 +44,7 @@ class ListsRepository extends Repository
             'public_listing' => $publicListing,
             'image_url' => $imageUrl,
             'preview_url' => $previewUrl,
+            'page_url' => $pageUrl,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime()
         ]);
