@@ -1320,6 +1320,7 @@ Field `id` has higher precedence in finding the existing record.
     "public_listing": false, // Boolean, optional; Flag whether the user should see the newsletter. Defaults to false.
     "image_url": "http://example.com/image.jpg", // String, optional; URL of image for frontend UI.
     "preview_url": "http://example.com/demo.html", // String, optional; URL of example newsletter to preview content to users.
+    "page_url": "http://example.com/page.html", // String, optional; URL of newsletter title page with description and editions.
 }
 ```
 
@@ -1359,6 +1360,7 @@ Response:
         "auto_subscribe": false,
         "image_url": null,
         "preview_url": null,
+        "page_url": null,
         "created_at": "2019-06-27T14:08:25+02:00",
         "updated_at": "2019-06-27T14:08:36+02:00",
         "is_multi_variant": false,

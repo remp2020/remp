@@ -82,6 +82,7 @@ class MailTypeUpsertHandler extends BaseHandler
                 'auto_subscribe' => (bool) $list->auto_subscribe,
                 'image_url' => $list->image_url,
                 'preview_url' => $list->preview_url,
+                'page_url' => $list->page_url,
                 'created_at' => $list->created_at->format(DATE_RFC3339),
                 'updated_at' => $list->updated_at->format(DATE_RFC3339),
                 'is_multi_variant' => (bool) $list->is_multi_variant,
@@ -151,6 +152,7 @@ class MailTypeUpsertHandler extends BaseHandler
             $params['is_public'] ?? true,
             $params['description'] ?? null,
             $params['preview_url'] ?? null,
+            $params['page_url'] ?? null,
             $params['image_url'] ?? null,
             $params['public_listing'] ?? true
         );

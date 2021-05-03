@@ -86,6 +86,8 @@ class ListFormFactory
 
         $form->addText('preview_url', 'Preview URL');
 
+        $form->addText('page_url', 'Page URL');
+
         $form->addText('image_url', 'Image URL');
 
         $orderOptions = [
@@ -222,6 +224,7 @@ class ListFormFactory
                 $values['is_public'],
                 $values['description'],
                 $values['preview_url'],
+                $values['page_url'],
                 $values['image_url']
             );
             ($this->onCreate)($row);
