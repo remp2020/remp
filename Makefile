@@ -36,7 +36,7 @@ phpunit:
 copy-env:
 	cd $(SUB_BEAM) && cp .env.example .env
 	cd $(SUB_CAMPAIGN) && cp .env.example .env
-	cd $(SUB_MAILER) && cp .env.test .env
+	cd $(SUB_MAILER) && cp tests/.env.example tests/.env
 	cd $(SUB_MAILER) && cp app/config/config.local.neon.example app/config/config.local.neon
 
 phpstan:
