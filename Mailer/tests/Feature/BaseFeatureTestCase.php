@@ -179,4 +179,9 @@ SET FOREIGN_KEY_CHECKS=1;
             $publicListing
         );
     }
+
+    protected function createMailTypeVariant($mailType, string $title = 'variant', string $code = 'variant', int $sorting = 100)
+    {
+        return $this->listVariantsRepository->add($mailType, $title, $code, $sorting);
+    }
 }

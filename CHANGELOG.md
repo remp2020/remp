@@ -13,7 +13,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Fixed incorrect `updated_at` setting when subscribing user to the newsletter and updating newsletter. remp/remp#896
-- Added separate configuration for tests, so we can guarantee tests reproducibility. remp/remp#890 
+- Added `page_url` to `ListForm` to set frontend URL where information about newsletter (with past editions) is available. remp/remp#882
+- Added separate configuration for tests, so we can guarantee tests reproducibility. remp/remp#890
+- Added `context` and `mail_type_variant_id` parameters to `MailJobCreateApiHandler`. remp/remp#890
+- Added API endpoint `/api/v1/mailers/mail-type-variants` to create new mail type variants. See [README.md](./Mailer/README.md) for more details. remp/remp#890
 
 ## [0.22.0] - 2021-04-28
 
@@ -37,7 +40,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added attribute `autocomplete=off` to `start_at` input field in `NewBatchForm`. remp/remp#854
 - Added `save_start` submit button to `NewBatchForm` to create new mail job batch and set its status to `ready`. remp/remp#855
 - Changed `MailWorkerCommand` to clean `mail_job_queue` table after all batch mail jobs are done. This change should help with email sending issues caused by possible database deadlock. remp/remp#886
-- Added `page_url` to `ListForm` to set frontend URL where information about newsletter (with past editions) is available. remp/remp#882
 
 ### [Sso]
 

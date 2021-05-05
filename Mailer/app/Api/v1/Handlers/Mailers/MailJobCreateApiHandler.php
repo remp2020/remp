@@ -6,10 +6,10 @@ namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 use Nette\Http\Response;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
+use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Models\Segment\Aggregator;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\PostInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
@@ -24,17 +24,21 @@ class MailJobCreateApiHandler extends BaseHandler
 
     private $aggregator;
 
+    private $listVariantsRepository;
+
     public function __construct(
         JobsRepository $jobsRepository,
         BatchesRepository $batchesRepository,
         TemplatesRepository $templatesRepository,
-        Aggregator $aggregator
+        Aggregator $aggregator,
+        ListVariantsRepository $listVariantsRepository
     ) {
         parent::__construct();
         $this->jobsRepository = $jobsRepository;
         $this->batchesRepository = $batchesRepository;
         $this->templatesRepository = $templatesRepository;
         $this->aggregator = $aggregator;
+        $this->listVariantsRepository = $listVariantsRepository;
     }
 
     public function params(): array
@@ -43,6 +47,8 @@ class MailJobCreateApiHandler extends BaseHandler
             (new PostInputParam('segment_code'))->setRequired(),
             (new PostInputParam('segment_provider'))->setRequired(),
             (new PostInputParam('template_id'))->setRequired(),
+            (new PostInputParam('context')),
+            (new PostInputParam('mail_type_variant_code')),
         ];
     }
 
@@ -67,10 +73,24 @@ class MailJobCreateApiHandler extends BaseHandler
             }
         }
         if (!$segmentFound) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'No such segment was found']);
+            return new JsonApiResponse(Response::S404_NOT_FOUND, [
+                'status' => 'error',
+                'message' => 'No such segment was found'
+            ]);
         }
 
-        $mailJob = $this->jobsRepository->add($segmentCode, $segmentProvider);
+        $mailTypeVariant = null;
+        if (isset($params['mail_type_variant_code'])) {
+            $mailTypeVariant = $this->listVariantsRepository->findBy('code', ($params['mail_type_variant_code']));
+            if (!$mailTypeVariant) {
+                return new JsonApiResponse(Response::S404_NOT_FOUND, [
+                    'status' => 'error',
+                    'message' => 'No such mail type variant with code:' . $params['mail_type_variant_code'],
+                ]);
+            }
+        }
+
+        $mailJob = $this->jobsRepository->add($segmentCode, $segmentProvider, $params['context'] ?? null, $mailTypeVariant);
         $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
         $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
