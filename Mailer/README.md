@@ -1644,6 +1644,8 @@ Endpoint complements manual job creation via web interface.
 | segment_code | *String* | yes | Code of the segment to be used. |
 | segment_provider | *String* | yes | Segment provider owning the segment. |
 | template_id | *String* | yes | ID of *email*. |
+| context | *String* | no | Context to be used. |
+| mail_type_variant_code | *String* | no | Specify mail type variant code to be used. |
 
 ##### *Example:*
 
@@ -1652,7 +1654,7 @@ curl -X POST \
   http://mailer.remp.press/api/v1/mailers/jobs \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'template_id=24832&segment_code=users_with_print_in_past&segment_provider=crm-segment'
+  -d 'template_id=24832&segment_code=users_with_print_in_past&segment_provider=crm-segment&context=123&mail_type_variant_code=variant-1'
 ```
 
 Response:
@@ -1907,6 +1909,45 @@ Response:
 Actual sending is being processed asynchronously by background workers and might be delayed based on available system resources and size of the background processing queue.
 
 ---
+
+#### POST `/api/v1/mailers/mail-type-variants`
+
+Creates new mail type variant.
+
+##### *Body:*
+
+```json5
+{
+  "mail_type_code": "type-25",
+  "title": "Variant 1",
+  "code": "variant-1",
+  "sorting": 100
+}
+```
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/mailers/mail-type-variants \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"mail_type_code": "type-25",
+	"title": "Variant 1",
+	"code": "variant-1",
+	"sorting": 100
+}
+```
+
+Response:
+
+```json5
+{
+    "status": "ok",
+    "id": 24066 // Integer; ID of created mail type variant
+}
+```
 
 ### Base flow of actions
 

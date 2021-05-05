@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Mail type variant resource",
+  "$id": "POST /api/v1/mailers/mail-type-variants",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mail_type_code",
+    "title",
+    "code",
+    "sorting"
+  ],
+  "properties": {
+    "mail_type_code": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "sorting": {
+      "type": "integer"
+    }
+  }
+}
