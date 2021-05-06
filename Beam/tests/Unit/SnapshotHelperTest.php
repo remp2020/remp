@@ -15,7 +15,7 @@ class SnapshotHelperTest extends TestCase
     /** @var SnapshotHelpers */
     private $snapshotHelpers;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->snapshotHelpers = new SnapshotHelpers();

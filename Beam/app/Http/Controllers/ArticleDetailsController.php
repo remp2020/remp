@@ -85,7 +85,7 @@ class ArticleDetailsController extends Controller
                 $text = null;
                 if ($newTitle->title === null) {
                     $text = "<b>{$variant} Title Variant Deleted</b><br /><strike>{$oldTitle->title}</strike>";
-                } else if ($oldTitle->title === null) {
+                } elseif ($oldTitle->title === null) {
                     $text = "<b>{$variant} Title Variant Added</b><br />{$newTitle->title}";
                 } else {
                     $text = "<b>{$variant} Title Variant Changed</b><br />" .
@@ -216,7 +216,7 @@ class ArticleDetailsController extends Controller
                     $text = null;
                     if ($newTitle->title === null) {
                         $text = "<b>{$variantText} Deleted</b><br /><strike>{$oldTitle->title}</strike>";
-                    } else if ($oldTitle->title === null) {
+                    } elseif ($oldTitle->title === null) {
                         $text = "<b>{$variantText} Added</b><br />{$newTitle->title}";
                     } else {
                         $text = "<b>{$variantText} Changed</b><br />" .
