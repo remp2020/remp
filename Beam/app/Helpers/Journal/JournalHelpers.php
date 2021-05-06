@@ -161,7 +161,7 @@ class JournalHelpers
             })->unique()->count() > 1;
 
             $hasImageTest = $item->image_variants->filter(function ($variant) {
-                    return $variant !== '';
+                return $variant !== '';
             })->unique()->count() > 1;
 
             return (object) [

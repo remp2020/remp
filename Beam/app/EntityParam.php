@@ -18,8 +18,6 @@ class EntityParam extends Model
 
     protected $table = 'entity_params';
 
-    protected $dates = ['deleted_at'];
-
     protected $fillable = [
         'id',
         'name',

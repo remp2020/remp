@@ -2,18 +2,12 @@
 
 namespace App\Providers;
 
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use League\Uri\Parser;
 
-class UriParserServiceProvider extends ServiceProvider
+class UriParserServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     public function register()
     {
         $this->app->bind(Parser::class, function ($app) {

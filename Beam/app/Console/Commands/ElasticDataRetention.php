@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -50,7 +51,7 @@ class ElasticDataRetention extends Command
         $options = [];
         if ($this->input->getOption('auth')) {
             $auth = $this->input->getOption('auth');
-            if (!str_contains($auth, ':')) {
+            if (!Str::contains($auth, ':')) {
                 $this->line("<error>ERROR</error> You need to provide <info>--auth</info> option with a name and a password (to Elastic instance) separated by ':', e.g. admin:password");
                 return;
             }

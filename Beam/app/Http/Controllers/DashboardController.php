@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Arr;
 use App\Article;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
@@ -625,7 +626,7 @@ class DashboardController extends Controller
      */
     private function addOverviewChartData(array $topPages, JournalInterval $journalInterval)
     {
-        $articleIds = array_filter(array_pluck($topPages, 'article.external_id'));
+        $articleIds = array_filter(Arr::pluck($topPages, 'article.external_id'));
         //no articles present in the topPages
         if (empty($articleIds)) {
             return $topPages;

@@ -31,7 +31,8 @@ class CompressSnapshots extends Command
         $this->line('');
 
         // Start compression from last hour (to avoid complicated rounding of retention intervals, to get "nice" datetimes in dashboard)
-        $now = Carbon::now()->second(0)->minute(0);
+        $now = Carbon::now();
+        $now->setTime($now->hour, 0);
 
         // $now can be optionally rewritten (useful in tests)
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : $now;

@@ -27,7 +27,7 @@ class ProcessConversionSourcesTest extends TestCase
     /** @var JournalContract */
     private $journal;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
