@@ -93,7 +93,6 @@ class Mailer implements MailerContract
         $mailTypeCode,
         $extras = null
     ): int {
-    
         $multipart = [
             [
                 'name' => 'name',

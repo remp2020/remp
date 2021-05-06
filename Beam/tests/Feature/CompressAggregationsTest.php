@@ -19,7 +19,7 @@ class CompressAggregationsTest extends TestCase
 
     private $thresholdPeriod;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->thresholdPeriod = config('beam.aggregated_data_retention_period');

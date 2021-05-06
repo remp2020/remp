@@ -24,7 +24,7 @@
 
                         <select v-model="form.days" name="days" class="selectpicker bs-select-hidden">
                             @foreach($days as $day)
-                                <option value="{{$day}}">{{$day}} {{str_plural('day', $day)}}</option>
+                                <option value="{{$day}}">{{$day}} {{Str::plural('day', $day)}}</option>
                             @endforeach
                         </select>
                     </div>

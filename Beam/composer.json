@@ -1,7 +1,10 @@
 {
     "name": "laravel/laravel",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "type": "project",
     "minimum-stability": "dev",
@@ -15,14 +18,14 @@
             }
         },
         {
-            "type":"package",
+            "type": "package",
             "package": {
                 "name": "snowplow/referer-parser-php",
-                "version":"0.0.1",
+                "version": "0.0.1",
                 "source": {
                     "url": "https://github.com/snowplow-referer-parser/php-referer-parser",
                     "type": "git",
-                    "reference":"master"
+                    "reference": "master"
                 },
                 "autoload": {
                     "psr-4": {
@@ -45,9 +48,10 @@
         "fzaninotto/faker": "~1.9",
         "google/apiclient": "^2.7",
         "kouz/laravel-airbrake": "^0.6",
+        "laminas/laminas-diactoros": "^2.5",
         "laracasts/flash": " ^3.0",
-        "laravel/framework": "5.7.*",
-        "laravelcollective/html": "5.7.*",
+        "laravel/framework": "5.8.*",
+        "laravelcollective/html": "5.8.*",
         "league/uri": "^5.0",
         "madewithlove/illuminate-psr-cache-bridge": "^1.0",
         "marc-mabe/php-enum": "^3.0",
@@ -69,7 +73,7 @@
         "tightenco/ziggy": "^0.9",
         "ukfast/laravel-health-check": "^1.5",
         "yadakhov/insert-on-duplicate-key": "^1.2",
-        "yajra/laravel-datatables-oracle": "^8.0"
+        "yajra/laravel-datatables-oracle": "^9.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.6",
@@ -78,7 +82,9 @@
         "laravel/tinker": "^1.0",
         "mockery/mockery": "^1.2",
         "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^7.5"
+        "phpunit/phpunit": "^7.5",
+        "beyondcode/laravel-dump-server": "^1.0",
+        "filp/whoops": "^2.0"
     },
     "autoload": {
         "classmap": [

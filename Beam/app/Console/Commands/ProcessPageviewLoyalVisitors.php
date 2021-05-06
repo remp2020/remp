@@ -33,8 +33,8 @@ class ProcessPageviewLoyalVisitors extends Command
 
         foreach (range(1, $days) as $dayOffset) {
             $now = Carbon::now();
-            $timeBefore = $now->copy()->hour(0)->minute(0)->second(0)->subDays($dayOffset);
-            $timeAfter = $now->copy()->hour(0)->minute(0)->second(0)->subDays($dayOffset+1);
+            $timeBefore = $now->copy()->setTime(0, 0)->subDays($dayOffset);
+            $timeAfter = $now->copy()->setTime(0, 0)->subDays($dayOffset+1);
 
             $request = new AggregateRequest('pageviews', 'load');
             $request->setTimeAfter($timeAfter);

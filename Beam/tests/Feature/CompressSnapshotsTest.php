@@ -31,7 +31,8 @@ class CompressSnapshotsTest extends TestCase
 
     public function testCompression()
     {
-        $start = Carbon::now()->second(0);
+        $start = Carbon::now();
+        $start->setTime($start->hour, $start->minute, 0, 0);
 
          //Last 10 minutes should be kept
         for ($i = 0; $i < 10; $i++) {

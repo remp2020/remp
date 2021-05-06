@@ -108,7 +108,6 @@ class SnapshotHelpers
         bool $addLastMinute = false,
         callable $conditions = null
     ): SnapshotTimePoints {
-
         $q = DB::table(ArticleViewsSnapshot::getTableName())
             ->select('time')
             ->where('time', '>=', $from)

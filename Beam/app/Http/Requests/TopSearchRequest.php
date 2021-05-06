@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Support\Arr;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TopSearchRequest extends FormRequest
@@ -27,7 +28,7 @@ class TopSearchRequest extends FormRequest
             'from' => 'required|date',
             'limit' => 'required|integer',
             'sections' => ['array', function ($attr, $value, $fail) {
-                if (array_has($value, ['external_id', 'name'])) {
+                if (Arr::has($value, ['external_id', 'name'])) {
                     $fail("You can not have both 'external_id' and 'name' arrays specified in sections filter");
                 }
                 if (!array_key_exists('external_id', $value) && !array_key_exists('name', $value)) {
@@ -39,7 +40,7 @@ class TopSearchRequest extends FormRequest
             'sections.name' => 'array',
             'sections.name.*' => 'string',
             'authors' => ['array', function ($attr, $value, $fail) {
-                if (array_has($value, ['external_id', 'name'])) {
+                if (Arr::has($value, ['external_id', 'name'])) {
                     $fail("You can not have both 'external_id' and 'name' arrays specified in authors filter");
                 }
                 if (!array_key_exists('external_id', $value) && !array_key_exists('name', $value)) {
