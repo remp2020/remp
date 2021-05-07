@@ -31,20 +31,18 @@ Route::middleware('auth:api')->group(function() {
     Route::post('authors/top', 'AuthorController@topAuthors')->name('authors.top');
     Route::post('tags/top', 'TagController@topTags')->name('tags.top');
 
-    Route::middleware('cors')->group(function() {
-        Route::get('article/{article?}', 'ArticleDetailsController@show');
-        Route::get('article/{article}/histogram', 'ArticleDetailsController@timeHistogram');
-        Route::get('article/{article}/variants-histogram', 'ArticleDetailsController@variantsHistogram');
+    Route::get('article/{article?}', 'ArticleDetailsController@show');
+    Route::get('article/{article}/histogram', 'ArticleDetailsController@timeHistogram');
+    Route::get('article/{article}/variants-histogram', 'ArticleDetailsController@variantsHistogram');
 
-        Route::get('/journal/concurrents/count/', 'JournalController@concurrentsCount');
-        Route::match(['GET', 'POST'], '/journal/concurrents/count/articles', 'JournalController@articlesConcurrentsCount');
-        Route::post('/journal/concurrents/count/', 'JournalController@concurrentsCount');
+    Route::get('/journal/concurrents/count/', 'JournalController@concurrentsCount');
+    Route::match(['GET', 'POST'], '/journal/concurrents/count/articles', 'JournalController@articlesConcurrentsCount');
+    Route::post('/journal/concurrents/count/', 'JournalController@concurrentsCount');
 
-        // Pure proxy calls to Journal API (TODO: rework to more user-friendly API)
-        Route::post('/journal/pageviews/actions/progress/count', 'JournalProxyController@pageviewsProgressCount');
-        Route::post('/journal/pageviews/actions/load/unique/browsers', 'JournalProxyController@pageviewsUniqueBrowsersCount');
-        Route::post('/journal/commerce/steps/purchase/count', 'JournalProxyController@commercePurchaseCount');
-    });
+    // Pure proxy calls to Journal API (TODO: rework to more user-friendly API)
+    Route::post('/journal/pageviews/actions/progress/count', 'JournalProxyController@pageviewsProgressCount');
+    Route::post('/journal/pageviews/actions/load/unique/browsers', 'JournalProxyController@pageviewsUniqueBrowsersCount');
+    Route::post('/journal/commerce/steps/purchase/count', 'JournalProxyController@commercePurchaseCount');
 });
 
 Route::get('/journal/{group}/categories/{category}/actions', 'JournalController@actions');
