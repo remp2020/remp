@@ -731,6 +731,17 @@ class ArticleController extends Controller
 
         $contentType = $request->json('content_type');
 
+        $tags = $request->json('tags');
+        $tagValueType = null;
+        $tagValues = null;
+        if (isset($tags['external_id'])) {
+            $tagValueType = 'external_id';
+            $tagValues = $tags['external_id'];
+        } elseif (isset($tags['name'])) {
+            $tagValueType = 'name';
+            $tagValues = $tags['name'];
+        }
+
         return response()->json($topSearch->topArticles(
             $timeFrom,
             $limit,
@@ -738,7 +749,9 @@ class ArticleController extends Controller
             $sectionValues,
             $authorValueType,
             $authorValues,
-            $contentType
+            $contentType,
+            $tagValueType,
+            $tagValues
         ));
     }
 }

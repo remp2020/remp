@@ -841,11 +841,15 @@ You can filter articles by section and time of pageview.
 	"content_type": "article", // String; OPTIONAL; filters articles by content_type
 	"sections": { // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both)
 		"external_id": ["Section external id"], // String; section external IDs 
-		"name": ["Section title"] // String; section external_id
+		"name": ["Section title"] // String; section names
 	},
 	"authors": { // OPTIONAL; filters from which authors take articles (use either external_id or name arrays, not both)
-		"external_id": ["author external id"], // String; section external IDs 
-		"name": ["author name"] // String; section external_id
+		"external_id": ["author external id"], // String; author external IDs 
+		"name": ["author name"] // String; author names
+	},
+	"tags": { // OPTIONAL; filters articles with tags (use either external_id or name arrays, not both)
+		"external_id": ["tag external id"], // String; tag external IDs 
+		"name": ["tag name"] // String; tag names
 	}
 }
 ```
@@ -869,6 +873,9 @@ curl --location --request POST 'http://beam.remp.press/api/articles/top' \
 	},
 	"authors": {
 		"external_id": ["123"]
+	},
+	"tags": {
+		"external_id": ["10"]
 	}
 }'
 ```
@@ -888,6 +895,9 @@ $payload = [
 	],
 	"authors" => [
 		"name" => ["John Doe"]
+	],
+	"tags" => [
+		"name" => ["News"]
 	]
 ];
 $jsonPayload = json_encode($payload);
@@ -951,7 +961,11 @@ You can filter authors by time of pageview.
 	"content_type": "article", // String; OPTIONAL; filters articles by content_type
 	"sections": { // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both)
 		"external_id": ["Section external id"], // String; section external IDs 
-		"name": ["Section title"] // String; section external_id
+		"name": ["Section title"] // String; section names
+	},
+	"tags": { // OPTIONAL; filters articles with tags (use either external_id or name arrays, not both)
+		"external_id": ["Tag external id"], // String; tag external IDs 
+		"name": ["Tag title"] // String; tag names
 	}
 }
 ```
@@ -972,6 +986,9 @@ curl --location --request POST 'http://beam.remp.press/api/authors/top' \
 	"content_type": "article",
 	"sections": {
 	    "external_id": ["22"]
+	},
+	"tags": {
+	    "external_id": ["10"]
 	}
 }'
 ```
@@ -985,7 +1002,13 @@ curl --location --request POST 'http://beam.remp.press/api/authors/top' \
 $payload = [
 	"from" => "2020-08-10T08:14:09+00:00",
 	"limit" => 3,
-	"content_type" => "article"
+	"content_type" => "article",
+	"sections" => [
+		"name" => ["Blog"]
+	],
+	"tags" => [
+		"name" => ["News"]
+	]
 ];
 $jsonPayload = json_encode($payload);
 $context = stream_context_create([
