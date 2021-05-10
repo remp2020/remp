@@ -52,6 +52,18 @@ class TopSearchRequest extends FormRequest
             'authors.name' => 'array',
             'authors.name.*' => 'string',
             'content_type' => 'string',
+            'tags' => ['array', function ($attr, $value, $fail) {
+                if (array_has($value, ['external_id', 'name'])) {
+                    $fail("You can not have both 'external_id' and 'name' arrays specified in tags filter");
+                }
+                if (!array_key_exists('external_id', $value) && !array_key_exists('name', $value)) {
+                    $fail("You have to specify either 'external_id' or 'name' array in tags filter");
+                }
+            }],
+            'tags.external_id' => 'array',
+            'tags.external_id.*' => 'string',
+            'tags.name' => 'array',
+            'tags.name.*' => 'string',
         ];
     }
 }

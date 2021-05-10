@@ -369,8 +369,28 @@ class AuthorController extends Controller
             $sectionValueType = 'name';
             $sectionValues = $sections['name'];
         }
+
         $contentType = $request->json('content_type');
 
-        return response()->json($topSearch->topAuthors($timeFrom, $limit, $sectionValueType, $sectionValues, $contentType));
+        $tags = $request->json('tags');
+        $tagValueType = null;
+        $tagValues = null;
+        if (isset($tags['external_id'])) {
+            $tagValueType = 'external_id';
+            $tagValues = $tags['external_id'];
+        } elseif (isset($tags['name'])) {
+            $tagValueType = 'name';
+            $tagValues = $tags['name'];
+        }
+
+        return response()->json($topSearch->topAuthors(
+            $timeFrom,
+            $limit,
+            $sectionValueType,
+            $sectionValues,
+            $contentType,
+            $tagValueType,
+            $tagValues
+        ));
     }
 }
