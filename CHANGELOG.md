@@ -21,6 +21,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `context` and `mail_type_variant_id` parameters to `MailJobCreateApiHandler`. remp/remp#890
 - Added API endpoint `/api/v1/mailers/mail-type-variants` to create new mail type variants. See [README.md](./Mailer/README.md) for more details. remp/remp#890
 
+### [Sso]
+
+- **BREAKING:** Environment variable QUEUE_DRIVER changed to QUEUE_CONNECTION, please update your .env file accordingly. remp/remp#491
+- Upgraded Laravel version to 5.8. remp/remp#491
+
 ## [0.22.0] - 2021-04-28
 
 ### Project
