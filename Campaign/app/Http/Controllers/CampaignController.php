@@ -350,7 +350,6 @@ class CampaignController extends Controller
         $newScheduleStartTime = null,
         $newScheduleEndTime = null
     ): ?string {
-
         if ($activationMode === 'activate-schedule'
             && !is_null($newScheduleStartTime)) {
             $schedule = new Schedule();
@@ -568,7 +567,7 @@ class CampaignController extends Controller
         // main banner
         if (array_key_exists('banner_id', $data)) {
             $bannerId = $data['banner_id'];
-        } else if (!$campaign->campaignBanners->isEmpty()) {
+        } elseif (!$campaign->campaignBanners->isEmpty()) {
             $bannerId = optional($campaign->campaignBanners[0])->banner_id;
         } else {
             $bannerId = optional($campaign->campaignBanners()->first())->banner_id;
@@ -577,7 +576,7 @@ class CampaignController extends Controller
         // variants
         if (array_key_exists('variants', $data)) {
             $variants = $data['variants'];
-        } else if (!$campaign->campaignBanners->isEmpty()) {
+        } elseif (!$campaign->campaignBanners->isEmpty()) {
             $variants = $campaign->campaignBanners;
         } else {
             $variants = $campaign->campaignBanners()

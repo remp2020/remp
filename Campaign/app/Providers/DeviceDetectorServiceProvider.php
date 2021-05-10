@@ -2,21 +2,15 @@
 
 namespace App\Providers;
 
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
 use Illuminate\Support\ServiceProvider;
 use DeviceDetector\Cache\PSR6Bridge;
 use DeviceDetector\DeviceDetector;
 use Illuminate\Support\Facades\Redis;
 
-class DeviceDetectorServiceProvider extends ServiceProvider
+class DeviceDetectorServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
     public function register()
     {
         $this->app->bind(DeviceDetector::class, function ($app) {

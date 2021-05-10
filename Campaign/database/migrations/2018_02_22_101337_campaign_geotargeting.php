@@ -34,7 +34,7 @@ class CampaignGeotargeting extends Migration
 
         });
 
-        Artisan::call('db:seed', array('--class' => CountrySeeder::class));
+        Artisan::call('db:seed', ['--class' => CountrySeeder::class]);
     }
 
     /**

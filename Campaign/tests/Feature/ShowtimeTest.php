@@ -38,7 +38,7 @@ class ShowtimeTest extends TestCase
     /** @var CampaignBanner */
     protected $campaignBanner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -16,8 +16,6 @@ class CampaignBanner extends Model
 
     public $timestamps = false;
 
-    protected $dates = ['deleted_at'];
-
     protected $fillable = [
         'id',
         'campaign_id',
