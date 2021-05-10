@@ -1,7 +1,10 @@
 {
     "name": "remp/sso",
     "description": "REMP SSO",
-    "keywords": ["remp", "sso"],
+    "keywords": [
+        "remp",
+        "sso"
+    ],
     "license": "MIT",
     "type": "project",
     "minimum-stability": "dev",
@@ -39,9 +42,9 @@
         "fzaninotto/faker": "~1.9",
         "kouz/laravel-airbrake": "^0.4",
         "laracasts/flash": "3.2",
-        "laravel/framework": "5.7.*",
+        "laravel/framework": "5.8.*",
         "laravel/socialite": "4.4.1",
-        "laravelcollective/html": "5.7.*",
+        "laravelcollective/html": "5.8.*",
         "league/uri": "^5.3",
         "php-amqplib/php-amqplib": "^2.12",
         "predis/predis": " ~1.1",
@@ -53,14 +56,17 @@
         "symfony/psr-http-message-bridge": "^1.0",
         "tymon/jwt-auth": "^1.0",
         "ukfast/laravel-health-check": "^1.5",
-        "yajra/laravel-datatables-oracle": "v8.13.7"
+        "yajra/laravel-datatables-oracle": "^9.0",
+        "laravel/tinker": "^1.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",
         "friendsofphp/php-cs-fixer": "2.16.4",
         "mockery/mockery": "^1.4",
         "nunomaduro/collision": "^2.1.1",
-        "phpunit/phpunit": "9.3.11"
+        "phpunit/phpunit": "9.3.11",
+        "beyondcode/laravel-dump-server": "^1.0",
+        "filp/whoops": "^2.0"
     },
     "autoload": {
         "classmap": [
