@@ -1,7 +1,10 @@
 {
     "name": "laravel/laravel",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "type": "project",
     "minimum-stability": "dev",
@@ -22,15 +25,15 @@
         "deployer/deployer": "^6.0",
         "deployer/recipes": "^6.0",
         "doctrine/dbal": "~2.3",
-        "fico7489/laravel-pivot": "^2.1",
+        "fico7489/laravel-pivot": "^3.0",
         "fideloper/proxy": "^4.0",
         "fzaninotto/faker": "~1.4",
         "geoip2/geoip2": "~2.0",
         "guzzlehttp/guzzle": "^6.2",
         "kouz/laravel-airbrake": "^0.4",
         "laracasts/flash": "^3.0",
-        "laravel/framework": "5.7.*",
-        "laravelcollective/html": "5.7.*",
+        "laravel/framework": "5.8.*",
+        "laravelcollective/html": "5.8.*",
         "league/uri": "^5.0",
         "nicolaslopezj/searchable": "^1.13",
         "php-amqplib/php-amqplib": "^2.7",
@@ -46,7 +49,7 @@
         "symfony/psr-http-message-bridge": "^1.0",
         "tightenco/ziggy": "^0.6.9",
         "ukfast/laravel-health-check": "^1.5",
-        "yajra/laravel-datatables-oracle": "^8.0"
+        "yajra/laravel-datatables-oracle": "^9.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.3",
@@ -54,7 +57,11 @@
         "josiasmontag/laravel-redis-mock": "~1.2",
         "mockery/mockery": "^1.2",
         "nunomaduro/collision": "^2.1",
-        "phpunit/phpunit": "^7.0"
+        "phpunit/phpunit": "^7.5",
+        "beyondcode/laravel-dump-server": "^1.0",
+        "filp/whoops": "^2.0",
+        "fzaninotto/faker": "^1.4",
+        "laravel/tinker": "^1.0"
     },
     "autoload": {
         "classmap": [

@@ -14,6 +14,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed missing `Access-Control-Allow-Headers` header in preflight request causing IOTA loading issues. remp/remp#905 
 - Added option to specify `tags` parameter in `/api/articles/top` and `/api/authors/top` API endpoints via `name` or `external_id` parameters. remp/remp#897
 
+### [Campaign]
+
+- **BREAKING:** Environment variable QUEUE_DRIVER changed to QUEUE_CONNECTION, please update your .env file accordingly. remp/remp#491
+- Upgraded Laravel version to 5.8. remp/remp#491
+
 ### [Mailer]
 
 - Fixed incorrect `updated_at` setting when subscribing user to the newsletter and updating newsletter. remp/remp#896

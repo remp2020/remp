@@ -1,9 +1,0 @@
-; Within this file you may set preferences for Shift.
-; These may be used to customize the behavior of the
-; Shift bot by disabling or guiding the automation.
-; Section to set options for PHP Shifts.
-[php]
-; The path to the .php_cs config file included
-; in your project for Shift to apply your
-; custom code style instead of PSR-2.
-phpcs = ".php-cs"
