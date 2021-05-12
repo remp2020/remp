@@ -535,7 +535,13 @@ Your CMS should track all article-related changes to Beam so Beam knows about th
             "tags": [ // Optional
                 {
                     "external_id": "1", // String; Required; External id of the tag
-                    "name": "Elections 2020" // String; Required; Name of the tag
+                    "name": "Elections 2020", // String; Required; Name of the tag,
+                    "categories": [ // Optional
+                        {
+                            "external_id": "1", // String; Required; External id of the tag category
+                            "name": "USA" // String; Required; Name of the tag category
+                        }
+                    ]
                 }
             ],
             "published_at": "2018-06-05T06:03:05Z" // RFC3339 formatted datetime
@@ -582,7 +588,13 @@ curl -X POST \
             "tags": [
                 {
                     "external_id": "1",
-                    "name": "Elections 2020" 
+                    "name": "Elections 2020",
+                    "categories": [
+                        {
+                            "external_id": "1",
+                            "name": "USA"
+                        }
+                    ]
                 }
             ],
             "published_at": "2018-06-05T06:03:05Z"
@@ -624,7 +636,13 @@ $payload = [
             "tags" => [
                 [
                     "external_id" => "1",
-                    "name" => "Elections 2020" 
+                    "name" => "Elections 2020" ,
+                    "categories" => [
+                        [
+                            "external_id" => "1",
+                            "name" => "USA"
+                        ]
+                    ]
                 ]
             ],
             "published_at" => "2018-06-05T06:03:05Z",
@@ -692,7 +710,13 @@ $response = file_get_contents("http://beam.remp.press/api/v2/articles/upsert ", 
                     "external_id": "1",
                     "name": "Elections 2020",
                     "created_at": "2019-05-17 11:43:04",
-                    "updated_at": "2019-05-17 11:43:04"
+                    "updated_at": "2019-05-17 11:43:04",
+                    "tag_categories": [
+                        {
+                            "external_id": "1",
+                            "name": "USA"
+                        }
+                    ]
                 }
             ],            
         }

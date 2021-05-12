@@ -17,6 +17,7 @@ use App\Model\NewsletterCriterion;
 use App\Model\Pageviews\TopSearch;
 use App\Model\Tag;
 use App\Section;
+use App\TagCategory;
 use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -487,61 +488,25 @@ class ArticleController extends Controller
 
             $article->sections()->detach();
             foreach ($a['sections'] ?? [] as $section) {
-                $sectionObj = Section::where('external_id', $section['external_id'])->first();
-                if ($sectionObj) {
-                    $sectionObj->update($section);
-                    $article->sections()->attach($sectionObj);
-                    continue;
-                }
-
-                $sectionObj = Section::where('name', $section['name'])->first();
-                if ($sectionObj && $sectionObj->external_id === null) {
-                    $sectionObj->update($section);
-                    $article->sections()->attach($sectionObj);
-                    continue;
-                }
-
-                $sectionObj = Section::firstOrCreate($section);
+                $sectionObj = $this->upsertSection($section);
                 $article->sections()->attach($sectionObj);
             }
 
             $article->tags()->detach();
             foreach ($a['tags'] ?? [] as $tag) {
-                $tagObj = Tag::where('external_id', $tag['external_id'])->first();
-                if ($tagObj) {
-                    $tagObj->update($tag);
-                    $article->tags()->attach($tagObj);
-                    continue;
-                }
-
-                $tagObj = Tag::where('name', $tag['name'])->first();
-                if ($tagObj && $tagObj->external_id === null) {
-                    $tagObj->update($tag);
-                    $article->tags()->attach($tagObj);
-                    continue;
-                }
-
-                $tagObj = Tag::firstOrCreate($tag);
+                $tagObj = $this->upsertTag($tag);
                 $article->tags()->attach($tagObj);
+
+                $tagObj->tagCategories()->detach();
+                foreach ($tag['categories'] ?? [] as $tagCategory) {
+                    $tagCategoryObj = $this->upsertTagCategory($tagCategory);
+                    $tagObj->tagCategories()->attach($tagCategoryObj);
+                }
             }
 
             $article->authors()->detach();
             foreach ($a['authors'] ?? [] as $author) {
-                $authorObj = Author::where('external_id', $author['external_id'])->first();
-                if ($authorObj) {
-                    $authorObj->update($author);
-                    $article->authors()->attach($authorObj);
-                    continue;
-                }
-
-                $authorObj = Author::where('name', $author['name'])->first();
-                if ($authorObj && $authorObj->external_id === null) {
-                    $authorObj->update($author);
-                    $article->authors()->attach($authorObj);
-                    continue;
-                }
-
-                $authorObj = Author::firstOrCreate($author);
+                $authorObj = $this->upsertAuthor($author);
                 $article->authors()->attach($authorObj);
             }
 
@@ -598,7 +563,7 @@ class ArticleController extends Controller
                 }
             }
 
-            $article->load(['authors', 'sections', 'tags']);
+            $article->load(['authors', 'sections', 'tags', 'tags.tagCategories']);
             $articles[] = $article;
         }
 
@@ -606,6 +571,74 @@ class ArticleController extends Controller
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),
             'json' => ArticleResource::collection(collect($articles)),
         ]);
+    }
+
+    private function upsertSection($section): Section
+    {
+        $sectionObj = Section::where('external_id', $section['external_id'])->first();
+        if ($sectionObj) {
+            $sectionObj->update($section);
+            return $sectionObj;
+        }
+
+        $sectionObj = Section::where('name', $section['name'])->first();
+        if ($sectionObj && $sectionObj->external_id === null) {
+            $sectionObj->update($section);
+            return $sectionObj;
+        }
+
+        return Section::firstOrCreate($section);
+    }
+
+    private function upsertTag($tag): Tag
+    {
+        $tagObj = Tag::where('external_id', $tag['external_id'])->first();
+        if ($tagObj) {
+            $tagObj->update($tag);
+            return $tagObj;
+        }
+
+        $tagObj = Tag::where('name', $tag['name'])->first();
+        if ($tagObj && $tagObj->external_id === null) {
+            $tagObj->update($tag);
+            return $tagObj;
+        }
+
+        return Tag::firstOrCreate($tag);
+    }
+
+    private function upsertTagCategory($tagCategory): TagCategory
+    {
+        $tagCategoryObj = TagCategory::where('external_id', $tagCategory['external_id'])->first();
+        if ($tagCategoryObj) {
+            $tagCategoryObj->update($tagCategory);
+            return $tagCategoryObj;
+        }
+
+        $tagCategoryObj = Tag::where('name', $tagCategory['name'])->first();
+        if ($tagCategoryObj && $tagCategoryObj->external_id === null) {
+            $tagCategoryObj->update($tagCategory);
+            return $tagCategoryObj;
+        }
+
+        return TagCategory::firstOrCreate($tagCategory);
+    }
+
+    private function upsertAuthor($author): Author
+    {
+        $authorObj = Author::where('external_id', $author['external_id'])->first();
+        if ($authorObj) {
+            $authorObj->update($author);
+            return $authorObj;
+        }
+
+        $authorObj = Author::where('name', $author['name'])->first();
+        if ($authorObj && $authorObj->external_id === null) {
+            $authorObj->update($author);
+            return $authorObj;
+        }
+
+        return Author::firstOrCreate($author);
     }
 
     public function unreadArticlesForUsers(UnreadArticlesRequest $request)
