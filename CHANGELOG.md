@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- Fixed possible UI flaws caused by select pickers overflowing if the content is too wide. remp/remp#781
+
 ### [Beam]
 
 - **BREAKING**: Environment variable `QUEUE_DRIVER` changed to `QUEUE_CONNECTION`, please update your `.env` file accordingly. remp/remp#491
@@ -26,6 +30,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added separate configuration for tests, so we can guarantee tests reproducibility. remp/remp#890
 - Added `context` and `mail_type_variant_id` parameters to `MailJobCreateApiHandler`. remp/remp#890
 - Added API endpoint `/api/v1/mailers/mail-type-variants` to create new mail type variants. See [README.md](./Mailer/README.md) for more details. remp/remp#890
+- Fixed "copy" feature of mail templates broken since internal changes in `0.20.0`. remp/crm#1889 
 
 ### [Sso]
 
