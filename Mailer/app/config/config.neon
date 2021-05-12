@@ -110,6 +110,8 @@ services:
 		factory: Monolog\Logger('commands-logger')
 	mailProcessLogger:
 		factory: Monolog\Logger('mail-process-logger')
+	mailgunLogger:
+		factory: Monolog\Logger('mailgun-logger')
 
 	hermesLogRedact: Remp\MailerModule\Hermes\LogRedact
 	hermesLogger:
@@ -156,12 +158,16 @@ services:
 		setup:
 			- register(Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace())
 
+	mailgunMailer:
+		factory: Remp\MailerModule\Models\Mailer\MailgunMailer
+		autowired: false
+
 	mailFactory:
 		factory: Remp\MailerModule\Models\Sender\MailerFactory
 		setup:
 			# Register all Mailers (Nette\Mail\IMailer)
 			- addMailer(Remp\MailerModule\Models\Mailer\SmtpMailer())
-			- addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer())
+			- addMailer(@mailgunMailer)
 
 #	# Internal CRM system. For more details contact Tomas Bella.
 #	authenticator:
