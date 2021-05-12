@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- Fixed possible UI flaws caused by select pickers overflowing if the content is too wide. remp/remp#781
+
 ### [Beam]
 
 - **BREAKING**: Environment variable `QUEUE_DRIVER` changed to `QUEUE_CONNECTION`, please update your `.env` file accordingly. remp/remp#491

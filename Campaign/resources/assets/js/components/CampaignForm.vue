@@ -36,7 +36,7 @@
                             <div class="panel-body p-b-30 p-l-10 p-r-20">
 
                                 <div class="row">
-                                    <div class="col-md-9">
+                                    <div class="col-md-12">
 
                                         <div class="input-group fg-float m-t-30">
                                             <span class="input-group-addon"><i class="zmdi zmdi-file-text"></i></span>
@@ -172,7 +172,7 @@
                         <div id="collapseInclusiveSegments" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingInclusiveSegments">
                             <div class="panel-body p-l-10 p-r-20">
                                 <div class="row">
-                                    <div class="col-md-8">
+                                    <div class="col-md-12">
                                         <p class="m-l-20">
                                             User <strong>needs to be member of ALL</strong> of these segments in order to see the campaign:
                                         </p>
@@ -217,7 +217,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-8" style="margin-top:15px">
+                                    <div class="col-md-12" style="margin-top:15px">
                                         <p class="m-l-20">
                                             User <strong>CANNOT be member of ANY</strong> of these segments in order to see the campaign:
                                         </p>
@@ -349,10 +349,10 @@
                                     <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
                                     <div>
                                         <div class="row">
-                                            <div class="col-md-12">
+                                            <div class="col-md-8 col-sm-12">
                                                 <label for="countries_blacklist" class="fg-label">Whitelist / Blacklist</label>
                                             </div>
-                                            <div class="col-md-12">
+                                            <div class="col-md-8 col-sm-12">
                                                 <v-select v-model="countriesBlacklist"
                                                         id="countries_blacklist"
                                                         :name="'countries_blacklist'"
@@ -368,7 +368,7 @@
                                     <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
                                     <div>
                                         <div class="row">
-                                            <div class="col-md-12">
+                                            <div class="col-md-8 col-sm-12">
                                                 <select v-model="addedCountry" title="Select countries" v-on:change="selectCountry" class="selectpicker" data-live-search="true" data-max-options="1">
                                                     <option v-for="(obj,iso_code) in availableCountries" :value="obj">
                                                         {{ obj.name }}
