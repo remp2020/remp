@@ -102,7 +102,8 @@ class TemplatesRepository extends Repository
             'copy_from' => $template->id,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
-            'extras' => $template->extras
+            'extras' => $template->extras,
+            'attachments_enabled' => $template->attachments_enabled,
         ]);
     }
 
