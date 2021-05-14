@@ -1510,7 +1510,7 @@ in your own extensions/implementation.
 
 #### Dependencies
 
-- Elastic ^6.2
+- Elastic ^7.5
 - MySQL ^5.7
 
 ## [Telegraf](../Docker/telegraf)
