@@ -174,7 +174,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             let campaigns = this.getCampaigns();
             campaigns = this.cleanup(campaigns);
             if (campaigns) {
-                remplib.setToStorage(this.campaignsStorageKey, JSON.stringify(campaigns));
+                remplib.setToStorage(this.campaignsStorageKey, this.minifyStoredData(campaigns));
             }
 
             if (selfCheckFunc !== undefined) {
@@ -303,7 +303,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         getCampaigns: function() {
             let campaigns = {};
             try {
-                campaigns = JSON.parse(remplib.getFromStorage(this.campaignsStorageKey)) || {};
+                campaigns = this.unminifyStoredData(remplib.getFromStorage(this.campaignsStorageKey)) || {};
             } catch (e) {
                 return campaigns;
             }
@@ -355,7 +355,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             campaigns[campaignId].seen++;
 
             campaigns = remplib.campaign.cleanup(campaigns);
-            remplib.setToStorage(this.campaignsStorageKey, JSON.stringify(campaigns));
+            remplib.setToStorage(this.campaignsStorageKey, this.minifyStoredData(campaigns));
         },
 
         incrementPageviewCountForCampaigns: function (activeCampaignIds)  {
@@ -382,11 +382,11 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             }
 
-            remplib.setToStorage(this.campaignsStorageKey, JSON.stringify(campaigns));
+            remplib.setToStorage(this.campaignsStorageKey, this.minifyStoredData(campaigns));
         },
 
         getCampaignsSession: function() {
-            let campaignsSession = JSON.parse(remplib.getFromStorage(this.campaignsSessionStorageKey)) || {};
+            let campaignsSession = this.unminifyStoredData(remplib.getFromStorage(this.campaignsSessionStorageKey)) || {};
 
             // migrations on campaigns values
             for (let campaignId in campaignsSession) {
@@ -416,7 +416,47 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             campaignsSession[campaignId].updatedAt = now;
             campaignsSession[campaignId].seen++;
 
-            remplib.setToStorage(this.campaignsSessionStorageKey, JSON.stringify(campaignsSession));
+            remplib.setToStorage(this.campaignsSessionStorageKey, this.minifyStoredData(campaignsSession));
+        },
+        minifyStoredData: function (data) {
+            for (const id in data) {
+                this.renameKey(data[id], 'seen', 'sn');
+                this.renameKey(data[id], 'count', 'ct');
+                this.renameKey(data[id], 'variantId', 'vi');
+                this.renameKey(data[id], 'bannerId', 'bi');
+                this.renameKey(data[id], 'updatedAt', 'ut');
+
+                if (data[id].hasOwnProperty('ut')) {
+                    const unixTime = new Date(data[id].ut).getTime();
+                    data[id].ut = Math.floor(unixTime / 1000);
+                }
+            }
+
+            return JSON.stringify(data);
+        },
+        unminifyStoredData: function (data) {
+            data = JSON.parse(data);
+            for (const id in data) {
+                this.renameKey(data[id], 'sn', 'seen');
+                this.renameKey(data[id], 'ct', 'count');
+                this.renameKey(data[id], 'vi', 'variantId');
+                this.renameKey(data[id], 'bi', 'bannerId');
+
+                if (data[id].hasOwnProperty('ut')) {
+                    const date = new Date();
+                    date.setTime(data[id].ut * 1000);
+                    data[id].ut = date;
+                }
+                this.renameKey(data[id], 'ut', 'updatedAt');
+            }
+
+            return data;
+        },
+        renameKey: function (data, oldKey, newKey) {
+            if (data.hasOwnProperty(oldKey)) {
+                data[newKey] = data[oldKey];
+                delete data[oldKey];
+            }
         },
     };
 
