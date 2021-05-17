@@ -18,6 +18,6 @@ class CreateMailTypeStatsTable extends AbstractMigration
 
     public function down()
     {
-        $this->table('mail_type_stats')->drop();
+        $this->table('mail_type_stats')->drop()->save();
     }
 }

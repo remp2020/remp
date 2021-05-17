@@ -22,6 +22,6 @@ class CreateMailTemplateStatsTable extends AbstractMigration
     public function down()
     {
         $this->table('mail_template_stats')
-            ->drop();
+            ->drop()->save();
     }
 }
