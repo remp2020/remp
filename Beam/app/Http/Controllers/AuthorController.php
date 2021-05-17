@@ -7,7 +7,6 @@ use App\ArticleAuthor;
 use App\Author;
 use App\Conversion;
 use App\Http\Requests\TopAuthorsSearchRequest;
-use App\Http\Requests\TopSearchRequest;
 use App\Http\Resources\AuthorResource;
 use App\Model\Pageviews\TopSearch;
 use App\Model\Tag;
@@ -356,41 +355,6 @@ class AuthorController extends Controller
 
     public function topAuthors(TopAuthorsSearchRequest $request, TopSearch $topSearch)
     {
-        $limit = $request->json('limit');
-        $timeFrom = Carbon::parse($request->json('from'));
-
-        $sections = $request->json('sections');
-        $sectionValueType = null;
-        $sectionValues = null;
-        if (isset($sections['external_id'])) {
-            $sectionValueType = 'external_id';
-            $sectionValues = $sections['external_id'];
-        } elseif (isset($sections['name'])) {
-            $sectionValueType = 'name';
-            $sectionValues = $sections['name'];
-        }
-
-        $contentType = $request->json('content_type');
-
-        $tags = $request->json('tags');
-        $tagValueType = null;
-        $tagValues = null;
-        if (isset($tags['external_id'])) {
-            $tagValueType = 'external_id';
-            $tagValues = $tags['external_id'];
-        } elseif (isset($tags['name'])) {
-            $tagValueType = 'name';
-            $tagValues = $tags['name'];
-        }
-
-        return response()->json($topSearch->topAuthors(
-            $timeFrom,
-            $limit,
-            $sectionValueType,
-            $sectionValues,
-            $contentType,
-            $tagValueType,
-            $tagValues
-        ));
+        return response()->json($topSearch->topAuthors($request));
     }
 }
