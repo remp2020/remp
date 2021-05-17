@@ -9,7 +9,7 @@ use App\Helpers\Misc;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\ArticleUpsertRequestV2;
-use App\Http\Requests\TopSearchRequest;
+use App\Http\Requests\TopArticlesSearchRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
 use App\Model\Config\ConversionRateConfig;
@@ -735,56 +735,8 @@ class ArticleController extends Controller
         return $usersReadArticles;
     }
 
-    public function topArticles(TopSearchRequest $request, TopSearch $topSearch)
+    public function topArticles(TopArticlesSearchRequest $request, TopSearch $topSearch)
     {
-        $limit = $request->json('limit');
-        $timeFrom = Carbon::parse($request->json('from'));
-
-        $sections = $request->json('sections');
-        $sectionValueType = null;
-        $sectionValues = null;
-        if (isset($sections['external_id'])) {
-            $sectionValueType = 'external_id';
-            $sectionValues = $sections['external_id'];
-        } elseif (isset($sections['name'])) {
-            $sectionValueType = 'name';
-            $sectionValues = $sections['name'];
-        }
-
-        $authors = $request->json('authors');
-        $authorValueType = null;
-        $authorValues = null;
-        if (isset($authors['external_id'])) {
-            $authorValueType = 'external_id';
-            $authorValues = $authors['external_id'];
-        } elseif (isset($authors['name'])) {
-            $authorValueType = 'name';
-            $authorValues = $authors['name'];
-        }
-
-        $contentType = $request->json('content_type');
-
-        $tags = $request->json('tags');
-        $tagValueType = null;
-        $tagValues = null;
-        if (isset($tags['external_id'])) {
-            $tagValueType = 'external_id';
-            $tagValues = $tags['external_id'];
-        } elseif (isset($tags['name'])) {
-            $tagValueType = 'name';
-            $tagValues = $tags['name'];
-        }
-
-        return response()->json($topSearch->topArticles(
-            $timeFrom,
-            $limit,
-            $sectionValueType,
-            $sectionValues,
-            $authorValueType,
-            $authorValues,
-            $contentType,
-            $tagValueType,
-            $tagValues
-        ));
+        return response()->json($topSearch->topArticles($request));
     }
 }

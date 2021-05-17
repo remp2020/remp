@@ -846,7 +846,7 @@ $response = file_get_contents("http://beam.remp.press/api/conversions/upsert ", 
 ##### POST `api/articles/top`
 
 Beam admin provides statistics about article performance. This endpoint return top articles by pageviews.
-You can filter articles by section and time of pageview.
+You can filter articles by content type, sections, authors, tags or tag categories.
 
 ##### *Headers:*
 
@@ -874,6 +874,10 @@ You can filter articles by section and time of pageview.
 	"tags": { // OPTIONAL; filters articles with tags (use either external_id or name arrays, not both)
 		"external_id": ["tag external id"], // String; tag external IDs 
 		"name": ["tag name"] // String; tag names
+	},
+	"tag_categories": { // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both)
+		"external_id": ["tag category external id"], // String; tag category external IDs 
+		"name": ["tag category name"] // String; tag category names
 	}
 }
 ```
@@ -900,6 +904,9 @@ curl --location --request POST 'http://beam.remp.press/api/articles/top' \
 	},
 	"tags": {
 		"external_id": ["10"]
+	},
+	"tag_categories": {
+		"external_id": ["1"]
 	}
 }'
 ```
@@ -922,6 +929,9 @@ $payload = [
 	],
 	"tags" => [
 		"name" => ["News"]
+	],
+	"tag_categories" => [
+		"name" => ["Europe"]
 	]
 ];
 $jsonPayload = json_encode($payload);
@@ -966,7 +976,7 @@ $response = file_get_contents("http://beam.remp.press/api/articles/top", false, 
 ##### POST `api/authors/top`
 
 Beam admin provides statistics about author performance. This endpoint return top authors by pageviews.
-You can filter authors by time of pageview.
+You can filter authors by content type, sections, tags or tag categories.
 
 ##### *Headers:*
 
@@ -990,6 +1000,10 @@ You can filter authors by time of pageview.
 	"tags": { // OPTIONAL; filters articles with tags (use either external_id or name arrays, not both)
 		"external_id": ["Tag external id"], // String; tag external IDs 
 		"name": ["Tag title"] // String; tag names
+	},
+	"tag_categories": { // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both)
+		"external_id": ["tag category external id"], // String; tag category external IDs 
+		"name": ["tag category name"] // String; tag category names
 	}
 }
 ```
@@ -1013,6 +1027,9 @@ curl --location --request POST 'http://beam.remp.press/api/authors/top' \
 	},
 	"tags": {
 	    "external_id": ["10"]
+	},
+	"tag_categories": {
+		"external_id": ["1"]
 	}
 }'
 ```
@@ -1032,6 +1049,9 @@ $payload = [
 	],
 	"tags" => [
 		"name" => ["News"]
+	],
+	"tag_categories" => [
+		"name" => ["Europe"]
 	]
 ];
 $jsonPayload = json_encode($payload);
@@ -1069,7 +1089,7 @@ $response = file_get_contents("http://beam.remp.press/api/authors/top", false, $
 ##### POST `api/tags/top`
 
 Beam admin provides statistics about tag performance. This endpoint return top post tags by pageviews.
-You can filter tags by time of pageview.
+You can filter tags by content type, sections, authors or tag categories.
 
 ##### *Headers:*
 
@@ -1093,6 +1113,10 @@ You can filter tags by time of pageview.
 	"authors": { // OPTIONAL; filters from which authors take articles (use either external_id or name arrays, not both)
 		"external_id": ["author external id"], // String; section external IDs 
 		"name": ["author name"] // String; section external_id
+	},
+	"tag_categories": { // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both)
+		"external_id": ["tag category external id"], // String; tag category external IDs 
+		"name": ["tag category name"] // String; tag category names
 	}
 }
 ```
@@ -1116,6 +1140,9 @@ curl --location --request POST 'http://beam.remp.press/api/tags/top' \
 	},
 	"authors": {
 		"external_id": ["123"]
+	},
+	"tag_categories": {
+		"external_id": ["1"]
 	}
 }'
 ```
@@ -1135,6 +1162,9 @@ $payload = [
 	],
 	"authors" => [
 		"name" => ["John Doe"]
+	],
+	"tag_categories" => [
+		"name" => ["Europe"]
 	]
 ];
 $jsonPayload = json_encode($payload);

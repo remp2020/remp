@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added `TagCategory` filter option to `/top` APIs. remp/remp#898
+
 ## [0.23.0] - 2021-05-12
 
 ### Project
