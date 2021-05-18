@@ -10,12 +10,12 @@
     }
   ],
   "require": {
-    "php": ">=7.0",
+    "php": "^7.4",
     "league/uri": "^5.0",
-    "illuminate/auth": "^5.4",
-    "illuminate/contracts": "^5.4",
-    "illuminate/http": "^5.4",
-    "illuminate/support": "^5.4",
+    "illuminate/auth": "^5.8|^6.0",
+    "illuminate/contracts": "^5.8|^6.0",
+    "illuminate/http": "^5.8|^6.0",
+    "illuminate/support": "^5.8|^6.0",
     "guzzlehttp/guzzle": "^6.2"
   },
   "require-dev": {
