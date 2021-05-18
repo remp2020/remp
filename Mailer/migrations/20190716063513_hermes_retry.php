@@ -4,7 +4,7 @@ use Phinx\Migration\AbstractMigration;
 
 class HermesRetry extends AbstractMigration
 {
-    public function change()
+    public function up()
     {
         // probably the only feasible way how to change this without breaking running instances
         if (!$this->hasTable('hermes_tasks_old')) {
@@ -33,5 +33,10 @@ SQL;
 
             $this->execute($sql);
         }
+    }
+
+    public function down()
+    {
+        $this->output->writeln('Down migration is not available.');
     }
 }

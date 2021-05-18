@@ -26,6 +26,6 @@ class MailSourceTemplate extends AbstractMigration
      */
     public function down()
     {
-        $this->table('mail_source_template')->drop();
+        $this->table('mail_source_template')->drop()->save();
     }
 }
