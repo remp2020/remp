@@ -70,6 +70,42 @@ class SegmentAggregator implements SegmentContract
             ->cacheEnabled($campaignSegment);
     }
 
+    /**
+     * @throws SegmentCacheException Exception is thrown if cache is disabled for segment's provider.
+     */
+    public function addUserToCache(CampaignSegment $campaignSegment, string $userId): bool
+    {
+        if (!$this->cacheEnabled($campaignSegment)) {
+            throw new SegmentCacheException("Unable to add user to segment's cache. Cache is disabled for this segment provider.");
+        }
+
+        return $this->contracts[$campaignSegment->provider]
+            ->addUserToCache($campaignSegment, $userId);
+    }
+
+    /**
+     * @throws SegmentCacheException Exception is thrown if cache is disabled for segment's provider.
+     */
+    public function removeUserFromCache(CampaignSegment $campaignSegment, string $userId): bool
+    {
+        if (!$this->cacheEnabled($campaignSegment)) {
+            throw new SegmentCacheException("Unable to remove user from segment's cache. Cache is disabled for this segment provider.");
+        }
+
+        return $this->contracts[$campaignSegment->provider]
+            ->removeUserFromCache($campaignSegment, $userId);
+    }
+
+    /**
+     * Key returns unique key under which the data for given campaignSegment are cached.
+     *
+     * @return string
+     */
+    public static function cacheKey(CampaignSegment $campaignSegment): string
+    {
+        return "{$campaignSegment->provider}|{$campaignSegment->code}";
+    }
+
     public function setProviderData($cache): void
     {
         foreach ($this->contracts as $provider => $contract) {

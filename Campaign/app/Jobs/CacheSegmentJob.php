@@ -39,7 +39,9 @@ class CacheSegmentJob implements ShouldQueue
      */
     public function handle(SegmentAggregator $segmentAggregator)
     {
-        if (!$this->force && Redis::connection()->scard($this->key())) {
+        $cacheKey = $segmentAggregator::cacheKey($this->campaignSegment);
+
+        if (!$this->force && Redis::connection()->scard($cacheKey)) {
             return;
         }
 
@@ -57,20 +59,10 @@ class CacheSegmentJob implements ShouldQueue
             throw $e;
         }
 
-        Redis::connection()->del([$this->key()]);
+        Redis::connection()->del([$cacheKey]);
         if ($users->isNotEmpty()) {
-            Redis::connection()->sadd($this->key(), $users->toArray());
-            Redis::connection()->expire($this->key(), 60*60*24);
+            Redis::connection()->sadd($cacheKey, $users->toArray());
+            Redis::connection()->expire($cacheKey, 60*60*24);
         }
-    }
-
-    /**
-     * Key returns unique key under which the data for given campaignSegment are cached.
-     *
-     * @return string
-     */
-    public function key(): string
-    {
-        return "{$this->campaignSegment->provider}|{$this->campaignSegment->code}";
     }
 }

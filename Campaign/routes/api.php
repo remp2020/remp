@@ -27,4 +27,13 @@ Route::middleware('auth:api')->group(function() {
     Route::apiResource('schedule', 'ScheduleController');
 
     Route::post('campaigns/toggle-active/{campaign}', 'CampaignController@toggleActive')->name('api.campaigns.toggle_active');
+
+    Route::post(
+        'segment-cache/provider/{segment_provider}/code/{segment_code}/add-user',
+        'SegmentCacheController@addUserToCache'
+    );
+    Route::post(
+        'segment-cache/provider/{segment_provider}/code/{segment_code}/remove-user',
+        'SegmentCacheController@removeUserFromCache'
+    );
 });
