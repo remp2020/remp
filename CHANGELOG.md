@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Sso]
+
+- Upgraded to Laravel 6. remp/remp#491
+
 ### [Beam]
 
 - Added `TagCategory` filter option to `/top` APIs. remp/remp#898
