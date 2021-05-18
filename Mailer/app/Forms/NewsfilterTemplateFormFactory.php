@@ -82,7 +82,16 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 50) {
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 53) {
+            $defaults = [
+                'name' => 'Súhrn MS v hokeji ' . date('j.n.Y'),
+                'code' => 'nwsf_ms_hokej_2021_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 36, // Súhrn MS v hokeji
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 50) {
             $defaults = [
                 'name' => 'Porazení ' . date('j.n.Y'),
                 'code' => 'nwsf_porazeni_' . date('dmY'),
