@@ -118,7 +118,7 @@ class ConversionController extends Controller
             if ($event->article) {
                 $t = new \stdClass();
                 $t->title = $event->article->title;
-                $t->href = route('articles.show', $event->article->id);
+                $t->href = route('articles.show', ['article' => $event->article->id]);
                 $obj->tags[] = $t;
             }
 
