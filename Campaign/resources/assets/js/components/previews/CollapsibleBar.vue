@@ -3,16 +3,14 @@
 @import url('../../../sass/transitions.scss');
 
 .collapsible-bar-wrap {
-    position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
     overflow: hidden;
-    z-index: 100000;
 }
 
 #banner-preview .collapsible-bar-wrap {
-    position: absolute;
+    position: absolute !important;
 }
 
 .collapsible-bar-preview-close {
@@ -109,7 +107,8 @@
 </style>
 
 <template>
-    <div class="collapsible-bar-wrap">
+    <div class="collapsible-bar-wrap"
+         v-bind:style="[containerStyles]">
         <div class="collapsible-bar-header">
             {{ headerText }}
 
@@ -174,6 +173,7 @@ export default {
         "collapseText",
         "expandText",
         "buttonText",
+        "displayType",
 
         "show",
         "transition",
@@ -224,6 +224,22 @@ export default {
         closeStyles() {
             return {
                 color: this.textColor,
+            }
+        },
+        containerStyles: function () {
+            let position, zIndex;
+            if (this.displayType === 'overlay') {
+                position = 'fixed';
+                zIndex = 9999;
+            } else {
+                position = 'relative'
+            }
+            if (typeof this.forcedPosition !== 'undefined') {
+                position = this.forcedPosition;
+            }
+            return {
+                position: position,
+                zIndex: zIndex,
             }
         }
     }
