@@ -38,6 +38,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **BREAKING:** Environment variable QUEUE_DRIVER changed to QUEUE_CONNECTION, please update your .env file accordingly. remp/remp#491
 - Upgraded Laravel version to 5.8. remp/remp#491
+- Added option to set collapsible bar template as inline. remp/remp#906
 
 ### [Mailer]
 
