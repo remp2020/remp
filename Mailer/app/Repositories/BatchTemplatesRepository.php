@@ -9,6 +9,15 @@ class BatchTemplatesRepository extends Repository
 {
     protected $tableName = 'mail_job_batch_templates';
 
+    private $eventMap = [
+        'delivered_at' => 'delivered',
+        'clicked_at' => 'clicked',
+        'opened_at' => 'opened',
+        'spam_complained_at' => 'spam_complained',
+        'hard_bounced_at' => 'hard_bounced',
+        'dropped_at' => 'dropped',
+    ];
+
     public function getDashboardGraphDataForTypes(DateTime $from, DateTime $to): Selection
     {
         return $this->getTable()
@@ -55,5 +64,35 @@ class BatchTemplatesRepository extends Repository
     public function deleteByBatchId(int $batchId): int
     {
         return $this->findByBatchId($batchId)->delete();
+    }
+
+    public function mapEvent($event): ?string
+    {
+        return $this->eventMap[$event] ?? null;
+    }
+
+    public function updateAllConverted()
+    {
+        return $this->database->query('
+            update mail_job_batch_templates
+                left join (
+                    select count(*) as count, mail_job_batch_id, mail_template_id
+                    from mail_log_conversions
+                             left join mail_logs on mail_log_id = mail_logs.id
+                    group by mail_job_batch_id, mail_template_id
+                ) t1 on mail_job_batch_templates.mail_template_id = t1.mail_template_id and
+                        mail_job_batch_templates.mail_job_batch_id = t1.mail_job_batch_id
+            set converted = coalesce(t1.count, 0)
+        ');
+    }
+
+    public function incrementColumn($column, $mailTemplateId, $mailJobBatchId)
+    {
+        return $this->getTable()->where([
+            'mail_template_id' => $mailTemplateId,
+            'mail_job_batch_id' => $mailJobBatchId,
+        ])->update([
+            "{$column}+=" => 1,
+        ]);
     }
 }
