@@ -23,6 +23,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Removed unused table `hermes_tasks_old` created as backup when Hermes was updated to v2.1 _(see `HermesRetry` migration; commit [5fcd07ff](https://github.com/remp2020/remp/commit/5fcd07ffdda658334b0b990252eb94af0857b894))_.
+- Added mail job stats updating to `MailgunEventHandler`. Every suitable Mailgun event is processed and corresponding column in `mail_job_batch_templates` updated. remp/remp#853
+- Added `only-converted` option to `ProcessJobStatsCommand` to run command to update only `converted` column in `mail_job_batch_templates` table. remp/remp#853
 
 ## [0.23.0] - 2021-05-12
 
