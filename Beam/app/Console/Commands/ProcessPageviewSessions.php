@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\SessionDevice;
 use App\SessionReferer;
-use DeviceDetector\DeviceDetector;
 use App\Console\Command;
+use DeviceDetector\DeviceDetector;
 use Illuminate\Support\Carbon;
 use Remp\Journal\JournalContract;
 use Remp\Journal\ListRequest;

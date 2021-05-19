@@ -99,4 +99,5 @@ return [
     */
 
     'prefix' => env('CACHE_PREFIX', 'beam_cache'),
+
 ];

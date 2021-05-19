@@ -32,8 +32,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- Upgraded to Laravel 6. remp/remp#491
 - **BREAKING**: Environment variable `QUEUE_DRIVER` changed to `QUEUE_CONNECTION`, please update your `.env` file accordingly. remp/remp#491
-- Upgraded Laravel version to 5.8. remp/remp#491
 - Fixed possibility of missing data in the Segments API unique count aggregation if the aggregation was not fully resolved - if one of the groupped fields was not set in the raw data. remp/remp#902
 - Fixed missing `Access-Control-Allow-Headers` header in preflight request causing IOTA loading issues. remp/remp#905 
 - Added option to specify `tags` parameter in `/api/articles/top` and `/api/authors/top` API endpoints via `name` or `external_id` parameters. remp/remp#897

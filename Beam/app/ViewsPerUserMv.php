@@ -14,6 +14,8 @@ class ViewsPerUserMv extends Model
 {
     protected $table = 'views_per_user_mv';
 
+    protected $keyType = 'string';
+
     public $timestamps = false;
 
     protected $casts = [
