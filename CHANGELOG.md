@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Moved key used for segment caching from `CacheSegmentJob` into `SegmentAggregator`. remp/crm#1765
 - Added API to temporary override user's presence in cached segment (next scheduled cache job loads list against segment query). remp/crm#1765
 - Changed the format of stored tracking parameters in cookies and local storage. remp/remp#889
+- Added option to set timeout for Beam and Pythia segments. remp/remp#899
 
 ### [Mailer]
 

@@ -29,8 +29,8 @@ class StatsServiceProvider extends ServiceProvider
     {
         $this->app->bind(StatsContract::class, function (Application $app) {
             $client = new Client([
-                'base_uri' => $app['config']->get('services.remp.beam.segments_addr'),
-                'timeout' => 5,
+                'base_uri' => config('services.remp.beam.segments_addr'),
+                'timeout' => config('services.remp.beam.segments_timeout'),
                 'connect_timeout' => 1,
             ]);
 
