@@ -79,8 +79,7 @@ class LogsRepository extends Repository
             'COUNT(spam_complained_at) AS spam_complained',
             'COUNT(hard_bounced_at) AS hard_bounced',
             'COUNT(clicked_at) AS clicked',
-            'COUNT(opened_at) AS opened',
-            'COUNT(:mail_log_conversions.converted_at) AS converted',
+            'COUNT(opened_at) AS opened'
         ];
         return $this->getTable()
             ->select(implode(',', $columns))

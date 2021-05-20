@@ -3,6 +3,7 @@
 namespace App\Contracts\Crm;
 
 use App\CampaignSegment;
+use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
 use App\Jobs\CacheSegmentJob;
@@ -71,8 +72,7 @@ class Segment implements SegmentContract
      */
     public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
-        $cacheJob = new CacheSegmentJob($campaignSegment);
-        return $this->redis->sismember($cacheJob->key(), $userId);
+        return $this->redis->sismember(SegmentAggregator::cacheKey($campaignSegment), $userId);
     }
 
     /**
@@ -124,5 +124,15 @@ class Segment implements SegmentContract
     public function getProviderData()
     {
         return $this->providerData;
+    }
+
+    public function addUserToCache(CampaignSegment $campaignSegment, string $userId): bool
+    {
+        return $this->redis->sadd(SegmentAggregator::cacheKey($campaignSegment), [$userId]) ?: false;
+    }
+
+    public function removeUserFromCache(CampaignSegment $campaignSegment, string $userId): bool
+    {
+        return $this->redis->srem(SegmentAggregator::cacheKey($campaignSegment), $userId) ?: false;
     }
 }

@@ -346,7 +346,7 @@ class ArticleDetailsController extends Controller
             }
         }
 
-        return redirect()->route('articles.show', ['id' => $article->id]);
+        return redirect()->route('articles.show', ['article' => $article->id]);
     }
 
     public function show(Request $request, Article $article = null)

@@ -404,6 +404,101 @@ Valid response with 202 HTTP code:
 }
 ```
 
+##### Override user's presence in segment's cache
+
+- Add user: `POST /api/segment-cache/provider/{segment_provider}/code/{segment_code}/add-user`
+- Remove user: `POST /api/segment-cache/provider/{segment_provider}/code/{segment_code}/remove-user`
+
+If segment provider supports it, Campaign will cache members of segment for faster access. If segment is dynamic _(changed often)_, it can lead to incorrect campaign targeting _(old data)_.
+
+> Note: Interval for cache invalidation is set to one hour _(check `App\Console\Kernel->schedule()`)_.
+
+These two API endpoints allow overriding membership of one user in cached segment from outside of Campaign _(eg. from CRM)_.
+
+Both endpoints return response `404 Not found` if segment is not actively used by active or scheduled campaign.
+
+##### _API path parameters:_
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `segment_provider` | string | yes | Segment's provider returned by `SegmentContract->provider()`.<br> _Eg. out of box contracts: `crm_segment/pythia_segment/remp_segment`._ |
+| `segment_code` | string | yes | Code which identifies segment _(stored in `campaign_segments.code`)_. |
+
+##### _Body:_
+
+```json5
+{
+  "user_id": "29953", // String; Required; ID of targeted user
+}
+```
+
+##### *Examples*:
+
+<details>
+<summary>curl</summary>
+
+Path parameters:
+
+- segment_provider - `crm_segment`
+- segment_code - `example_testing_segment`
+
+```shell
+curl -X POST \
+  http://campaign.remp.press/api/segment-cache/provider/crm_segment/code/example_testing_segment/add-user \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "user_id": "29953"
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+    "user_id" => "29953",
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$segmentProvider = "crm_segment";
+$segmentCode = "example_testing_segment";
+$response = file_get_contents("http://campaign.remp.press/api/segment-cache/provider/{$segmentProvider}/code/{$segmentCode}/add-user", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+Valid response with 202 HTTP code:
+```json5
+{
+  "status": "ok"
+}
+```
+
+Response with 404 HTTP code:
+```json5
+{
+  "status": "error",
+  "message": "Segment with code [example_testing_segment] from provider [crm_segment] is not actively used in the campaign."
+}
+```
+
 ## Healthcheck
 
 Route `http://campaign.remp.press/health` provides health check for database, Redis, storage and logging.

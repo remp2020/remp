@@ -83,7 +83,16 @@ class NovydenikNewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 17) {
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 21) {
+            $defaults = [
+                'name' => 'Brněnský orloj ' . date('j.n.Y'),
+                'code' => 'nwsf_brnensky_orloj_' . date('dmY'),
+                'mail_layout_id' => 2, // empty layout
+                'locked_mail_layout_id' => 2, // empty layout
+                'mail_type_id' => 15, // Brnensky orloj
+                'from' => 'Deník N <info@denikn.cz>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 17) {
             $defaults = [
                 'name' => 'PolitikoN ' . date('j.n.Y'),
                 'code' => 'nwsf_politikon_' . date('dmY'),

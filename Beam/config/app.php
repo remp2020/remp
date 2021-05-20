@@ -161,6 +161,7 @@ return [
         App\Providers\RempMailerServiceProvider::class,
         App\Providers\GoogleAnalyticsReportingServiceProvider::class,
         App\Providers\RefererParserServiceProvider::class,
+        App\Providers\DeviceDetectorServiceProvider::class,
     ],
 
     /*

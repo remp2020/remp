@@ -535,7 +535,13 @@ Your CMS should track all article-related changes to Beam so Beam knows about th
             "tags": [ // Optional
                 {
                     "external_id": "1", // String; Required; External id of the tag
-                    "name": "Elections 2020" // String; Required; Name of the tag
+                    "name": "Elections 2020", // String; Required; Name of the tag,
+                    "categories": [ // Optional
+                        {
+                            "external_id": "1", // String; Required; External id of the tag category
+                            "name": "USA" // String; Required; Name of the tag category
+                        }
+                    ]
                 }
             ],
             "published_at": "2018-06-05T06:03:05Z" // RFC3339 formatted datetime
@@ -582,7 +588,13 @@ curl -X POST \
             "tags": [
                 {
                     "external_id": "1",
-                    "name": "Elections 2020" 
+                    "name": "Elections 2020",
+                    "categories": [
+                        {
+                            "external_id": "1",
+                            "name": "USA"
+                        }
+                    ]
                 }
             ],
             "published_at": "2018-06-05T06:03:05Z"
@@ -624,7 +636,13 @@ $payload = [
             "tags" => [
                 [
                     "external_id" => "1",
-                    "name" => "Elections 2020" 
+                    "name" => "Elections 2020" ,
+                    "categories" => [
+                        [
+                            "external_id" => "1",
+                            "name" => "USA"
+                        ]
+                    ]
                 ]
             ],
             "published_at" => "2018-06-05T06:03:05Z",
@@ -692,7 +710,13 @@ $response = file_get_contents("http://beam.remp.press/api/v2/articles/upsert ", 
                     "external_id": "1",
                     "name": "Elections 2020",
                     "created_at": "2019-05-17 11:43:04",
-                    "updated_at": "2019-05-17 11:43:04"
+                    "updated_at": "2019-05-17 11:43:04",
+                    "tag_categories": [
+                        {
+                            "external_id": "1",
+                            "name": "USA"
+                        }
+                    ]
                 }
             ],            
         }
@@ -822,7 +846,7 @@ $response = file_get_contents("http://beam.remp.press/api/conversions/upsert ", 
 ##### POST `api/articles/top`
 
 Beam admin provides statistics about article performance. This endpoint return top articles by pageviews.
-You can filter articles by section and time of pageview.
+You can filter articles by content type, sections, authors, tags or tag categories.
 
 ##### *Headers:*
 
@@ -850,6 +874,10 @@ You can filter articles by section and time of pageview.
 	"tags": { // OPTIONAL; filters articles with tags (use either external_id or name arrays, not both)
 		"external_id": ["tag external id"], // String; tag external IDs 
 		"name": ["tag name"] // String; tag names
+	},
+	"tag_categories": { // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both)
+		"external_id": ["tag category external id"], // String; tag category external IDs 
+		"name": ["tag category name"] // String; tag category names
 	}
 }
 ```
@@ -876,6 +904,9 @@ curl --location --request POST 'http://beam.remp.press/api/articles/top' \
 	},
 	"tags": {
 		"external_id": ["10"]
+	},
+	"tag_categories": {
+		"external_id": ["1"]
 	}
 }'
 ```
@@ -898,6 +929,9 @@ $payload = [
 	],
 	"tags" => [
 		"name" => ["News"]
+	],
+	"tag_categories" => [
+		"name" => ["Europe"]
 	]
 ];
 $jsonPayload = json_encode($payload);
@@ -942,7 +976,7 @@ $response = file_get_contents("http://beam.remp.press/api/articles/top", false, 
 ##### POST `api/authors/top`
 
 Beam admin provides statistics about author performance. This endpoint return top authors by pageviews.
-You can filter authors by time of pageview.
+You can filter authors by content type, sections, tags or tag categories.
 
 ##### *Headers:*
 
@@ -966,6 +1000,10 @@ You can filter authors by time of pageview.
 	"tags": { // OPTIONAL; filters articles with tags (use either external_id or name arrays, not both)
 		"external_id": ["Tag external id"], // String; tag external IDs 
 		"name": ["Tag title"] // String; tag names
+	},
+	"tag_categories": { // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both)
+		"external_id": ["tag category external id"], // String; tag category external IDs 
+		"name": ["tag category name"] // String; tag category names
 	}
 }
 ```
@@ -989,6 +1027,9 @@ curl --location --request POST 'http://beam.remp.press/api/authors/top' \
 	},
 	"tags": {
 	    "external_id": ["10"]
+	},
+	"tag_categories": {
+		"external_id": ["1"]
 	}
 }'
 ```
@@ -1008,6 +1049,9 @@ $payload = [
 	],
 	"tags" => [
 		"name" => ["News"]
+	],
+	"tag_categories" => [
+		"name" => ["Europe"]
 	]
 ];
 $jsonPayload = json_encode($payload);
@@ -1045,7 +1089,7 @@ $response = file_get_contents("http://beam.remp.press/api/authors/top", false, $
 ##### POST `api/tags/top`
 
 Beam admin provides statistics about tag performance. This endpoint return top post tags by pageviews.
-You can filter tags by time of pageview.
+You can filter tags by content type, sections, authors or tag categories.
 
 ##### *Headers:*
 
@@ -1069,6 +1113,10 @@ You can filter tags by time of pageview.
 	"authors": { // OPTIONAL; filters from which authors take articles (use either external_id or name arrays, not both)
 		"external_id": ["author external id"], // String; section external IDs 
 		"name": ["author name"] // String; section external_id
+	},
+	"tag_categories": { // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both)
+		"external_id": ["tag category external id"], // String; tag category external IDs 
+		"name": ["tag category name"] // String; tag category names
 	}
 }
 ```
@@ -1092,6 +1140,9 @@ curl --location --request POST 'http://beam.remp.press/api/tags/top' \
 	},
 	"authors": {
 		"external_id": ["123"]
+	},
+	"tag_categories": {
+		"external_id": ["1"]
 	}
 }'
 ```
@@ -1111,6 +1162,9 @@ $payload = [
 	],
 	"authors" => [
 		"name" => ["John Doe"]
+	],
+	"tag_categories" => [
+		"name" => ["Europe"]
 	]
 ];
 $jsonPayload = json_encode($payload);
@@ -1486,7 +1540,7 @@ in your own extensions/implementation.
 
 #### Dependencies
 
-- Elastic ^6.2
+- Elastic ^7.5
 - MySQL ^5.7
 
 ## [Telegraf](../Docker/telegraf)

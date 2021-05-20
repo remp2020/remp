@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class ArticlePageviewsArticleTimeFromIndex extends Migration
+class CreateTagCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,11 @@ class ArticlePageviewsArticleTimeFromIndex extends Migration
      */
     public function up()
     {
-        Schema::table('article_pageviews', function (Blueprint $table) {
-            $table->index(['article_id', 'time_from']);
+        Schema::create('tag_categories', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('external_id');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +28,6 @@ class ArticlePageviewsArticleTimeFromIndex extends Migration
      */
     public function down()
     {
-        Schema::table('index', function (Blueprint $table) {
-            $table->dropIndex(['article_id', 'time_from']);
-        });
+        Schema::dropIfExists('tag_categories');
     }
 }

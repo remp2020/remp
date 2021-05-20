@@ -52,6 +52,18 @@ class TopAuthorsSearchRequest extends FormRequest
             'tags.external_id.*' => 'string',
             'tags.name' => 'array',
             'tags.name.*' => 'string',
+            'tag_categories' => ['array', function ($attr, $value, $fail) {
+                if (Arr::has($value, ['external_id', 'name'])) {
+                    $fail("You can not have both 'external_id' and 'name' arrays specified in tag categories filter");
+                }
+                if (!array_key_exists('external_id', $value) && !array_key_exists('name', $value)) {
+                    $fail("You have to specify either 'external_id' or 'name' array in tag categories filter");
+                }
+            }],
+            'tag_categories.external_id' => 'array',
+            'tag_categories.external_id.*' => 'string',
+            'tag_categories.name' => 'array',
+            'tag_categories.name.*' => 'string',
         ];
     }
 }

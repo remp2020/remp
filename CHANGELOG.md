@@ -8,16 +8,49 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- Added `TagCategory` filter option to `/top` APIs. remp/remp#898
+- Fixed issue with article scroll progress tracking if `article.elementFn` callback wasn't set or didn't return any element. 
+- Upgraded to Laravel 6. remp/remp#491
+
+### [Campaign]
+
+- **BREAKING**: Moved key used for segment caching from `CacheSegmentJob` into `SegmentAggregator`. remp/crm#1765
+- Added API to temporary override user's presence in cached segment (next scheduled cache job loads list against segment query). remp/crm#1765
+- Changed the format of stored tracking parameters in cookies and local storage. remp/remp#889
+- Added option to set timeout for Beam and Pythia segments. remp/remp#899
+- Removed API's throttle (rate limiting). APIs `SegmentCacheController@addUserToCache` and `SegmentCacheController@removeUserFromCache` have to receive more requests than predefined limit. Will be enabled back with Laravel 8. remp/remp#913
+- Upgraded to Laravel 6. remp/remp#491
+
+### [Mailer]
+
+- Removed unused table `hermes_tasks_old` created as backup when Hermes was updated to v2.1 _(see `HermesRetry` migration; commit [5fcd07ff](https://github.com/remp2020/remp/commit/5fcd07ffdda658334b0b990252eb94af0857b894))_.
+- Added mail job stats updating to `MailgunEventHandler`. Every suitable Mailgun event is processed and corresponding column in `mail_job_batch_templates` updated. remp/remp#853
+- Added `only-converted` option to `ProcessJobStatsCommand` to run command to update only `converted` column in `mail_job_batch_templates` table. remp/remp#853
+
+### [Sso]
+
+- Upgraded to Laravel 6. remp/remp#491
+
+## [0.23.0] - 2021-05-12
+
+### Project
+
+- Fixed possible UI flaws caused by select pickers overflowing if the content is too wide. remp/remp#781
+
+### [Beam]
+
 - **BREAKING**: Environment variable `QUEUE_DRIVER` changed to `QUEUE_CONNECTION`, please update your `.env` file accordingly. remp/remp#491
 - Upgraded Laravel version to 5.8. remp/remp#491
 - Fixed possibility of missing data in the Segments API unique count aggregation if the aggregation was not fully resolved - if one of the groupped fields was not set in the raw data. remp/remp#902
 - Fixed missing `Access-Control-Allow-Headers` header in preflight request causing IOTA loading issues. remp/remp#905 
 - Added option to specify `tags` parameter in `/api/articles/top` and `/api/authors/top` API endpoints via `name` or `external_id` parameters. remp/remp#897
+- Added `TagCategory` to categorize `Tags`. Added support for `TagCategories` to `/api/v2/articles/upsert` API. remp/remp#898
 
 ### [Campaign]
 
 - **BREAKING:** Environment variable QUEUE_DRIVER changed to QUEUE_CONNECTION, please update your .env file accordingly. remp/remp#491
-- Upgraded to Laravel 6. remp/remp#491
+- Upgraded Laravel version to 5.8. remp/remp#491
+- Added option to set collapsible bar template as inline. remp/remp#906
 
 ### [Mailer]
 
@@ -26,6 +59,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added separate configuration for tests, so we can guarantee tests reproducibility. remp/remp#890
 - Added `context` and `mail_type_variant_id` parameters to `MailJobCreateApiHandler`. remp/remp#890
 - Added API endpoint `/api/v1/mailers/mail-type-variants` to create new mail type variants. See [README.md](./Mailer/README.md) for more details. remp/remp#890
+- Fixed "copy" feature of mail templates broken since internal changes in `0.20.0`. remp/crm#1889
+- Changed type of `payload` column in `hermes_tasks` error logging table to `mediumtext` to avoid issues with trimmed payloads in case the hermes message was bigger. remp/crm#1891
 
 ### [Sso]
 
@@ -771,7 +806,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.22.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.23.0...master
+[0.23.0]: https://github.com/remp2020/remp/compare/0.22.0...0.23.0
 [0.22.0]: https://github.com/remp2020/remp/compare/0.21.5...0.22.0
 [0.21.5]: https://github.com/remp2020/remp/compare/0.21.4...0.21.5
 [0.21.4]: https://github.com/remp2020/remp/compare/0.21.3...0.21.4

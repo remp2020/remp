@@ -880,14 +880,19 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 timestamp: new Date(),
             };
 
-            if (remplib.tracker.article) {
+            if (remplib.tracker.article && remplib.tracker.article.elementFn) {
                 const article = remplib.tracker.article.elementFn();
-                const root = remplib.tracker.getRootElement();
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                if (article) {
+                    const root = remplib.tracker.getRootElement();
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
 
-                payload.articleScrollRatio = Math.min(1, Math.max(0,
-                    (scrollTop + root.clientHeight - remplib.tracker.getElementOffsetTop(article)) / article.scrollHeight
-                ));
+                    payload.articleScrollRatio = Math.min(1, Math.max(0,
+                        (scrollTop + root.clientHeight - remplib.tracker.getElementOffsetTop(article)) / article.scrollHeight
+                    ));
+                } else {
+                    console.warn("remplib: Disabling article tracking, article.elementFn() did not return any element.");
+                    remplib.tracker.article.elementFn = null;
+                }
             }
 
             const event = new CustomEvent("scroll_progress", {

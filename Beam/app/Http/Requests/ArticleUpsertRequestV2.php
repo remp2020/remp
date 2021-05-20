@@ -50,6 +50,10 @@ class ArticleUpsertRequestV2 extends FormRequest
             'articles.*.tags.*' => 'array',
             'articles.*.tags.*.external_id' => 'required|string',
             'articles.*.tags.*.name' => 'required|string',
+            'articles.*.tags.*.categories' => 'array',
+            'articles.*.tags.*.categories.*' => 'array',
+            'articles.*.tags.*.categories.*.external_id' => 'required|string',
+            'articles.*.tags.*.categories.*.name' => 'required|string',
         ];
     }
 }

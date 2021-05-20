@@ -14,6 +14,8 @@ class ViewsPerBrowserMv extends Model
 {
     protected $table = 'views_per_browser_mv';
 
+    protected $keyType = 'string';
+
     public $timestamps = false;
 
     protected $casts = [

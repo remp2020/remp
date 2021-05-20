@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Hermes;
 
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Tomaj\Hermes\Emitter;
 use Tomaj\Hermes\Handler\HandlerInterface;
@@ -16,12 +17,16 @@ class MailgunEventHandler implements HandlerInterface
 
     private $emitter;
 
+    private $batchTemplatesRepository;
+
     public function __construct(
         LogsRepository $logsRepository,
-        Emitter $emitter
+        Emitter $emitter,
+        BatchTemplatesRepository $batchTemplatesRepository
     ) {
         $this->logsRepository = $logsRepository;
         $this->emitter = $emitter;
+        $this->batchTemplatesRepository = $batchTemplatesRepository;
     }
 
     public function handle(MessageInterface $message): bool
@@ -55,6 +60,11 @@ class MailgunEventHandler implements HandlerInterface
             $mailgunEvent => $date,
             'updated_at' => new DateTime(),
         ]);
+
+        $column = $this->batchTemplatesRepository->mapEvent($mailgunEvent);
+        if (isset($column)) {
+            $this->batchTemplatesRepository->incrementColumn($column, $log->mail_template_id, $log->mail_job_batch_id);
+        }
 
         if ($payload['event'] === 'dropped') {
             $this->emitter->emit(new Message('email-dropped', ['email' => $log->email]), RedisDriver::PRIORITY_LOW);

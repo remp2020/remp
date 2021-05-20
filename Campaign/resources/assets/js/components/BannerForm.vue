@@ -239,7 +239,7 @@
                 </div>
             </div>
 
-            <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal" :class="{ hidden: collapsibleBarTemplate != null }">
+            <ul class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
                 <li v-on:click="displayType='overlay'" v-bind:class="{active: displayType === 'overlay'}">
                     <a href="#overlay-banner" role="tab" data-toggle="tab" aria-expanded="true">Overlay Banner</a>
                 </li>
@@ -248,9 +248,9 @@
                 </li>
             </ul>
 
-            <div class="card m-t-15" :class="{ hidden: collapsibleBarTemplate != null }">
+            <div class="card m-t-15">
                 <div class="tab-content p-0">
-                    <div role="tabpanel" v-bind:class="[{active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
+                    <div role="tabpanel" v-bind:class="[{ hidden: collapsibleBarTemplate != null, active: displayType === 'overlay'}, 'tab-pane']" id="overlay-banner">
                         <div class="card-body card-padding p-l-15">
 
                             <div class="input-group" v-if="isOverlay">
@@ -345,7 +345,7 @@
                                 </div>
                             </div>
 
-                            <div class="input-group fg-float checkbox">
+                            <div class="input-group fg-float checkbox" :class="{ hidden: collapsibleBarTemplate != null }">
                                 <label class="m-l-15">
                                     Ability to close banner manually
                                     <input v-model="closeable" value="1" name="closeable" type="checkbox">

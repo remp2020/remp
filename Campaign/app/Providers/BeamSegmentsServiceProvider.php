@@ -31,7 +31,7 @@ class BeamSegmentsServiceProvider extends ServiceProvider
         $this->app->bind(Segment::class, function (Application $app) {
             $client = new Client([
                 'base_uri' => config('services.remp.beam.segments_addr'),
-                'timeout' => 1,
+                'timeout' => config('services.remp.beam.segments_timeout'),
                 'connect_timeout' => 1,
             ]);
             return new Segment($client);

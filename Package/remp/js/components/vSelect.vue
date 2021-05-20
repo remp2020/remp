@@ -1,3 +1,11 @@
+<style lang="scss">
+.bootstrap-select {
+    .btn.dropdown-toggle.btn-default {
+        display: inline-grid;
+    }
+}
+</style>
+
 <template>
     <div>
         <div class="row">
