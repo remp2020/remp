@@ -8,6 +8,8 @@ class Country extends Model
 {
     protected $primaryKey = 'iso_code';
 
+    protected $keyType = 'string';
+
     public $incrementing = false;
 
     public $timestamps = false;

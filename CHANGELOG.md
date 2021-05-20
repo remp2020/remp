@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - **BREAKING:** Environment variable QUEUE_DRIVER changed to QUEUE_CONNECTION, please update your .env file accordingly. remp/remp#491
-- Upgraded Laravel version to 5.8. remp/remp#491
+- Upgraded to Laravel 6. remp/remp#491
 
 ### [Mailer]
 

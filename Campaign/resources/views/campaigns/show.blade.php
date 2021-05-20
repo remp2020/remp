@@ -29,7 +29,7 @@
                                 </li>
                             @else
                                 <li>
-                                    <a href="{{ route('banners.edit', $variant['banner_id']) }}">
+                                    <a href="{{ route('banners.edit', ['banner' => $variant['banner_id']]) }}">
                                         {{ $variant->banner['name'] }} ({{ $variant->proportion }}%)
                                     </a>
                                 </li>
