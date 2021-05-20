@@ -19,7 +19,7 @@ class User implements Authenticatable, Arrayable
      */
     public function getAuthIdentifierName()
     {
-        return 'id';
+        return 'token';
     }
 
     /**
@@ -29,7 +29,7 @@ class User implements Authenticatable, Arrayable
      */
     public function getAuthIdentifier()
     {
-        return $this->id;
+        return $this->token;
     }
 
     /**
