@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added `TagCategory` filter option to `/top` APIs. remp/remp#898
+- Fixed issue with article scroll progress tracking if `article.elementFn` callback wasn't set or didn't return any element. 
 
 ### [Campaign]
 
