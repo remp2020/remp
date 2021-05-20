@@ -54,16 +54,18 @@ return [
         'beam' => [
             'web_addr' => env('REMP_BEAM_ADDR'),
             'segments_addr' => env('REMP_SEGMENTS_ADDR'),
+            'segments_timeout' => (int) env('REMP_SEGMENTS_TIMEOUT') ?: 5,
         ],
         'mailer' => [
             'web_addr' => env('REMP_MAILER_ADDR'),
         ],
         'sso' => [
             'web_addr' => env('REMP_SSO_ADDR'),
-            'api_token' => env('REMP_SSO_API_TOKEN')
+            'api_token' => env('REMP_SSO_API_TOKEN'),
         ],
         'pythia' => [
             'segments_addr' => env('REMP_PYTHIA_SEGMENTS_ADDR'),
+            'segments_timeout' => (int) env('REMP_PYTHIA_SEGMENTS_TIMEOUT') ?: 1,
         ],
         'linked' => [
             'beam' => [
