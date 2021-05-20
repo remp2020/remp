@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added API to temporary override user's presence in cached segment (next scheduled cache job loads list against segment query). remp/crm#1765
 - Changed the format of stored tracking parameters in cookies and local storage. remp/remp#889
 - Added option to set timeout for Beam and Pythia segments. remp/remp#899
+- Removed API's throttle (rate limiting). APIs `SegmentCacheController@addUserToCache` and `SegmentCacheController@removeUserFromCache` have to receive more requests than predefined limit. Will be enabled back with Laravel 8. remp/remp#913
 
 ### [Mailer]
 
