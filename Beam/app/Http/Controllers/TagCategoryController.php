@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\ArticlesDataTable;
 use App\Author;
+use App\Model\Tag;
 use App\Section;
 use App\Http\Resources\TagCategoryResource;
 use App\TagCategoriesDataTable;
@@ -40,7 +41,7 @@ class TagCategoryController extends Controller
         return response()->format([
             'html' => view('tagcategories.show', [
                 'tagCategory' => $tagCategory,
-                'tags' => $tagCategory->tags()->pluck('tags.name', 'tags.id'),
+                'tags' => Tag::all()->pluck('name', 'id'),
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
                 'sections' => Section::all()->pluck('name', 'id'),
                 'authors' => Author::all()->pluck('name', 'id'),
