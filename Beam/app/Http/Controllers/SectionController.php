@@ -178,12 +178,17 @@ class SectionController extends Controller
             ->addColumn('name', function (Section $section) {
                 return Html::linkRoute('sections.show', $section->name, $section);
             })
-            ->filterColumn('name', function (Builder $query, $value) {
-                $sectionIds = explode(',', $value);
-                $query->where(function (Builder $query) use ($sectionIds, $value) {
-                    $query->where('sections.name', 'like', '%' . $value . '%')
-                        ->orWhereIn('sections.id', $sectionIds);
-                });
+            ->filterColumn('name', function (Builder $query, $value) use ($request) {
+                if ($request->input('search')['value'] === $value) {
+                    $query->where(function (Builder $query) use ($value) {
+                        $query->where('sections.name', 'like', '%' . $value . '%');
+                    });
+                } else {
+                    $sectionIds = explode(',', $value);
+                    $query->where(function (Builder $query) use ($sectionIds) {
+                        $query->whereIn('sections.id', $sectionIds);
+                    });
+                }
             })
             ->addColumn('conversions_count', function (Section $section) use ($conversionCounts) {
                 return $conversionCounts[$section->id] ?? 0;

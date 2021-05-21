@@ -161,12 +161,17 @@ class AuthorController extends Controller
             ->addColumn('name', function (Author $author) {
                 return Html::linkRoute('authors.show', $author->name, $author);
             })
-            ->filterColumn('name', function (Builder $query, $value) {
-                $authorIds = explode(',', $value);
-                $query->where(function (Builder $query) use ($authorIds, $value) {
-                    $query->where('authors.name', 'like', '%' . $value . '%')
-                        ->orWhereIn('authors.id', $authorIds);
-                });
+            ->filterColumn('name', function (Builder $query, $value) use ($request) {
+                if ($request->input('search')['value'] === $value) {
+                    $query->where(function (Builder $query) use ($value) {
+                        $query->where('authors.name', 'like', '%' . $value . '%');
+                    });
+                } else {
+                    $authorIds = explode(',', $value);
+                    $query->where(function (Builder $query) use ($authorIds) {
+                        $query->whereIn('authors.id', $authorIds);
+                    });
+                }
             })
             ->addColumn('conversions_count', function (Author $author) use ($conversionCounts) {
                 return $conversionCounts[$author->id] ?? 0;

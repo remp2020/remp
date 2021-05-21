@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Upgraded to Laravel 6. remp/remp#491
 - Added UI for `TagCategory`. remp/remp#898
 - Fixed filter bugs in article datatable. remp/remp#921
+- Fixed fulltext search bug in datatables. remp/remp#923
 
 ### [Campaign]
 
