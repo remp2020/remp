@@ -148,12 +148,17 @@ class TagCategoriesDataTable
             ->addColumn('name', function (TagCategory $tagCategory) {
                 return Html::linkRoute('tag-categories.show', $tagCategory->name, $tagCategory);
             })
-            ->filterColumn('name', function (Builder $query, $value) {
-                $tagCategoryIds = explode(',', $value);
-                $query->where(function (Builder $query) use ($tagCategoryIds, $value) {
-                    $query->where('tag_categories.name', 'like', '%' . $value . '%')
-                        ->orWhereIn('tag_categories.id', $tagCategoryIds);
-                });
+            ->filterColumn('name', function (Builder $query, $value) use ($request) {
+                if ($request->input('search')['value'] === $value) {
+                    $query->where(function (Builder $query) use ($value) {
+                        $query->where('tag_categories.name', 'like', '%' . $value . '%');
+                    });
+                } else {
+                    $tagCategoryIds = explode(',', $value);
+                    $query->where(function (Builder $query) use ($tagCategoryIds) {
+                        $query->whereIn('tag_categories.id', $tagCategoryIds);
+                    });
+                }
             })
             ->addColumn('conversions_count', function (TagCategory $tagCategory) use ($conversionCounts) {
                 return $conversionCounts[$tagCategory->id] ?? 0;

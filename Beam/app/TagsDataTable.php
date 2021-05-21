@@ -143,12 +143,17 @@ class TagsDataTable
             ->addColumn('name', function (Tag $tag) {
                 return Html::linkRoute('tags.show', $tag->name, $tag);
             })
-            ->filterColumn('name', function (Builder $query, $value) {
-                $tagIds = explode(',', $value);
-                $query->where(function (Builder $query) use ($tagIds, $value) {
-                    $query->where('tags.name', 'like', '%' . $value . '%')
-                        ->orWhereIn('tags.id', $tagIds);
-                });
+            ->filterColumn('name', function (Builder $query, $value) use ($request) {
+                if ($request->input('search')['value'] === $value) {
+                    $query->where(function (Builder $query) use ($value) {
+                        $query->where('tags.name', 'like', '%' . $value . '%');
+                    });
+                } else {
+                    $tagIds = explode(',', $value);
+                    $query->where(function (Builder $query) use ($tagIds) {
+                        $query->whereIn('tags.id', $tagIds);
+                    });
+                }
             })
             ->addColumn('conversions_count', function (Tag $tag) use ($conversionCounts) {
                 return $conversionCounts[$tag->id] ?? 0;
