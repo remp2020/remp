@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.24.0] - 2021-05-21
+
 ### [Beam]
 
 - Added `TagCategory` filter option to `/top` APIs. remp/remp#898
@@ -18,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - **BREAKING**: Moved key used for segment caching from `CacheSegmentJob` into `SegmentAggregator`. remp/crm#1765
+  - If you use `CacheSegmentJob::key()`, replace it with `SegmentAggregator::cacheKey($campaignSegment)`.
 - Added API to temporary override user's presence in cached segment (next scheduled cache job loads list against segment query). remp/crm#1765
 - Changed the format of stored tracking parameters in cookies and local storage. remp/remp#889
 - Added option to set timeout for Beam and Pythia segments. remp/remp#899
@@ -30,6 +33,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Removed unused table `hermes_tasks_old` created as backup when Hermes was updated to v2.1 _(see `HermesRetry` migration; commit [5fcd07ff](https://github.com/remp2020/remp/commit/5fcd07ffdda658334b0b990252eb94af0857b894))_.
 - Added mail job stats updating to `MailgunEventHandler`. Every suitable Mailgun event is processed and corresponding column in `mail_job_batch_templates` updated. remp/remp#853
 - Added `only-converted` option to `ProcessJobStatsCommand` to run command to update only `converted` column in `mail_job_batch_templates` table. remp/remp#853
+  - If you have `mail:job-stats` command in your scheduler, it should be enough to run it just once a day.
+  - Please add new entry to your scheduler with `mail:job-stats --only-converted` based on how often you want your conversion stats to be updated. We recommend every 10 minutes. Rest of the stats should now be updated continuously immediately when Mailer receives Mailgun webhook.
 
 ### [Sso]
 
@@ -810,7 +815,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.23.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.24.0...master
+[0.24.0]: https://github.com/remp2020/remp/compare/0.23.0...0.24.0
 [0.23.0]: https://github.com/remp2020/remp/compare/0.22.0...0.23.0
 [0.22.0]: https://github.com/remp2020/remp/compare/0.21.5...0.22.0
 [0.21.5]: https://github.com/remp2020/remp/compare/0.21.4...0.21.5
