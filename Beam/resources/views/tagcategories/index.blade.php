@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Tags')
+@section('title', 'Tag Categories')
 
 @section('content')
 
     <div class="c-header">
-        <h2>Tags</h2>
+        <h2>Tag Categories</h2>
     </div>
 
     <div class="well">
@@ -44,10 +44,10 @@
 
     <div class="card">
         <div class="card-header">
-            <h2>Tag stats <small></small></h2>
+            <h2>Tag Category stats <small></small></h2>
         </div>
 
-        @include('tags.subviews.dt_tags', ['dataSource' => route('tags.dtTags')])
+        @include('tagcategories.subviews.dt_tag_categories', ['dataSource' => route('tagCategories.dtTagCategories')])
     </div>
 
     <script type="text/javascript">

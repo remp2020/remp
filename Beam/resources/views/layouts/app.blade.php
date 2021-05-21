@@ -172,6 +172,9 @@
             <li {!! route_active(['tags']) !!}>
                 <a href="{{ route('tags.index') }}" ><i class="zmdi zmdi-label"></i> Tags</a>
             </li>
+            <li {!! route_active(['tag-categories']) !!}>
+                <a href="{{ route('tag-categories.index') }}" ><i class="zmdi zmdi-filter-list"></i> Tag Categories</a>
+            </li>
             <li {!! route_active(['visitors.devices', 'visitors.sources'], 'sub-menu', 'toggled') !!}>
                 <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-face"></i> Visitors</a>
                 <ul>
