@@ -119,6 +119,13 @@ Route::middleware('auth.jwt')->group(function () {
         'only' => ['index', 'show']
     ]);
 
+    Route::get('tag-categories/dtTagCategories', 'TagCategoryController@dtTagCategories')->name('tagCategories.dtTagCategories');
+    Route::get('tag-categories/{tagCategory}/dtTags', 'TagCategoryController@dtTags')->name('tagCategories.dtTags');
+    Route::get('tag-categories/{tagCategory}/dtArticles', 'TagCategoryController@dtArticles')->name('tagCategories.dtArticles');
+    Route::resource('tag-categories', 'TagCategoryController', [
+        'only' => ['index', 'show']
+    ]);
+
     Route::get('settings', 'SettingsController@index')->name('settings.index');
     Route::post('settings/{configCategory}', 'SettingsController@update')->name('settings.update');
 

@@ -5,23 +5,22 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\ArticlesDataTable;
 use App\Author;
-use App\Http\Request;
-use App\Http\Requests\TopTagsSearchRequest;
-use App\Http\Resources\TagResource;
-use App\Model\Pageviews\TopSearch;
-use App\Model\Tag;
 use App\Section;
-use App\TagsDataTable;
+use App\Http\Resources\TagCategoryResource;
+use App\TagCategoriesDataTable;
+use App\TagCategory;
 use Yajra\DataTables\DataTables;
+use App\Http\Request;
 use Html;
+use App\TagsDataTable;
 
-class TagController extends Controller
+class TagCategoryController extends Controller
 {
     public function index(Request $request)
     {
         return response()->format([
-            'html' => view('tags.index', [
-                'tags' => Tag::all()->pluck('name', 'id'),
+            'html' => view('tagcategories.index', [
+                'tagCategories' => TagCategory::all()->pluck('name', 'id'),
                 'contentTypes' => array_merge(
                     ['all'],
                     Article::groupBy('content_type')->pluck('content_type')->toArray()
@@ -32,15 +31,16 @@ class TagController extends Controller
                 'conversionTo' => $request->input('conversion_to', 'now'),
                 'contentType' => $request->input('content_type', 'all'),
             ]),
-            'json' => TagResource::collection(Tag::paginate()),
+            'json' => TagCategoryResource::collection(TagCategory::paginate()),
         ]);
     }
 
-    public function show(Tag $tag, Request $request)
+    public function show(TagCategory $tagCategory, Request $request)
     {
         return response()->format([
-            'html' => view('tags.show', [
-                'tag' => $tag,
+            'html' => view('tagcategories.show', [
+                'tagCategory' => $tagCategory,
+                'tags' => $tagCategory->tags()->pluck('tags.name', 'tags.id'),
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
                 'sections' => Section::all()->pluck('name', 'id'),
                 'authors' => Author::all()->pluck('name', 'id'),
@@ -49,23 +49,24 @@ class TagController extends Controller
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->input('conversion_to', 'now'),
             ]),
-            'json' => new TagResource($tag),
+            'json' => new TagCategoryResource($tagCategory),
         ]);
     }
 
-    public function dtTags(Request $request, DataTables $datatables, TagsDataTable $tagsDataTable)
+    public function dtTagCategories(Request $request, DataTables $datatables, TagCategoriesDataTable $tagCategoriesDataTable)
     {
+        return $tagCategoriesDataTable->getDataTable($request, $datatables);
+    }
+
+    public function dtTags(TagCategory $tagCategory, Request $request, DataTables $datatables, TagsDataTable $tagsDataTable)
+    {
+        $tagsDataTable->setTagCategory($tagCategory);
         return $tagsDataTable->getDataTable($request, $datatables);
     }
 
-    public function dtArticles(Tag $tag, Request $request, Datatables $datatables, ArticlesDataTable $articlesDataTable)
+    public function dtArticles(TagCategory $tagCategory, Request $request, DataTables $datatables, ArticlesDataTable $articlesDataTable)
     {
-        $articlesDataTable->setTag($tag);
+        $articlesDataTable->setTagCategory($tagCategory);
         return $articlesDataTable->getDataTable($request, $datatables);
-    }
-
-    public function topTags(TopTagsSearchRequest $request, TopSearch $topSearch)
-    {
-        return response()->json($topSearch->topPostTags($request));
     }
 }
