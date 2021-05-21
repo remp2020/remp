@@ -14,6 +14,7 @@ class CampaignBanner extends Model
     use HasFactory;
 
     use SoftDeletes;
+    use IdentificationTrait;
 
     protected $table = 'campaign_banners';
 
@@ -33,7 +34,8 @@ class CampaignBanner extends Model
         parent::boot();
 
         static::creating(function (CampaignBanner $variant) {
-            $variant->uuid = Uuid::uuid4()->toString();
+            $variant->uuid = self::generateUuid();
+            $variant->public_id = self::generatePublicId();
         });
     }
 

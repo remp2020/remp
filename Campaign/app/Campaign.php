@@ -15,6 +15,7 @@ class Campaign extends Model implements Searchable
     use HasFactory;
 
     use PivotEventTrait;
+    use IdentificationTrait;
 
     const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';
     const CAMPAIGN_TAG = 'campaign';
@@ -75,7 +76,8 @@ class Campaign extends Model implements Searchable
         parent::boot();
 
         static::creating(function (Campaign $campaign) {
-            $campaign->uuid = Uuid::uuid4()->toString();
+            $campaign->uuid = self::generateUuid();
+            $campaign->public_id = self::generatePublicId();
         });
     }
 
