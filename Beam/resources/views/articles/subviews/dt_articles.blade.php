@@ -68,6 +68,12 @@
                         'filter' => $authors,
                         'priority' => 5,
                     ],
+                    'tags[, ].name' => [
+                        'header' => 'tags',
+                        'orderable' => false,
+                        'filter' => $tags,
+                        'priority' => 6,
+                    ],
                     'published_at' => [
                         'header' => 'published',
                         'render' => 'date',

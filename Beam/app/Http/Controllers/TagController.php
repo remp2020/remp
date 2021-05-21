@@ -41,6 +41,7 @@ class TagController extends Controller
         return response()->format([
             'html' => view('tags.show', [
                 'tag' => $tag,
+                'tags' => Tag::all()->pluck('name', 'id'),
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
                 'sections' => Section::all()->pluck('name', 'id'),
                 'authors' => Author::all()->pluck('name', 'id'),

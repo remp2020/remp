@@ -13,6 +13,10 @@ use App\Http\Request;
 
 class ArticlesDataTable
 {
+    private Author $author;
+
+    private Section $section;
+
     private Tag $tag;
 
     private TagCategory $tagCategory;
@@ -37,9 +41,6 @@ class ArticlesDataTable
             'timespent_subscribers / pageviews_subscribers as avg_timespent_subscribers',
         ]))
             ->with(['authors', 'sections', 'tags'])
-            ->join('article_tag', 'articles.id', '=', 'article_tag.article_id')
-            ->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id')
-            ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
             ->groupBy(['articles.id', 'articles.title', 'articles.published_at', 'articles.url', "articles.pageviews_all",
                 "articles.pageviews_signed_in", "articles.pageviews_subscribers", "articles.timespent_all",
                 "articles.timespent_signed_in", "articles.timespent_subscribers", 'avg_timespent_all',
@@ -48,17 +49,34 @@ class ArticlesDataTable
         // filtering query (used as subquery - joins were messing with counts and sums) to fetch matching conversions
         $conversionsFilter = \DB::table('conversions')
             ->distinct()
-            ->join('article_tag', 'conversions.article_id', '=', 'article_tag.article_id')
-            ->join('articles', 'articles.id', '=', 'article_tag.article_id');
+            ->join('articles', 'articles.id', '=', 'conversions.article_id');
 
+        if (isset($this->author)) {
+            $articles->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
+                ->where(['article_author.author_id' => $this->author->id]);
+            $conversionsFilter->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
+                ->where(['article_author.author_id' => $this->author->id]);
+        }
+        if (isset($this->section)) {
+            $articles->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id')
+                ->where(['article_section.section_id' => $this->section->id]);
+            $conversionsFilter->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id')
+                ->where(['article_section.section_id' => $this->section->id]);
+        }
         if (isset($this->tag)) {
-            $articles->where(['article_tag.tag_id' => $this->tag->id]);
-            $conversionsFilter->where(['article_tag.tag_id' => $this->tag->id]);
+            $articles->leftJoin('article_tag as at1', 'articles.id', '=', 'at1.article_id')
+                ->where(['at1.tag_id' => $this->tag->id]);
+            $conversionsFilter->leftJoin('article_tag as at1', 'articles.id', '=', 'at1.article_id')
+                ->where(['at1.tag_id' => $this->tag->id]);
         }
         if (isset($this->tagCategory)) {
-            $articles->whereIn('article_tag.tag_id', $this->tagCategory->tags()->pluck('tags.id'));
-            $conversionsFilter->whereIn('article_tag.tag_id', $this->tagCategory->tags()->pluck('tags.id'));
+            $tags = $this->tagCategory->tags()->pluck('tags.id');
+            $articles->leftJoin('article_tag as at2', 'articles.id', '=', 'at2.article_id')
+                ->whereIn('at2.tag_id', $tags);
+            $conversionsFilter->leftJoin('article_tag as at2', 'articles.id', '=', 'at2.article_id')
+                ->whereIn('at2.tag_id', $tags);
         }
+
         // adding conditions to queries based on request inputs
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'));
@@ -165,18 +183,23 @@ class ArticlesDataTable
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);
-                $filterQuery = \DB::table('sections')
-                    ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
-                    ->whereIn('article_section.author_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $filterQuery = \DB::table('article_section')
+                    ->whereIn('article_section.section_id', $values);
+                $articleIds = $filterQuery->pluck('article_section.article_id')->toArray();
                 $query->whereIn('articles.id', $articleIds);
             })
             ->filterColumn('authors[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);
-                $filterQuery = \DB::table('authors')
-                    ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
+                $filterQuery = \DB::table('article_author')
                     ->whereIn('article_author.author_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
+                $articleIds = $filterQuery->pluck('article_author.article_id')->toArray();
+                $query->whereIn('articles.id', $articleIds);
+            })
+            ->filterColumn('tags[, ].name', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $filterQuery = \DB::table('article_tag')
+                    ->whereIn('article_tag.tag_id', $values);
+                $articleIds = $filterQuery->pluck('article_tag.article_id')->toArray();
                 $query->whereIn('articles.id', $articleIds);
             })
             ->orderColumn('avg_sum', 'timespent_sum / pageviews_all $1')
@@ -186,6 +209,16 @@ class ArticlesDataTable
             ->orderColumn('conversions_sum', 'conversions_sum $1')
             ->orderColumn('conversions_avg', 'conversions_avg $1')
             ->make(true);
+    }
+
+    public function setAuthor(Author $author): void
+    {
+        $this->author = $author;
+    }
+
+    public function setSection(Section $section): void
+    {
+        $this->section = $section;
     }
 
     public function setTag(Tag $tag): void
