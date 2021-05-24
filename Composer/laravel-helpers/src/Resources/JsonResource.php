@@ -2,10 +2,10 @@
 
 namespace Remp\LaravelHelpers\Resources;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource as LaravelJsonResource;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class JsonResource extends Resource
+class JsonResource extends LaravelJsonResource
 {
     public function toArray($request)
     {
