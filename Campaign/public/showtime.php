@@ -290,7 +290,7 @@ JS;
 
 header('Content-Type: application/javascript');
 
-$dotenv = \Dotenv\Dotenv::create(__DIR__ . '/../');
+$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 $logger = new Logger('showtime');
