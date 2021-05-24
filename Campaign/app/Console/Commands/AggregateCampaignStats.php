@@ -84,5 +84,6 @@ class AggregateCampaignStats extends Command
         }
 
         $this->line(' <info>OK!</info>');
+        return 0;
     }
 }

@@ -62,7 +62,6 @@ class CampaignsRefreshCache extends Command
         }
 
         $this->line('Campaigns cache refreshed.');
-
-        return true;
+        return 0;
     }
 }
