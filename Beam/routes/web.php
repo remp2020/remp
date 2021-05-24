@@ -83,7 +83,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('articles/{article}/dtReferers', 'ArticleDetailsController@dtReferers')->name('articles.dtReferers');
 
     Route::resource('articles', 'ArticleController', [
-        'only' => ['store'],
+        'only' => ['index', 'store'],
     ]);
 
     Route::resource('articles', 'ArticleDetailsController', [

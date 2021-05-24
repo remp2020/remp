@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added `/api/articles` list articles info api endpoint. remp/remp#909
+
 ## [0.24.0] - 2021-05-21
 
 ### [Beam]

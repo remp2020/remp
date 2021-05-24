@@ -6,6 +6,7 @@ use App\Article;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Colors;
 use App\Helpers\Journal\JournalInterval;
+use App\Http\Requests\ArticlesListRequest;
 use App\Http\Resources\ArticleResource;
 use App\Model\ConversionSource;
 use App\Model\Snapshots\SnapshotHelpers;
@@ -347,6 +348,21 @@ class ArticleDetailsController extends Controller
         }
 
         return redirect()->route('articles.show', ['article' => $article->id]);
+    }
+
+    public function list(ArticlesListRequest $request)
+    {
+        $externalIds = $request->external_ids;
+        if (!empty($externalIds)) {
+            $articles = Article::whereIn('external_id', $externalIds)->get();
+        }
+
+        $ids = $request->ids;
+        if (!empty($ids)) {
+            $articles = Article::whereIn('id', $ids)->get();
+        }
+
+        return response()->json(['articles' => $articles]);
     }
 
     public function show(Request $request, Article $article = null)
