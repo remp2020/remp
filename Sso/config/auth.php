@@ -126,7 +126,7 @@ return [
     |   - value: Label of SSO provider used on login page.
     |
     */
-    
+
     'sso_providers' => [
         'google' => 'Google',
         // define additional providers in services.php and enable them here

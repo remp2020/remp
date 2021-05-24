@@ -33,7 +33,7 @@ php artisan db:seed
 
 #### Dependencies
 
-- PHP 7.1.3
+- PHP 7.4
 - MySQL 5.7
 - Redis 3.2
 
