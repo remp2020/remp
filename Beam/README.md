@@ -1207,6 +1207,82 @@ $response = file_get_contents("http://beam.remp.press/api/tags/top", false, $con
 ]
 ```
 
+---
+
+##### GET `/api/articles`
+
+Returns list of articles specified by ids or external ids.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Examples:*
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl -X GET \
+  http://beam.remp.press/api/articles?external_ids=123,231 \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/articles?external_ids=123,231", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+{
+  "data": [
+    {
+      "id": 123,
+      "external_id": "123",
+      "property_uuid": "a6c80469-464d-4118-830c-0448494ada86",
+      "title": "Test article title",
+      "url": "http:\/\/example.com\/test-article\/",
+      "content_type": "article",
+      "image_url": "http:\/\/example.com\/test-article\/image.jpg",
+      "published_at": "2021-04-13 09:26:10",
+      "pageviews_all": 7505,
+      "pageviews_signed_in": 4492,
+      "pageviews_subscribers": 4029,
+      "timespent_all": 900715,
+      "timespent_signed_in": 789643,
+      "timespent_subscribers": 758675,
+      "created_at": "2021-04-13 09:26:13",
+      "updated_at": "2021-04-14 06:27:13"
+    }
+  ]
+}
+```
+
 ### Scheduled events
 
 #### Laravel scheduler

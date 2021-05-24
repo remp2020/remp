@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 
 Route::middleware('auth:api')->group(function() {
     Route::apiResource('articles', 'ArticleController', [
-        'only' => ['store'],
+        'only' => ['index', 'store'],
     ]);
     Route::apiResource('conversions', 'ConversionController', [
         'only' => ['index', 'store']

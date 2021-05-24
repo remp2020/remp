@@ -7,6 +7,7 @@ use App\Author;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Misc;
 use App\Http\Requests\ArticleRequest;
+use App\Http\Requests\ArticlesListRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\ArticleUpsertRequestV2;
 use App\Http\Requests\TopArticlesSearchRequest;
@@ -53,14 +54,30 @@ class ArticleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(ArticlesListRequest $request)
     {
+        $articles = null;
+
+        $externalIds = $request->input('external_ids', []);
+        if (count($externalIds)) {
+            $articles = Article::whereIn('external_id', $externalIds)->get();
+        }
+
+        if (!$articles) {
+            $ids = $request->input('ids', []);
+            if (count($request->ids)) {
+                $articles = Article::whereIn('id', $ids)->get();
+            }
+        }
+
+        if (!$articles) {
+            $articles = Article::paginate();
+        }
+
+        $articleResource = new ArticleResource($articles);
         return response()->format([
-            'html' => view('articles.pageviews', [
-                'authors' => Author::all()->pluck('name', 'id'),
-                'sections' => Section::all()->pluck('name', 'id'),
-            ]),
-            'json' => ArticleResource::collection(Article::paginate()),
+            'html' => redirect()->route('articles.pageviews'),
+            'json' => $articleResource,
         ]);
     }
 
