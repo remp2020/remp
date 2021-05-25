@@ -11,6 +11,8 @@ class UserSubscriptionsRepository extends Repository
 {
     protected $tableName = 'mail_user_subscriptions';
 
+    protected $dataTableSearchable = ['user_email'];
+
     private $userSubscriptionVariantsRepository;
 
     public function __construct(
@@ -148,7 +150,7 @@ class UserSubscriptionsRepository extends Repository
                 'subscribed' => false,
                 'updated_at' => new DateTime(),
             ] + $rtmParams);
-        
+
         $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
     }
 
@@ -187,5 +189,30 @@ class UserSubscriptionsRepository extends Repository
             ->where('updated_at != created_at')
             ->group('label_date')
             ->order('label_date DESC');
+    }
+
+    public function tableFilter(string $query, string $order, string $orderDirection, int $listId, ?int $limit = null, ?int $offset = null): Selection
+    {
+        $selection = $this->getTable()
+            ->where([
+                'mail_type_id' => $listId,
+                'subscribed' => true
+            ])
+            ->order($order . ' ' . strtoupper($orderDirection));
+
+        if (!empty($query)) {
+            $where = [];
+            foreach ($this->dataTableSearchable as $col) {
+                $where[$col . ' LIKE ?'] = '%' . $query . '%';
+            }
+
+            $selection->whereOr($where);
+        }
+
+        if ($limit !== null) {
+            $selection->limit($limit, $offset);
+        }
+
+        return $selection;
     }
 }

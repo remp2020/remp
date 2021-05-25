@@ -139,8 +139,15 @@
     <div class="col-md-12">
         <div role="tabpanel">
             <ul class="tab-nav" role="tablist">
-                <li class="active"><a href="#templates" aria-controls="templates" role="tab" data-toggle="tab" aria-expanded="true">Emails</a></li>
-                <li n:if="$hasVariantsTab"><a href="#variants" aria-controls="variants" role="tab" data-toggle="tab">Variants</a></li>
+                <li class="active"><a href="#templates" aria-controls="templates" role="tab" data-toggle="tab" aria-expanded="true">
+                    <i class="zmdi zmdi-email"></i> Emails
+                </a></li>
+                <li n:if="$hasVariantsTab"><a href="#variants" aria-controls="variants" role="tab" data-toggle="tab">
+                    <i class="zmdi zmdi zmdi-arrow-split"></i> Variants
+                </a></li>
+                <li><a href="#subscribers" aria-controls="subscribers" role="tab" data-toggle="tab">
+                    <i class="zmdi zmdi zmdi-accounts-list-alt"></i> Subscribers</a>
+                </li>
             </ul>
 
             <div class="tab-content">
@@ -153,6 +160,13 @@
                 </div>
                 <div n:if="$hasVariantsTab" role="tabpanel" class="tab-pane" id="variants">
                     {control dataTableVariants}
+                </div>
+                <div role="tabpanel" class="tab-pane" id="subscribers">
+                    <div class="card">
+                        <div class="card-body">
+                            {control dataTableSubscriberEmails}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
