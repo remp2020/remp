@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7d0fd2f8173dfede853f2857a17a0d37",
+    "content-hash": "3706839f80acaa675ffba29a3941ce49",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -8576,16 +8576,16 @@
         },
         {
             "name": "tightenco/ziggy",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tighten/ziggy.git",
-                "reference": "ac0833645f25b51acf9e3d523d6bf8633938f9c5"
+                "reference": "147804d5f3e98b897fc1ed15efc2807f1099cf83"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tighten/ziggy/zipball/ac0833645f25b51acf9e3d523d6bf8633938f9c5",
-                "reference": "ac0833645f25b51acf9e3d523d6bf8633938f9c5",
+                "url": "https://api.github.com/repos/tighten/ziggy/zipball/147804d5f3e98b897fc1ed15efc2807f1099cf83",
+                "reference": "147804d5f3e98b897fc1ed15efc2807f1099cf83",
                 "shasum": ""
             },
             "require": {
@@ -8636,9 +8636,9 @@
             ],
             "support": {
                 "issues": "https://github.com/tighten/ziggy/issues",
-                "source": "https://github.com/tighten/ziggy/tree/v1.1.0"
+                "source": "https://github.com/tighten/ziggy/tree/v1.2.0"
             },
-            "time": "2021-04-02T17:17:05+00:00"
+            "time": "2021-05-24T22:46:59+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",

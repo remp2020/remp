@@ -27,6 +27,7 @@
         "doctrine/dbal": "^2.13",
         "fico7489/laravel-pivot": "^3.0",
         "fideloper/proxy": "^4.4",
+        "fruitcake/laravel-cors": "^2.0",
         "fzaninotto/faker": "~1.4",
         "geoip2/geoip2": "~2.0",
         "guzzlehttp/guzzle": "^6.3.1|^7.0.1",
@@ -47,10 +48,9 @@
         "sentry/sentry-laravel": "^2.5",
         "spatie/laravel-searchable": "^1.9",
         "symfony/psr-http-message-bridge": "^1.0",
-        "tightenco/ziggy": "^1.1",
+        "tightenco/ziggy": "^1.2",
         "ukfast/laravel-health-check": "^1.5",
-        "yajra/laravel-datatables-oracle": "^9.18",
-        "fruitcake/laravel-cors": "^2.0"
+        "yajra/laravel-datatables-oracle": "^9.18"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",
