@@ -616,4 +616,52 @@ final class ListPresenter extends BasePresenter
         $this->redrawControl('relativeGraph');
         $this->redrawControl('unsubscribedGraph');
     }
+
+    public function createComponentDataTableSubscriberEmails(): DataTable
+    {
+        $dataTable = $this->dataTableFactory->create();
+        $dataTable
+            ->setSourceUrl($this->link('subscriberEmailsJsonData'))
+            ->setColSetting('user_email', [
+                'header' => 'user email',
+                'priority' => 1,
+            ])
+            ->setColSetting('updated_at', [
+                'header' => 'subscribed at',
+                'render' => 'date',
+                'priority' => 1,
+            ])
+            ->setTableSetting('add-params', Json::encode(['listId' => $this->getParameter('id')]))
+            ->setTableSetting('order', Json::encode([[1, 'DESC']]));
+
+        return $dataTable;
+    }
+
+    public function renderSubscriberEmailsJsonData(): void
+    {
+        $request = $this->request->getParameters();
+
+        $subscriberEmailsCount = $this->userSubscriptionsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['listId'])
+            ->count('*');
+
+        $subscriberEmails = $this->userSubscriptionsRepository
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['listId'], (int)$request['length'], (int)$request['start'])
+            ->fetchAll();
+
+        $result = [
+            'recordsTotal' => $subscriberEmailsCount,
+            'recordsFiltered' => $subscriberEmailsCount,
+            'data' => []
+        ];
+
+        /** @var ActiveRow $subscriberEmail */
+        foreach ($subscriberEmails as $subscriberEmail) {
+            $result['data'][] = [
+                $subscriberEmail->user_email,
+                $subscriberEmail->updated_at,
+            ];
+        }
+        $this->presenter->sendJson($result);
+    }
 }
