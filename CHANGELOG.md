@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Changed calculation of subscriber values for newsletter list dashboard and detail charts. Instead of the latest value of each day, max value of the day is now used. This significantly improved the dashboard performance. remp/remp#928
+- Added newsletter subscribers list into the newsletter detail section. remp/remp#873
 
 ### [Sso]
 
