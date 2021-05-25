@@ -48,7 +48,7 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         "urlPatterns": {!! @json($campaign->url_patterns) !!},
         "refererFilter": {!! @json($campaign->referer_filter) !!},
         "refererPatterns": {!! @json($campaign->referer_patterns) !!},
-        "statsLink": '{!! route('campaigns.stats', $campaign) !!}',
+        "statsLink": '{!! $campaign->id ? route('campaigns.stats', $campaign) : null !!}',
 
         "banners": {!! $banners->toJson(JSON_UNESCAPED_UNICODE) !!},
         "availableSegments": {!! $segments->toJson(JSON_UNESCAPED_UNICODE) !!},
