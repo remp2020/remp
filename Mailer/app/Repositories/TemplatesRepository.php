@@ -10,7 +10,8 @@ class TemplatesRepository extends Repository
 {
     protected $tableName = 'mail_templates';
 
-    protected $dataTableSearchable = ['name', 'code', 'description', 'subject', 'mail_body_text', 'mail_body_html'];
+    protected $dataTableSearchable = ['name', 'code', 'description', 'subject'];
+    protected $dataTableSearchableFullText = ['mail_body_html'];
 
     public function all(): Selection
     {
@@ -142,6 +143,9 @@ class TemplatesRepository extends Repository
                 $where[$col . ' LIKE ?'] = '%' . $query . '%';
             }
 
+            foreach ($this->dataTableSearchableFullText as $col) {
+                $where['MATCH('.$col . ') AGAINST(? IN BOOLEAN MODE)'] = '+' . $query . '*';
+            }
             $selection->whereOr($where);
         }
 
