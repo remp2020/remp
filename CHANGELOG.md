@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- **BREAKING**: Upgraded to Laravel 7. remp/remp#491
+  - All API endpoints now return dates in ISO-8601 compatible format. Make sure all code consuming the Beam API is accustomed to this change. For example, previously, date would serialized like the following: `2019-12-02 20:01:00`. Now it is serialized like `2019-12-02T20:01:00.283041Z` (always in UTC).
+  - Environment variable `APP_SESSION_EXPIRATION` was renamed to `SESSION_LIFETIME`.
 - Added `/api/articles` list articles info api endpoint. remp/remp#909
 
 ### [Campaign]

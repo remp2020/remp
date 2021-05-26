@@ -34,4 +34,18 @@ class Misc
         }
         return $c;
     }
+
+    /**
+     * Convert any Carbon parseable date to format that can be safely used in SQL (with correct time zone)
+     * TODO: this can be removed after update to Laravel 8 and getting rid of upsert, see Article#upsert method
+     * @param $date
+     *
+     * @return string
+     */
+    public static function dateToSql($date): string
+    {
+        return Carbon::parse($date)
+            ->tz(date_default_timezone_get())
+            ->toDateTimeString();
+    }
 }

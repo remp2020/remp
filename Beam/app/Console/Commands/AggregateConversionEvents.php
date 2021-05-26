@@ -49,12 +49,12 @@ class AggregateConversionEvents extends Command
             $conversion = Conversion::find($conversionId);
             if (!$conversion) {
                 $this->error("Conversion with ID $conversionId not found.");
-                return;
+                return 1;
             }
 
             if ($conversion->events_aggregated) {
                 $this->info("Conversion with ID $conversionId already aggregated.");
-                return;
+                return 2;
             }
 
             $this->aggregateConversion($conversion, $days);
@@ -65,6 +65,7 @@ class AggregateConversionEvents extends Command
         }
 
         $this->line(' <info>Done!</info>');
+        return 0;
     }
 
     protected function getBrowsersForUser(Conversion $conversion, $category, $action = null)

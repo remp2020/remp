@@ -47,7 +47,7 @@ class SendNewslettersCommand extends Command
 
         if ($newsletters->count() === 0) {
             $this->info("No newsletters to process");
-            return;
+            return 0;
         }
 
         foreach ($newsletters as $newsletter) {
@@ -77,6 +77,9 @@ class SendNewslettersCommand extends Command
 
             $newsletter->save();
         }
+
+        $this->line(' <info>Done!</info>');
+        return 0;
     }
 
     private function retrieveNextSending($newsletter)

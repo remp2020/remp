@@ -40,6 +40,7 @@ class CompressSnapshots extends Command
         $this->compress($now);
 
         $this->line(' <info>OK!</info>');
+        return 0;
     }
 
     private function compress(Carbon $now)

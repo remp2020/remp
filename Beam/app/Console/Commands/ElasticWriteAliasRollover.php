@@ -19,17 +19,17 @@ class ElasticWriteAliasRollover extends Command
     {
         if (!$this->input->getOption('host')) {
             $this->line('<error>ERROR</error> You need to provide <info>--host</info> option with address to your Elastic instance (e.g. <info>--host=http://localhost:9200</info>)');
-            return;
+            return 1;
         }
         if (!$this->input->getOption('write-alias')) {
             $this->line('<error>ERROR</error> You need to provide <info>--write-alias</info> option with name of the write alias you use (e.g. <info>--write-alias=pageviews_write</info>)');
-            return;
+            return 1;
         }
         if (!$this->input->getOption('read-alias')) {
             $this->line('<error>ERROR</error> You need to provide <info>--read-alias</info> option with name of the read alias you use (e.g. <info>--read-alias=pageviews</info>)');
-            return;
+            return 1;
         }
-        
+
         $client = new Client([
             'base_uri' => $this->input->getOption('host'),
         ]);
@@ -46,7 +46,7 @@ class ElasticWriteAliasRollover extends Command
             $auth = $this->input->getOption('auth');
             if (!Str::contains($auth, ':')) {
                 $this->line("<error>ERROR</error> You need to provide <info>--auth</info> option with a name and a password (to Elastic instance) separated by ':', e.g. admin:password");
-                return;
+                return 1;
             }
 
             [$user, $pass] = explode(':', $auth, 2);
@@ -69,14 +69,14 @@ class ElasticWriteAliasRollover extends Command
         } catch (ClientException $e) {
             $body = json_decode($e->getResponse()->getBody());
             dump($body);
-            return;
+            return 2;
         }
 
 
         $body = json_decode($response->getBody(), true);
         if (!$body['rolled_over']) {
             $this->line('  * Condition not matched, done.');
-            return;
+            return 3;
         }
 
         $this->line(sprintf(
@@ -100,9 +100,10 @@ class ElasticWriteAliasRollover extends Command
         } catch (ClientException $e) {
             $body = json_decode($e->getResponse()->getBody());
             dump($body);
-            return;
+            return 4;
         }
 
         $this->line('  * Alias created, done.');
+        return 0;
     }
 }

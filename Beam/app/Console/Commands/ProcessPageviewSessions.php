@@ -28,7 +28,7 @@ class ProcessPageviewSessions extends Command
         $request = new ListRequest('pageviews');
 
         $now = $this->hasOption('now') ? Carbon::parse($this->option('now')) : Carbon::now();
-        $timeBefore = $now->minute(0)->second(0);
+        $timeBefore = $now->minute(0)->second(0)->microsecond(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
         // select first pageview of each session
@@ -159,6 +159,9 @@ class ProcessPageviewSessions extends Command
             $this->line('');
             unset($refererConditionsAndCounts);
         }
+
+        $this->line(' <info>Done!</info>');
+        return 0;
     }
 
     private function increment($aggregate, $data)

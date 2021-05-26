@@ -26,7 +26,7 @@ class CompressAggregations extends Command
 
         if ($sub < 0) {
             $this->info("Negative threshold given ($sub), not compressing data.");
-            return;
+            return 0;
         }
 
         $this->line('');
@@ -49,6 +49,7 @@ class CompressAggregations extends Command
         $this->aggregate(SessionDevice::class, $threshold);
 
         $this->line(' <info>OK!</info>');
+        return 0;
     }
 
     public function aggregate($modelClass, Carbon $threshold)

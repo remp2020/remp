@@ -21,7 +21,7 @@ class ProcessPageviewLoyalVisitors extends Command
 
         if (!$days) {
             $this->line("No days to process, exiting.");
-            return;
+            return 0;
         }
 
         $bar = $this->output->createProgressBar($days);
@@ -87,13 +87,13 @@ class ProcessPageviewLoyalVisitors extends Command
 
         if ($treshold <= 1) {
             $this->line("No segment will be created, treshold would be too low");
-            return;
+            return 1;
         }
 
         $segmentCode = "{$treshold}-plus-article-views-in-{$days}-days";
         if (\App\Segment::where(['code' => $segmentCode])->exists()) {
             $this->line("Segment <info>{$segmentCode}</info> already exists, no new segment was created");
-            return;
+            return 2;
         }
 
         $segment = Segment::create([
@@ -113,5 +113,6 @@ class ProcessPageviewLoyalVisitors extends Command
         ]);
 
         $this->line("Segment <info>{$segmentCode}</info> was created, you can use it to target your loyal audience");
+        return 0;
     }
 }

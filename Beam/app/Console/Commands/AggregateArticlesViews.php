@@ -74,6 +74,7 @@ class AggregateArticlesViews extends Command
         }
 
         $this->line(' <info>OK!</info>');
+        return 0;
     }
 
     private function aggregateDay(Carbon $startDate)

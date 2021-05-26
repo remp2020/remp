@@ -43,6 +43,7 @@ class SnapshotArticlesViews extends Command
         $this->snapshot($thisMinute);
 
         $this->line(' <info>OK!</info>');
+        return 0;
     }
 
     private function snapshot(Carbon $now)
@@ -54,7 +55,7 @@ class SnapshotArticlesViews extends Command
         }, $to);
 
         $items = [];
-        $dbTime = $to->second(0);
+        $dbTime = $to->second(0)->microsecond(0);
 
         foreach ($records as $record) {
             $token = $record->tags->token;
