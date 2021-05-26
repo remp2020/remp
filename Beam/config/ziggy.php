@@ -2,7 +2,7 @@
 
 return [
     // Filter laravel paths that are passed to JS via Ziggy library
-    'whitelist' => [
+    'only' => [
         'properties.switch',
         'settings.index',
         'authorSegments.testingConfiguration'

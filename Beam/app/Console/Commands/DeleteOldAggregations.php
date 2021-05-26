@@ -22,7 +22,7 @@ class DeleteOldAggregations extends Command
 
         if ($sub < 0) {
             $this->info("Negative number of days ($sub), not deleting data.");
-            return;
+            return 0;
         }
 
         $this->line('');
@@ -35,6 +35,7 @@ class DeleteOldAggregations extends Command
         $this->deleteConversionEventsData($threshold);
 
         $this->line(' <info>OK!</info>');
+        return 0;
     }
 
 

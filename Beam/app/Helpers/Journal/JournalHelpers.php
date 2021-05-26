@@ -28,7 +28,7 @@ class JournalHelpers
     {
         $timeBefore = $now;
         if ($timeBefore === null) {
-            $timeBefore = Carbon::now();
+            $timeBefore = Carbon::now()->microsecond(0);
         }
 
         $timeAfter = (clone $timeBefore)->subSeconds(600); // Last 10 minutes

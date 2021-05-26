@@ -20,15 +20,15 @@ class ElasticDataRetention extends Command
     {
         if (!$this->input->getOption('host')) {
             $this->line('<error>ERROR</error> You need to provide <info>--host</info> option with address to your Elastic instance (e.g. <info>--host=http://localhost:9200</info>)');
-            return;
+            return 1;
         }
         if (!$this->input->getOption('match-index')) {
             $this->line('<error>ERROR</error> You need to provide <info>--match-index</info> option with name of the index you want to cleanup (e.g. <info>--write-alias=pageviews_write</info>)');
-            return;
+            return 1;
         }
         if (!$this->input->getOption('date')) {
             $this->line('<error>ERROR</error> You need to provide <info>--date</info> option with date that will be searched within index name (e.g. <info>--date="90 days ago"</info>)');
-            return;
+            return 1;
         }
 
         $date = new Carbon($this->input->getOption('date'));
@@ -53,7 +53,7 @@ class ElasticDataRetention extends Command
             $auth = $this->input->getOption('auth');
             if (!Str::contains($auth, ':')) {
                 $this->line("<error>ERROR</error> You need to provide <info>--auth</info> option with a name and a password (to Elastic instance) separated by ':', e.g. admin:password");
-                return;
+                return 1;
             }
 
             [$user, $pass] = explode(':', $auth, 2);
@@ -68,9 +68,10 @@ class ElasticDataRetention extends Command
         } catch (ClientException $e) {
             $body = json_decode($e->getResponse()->getBody());
             dump($body);
-            return;
+            return 2;
         }
 
         $this->line('  * Done.');
+        return 0;
     }
 }

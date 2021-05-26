@@ -25,7 +25,7 @@ class AggregatePageviewTimespentJob extends Command
         $articleId = $this->option('article_id') ?? null;
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
 
-        $timeBefore = $now->minute(0)->second(0);
+        $timeBefore = $now->minute(0)->second(0)->microsecond(0);
         $timeAfter = (clone $timeBefore)->subHour();
 
         $this->line(sprintf("Fetching aggregated timespent data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
@@ -41,7 +41,7 @@ class AggregatePageviewTimespentJob extends Command
 
         if (count($records) === 1 && !isset($records[0]->tags->article_id)) {
             $this->line("No articles to process, exiting.");
-            return;
+            return 0;
         }
 
         /** @var ProgressBar $bar */
@@ -81,7 +81,7 @@ class AggregatePageviewTimespentJob extends Command
 
         if (count($all) === 0) {
             $this->line("No data to store for articles, exiting.");
-            return;
+            return 0;
         }
 
         $externalIdsChunks =  array_chunk(array_keys($all), 200);
@@ -122,5 +122,6 @@ class AggregatePageviewTimespentJob extends Command
         }
         $bar->finish();
         $this->line(' <info>OK!</info>');
+        return 0;
     }
 }

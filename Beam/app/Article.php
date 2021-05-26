@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Helpers\Journal\JournalHelpers;
+use App\Helpers\Misc;
 use App\Model\ArticleTitle;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\ConversionSource;
@@ -352,8 +353,13 @@ SQL;
         return $query;
     }
 
+
     /**
      * Update or create record in case it doesn't exist.
+     *
+     * @param array $values
+     *
+     * @return Article
      */
     public static function upsert(array $values): Article
     {
@@ -362,6 +368,10 @@ SQL;
         $updateKeys[] = 'updated_at';
         // Timestamp values are not inserted automatically
         $attributes['updated_at'] = $attributes['created_at'] = Carbon::now()->toDateTimeString();
+        if (isset($attributes['published_at'])) {
+            $attributes['published_at'] = Misc::dateToSql($attributes['published_at']);
+        }
+
         static::insertOnDuplicateKey($attributes, $updateKeys);
 
         return static::where('external_id', $values['external_id'])->first();
