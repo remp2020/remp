@@ -20,7 +20,7 @@ final class AddCodeColumnToMailLayoutsTable extends AbstractMigration
             $code = $layoutId . '_' . \Nette\Utils\Strings::webalize($layout['name']);
 
             $this->execute("
-                UPDATE mail_layouts SET 'code' = {$code} WHERE id = {$layoutId}
+                UPDATE mail_layouts SET code = '{$code}' WHERE id = {$layoutId}
             ");
         }
 
