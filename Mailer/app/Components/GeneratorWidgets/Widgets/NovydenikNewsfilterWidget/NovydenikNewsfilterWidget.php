@@ -9,13 +9,12 @@ use Nette\Http\Session;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\IGeneratorWidget;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
-use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 use Remp\MailerModule\Forms\NovydenikNewsfilterTemplateFormFactory;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Models\DataRow;
 use Remp\MailerModule\Presenters\MailGeneratorPresenter;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
-use Remp\MailerModule\Repositories\TemplatesRepository;
 
 class NovydenikNewsfilterWidget extends BaseControl implements IGeneratorWidget
 {
@@ -31,18 +30,22 @@ class NovydenikNewsfilterWidget extends BaseControl implements IGeneratorWidget
 
     private $newsfilterTemplateFormFactory;
 
+    private $generatorInputFactory;
+
     public function __construct(
         Session $session,
         LayoutsRepository $layoutsRepository,
         ListsRepository $listsRepository,
         ContentGenerator $contentGenerator,
-        NovydenikNewsfilterTemplateFormFactory $newsfilterTemplateFormFactory
+        NovydenikNewsfilterTemplateFormFactory $newsfilterTemplateFormFactory,
+        GeneratorInputFactory $generatorInputFactory
     ) {
         $this->layoutsRepository = $layoutsRepository;
         $this->session = $session;
         $this->listsRepository = $listsRepository;
         $this->contentGenerator = $contentGenerator;
         $this->newsfilterTemplateFormFactory = $newsfilterTemplateFormFactory;
+        $this->generatorInputFactory = $generatorInputFactory;
     }
 
     public function identifier(): string
@@ -104,7 +107,7 @@ class NovydenikNewsfilterWidget extends BaseControl implements IGeneratorWidget
                 'mail_type' => $mailType
             ]);
 
-            return $this->contentGenerator->render(new GeneratorInput($mailTemplate));
+            return $this->contentGenerator->render($this->generatorInputFactory->create($mailTemplate));
         };
 
         $mailContent = $generate($htmlContent, $textContent, $mailLayout, $mailType);

@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\ContentGenerator\Replace;
 
+use Nette\DI\Container;
 use PHPUnit\Framework\TestCase;
-use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace;
 use Remp\MailerModule\Models\DataRow;
 
@@ -17,6 +18,9 @@ class RtmReplaceTest extends TestCase
 
     public function setUp(): void
     {
+        /** @var Container $container */
+        $container = $GLOBALS['container'];
+
         $this->rtmReplace = new AnchorRtmReplace();
 
         $mailType = new DataRow([
@@ -45,7 +49,8 @@ class RtmReplaceTest extends TestCase
             'mail_type' => $mailType
         ]);
 
-        $this->generatorInput = new GeneratorInput($mailTemplate);
+        $generatorInputFactory = $container->getByType(GeneratorInputFactory::class);
+        $this->generatorInput = $generatorInputFactory->create($mailTemplate);
     }
 
     public function testAddUtmParametersWhenTheUrlDoesNotContainAnyRtm()

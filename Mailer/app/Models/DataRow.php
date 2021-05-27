@@ -4,12 +4,10 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Models;
 
 use Exception;
-use IteratorAggregate;
-use ArrayIterator;
-use Nette\Database\Table\IRow;
+use Nette\Database\Row;
 use Nette\Database\Table\Selection;
 
-class DataRow implements IteratorAggregate, IRow
+class DataRow extends Row
 {
     private $data;
 
@@ -23,37 +21,37 @@ class DataRow implements IteratorAggregate, IRow
         throw new Exception('Not supported');
     }
 
-    public function __isset(string $key): bool
+    public function __isset($key): bool
     {
         return isset($this->data[$key]);
     }
 
-    public function &__get(string $key)
+    public function &__get($key)
     {
         return $this->data[$key];
     }
 
-    public function getIterator(): ArrayIterator
+    public function getIterator(): \RecursiveArrayIterator
     {
-        return new ArrayIterator($this->data);
+        return new \RecursiveArrayIterator($this->data);
     }
 
-    public function offsetExists($offset)
-    {
-        throw new Exception('Not supported');
-    }
-
-    public function offsetGet($offset)
+    public function offsetExists($key): bool
     {
         throw new Exception('Not supported');
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetGet($key): bool
     {
         throw new Exception('Not supported');
     }
 
-    public function offsetUnset($offset)
+    public function offsetSet($key, $value): void
+    {
+        throw new Exception('Not supported');
+    }
+
+    public function offsetUnset($key): void
     {
         throw new Exception('Not supported');
     }
