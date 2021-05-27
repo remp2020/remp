@@ -27,6 +27,7 @@ class LayoutFormFactory implements IFormFactory
 
     public function create(?int $id = null): Form
     {
+        $layout = null;
         $defaults = [];
         if ($id !== null) {
             $layout = $this->layoutsRepository->find($id);
@@ -40,6 +41,19 @@ class LayoutFormFactory implements IFormFactory
 
         $form->addText('name', 'Name')
             ->setRequired("Field 'Name' is required.");
+
+        $codeInput = $form->addText('code', 'Code')
+            ->setRequired("Field 'Code' is required.")
+            ->addRule(function ($input) {
+                $exists = $this->layoutsRepository->getTable()
+                    ->where('code = ?', $input->value)
+                    ->count('*');
+                return !$exists;
+            }, "Layout code must be unique. Code '%value' is already used.");
+
+        if ($layout !== null) {
+            $codeInput->setDisabled(true);
+        }
 
         $form->addTextArea('layout_text', 'Text version')
             ->setHtmlAttribute('rows', 3);
@@ -78,7 +92,12 @@ class LayoutFormFactory implements IFormFactory
             $this->layoutsRepository->update($row, (array) $values);
             ($this->onUpdate)($row, $buttonSubmitted);
         } else {
-            $row = $this->layoutsRepository->add($values['name'], $values['layout_text'], $values['layout_html']);
+            $row = $this->layoutsRepository->add(
+                $values['name'],
+                $values['code'],
+                $values['layout_text'],
+                $values['layout_html']
+            );
             ($this->onCreate)($row, $buttonSubmitted);
         }
     }

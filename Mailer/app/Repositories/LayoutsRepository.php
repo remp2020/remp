@@ -9,17 +9,18 @@ class LayoutsRepository extends Repository
 {
     protected $tableName = 'mail_layouts';
 
-    protected $dataTableSearchable = ['name', 'layout_text', 'layout_html'];
+    protected $dataTableSearchable = ['name', 'code', 'layout_text', 'layout_html'];
 
     public function all(): Selection
     {
         return $this->getTable()->order('name ASC');
     }
 
-    public function add(string $name, string $layoutText, string $layoutHtml): ActiveRow
+    public function add(string $name, string $code, string $layoutText, string $layoutHtml): ActiveRow
     {
         $result = $this->insert([
             'name' => $name,
+            'code' => $code,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
             'layout_html' => $layoutHtml,
