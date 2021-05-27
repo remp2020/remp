@@ -35,6 +35,10 @@ final class GeneratorPresenter extends BasePresenter
     {
         $dataTable = $this->dataTableFactory->create();
         $dataTable
+            ->setColSetting('sorting', [
+                'header' => '#',
+                'priority' => 1,
+            ])
             ->setColSetting('created_at', [
                 'header' => 'created at',
                 'render' => 'date',
@@ -51,7 +55,7 @@ final class GeneratorPresenter extends BasePresenter
             ])
             ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit generator')
             ->setRowAction('generate', 'palette-Cyan zmdi-spellcheck', 'Generate emails')
-            ->setTableSetting('sorting', Json::encode([[0, 'DESC']]));
+            ->setTableSetting('sorting', Json::encode([[0, 'ASC']]));
 
         return $dataTable;
     }
@@ -75,7 +79,8 @@ final class GeneratorPresenter extends BasePresenter
         ];
 
         /** @var ActiveRow $sourceTemplate */
-        foreach ($sourceTemplates as $sourceTemplate) {
+        $idx = 1;
+        foreach ($sourceTemplates as $i => $sourceTemplate) {
             $editUrl = $this->link('Edit', $sourceTemplate->id);
             $generateUrl = $this->link('Generate', $sourceTemplate->id);
             $result['data'][] = [
@@ -83,6 +88,7 @@ final class GeneratorPresenter extends BasePresenter
                     'edit' => $editUrl,
                     'generate' => $generateUrl,
                 ],
+                (int)$request['start'] + $idx++ . '.',
                 $sourceTemplate->created_at,
                 "<a href='{$editUrl}'>{$sourceTemplate->title}</a>",
                 "<code>{$sourceTemplate->code}</code>",
@@ -119,5 +125,14 @@ final class GeneratorPresenter extends BasePresenter
             $this->redirectBasedOnButtonSubmitted($buttonSubmitted, $mailSourceTemplate->id);
         };
         return $form;
+    }
+
+    public function handleRenderSorting($sorting): void
+    {
+        // set sorting value
+        $this['mailSourceTemplateForm']['sorting']->setValue($sorting);
+
+        $this->redrawControl('wrapper');
+        $this->redrawControl('sortingAfterSnippet');
     }
 }

@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added newsletter subscribers list into the newsletter detail section. remp/remp#873
 - Changed email filter to use fulltext search for `mail_body_html`. remp/remp#595
   - **WARNING**: The migration adding the fulltext index to speed up the search can take longer than usual. Testing migration lasted ~5 minutes for 1GB of `mail_templates` MySQL table data (~100K rows). The table is locked for writes during the migration and Mailer will not be able to create/update emails during the migration period. Please release this version in less exposed time.
+ - Added sorting inputs to mail source template form and use ascending sorting. remp/remp#918
 
 ### [Sso]
 

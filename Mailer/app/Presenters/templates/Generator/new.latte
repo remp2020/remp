@@ -10,6 +10,8 @@
         <h2 n:block="title">Add new generator template <small></small></h2>
     </div>
     <div class="card-body card-padding">
-        {include '@form.latte'}
+        {snippetArea wrapper}
+            {include '@form.latte'}
+        {/snippetArea}
     </div>
 </div>

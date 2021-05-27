@@ -29,6 +29,7 @@ class SourceTemplateFormFactory implements IFormFactory
 
     public function create(?int $id = null): Form
     {
+        $mailTemplate = null;
         $defaults = [];
         if ($id !== null) {
             $mailTemplate = $this->mailSourceTemplateRepository->find($id);
@@ -49,6 +50,41 @@ class SourceTemplateFormFactory implements IFormFactory
         $items = $this->mailGeneratorFactory->pairs();
         $form->addSelect('generator', 'Generator', $items)
             ->setRequired("Field 'Generator' is required.");
+
+        $orderOptions = [
+            'begin' => 'At the beginning',
+            'end' => 'At the end',
+        ];
+        $sortingPairs = $this->mailSourceTemplateRepository->getSortingPairs();
+        if (count($sortingPairs) > 0) {
+            $orderOptions['after'] = 'After';
+        }
+
+        $form->addRadioList('sorting', 'Order', $orderOptions)->setRequired("Field 'Order' is required.");
+
+        if ($mailTemplate !== null) {
+            $keys = array_keys($sortingPairs);
+            if (reset($keys) === $mailTemplate->sorting) {
+                $defaults['sorting'] = 'begin';
+                unset($defaults['sorting_after']);
+            } elseif (end($keys) === $mailTemplate->sorting) {
+                $defaults['sorting'] = 'end';
+                unset($defaults['sorting_after']);
+            } else {
+                $defaults['sorting'] = 'after';
+                foreach ($sortingPairs as $sorting => $_) {
+                    if ($mailTemplate->sorting <= $sorting) {
+                        break;
+                    }
+                    $defaults['sorting_after'] = $sorting;
+                }
+            }
+
+            unset($sortingPairs[$mailTemplate->sorting]);
+        }
+
+        $form->addSelect('sorting_after', null, $sortingPairs)
+            ->setPrompt('Choose newsletter list');
 
         $form->addTextArea('content_text', 'Text')
             ->setHtmlAttribute('rows', 20)
@@ -86,26 +122,69 @@ class SourceTemplateFormFactory implements IFormFactory
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
         }
 
-        if (!empty($values['id'])) {
-            $id = $values['id'];
-            unset($values['id']);
+        $template = null;
+        if (isset($values['id'])) {
+            $template = $this->mailSourceTemplateRepository->find($values['id']);
+        }
 
-            $row = $this->mailSourceTemplateRepository->find($id);
-            $this->mailSourceTemplateRepository->update($row, (array) $values);
-            $this->onUpdate->__invoke($form, $row, $buttonSubmitted);
+        $templatesSortingPairs = $this->mailSourceTemplateRepository->getSortingPairs();
+
+
+        switch ($values['sorting']) {
+            case 'begin':
+                $first = reset($templatesSortingPairs);
+                $values['sorting'] = $first ? array_key_first($templatesSortingPairs) - 1 : 1;
+                break;
+
+            case 'after':
+                // fix missing form value because of dynamically loading select options
+                // in ListPresenter->handleRenderSorting
+                if ($values['sorting_after'] === null) {
+                    $formHttpData = $form->getHttpData();
+
+                    // + add validation
+                    if (empty($formHttpData['sorting_after'])) {
+                        $form->addError("Field 'Order' is required.");
+                        return;
+                    }
+                    $values['sorting_after'] = $formHttpData['sorting_after'];
+                }
+
+                $values['sorting'] = $values['sorting_after'];
+
+                if (!$template || ($template && $template->sorting > $values['sorting_after'])
+                ) {
+                    $values['sorting'] += 1;
+                }
+                break;
+            default:
+            case 'end':
+                $last = end($templatesSortingPairs);
+                $values['sorting'] = $last ? array_key_last($templatesSortingPairs) + 1 : 1;
+                break;
+        }
+
+        $this->mailSourceTemplateRepository->updateSorting(
+            $values['sorting'],
+            $template->sorting ?? null
+        );
+
+        unset($values['sorting_after']);
+
+        if ($template) {
+            $this->mailSourceTemplateRepository->update($template, (array) $values);
+            $this->onUpdate->__invoke($form, $template, $buttonSubmitted);
         } else {
-            $template = $this->mailSourceTemplateRepository->findLast()->fetch();
-
-            $row = $this->mailSourceTemplateRepository->add(
+            $template = $this->mailSourceTemplateRepository->add(
                 $values['title'],
                 $values['code'],
                 $values['generator'],
                 $values['content_html'],
                 $values['content_text'],
-                $template ? $template->sorting + 100 : 100
+                $values['sorting']
             );
 
-            $this->onSave->__invoke($form, $row, $buttonSubmitted);
+            $this->onSave->__invoke($form, $template, $buttonSubmitted);
         }
     }
 }

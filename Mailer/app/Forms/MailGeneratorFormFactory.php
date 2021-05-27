@@ -35,26 +35,21 @@ class MailGeneratorFormFactory
         $keys = $this->mailGeneratorFactory->keys();
         $pairs = $this->sourceTemplatesRepository->getTable()
             ->where(['generator' => $keys])
+            ->order('sorting ASC')
             ->fetchPairs('id', 'title');
 
         $form->addSelect('source_template_id', 'Generator', $pairs)
             ->setRequired("Field 'Generator' is required.");
 
-        $generator = null;
-        $template = null;
-
         if ($sourceTemplateId) {
             $template = $this->sourceTemplatesRepository->find($sourceTemplateId);
             $generator = $template->generator;
         } else {
-            foreach ($keys as $key) {
-                $tmpl = $this->sourceTemplatesRepository->getTable()->where(['generator' => $key])->fetch();
-                if ($tmpl) {
-                    $template = $tmpl;
-                    $generator = $key;
-                    break;
-                }
-            }
+            $tmpl = $this->sourceTemplatesRepository->getTable()
+                ->order('sorting ASC')
+                ->fetch();
+            $template = $tmpl;
+            $generator = $tmpl->generator;
         }
 
         if ($generator && $template) {
