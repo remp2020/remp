@@ -36,6 +36,9 @@ final class LayoutPresenter extends BasePresenter
             ->setColSetting('name', [
                 'priority' => 1,
             ])
+            ->setColSetting('code', [
+                'priority' => 1,
+            ])
             ->setColSetting('created_at', [
                 'header' => 'created at',
                 'render' => 'date',
@@ -71,6 +74,7 @@ final class LayoutPresenter extends BasePresenter
                     'edit' => $editUrl,
                 ],
                 "<a href='{$editUrl}'>{$layout->name}</a>",
+                $layout->code,
                 $layout->created_at,
             ];
         }

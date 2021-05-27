@@ -152,7 +152,7 @@ SET FOREIGN_KEY_CHECKS=1;
 
     protected function createMailLayout()
     {
-        return $this->layoutsRepository->add('layout', '', '');
+        return $this->layoutsRepository->add('Layout', 'layout', '', '');
     }
 
     protected function createMailTypeWithCategory(

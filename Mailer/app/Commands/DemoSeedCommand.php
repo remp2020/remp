@@ -202,7 +202,7 @@ class DemoSeedCommand extends Command
                 </body>
             </html>
             HTML;
-        $layout = $this->layoutsRepository->add('DEMO layout', $text, $html);
+        $layout = $this->layoutsRepository->add('DEMO layout', 'demo_layout', $text, $html);
 
         return $layout;
     }
