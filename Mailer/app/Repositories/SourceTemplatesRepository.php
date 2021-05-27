@@ -13,7 +13,7 @@ class SourceTemplatesRepository extends Repository
 
     public function all(): Selection
     {
-        return $this->getTable()->select('*')->order('sorting DESC');
+        return $this->getTable()->order('sorting ASC');
     }
 
     public function add(string $title, string $code, string $generator, string $html, string $text, int $sorting = 100): ActiveRow
@@ -59,5 +59,31 @@ class SourceTemplatesRepository extends Repository
         }
 
         return $selection;
+    }
+
+    public function getSortingPairs(): array
+    {
+        return $this->all()
+            ->fetchPairs('sorting', 'title');
+    }
+
+    public function updateSorting(int $newSorting, ?int $oldSorting = null): void
+    {
+        if ($newSorting === $oldSorting) {
+            return;
+        }
+
+        if ($oldSorting !== null) {
+            $this->getTable()
+                ->where(
+                    'sorting > ?',
+                    $oldSorting
+                )->update(['sorting-=' => 1]);
+        }
+
+        $this->getTable()->where(
+            'sorting >= ?',
+            $newSorting
+        )->update(['sorting+=' => 1]);
     }
 }

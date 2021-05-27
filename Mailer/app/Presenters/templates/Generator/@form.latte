@@ -24,6 +24,26 @@
             </div>
 
             <div class="form-group m-b-30">
+                Order
+                <div n:foreach="$form['sorting']->getItems() as $key => $label" class="radio m-b-15">
+                    {label sorting:$key}
+                        {input sorting:$key}
+                        <i class="input-helper"></i> {$label}
+                        {if $key == 'after'}
+                            {snippet sortingAfterSnippet}
+                                {var $form = $control['mailSourceTemplateForm']}
+                                {if $form['sorting']->getValue() === 'after'}
+                                    {input sorting_after, class => 'selectpicker sorting_after m-t-10'}
+                                {/if}
+                            {/snippet}
+                        {/if}
+                    {/label}
+                </div>
+            </div>
+
+            <div class="clearfix m-b-30"></div>
+
+            <div class="form-group m-b-30">
                 {label content_html /}
                 {input content_html, class => 'form-control html-editor'}
             </div>
@@ -50,4 +70,30 @@
     </div>
 
 {/form}
+
+{include jsCallbackRenderSorting, link => renderSorting}
+
+{define jsCallbackRenderSorting}
+    <script>
+        var $sorting = $('[name={$control['mailSourceTemplateForm']['sorting']->name|noescape}]');
+
+        var renderSortingAction = function () {
+            $.nette.ajax({
+                type: 'GET',
+                url: {link {$link}!},
+                data: {
+                    'sorting': $sorting.filter(':checked').val()
+                }
+            }).done(function () {
+                $('.selectpicker').selectpicker('refresh');
+            });
+        };
+
+        {if $control['mailSourceTemplateForm']->hasErrors()}
+        renderSortingAction();
+        {/if}
+
+        $sorting.off('change').on('change', renderSortingAction);
+    </script>
+{/define}
 

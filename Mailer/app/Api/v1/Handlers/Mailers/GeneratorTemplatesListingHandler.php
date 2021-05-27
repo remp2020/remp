@@ -39,7 +39,9 @@ class GeneratorTemplatesListingHandler extends BaseHandler
         }
         $results = $this->sourceTemplatesRepository->getTable()
             ->where(['generator' => $generator])
-            ->select('id,title')->fetchAll();
+            ->order('sorting ASC')
+            ->select('id,title')
+            ->fetchAll();
 
         $output = [];
         foreach ($results as $row) {
