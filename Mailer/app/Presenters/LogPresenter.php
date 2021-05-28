@@ -5,7 +5,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
-use Remp\MailerModule\Components\DataTable\IDataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Repositories\LogsRepository;
 
 final class LogPresenter extends BasePresenter
@@ -16,7 +16,7 @@ final class LogPresenter extends BasePresenter
 
     public function __construct(
         LogsRepository $logsRepository,
-        IDataTableFactory $dataTableFactory
+        DataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->logsRepository = $logsRepository;

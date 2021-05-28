@@ -5,12 +5,11 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Multiplier;
-use Nette\Bridges\ApplicationLatte\ILatteFactory;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory;
-use Remp\MailerModule\Components\DataTable\IDataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Components\SendingStats\ISendingStatsFactory;
 use Remp\MailerModule\Forms\EditBatchFormFactory;
 use Remp\MailerModule\Forms\IFormFactory;
@@ -86,7 +85,7 @@ final class JobPresenter extends BasePresenter
         LatteFactory $latteFactory,
         LinkGenerator $linkGenerator,
         ListsRepository $listsRepository,
-        IDataTableFactory $dataTableFactory,
+        DataTableFactory $dataTableFactory,
         ISendingStatsFactory $sendingStatsFactory,
         IBatchExperimentEvaluationFactory $batchExperimentEvaluationFactory
     ) {

@@ -6,7 +6,7 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Components\DataTable\DataTable;
-use Remp\MailerModule\Components\DataTable\IDataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\LayoutFormFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 
@@ -21,7 +21,7 @@ final class LayoutPresenter extends BasePresenter
     public function __construct(
         LayoutsRepository $layoutsRepository,
         LayoutFormFactory $layoutFormFactory,
-        IDataTableFactory $dataTableFactory
+        DataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;

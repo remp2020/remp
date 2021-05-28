@@ -40,10 +40,14 @@ class SourceTemplatesRepository extends Repository
         return $this->getTable()->order('sorting DESC')->limit(1);
     }
 
-    public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null): Selection
+    public function tableFilter(string $query, ?string $order, ?string $orderDirection, ?int $limit = null, ?int $offset = null): Selection
     {
-        $selection = $this->getTable()
-            ->order($order . ' ' . strtoupper($orderDirection));
+        $selection = $this->getTable();
+        if ($order && $orderDirection) {
+            $selection->order($order . ' ' . strtoupper($orderDirection));
+        } else {
+            $selection->order('sorting ASC');
+        }
 
         if (!empty($query)) {
             $where = [];

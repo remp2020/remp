@@ -10,17 +10,15 @@ use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Hermes\RedisDriver;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
-use Remp\MailerModule\Components\DataTable\IDataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
-use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\MailTemplateStatsRepository;
 use Remp\MailerModule\Repositories\MailTypeStatsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
-use Tomaj\Hermes\Dispatcher;
 use Tomaj\Hermes\Emitter;
 use Nette\Utils\DateTime;
 use DateInterval;
@@ -59,7 +57,7 @@ final class ListPresenter extends BasePresenter
         ListFormFactory $listFormFactory,
         ListVariantsRepository $listVariantsRepository,
         Emitter $emitter,
-        IDataTableFactory $dataTableFactory
+        DataTableFactory $dataTableFactory
     ) {
         parent::__construct();
 

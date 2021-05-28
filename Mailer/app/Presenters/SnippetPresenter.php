@@ -6,7 +6,7 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Components\DataTable\DataTable;
-use Remp\MailerModule\Components\DataTable\IDataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\SnippetFormFactory;
 use Remp\MailerModule\Repositories\SnippetsRepository;
 
@@ -21,7 +21,7 @@ final class SnippetPresenter extends BasePresenter
     public function __construct(
         SnippetsRepository $snippetsRepository,
         SnippetFormFactory $snippetFormFactory,
-        IDataTableFactory $dataTableFactory
+        DataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->snippetsRepository = $snippetsRepository;

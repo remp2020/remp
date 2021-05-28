@@ -11,7 +11,7 @@ use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
-use Remp\MailerModule\Components\DataTable\IDataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Components\SendingStats\ISendingStatsFactory;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Forms\TemplateFormFactory;
@@ -55,7 +55,7 @@ final class TemplatePresenter extends BasePresenter
         SnippetsRepository $snippetsRepository,
         ListsRepository $listsRepository,
         ContentGenerator $contentGenerator,
-        IDataTableFactory $dataTableFactory,
+        DataTableFactory $dataTableFactory,
         ISendingStatsFactory $sendingStatsFactory,
         GeneratorInputFactory $generatorInputFactory
     ) {

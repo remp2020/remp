@@ -6,9 +6,8 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Repositories\ActiveRow;
-use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
-use Remp\MailerModule\Components\DataTable\IDataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\SourceTemplateFormFactory;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
@@ -23,7 +22,7 @@ final class GeneratorPresenter extends BasePresenter
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
         SourceTemplateFormFactory $sourceTemplateFormFactory,
-        IDataTableFactory $dataTableFactory
+        DataTableFactory $dataTableFactory
     ) {
         parent::__construct();
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
@@ -35,15 +34,6 @@ final class GeneratorPresenter extends BasePresenter
     {
         $dataTable = $this->dataTableFactory->create();
         $dataTable
-            ->setColSetting('sorting', [
-                'header' => '#',
-                'priority' => 1,
-            ])
-            ->setColSetting('created_at', [
-                'header' => 'created at',
-                'render' => 'date',
-                'priority' => 2,
-            ])
             ->setColSetting('title', [
                 'priority' => 1,
             ])
@@ -51,11 +41,21 @@ final class GeneratorPresenter extends BasePresenter
                 'priority' => 1,
             ])
             ->setColSetting('generator', [
-                'priority' => 1,
+                'priority' => 2,
+            ])
+            ->setColSetting('created_at', [
+                'header' => 'created at',
+                'render' => 'date',
+                'priority' => 3,
+            ])
+            ->setColSetting('updated_at', [
+                'header' => 'updated at',
+                'render' => 'date',
+                'priority' => 3,
             ])
             ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit generator')
             ->setRowAction('generate', 'palette-Cyan zmdi-spellcheck', 'Generate emails')
-            ->setTableSetting('sorting', Json::encode([[0, 'ASC']]));
+            ->setTableSetting('order', '[]');
 
         return $dataTable;
     }
@@ -63,13 +63,14 @@ final class GeneratorPresenter extends BasePresenter
     public function renderDefaultJsonData(): void
     {
         $request = $this->request->getParameters();
+        [$orderColumn, $orderDir] = $this->dataTableFactory->getOrderFromRequest($request);
 
         $sourceTemplatesCount = $this->sourceTemplatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
+            ->tableFilter($request['search']['value'], $orderColumn, $orderDir)
             ->count('*');
 
         $sourceTemplates = $this->sourceTemplatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['length'], (int)$request['start'])
+            ->tableFilter($request['search']['value'], $orderColumn, $orderDir, (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
@@ -79,7 +80,6 @@ final class GeneratorPresenter extends BasePresenter
         ];
 
         /** @var ActiveRow $sourceTemplate */
-        $idx = 1;
         foreach ($sourceTemplates as $i => $sourceTemplate) {
             $editUrl = $this->link('Edit', $sourceTemplate->id);
             $generateUrl = $this->link('Generate', $sourceTemplate->id);
@@ -88,11 +88,11 @@ final class GeneratorPresenter extends BasePresenter
                     'edit' => $editUrl,
                     'generate' => $generateUrl,
                 ],
-                (int)$request['start'] + $idx++ . '.',
-                $sourceTemplate->created_at,
                 "<a href='{$editUrl}'>{$sourceTemplate->title}</a>",
                 "<code>{$sourceTemplate->code}</code>",
                 "<code>{$sourceTemplate->generator}</code>",
+                $sourceTemplate->created_at,
+                $sourceTemplate->updated_at,
             ];
         }
         $this->presenter->sendJson($result);
