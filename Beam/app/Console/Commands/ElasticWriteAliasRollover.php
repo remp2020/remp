@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Support\Str;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use App\Console\Command;
 
 class ElasticWriteAliasRollover extends Command
@@ -56,22 +55,15 @@ class ElasticWriteAliasRollover extends Command
         }
 
         // execute rollover; https://www.elastic.co/guide/en/elasticsearch/reference/6.3/indices-rollover-index.html
-        try {
-            $response = $client->post(sprintf("/%s/_rollover", $this->input->getOption('write-alias')), array_merge([
-                'json' => [
-                    'conditions' => [
+        $response = $client->post(sprintf("/%s/_rollover", $this->input->getOption('write-alias')), array_merge([
+            'json' => [
+                'conditions' => [
                     'max_age' => '31d',
                     'max_size' => '4gb',
-                        //'max_docs' => 1, // condition for testing
-                    ],
+                    //'max_docs' => 1, // condition for testing
                 ],
-            ], $options));
-        } catch (ClientException $e) {
-            $body = json_decode($e->getResponse()->getBody());
-            dump($body);
-            return 2;
-        }
-
+            ],
+        ], $options));
 
         $body = json_decode($response->getBody(), true);
         if (!$body['rolled_over']) {
@@ -86,22 +78,16 @@ class ElasticWriteAliasRollover extends Command
         ));
 
         // if rollover happened, add newly created index to the read alias (so it contains all the indices)
-        try {
-            $client->post("/_aliases", array_merge([
-                'json' => [
-                    'actions' => [
-                        'add' => [
-                            'index' => $body['new_index'],
-                            'alias' => $this->input->getOption('read-alias')
-                        ],
+        $client->post("/_aliases", array_merge([
+            'json' => [
+                'actions' => [
+                    'add' => [
+                        'index' => $body['new_index'],
+                        'alias' => $this->input->getOption('read-alias')
                     ],
                 ],
-            ], $options));
-        } catch (ClientException $e) {
-            $body = json_decode($e->getResponse()->getBody());
-            dump($body);
-            return 4;
-        }
+            ],
+        ], $options));
 
         $this->line('  * Alias created, done.');
         return 0;
