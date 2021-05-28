@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.25.0] - 2021-05-28
+
 ### [Beam]
 
 - **BREAKING**: Upgraded to Laravel 7. remp/remp#491
@@ -18,8 +20,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Upgraded to Laravel 7. remp/remp#491
   - All API endpoints now return dates in ISO-8601 compatible format. Make sure all code consuming the Campaign API is accustomed to this change. For example, previously, date would serialized like the following: `2019-12-02 20:01:00`. Now it is serialized like `2019-12-02T20:01:00.283041Z` (always in UTC).
   - Environment variable `APP_SESSION_EXPIRATION` was renamed to `SESSION_LIFETIME`.
-  - Fixed broken campaign comparison. remp/remp#926
-  - Fixed broken campaign copying. remp/remp#927
+- Fixed broken campaign comparison. remp/remp#926
+- Fixed broken campaign copying. remp/remp#927
 
 ### [Mailer]
 
@@ -29,7 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - **WARNING**: The migration adding the fulltext index to speed up the search can take longer than usual. Testing migration lasted ~5 minutes for 1GB of `mail_templates` MySQL table data (~100K rows). The table is locked for writes during the migration and Mailer will not be able to create/update emails during the migration period. Please release this version in less exposed time.
 - Added sorting inputs to mail source template form and use ascending sorting. remp/remp#918
 - Added `code` to mail layouts. Code of existing layout was generated based their ID and name. remp/remp#917
-- Added unique index to `mail_type` `code` column and add unique validation to `ListFormFactory`. remp/remp#919
+- Added unique index to `mail_type.code` column and add unique validation to `ListFormFactory`. remp/remp#919
 
 ### [Sso]
 
@@ -844,7 +846,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.24.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.25.0...master
+[0.25.0]: https://github.com/remp2020/remp/compare/0.24.0...0.25.0
 [0.24.0]: https://github.com/remp2020/remp/compare/0.23.0...0.24.0
 [0.23.0]: https://github.com/remp2020/remp/compare/0.22.0...0.23.0
 [0.22.0]: https://github.com/remp2020/remp/compare/0.21.5...0.22.0
