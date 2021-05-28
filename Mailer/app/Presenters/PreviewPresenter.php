@@ -7,8 +7,7 @@ use Nette\Application\BadRequestException;
 use Nette\Application\UI\Presenter;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
-use Remp\MailerModule\Repositories\SnippetsRepository;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
 final class PreviewPresenter extends Presenter
@@ -22,8 +21,8 @@ final class PreviewPresenter extends Presenter
     /** @var ContentGenerator @inject */
     public $contentGenerator;
 
-    /** @var SnippetsRepository @inject */
-    public $snippetsRepository;
+    /** @var GeneratorInputFactory @inject */
+    public $generatorInputFactory;
 
     public function renderPreview($code): void
     {
@@ -35,10 +34,7 @@ final class PreviewPresenter extends Presenter
             throw new BadRequestException();
         }
 
-        $snippets = $this->snippetsRepository
-            ->getSnippetsForMailType($this->template->mail_type_id)->fetchPairs('code', 'html');
-
-        $mailContent = $this->contentGenerator->render(new GeneratorInput($template, ['snippets' => $snippets]));
+        $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template));
         $this->template->content = $mailContent->html();
     }
 }

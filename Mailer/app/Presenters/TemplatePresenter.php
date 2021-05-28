@@ -7,13 +7,13 @@ use Http\Discovery\Exception\NotFoundException;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\IDataTableFactory;
 use Remp\MailerModule\Components\SendingStats\ISendingStatsFactory;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
-use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 use Remp\MailerModule\Forms\TemplateFormFactory;
 use Remp\MailerModule\Forms\TemplateTestFormFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
@@ -44,6 +44,8 @@ final class TemplatePresenter extends BasePresenter
 
     private $sendingStatsFactory;
 
+    private $generatorInputFactory;
+
     public function __construct(
         TemplatesRepository $templatesRepository,
         LogsRepository $logsRepository,
@@ -54,7 +56,8 @@ final class TemplatePresenter extends BasePresenter
         ListsRepository $listsRepository,
         ContentGenerator $contentGenerator,
         IDataTableFactory $dataTableFactory,
-        ISendingStatsFactory $sendingStatsFactory
+        ISendingStatsFactory $sendingStatsFactory,
+        GeneratorInputFactory $generatorInputFactory
     ) {
         parent::__construct();
         $this->templatesRepository = $templatesRepository;
@@ -67,6 +70,7 @@ final class TemplatePresenter extends BasePresenter
         $this->contentGenerator = $contentGenerator;
         $this->dataTableFactory = $dataTableFactory;
         $this->sendingStatsFactory = $sendingStatsFactory;
+        $this->generatorInputFactory = $generatorInputFactory;
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -280,8 +284,7 @@ final class TemplatePresenter extends BasePresenter
             throw new BadRequestException();
         }
 
-        $snippets = $this->snippetsRepository->getSnippetsForMailType($template->mail_type_id)->fetchPairs('code', 'html');
-        $mailContent = $this->contentGenerator->render(new GeneratorInput($template, ['snippets' => $snippets]));
+        $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template));
         $this->template->content = ($type === 'html')
             ? $mailContent->html()
             : "<pre>{$mailContent->text()}</pre>";

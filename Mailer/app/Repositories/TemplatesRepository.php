@@ -46,7 +46,8 @@ class TemplatesRepository extends Repository
         int $layoutId,
         int $typeId,
         ?bool $clickTracking = null,
-        ?string $extras = null,
+        ?string $extrasJson = null,
+        ?string $paramsJson = null,
         bool $attachmentsEnabled = true
     ): ActiveRow {
         if ($this->exists($code)) {
@@ -67,7 +68,8 @@ class TemplatesRepository extends Repository
             'mail_type_id' => $typeId,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
-            'extras' => $extras,
+            'extras' => $extrasJson,
+            'params' => $paramsJson,
             'attachments_enabled' => $attachmentsEnabled
         ]);
 
@@ -104,6 +106,7 @@ class TemplatesRepository extends Repository
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
             'extras' => $template->extras,
+            'params' => $template->params,
             'attachments_enabled' => $template->attachments_enabled,
         ]);
     }

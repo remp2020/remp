@@ -6,16 +6,15 @@ namespace Remp\MailerModule\Models;
 use Nette\Mail\Message;
 use Nette\Utils\AssertionException;
 use Remp\MailerModule\Models\Config\ConfigNotExistsException;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Models\Auth\AutoLogin;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 use Remp\MailerModule\Models\Mailer\Mailer;
 use Remp\MailerModule\Repositories\LogsRepository;
-use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
 use Remp\MailerModule\Models\Sender\MailerFactory;
@@ -56,7 +55,7 @@ class Sender
 
     private $contentGenerator;
 
-    private $snippetsRepository;
+    private $generatorInputFactory;
 
     public function __construct(
         MailerFactory $mailerFactory,
@@ -65,7 +64,7 @@ class Sender
         LogsRepository $logsRepository,
         EngineFactory $engineFactory,
         ContentGenerator $contentGenerator,
-        SnippetsRepository $snippetsRepository
+        GeneratorInputFactory $generatorInputFactory
     ) {
         $this->mailerFactory = $mailerFactory;
         $this->autoLogin = $autoLogin;
@@ -73,7 +72,7 @@ class Sender
         $this->logsRepository = $logsRepository;
         $this->engineFactory = $engineFactory;
         $this->contentGenerator = $contentGenerator;
-        $this->snippetsRepository = $snippetsRepository;
+        $this->generatorInputFactory = $generatorInputFactory;
     }
 
     public function addRecipient(string $email, string $name = null, array $params = []): self
@@ -153,10 +152,11 @@ class Sender
         $message->setFrom($this->template->from);
         $message->setSubject($this->generateSubject($this->template->subject, $this->params));
 
-        $this->params['snippets'] = $this->snippetsRepository
-            ->getSnippetsForMailType($this->template->mail_type_id)->fetchPairs('code', 'html');
-
-        $mailContent = $this->contentGenerator->render(new GeneratorInput($this->template, $this->params, $this->batchId));
+        $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create(
+            $this->template,
+            $this->params,
+            $this->batchId
+        ));
 
         if ($this->template->mail_body_text) {
             $message->setBody($mailContent->text());
@@ -263,10 +263,11 @@ class Sender
 
         $message->setSubject($this->generateSubject($this->template->subject, $transformedParams));
 
-        $transformedParams['snippets'] = $this->snippetsRepository
-            ->getSnippetsForMailType($this->template->mail_type_id)->fetchPairs('code', 'html');
-
-        $generatorInput = new GeneratorInput($this->template, $transformedParams, $this->batchId);
+        $generatorInput = $this->generatorInputFactory->create(
+            $this->template,
+            $transformedParams,
+            $this->batchId
+        );
 
         foreach ($templateParams as $email => $params) {
             $templateParams[$email] = $this->contentGenerator->getEmailParams($generatorInput, $params);

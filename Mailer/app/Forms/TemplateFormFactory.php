@@ -10,10 +10,9 @@ use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Forms\Rules\FormRules;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
-use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
-use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\TemplatesCodeNotUniqueException;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
@@ -34,26 +33,26 @@ class TemplateFormFactory implements IFormFactory
 
     public $onUpdate;
 
-    private $snippetsRepository;
-
     private $contentGenerator;
 
     private $database;
+
+    private $generatorInputFactory;
 
     public function __construct(
         TemplatesRepository $templatesRepository,
         LayoutsRepository $layoutsRepository,
         ListsRepository $listsRepository,
-        SnippetsRepository $snippetsRepository,
         ContentGenerator $contentGenerator,
-        Explorer $database
+        Explorer $database,
+        GeneratorInputFactory $generatorInputFactory
     ) {
         $this->templatesRepository = $templatesRepository;
         $this->layoutsRepository = $layoutsRepository;
         $this->listsRepository = $listsRepository;
-        $this->snippetsRepository = $snippetsRepository;
         $this->contentGenerator = $contentGenerator;
         $this->database = $database;
+        $this->generatorInputFactory = $generatorInputFactory;
     }
 
     public function create(?int $id = null): Form
@@ -172,8 +171,7 @@ class TemplateFormFactory implements IFormFactory
                 $callback = $this->onCreate;
             }
 
-            $snippets = $this->snippetsRepository->getSnippetsForMailType($row->mail_type_id)->fetchPairs('code', 'html');
-            $this->contentGenerator->render(new GeneratorInput($row, ['snippets' => $snippets]));
+            $this->contentGenerator->render($this->generatorInputFactory->create($row));
         } catch (TemplatesCodeNotUniqueException $e) {
             $this->database->rollback();
             $form['code']->addError($e->getMessage());

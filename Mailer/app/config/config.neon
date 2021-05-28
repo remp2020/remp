@@ -157,6 +157,7 @@ services:
 		factory: Remp\MailerModule\Models\ContentGenerator\ContentGenerator
 		setup:
 			- register(Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace())
+	generatorInputFactory: Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory
 
 	mailgunMailer:
 		factory: Remp\MailerModule\Models\Mailer\MailgunMailer
