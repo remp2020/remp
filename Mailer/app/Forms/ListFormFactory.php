@@ -63,7 +63,13 @@ class ListFormFactory
             ->setRequired("Field 'Priority' is required.");
 
         $codeInput = $form->addText('code', 'Code')
-            ->setRequired("Field 'Code' is required.");
+            ->setRequired("Field 'Code' is required.")
+            ->addRule(function ($input) {
+                $exists = $this->listsRepository->getTable()
+                    ->where('code = ?', $input->value)
+                    ->count('*');
+                return !$exists;
+            }, "Newsletter list code must be unique. Code '%value' is already used.");
 
         $mailers = [];
         $availableMailers =  $this->mailerFactory->getAvailableMailers();

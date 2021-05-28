@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - **WARNING**: The migration adding the fulltext index to speed up the search can take longer than usual. Testing migration lasted ~5 minutes for 1GB of `mail_templates` MySQL table data (~100K rows). The table is locked for writes during the migration and Mailer will not be able to create/update emails during the migration period. Please release this version in less exposed time.
 - Added sorting inputs to mail source template form and use ascending sorting. remp/remp#918
 - Added `code` to mail layouts. Code of existing layout was generated based their ID and name. remp/remp#917
+- Added unique index to `mail_type` `code` column and add unique validation to `ListFormFactory`. remp/remp#919
 
 ### [Sso]
 
