@@ -611,17 +611,22 @@ class ArticleController extends Controller
     {
         $tagObj = Tag::where('external_id', $tag['external_id'])->first();
         if ($tagObj) {
-            $tagObj->update($tag);
+            $tagObj->name = $tag['name'];
+            $tagObj->save();
             return $tagObj;
         }
 
         $tagObj = Tag::where('name', $tag['name'])->first();
         if ($tagObj && $tagObj->external_id === null) {
-            $tagObj->update($tag);
+            $tagObj->external_id = $tag['external_id'];
+            $tagObj->save();
             return $tagObj;
         }
 
-        return Tag::firstOrCreate($tag);
+        return Tag::firstOrCreate([
+            'name' => $tag['name'],
+            'external_id' => $tag['external_id'],
+        ]);
     }
 
     private function upsertTagCategory($tagCategory): TagCategory
@@ -632,7 +637,7 @@ class ArticleController extends Controller
             return $tagCategoryObj;
         }
 
-        $tagCategoryObj = Tag::where('name', $tagCategory['name'])->first();
+        $tagCategoryObj = TagCategory::where('name', $tagCategory['name'])->first();
         if ($tagCategoryObj && $tagCategoryObj->external_id === null) {
             $tagCategoryObj->update($tagCategory);
             return $tagCategoryObj;
