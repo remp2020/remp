@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed article upsert API bug if tag with categories is updated. remp/remp#931 
+
 ## [0.25.0] - 2021-05-28
 
 ### [Beam]
