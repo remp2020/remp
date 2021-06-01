@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.25.1] - 2021-06-01
+
 ### [Beam]
 
 - Fixed article upsert API bug if tag with categories is updated. remp/remp#931 
@@ -850,7 +852,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.25.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.25.1...master
+[0.25.1]: https://github.com/remp2020/remp/compare/0.25.0...0.25.1
 [0.25.0]: https://github.com/remp2020/remp/compare/0.24.0...0.25.0
 [0.24.0]: https://github.com/remp2020/remp/compare/0.23.0...0.24.0
 [0.23.0]: https://github.com/remp2020/remp/compare/0.22.0...0.23.0
