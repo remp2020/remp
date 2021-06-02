@@ -82,7 +82,43 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 53) {
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 59) {
+            $defaults = [
+                'name' => 'Súhrn dňa letnej olympiády ' . date('j.n.Y'),
+                'code' => 'nwsf_let_olympiada_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 37, // Súhrn dňa letnej olympiády
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 58) {
+            $defaults = [
+                'name' => 'Súhrn dňa futbalového Eura ' . date('j.n.Y'),
+                'code' => 'nwsf_fut_euro_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 39, // Súhrn dňa futbalového Eura
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 55) {
+            $defaults = [
+                'name' => 'Ako to číta Ivan Mikloš ' . date('j.n.Y'),
+                'code' => 'nwsf_miklos_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 40, // Ako to číta Ivan Mikloš
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 54) {
+            $defaults = [
+                'name' => 'Český týždeň ' . date('j.n.Y'),
+                'code' => 'nwsf_cz_tyzden_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 38, // Český týždeň
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 53) {
             $defaults = [
                 'name' => 'Súhrn MS v hokeji ' . date('j.n.Y'),
                 'code' => 'nwsf_ms_hokej_2021_' . date('dmY'),
