@@ -9,6 +9,7 @@
                 'tags_count' => [
                     'header' => 'tags',
                     'priority' => 3,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'render' => 'number',
                     'className' => 'text-right'
@@ -16,6 +17,7 @@
                 'articles_count' => [
                     'header' => 'articles',
                     'priority' => 3,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'render' => 'number',
                     'className' => 'text-right'
@@ -23,6 +25,7 @@
                 'conversions_count' => [
                     'header' => 'conversions',
                     'priority' => 2,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'render' => 'number',
                     'className' => 'text-right'
@@ -31,6 +34,7 @@
                     'header' => 'amount',
                     'render' => 'array',
                     'priority' => 2,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'className' => 'text-right'
                 ],
@@ -38,6 +42,7 @@
                     'header' => 'all pageviews',
                     'render' => 'number',
                     'priority' => 2,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'className' => 'text-right'
                 ],
@@ -45,6 +50,7 @@
                     'header' => 'not subscribed pageviews',
                     'render' => 'number',
                     'priority' => 5,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'className' => 'text-right'
                 ],
@@ -52,6 +58,7 @@
                     'header' => 'subscriber pageviews',
                     'render' => 'number',
                     'priority' => 5,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'className' => 'text-right'
                 ],
@@ -59,6 +66,7 @@
                     'header' => 'avg time all',
                     'render' => 'duration',
                     'priority' => 2,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'className' => 'text-right'
                 ],
@@ -66,6 +74,7 @@
                     'header' => 'avg time not subscribed',
                     'render' => 'duration',
                     'priority' => 5,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'className' => 'text-right'
                 ],
@@ -73,6 +82,7 @@
                     'header' => 'avg time subscribers',
                     'render' => 'duration',
                     'priority' => 5,
+                    'orderSequence' => ['desc', 'asc'],
                     'searchable' => false,
                     'className' => 'text-right'
                 ],

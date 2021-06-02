@@ -63,6 +63,7 @@
                     'header' => 'amount',
                     'render' => 'number',
                     'priority' => 1,
+                    'orderSequence' => ['desc', 'asc'],
                     'className' => 'text-right',
                 ],
                 'currency' => [

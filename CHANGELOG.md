@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed sorting of referer stats in the article detail. The default sorting is now again Visits count. remp/remp#934
+- Changed default order sequence for numeric columns to be descending first. remp/remp#934
+
 ## [0.25.1] - 2021-06-01
 
 ### [Beam]
