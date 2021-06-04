@@ -28,9 +28,9 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param  \Throwable  $exception
+     * @param  \Throwable $exception
      * @return void
-     * @throws \Throwable
+     * @throws Exception
      */
     public function report(Throwable $exception)
     {

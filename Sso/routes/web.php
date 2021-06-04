@@ -11,17 +11,22 @@
 |
 */
 
-Route::get('/error', 'AuthController@error')->name('sso.error');
+use App\Http\Controllers\ApiTokenController;
+use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SettingsController;
+
+Route::get('/error', [AuthController::class, 'error'])->name('sso.error');
 
 Route::middleware('auth.jwt')->group(function () {
-    Route::get('/', 'ApiTokenController@index');
-    Route::get('api-tokens/json', 'ApiTokenController@json')->name('api-tokens.json');
-    Route::resource('api-tokens', 'ApiTokenController');
-    Route::get('auth/logout-web', 'AuthController@logoutWeb')->name('auth.logout-web');
-    Route::get('settings/jwtwhitelist', 'SettingsController@jwtwhitelist')->name('settings.jwtwhitelist');
+    Route::get('/', [ApiTokenController::class, 'index']);
+    Route::get('api-tokens/json', [ApiTokenController::class, 'json'])->name('api-tokens.json');
+    Route::resource('api-tokens', ApiTokenController::class);
+    Route::get('auth/logout-web', [AuthController::class, 'logoutWeb'])->name('auth.logout-web');
+    Route::get('settings/jwtwhitelist', [SettingsController::class, 'jwtwhitelist'])->name('settings.jwtwhitelist');
 });
 
-Route::get('auth/login', 'AuthController@login')->name('auth.login');
-Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
-Route::get('auth/google', 'Auth\GoogleController@redirect')->name('auth.google');
-Route::get('auth/google/callback', 'Auth\GoogleController@callback');
+Route::get('auth/login', [AuthController::class, 'login'])->name('auth.login');
+Route::get('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
+Route::get('auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+Route::get('auth/google/callback', [GoogleController::class, 'callback']);

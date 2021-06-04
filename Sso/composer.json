@@ -42,7 +42,7 @@
         "fzaninotto/faker": "~1.9",
         "kouz/laravel-airbrake": "^0.7",
         "laracasts/flash": "^3.2",
-        "laravel/framework": "^7.29",
+        "laravel/framework": "^8.42",
         "laravel/socialite": "^5.2",
         "laminas/laminas-diactoros": "^2.5",
         "laravelcollective/html": "^6.2",
@@ -60,15 +60,15 @@
         "yajra/laravel-datatables-oracle": "^9.18",
         "laravel/tinker": "^2.5",
         "fruitcake/laravel-cors": "^2.0",
-        "guzzlehttp/guzzle": "^6.3.1|^7.0.1"
+        "guzzlehttp/guzzle": "^7.0.1"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.8",
+        "barryvdh/laravel-ide-helper": "^2.10",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "mockery/mockery": "^1.4",
-        "nunomaduro/collision": "^4.3",
+        "mockery/mockery": "^1.4.2",
+        "nunomaduro/collision": "^5.0",
         "phpunit/phpunit": "9.3.11",
-        "facade/ignition": "^2.0",
+        "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "filp/whoops": "^2.12",
         "beyondcode/laravel-dump-server": "^1.7"
@@ -78,7 +78,9 @@
             "database"
         ],
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
