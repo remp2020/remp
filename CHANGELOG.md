@@ -14,7 +14,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Changed showtime experiment to be enabled by default. This should change make showtime requests much faster by bypassing Laravel in very exposed endpoint. remp/remp#939
-  - If you want to fallback to the original implementation, use `rempConfig.campaign.showtimExperiment = false` in the remplib JS configuration. 
+  - If you want to fallback to the original implementation, use `rempConfig.campaign.showtimExperiment = false` in the remplib JS configuration.
+  
+### [Mailer]
+
+- Removed deprecated column in `mail_user_subscriptions` table.
 
 ## [0.25.1] - 2021-06-01
 
