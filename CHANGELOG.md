@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed sorting of referer stats in the article detail. The default sorting is now again Visits count. remp/remp#934
 - Changed default order sequence for numeric columns to be descending first. remp/remp#934
 
+### [Campaign]
+
+- Changed showtime experiment to be enabled by default. This should change make showtime requests much faster by bypassing Laravel in very exposed endpoint. remp/remp#939
+  - If you want to fallback to the original implementation, use `rempConfig.campaign.showtimExperiment = false` in the remplib JS configuration. 
+
 ## [0.25.1] - 2021-06-01
 
 ### [Beam]

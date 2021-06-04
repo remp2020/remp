@@ -24,7 +24,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
         campaignsSessionStorageKey: "campaigns_session",
 
-        showtimeExperiment: false,
+        showtimeExperiment: true,
 
         initialized: false,
 
