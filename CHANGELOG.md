@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed sorting of referer stats in the article detail. The default sorting is now again Visits count. remp/remp#934
 - Changed default order sequence for numeric columns to be descending first. remp/remp#934
+- Fixed incorrect pageviews bug in `/top` APIs when using filters. remp/remp#937
 
 ### [Campaign]
 

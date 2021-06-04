@@ -150,26 +150,33 @@ class TopSearch
         return [$filterValueType, $filterValues];
     }
 
-    private function addSectionsCondition(Builder $articlePageviewsQuery, string $type, array $values): void
+    private function checkQueryType($type)
     {
         if (!in_array($type, ['external_id', 'name'], true)) {
             throw new \Exception("type '$type' is not one of 'external_id' or 'name' values");
         }
+    }
 
-        $articlePageviewsQuery->join('article_section', 'article_pageviews.article_id', '=', 'article_section.article_id')
-            ->join('sections', 'article_section.section_id', '=', 'sections.id')
-            ->whereIn('sections.' . $type, $values);
+    private function addSectionsCondition(Builder $articlePageviewsQuery, string $type, array $values): void
+    {
+        $this->checkQueryType($type);
+        $articlePageviewsQuery->whereIn('article_pageviews.article_id', function ($query) use ($type, $values) {
+            $query->select('article_id')
+                ->from('article_section')
+                ->join('sections', 'article_section.section_id', '=', 'sections.id')
+                ->whereIn('sections.' . $type, $values);
+        });
     }
 
     private function addAuthorsCondition(Builder $articlePageviewsQuery, string $type, array $values): void
     {
-        if (!in_array($type, ['external_id', 'name'], true)) {
-            throw new \Exception("type '$type' is not one of 'external_id' or 'name' values");
-        }
-
-        $articlePageviewsQuery->join('article_author', 'article_pageviews.article_id', '=', 'article_author.article_id')
-            ->join('authors', 'article_author.author_id', '=', 'authors.id')
-            ->whereIn('authors.' . $type, $values);
+        $this->checkQueryType($type);
+        $articlePageviewsQuery->whereIn('article_pageviews.article_id', function ($query) use ($type, $values) {
+            $query->select('article_id')
+                ->from('article_author')
+                ->join('authors', 'article_author.author_id', '=', 'authors.id')
+                ->whereIn('authors.' . $type, $values);
+        });
     }
 
     private function addContentTypeCondition(Builder $articlePageviewsQuery, string $contentType): void
@@ -180,16 +187,24 @@ class TopSearch
 
     private function addTagsCondition(Builder $articlePageviewsQuery, string $type, array $values): void
     {
-        $articlePageviewsQuery->join('article_tag', 'article_pageviews.article_id', '=', 'article_tag.article_id')
-            ->join('tags', 'article_tag.tag_id', '=', 'tags.id')
-            ->whereIn('tags.' . $type, $values);
+        $this->checkQueryType($type);
+        $articlePageviewsQuery->whereIn('article_pageviews.article_id', function ($query) use ($type, $values) {
+            $query->select('article_id')
+                ->from('article_tag')
+                ->join('tags', 'article_tag.tag_id', '=', 'tags.id')
+                ->whereIn('tags.' . $type, $values);
+        });
     }
 
     private function addTagCategoriesCondition(Builder $articlePageviewsQuery, string $type, array $values): void
     {
-        $articlePageviewsQuery->join('article_tag as at', 'article_pageviews.article_id', '=', 'at.article_id')
-            ->join('tag_tag_category', 'tag_tag_category.tag_id', '=', 'at.tag_id')
-            ->join('tag_categories', 'tag_categories.id', '=', 'tag_tag_category.tag_category_id')
-            ->whereIn('tag_categories.' . $type, $values);
+        $this->checkQueryType($type);
+        $articlePageviewsQuery->whereIn('article_pageviews.article_id', function ($query) use ($type, $values) {
+            $query->select('article_id')
+                ->from('article_tag as at')
+                ->join('tag_tag_category', 'tag_tag_category.tag_id', '=', 'at.tag_id')
+                ->join('tag_categories', 'tag_categories.id', '=', 'tag_tag_category.tag_category_id')
+                ->whereIn('tag_categories.' . $type, $values);
+        });
     }
 }
