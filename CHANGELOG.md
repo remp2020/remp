@@ -21,6 +21,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Removed deprecated column in `mail_user_subscriptions` table.
 
+### [Sso]
+
+- Added optional `APP_TRUSTED_PROXIES` environmental variable.
+
 ## [0.25.1] - 2021-06-01
 
 ### [Beam]
