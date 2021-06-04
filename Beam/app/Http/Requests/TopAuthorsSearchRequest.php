@@ -41,7 +41,7 @@ class TopAuthorsSearchRequest extends FormRequest
             'sections.name.*' => 'string',
             'content_type' => 'string',
             'tags' => ['array', function ($attr, $value, $fail) {
-                if (array_has($value, ['external_id', 'name'])) {
+                if (Arr::has($value, ['external_id', 'name'])) {
                     $fail("You can not have both 'external_id' and 'name' arrays specified in tags filter");
                 }
                 if (!array_key_exists('external_id', $value) && !array_key_exists('name', $value)) {
