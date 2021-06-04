@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,9 +14,10 @@ use Illuminate\Http\Request;
 */
 
 Route::middleware('app.jwt.auth')->group(function() {
-    Route::get('auth/introspect', 'AuthController@introspect')->name('auth.introspect');
+    Route::get('auth/introspect', [AuthController::class, 'introspect'])->name('auth.introspect');
 });
 
-Route::post('auth/refresh', 'AuthController@refresh')->name('auth.refresh');
-Route::post('auth/invalidate', 'AuthController@invalidate')->name('auth.invalidate');
-Route::get('auth/check-token', 'AuthController@apiToken')->name('auth.check-token');
+
+Route::post('auth/refresh', [AuthController::class, 'refresh'])->name('auth.refresh');
+Route::post('auth/invalidate', [AuthController::class, 'invalidate'])->name('auth.invalidate');
+Route::get('auth/check-token', [AuthController::class, 'apiToken'])->name('auth.check-token');

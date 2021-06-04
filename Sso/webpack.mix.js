@@ -5,7 +5,7 @@ mix.webpackConfig({
         symlinks: false,
     },
     watchOptions: {
-        ignored: [ /node_modules([\\]+|\/)+(?!remp)/ ]
+        ignored: /node_modules([\\]+|\/)+(?!remp)/
     }
 }).version();
 
