@@ -2,20 +2,21 @@
 
 namespace Tests\Feature;
 
+use Database\Seeders\CountrySeeder;
 use App\Banner;
 use App\Campaign;
 use App\CampaignBanner;
 use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
-use App\Http\Request;
 use App\Http\Showtime\LazyDeviceDetector;
 use App\Http\Showtime\LazyGeoReader;
 use App\Http\Showtime\Showtime;
 use App\Schedule;
 use App\ShortMessageTemplate;
-use CountrySeeder;
+
 use Faker\Provider\Base;
 use Faker\Provider\Uuid;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Mockery;
 use Monolog\Logger;
@@ -57,10 +58,10 @@ class ShowtimeTest extends TestCase
         $this->showtime = $showtime;
 
         // Prepare banner and campaign
-        $banner = factory(Banner::class)->create(['template' => 'short_message']);
-        factory(ShortMessageTemplate::class)->create(['banner_id' => $banner->id]);
+        $banner = Banner::factory()->create(['template' => 'short_message']);
+        ShortMessageTemplate::factory()->create(['banner_id' => $banner->id]);
 
-        $campaign = factory(Campaign::class)->create([
+        $campaign = Campaign::factory()->create([
             'once_per_session' => false,
             'signed_in' => null,
             'using_adblock' => null,
@@ -69,14 +70,14 @@ class ShowtimeTest extends TestCase
             'devices' => [Campaign::DEVICE_DESKTOP, Campaign::DEVICE_MOBILE],
             'pageview_rules' => null,
         ]);
-        $this->campaignBanner = factory(CampaignBanner::class)->create([
+        $this->campaignBanner = CampaignBanner::factory()->create([
             'campaign_id' => $campaign->id,
             'banner_id' => $banner->id,
             'control_group' => 0,
             'proportion' => 100,
             'weight' => 1
         ]);
-        factory(CampaignBanner::class)->create([
+        CampaignBanner::factory()->create([
             'campaign_id' => $campaign->id,
             'control_group' => 1,
             'proportion' => 0,
@@ -141,7 +142,7 @@ class ShowtimeTest extends TestCase
     {
         $data = $this->getUserData();
         $activeCampaignUuids = [];
-        $campaign = factory(Campaign::class)->create();
+        $campaign = Campaign::factory()->create();
         $this->assertNull($this->showtime->shouldDisplay($campaign, $data, $activeCampaignUuids));
         $this->assertEmpty($activeCampaignUuids);
     }

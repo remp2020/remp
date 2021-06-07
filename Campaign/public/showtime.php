@@ -315,15 +315,17 @@ try {
 $data = filter_input(INPUT_GET, 'data');
 $callback = filter_input(INPUT_GET, 'callback');
 
+
+
 // dependencies initialization
 $redis = new \Predis\Client([
     'scheme' => 'tcp',
-    'host'   => getenv('REDIS_HOST'),
-    'port'   => getenv('REDIS_PORT') ?: 6379,
-    'password' => getenv('REDIS_PASSWORD') ?: null,
-    'database' => getenv('REDIS_DEFAULT_DATABASE') ?: 0,
+    'host'   => env('REDIS_HOST'),
+    'port'   => env('REDIS_PORT') ?: 6379,
+    'password' => env('REDIS_PASSWORD') ?: null,
+    'database' => env('REDIS_DEFAULT_DATABASE') ?: 0,
 ], [
-    'prefix' => getenv('REDIS_PREFIX') ?: '',
+    'prefix' => env('REDIS_PREFIX') ?: '',
 ]);
 
 $showtimeResponse = new PlainPhpShowtimeResponse();
@@ -335,7 +337,7 @@ if (!$segmentAggregator) {
 }
 
 $deviceDetector = new LazyDeviceDetector($redis);
-$maxmindDbPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . getenv('MAXMIND_DATABASE');
+$maxmindDbPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . env('MAXMIND_DATABASE');
 $geoReader = new LazyGeoReader($maxmindDbPath);
 
 $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $deviceDetector, $logger);

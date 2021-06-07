@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Redis;
@@ -12,6 +13,8 @@ use Spatie\Searchable\SearchResult;
 
 class Banner extends Model implements Searchable
 {
+    use HasFactory;
+
     use Notifiable;
 
     const BANNER_TAG = 'banner';

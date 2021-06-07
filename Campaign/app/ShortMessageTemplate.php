@@ -2,8 +2,12 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class ShortMessageTemplate extends AbstractTemplate
 {
+    use HasFactory;
+
     protected $fillable = [
         'text',
         'background_color',

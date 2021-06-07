@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
@@ -11,6 +12,8 @@ use Spatie\Searchable\SearchResult;
 
 class Campaign extends Model implements Searchable
 {
+    use HasFactory;
+
     use PivotEventTrait;
 
     const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';

@@ -2,8 +2,12 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class BarTemplate extends AbstractTemplate
 {
+    use HasFactory;
+
     protected $fillable = [
         'main_text',
         'button_text',
