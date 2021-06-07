@@ -90,4 +90,9 @@ class SourceTemplatesRepository extends Repository
             $newSorting
         )->update(['sorting+=' => 1]);
     }
+
+    public function getByCode(string $code)
+    {
+        return $this->getTable()->where('code = ?', $code)->fetch();
+    }
 }

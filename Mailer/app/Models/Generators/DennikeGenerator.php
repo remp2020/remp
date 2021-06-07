@@ -47,7 +47,6 @@ class DennikeGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('source_template_id'))->setRequired(),
             (new PostInputParam('dennike_html'))->setRequired(),
             (new PostInputParam('url'))->setRequired(),
             (new PostInputParam('title'))->setRequired(),
@@ -286,7 +285,7 @@ class DennikeGenerator implements IGenerator
         $output = new ArrayHash();
 
         if (!isset($data->post_authors[0]->display_name)) {
-            throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
+            throw new PreprocessException("WP json object does not contain required attribute 'post_authors.0.display_name'");
         }
 
         if (isset($data->sender_email) && $data->sender_email) {

@@ -38,19 +38,29 @@ class MailGeneratorPreprocessHandler extends BaseHandler
 
         $data = json_decode($json);
 
-        if (!isset($data->source_template_id)) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Missing required json parameter \'source_template_id\'']);
+        if (!isset($data->source_template_id) && !isset($data->source_template_code)) {
+            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'You have to specify either \'source_template_id\' or \'source_template_code\' param to identify generators source template']);
         }
+
+        $template = null;
+        if (isset($data->source_template_id)) {
+            $template = $this->sourceTemplatesRepository->find($data->source_template_id);
+        }
+        if (!$template && isset($data->source_template_code)) {
+            $template = $this->sourceTemplatesRepository->getByCode($data->source_template_code);
+        }
+        if (!$template) {
+            return new JsonApiResponse(404, [
+                'status' => 'error',
+                'message' => "Cannot find the source template: " . ($data->source_template_id ?? $data->source_template_code),
+            ]);
+        }
+
         if (!isset($data->data)) {
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Missing required json parameter \'data\'']);
         }
 
         $generator = null;
-        $template = $this->sourceTemplatesRepository->find($data->source_template_id);
-        if (!$template) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => "No source template associated with id {$data->source_template_id}"]);
-        }
-
         try {
             $generator = $this->generatorFactory->get($template->generator);
         } catch (\Exception $ex) {
@@ -62,10 +72,11 @@ class MailGeneratorPreprocessHandler extends BaseHandler
             if (!$output) {
                 return new JsonApiResponse(400, [
                     'status' => 'error',
-                    'message' => "Generator [{$template->generator}] used for source template [{$data->source_template_id}] does not support parameter preprocessing",
+                    'message' => "Generator [{$template->generator}] used for source template [{$template->code}] does not support parameter preprocessing",
                 ]);
             }
-            $output->source_template_id = $data->source_template_id;
+            $output->source_template_id = $template->id;
+            $output->source_template_code = $template->code;
             return new JsonApiResponse(200, [
                 'status' => 'ok',
                 'data' => $output,

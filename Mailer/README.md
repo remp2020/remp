@@ -309,7 +309,7 @@ to the parameters stated in `apiParams()`. This is a very specific use of an int
             $output = new \stdClass();
     
             if (!isset($data->post_authors[0]->display_name)) {
-                throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
+                throw new PreprocessException("WP json object does not contain required attribute 'post_authors.0.display_name'");
             }
             $output->editor = $data->post_authors[0]->display_name;
             $output->from = "Denník N <info@dennikn.sk>";
@@ -1557,7 +1557,8 @@ parameters based on the used *generator*. It complements generation of HTML/text
 
 | Name | Value | Required | Description |
 | --- |---| --- | --- |
-| source_template_id | *String* | yes | ID of *generator template* to be used. |
+| source_template_id | *String* | yes if CODE not provided  | ID of *generator template* to be used. |
+| source_template_code | *String* | yes if ID not provided | CODE of *generator template* to be used. |
 
 Any other parameters are specific to each generator and require knowledge of the generator implementation.
 See `apiParams()` method of the generator for the list of available/required parameters.
@@ -1686,6 +1687,7 @@ See [`preprocessParameters()` bullet of Implementing Generator section](#impleme
 ```json5
 {
     "source_template_id": 17, // Integer; referencing generator template ID
+    "source_template_code": "template-code", // String; referencing generator template CODE,
     "data": { // Object; arbitrary data for generator to evaluate and process
         // ...
     }
