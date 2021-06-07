@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 
 class CampaignSeeder extends Seeder
@@ -12,46 +14,46 @@ class CampaignSeeder extends Seeder
     public function run()
     {
         /** @var \App\Banner $banner */
-        $banner = factory(\App\Banner::class)->create([
+        $banner = \App\Banner::factory()->create([
             'name' => 'DEMO Medium Rectangle Banner',
             'template' => 'medium_rectangle',
             'offset_horizontal' => 10,
             'offset_vertical' => 10,
         ]);
         $banner->mediumRectangleTemplate()->save(
-            factory(\App\MediumRectangleTemplate::class)->make()
+            \App\MediumRectangleTemplate::factory()->make()
         );
 
         /** @var \App\Banner $altBanner */
-        $altBanner = factory(\App\Banner::class)->create([
+        $altBanner = \App\Banner::factory()->create([
             'name' => 'DEMO Bar Banner',
             'template' => 'bar',
             'offset_horizontal' => 10,
             'offset_vertical' => 10,
         ]);
         $altBanner->barTemplate()->save(
-            factory(\App\BarTemplate::class)->make()
+            \App\BarTemplate::factory()->make()
         );
 
         /** @var \App\Campaign $campaign */
-        $campaign = factory(\App\Campaign::class)->create();
+        $campaign = \App\Campaign::factory()->create();
 
         $campaign->segments()->save(
-            factory(\App\CampaignSegment::class)->make()
+            \App\CampaignSegment::factory()->make()
         );
 
-        $campaignBanner = factory(\App\CampaignBanner::class)->create([
+        $campaignBanner = \App\CampaignBanner::factory()->create([
             'banner_id' => $banner->id,
             'campaign_id' => $campaign->id,
         ]);
 
-        $altCampaignBanner = factory(\App\CampaignBanner::class)->create([
+        $altCampaignBanner = \App\CampaignBanner::factory()->create([
             'banner_id' => $altBanner->id,
             'campaign_id' => $campaign->id,
             'weight' => 2,
         ]);
 
-        $controlGroup = factory(\App\CampaignBanner::class)->create([
+        $controlGroup = \App\CampaignBanner::factory()->create([
             'banner_id' => null,
             'campaign_id' => $campaign->id,
             'weight' => 3,

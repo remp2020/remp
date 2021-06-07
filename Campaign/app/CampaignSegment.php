@@ -2,10 +2,13 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CampaignSegment extends Model
 {
+    use HasFactory;
+
     protected $appends = ['name', 'group'];
 
     protected $fillable = [

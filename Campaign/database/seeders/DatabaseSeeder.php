@@ -1,5 +1,9 @@
 <?php
 
+namespace Database\Seeders;
+
+use Database\Seeders\CountrySeeder;
+use Database\Seeders\CampaignSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder

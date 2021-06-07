@@ -2,8 +2,12 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class MediumRectangleTemplate extends AbstractTemplate
 {
+    use HasFactory;
+
     protected $fillable = [
         'header_text',
         'main_text',

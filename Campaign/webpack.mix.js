@@ -5,7 +5,7 @@ mix.webpackConfig({
         symlinks: false,
     },
     watchOptions: {
-        ignored: [ /node_modules([\\]+|\/)+(?!remp)/ ]
+        ignored: /node_modules([\\]+|\/)+(?!remp)/,
     }
 }).version();
 
@@ -24,6 +24,7 @@ if (process.env.REMP_TARGET === 'lib') {
         .js("resources/assets/js/banner.js", "js/banner.js")
         .js("resources/assets/js/remplib.js", "js/remplib.js")
         .js("resources/assets/js/bannerSelector.js", "js/bannerSelector.js")
+        .vue()
         .polyfill({
             enabled: true,
             useBuiltIns: "usage",
@@ -43,5 +44,6 @@ if (process.env.REMP_TARGET === 'lib') {
         .js("resources/assets/js/banner.js", "js/banner.js")
         .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
         .sass("resources/assets/sass/app.scss", "css/app.css")
+        .vue()
         .extract();
 }

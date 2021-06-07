@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Banner;
 use App\Campaign;
 use Ramsey\Uuid\Uuid;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CampaignBanner extends Model
 {
+    use HasFactory;
+
     use SoftDeletes;
 
     protected $table = 'campaign_banners';

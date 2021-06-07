@@ -11,43 +11,52 @@
 |
 */
 
-Route::get('/error', 'AuthController@error')->name('sso.error');
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\CampaignsComparisonController;
+use App\Http\Controllers\StatsController;
+use App\Http\Controllers\SearchController;
 
-Route::get('banners/preview/{uuid}', 'BannerController@preview')->name('banners.preview');
-Route::get('campaigns/showtime', 'CampaignController@showtime')->name('campaigns.showtime');
+Route::get('/error', [AuthController::class, 'error'])->name('sso.error');
+
+Route::get('banners/preview/{uuid}', [BannerController::class, 'preview'])->name('banners.preview');
+Route::get('campaigns/showtime', [CampaignController::class, 'showtime'])->name('campaigns.showtime');
 
 Route::middleware('auth.jwt')->group(function () {
-    Route::get('/', 'DashboardController@index');
-    Route::get('dashboard', 'DashboardController@index')->name('dashboard');
-    Route::get('banners/json', 'BannerController@json')->name('banners.json');
-    Route::get('banners/{sourceBanner}/copy', 'BannerController@copy')->name('banners.copy');
-    Route::get('campaigns/json', 'CampaignController@json')->name('campaigns.json');
-    Route::get('campaigns/{sourceCampaign}/copy', 'CampaignController@copy')->name('campaigns.copy');
-    Route::get('campaigns/{campaign}/schedule/json', 'ScheduleController@json')->name('campaign.schedule.json');
-    Route::get('schedule/json', 'ScheduleController@json')->name('schedule.json');
-    Route::post('schedule/{schedule}/start', 'ScheduleController@start')->name('schedule.start');
-    Route::post('schedule/{schedule}/pause', 'ScheduleController@pause')->name('schedule.pause');
-    Route::post('schedule/{schedule}/stop', 'ScheduleController@stop')->name('schedule.stop');
+    Route::get('/', [DashboardController::class, 'index']);
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('banners/json', [BannerController::class, 'json'])->name('banners.json');
+    Route::get('banners/{sourceBanner}/copy', [BannerController::class, 'copy'])->name('banners.copy');
+    Route::get('campaigns/json', [CampaignController::class, 'json'])->name('campaigns.json');
+    Route::get('campaigns/{sourceCampaign}/copy', [CampaignController::class, 'copy'])->name('campaigns.copy');
+    Route::get('campaigns/{campaign}/schedule/json', [ScheduleController::class, 'json'])->name('campaign.schedule.json');
+    Route::get('schedule/json', [ScheduleController::class, 'json'])->name('schedule.json');
+    Route::post('schedule/{schedule}/start', [ScheduleController::class, 'start'])->name('schedule.start');
+    Route::post('schedule/{schedule}/pause', [ScheduleController::class, 'pause'])->name('schedule.pause');
+    Route::post('schedule/{schedule}/stop', [ScheduleController::class, 'stop'])->name('schedule.stop');
 
-    Route::get('comparison', 'CampaignsComparisonController@index')->name('comparison.index');
-    Route::get('comparison/json', 'CampaignsComparisonController@json')->name('comparison.json');
-    Route::put('comparison/{campaign}', 'CampaignsComparisonController@add')->name('comparison.add');
-    Route::post('comparison/addAll', 'CampaignsComparisonController@addAll')->name('comparison.addAll');
-    Route::post('comparison/removeAll', 'CampaignsComparisonController@removeAll')->name('comparison.removeAll');
-    Route::delete('comparison/{campaign}/', 'CampaignsComparisonController@remove')->name('comparison.remove');
+    Route::get('comparison', [CampaignsComparisonController::class, 'index'])->name('comparison.index');
+    Route::get('comparison/json', [CampaignsComparisonController::class, 'json'])->name('comparison.json');
+    Route::put('comparison/{campaign}', [CampaignsComparisonController::class, 'add'])->name('comparison.add');
+    Route::post('comparison/addAll', [CampaignsComparisonController::class, 'addAll'])->name('comparison.addAll');
+    Route::post('comparison/removeAll', [CampaignsComparisonController::class, 'removeAll'])->name('comparison.removeAll');
+    Route::delete('comparison/{campaign}/', [CampaignsComparisonController::class, 'remove'])->name('comparison.remove');
 
-    Route::post('campaigns/validate', 'CampaignController@validateForm')->name('campaigns.validateForm');
-    Route::post('banners/validate', 'BannerController@validateForm')->name('banners.validateForm');
+    Route::post('campaigns/validate', [CampaignController::class, 'validateForm'])->name('campaigns.validateForm');
+    Route::post('banners/validate', [BannerController::class, 'validateForm'])->name('banners.validateForm');
 
-    Route::get('campaigns/{campaign}/stats', 'CampaignController@stats')->name('campaigns.stats');
-    Route::post('campaigns/{campaign}/stats/data', 'StatsController@getStats')->name('campaigns.stats.data');
+    Route::get('campaigns/{campaign}/stats', [CampaignController::class, 'stats'])->name('campaigns.stats');
+    Route::post('campaigns/{campaign}/stats/data', [StatsController::class, 'getStats'])->name('campaigns.stats.data');
 
-    Route::get('auth/logout', 'AuthController@logout')->name('auth.logout');
+    Route::get('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
-    Route::resource('banners', 'BannerController');
-    Route::resource('campaigns', 'CampaignController');
-    Route::resource('schedule', 'ScheduleController')->only(['index', 'create', 'edit', 'update', 'destroy']);
-    Route::resource('campaigns.schedule', 'ScheduleController');
+    Route::resource('banners', BannerController::class);
+    Route::resource('campaigns', CampaignController::class);
+    Route::resource('schedule', ScheduleController::class)->only(['index', 'create', 'edit', 'update', 'destroy']);
+    Route::resource('campaigns.schedule', ScheduleController::class);
 
-    Route::get('search', 'SearchController@search')->name('search');
+    Route::get('search', [SearchController::class, 'search'])->name('search');
 });

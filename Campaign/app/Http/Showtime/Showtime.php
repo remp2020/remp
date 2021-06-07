@@ -6,8 +6,8 @@ use App\Banner;
 use App\Campaign;
 use App\CampaignBanner;
 use App\Contracts\SegmentAggregator;
-use App\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
@@ -58,7 +58,7 @@ class Showtime
     private function getRequest()
     {
         if (!$this->request) {
-            $this->request = \App\Http\Request::createFromGlobals();
+            $this->request = Request::createFromGlobals();
         }
         return $this->request;
     }
