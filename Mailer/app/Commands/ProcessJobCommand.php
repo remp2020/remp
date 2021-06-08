@@ -44,25 +44,25 @@ class ProcessJobCommand extends Command
 
         while ($batch = $this->batchesRepository->getBatchReady()) {
             try {
-                $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_PROCESSING]);
+                $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_PROCESSING);
                 $output->writeln("  * processing mail batch <info>#{$batch->id}</info>");
 
                 if ($batch->related('mail_job_batch_templates')->count('*') == 0) {
                     $output->writeln("<error>Batch #{$batch->id} has no templates</error>");
-                    $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_CREATED]);
+                    $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_CREATED);
                     continue;
                 }
 
                 $this->batchEmailGenerator->generate($batch);
+                $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_PROCESSED);
                 $this->batchesRepository->update($batch, [
-                    'status' => BatchesRepository::STATUS_PROCESSED,
                     'pid' => $pid,
                 ]);
             } catch (Exception $e) {
                 Debugger::log($e, ILogger::ERROR);
                 $reschedule = DateTime::from('+5 minutes');
+                $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY);
                 $this->batchesRepository->update($batch, [
-                    'status' => BatchesRepository::STATUS_READY,
                     'start_at' => $reschedule,
                 ]);
                 $output->writeln("  * <error>processing failed</error>: {$e->getMessage()}; rescheduling to <info>{$reschedule->format(DATE_RFC3339)}</info>");

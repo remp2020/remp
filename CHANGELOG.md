@@ -21,6 +21,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Removed deprecated column in `mail_user_subscriptions` table.
+- Added new hermes event `batch-status-change` to emit when mail job batch status is changed. remp/remp#660
+- Added `TrackNewsletterArticlesHandler` to track articles sent in newsletters. remp/remp#660
 
 ### [Sso]
 

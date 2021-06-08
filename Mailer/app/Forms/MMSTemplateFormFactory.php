@@ -157,7 +157,7 @@ class MMSTemplateFormFactory
                 $batchStatus = BatchesRepository::STATUS_CREATED;
             }
 
-            $this->batchesRepository->update($batch, ['status' => $batchStatus]);
+            $this->batchesRepository->updateStatus($batch, $batchStatus);
         };
 
         $generate(

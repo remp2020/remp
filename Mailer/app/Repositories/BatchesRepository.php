@@ -3,7 +3,12 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use Nette\Caching\Storage;
+use Nette\Database\Context;
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Hermes\HermesMessage;
+use Remp\MailerModule\Hermes\RedisDriver;
+use Tomaj\Hermes\Emitter;
 
 class BatchesRepository extends Repository
 {
@@ -28,6 +33,14 @@ class BatchesRepository extends Repository
 
     protected $tableName = 'mail_job_batch';
 
+    private Emitter $emitter;
+
+    public function __construct(Context $database, Emitter $emitter, Storage $cacheStorage = null)
+    {
+        parent::__construct($database, $cacheStorage);
+        $this->emitter = $emitter;
+    }
+
     public function add(int $jobId, int $emailCount = null, string $startAt = null, string $method = 'random'): ActiveRow
     {
         $result = $this->insert([
@@ -42,6 +55,21 @@ class BatchesRepository extends Repository
         if (is_numeric($result)) {
             return $this->getTable()->where('id', $result)->fetch();
         }
+
+        return $result;
+    }
+
+    public function updateStatus(ActiveRow $batch, $status): bool
+    {
+        $result = $this->update($batch, [
+            'status' => $status,
+            'updated_at' => new DateTime()
+        ]);
+        $this->emitter->emit(new HermesMessage('batch-status-change', [
+            'mail_job_batch_id' => $batch->id,
+            'time' => time(),
+            'status' => $status
+        ]), RedisDriver::PRIORITY_LOW);
 
         return $result;
     }

@@ -154,7 +154,7 @@ class NewBatchFormFactory
 
         $buttonSaveStart = $form[self::FORM_ACTION_SAVE_START];
         if ($buttonSaveStart->isSubmittedBy()) {
-            $this->batchesRepository->update($batch, ['status' => BatchesRepository::STATUS_READY]);
+            $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY);
         }
 
         ($this->onSuccess)($batch->job);
