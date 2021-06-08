@@ -2,7 +2,10 @@ const global = require('global');
 
 // vendor libraries we need to use outside of JS files
 global.$ = global.jQuery = require('jquery');
-global.Vue = require('vue');
+
+import Vue from 'vue';
+global.Vue = Vue;
+
 global.moment = require('moment');
 global.autosize = require('autosize');
 global.Waves = require('node-waves');

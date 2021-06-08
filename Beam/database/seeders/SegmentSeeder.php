@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use App\SegmentGroup;
 use Illuminate\Database\Seeder;
 

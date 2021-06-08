@@ -9,13 +9,13 @@ use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
 use App\Country;
-use App\Http\Request;
 use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use App\Http\Showtime\ControllerShowtimeResponse;
 use App\Http\Showtime\Showtime;
 use App\Schedule;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use View;
 use HTML;
 use Illuminate\Http\JsonResponse;
@@ -156,13 +156,13 @@ class CampaignController extends Controller
     {
         $campaign = new Campaign();
 
-        list(
+        [
             $campaign,
             $bannerId,
             $variants,
             $selectedCountries,
             $countriesBlacklist
-        ) = $this->processOldCampaign($campaign, old());
+        ] = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
@@ -183,13 +183,13 @@ class CampaignController extends Controller
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
 
-        list(
+        [
             $campaign,
             $bannerId,
             $variants,
             $selectedCountries,
             $countriesBlacklist
-        ) = $this->processOldCampaign($campaign, old());
+        ] = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.create', [
             'campaign' => $campaign,
@@ -275,13 +275,13 @@ class CampaignController extends Controller
      */
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
     {
-        list(
+        [
             $campaign,
             $bannerId,
             $variants,
             $selectedCountries,
             $countriesBlacklist
-        ) = $this->processOldCampaign($campaign, old());
+        ] = $this->processOldCampaign($campaign, old());
 
         return view('campaigns.edit', [
             'campaign' => $campaign,

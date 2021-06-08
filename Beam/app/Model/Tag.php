@@ -2,12 +2,15 @@
 
 namespace App\Model;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Article;
 use App\TagCategory;
 use Illuminate\Database\Eloquent\Model;
 
 class Tag extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'external_id',

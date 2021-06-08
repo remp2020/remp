@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Misc;
 use App\Model\ArticleTitle;
@@ -21,6 +22,8 @@ use Yadakhov\InsertOnDuplicateKey;
 
 class Article extends Model implements Searchable
 {
+    use HasFactory;
+
     use InsertOnDuplicateKey;
 
     private const DEFAULT_TITLE_VARIANT = 'default';

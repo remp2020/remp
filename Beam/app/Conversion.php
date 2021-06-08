@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Model\ConversionCommerceEvent;
 use App\Model\ConversionGeneralEvent;
 use App\Model\ConversionPageviewEvent;
@@ -20,6 +21,8 @@ use Illuminate\Support\Carbon;
  */
 class Conversion extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'article_external_id',
         'transaction_id',

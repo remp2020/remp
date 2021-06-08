@@ -2,11 +2,14 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Model\TableName;
 use Illuminate\Database\Eloquent\Model;
 
 class SegmentBrowser extends Model
 {
+    use HasFactory;
+
     use TableName;
 
     protected $fillable = [

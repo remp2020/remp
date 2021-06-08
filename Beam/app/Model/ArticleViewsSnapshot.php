@@ -1,6 +1,7 @@
 <?php
 namespace App\Model;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Model\Property\SelectedProperty;
 use App\Model\Scopes\PropertyTokenScope;
 use DB;
@@ -8,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ArticleViewsSnapshot extends Model
 {
+    use HasFactory;
+
     use TableName;
 
     public $timestamps = false;

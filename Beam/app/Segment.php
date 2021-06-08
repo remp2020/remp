@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Model\TableName;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Searchable\Searchable;
@@ -9,6 +10,8 @@ use Spatie\Searchable\SearchResult;
 
 class Segment extends Model implements Searchable
 {
+    use HasFactory;
+
     use TableName;
 
     protected $casts = [
