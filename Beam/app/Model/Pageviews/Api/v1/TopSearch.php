@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Model\Pageviews;
+namespace App\Model\Pageviews\Api\v1;
 
-use App\Http\Requests\TopAuthorsSearchRequest;
-use App\Http\Requests\TopArticlesSearchRequest;
-use App\Http\Requests\TopTagsSearchRequest;
+use App\Http\Requests\Api\v1\TopArticlesSearchRequest;
+use App\Http\Requests\Api\v1\TopAuthorsSearchRequest;
+use App\Http\Requests\Api\v1\TopTagsSearchRequest;
 use DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;

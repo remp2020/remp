@@ -973,6 +973,139 @@ $response = file_get_contents("http://beam.remp.press/api/articles/top", false, 
 
 ---
 
+##### POST `api/v2/articles/top`
+
+Beam admin provides statistics about article performance. This endpoint return top articles by pageviews.
+You can filter articles by content type, sections, authors, tags or tag categories.
+
+You can combine multiple filters for each filter category. Filters in and between categories are joined with `AND`, values in filter are joined with `OR`.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Body:*
+
+```json5
+{
+	"from": "2020-08-10T08:09:18+00:00", // RFC3339-based start time from which to take pageviews to this today 
+	"limit": 3, // limit how many top articles this endpoint returns
+	"content_type": "article", // String; OPTIONAL; filters articles by content_type
+	"sections": [ // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["Section external ids"]}, // String; section external IDs; values joined with OR
+		{"names": ["Section titles"]} // String; section names; joined with OR; values joined with OR
+	],
+	"authors": [ // OPTIONAL; filters from which authors take articles (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["author external ids"]}, // String; author external IDs; values joined with OR
+		{"names": ["author names"]} // String; author names; joined with OR; values joined with OR
+	],
+	"tags": [ // OPTIONAL; filters articles with tags (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["tag external ids"]}, // String; tag external IDs; values joined with OR
+		{"names": ["tag names"]} // String; tag names; values joined with OR
+	],
+	"tag_categories": [ // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["tag category external ids"]}, // String; tag category external IDs; values joined with OR
+		{"names": ["tag category names"]} // String; tag category names; values joined with OR
+	]
+}
+```
+
+##### *Examples*:
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl --location --request POST 'http://beam.remp.press/api/v2/articles/top' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer XXX' \
+--data-raw '{
+	"from": "2020-08-10T08:09:18+00:00",
+	"limit": 3,
+	"content_type": "article",
+	"sections": [
+		{"external_ids": ["1", "2"]},
+		{"names": ["World"]}
+	],
+	"authors": [
+		{"external_ids": ["123"]}
+	],
+	"tags": [
+		{"external_ids": ["10"]}
+	],
+	"tag_categories": [
+		{"external_ids": ["1"]}
+	]
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+	"from" => "2020-08-10T08:09:18+00:00",
+	"limit" => 3,
+	"content_type" => "article",
+	"sections" => [
+		["names" => ["Blog"]]
+	],
+	"authors" => [
+		["names" => ["John Doe"]]
+	],
+	"tags" => [
+		["names" => ["News"]]
+	],
+	"tag_categories" => [
+		["names" => ["Europe"]]
+	]
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/v2/articles/top", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+[
+    {
+        "external_id": "1411843",
+        "pageviews": 274
+    },
+    {
+        "external_id": "1443988",
+        "pageviews": 150
+    },
+    {
+        "external_id": "1362607",
+        "pageviews": 45
+    }
+]
+```
+
+---
+
 ##### POST `api/authors/top`
 
 Beam admin provides statistics about author performance. This endpoint return top authors by pageviews.
@@ -1086,6 +1219,121 @@ $response = file_get_contents("http://beam.remp.press/api/authors/top", false, $
 
 ---
 
+##### POST `api/v2/authors/top`
+
+Beam admin provides statistics about author performance. This endpoint return top authors by pageviews.
+You can filter authors by content type, sections, tags or tag categories.
+
+You can combine multiple filters for each filter category. Filters in and between categories are joined with `AND`, values in filter are joined with `OR`.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Body:*
+
+```json5
+{
+	"from": "2020-08-10T08:14:09+00:00", // RFC3339-based start datetime from which to take pageviews to this today 
+	"limit": 3, // limit how many top authors this endpoint returns
+	"content_type": "article", // String; OPTIONAL; filters articles by content_type
+	"sections": [ // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["Section external ids"]}, // String; section external IDs; values joined with OR
+		{"names": ["Section titles"]} // String; section names; values joined with OR
+	],
+	"tags": [ // OPTIONAL; filters articles with tags (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["Tag external ids"]}, // String; tag external IDs; values joined with OR
+		{"names": ["Tag titles"]} // String; tag names; values joined with OR
+	],
+	"tag_categories": [ // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["tag category external ids"]}, // String; tag category external IDs; values joined with OR 
+		{"names": ["tag category names"]} // String; tag category names; values joined with OR
+	]
+}
+```
+
+##### *Examples*:
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl --location --request POST 'http://beam.remp.press/api/v2/authors/top' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer XXX' \
+--data-raw '{
+	"from": "2020-08-10T08:14:09+00:00",
+	"limit": 3,
+	"content_type": "article",
+	"sections": [
+		{"external_ids": ["22"]}
+	],
+	"tags": [
+		{"external_ids": ["10"]}
+	],
+	"tag_categories": [
+		{"external_ids": ["1"]}
+	]
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+	"from" => "2020-08-10T08:14:09+00:00",
+	"limit" => 3,
+	"content_type" => "article",
+	"sections" => [
+		["names" => ["Blog"]]
+	],
+	"tags" => [
+		["names" => ["News"]]
+	],
+	"tag_categories" => [
+		["names" => ["Europe"]]
+	]
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/v2/authors/top", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+[
+    {
+        "external_id": 100,
+        "name": "Example Author",
+        "pageviews": 23000
+    }
+]
+```
+
+---
+
 ##### POST `api/tags/top`
 
 Beam admin provides statistics about tag performance. This endpoint return top post tags by pageviews.
@@ -1180,6 +1428,131 @@ $context = stream_context_create([
     ]
 );
 $response = file_get_contents("http://beam.remp.press/api/tags/top", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+[
+    {
+        "name": "ekonomika",
+        "pageviews": 4000,
+        "external_id": "1"
+    },
+    {
+        "name": "covid19",
+        "pageviews": 3000,
+        "external_id": "2"
+    },
+    {
+        "name": "brexit",
+        "pageviews": 2000,
+        "external_id": "3"
+    }
+]
+```
+
+---
+
+##### POST `api/v2/tags/top`
+
+Beam admin provides statistics about tag performance. This endpoint return top post tags by pageviews.
+You can filter tags by content type, sections, authors or tag categories.
+
+You can combine multiple filters for each filter category. Filters in and between categories are joined with `AND`, values in filter are joined with `OR`.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Body:*
+
+```json5
+{
+	"from": "2020-08-10T08:14:09+00:00", // RFC3339-based start datetime from which to take pageviews to this today 
+	"limit": 3, // limit how many top tags this endpoint returns
+	"content_type": "article", // String; OPTIONAL; filters articles by content_type
+	"sections": [ // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["Section external ids"]}, // String; section external IDs; values joined with OR
+		{"names": ["Section titles"]} // String; section external_id; values joined with OR
+	],
+	"authors": [ // OPTIONAL; filters from which authors take articles (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["author external ids"]}, // String; section external IDs; values joined with OR
+		{"names": ["author names"]} // String; section external_id; values joined with OR
+	],
+	"tag_categories": [ // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["tag category external ids"]}, // String; tag category external IDs; values joined with OR 
+		{"names": ["tag category names"]} // String; tag category names; values joined with OR
+	]
+}
+```
+
+##### *Examples*:
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl --location --request POST 'http://beam.remp.press/api/v2/tags/top' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer XXX' \
+--data-raw '{
+	"from": "2020-08-10T08:14:09+00:00",
+	"limit": 3,
+	"content_type": "article",
+	"sections": [
+		{"external_ids": ["1"]}
+	],
+	"authors": [
+		{"external_ids": ["123"]}
+	],
+	"tag_categories": [
+		{"external_ids": ["1"]}
+	]
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+	"from" => "2020-08-10T08:14:09+00:00",
+	"limit" => 3,
+	"content_type" => "article",
+	"sections" => [
+		["names" => ["Blog"]]
+	],
+	"authors" => [
+		["names" => ["John Doe"]]
+	],
+	"tag_categories" => [
+		["names" => ["Europe"]]
+	]
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/v2/tags/top", false, $context);
 // process response (raw JSON string)
 ```
 

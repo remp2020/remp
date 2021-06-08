@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed default order sequence for numeric columns to be descending first. remp/remp#934
 - Fixed incorrect pageviews bug in `/top` APIs when using filters. remp/remp#937
 - Added optional `APP_TRUSTED_PROXIES` environmental variable.
+- Added v2 of `/top` APIs. See [README.md](./Beam/README.md) for more details. remp/remp#938
 
 ### [Campaign]
 

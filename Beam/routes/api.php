@@ -1,13 +1,17 @@
 <?php
 
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\Api\v1\ArticleController as ArticleControllerApiV1;
+use App\Http\Controllers\Api\v2\ArticleController as ArticleControllerApiV2;
 use App\Http\Controllers\ArticleDetailsController;
-use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\Api\v1\AuthorController as AuthorControllerApiV1;
+use App\Http\Controllers\Api\v2\AuthorController as AuthorControllerApiV2;
 use App\Http\Controllers\ConversionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\JournalProxyController;
-use App\Http\Controllers\TagController;
+use App\Http\Controllers\Api\v1\TagController as TagControllerApiV1;
+use App\Http\Controllers\Api\v2\TagController as TagControllerApiV2;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,13 +35,6 @@ Route::middleware('auth:api')->group(function() {
     Route::post('articles/upsert', [ArticleController::class, 'upsert'])->name('articles.upsert');
     Route::post('conversions/upsert', [ConversionController::class, 'upsert'])->name('conversions.upsert');
 
-    // TODO: this is temporary solution - will be refactored in https://gitlab.com/remp/remp/-/issues/601
-    Route::post('v2/articles/upsert', [ArticleController::class, 'upsertV2'])->name('articles.upsertV2');
-
-    Route::post('articles/top', [ArticleController::class, 'topArticles'])->name('articles.top');
-    Route::post('authors/top', [AuthorController::class, 'topAuthors'])->name('authors.top');
-    Route::post('tags/top', [TagController::class, 'topTags'])->name('tags.top');
-
     Route::get('article/{article?}', [ArticleDetailsController::class, 'show']);
     Route::get('article/{article}/histogram', [ArticleDetailsController::class, 'timeHistogram']);
     Route::get('article/{article}/variants-histogram', [ArticleDetailsController::class, 'variantsHistogram']);
@@ -50,6 +47,18 @@ Route::middleware('auth:api')->group(function() {
     Route::post('/journal/pageviews/actions/progress/count', [JournalProxyController::class, 'pageviewsProgressCount']);
     Route::post('/journal/pageviews/actions/load/unique/browsers', [JournalProxyController::class, 'pageviewsUniqueBrowsersCount']);
     Route::post('/journal/commerce/steps/purchase/count', [JournalProxyController::class, 'commercePurchaseCount']);
+
+    Route::post('articles/top', [ArticleControllerApiV1::class, 'topArticles'])->name('articles.top');
+    Route::post('authors/top', [AuthorControllerApiV1::class, 'topAuthors'])->name('authors.top');
+    Route::post('tags/top', [TagControllerApiV1::class, 'topTags'])->name('tags.top');
+
+    Route::group(['prefix' => 'v2'], function() {
+        Route::post('articles/top', [ArticleControllerApiV2::class, 'topArticles'])->name('articles.top.v2');
+        Route::post('authors/top', [AuthorControllerApiV2::class, 'topAuthors'])->name('authors.top.v2');
+        Route::post('tags/top', [TagControllerApiV2::class, 'topTags'])->name('tags.top.v2');
+
+        Route::post('articles/upsert', [ArticleController::class, 'upsertV2'])->name('articles.upsert.v2');
+    });
 });
 
 Route::get('/journal/{group}/categories/{category}/actions', [JournalController::class, 'actions']);
