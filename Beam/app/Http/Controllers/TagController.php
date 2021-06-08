@@ -6,9 +6,7 @@ use App\Article;
 use App\ArticlesDataTable;
 use App\Author;
 use App\Http\Request;
-use App\Http\Requests\TopTagsSearchRequest;
 use App\Http\Resources\TagResource;
-use App\Model\Pageviews\TopSearch;
 use App\Model\Tag;
 use App\Section;
 use App\TagsDataTable;
@@ -63,10 +61,5 @@ class TagController extends Controller
     {
         $articlesDataTable->setTag($tag);
         return $articlesDataTable->getDataTable($request, $datatables);
-    }
-
-    public function topTags(TopTagsSearchRequest $request, TopSearch $topSearch)
-    {
-        return response()->json($topSearch->topPostTags($request));
     }
 }

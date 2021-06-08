@@ -7,9 +7,7 @@ use App\ArticleAuthor;
 use App\ArticlesDataTable;
 use App\Author;
 use App\Conversion;
-use App\Http\Requests\TopAuthorsSearchRequest;
 use App\Http\Resources\AuthorResource;
-use App\Model\Pageviews\TopSearch;
 use App\Model\Tag;
 use App\Section;
 use Illuminate\Database\Eloquent\Builder;
@@ -196,10 +194,5 @@ class AuthorController extends Controller
     {
         $articlesDataTable->setAuthor($author);
         return $articlesDataTable->getDataTable($request, $datatables);
-    }
-
-    public function topAuthors(TopAuthorsSearchRequest $request, TopSearch $topSearch)
-    {
-        return response()->json($topSearch->topAuthors($request));
     }
 }

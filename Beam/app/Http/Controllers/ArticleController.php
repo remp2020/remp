@@ -10,12 +10,10 @@ use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticlesListRequest;
 use App\Http\Requests\ArticleUpsertRequest;
 use App\Http\Requests\ArticleUpsertRequestV2;
-use App\Http\Requests\TopArticlesSearchRequest;
 use App\Http\Requests\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\NewsletterCriterion;
-use App\Model\Pageviews\TopSearch;
 use App\Model\Tag;
 use App\Section;
 use App\TagCategory;
@@ -755,10 +753,5 @@ class ArticleController extends Controller
             }
         }
         return $usersReadArticles;
-    }
-
-    public function topArticles(TopArticlesSearchRequest $request, TopSearch $topSearch)
-    {
-        return response()->json($topSearch->topArticles($request));
     }
 }
