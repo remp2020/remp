@@ -7,7 +7,7 @@ use App\ArticlesDataTable;
 use App\ArticleSection;
 use App\Author;
 use App\Conversion;
-use App\Http\Request;
+use Illuminate\Http\Request;
 use App\Http\Resources\SectionResource;
 use App\Model\Tag;
 use App\Section;

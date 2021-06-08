@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Author;
 use App\Conversion;
-use App\Http\Request;
+use Illuminate\Http\Request;
 use App\Model\ConversionCommerceEvent;
 use App\Model\ConversionGeneralEvent;
 use App\Model\ConversionPageviewEvent;

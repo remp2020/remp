@@ -11,7 +11,7 @@ use App\Http\Resources\TagCategoryResource;
 use App\TagCategoriesDataTable;
 use App\TagCategory;
 use Yajra\DataTables\DataTables;
-use App\Http\Request;
+use Illuminate\Http\Request;
 use Html;
 use App\TagsDataTable;
 

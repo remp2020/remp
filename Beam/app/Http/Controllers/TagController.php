@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\ArticlesDataTable;
 use App\Author;
-use App\Http\Request;
+use Illuminate\Http\Request;
 use App\Http\Resources\TagResource;
 use App\Model\Tag;
 use App\Section;

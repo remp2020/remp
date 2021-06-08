@@ -3,7 +3,7 @@
 
 namespace App;
 
-use App\Http\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Model\Tag;

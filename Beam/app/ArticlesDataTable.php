@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Html;
 use Yajra\DataTables\DataTables;
-use App\Http\Request;
+use Illuminate\Http\Request;
 
 class ArticlesDataTable
 {

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Request;
+use Illuminate\Http\Request;
 use App\Http\Resources\ConfigResource;
 use App\Model\Config\Config;
 use App\Model\Config\ConfigCategory;

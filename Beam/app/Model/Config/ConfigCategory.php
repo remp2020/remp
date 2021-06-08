@@ -2,7 +2,7 @@
 
 namespace App\Model\Config;
 
-use App\Http\Request;
+use Illuminate\Http\Request;
 use App\Http\Requests\AuthorSegmentsConfigurationRequest;
 use Illuminate\Database\Eloquent\Model;
 

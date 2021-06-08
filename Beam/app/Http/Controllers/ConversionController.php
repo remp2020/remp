@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Author;
 use App\Conversion;
-use App\Http\Request;
+use Illuminate\Http\Request;
 use App\Http\Requests\ConversionRequest;
 use App\Http\Requests\ConversionUpsertRequest;
 use App\Http\Resources\ConversionResource;
