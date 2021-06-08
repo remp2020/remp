@@ -39,7 +39,6 @@ class Remp implements ITracker
             'category' => $category,
             'action' => $action,
             'fields' => $options->getFields(),
-            'value' => $options->getValue(),
             'remp_event_id' => Uuid::uuid4(),
         ]);
 
