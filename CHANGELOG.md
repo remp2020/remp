@@ -8,12 +8,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- **BREAKING**: Upgraded to Laravel 8. remp/remp#491
+  - Make sure that when including `remplib` library (built with production settings), your HTML document has defined character encoding, otherwise `remplib` might not be initialized correctly. Character encoding can be specified using `meta` tag, e.g. `<meta charset="UTF-8" />`.
 - Fixed sorting of referer stats in the article detail. The default sorting is now again Visits count. remp/remp#934
 - Changed default order sequence for numeric columns to be descending first. remp/remp#934
 - Fixed incorrect pageviews bug in `/top` APIs when using filters. remp/remp#937
+- Added optional `APP_TRUSTED_PROXIES` environmental variable.
 
 ### [Campaign]
 
+- Upgraded to Laravel 8. remp/remp#491
 - Changed showtime experiment to be enabled by default. This should change make showtime requests much faster by bypassing Laravel in very exposed endpoint. remp/remp#939
   - If you want to fallback to the original implementation, use `rempConfig.campaign.showtimExperiment = false` in the remplib JS configuration.
 - Added optional `APP_TRUSTED_PROXIES` environmental variable.
@@ -26,6 +30,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Sso]
 
+- Upgraded to Laravel 8. remp/remp#491
 - Added optional `APP_TRUSTED_PROXIES` environmental variable.
 
 ## [0.25.1] - 2021-06-01

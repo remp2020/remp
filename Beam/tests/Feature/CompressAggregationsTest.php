@@ -39,7 +39,7 @@ class CompressAggregationsTest extends TestCase
     {
         $start = Carbon::today()->subDays($this->thresholdPeriod + 1);
         for ($i = 0; $i < 24; $i++) {
-            factory(SessionReferer::class)->create([
+            SessionReferer::factory()->create([
                 'time_from' => (clone $start)->addHours($i),
                 'time_to' => (clone $start)->addHours($i + 1),
                 'subscriber' => false,
@@ -69,7 +69,7 @@ class CompressAggregationsTest extends TestCase
             'client_version' => 'a',
         ];
 
-        factory(SessionDevice::class)->create(array_merge($same, [
+        SessionDevice::factory()->create(array_merge($same, [
                 'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod),
                 'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod),
                 'subscriber' => false,
@@ -77,7 +77,7 @@ class CompressAggregationsTest extends TestCase
             ])
         );
 
-        factory(SessionDevice::class)->create(array_merge($same, [
+        SessionDevice::factory()->create(array_merge($same, [
                 'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod),
                 'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod),
                 'subscriber' => false,
@@ -85,7 +85,7 @@ class CompressAggregationsTest extends TestCase
             ])
         );
 
-        factory(SessionDevice::class)->create(array_merge($same, [
+        SessionDevice::factory()->create(array_merge($same, [
                 'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod),
                 'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod),
                 'subscriber' => true,
@@ -94,7 +94,7 @@ class CompressAggregationsTest extends TestCase
         );
 
         //// Do not aggregate these
-        factory(SessionDevice::class)->create(array_merge($same, [
+        SessionDevice::factory()->create(array_merge($same, [
                 'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod - 1),
                 'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod - 1),
                 'subscriber' => false,
@@ -102,7 +102,7 @@ class CompressAggregationsTest extends TestCase
             ])
         );
 
-        factory(SessionDevice::class)->create(array_merge($same, [
+        SessionDevice::factory()->create(array_merge($same, [
                 'time_from' => Carbon::today()->hour(9)->subDays($this->thresholdPeriod - 1),
                 'time_to' => Carbon::today()->hour(10)->subDays($this->thresholdPeriod - 1),
                 'subscriber' => false,
@@ -122,38 +122,38 @@ class CompressAggregationsTest extends TestCase
 
     public function runAndTestArticleAggregations($className)
     {
-        $property = factory(Property::class)->create();
+        $property = Property::factory()->create();
 
-        $article1 = factory(Article::class)->create(['property_uuid' => $property->uuid]);
-        $article2 = factory(Article::class)->create(['property_uuid' => $property->uuid]);
+        $article1 = Article::factory()->create(['property_uuid' => $property->uuid]);
+        $article2 = Article::factory()->create(['property_uuid' => $property->uuid]);
 
         // Prepare data to be aggregated
-        $ag1 = factory($className)->create([
+        $ag1 = $className::factory()->create([
             'article_id' => $article1->id,
             'time_from' => Carbon::today()->hour(9)->subDays(91),
             'time_to' => Carbon::today()->hour(10)->subDays(91),
         ]);
 
-        $ag2 = factory($className)->create([
+        $ag2 = $className::factory()->create([
             'article_id' => $article1->id,
             'time_from' => Carbon::today()->hour(10)->subDays(91),
             'time_to' => Carbon::today()->hour(11)->subDays(91),
         ]);
 
-        factory($className)->create([
+        $className::factory()->create([
             'article_id' => $article2->id,
             'time_from' => Carbon::today()->hour(10)->subDays(91),
             'time_to' => Carbon::today()->hour(11)->subDays(91),
         ]);
 
-        factory($className)->create([
+        $className::factory()->create([
             'article_id' => $article1->id,
             'time_from' => Carbon::today()->hour(10)->subDays(90),
             'time_to' => Carbon::today()->hour(11)->subDays(90),
         ]);
 
         // These won't be aggregated
-        factory($className)->create([
+        $className::factory()->create([
             'article_id' => $article1->id,
             'time_from' => Carbon::today()->hour(10)->subDays(89),
             'time_to' => Carbon::today()->hour(11)->subDays(89),

@@ -31,8 +31,8 @@ class ProcessConversionSourcesTest extends TestCase
     {
         parent::setUp();
 
-        $account = factory(Account::class)->create();
-        $this->property = factory(Property::class)->create(['account_id' => $account->id]);
+        $account = Account::factory()->create();
+        $this->property = Property::factory()->create(['account_id' => $account->id]);
 
         // Mock Journal data
         $this->journal = Mockery::mock(Journal::class);
@@ -46,21 +46,21 @@ class ProcessConversionSourcesTest extends TestCase
 
     public function testSuccessMultiplePageviews()
     {
-        $referalArticle = factory(Article::class)->create([
+        $referalArticle = Article::factory()->create([
             'external_id' => 9,
             'property_uuid' => $this->property->uuid,
         ]);
-        $conversionArticle = factory(Article::class)->create([
+        $conversionArticle = Article::factory()->create([
             'external_id' => 'article1',
             'property_uuid' => $this->property->uuid,
         ]);
-        $conversion = factory(Conversion::class)->create([
+        $conversion = Conversion::factory()->create([
             'user_id' => 26,
             'transaction_id' => '1234567890',
             'article_id' => $conversionArticle->id,
             'events_aggregated' => true,
         ]);
-        factory(ConversionCommerceEvent::class)->create([
+        ConversionCommerceEvent::factory()->create([
             'conversion_id' => $conversion,
             'step' => 'payment',
             'time' => Carbon::createFromTimeString('2020-08-06T14:36:47Z'),
@@ -94,17 +94,17 @@ class ProcessConversionSourcesTest extends TestCase
 
     public function testSuccessfulSinglePageview()
     {
-        $conversionArticle = factory(Article::class)->create([
+        $conversionArticle = Article::factory()->create([
             'external_id' => 'article1',
             'property_uuid' => $this->property->uuid,
         ]);
-        $conversion = factory(Conversion::class)->create([
+        $conversion = Conversion::factory()->create([
             'user_id' => 26,
             'article_id' => $conversionArticle->id,
             'transaction_id' => '1234567890',
             'events_aggregated' => true,
         ]);
-        factory(ConversionCommerceEvent::class)->create([
+        ConversionCommerceEvent::factory()->create([
             'conversion_id' => $conversion,
             'step' => 'payment',
             'time' => Carbon::createFromTimeString('2020-08-06T14:36:47Z'),
@@ -135,17 +135,17 @@ class ProcessConversionSourcesTest extends TestCase
 
     public function testNoPageview()
     {
-        $conversionArticle = factory(Article::class)->create([
+        $conversionArticle = Article::factory()->create([
             'external_id' => 'article1',
             'property_uuid' => $this->property->uuid,
         ]);
-        $conversion = factory(Conversion::class)->create([
+        $conversion = Conversion::factory()->create([
             'user_id' => 26,
             'article_id' => $conversionArticle->id,
             'transaction_id' => '1234567890',
             'events_aggregated' => true,
         ]);
-        factory(ConversionCommerceEvent::class)->create([
+        ConversionCommerceEvent::factory()->create([
             'conversion_id' => $conversion,
             'step' => 'payment',
             'time' => Carbon::createFromTimeString('2020-08-06T14:36:47Z'),
@@ -171,11 +171,11 @@ class ProcessConversionSourcesTest extends TestCase
 
     public function testEventsNotAggregatedYet()
     {
-        $conversionArticle = factory(Article::class)->create([
+        $conversionArticle = Article::factory()->create([
             'external_id' => 'article1',
             'property_uuid' => $this->property->uuid,
         ]);
-        $conversion = factory(Conversion::class)->create([
+        $conversion = Conversion::factory()->create([
             'user_id' => 26,
             'article_id' => $conversionArticle->id,
             'transaction_id' => '1234567890',
@@ -192,17 +192,17 @@ class ProcessConversionSourcesTest extends TestCase
 
     public function testMissingCommercePaymentEvent()
     {
-        $conversionArticle = factory(Article::class)->create([
+        $conversionArticle = Article::factory()->create([
             'external_id' => 'article1',
             'property_uuid' => $this->property->uuid,
         ]);
-        $conversion = factory(Conversion::class)->create([
+        $conversion = Conversion::factory()->create([
             'user_id' => 26,
             'article_id' => $conversionArticle->id,
             'transaction_id' => '1234567890',
             'events_aggregated' => true,
         ]);
-        factory(ConversionCommerceEvent::class)->create([
+        ConversionCommerceEvent::factory()->create([
             'conversion_id' => $conversion,
             'step' => 'payment',
             'time' => Carbon::createFromTimeString('2020-08-06T14:36:47Z'),
@@ -220,17 +220,17 @@ class ProcessConversionSourcesTest extends TestCase
 
     public function testMissingBrowserId()
     {
-        $conversionArticle = factory(Article::class)->create([
+        $conversionArticle = Article::factory()->create([
             'external_id' => 'article1',
             'property_uuid' => $this->property->uuid,
         ]);
-        $conversion = factory(Conversion::class)->create([
+        $conversion = Conversion::factory()->create([
             'user_id' => 26,
             'article_id' => $conversionArticle->id,
             'transaction_id' => '1234567890',
             'events_aggregated' => true,
         ]);
-        factory(ConversionCommerceEvent::class)->create([
+        ConversionCommerceEvent::factory()->create([
             'conversion_id' => $conversion,
             'step' => 'payment',
             'time' => Carbon::createFromTimeString('2020-08-06T14:36:47Z'),

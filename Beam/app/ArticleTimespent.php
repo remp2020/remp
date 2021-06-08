@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Model\Aggregable;
 use Carbon\Carbon;
 use DB;
@@ -10,6 +11,8 @@ use Illuminate\Support\Collection;
 
 class ArticleTimespent extends Model implements Aggregable
 {
+    use HasFactory;
+
     public $timestamps = false;
 
     protected $fillable = [

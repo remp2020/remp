@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 
 class PropertySeeder extends Seeder
@@ -12,10 +14,10 @@ class PropertySeeder extends Seeder
     public function run()
     {
         /** @var \App\Account $account */
-        $account = factory(\App\Account::class)->create();
+        $account = \App\Account::factory()->create();
 
         /** @var \App\Property $property */
-        $property = factory(\App\Property::class)->make();
+        $property = \App\Property::factory()->make();
         $account->properties()->save($property);
     }
 }

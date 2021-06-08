@@ -21,13 +21,13 @@ class ComputeAuthorsSegmentsTest extends TestCase
 
     public function testJob()
     {
-        $account = factory(Account::class)->create();
-        $property = factory(Property::class)->create(['account_id' => $account->id]);
-        $article = factory(Article::class)->create([
+        $account = Account::factory()->create();
+        $property = Property::factory()->create(['account_id' => $account->id]);
+        $article = Article::factory()->create([
             'external_id' => 1,
             'property_uuid' => $property->uuid,
         ]);
-        $author = factory(Author::class)->create();
+        $author = Author::factory()->create();
         $article->authors()->save($author);
 
         $date = Carbon::today()->toDateString();
@@ -72,17 +72,17 @@ class ComputeAuthorsSegmentsTest extends TestCase
         SegmentUser::query()->delete();
         Segment::query()->delete();
 
-        $s1 = factory(Segment::class)->state('author')->create();
-        $s1->users()->save(factory(SegmentUser::class)->make());
-        $s1->browsers()->save(factory(SegmentBrowser::class)->make());
+        $s1 = Segment::factory()->author()->create();
+        $s1->users()->save(SegmentUser::factory()->make());
+        $s1->browsers()->save(SegmentBrowser::factory()->make());
 
-        $s2 = factory(Segment::class)->state('author')->create();
-        $s2->users()->save(factory(SegmentUser::class)->make());
+        $s2 = Segment::factory()->author()->create();
+        $s2->users()->save(SegmentUser::factory()->make());
 
-        $s3 = factory(Segment::class)->state('author')->create();
-        $s3->browsers()->save(factory(SegmentBrowser::class)->make());
+        $s3 = Segment::factory()->author()->create();
+        $s3->browsers()->save(SegmentBrowser::factory()->make());
 
-        factory(Segment::class)->state('author')->create();
+        Segment::factory()->author()->create();
 
         $this->assertEquals(4, Segment::all()->count());
 

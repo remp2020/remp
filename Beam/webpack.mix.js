@@ -5,7 +5,7 @@ mix.webpackConfig({
         symlinks: false,
     },
     watchOptions: {
-        ignored: [ /node_modules([\\]+|\/)+(?!remp)/ ]
+        ignored: /node_modules([\\]+|\/)+(?!remp)/
     }
 }).version();
 
@@ -22,6 +22,7 @@ if (process.env.REMP_TARGET === 'iota') {
             ],
         })
         .js("resources/assets/js/iota.js", "js/iota.js")
+        .vue()
 } else if (process.env.REMP_TARGET === 'lib') {
     // we're not using mix.extract() due to issues with splitting of banner.js + vue.js; basically we need not to have manifest.js
     mix
@@ -33,6 +34,7 @@ if (process.env.REMP_TARGET === 'iota') {
             ],
         })
         .js("resources/assets/js/remplib.js", "js/remplib.js")
+        .vue()
         .polyfill({
             enabled: true,
             useBuiltIns: "usage",
@@ -53,5 +55,6 @@ if (process.env.REMP_TARGET === 'iota') {
         .js("resources/assets/js/remplib.js", "js/remplib.js")
         .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
         .sass("resources/assets/sass/app.scss", "css/app.css")
+        .vue()
         .extract();
 }

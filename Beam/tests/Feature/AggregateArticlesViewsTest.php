@@ -79,13 +79,13 @@ JSON;
 JSON;
         $timespent3 = '[]';
 
-        $account = factory(Account::class)->create();
-        $property = factory(Property::class)->create(['account_id' => $account->id]);
-        $article1148518 = factory(Article::class)->create([
+        $account = Account::factory()->create();
+        $property = Property::factory()->create(['account_id' => $account->id]);
+        $article1148518 = Article::factory()->create([
             'external_id' => 1148518,
             'property_uuid' => $property->uuid,
         ]);
-        $article2148518 = factory(Article::class)->create([
+        $article2148518 = Article::factory()->create([
             'external_id' => 2148518,
             'property_uuid' => $property->uuid,
         ]);

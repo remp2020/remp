@@ -2,11 +2,14 @@
 
 namespace App\Model;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Conversion;
 use Illuminate\Database\Eloquent\Model;
 
 class ConversionCommerceEvent extends Model
 {
+    use HasFactory;
+
     protected $casts = [
         'minutes_to_conversion' => 'integer',
         'event_prior_conversion' => 'integer',
