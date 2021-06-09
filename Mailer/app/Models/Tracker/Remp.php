@@ -20,9 +20,12 @@ class Remp implements ITracker
 
     private $token;
 
+    private $trackerHost;
+
     public function __construct(string $trackerHost, string $token)
     {
         $this->token = $token;
+        $this->trackerHost = $trackerHost;
         $this->client = new Client([
             'base_uri' => $trackerHost,
         ]);
@@ -47,7 +50,7 @@ class Remp implements ITracker
                 'json' => $payload,
             ]);
         } catch (ClientException $e) {
-            Debugger::log($e->getResponse()->getBody()->getContents(), Logger::ERROR);
+            Debugger::log("Host: [{$this->trackerHost}], Payload: [{$payload}], response: [{$e->getResponse()->getBody()}]", Logger::ERROR);
         }
     }
 }
