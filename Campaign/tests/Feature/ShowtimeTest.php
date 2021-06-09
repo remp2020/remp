@@ -161,7 +161,7 @@ class ShowtimeTest extends TestCase
         $this->assertNotNull($bannerVariant);
         $this->assertEquals($this->campaignBanner->id, $bannerVariant->id);
         $this->assertCount(1, $activeCampaignUuids);
-        $this->assertEquals($this->campaign->uuid, $activeCampaignUuids[0]);
+        $this->assertEquals($this->campaign->uuid, $activeCampaignUuids[0]['uuid']);
 
         $activeCampaignUuids = [];
         $campaignsSession = [$this->campaign->uuid => ['seen' => 1]];

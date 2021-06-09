@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Introduced `public_id` row to reach unique identifications with shorter string. remp/remp#916
+- Replaced `uuid` campaign's identification with shorter `public_id` in cookies and local storage. remp/remp#916
 
 ### [Mailer]
 

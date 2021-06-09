@@ -158,17 +158,17 @@ class Showtime
             return $showtimeResponse->success($callback, [], [], $segmentAggregator->getProviderData());
         }
 
-        $activeCampaignUuids = [];
+        $activeCampaigns = [];
         foreach ($campaignIds as $campaignId) {
             /** @var Campaign $campaign */
             $campaign = unserialize($this->redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"));
-            $campaignBannerVariant = $this->shouldDisplay($campaign, $data, $activeCampaignUuids);
+            $campaignBannerVariant = $this->shouldDisplay($campaign, $data, $activeCampaigns);
             if ($campaignBannerVariant) {
                 $displayData[] = $showtimeResponse->renderCampaign($campaignBannerVariant, $campaign, $alignments, $dimensions, $positions);
             }
         }
 
-        return $showtimeResponse->success($callback, $displayData, $activeCampaignUuids, $segmentAggregator->getProviderData());
+        return $showtimeResponse->success($callback, $displayData, $activeCampaigns, $segmentAggregator->getProviderData());
     }
 
 
@@ -178,11 +178,11 @@ class Showtime
      *
      * @param Campaign    $campaign
      * @param             $userData
-     * @param array       $activeCampaignUuids
+     * @param array       $activeCampaigns
      *
      * @return CampaignBanner|null
      */
-    public function shouldDisplay(Campaign $campaign, $userData, array &$activeCampaignUuids): ?CampaignBanner
+    public function shouldDisplay(Campaign $campaign, $userData, array &$activeCampaigns): ?CampaignBanner
     {
         $userId = $userData->userId ?? null;
         $browserId = $userData->browserId;
@@ -212,9 +212,21 @@ class Showtime
 
         // find variant previously displayed to user
         $seenCampaigns = $userData->campaigns ?? false;
-        if ($seenCampaigns && isset($seenCampaigns->{$campaign->uuid})) {
-            $bannerUuid = $seenCampaigns->{$campaign->uuid}->bannerId ?? null;
-            $variantUuid = $seenCampaigns->{$campaign->uuid}->variantId ?? null;
+        if ($seenCampaigns) {
+            if (isset($seenCampaigns->{$campaign->uuid})) {
+                $bannerUuid = $seenCampaigns->{$campaign->uuid}->bannerId ?? null;
+                $variantUuid = $seenCampaigns->{$campaign->uuid}->variantId ?? null;
+            }
+
+            if (isset($seenCampaigns->{$campaign->public_id})) {
+                foreach ($campaign->campaignBanners as $campaignBanner) {
+                    if ($campaignBanner->banner->public_id === $seenCampaigns->{$campaign->public_id}->bannerId) {
+                        $bannerUuid = $campaignBanner->banner->uuid ?? null;
+                        $variantUuid = $campaignBanner->uuid ?? null;
+                        break;
+                    }
+                }
+            }
         }
 
         // fallback for older version of campaigns local storage data
@@ -376,9 +388,9 @@ class Showtime
         // Active campaign is campaign that targets selected user (previous rules were passed),
         // but whether it displays or not depends on pageview counting rules (every n-th page, up to N pageviews).
         // We need to track such campaigns on the client-side too.
-        $activeCampaignUuids[] = $campaign->uuid;
+        $activeCampaigns[] = ['uuid' => $campaign->uuid, 'public_id' => $campaign->public_id];
 
-        $seenCampaign = $seenCampaigns->{$campaign->uuid} ?? null;
+        $seenCampaign = $seenCampaigns->{$campaign->uuid} ?? $seenCampaigns->{$campaign->public_id} ?? null;
 
         // pageview rules - check display banner every n-th request
         if ($seenCampaign !== null && $campaign->pageview_rules !== null) {

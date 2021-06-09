@@ -117,23 +117,24 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         ], $statusCode);
     }
 
-    public function success(string $callback, $data, $activeCampaignUuids, $providerData)
+    public function success(string $callback, $data, $activeCampaigns, $providerData)
     {
         $this->jsonpResponse($callback, [
             'success' => true,
             'errors' => [],
             'data' => empty($data) ? [] : $data,
-            'activeCampaignIds' => $activeCampaignUuids,
+            'activeCampaignIds' => array_column($activeCampaigns, 'uuid'),
+            'activeCampaigns' => $activeCampaigns,
             'providerData' => $providerData,
         ]);
     }
 
     public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions): string {
-        return $this->renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->control_group, $alignments, $dimensions, $positions);
+        return $this->renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->control_group, $alignments, $dimensions, $positions, $variant->public_id, $campaign->public_id);
     }
 
     public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions): string {
-        return $this->renderInternal($banner, null, null, 0, $alignments, $dimensions, $positions);
+        return $this->renderInternal($banner, null, null, 0, $alignments, $dimensions, $positions, null, null);
     }
 
     private function renderInternal(
@@ -143,8 +144,10 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         $isControlGroup,
         $alignments,
         $dimensions,
-        $positions) {
-
+        $positions,
+        $variantPublicId,
+        $campaignPublicId
+    ) {
         $alignmentsJson = json_encode($alignments);
         $dimensionsJson = json_encode($dimensions);
         $positionsJson = json_encode($positions);
@@ -156,6 +159,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         } else {
             $js = "
 var bannerUuid = '{$banner->uuid}';
+var bannerPublicId = '{$banner->public_id}';
 var bannerId = 'b-' + bannerUuid;
 var bannerJsonData = {$banner->toJson()};
 ";
@@ -163,14 +167,18 @@ var bannerJsonData = {$banner->toJson()};
 
         if ($variantUuid) {
             $js .= "var variantUuid = '{$variantUuid}';\n";
+            $js .= "var variantPublicId = '{$variantPublicId}';\n";
         } else {
             $js .= "var variantUuid = null;\n";
+            $js .= "var variantPublicId = null;\n";
         }
 
         if ($campaignUuid) {
             $js .= "var campaignUuid = '{$campaignUuid}';\n";
+            $js .= "var campaignPublicId = '{$campaignPublicId}';\n";
         } else {
             $js .= "var campaignUuid = null;\n";
+            $js .= "var campaignPublicId = null;\n";
         }
 
         $js .= <<<JS
@@ -203,8 +211,11 @@ var run = function() {
     banner.positionOptions = positions;
 
     banner.campaignUuid = campaignUuid;
+    banner.campaignPublicId = campaignPublicId;
     banner.variantUuid = variantUuid;
+    banner.variantPublicId = variantPublicId;
     banner.uuid = bannerUuid;
+    banner.publicId = bannerPublicId;
 
     if (typeof remplib.campaign.bannerUrlParams !== "undefined") {
         banner.urlParams = remplib.campaign.bannerUrlParams;
@@ -260,7 +271,7 @@ var run = function() {
         }
 
         if (banner.campaignUuid && banner.variantUuid) {
-            remplib.campaign.handleBannerDisplayed(banner.campaignUuid, banner.uuid, banner.variantUuid);
+            remplib.campaign.handleBannerDisplayed(banner.campaignUuid, banner.uuid, banner.variantUuid, banner.campaignPublicId, banner.publicId, banner.variantPublicId);
         }
 
         if (typeof resolve !== "undefined") {

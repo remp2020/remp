@@ -93,7 +93,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     );
                 });
 
-                remplib.campaign.incrementPageviewCountForCampaigns(result.activeCampaignIds);
+                remplib.campaign.incrementPageviewCountForCampaigns(result.activeCampaigns);
             },
         },
 
@@ -266,9 +266,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         },
 
         // store persistent and session campaign details, called from banner view (when banner is shown)
-        handleBannerDisplayed: function(campaignId, bannerId, variantId) {
-            this.storePersistentCampaignData(campaignId, bannerId, variantId);
-            this.storeSessionCampaignData(campaignId);
+        handleBannerDisplayed: function(campaignId, bannerId, variantId, campaignPublicId, bannerPublicId, variantPublicId) {
+            this.storePersistentCampaignData(campaignId, bannerId, variantId, campaignPublicId, bannerPublicId, variantPublicId);
+            this.storeSessionCampaignData(campaignId, campaignPublicId);
         },
 
         getCampaigns: function() {
@@ -304,32 +304,38 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return campaigns;
         },
 
-        storePersistentCampaignData: function(campaignId, bannerId, variantId) {
+        storePersistentCampaignData: function(campaignId, bannerId, variantId, campaignPublicId, bannerPublicId, variantPublicId) {
             let campaigns = this.getCampaigns();
 
             const now = new Date();
 
-            if (!campaigns.hasOwnProperty(campaignId)) {
-                campaigns[campaignId] = {
-                    "bannerId": bannerId,
-                    "variantId": variantId,
+            if (!campaigns.hasOwnProperty(campaignPublicId)) {
+                campaigns[campaignPublicId] = {
+                    "bannerId": bannerPublicId,
+                    "variantId": variantPublicId,
                     "seen": 0,
                     "count": 0,
                     "updatedAt": now,
                 }
             }
+            
+            if (campaigns.hasOwnProperty(campaignId)) {
+                campaigns[campaignPublicId].seen = campaigns[campaignId].seen;
+                campaigns[campaignPublicId].count = campaigns[campaignId].count;
+                delete(campaigns[campaignId]);
+            }
 
             // always set the new value in case user doesn't have all object properties saved
-            campaigns[campaignId].bannerId = bannerId;
-            campaigns[campaignId].variantId = variantId;
-            campaigns[campaignId].updatedAt = now;
-            campaigns[campaignId].seen++;
+            campaigns[campaignPublicId].bannerId = bannerPublicId;
+            campaigns[campaignPublicId].variantId = variantPublicId;
+            campaigns[campaignPublicId].updatedAt = now;
+            campaigns[campaignPublicId].seen++;
 
             campaigns = remplib.campaign.cleanup(campaigns);
             remplib.setToStorage(this.campaignsStorageKey, this.minifyStoredData(campaigns));
         },
 
-        incrementPageviewCountForCampaigns: function (activeCampaignIds)  {
+        incrementPageviewCountForCampaigns: function (activeCampaigns)  {
             let campaigns = this.getCampaigns();
             const now = new Date();
 
@@ -337,19 +343,25 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 campaigns = {};
             }
 
-            if (activeCampaignIds) {
-                for (const campaignId of activeCampaignIds) {
-                    if (!campaigns.hasOwnProperty(campaignId)) {
+            if (activeCampaigns) {
+                for (const activeCampaign of activeCampaigns) {
+                    if (!campaigns.hasOwnProperty(activeCampaign.public_id)) {
                         // bannerId and variantID will be added later in storeCampaigns()
-                        campaigns[campaignId] = {
+                        campaigns[activeCampaign.public_id] = {
                             "seen": 0,
                             "count": 0,
                             "updatedAt": now,
                         }
                     }
 
-                    campaigns[campaignId].count++;
-                    campaigns[campaignId].updatedAt = now;
+                    if (campaigns.hasOwnProperty(activeCampaign.uuid)) {
+                        campaigns[activeCampaign.public_id].seen = campaigns[activeCampaign.uuid].seen;
+                        campaigns[activeCampaign.public_id].count = campaigns[activeCampaign.uuid].count;
+                        delete(campaigns[activeCampaign.uuid]);
+                    }
+
+                    campaigns[activeCampaign.public_id].count++;
+                    campaigns[activeCampaign.public_id].updatedAt = now;
                 }
             }
 
@@ -368,7 +380,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             return campaignsSession;
         },
 
-        storeSessionCampaignData: function(campaignId) {
+        storeSessionCampaignData: function(campaignId, campaignPublicId) {
             let campaignsSession = this.getCampaignsSession();
 
             const now = new Date();
@@ -377,15 +389,20 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 campaignsSession = {};
             }
 
-            if (!campaignsSession.hasOwnProperty(campaignId)) {
-                campaignsSession[campaignId] = {
+            if (!campaignsSession.hasOwnProperty(campaignPublicId)) {
+                campaignsSession[campaignPublicId] = {
                     "seen": 0,
                     "updatedAt": now,
                 }
             }
 
-            campaignsSession[campaignId].updatedAt = now;
-            campaignsSession[campaignId].seen++;
+            if (campaignsSession.hasOwnProperty(campaignId)) {
+                campaignsSession[campaignPublicId].seen = campaignsSession[campaignId].seen;
+                delete(campaignsSession[campaignId]);
+            }
+
+            campaignsSession[campaignPublicId].updatedAt = now;
+            campaignsSession[campaignPublicId].seen++;
 
             remplib.setToStorage(this.campaignsSessionStorageKey, this.minifyStoredData(campaignsSession));
         },
