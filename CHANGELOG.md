@@ -6,14 +6,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.26.0] - 2021-06-10
+
 ### [Beam]
 
 - **BREAKING**: Upgraded to Laravel 8. remp/remp#491
   - Make sure that when including `remplib` library (built with production settings), your HTML document has defined character encoding, otherwise `remplib` might not be initialized correctly. Character encoding can be specified using `meta` tag, e.g. `<meta charset="UTF-8" />`.
 - Fixed sorting of referer stats in the article detail. The default sorting is now again Visits count. remp/remp#934
 - Changed default order sequence for numeric columns to be descending first. remp/remp#934
-- Fixed incorrect pageviews bug in `/top` APIs when using filters. remp/remp#937
-- Added optional `APP_TRUSTED_PROXIES` environmental variable.
+- Fixed incorrect pageviews count bug in `/top` APIs when using filters. remp/remp#937
+- Added optional `APP_TRUSTED_PROXIES` environmental variable. IP/HTTP related headers will only be allowed from trusted proxy. All proxies are trusted by default.
 - Added v2 of `/top` APIs. See [README.md](./Beam/README.md) for more details. remp/remp#938
 
 ### [Campaign]
@@ -21,7 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Upgraded to Laravel 8. remp/remp#491
 - Changed showtime experiment to be enabled by default. This should change make showtime requests much faster by bypassing Laravel in very exposed endpoint. remp/remp#939
   - If you want to fallback to the original implementation, use `rempConfig.campaign.showtimExperiment = false` in the remplib JS configuration.
-- Added optional `APP_TRUSTED_PROXIES` environmental variable.
+- Added optional `APP_TRUSTED_PROXIES` environmental variable. IP/HTTP related headers will only be allowed from trusted proxy. All proxies are trusted by default.
   
 ### [Mailer]
 
@@ -33,7 +35,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Sso]
 
 - Upgraded to Laravel 8. remp/remp#491
-- Added optional `APP_TRUSTED_PROXIES` environmental variable.
+- Added optional `APP_TRUSTED_PROXIES` environmental variable. IP/HTTP related headers will only be allowed from trusted proxy. All proxies are trusted by default.
 
 ## [0.25.1] - 2021-06-01
 
@@ -881,7 +883,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.25.1...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.26.0...master
+[0.26.0]: https://github.com/remp2020/remp/compare/0.25.1...0.26.0
 [0.25.1]: https://github.com/remp2020/remp/compare/0.25.0...0.25.1
 [0.25.0]: https://github.com/remp2020/remp/compare/0.24.0...0.25.0
 [0.24.0]: https://github.com/remp2020/remp/compare/0.23.0...0.24.0
