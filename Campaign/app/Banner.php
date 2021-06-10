@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Str;
 use Predis\ClientInterface;
 use Ramsey\Uuid\Uuid;
 use Spatie\Searchable\Searchable;
@@ -16,6 +17,7 @@ class Banner extends Model implements Searchable
     use HasFactory;
 
     use Notifiable;
+    use IdentificationTrait;
 
     const BANNER_TAG = 'banner';
 
@@ -68,7 +70,8 @@ class Banner extends Model implements Searchable
         parent::boot();
 
         static::creating(function (Banner $banner) {
-            $banner->uuid = Uuid::uuid4()->toString();
+            $banner->uuid = self::generateUuid();
+            $banner->public_id = self::generatePublicId();
         });
     }
 
