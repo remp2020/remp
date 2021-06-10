@@ -2,13 +2,13 @@
 
 namespace App;
 
+use App\Model\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Model\TableName;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
-class Segment extends Model implements Searchable
+class Segment extends BaseModel implements Searchable
 {
     use HasFactory;
 

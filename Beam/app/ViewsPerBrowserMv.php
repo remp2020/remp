@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model\BaseModel;
 
 /**
  * Class ViewsPerBrowserMv
@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * TODO this will go out after remp#253 issue is closed
  * @package App
  */
-class ViewsPerBrowserMv extends Model
+class ViewsPerBrowserMv extends BaseModel
 {
     protected $table = 'views_per_browser_mv';
 

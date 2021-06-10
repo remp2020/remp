@@ -2,10 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model\BaseModel;
 use Recurr\Rule;
 
-class Newsletter extends Model
+class Newsletter extends BaseModel
 {
     const STATE_STARTED = 'started';
     const STATE_PAUSED = 'paused';

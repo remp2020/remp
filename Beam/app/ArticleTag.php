@@ -2,10 +2,10 @@
 
 namespace App;
 
+use App\Model\BaseModel;
 use App\Model\Tag;
-use Illuminate\Database\Eloquent\Model;
 
-class ArticleTag extends Model
+class ArticleTag extends BaseModel
 {
     protected $table = 'article_tag';
 

@@ -2,9 +2,7 @@
 
 namespace App\Model;
 
-use Illuminate\Database\Eloquent\Model;
-
-class ArticleTitle extends Model
+class ArticleTitle extends BaseModel
 {
     protected $fillable = [
         'variant',

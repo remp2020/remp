@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model\BaseModel;
 
-class Entity extends Model
+class Entity extends BaseModel
 {
     protected $table = 'entities';
 

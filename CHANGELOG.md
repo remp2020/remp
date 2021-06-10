@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - This only affects you if you rely on this behavior and expect to find any query parameters in the cookie/local_storage during the visit.
 - Changed scheduled commands to run in background. remp/remp#942 
 - Added `AggregatePageviews` command which groups article timespent/load commands. remp/remp#942
+- Fixed possibly invalid aggregation of conversion data which caused time columns to be off due to the timezone issues. remp/remp#464
+  - We decided to truncate all of the aggregations (they're temporary, they would be removed eventually) and trigger the aggregation internally again. You might see higher load after the release caused by `conversions:aggregate-events` and `conversions:process-sources` commands.
 
 ### [Campaign]
 

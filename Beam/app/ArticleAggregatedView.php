@@ -2,11 +2,10 @@
 
 namespace App;
 
-use DB;
-use Illuminate\Database\Eloquent\Model;
+use App\Model\BaseModel;
 use Yadakhov\InsertOnDuplicateKey;
 
-class ArticleAggregatedView extends Model
+class ArticleAggregatedView extends BaseModel
 {
     use InsertOnDuplicateKey;
 

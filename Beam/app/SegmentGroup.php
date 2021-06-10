@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model\BaseModel;
 
-class SegmentGroup extends Model
+class SegmentGroup extends BaseModel
 {
     const CODE_AUTHORS_SEGMENTS = 'authors-segments';
     const CODE_SECTIONS_SEGMENTS = 'sections-segments';

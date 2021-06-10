@@ -4,9 +4,8 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Conversion;
-use Illuminate\Database\Eloquent\Model;
 
-class ConversionCommerceEvent extends Model
+class ConversionCommerceEvent extends BaseModel
 {
     use HasFactory;
 

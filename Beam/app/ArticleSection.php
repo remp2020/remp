@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model\BaseModel;
 
-class ArticleSection extends Model
+class ArticleSection extends BaseModel
 {
     protected $table = 'article_section';
 

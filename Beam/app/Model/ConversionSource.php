@@ -3,9 +3,8 @@
 namespace App\Model;
 
 use App\Conversion;
-use Illuminate\Database\Eloquent\Model;
 
-class ConversionSource extends Model
+class ConversionSource extends BaseModel
 {
     // source determined based on the first pageview of session prior to the payment
     public const TYPE_SESSION_FIRST = 'session_first';
