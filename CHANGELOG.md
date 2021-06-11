@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Introduced `public_id` row to reach unique identifications with shorter string. remp/remp#916
 
+### [Mailer]
+
+- Added missing login error messages if REMP CRM is used to authenticate the user.
+
 ## [0.26.0] - 2021-06-10
 
 ### [Beam]

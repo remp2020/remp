@@ -39,7 +39,11 @@ class RemoteUser
 
             $responseData = Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
         } catch (ClientException $clientException) {
-            $data = json_decode($clientException->getResponse()->getBody()->getContents());
+            try {
+                $data = Json::decode($clientException->getResponse()->getBody()->getContents());
+            } catch (JsonException $e) {
+                return ['status' => 'error', 'error' => $e->getMessage(), 'message' => 'Invalid response provided by CRM. Is SSO_ADDR configured correctly?'];
+            }
             return ['status' => 'error', 'error' => $data->error, 'message' => $data->message];
         } catch (ConnectException $connectException) {
             return ['status' => 'error', 'error' => 'unavailable server', 'message' => 'Cannot connect to auth server'];

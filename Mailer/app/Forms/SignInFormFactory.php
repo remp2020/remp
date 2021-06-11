@@ -28,7 +28,7 @@ class SignInFormFactory
 
         $form->addProtection();
         $form->addText('username', 'Email Address')
-            ->setType('email')
+            ->setHtmlType('email')
             ->setRequired('Please enter your email');
 
         $form->addPassword('password', 'Password')
