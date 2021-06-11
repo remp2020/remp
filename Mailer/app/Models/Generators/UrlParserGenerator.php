@@ -72,7 +72,6 @@ class UrlParserGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('source_template_id'))->setRequired(),
             (new PostInputParam('articles'))->setRequired(),
             (new PostInputParam('footer'))->setRequired(),
             (new PostInputParam('utm_campaign'))->setRequired(),

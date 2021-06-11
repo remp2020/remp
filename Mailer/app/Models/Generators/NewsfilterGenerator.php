@@ -49,7 +49,6 @@ class NewsfilterGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('source_template_id'))->setRequired(),
             (new PostInputParam('newsfilter_html'))->setRequired(),
             (new PostInputParam('url'))->setRequired(),
             (new PostInputParam('title'))->setRequired(),
@@ -270,7 +269,7 @@ class NewsfilterGenerator implements IGenerator
         $output = new ArrayHash();
 
         if (!isset($data->post_authors[0]->display_name)) {
-            throw new PreprocessException("WP json object does not contain required attribute 'display_name' of first post author");
+            throw new PreprocessException("WP json object does not contain required attribute 'post_authors.0.display_name'");
         }
         $output->editor = $data->post_authors[0]->display_name;
 

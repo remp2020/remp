@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added missing login error messages if REMP CRM is used to authenticate the user.
+- Added option to identify source template by code in `MailGeneratorPreprocessHandler`. remp/remp#941
 
 ## [0.26.0] - 2021-06-10
 

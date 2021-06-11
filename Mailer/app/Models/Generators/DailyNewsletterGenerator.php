@@ -89,7 +89,6 @@ class DailyNewsletterGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('source_template_id'))->setRequired(),
             (new PostInputParam('posts'))->setRequired(),
         ];
     }

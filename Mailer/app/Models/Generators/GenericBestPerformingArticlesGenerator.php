@@ -60,7 +60,6 @@ class GenericBestPerformingArticlesGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('source_template_id'))->setRequired(),
             new PostInputParam('dynamic'),
             new PostInputParam('articles'),
             new PostInputParam('articles_count'),
