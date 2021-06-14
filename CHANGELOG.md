@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Changed scheduled commands to run in background. remp/remp#942 
+- Added `AggregatePageviews` command which groups article timespent/load commands. remp/remp#942
+
 ### [Campaign]
 
 - Introduced `public_id` row to reach unique identifications with shorter string. remp/remp#916
