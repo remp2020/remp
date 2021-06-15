@@ -18,6 +18,8 @@ export default {
 
     storage: "local_storage", // "cookie", "local_storage"
 
+    internalStorageKeys: null,
+
     storageExpiration: {
         "default": 15,
         "keys": {
@@ -33,6 +35,61 @@ export default {
     rempPageviewID: null,
 
     usingAdblock: null,
+
+    init: function(config) {
+        if (typeof config.userId !== 'undefined' && config.userId !== null) {
+            remplib.userId = config.userId;
+        }
+        if (typeof config.userSubscribed !== 'undefined' && config.userSubscribed !== null) {
+            remplib.userSubscribed = config.userSubscribed;
+        }
+        if (config.subscriptionIds instanceof Array) {
+            remplib.subscriptionIds = config.subscriptionIds;
+        }
+        if (typeof config.browserId !== 'undefined' && config.browserId !== null) {
+            remplib.browserId = config.browserId;
+        }
+
+        if (typeof config.cookieDomain === 'string') {
+            remplib.cookieDomain = config.cookieDomain;
+        }
+
+        if (typeof config.storage === 'string') {
+            if (['cookie', 'local_storage'].indexOf(config.storage) === -1) {
+                console.warn('remplib: storage type `' + config.storage + '` is not supported, falling back to `local_storage`');
+            } else {
+                remplib.storage = config.storage;
+            }
+        }
+        if (typeof window.localStorage !== 'object' || localStorage === null) {
+            console.warn('remplib: local storage is not available in this browser, falling back to `cookie`');
+            remplib.storage = 'cookie';
+        }
+
+        if (typeof config.storageExpiration === 'object') {
+            if (config.storageExpiration.default) {
+                remplib.storageExpiration.default = config.storageExpiration.default;
+            }
+            if (config.storageExpiration.keys) {
+                remplib.storageExpiration.keys = {
+                    ...remplib.storageExpiration.keys,
+                    ...config.storageExpiration.keys
+                };
+            }
+        }
+
+        remplib.internalStorageKeys = remplib.internalStorageKeys || {};
+
+        remplib.internalStorageKeys["browser_id"] = true;
+        remplib.internalStorageKeys[remplib.rempSessionIDKey] = true;
+        remplib.internalStorageKeys[remplib.rempPageviewIDKey] = true;
+        remplib.internalStorageKeys[remplib.commerceSessionIDKey] = true;
+        remplib.internalStorageKeys["rtm_source"] = true;
+        remplib.internalStorageKeys["rtm_medium"] = true;
+        remplib.internalStorageKeys["rtm_campaign"] = true;
+        remplib.internalStorageKeys["rtm_content"] = true;
+        remplib.internalStorageKeys["rtm_variant"] = true;
+    },
 
     getUserId: function() {
         return this.userId;
@@ -126,6 +183,10 @@ export default {
     },
 
     setToStorage: function(key, value) {
+        if (typeof remplib.internalStorageKeys[key] === 'undefined' && typeof remplib.storageExpiration['keys'][key] === 'undefined') {
+            console.warn('remplib: Ignoring attempt to store "' + key + '" to the storage. Only internal keys and keys with explicit rempConfig.storageExpiration are allowed.');
+            return;
+        }
         let now = new Date();
         let serializedItem = JSON.stringify({
             "version": 1,
