@@ -73,23 +73,10 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 throw "remplib: configuration tracker.url invalid or missing: " + config.tracker.url
             }
 
+            remplib.init(config);
+
             this.url = config.tracker.url;
-
-            // global
             this.beamToken = config.token;
-            if (typeof config.userId !== 'undefined' && config.userId !== null) {
-                remplib.userId = config.userId;
-            }
-            if (typeof config.userSubscribed !== 'undefined' && config.userSubscribed !== null) {
-                remplib.userSubscribed = config.userSubscribed;
-            }
-            if (config.subscriptionIds instanceof Array) {
-                remplib.subscriptionIds = config.subscriptionIds;
-            }
-            if (typeof config.browserId !== 'undefined' && config.browserId !== null) {
-                remplib.browserId = config.browserId;
-            }
-
             this.setArticle(config.article);
 
             let refererMediumType = typeof config.tracker.refererMedium;
@@ -110,32 +97,17 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 }
             }
 
-            if (typeof config.cookieDomain === 'string') {
-                remplib.cookieDomain = config.cookieDomain;
+            if (typeof config.tracker.utmBackwardCompatibilityEnabled === 'boolean') {
+                this.utmBackwardCompatibilityEnabled = config.tracker.utmBackwardCompatibilityEnabled;
             }
 
-            if (typeof config.storage === 'string') {
-                if (['cookie', 'local_storage'].indexOf(config.storage) === -1) {
-                    console.warn('remplib: storage type `' + config.storage + '` is not supported, falling back to `local_storage`');
-                } else {
-                    remplib.storage = config.storage;
-                }
-            }
-            if (typeof window.localStorage !== 'object' || localStorage === null) {
-                console.warn('remplib: local storage is not available in this browser, falling back to `cookie`');
-                remplib.storage = 'cookie';
-            }
-
-            if (typeof config.storageExpiration === 'object') {
-                if (config.storageExpiration.default) {
-                    remplib.storageExpiration.default = config.storageExpiration.default;
-                }
-                if (config.storageExpiration.keys) {
-                    remplib.storageExpiration.keys = {
-                        ...remplib.storageExpiration.keys,
-                        ...config.storageExpiration.keys
-                    };
-                }
+            // configure beam-based internal storage keys
+            if (this.utmBackwardCompatibilityEnabled === true) {
+                remplib.internalStorageKeys["utm_source"] = true;
+                remplib.internalStorageKeys["utm_medium"] = true;
+                remplib.internalStorageKeys["utm_campaign"] = true;
+                remplib.internalStorageKeys["utm_content"] = true;
+                remplib.internalStorageKeys["utm_variant"] = true;
             }
 
             this.parseUriParams();
@@ -155,10 +127,6 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 if (typeof config.tracker.timeSpent.interval === 'number') {
                     this.timeSpentInterval = config.tracker.timeSpent.interval;
                 }
-            }
-
-            if (typeof config.tracker.utmBackwardCompatibilityEnabled === 'boolean') {
-                this.utmBackwardCompatibilityEnabled = config.tracker.utmBackwardCompatibilityEnabled;
             }
 
             window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
@@ -750,10 +718,25 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             }
             
             var vars = query.split('&');
+            let trackingParams = ["rtm_source", "rtm_medium", "rtm_campaign", "rtm_content", "rtm_variant"];
+            if (this.utmBackwardCompatibilityEnabled === true) {
+                trackingParams.push("utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_variant");
+            }
+            Object.keys(remplib.storageExpiration['keys']).forEach((key, index) => {
+                if (typeof remplib.internalStorageKeys[key] !== 'undefined') {
+                    return;
+                }
+                trackingParams.push(key);
+            });
 
             for (var i = 0; i < vars.length; i++) {
                 let pair = vars[i].split('=');
+
                 let key = decodeURIComponent(pair[0]);
+                if (trackingParams.indexOf(key) === -1) {
+                    continue;
+                }
+
                 this.uriParams[key] = decodeURIComponent(pair[1]);
 
                 remplib.setToStorage(key, this.uriParams[key]);

@@ -91,7 +91,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     window.dispatchEvent(
                         new CustomEvent("remp:showtimeError")
                     );
-                });;
+                });
 
                 remplib.campaign.incrementPageviewCountForCampaigns(result.activeCampaignIds);
             },
@@ -110,6 +110,9 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (typeof config.campaign.url !== 'string') {
                 throw "remplib: configuration campaign.url invalid or missing: "+config.campaign.url
             }
+
+            remplib.init(config);
+
             this.url = config.campaign.url;
 
             for (let param in config.campaign.bannerUrlParams) {
@@ -130,45 +133,13 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                 this.showtimeExperiment = config.campaign.showtimeExperiment;
             }
 
-            // global
-            if (typeof config.userId !== 'undefined' && config.userId !== null) {
-                remplib.userId = config.userId;
-            }
-            if (typeof config.userSubscribed !== 'undefined' && config.userSubscribed !== null) {
-                remplib.userSubscribed = config.userSubscribed;
-            }
-
-            if (typeof config.cookieDomain === 'string') {
-                remplib.cookieDomain = config.cookieDomain;
-            }
-
-            if (typeof config.storage === 'string') {
-                if (['cookie', 'local_storage'].indexOf(config.storage) === -1) {
-                    console.warn('remplib: storage type `' + config.storage + '` is not supported, falling back to `local_storage`');
-                } else {
-                    remplib.storage = config.storage;
-                }
-            }
-            if (typeof window.localStorage !== 'object' || localStorage === null) {
-                console.warn('remplib: local storage is not available in this browser, falling back to `cookie`');
-                remplib.storage = 'cookie';
-            }
-
-            if (typeof config.storageExpiration === 'object') {
-                if (config.storageExpiration.default) {
-                    remplib.storageExpiration.default = config.storageExpiration.default;
-                }
-                if (config.storageExpiration.keys) {
-                    remplib.storageExpiration.keys = {
-                        ...remplib.storageExpiration.keys,
-                        ...config.storageExpiration.keys
-                    };
-                }
-            }
-
             if (window.opener && window.location.hash === '#bannerPicker') {
                 remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
             }
+
+            // configure campaign-based internal storage keys
+            remplib.internalStorageKeys[this.campaignsStorageKey] = true;
+            remplib.internalStorageKeys[this.campaignsSessionStorageKey] = true;
 
             // clean anything that's already obsolete
             let campaigns = this.getCampaigns();
