@@ -101,6 +101,6 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', 'sso_laravel'),
+    'prefix' => env('CACHE_PREFIX', 'sso'),
 
 ];

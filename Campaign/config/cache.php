@@ -101,6 +101,6 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', 'campaign_cache'),
+    'prefix' => env('CACHE_PREFIX', 'campaign'),
 
 ];
