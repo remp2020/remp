@@ -4,12 +4,15 @@
 var bannerUuid = null;
 @else
 var bannerUuid = '{{ $banner->uuid }}';
+var bannerPublicId = '{{ $banner->public_id }}';
 var bannerId = 'b-' + bannerUuid;
 var bannerJsonData = {!! $banner->toJson() !!};
 @endif
 
 var variantUuid = '{{ $variantUuid }}';
+var variantPublicId = '{{ $variantPublicId }}';
 var campaignUuid = '{{ $campaignUuid }}';
+var campaignPublicId = '{{ $campaignPublicId }}';
 var isControlGroup = {{ $controlGroup }};
 var scripts = [];
 if (typeof window.remplib.banner === 'undefined') {
@@ -39,8 +42,11 @@ var run = function() {
     banner.positionOptions = positions;
 
     banner.campaignUuid = campaignUuid;
+    banner.campaignPublicId = campaignPublicId;
     banner.variantUuid = variantUuid;
+    banner.variantPublicId = variantPublicId;
     banner.uuid = bannerUuid;
+    banner.publicId = bannerPublicId;
 
     if (typeof remplib.campaign.bannerUrlParams !== "undefined") {
         banner.urlParams = remplib.campaign.bannerUrlParams;
@@ -92,7 +98,7 @@ var run = function() {
             resolve(true);
         }
 
-        remplib.campaign.handleBannerDisplayed(banner.campaignUuid, banner.uuid, banner.variantUuid);
+        remplib.campaign.handleBannerDisplayed(banner.campaignUuid, banner.uuid, banner.variantUuid, banner.campaignPublicId, banner.publicId, banner.variantPublicId);
     }, banner.displayDelay);
 };
 

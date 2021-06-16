@@ -18,14 +18,15 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             ]);
     }
 
-    public function success(string $callback, $data, $activeCampaignIds, $providerData)
+    public function success(string $callback, $data, $activeCampaigns, $providerData)
     {
         return response()
             ->jsonp($callback, [
                 'success' => true,
                 'errors' => [],
                 'data' => empty($data) ? [] : $data,
-                'activeCampaignIds' => $activeCampaignIds,
+                'activeCampaignIds' => array_column($activeCampaigns, 'uuid'),
+                'activeCampaigns' => $activeCampaigns,
                 'providerData' => $providerData,
             ]);
     }
@@ -54,7 +55,9 @@ class ControllerShowtimeResponse implements ShowtimeResponse
         return View::make('banners.preview', [
             'banner' => $variant->banner,
             'variantUuid' => $variant->uuid,
+            'variantPublicId' => $variant->public_id,
             'campaignUuid' => $campaign->uuid,
+            'campaignPublicId' => $campaign->public_id,
             'positions' => $positions,
             'dimensions' => $dimensions,
             'alignments' => $alignments,
