@@ -8,4 +8,6 @@ interface IConversionsRepository
     public function getBatchTemplatesConversions(array $batchIds, array $mailTemplateCodes): array;
 
     public function getNonBatchTemplateConversions(array $mailTemplateCodes): array;
+
+    public function getBatchTemplatesConversionsSince(\DateTime $since): array;
 }
