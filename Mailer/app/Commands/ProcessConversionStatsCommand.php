@@ -5,7 +5,7 @@ namespace Remp\MailerModule\Commands;
 
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Repositories\BatchTemplatesRepository;
+use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\IConversionsRepository;
 use Remp\MailerModule\Repositories\LogConversionsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
@@ -23,29 +23,29 @@ class ProcessConversionStatsCommand extends Command
 
     private $templatesRepository;
 
-    private $batchTemplatesRepository;
-
     private $userProvider;
 
     private $logsRepository;
 
     private $logConversionsRepository;
 
+    private BatchesRepository $batchesRepository;
+
     public function __construct(
         IConversionsRepository $conversionsRepository,
         TemplatesRepository $templatesRepository,
-        BatchTemplatesRepository $batchTemplatesRepository,
         IUser $userProvider,
         LogsRepository $logsRepository,
-        LogConversionsRepository $logConversionsRepository
+        LogConversionsRepository $logConversionsRepository,
+        BatchesRepository $batchesRepository
     ) {
         parent::__construct();
         $this->conversionsRepository = $conversionsRepository;
         $this->templatesRepository = $templatesRepository;
-        $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->userProvider = $userProvider;
         $this->logsRepository = $logsRepository;
         $this->logConversionsRepository = $logConversionsRepository;
+        $this->batchesRepository = $batchesRepository;
     }
 
     protected function configure()
@@ -65,8 +65,7 @@ class ProcessConversionStatsCommand extends Command
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'processing mode (job_batch - processing newsletters, direct - processing system emails)',
                 ['job_batch']
-            )
-        ;
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -97,72 +96,68 @@ class ProcessConversionStatsCommand extends Command
 
     private function processBatchTemplateConversions(InputInterface $input, OutputInterface $output)
     {
-        $batchTemplates = $this->batchTemplatesRepository->getTable()
-            ->where('created_at > ?', DateTime::from($input->getOption('since')))
-            ->fetchAll();
+        $batchTemplatesConversions = $this->conversionsRepository->getBatchTemplatesConversionsSince(DateTime::from($input->getOption('since')));
 
-        if (!count($batchTemplates)) {
-            $output->writeln('No batch templates to process.');
-            return;
-        }
-
-        $progressBar = new ProgressBar($output, count($batchTemplates));
+        $progressBar = new ProgressBar($output, count($batchTemplatesConversions));
         $progressBar->setFormat('processStats');
         $progressBar->start();
 
-        $jobBatchIds = [];
-        $mailTemplateCodes = [];
-
-        foreach ($batchTemplates as $batchTemplate) {
-            $jobBatchIds[$batchTemplate->mail_job_batch_id] = (string) $batchTemplate->mail_job_batch_id;
-            $mailTemplateCodes[$batchTemplate->mail_template->code] = $batchTemplate->mail_template->code;
-        }
-        $batchTemplatesConversions = $this->conversionsRepository->getBatchTemplatesConversions(
-            array_values($jobBatchIds),
-            array_values($mailTemplateCodes)
-        );
-
-        /** @var ActiveRow $batchTemplate */
-        foreach ($batchTemplates as $batchTemplate) {
-            $progressBar->setMessage('Processing jobBatchTemplate <info>' . $batchTemplate->id . '</info>', 'processing');
-
-            if (!isset($batchTemplatesConversions[$batchTemplate->mail_job_batch_id][$batchTemplate->mail_template->code])) {
-                $progressBar->advance();
+        $validMailJobBatchIds = $this->getValidMailJobBatchIds(array_keys($batchTemplatesConversions));
+        foreach ($batchTemplatesConversions as $mailJobBatchId => $mailTemplateCodes) {
+            if (!in_array($mailJobBatchId, $validMailJobBatchIds, true)) {
                 continue;
             }
-
-            $batchTemplateConversions = $batchTemplatesConversions[$batchTemplate->mail_job_batch->id][$batchTemplate->mail_template->code] ?? [];
-            $userData = $this->getUserData(array_keys($batchTemplateConversions));
-
-            foreach ($batchTemplateConversions as $userId => $time) {
-                if (!isset($userData[$userId])) {
-                    // this might be incorrectly tracker userId; throwing warning won't probably help at this point
-                    // as it's not in Beam and the tracking might be already fixed
+            foreach ($mailTemplateCodes as $mailTemplateCode => $userIds) {
+                $userData = $this->getUserData(array_keys($userIds));
+                $mailTemplate = $this->templatesRepository->getByCode($mailTemplateCode);
+                if (!$mailTemplate) {
                     continue;
                 }
-                $latestLog = $this->logsRepository->getTable()
-                    ->select('MAX(id) AS id')
-                    ->where([
-                        'email' => $userData[$userId],
-                        'mail_template_id' => $batchTemplate->mail_template_id,
-                        'mail_job_batch_id' => $batchTemplate->mail_job_batch_id,
-                    ])
-                    ->where('created_at < ?', DateTime::from($time))
-                    ->fetch();
+                foreach ($userIds as $userId => $time) {
+                    if (!isset($userData[$userId])) {
+                        // this might be incorrectly tracker userId; throwing warning won't probably help at this point
+                        // as it's not in Beam and the tracking might be already fixed
+                        continue;
+                    }
+                    $latestLog = $this->logsRepository->getTable()
+                        ->where([
+                            'email' => $userData[$userId],
+                            'mail_template_id' => $mailTemplate->id,
+                            'mail_job_batch_id' => $mailJobBatchId
+                        ])
+                        ->where('created_at < ?', DateTime::from($time))
+                        ->order('id DESC')
+                        ->fetch();
 
-                $log = $this->logsRepository->find($latestLog->id);
-                if (!$log) {
-                    continue;
+                    if (!$latestLog) {
+                        continue;
+                    }
+                    $this->logConversionsRepository->upsert($latestLog, DateTime::from($time));
                 }
-                $this->logConversionsRepository->upsert($log, DateTime::from($time));
             }
-
             $progressBar->advance();
         }
 
         $progressBar->setMessage('done');
         $progressBar->finish();
         $output->writeln("");
+    }
+
+    private function getValidMailJobBatchIds($mailJobBatchIds): array
+    {
+        $result = [];
+        foreach ($mailJobBatchIds as $mailJobBatchId) {
+            if (!is_numeric($mailJobBatchId)) {
+                continue;
+            }
+
+            $mailJobBatch = $this->batchesRepository->find($mailJobBatchId);
+            if ($mailJobBatch) {
+                $result[] = $mailJobBatchId;
+            }
+        }
+
+        return $result;
     }
 
     private function processNonBatchTemplateConversions(InputInterface $input, OutputInterface $output)
