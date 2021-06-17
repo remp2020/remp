@@ -34,7 +34,7 @@ You can override any default config from
 
 #### Dependencies
 
-- PHP 7.1
+- PHP 7.4
 - MySQL 5.7
 - Redis 3.2
 
@@ -668,7 +668,7 @@ Please visit `/list/new` to create a newsletter via web admin.
   "list_code": "alerts", // String; code of the newsletter list you're subscribing the user to
 
   // optional 
-  "variant_code": "123", // String;  Code of newsletter variant to subscribe
+  "variant_id": 123, // Integer; ID of the newsletter variant to subscribe
 }
 ```
 
