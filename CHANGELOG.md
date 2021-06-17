@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- Added `--explicit_defaults_for_timestamp` switch to the MySQL docker command to avoid unpredictable behavior when creating database tables - MySQL would set the default `CURRENT_TIMESTAMP` to the first date column of each table. Make sure your production settings match to avoid issues.
+
 ### [Beam]
 
 - **BREAKING**: Remplib.js is not automatically storing any query param to storage anymore. Only `rtm_*` keys and keys explicitly specified in `rempConfig.storageExpiration` are allowed. remp/remp#950
