@@ -56,7 +56,11 @@ class PhinxRegistrator
 
         $configData = [
             'paths' => [
-                'migrations' => '%%PHINX_CONFIG_DIR%%/../../migrations',
+                'migrations' => [
+                    '%%PHINX_CONFIG_DIR%%/../../../../app/migrations',
+                    // currently the only extensions module
+                    '%%PHINX_CONFIG_DIR%%/../../../../vendor/remp/mailer-module/src/migrations',
+                ]
             ],
             'environments' => [
                 'default_migration_table' => 'phinxlog',

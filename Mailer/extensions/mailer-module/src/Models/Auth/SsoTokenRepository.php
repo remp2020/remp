@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Auth;
 
-use Remp\NetteSso\Security\Client;
+use Remp\MailerModule\Models\Sso\Client;
 use Tomaj\NetteApi\Misc\BearerTokenRepositoryInterface;
 
 class SsoTokenRepository implements BearerTokenRepositoryInterface

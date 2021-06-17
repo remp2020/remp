@@ -21,15 +21,13 @@
     <coverage>
         <include>
             <directory suffix=".php">app/</directory>
+            <directory suffix=".php">extensions/mailer-module/src/</directory>
         </include>
     </coverage>
 
     <testsuites>
-        <testsuite name="unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
+        <testsuite name="All">
+            <directory suffix="Test.php">extensions/mailer-module/src/Tests/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

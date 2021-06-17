@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace Remp\NetteSso\Security;
+namespace Remp\MailerModule\Models\Sso;
 
 use Nette\Http\Url;
 use Nette\Http\IRequest;
@@ -26,11 +27,15 @@ class Authenticator implements \Nette\Security\Authenticator
         $this->errorUrl = $errorUrl;
     }
 
+
     /**
-     * @param array $credentials Only present due to interface limitations, please use empty array.
+     * @param string $user
+     * @param string $password
+     *
      * @return IIdentity
+     * @throws \Nette\Security\AuthenticationException
      */
-    function authenticate(string $user, string $password): IIdentity
+    public function authenticate(string $user, string $password): IIdentity
     {
         $token = $this->request->getQuery('token');
         try {

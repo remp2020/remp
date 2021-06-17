@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace Remp\NetteSso\Security;
+namespace Remp\MailerModule\Models\Sso;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException;
@@ -67,7 +68,7 @@ class Client
      *
      * @param $token string
      * @return bool
-     * @throws \Remp\NetteSso\Security\SsoException
+     * @throws \Remp\MailerModule\Models\Sso\SsoException
      * @throws \RuntimeException
      */
     public function validToken($token)
@@ -81,7 +82,7 @@ class Client
         } catch (ClientException $e) {
             $response = $e->getResponse();
             $contents = $response->getBody()->getContents();
-            if ($response->getStatusCode() === 404){
+            if ($response->getStatusCode() === 404) {
                 return false;
             }
 

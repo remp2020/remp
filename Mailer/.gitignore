@@ -1,5 +1,6 @@
 app/config/config.local.neon
 .env
+.phpcs.cache
 tests/.env_test
 vendor/
 www/assets/vendor/

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Remp\MailerModule;
+namespace Remp\Mailer;
 
 use Dotenv\Dotenv;
 use Nette\Configurator;

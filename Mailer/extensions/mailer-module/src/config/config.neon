@@ -1,0 +1,291 @@
+parameters:
+	locale: @environmentConfig::get('LOCALE')
+	timezone: @environmentConfig::get('TIMEZONE')
+	sso_addr: @environmentConfig::get('SSO_ADDR')
+	sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
+	max_result_count: @environmentConfig::get('SEARCH_MAX_RESULT_COUNT')
+	redis:
+		host: @environmentConfig::get('REDIS_HOST')
+		port: @environmentConfig::getInt('REDIS_PORT')
+		db: @environmentConfig::getInt('REDIS_DB')
+	remp:
+		beam:
+			web_addr: @environmentConfig::get('REMP_BEAM_ADDR')
+			token: @environmentConfig::get('REMP_BEAM_API_TOKEN')
+			tracker_addr: @environmentConfig::get('REMP_BEAM_TRACKER_ADDR')
+			tracker_property_token: @environmentConfig::get('REMP_BEAM_TRACKER_PROPERTY_TOKEN')
+			segments_addr: @environmentConfig::get('REMP_BEAM_SEGMENTS_ADDR')
+		pythia:
+			segments_addr: @environmentConfig::get('REMP_PYTHIA_SEGMENTS_ADDR')
+		campaign:
+			web_addr: @environmentConfig::get('REMP_CAMPAIGN_ADDR')
+	preflight:
+		headers:
+			Access-Control-Allow-Headers:
+				- Authorization
+				- X-Requested-With
+				- Content-Type
+	template_editor: @environmentConfig::get('TEMPLATE_EDITOR')
+
+database:
+	default:
+		dsn: @environmentConfig::getDsn()
+		user: @environmentConfig::get('DB_USER')
+		password: @environmentConfig::get('DB_PASS')
+		options:
+			lazy: yes
+
+services:
+	router: Remp\MailerModule\Models\RouterFactory::createRouter
+	environmentConfig:
+		factory: Remp\MailerModule\Models\EnvironmentConfig
+		setup:
+			- linkService(beam, %remp.beam.web_addr%, album)
+			- linkService(campaign, %remp.campaign.web_addr%, trending-up)
+			- linkService(mailer, /, email)
+			- setParam(locale, %locale%)
+			- setParam(max_result_count, %max_result_count%)
+			- setParam(template_editor, %template_editor%)
+
+	# Latte filters
+	filterLoader:
+		factory: Remp\MailerModule\Filters\FilterLoader
+		setup:
+			- register('yesNo', [Remp\MailerModule\Filters\YesNoFilter(), process])
+
+	nette.latteFactory:
+		setup:
+			- addFilter(null, [@filterLoader, 'load'])
+
+	mailWorkerCommand:
+		factory: Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger)
+		setup:
+			- setShutdownInterface(@hermesShutdown)
+
+	templateEngine:
+		factory: Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory
+		setup:
+			- register('twig', Remp\MailerModule\Models\ContentGenerator\Engine\TwigEngine())
+			- defaultEngine('twig')
+
+	console:
+		factory: Symfony\Component\Console\Application
+		setup:
+			- add(Remp\MailerModule\Commands\ProcessJobCommand())
+			- add(@mailWorkerCommand)
+			- add(Remp\MailerModule\Commands\DatabaseSeedCommand())
+			- add(Remp\MailerModule\Commands\DemoSeedCommand())
+			- add(Remp\MailerModule\Commands\ProcessJobStatsCommand())
+			- add(Remp\MailerModule\Commands\AggregateMailTemplateStatsCommand())
+			- add(Remp\MailerModule\Commands\HeartbeatCommand())
+			- add(Remp\MailerModule\Commands\MailTypeStatsCommand())
+			- add(@hermesWorker)
+			- setCatchExceptions(true)
+
+	# Loggers
+	commandsLogger:
+		factory: Monolog\Logger('commands-logger')
+	mailProcessLogger:
+		factory: Monolog\Logger('mail-process-logger')
+	mailgunLogger:
+		factory: Monolog\Logger('mailgun-logger')
+
+	hermesLogRedact: Remp\MailerModule\Hermes\LogRedact
+	hermesLogger:
+		factory: Monolog\Logger('hermes-logger')
+		setup:
+			- pushProcessor(@hermesLogRedact::add(['password', 'token', 'content']))
+
+	dateFormatterFactory:
+		factory: Remp\MailerModule\Models\Formatters\DateFormatterFactory(%locale%, %timezone%)
+
+	# shutdown hermes and mail worker through hermes_shutdown key in redis (override in local config with second string argument if you want to change key)
+	hermesShutdown: Tomaj\Hermes\Shutdown\PredisShutdown(@redisCache::client())
+	hermesRedisDriver:
+		class: Remp\MailerModule\Hermes\RedisDriver
+		setup:
+			- setupPriorityQueue('hermes_tasks_high', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_HIGH)
+			- setupPriorityQueue('hermes_tasks', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_MEDIUM)
+			- setupPriorityQueue('hermes_tasks_low', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_LOW)
+	hermesDispatcher:
+		factory: Tomaj\Hermes\Dispatcher(@hermesRedisDriver, @hermesLogger, @hermesShutdown)
+	hermesEmitter:
+		factory: Tomaj\Hermes\Emitter(@hermesRedisDriver, @hermesLogger)
+	- Remp\MailerModule\Hermes\HermesTasksQueue(%redis.host%, %redis.port%, %redis.db%)
+	- Remp\MailerModule\Repositories\HermesTasksRepository
+
+	redisCache: Remp\MailerModule\Models\RedisCache(%redis.host%, %redis.port%, %redis.db%)
+	hermesWorker:
+		factory: Remp\MailerModule\Commands\HermesWorkerCommand
+		setup:
+			- add('list-created', Remp\MailerModule\Hermes\ListCreatedHandler())
+			- add('mailgun-event', Remp\MailerModule\Hermes\MailgunEventHandler())
+			- add('heartbeat', Remp\MailerModule\Hermes\PingMysql())
+			- add('send-email', Remp\MailerModule\Hermes\SendEmailHandler())
+#			- add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
+
+	eventDispatcher:
+		factory: League\Event\EventDispatcher
+
+	segmentAgreggator:
+		factory: Remp\MailerModule\Models\Segment\Aggregator
+
+	contentGenerator:
+		factory: Remp\MailerModule\Models\ContentGenerator\ContentGenerator
+		setup:
+			- register(Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace())
+	generatorInputFactory: Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory
+
+	mailgunMailer:
+		factory: Remp\MailerModule\Models\Mailer\MailgunMailer
+		autowired: false
+
+	mailFactory:
+		factory: Remp\MailerModule\Models\Sender\MailerFactory
+		setup:
+			# Register all Mailers (Nette\Mail\IMailer)
+			- addMailer(Remp\MailerModule\Models\Mailer\SmtpMailer())
+			- addMailer(@mailgunMailer)
+
+#	# Internal CRM system. For more details contact Tomas Bella.
+#	authenticator:
+#		factory: Remp\MailerModule\Models\Auth\Authenticator
+#	authStorage:
+#		factory: Remp\MailerModule\Models\Auth\RemoteUser(%sso_host%)
+
+	# SSO authentication
+	- Remp\MailerModule\Models\Sso\Client(%sso_addr%)
+	authenticator:
+		factory: Remp\MailerModule\Models\Sso\Authenticator(%sso_error_url%)
+
+	# API authentication
+	apiTokenRepository:
+		factory: Remp\MailerModule\Models\Auth\SsoTokenRepository
+
+
+	# Beam
+	- Remp\MailerModule\Models\Beam\Client(%remp.beam.web_addr%, %remp.beam.token%)
+	- Remp\MailerModule\Models\Beam\UnreadArticlesResolver
+	- Remp\MailerModule\Models\Beam\JournalFactory(%remp.beam.segments_addr%)
+
+	- Remp\MailerModule\Models\Config\Config
+	- Remp\MailerModule\Models\Sender
+	- Remp\MailerModule\Models\Job\BatchEmailGenerator(@mailProcessLogger)
+	- Remp\MailerModule\Models\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
+	- Remp\MailerModule\Models\Auth\AutoLogin
+
+	# API
+	- Tomaj\NetteApi\Link\ApiLink
+	- Tomaj\NetteApi\Misc\IpDetector
+	apiDecider:
+		factory: Tomaj\NetteApi\ApiDecider
+		setup:
+			- enableGlobalPreflight(Tomaj\NetteApi\Handlers\CorsPreflightHandler(Nette\Http\Response(), %preflight.headers%))
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'un-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'bulk-subscribe'), \Remp\MailerModule\Api\v1\Handlers\Users\BulkSubscribeHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'check-token'), \Remp\MailerModule\Api\v1\Handlers\Users\CheckTokenHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'email-changed'), \Remp\MailerModule\Api\v1\Handlers\Users\EmailChangedHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'user-preferences'), \Remp\MailerModule\Api\v1\Handlers\Users\UserPreferencesHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'user-registered'), \Remp\MailerModule\Api\v1\Handlers\Users\UserRegisteredHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'bulk-user-registered'), \Remp\MailerModule\Api\v1\Handlers\Users\BulkUserRegisteredHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'is-unsubscribed'), \Remp\MailerModule\Api\v1\Handlers\Users\IsUnsubscribedHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'logs'), \Remp\MailerModule\Api\v1\Handlers\Users\LogsHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'logs-count-per-status'), \Remp\MailerModule\Api\v1\Handlers\Users\LogsCountPerStatusHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'generate-mail'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'preprocess-generator-parameters'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorPreprocessHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'generator-templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\GeneratorTemplatesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailCreateTemplateHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'jobs'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailJobCreateApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-types'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-type-categories'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeCategoriesHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mail-type-upsert'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeUpsertHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTemplatesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'segments', 'list'), \Remp\MailerModule\Api\v1\Handlers\Segments\SegmentsListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 2, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'send-email'), \Remp\MailerModule\Api\v1\Handlers\Mailers\SendEmailHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mail-type-variants'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeVariantCreateApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+	# Generator
+	generator:
+		factory: Remp\MailerModule\Models\Generators\GeneratorFactory
+		setup:
+			- registerGenerator('empty', 'Empty generator', Remp\MailerModule\Models\Generators\EmptyGenerator())
+			- registerGenerator('best_performing_articles', 'Best performing articles', \Remp\MailerModule\Models\Generators\GenericBestPerformingArticlesGenerator())
+
+	transporter:
+		factory: Remp\MailerModule\Models\PageMeta\Transport\GuzzleTransport
+
+	content:
+		factory: Remp\MailerModule\Models\PageMeta\Content\GenericPageContent
+
+	# Repositories
+	- Remp\MailerModule\Repositories\AuditLogRepository
+	- Remp\MailerModule\Repositories\ConfigsRepository
+	- Remp\MailerModule\Repositories\UsersRepository
+	- Remp\MailerModule\Repositories\UserSubscriptionsRepository
+	- Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository
+	- Remp\MailerModule\Repositories\LogsRepository
+	- Remp\MailerModule\Repositories\LogConversionsRepository
+	- Remp\MailerModule\Repositories\LayoutsRepository
+	- Remp\MailerModule\Repositories\SnippetsRepository
+	- Remp\MailerModule\Repositories\ListsRepository
+	- Remp\MailerModule\Repositories\ListCategoriesRepository
+	- Remp\MailerModule\Repositories\ListVariantsRepository
+	- Remp\MailerModule\Repositories\TemplatesRepository
+	- Remp\MailerModule\Repositories\JobsRepository
+	- Remp\MailerModule\Repositories\JobQueueRepository
+	- Remp\MailerModule\Repositories\BatchesRepository
+	- Remp\MailerModule\Repositories\BatchTemplatesRepository
+	- Remp\MailerModule\Repositories\AutoLoginTokensRepository
+	- Remp\MailerModule\Repositories\SourceTemplatesRepository
+	- Remp\MailerModule\Repositories\MailTypesRepository
+	- Remp\MailerModule\Repositories\MailTemplateStatsRepository
+	- Remp\MailerModule\Repositories\MailTypeStatsRepository
+
+	# Factories
+	- Remp\MailerModule\Components\DataTable\DataTableFactory
+	- Remp\MailerModule\Components\SendingStats\ISendingStatsFactory
+	- Remp\MailerModule\Components\MissingConfiguration\IMissingConfigurationFactory
+	- Remp\MailerModule\Components\GeneratorWidgets\IGeneratorWidgetsFactory
+	- Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory
+
+	# Generator Widgets
+	- Remp\MailerModule\Components\GeneratorWidgets\GeneratorWidgetsManager
+	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget\NewsfilterWidget
+	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\NovydenikNewsfilterWidget\NovydenikNewsfilterWidget
+	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget\MediaBriefingWidget
+	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\DennikeWidget\DennikeWidget
+	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\TldrWidget\TldrWidget
+	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\MMSWidget\MMSWidget
+
+	# Forms
+	- Remp\MailerModule\Forms\SignInFormFactory
+	- Remp\MailerModule\Forms\ConfigFormFactory
+	- Remp\MailerModule\Forms\ListFormFactory
+	- Remp\MailerModule\Forms\LayoutFormFactory
+	- Remp\MailerModule\Forms\SnippetFormFactory
+	- Remp\MailerModule\Forms\TemplateFormFactory
+	- Remp\MailerModule\Forms\TemplateTestFormFactory
+	- Remp\MailerModule\Forms\JobFormFactory
+	- Remp\MailerModule\Forms\NewBatchFormFactory
+	- Remp\MailerModule\Forms\EditBatchFormFactory
+	- Remp\MailerModule\Forms\NewTemplateFormFactory
+	- Remp\MailerModule\Forms\SourceTemplateFormFactory
+	- Remp\MailerModule\Forms\MailGeneratorFormFactory
+	- Remp\MailerModule\Forms\NovydenikNewsfilterTemplateFormFactory('users_with_any_subscriptions', 'users-without-subscription')
+	- Remp\MailerModule\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
+	- Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
+	- Remp\MailerModule\Forms\DennikeTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
+	- Remp\MailerModule\Forms\TldrTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
+	- Remp\MailerModule\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
+
+	# Helpers
+	- Remp\MailerModule\Models\Generators\WordpressHelpers
+	embedParser:
+		factory: Remp\MailerModule\Models\Generators\EmbedParser
+	articleLocker:
+		factory: Remp\MailerModule\Models\Generators\ArticleLocker
+
+	# healtCheck - inject temp for storage check
+	- Remp\MailerModule\Presenters\HealthPresenter(%tempDir%)

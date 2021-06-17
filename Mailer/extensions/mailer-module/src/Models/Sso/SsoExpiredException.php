@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace Remp\NetteSso\Security;
+namespace Remp\MailerModule\Models\Sso;
 
 class SsoExpiredException extends \Exception
 {
