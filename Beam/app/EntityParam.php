@@ -2,10 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model\BaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class EntityParam extends Model
+class EntityParam extends BaseModel
 {
     use SoftDeletes;
 

@@ -2,9 +2,7 @@
 
 namespace App\Model;
 
-use Illuminate\Database\Eloquent\Model;
-
-class ConversionCommerceEventProduct extends Model
+class ConversionCommerceEventProduct extends BaseModel
 {
     protected $fillable = [
         'product_id',

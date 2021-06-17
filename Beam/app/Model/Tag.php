@@ -5,9 +5,8 @@ namespace App\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Article;
 use App\TagCategory;
-use Illuminate\Database\Eloquent\Model;
 
-class Tag extends Model
+class Tag extends BaseModel
 {
     use HasFactory;
 

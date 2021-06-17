@@ -2,12 +2,12 @@
 
 namespace App\Model\Config;
 
+use App\Model\BaseModel;
 use App\Model\Property\SelectedProperty;
 use App\Property;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
-class Config extends Model
+class Config extends BaseModel
 {
     protected $fillable = [
         'name',

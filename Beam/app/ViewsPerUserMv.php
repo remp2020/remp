@@ -2,7 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model\BaseModel;
 
 /*
  * Class ViewsPerUserMv
@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * TODO this will go out after remp#253 issue is closed
  * @package App
  */
-class ViewsPerUserMv extends Model
+class ViewsPerUserMv extends BaseModel
 {
     protected $table = 'views_per_user_mv';
 

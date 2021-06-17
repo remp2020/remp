@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Model\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Misc;
@@ -9,10 +10,8 @@ use App\Model\ArticleTitle;
 use App\Model\Config\ConversionRateConfig;
 use App\Model\ConversionSource;
 use App\Model\Tag;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
@@ -20,7 +19,7 @@ use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 use Yadakhov\InsertOnDuplicateKey;
 
-class Article extends Model implements Searchable
+class Article extends BaseModel implements Searchable
 {
     use HasFactory;
 
@@ -423,13 +422,5 @@ SQL;
             $this->journalHelpers = new JournalHelpers($this->getJournal());
         }
         return $this->journalHelpers;
-    }
-
-    // TODO: possibly remove after update to Laravel 8 (when upsert is available) or move to BaseModel class.
-    protected function asDateTime($value)
-    {
-        $dateTime = parent::asDateTime($value);
-        $dateTime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
-        return $dateTime;
     }
 }

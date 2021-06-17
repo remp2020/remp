@@ -2,10 +2,10 @@
 
 namespace App;
 
+use App\Model\BaseModel;
 use App\Model\Tag;
-use Illuminate\Database\Eloquent\Model;
 
-class TagCategory extends Model
+class TagCategory extends BaseModel
 {
     protected $fillable = [
         'name',

@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Model\BaseModel;
 
-class ArticleAuthor extends Model
+class ArticleAuthor extends BaseModel
 {
     protected $table = 'article_author';
 

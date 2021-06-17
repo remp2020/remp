@@ -2,24 +2,16 @@
 
 namespace App;
 
+use App\Model\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Model\ConversionCommerceEvent;
 use App\Model\ConversionGeneralEvent;
 use App\Model\ConversionPageviewEvent;
 use App\Model\ConversionSource;
-use DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
 
-/**
- * Class Conversion
- *
- * @property string articleExternalId
- *
- * @package App
- */
-class Conversion extends Model
+class Conversion extends BaseModel
 {
     use HasFactory;
 

@@ -4,9 +4,8 @@ namespace App\Model;
 
 use App\Article;
 use App\Conversion;
-use Illuminate\Database\Eloquent\Model;
 
-class ConversionPageviewEvent extends Model
+class ConversionPageviewEvent extends BaseModel
 {
     protected $casts = [
         'locked' => 'boolean',
