@@ -23,7 +23,8 @@ class PurgeInvalidAggregatedData extends Migration
         DB::statement("SET foreign_key_checks = 1");
 
         // Make sure all conversions will get aggregated and processed again.
-        DB::statement("UPDATE conversions SET events_aggregated = 0, source_processed = 0");
+        DB::statement("UPDATE conversions SET events_aggregated = 1, source_processed = 1 WHERE paid_at < NOW() - INTERVAL 90 DAY");
+        DB::statement("UPDATE conversions SET events_aggregated = 0, source_processed = 0 WHERE paid_at >= NOW() - INTERVAL 90 DAY");
     }
 
     /**

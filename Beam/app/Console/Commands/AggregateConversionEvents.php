@@ -94,7 +94,9 @@ class AggregateConversionEvents extends Command
 
     private function getUnaggregatedConversions(): Collection
     {
-        return Conversion::where('events_aggregated', 0)->get();
+        return Conversion::where('events_aggregated', 0)
+            ->orderBy('paid_at', 'DESC')
+            ->get();
     }
 
     protected function aggregateConversion(Conversion $conversion, int $days)
