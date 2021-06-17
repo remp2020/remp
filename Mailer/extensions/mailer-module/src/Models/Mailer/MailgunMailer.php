@@ -3,21 +3,17 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Mailer;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
-use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
-use GuzzleHttp\Client;
-use Http\Discovery\Psr18ClientDiscovery;
 use Mailgun\HttpClient\HttpClientConfigurator;
 use Mailgun\Mailgun;
 use Nette\Mail\Message;
 use Nette\Utils\Json;
 use Nette\Utils\Random;
 use Psr\Log\LoggerInterface;
-use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
-use Remp\MailerModule\Repositories\ConfigsRepository;
 
 class MailgunMailer extends Mailer
 {
@@ -69,8 +65,8 @@ class MailgunMailer extends Mailer
                 Middleware::log($this->logger, new MessageFormatter(MessageFormatter::DEBUG))
             );
 
-            $client = GuzzleAdapter::createWithConfig([
-                'handler' => $stack
+            $client = new Client([
+                'handler' => $stack,
             ]);
             $clientConfigurator->setHttpClient($client);
         }

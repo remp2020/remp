@@ -1,6 +1,6 @@
 #! /usr/bin/make
 
-PHP_FOLDERS=app bin tests
+PHP_FOLDERS=app bin extensions tests
 
 sniff:
 	php vendor/bin/phpcs --standard=.phpcs_ruleset.xml ${PHP_FOLDERS} -n -p
@@ -12,4 +12,4 @@ syntax:
 	find ${PHP_FOLDERS} -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
 
 phpstan:
-	php vendor/bin/phpstan analyse --configuration=.phpstan.neon --level=1 --memory-limit=1G app tests
+	php vendor/bin/phpstan analyse --configuration=.phpstan.neon --level=1 --memory-limit=1G app tests extensions
