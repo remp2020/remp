@@ -92,7 +92,7 @@ class ProcessConversionSources extends Command
             return;
         }
 
-        if (!$browserId = $this->getConversionBrowserId($conversion, $paymentEvent)) {
+        if (!$browserId = $this->getConversionBrowserId($conversion)) {
             return;
         }
 
@@ -128,13 +128,9 @@ class ProcessConversionSources extends Command
         $this->createConversionSourceModel($lastSessionPageview, $conversion, ConversionSource::TYPE_SESSION_LAST);
     }
 
-    private function getConversionBrowserId(Conversion $conversion, ConversionCommerceEvent $paymentEvent)
+    private function getConversionBrowserId(Conversion $conversion)
     {
-        $from = (clone $paymentEvent->time)->subSecond();
-        $to = (clone $paymentEvent->time)->addSecond();
-
         $paymentListRequest = ListRequest::from('commerce')
-            ->setTime($from, $to)
             ->addFilter('transaction_id', $conversion->transaction_id)
             ->addFilter('step', 'payment')
             ->addGroup('browser_id');
