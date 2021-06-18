@@ -68,11 +68,11 @@ class AggregateConversionEvents extends Command
         return 0;
     }
 
-    protected function getBrowsersForUser(Conversion $conversion, $category, $action = null)
+    protected function getBrowsersForUser(Conversion $conversion, $days, $category, $action = null)
     {
         $before = $conversion->paid_at;
         // take maximum one year old browser IDs
-        $after = (clone $before)->subYear();
+        $after = (clone $before)->subDays($days);
 
         $browserIds = [];
         $records = $this->journal->count(AggregateRequest::from($category, $action)
@@ -111,18 +111,18 @@ class AggregateConversionEvents extends Command
         try {
             $pageviewEvents = $this->loadPageviewEvents(
                 $conversion,
-                $this->getBrowsersForUser($conversion, 'pageviews', 'load'),
+                $this->getBrowsersForUser($conversion, $days, 'pageviews', 'load'),
                 $days
             );
 
             $commerceEvents = $this->loadCommerceEvents(
                 $conversion,
-                $this->getBrowsersForUser($conversion, 'commerce'),
+                $this->getBrowsersForUser($conversion, $days, 'commerce'),
                 $days
             );
             $generalEvents = $this->loadGeneralEvents(
                 $conversion,
-                $this->getBrowsersForUser($conversion, 'events'),
+                $this->getBrowsersForUser($conversion, $days, 'events'),
                 $days
             );
 
