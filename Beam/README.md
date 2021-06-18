@@ -1582,6 +1582,135 @@ $response = file_get_contents("http://beam.remp.press/api/v2/tags/top", false, $
 
 ---
 
+##### POST `api/pageviews/histogram`
+
+Beam admin provides pageviews histogram for articles satisfying the filter for days in date range. 
+You can filter articles by content type, sections, authors, tags or tag categories.
+
+You can combine multiple filters for each filter category. Filters in and between categories are joined with `AND`, values in filter are joined with `OR`.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Body:*
+
+```json5
+{
+	"from": "2020-08-10", // date from which take pageviews including
+	"to": "2020-08-12", // date to which take pageviews
+	"content_type": "article", // String; OPTIONAL; filters articles by content_type
+	"sections": [ // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["Section external ids"]}, // String; section external IDs; values joined with OR
+		{"names": ["Section titles"]} // String; section names; joined with OR; values joined with OR
+	],
+	"authors": [ // OPTIONAL; filters from which authors take articles (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["author external ids"]}, // String; author external IDs; values joined with OR
+		{"names": ["author names"]} // String; author names; joined with OR; values joined with OR
+	],
+	"tags": [ // OPTIONAL; filters articles with tags (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["tag external ids"]}, // String; tag external IDs; values joined with OR
+		{"names": ["tag names"]} // String; tag names; values joined with OR
+	],
+	"tag_categories": [ // OPTIONAL; filters articles with tag categories (use either external_id or name arrays, not both); filters joined with AND
+		{"external_ids": ["tag category external ids"]}, // String; tag category external IDs; values joined with OR
+		{"names": ["tag category names"]} // String; tag category names; values joined with OR
+	]
+}
+```
+
+##### *Examples*:
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl --location --request POST 'http://beam.remp.press/api/pageviews/histogram' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer XXX' \
+--data-raw '{
+	"from": "2020-08-10",
+	"to": "2020-08-12",
+	"content_type": "article",
+	"sections": [
+		{"external_ids": ["1", "2"]},
+		{"names": ["World"]}
+	],
+	"authors": [
+		{"external_ids": ["123"]}
+	],
+	"tags": [
+		{"external_ids": ["10"]}
+	],
+	"tag_categories": [
+		{"external_ids": ["1"]}
+	]
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+	"from" => "2020-08-10",
+	"to" => "2020-08-12",
+	"content_type" => "article",
+	"sections" => [
+		["names" => ["Blog"]]
+	],
+	"authors" => [
+		["names" => ["John Doe"]]
+	],
+	"tags" => [
+		["names" => ["News"]]
+	],
+	"tag_categories" => [
+		["names" => ["Europe"]]
+	]
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/pageviews/histogram", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+[
+    {
+        "date": "2020-08-10",
+        "pageviews": 274
+    },
+    {
+        "date": "2020-08-11",
+        "pageviews": 150
+    }
+]
+```
+
+---
+
 ##### GET `/api/articles`
 
 Returns list of articles specified by ids or external ids.

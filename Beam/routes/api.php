@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\v1\PageviewController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\Api\v1\ArticleController as ArticleControllerApiV1;
 use App\Http\Controllers\Api\v2\ArticleController as ArticleControllerApiV2;
@@ -51,6 +52,8 @@ Route::middleware('auth:api')->group(function() {
     Route::post('articles/top', [ArticleControllerApiV1::class, 'topArticles'])->name('articles.top');
     Route::post('authors/top', [AuthorControllerApiV1::class, 'topAuthors'])->name('authors.top');
     Route::post('tags/top', [TagControllerApiV1::class, 'topTags'])->name('tags.top');
+
+    Route::post('pageviews/histogram', [PageviewController::class, 'timeHistogram']);
 
     Route::group(['prefix' => 'v2'], function() {
         Route::post('articles/top', [ArticleControllerApiV2::class, 'topArticles'])->name('articles.top.v2');
