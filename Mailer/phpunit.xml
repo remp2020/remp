@@ -28,6 +28,7 @@
     <testsuites>
         <testsuite name="All">
             <directory suffix="Test.php">extensions/mailer-module/src/Tests/</directory>
+            <directory suffix="Test.php">tests/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

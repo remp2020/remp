@@ -20,6 +20,9 @@ $configurator->createRobotLoader()
     ->addDirectory(__DIR__)
     ->register();
 
+// Root config, so MailerModule can register extensions, etc...
+$configurator->addConfig(__DIR__ . '/../vendor/remp/mailer-module/src/config/config.root.neon');
+
 $configurator->addConfig(__DIR__ . '/../app/config/config.neon');
 $configurator->addConfig(__DIR__ . '/../app/config/config.test.neon');
 

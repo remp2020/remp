@@ -8,6 +8,12 @@ services:
             # If you're using Beam, you can enable this command to pull conversions from there
             # - add(Remp\MailerModule\Commands\ProcessConversionStatsCommand())
 
+#	# Internal CRM system. For more details contact Tomas Bella.
+#	authenticator:
+#		factory: Remp\MailerModule\Models\Auth\Authenticator
+#	authStorage:
+#		factory: Remp\MailerModule\Models\Auth\RemoteUser(%sso_host%)
+
     embedParser:
         setup:
             - setVideoLinkText("Click to play video")
