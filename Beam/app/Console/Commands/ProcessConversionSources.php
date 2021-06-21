@@ -60,6 +60,7 @@ class ProcessConversionSources extends Command
                 $conversionsToProcess = Conversion::select()
                     ->where('events_aggregated', true)
                     ->where('source_processed', false)
+                    ->orderBy('paid_at', 'DESC')
                     ->get();
 
                 foreach ($conversionsToProcess as $conversion) {
