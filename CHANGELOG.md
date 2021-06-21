@@ -20,11 +20,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - We decided to truncate all of the aggregations (they're temporary, they would be removed eventually) and trigger the aggregation internally again. You might see higher load after the release caused by `conversions:aggregate-events` and `conversions:process-sources` commands.
 - Added `/api/pageviews/histogram` API endpoint to get pageviews histogram for selected date range. See [README.md](./Beam/README.md) for more details. remp/remp#953
 - [Segments]: Fixed "Trying to create too many scroll contexts" error caused by the amount of opened scrolls in Elastic and loose close timeouts which could happen on selected queries. remp/remp#464
+- Fixed issue with API calls generating PHP sessions on each request, causing session store to be overloaded with records. remp/remp#954
 
 ### [Campaign]
 
 - Introduced `public_id` row to reach unique identifications with shorter string. remp/remp#916
 - Replaced `uuid` campaign's identification with shorter `public_id` in cookies and local storage. remp/remp#916
+- Fixed issue with API calls generating PHP sessions on each request, causing session store to be overloaded with records. remp/remp#954
 
 ### [Mailer]
 
@@ -32,6 +34,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added missing login error messages if REMP CRM is used to authenticate the user.
 - Added option to identify source template by code in `MailGeneratorPreprocessHandler`. remp/remp#941
 - Fixed `ProcessConversionStatsCommand` to process all conversions occurred after selected time, not only for mail job batch templates created after selected time. remp/remp#907
+
+### [Sso]
+
+- Fixed issue with API calls generating PHP sessions on each request, causing session store to be overloaded with records. remp/remp#954
 
 ## [0.26.0] - 2021-06-10
 
