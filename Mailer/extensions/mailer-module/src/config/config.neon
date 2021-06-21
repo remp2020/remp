@@ -1,40 +1,3 @@
-parameters:
-	locale: @environmentConfig::get('LOCALE')
-	timezone: @environmentConfig::get('TIMEZONE')
-	sso_addr: @environmentConfig::get('SSO_ADDR')
-	sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
-	max_result_count: @environmentConfig::get('SEARCH_MAX_RESULT_COUNT')
-	redis:
-		host: @environmentConfig::get('REDIS_HOST')
-		port: @environmentConfig::getInt('REDIS_PORT')
-		db: @environmentConfig::getInt('REDIS_DB')
-	remp:
-		beam:
-			web_addr: @environmentConfig::get('REMP_BEAM_ADDR')
-			token: @environmentConfig::get('REMP_BEAM_API_TOKEN')
-			tracker_addr: @environmentConfig::get('REMP_BEAM_TRACKER_ADDR')
-			tracker_property_token: @environmentConfig::get('REMP_BEAM_TRACKER_PROPERTY_TOKEN')
-			segments_addr: @environmentConfig::get('REMP_BEAM_SEGMENTS_ADDR')
-		pythia:
-			segments_addr: @environmentConfig::get('REMP_PYTHIA_SEGMENTS_ADDR')
-		campaign:
-			web_addr: @environmentConfig::get('REMP_CAMPAIGN_ADDR')
-	preflight:
-		headers:
-			Access-Control-Allow-Headers:
-				- Authorization
-				- X-Requested-With
-				- Content-Type
-	template_editor: @environmentConfig::get('TEMPLATE_EDITOR')
-
-database:
-	default:
-		dsn: @environmentConfig::getDsn()
-		user: @environmentConfig::get('DB_USER')
-		password: @environmentConfig::get('DB_PASS')
-		options:
-			lazy: yes
-
 services:
 	router: Remp\MailerModule\Models\RouterFactory::createRouter
 	environmentConfig:
@@ -147,12 +110,6 @@ services:
 			- addMailer(Remp\MailerModule\Models\Mailer\SmtpMailer())
 			- addMailer(@mailgunMailer)
 
-#	# Internal CRM system. For more details contact Tomas Bella.
-#	authenticator:
-#		factory: Remp\MailerModule\Models\Auth\Authenticator
-#	authStorage:
-#		factory: Remp\MailerModule\Models\Auth\RemoteUser(%sso_host%)
-
 	# SSO authentication
 	- Remp\MailerModule\Models\Sso\Client(%sso_addr%)
 	authenticator:
@@ -252,12 +209,6 @@ services:
 
 	# Generator Widgets
 	- Remp\MailerModule\Components\GeneratorWidgets\GeneratorWidgetsManager
-	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\NewsfilterWidget\NewsfilterWidget
-	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\NovydenikNewsfilterWidget\NovydenikNewsfilterWidget
-	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\MediaBriefingWidget\MediaBriefingWidget
-	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\DennikeWidget\DennikeWidget
-	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\TldrWidget\TldrWidget
-	- Remp\MailerModule\Components\GeneratorWidgets\Widgets\MMSWidget\MMSWidget
 
 	# Forms
 	- Remp\MailerModule\Forms\SignInFormFactory
@@ -273,12 +224,6 @@ services:
 	- Remp\MailerModule\Forms\NewTemplateFormFactory
 	- Remp\MailerModule\Forms\SourceTemplateFormFactory
 	- Remp\MailerModule\Forms\MailGeneratorFormFactory
-	- Remp\MailerModule\Forms\NovydenikNewsfilterTemplateFormFactory('users_with_any_subscriptions', 'users-without-subscription')
-	- Remp\MailerModule\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-	- Remp\MailerModule\Forms\MediaBriefingTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-	- Remp\MailerModule\Forms\DennikeTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-	- Remp\MailerModule\Forms\TldrTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-	- Remp\MailerModule\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 
 	# Helpers
 	- Remp\MailerModule\Models\Generators\WordpressHelpers

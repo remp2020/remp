@@ -43,6 +43,10 @@ final class Bootstrap
             ->addDirectory(__DIR__)
             ->register();
 
+        // Root config, so MailerModule can register extensions, etc.
+        $configurator->addConfig(__DIR__ . '/../vendor/remp/mailer-module/src/config/config.root.neon');
+
+        // Rest of configuration
         $configurator->addConfig(__DIR__ . '/config/config.neon');
         $configurator->addConfig(__DIR__ . '/config/config.local.neon');
 
