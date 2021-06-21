@@ -40,7 +40,6 @@
         "php-amqplib/php-amqplib": "^2.7",
         "piwik/device-detector": "^3.10",
         "predis/predis": "^1.1",
-        "recca0120/laravel-tracy": "^1.8",
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
@@ -50,8 +49,7 @@
         "symfony/psr-http-message-bridge": "^1.0",
         "tightenco/ziggy": "^1.2",
         "ukfast/laravel-health-check": "^1.5",
-        "yajra/laravel-datatables-oracle": "^9.18",
-        "laravel/tinker": "^2.5"
+        "yajra/laravel-datatables-oracle": "^9.18"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.10",
@@ -62,7 +60,8 @@
         "phpunit/phpunit": "^9.3.3",
         "laravel/tinker": "^2.0",
         "fakerphp/faker": "^1.9.1",
-        "facade/ignition": "^2.5"
+        "facade/ignition": "^2.5",
+        "recca0120/laravel-tracy": "^1.8"
     },
     "autoload": {
         "classmap": [

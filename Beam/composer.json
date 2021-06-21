@@ -58,7 +58,6 @@
         "matomo/searchengine-and-social-list": "^3.11",
         "php-amqplib/php-amqplib": "^v2.12",
         "predis/predis": "^1.1",
-        "recca0120/laravel-tracy": "^v1.13",
         "remp/journal": "*",
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
@@ -84,7 +83,8 @@
         "nunomaduro/collision": "^5.0",
         "phpunit/phpunit": "^9.3.3",
         "facade/ignition": "^2.5",
-        "fakerphp/faker": "^1.9.1"
+        "fakerphp/faker": "^1.9.1",
+        "recca0120/laravel-tracy": "^v1.13"
     },
     "autoload": {
         "classmap": [

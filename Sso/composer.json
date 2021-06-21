@@ -49,7 +49,6 @@
         "league/uri": "^5.3",
         "php-amqplib/php-amqplib": "^2.12",
         "predis/predis": "^1.1",
-        "recca0120/laravel-tracy": "^1.13",
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
@@ -71,7 +70,8 @@
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "filp/whoops": "^2.12",
-        "beyondcode/laravel-dump-server": "^1.7"
+        "beyondcode/laravel-dump-server": "^1.7",
+        "recca0120/laravel-tracy": "^1.13"
     },
     "autoload": {
         "classmap": [
