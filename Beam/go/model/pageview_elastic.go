@@ -286,6 +286,7 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 	if err != nil {
 		return nil, err
 	}
+	defer scroll.Clear(pDB.DB.Context)
 
 	// prepare PageviewRow buckets
 	prBuckets := make(map[string]*PageviewRow)
@@ -296,11 +297,9 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 	for {
 		results, err := scroll.Do(pDB.DB.Context)
 		if err == io.EOF {
-			scroll.Clear(pDB.DB.Context)
 			break
 		}
 		if err != nil {
-			scroll.Clear(pDB.DB.Context)
 			return nil, errors.Wrap(err, "error while reading list data from elastic")
 		}
 
@@ -407,17 +406,16 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 	if err != nil {
 		return nil, err
 	}
+	defer scroll.Clear(pDB.DB.Context)
 
 	timespentForPageviews := make(map[string]int)
 
 	for {
 		results, err := scroll.Do(pDB.DB.Context)
 		if err == io.EOF {
-			scroll.Clear(pDB.DB.Context)
 			break
 		}
 		if err != nil {
-			scroll.Clear(pDB.DB.Context)
 			return nil, errors.Wrap(err, "error while reading list data from elastic")
 		}
 

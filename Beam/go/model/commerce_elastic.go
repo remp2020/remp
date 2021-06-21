@@ -87,6 +87,7 @@ func (cDB *CommerceElastic) List(options ListOptions) (CommerceRowCollection, er
 	if err != nil {
 		return nil, err
 	}
+	defer scroll.Clear(cDB.DB.Context)
 
 	// prepare EventRow buckets
 	crBuckets := make(map[string]*CommerceRow)

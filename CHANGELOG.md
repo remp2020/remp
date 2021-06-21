@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possibly invalid aggregation of conversion data which caused time columns to be off due to the timezone issues. remp/remp#464
   - We decided to truncate all of the aggregations (they're temporary, they would be removed eventually) and trigger the aggregation internally again. You might see higher load after the release caused by `conversions:aggregate-events` and `conversions:process-sources` commands.
 - Added `/api/pageviews/histogram` API endpoint to get pageviews histogram for selected date range. See [README.md](./Beam/README.md) for more details. remp/remp#953
+- [Segments]: Fixed "Trying to create too many scroll contexts" error caused by the amount of opened scrolls in Elastic and loose close timeouts which could happen on selected queries. remp/remp#464
 
 ### [Campaign]
 

@@ -94,6 +94,7 @@ func (eDB *EventElastic) List(options ListOptions) (EventRowCollection, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer scroll.Clear(eDB.DB.Context)
 
 	// prepare EventRow buckets
 	erBuckets := make(map[string]*EventRow)
@@ -147,7 +148,7 @@ func (eDB *EventElastic) List(options ListOptions) (EventRowCollection, error) {
 					return nil, fmt.Errorf("unhandled tag type in pageview listing: %T", rawEvent[field])
 				}
 
-				tags[field] = fmt.Sprintf("%s", tagVal)
+				tags[field] = tagVal
 				key = fmt.Sprintf("%s%s=%s_", key, field, tagVal)
 			}
 
