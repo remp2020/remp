@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added missing login error messages if REMP CRM is used to authenticate the user.
 - Added option to identify source template by code in `MailGeneratorPreprocessHandler`. remp/remp#941
 - Fixed `ProcessConversionStatsCommand` to process all conversions occurred after selected time, not only for mail job batch templates created after selected time. remp/remp#907
+- Added `mail_from` into email's type options to make easier the mail composition. remp/remp#952
 
 ### [Sso]
 

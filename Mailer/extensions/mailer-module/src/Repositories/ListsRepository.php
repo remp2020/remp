@@ -29,13 +29,15 @@ class ListsRepository extends Repository
         ?string $previewUrl = null,
         ?string $pageUrl = null,
         ?string $imageUrl = null,
-        bool $publicListing = true
+        bool $publicListing = true,
+        ?string $mailFrom = null
     ): ActiveRow {
         $result = $this->insert([
             'mail_type_category_id' => $categoryId,
             'priority' => $priority,
             'code' => $code,
             'title' => $name,
+            'mail_from' => $mailFrom,
             'description' => $description,
             'sorting' => $sorting,
             'auto_subscribe' => $isAutoSubscribe,
