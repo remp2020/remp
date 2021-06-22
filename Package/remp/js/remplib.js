@@ -61,7 +61,7 @@ export default {
                 remplib.storage = config.storage;
             }
         }
-        if (typeof window.localStorage !== 'object' || localStorage === null) {
+        if (!this.localStorageIsAvailable()) {
             console.warn('remplib: local storage is not available in this browser, falling back to `cookie`');
             remplib.storage = 'cookie';
         }
@@ -217,7 +217,7 @@ export default {
 
         let value = null;
         if (this.storage === 'local_storage') {
-            value = this.getFromLocalStorage(key, now, expireInMinutes);
+            value = this._getFromLocalStorage(key, now, expireInMinutes);
             if (value) {
                 return value;
             }
@@ -233,14 +233,42 @@ export default {
 
         // Migration from local storage to cookie (e.g. campaigns_session). We got here because we didn't find value
         // in the cookie. It might be present in the local_storage.
-        if (this.storage === 'cookie') {
-            value = this.getFromLocalStorage(key, now, expireInMinutes);
+        if (this.storage === 'cookie' && this.localStorageIsAvailable()) {
+            value = this._getFromLocalStorage(key, now, expireInMinutes);
         }
 
         return value;
     },
 
-    getFromLocalStorage: function(key, now, expireInMinutes) {
+    // Recommended check that localStorage is available AND usable
+    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#testing_for_availability
+    localStorageIsAvailable: function() {
+        var storage;
+        try {
+            storage = window['localStorage'];
+            var x = '__storage_test__';
+            storage.setItem(x, x);
+            storage.removeItem(x);
+            return true;
+        }
+        catch(e) {
+            return e instanceof DOMException && (
+                // everything except Firefox
+                e.code === 22 ||
+                // Firefox
+                e.code === 1014 ||
+                // test name field too, because code might not be present
+                // everything except Firefox
+                e.name === 'QuotaExceededError' ||
+                // Firefox
+                e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+                // acknowledge QuotaExceededError only if there's something already stored
+                (storage && storage.length !== 0);
+        }
+    },
+
+    // private method
+    _getFromLocalStorage: function(key, now, expireInMinutes) {
         let data = localStorage.getItem(key);
         if (!data) {
             return null;
