@@ -90,6 +90,8 @@ class ListFormFactory
         $form->addTextArea('description', 'Description')
             ->setHtmlAttribute('rows', 3);
 
+        $form->addText('mail_from', 'From');
+
         $form->addText('preview_url', 'Preview URL');
 
         $form->addText('page_url', 'Page URL');
@@ -231,7 +233,9 @@ class ListFormFactory
                 $values['description'],
                 $values['preview_url'],
                 $values['page_url'],
-                $values['image_url']
+                $values['image_url'],
+                true,
+                $values['mail_from']
             );
             ($this->onCreate)($row);
         }

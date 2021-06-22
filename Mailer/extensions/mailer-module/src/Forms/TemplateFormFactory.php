@@ -61,6 +61,7 @@ class TemplateFormFactory implements IFormFactory
         $defaults = [];
 
         $layouts = $this->layoutsRepository->all()->fetchPairs('id', 'name');
+        $lists = $this->listsRepository->all()->fetchPairs('id', 'title');
 
         if (isset($id)) {
             $template = $this->templatesRepository->find($id);
@@ -68,6 +69,7 @@ class TemplateFormFactory implements IFormFactory
             $defaults = $template->toArray();
         } else {
             $defaults['mail_layout_id'] = key($layouts);
+            $defaults['from'] = $this->listsRepository->find(key($lists))->mail_from;
         }
 
         $form = new Form;
@@ -91,7 +93,7 @@ class TemplateFormFactory implements IFormFactory
 
         $form->addSelect('mail_layout_id', 'Layout', $layouts);
 
-        $form->addSelect('mail_type_id', 'Newsletter list', $this->listsRepository->all()->fetchPairs('id', 'title'))
+        $form->addSelect('mail_type_id', 'Newsletter list', $lists)
             ->setRequired("Field 'Newsletter list' is required.");
 
         $form->addText('from', 'From')

@@ -1030,6 +1030,7 @@ Field `id` has higher precedence in finding the existing record.
     "code": 22, // String, required; URL-friendly slug identifying mail type
     "title": "Foo Bar", // String, required: Title of mail type
     "description": "Newsletter sent to our premium subscribers", // String, required: Description of list visible in Mailer admin
+    "mail_from": "email@example.com", // String, optional; Who should be used as a sender of email type.
     "sorting": 100, // Integer, optional; Indicator of how the mail types should be sorted in API and web. Sorting is in ascending order.
     "locked": false, // Boolean, optional; Flag indicating whether users should be able to subscribe/unsubscribe from the list (e.g. you want your system emails locked and subscribed for everyone)
     "auto_subscribe": false, // Boolean, optional; Flag indicating whether users should be subscribed to this list automatically
@@ -1069,6 +1070,7 @@ Response:
         "title": "Foo Bar",
         "sorting": 15,
         "description": null,
+        "mail_from": null,
         "priority": 100,
         "mail_type_category_id": 5,
         "locked": false,

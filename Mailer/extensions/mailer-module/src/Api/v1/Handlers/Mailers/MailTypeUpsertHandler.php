@@ -74,6 +74,7 @@ class MailTypeUpsertHandler extends BaseHandler
                 'title' => $list->title,
                 'sorting' => $list->sorting,
                 'description' => $list->description,
+                'mail_from' => $list->mail_from,
                 'priority' => $list->priority,
                 'mail_type_category_id' => $list->mail_type_category_id,
                 'locked' => (bool) $list->locked,
@@ -154,7 +155,8 @@ class MailTypeUpsertHandler extends BaseHandler
             $params['preview_url'] ?? null,
             $params['page_url'] ?? null,
             $params['image_url'] ?? null,
-            $params['public_listing'] ?? true
+            $params['public_listing'] ?? true,
+            $params['mail_from'] ?? null
         );
     }
 }

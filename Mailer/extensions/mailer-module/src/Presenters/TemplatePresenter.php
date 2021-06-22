@@ -256,9 +256,11 @@ final class TemplatePresenter extends BasePresenter
     {
         $layouts = $this->layoutsRepository->getTable()->fetchPairs('id', 'layout_html');
         $snippets = $this->snippetsRepository->getTable()->select('code')->group('code')->fetchAssoc('code');
+        $lists = $this->listsRepository->all()->fetchAssoc('id');
 
         $this->template->layouts = $layouts;
         $this->template->snippets = $snippets;
+        $this->template->lists = $lists;
         $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
     }
 
@@ -270,10 +272,12 @@ final class TemplatePresenter extends BasePresenter
         }
         $layouts = $this->layoutsRepository->getTable()->fetchAssoc('id');
         $snippets = $this->snippetsRepository->getTable()->select('code')->group('code')->fetchAssoc('code');
+        $lists = $this->listsRepository->all()->fetchAssoc('id');
 
         $this->template->mailTemplate = $template;
         $this->template->layouts = $layouts;
         $this->template->snippets = $snippets;
+        $this->template->lists = $lists;
         $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
     }
 
