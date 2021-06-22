@@ -385,7 +385,7 @@ Please visit `/list/new` to create a newsletter via web admin.
   "list_code": "alerts", // String; code of the newsletter list you're subscribing the user to
 
   // optional
-  "variant_code": "123", // String;  Code of newsletter variant to subscribe
+  "variant_id": 123, // Integer; ID of the newsletter variant to subscribe
 }
 ```
 
