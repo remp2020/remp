@@ -12,6 +12,7 @@ class ArticleSearchAspect extends SearchAspect
     {
         return Article::query()
             ->where('title', 'LIKE', "%{$term}%")
+            ->orWhere('external_id', '=', $term)
             ->orWhereHas('tags', function ($query) use ($term) {
                 $query->where('name', 'LIKE', "{$term}%");
             })

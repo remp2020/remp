@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `/api/pageviews/histogram` API endpoint to get pageviews histogram for selected date range. See [README.md](./Beam/README.md) for more details. remp/remp#953
 - [Segments]: Fixed "Trying to create too many scroll contexts" error caused by the amount of opened scrolls in Elastic and loose close timeouts which could happen on selected queries. remp/remp#464
 - Fixed issue with API calls generating PHP sessions on each request, causing session store to be overloaded with records. remp/remp#954
+- Added support for article external ID in the global search. remp/remp#955
 
 ### [Campaign]
 

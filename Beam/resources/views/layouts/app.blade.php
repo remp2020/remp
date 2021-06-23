@@ -67,7 +67,7 @@
                     <input class="js-typeahead hs-input typeahead"
                            name="q"
                            autocomplete="off"
-                           placeholder="Search for articles, authors and segments">
+                           placeholder="Search for articles (titles and IDs), authors, and segments">
                     <i class="zmdi zmdi-search hs-reset" data-ma-action="search-clear"></i>
                 </div>
             </div>
