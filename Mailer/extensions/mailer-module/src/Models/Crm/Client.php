@@ -23,10 +23,10 @@ class Client
         ]);
     }
 
-    public function confirmUser(string $email): array
+    public function validateEmail(string $email): array
     {
         try {
-            $response = $this->client->post('api/v1/users/confirm', [
+            $response = $this->client->post('api/v1/users/set-email-validated', [
                 'form_params' => [
                     'email' => $email,
                 ],
@@ -37,8 +37,8 @@ class Client
             throw new Exception("could not connect to CRM: {$connectException->getMessage()}");
         } catch (ClientException $clientException) {
             $body = Json::decode($clientException->getResponse()->getBody()->getContents(), Json::FORCE_ARRAY);
-            if (isset($body['code']) && $body['code'] === 'user_not_found') {
-                throw new UserNotFoundException("Unable to find user: {$clientException->getMessage()}");
+            if (isset($body['code']) && $body['code'] === 'email_not_found') {
+                throw new UserNotFoundException("Unable to find email: {$clientException->getMessage()}");
             }
 
             throw new Exception("unable to confirm CRM user: {$clientException->getMessage()}");

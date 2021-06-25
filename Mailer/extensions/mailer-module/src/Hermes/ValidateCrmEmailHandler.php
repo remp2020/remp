@@ -9,7 +9,7 @@ use Remp\MailerModule\Repositories\LogsRepository;
 use Tomaj\Hermes\Handler\HandlerInterface;
 use Tomaj\Hermes\MessageInterface;
 
-class ConfirmCrmUserHandler implements HandlerInterface
+class ValidateCrmEmailHandler implements HandlerInterface
 {
     private $logsRepository;
 
@@ -46,7 +46,7 @@ class ConfirmCrmUserHandler implements HandlerInterface
         }
 
         try {
-            $this->crm->confirmUser($log->email);
+            $this->crm->validateEmail($log->email);
         } catch (UserNotFoundException $userNotFoundException) {
             // we don't want to schedule retry if user doesn't exist but we still want to track this error
             return false;

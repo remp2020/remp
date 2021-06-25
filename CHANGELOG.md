@@ -32,12 +32,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - **BREAKING**: Extended `IConversionsRepository` interface with `getBatchTemplatesConversionsSince()` function. remp/remp#907
-- **BREAKING** Proprietary Mailer classes' namespace was changed from `Remp/MailerModule` prefix to `Remp/Mailer` prefix. In the future, these classes may be completely removed from the repository. If you have previously relied on their functionality, make sure you reflect on this change and ideally copy the functionality into your own code. remp/remp#924
+- **BREAKING**: Proprietary Mailer classes' namespace was changed from `Remp/MailerModule` prefix to `Remp/Mailer`. In the future, these classes may be completely removed from the repository. If you have previously relied on their functionality, make sure you reflect on this change and ideally copy the functionality into your own code. remp/remp#924
   - List of affected widgets: `DennikeWidget`, `MediaBriefingWidget`, `MMSWidget`, `NewsfilterWidget`, `NovydenikNewsfilterWidget`, `TldrWidget`
   - List of affected form factories: `DennikeTemplateFormFactory`, `MediaBriefingTemplateFormFactory`, `MMSTemplateFormFactory`, `NewsfilterTemplateFormFactory`, `NovydenikNewsfilterTemplateFormFactory`, `TldrTemplateFormFactory` 
   - List of affected generators: `DailyNewsletterGenerator`, `DennikeGenerator`, `DennikNBestPerformingArticlesGenerator`, `MediaBriefingGenerator`, `MinutaAlertGenerator`, `MinutaDigestGenerator`, `MMSGenerator`, `NewsfilterGenerator`, `NovydenikNewsfilterGenerator`, `TldrGenerator`
   - `ContentInterface` implementations: `DenniknContent`, `NovydenikContent`, `TyzdenContent`
-
+- **BREAKING**: Handler confirming CRM user `Remp\MailerModule\Hermes\ConfirmCrmUserHandler` is replaced with `Remp\MailerModule\Hermes\ValidateCrmEmailHandler`. remp/crm#1740
+  - This conforms with the latest changes in the CRM which splits user confirmation and email validation flagging. If you used this handler in your `config.local.neon`, please replace it with the new one.
+  - This version requires CRM 0.32.0+, otherwise the confirmation APIs would return HTTP 404. After the upgrade, make sure the API key used to communicate with CRM has access to the `Users:EmailValidationApi` API by visiting `/api/api-access-admin/` in the CRM.
 - Added missing login error messages if REMP CRM is used to authenticate the user.
 - Added option to identify source template by code in `MailGeneratorPreprocessHandler`. remp/remp#941
 - Fixed `ProcessConversionStatsCommand` to process all conversions occurred after selected time, not only for mail job batch templates created after selected time. remp/remp#907
