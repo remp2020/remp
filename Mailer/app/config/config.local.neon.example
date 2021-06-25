@@ -1,3 +1,6 @@
+php:
+	intl.default_locale: sk_SK
+
 services:
     # All console commands you need to use should be registered here
     # This is a set that we recommend to use

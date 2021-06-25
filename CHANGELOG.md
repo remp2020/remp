@@ -42,6 +42,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added option to identify source template by code in `MailGeneratorPreprocessHandler`. remp/remp#941
 - Fixed `ProcessConversionStatsCommand` to process all conversions occurred after selected time, not only for mail job batch templates created after selected time. remp/remp#907
 - Added `mail_from` into email's type options to make easier the mail composition. remp/remp#952
+- Added `twig/intl-extra` extension to allow using more filters as `format_currency` etc. See https://github.com/twigphp/intl-extra for another filters. remp/remp#829 
 
 ### [Sso]
 

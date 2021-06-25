@@ -44,6 +44,7 @@
     "tomaj/nette-api": "^2.1",
     "tracy/tracy": "^2.6",
     "twig/twig": "^3.1",
+    "twig/intl-extra": "^3.3",
     "vlucas/phpdotenv": "^5.2"
   },
   "minimum-stability": "dev",
