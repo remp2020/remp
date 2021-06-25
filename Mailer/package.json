@@ -7,53 +7,29 @@
   ],
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch-poll": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --watch-poll --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+    "dev": "cross-env MAILER_MODULE_PATH=extensions/mailer-module mix --mix-config=extensions/mailer-module/webpack.mix.js",
+    "watch": "cross-env MAILER_MODULE_PATH=extensions/mailer-module mix watch --mix-config=extensions/mailer-module/webpack.mix.js",
+    "watch-poll": "cross-env MAILER_MODULE_PATH=extensions/mailer-module mix watch --mix-config=extensions/mailer-module/webpack.mix.js -- --watch-options-poll=1000",
+    "hot": "cross-env MAILER_MODULE_PATH=extensions/mailer-module mix watch --hot --mix-config=extensions/mailer-module/webpack.mix.js",
+    "production": "cross-env MAILER_MODULE_PATH=extensions/mailer-module mix --production --mix-config=extensions/mailer-module/webpack.mix.js"
   },
   "engines": {
     "node": ">=12"
   },
   "dependencies": {
-    "acorn": "^7.4.0",
-    "animate.css": "^3.7.0",
-    "autosize": "^4.0.2",
-    "bootstrap": "^3.4.1",
-    "bootstrap-notify": "^3.1.3",
-    "bootstrap-select": "^1.13.18",
-    "chart.js": "^2.9.3",
-    "codemirror": "^5.45.0",
-    "datatables.net": "^1.10.19",
-    "datatables.net-buttons": "^1.6.1",
-    "datatables.net-responsive": "^2.2.3",
-    "datatables.net-rowgroup": "^1.1.0",
-    "easy-pie-chart": "^2.1.7",
-    "eonasdan-bootstrap-datetimepicker": "^4.17.47",
-    "global": "^4.3.2",
-    "google-material-color": "^1.3.1",
-    "jquery": "3.5.1",
-    "jquery-placeholder": "^2.3.1",
-    "jquery-typeahead": "^2.11.0",
-    "lodash": "^4.17.20",
-    "material-design-iconic-font": "^2.2.0",
-    "moment": "^2.24.0",
-    "nette-forms": "^2.4.9",
-    "nette.ajax.js": "^2.3.0",
-    "node-waves": "^0.7.6",
-    "remp": "file:../Package/remp",
-    "rison": "^0.1.1",
-    "salvattore": "^1.0.9",
-    "trumbowyg": "^2.21.0",
-    "vue": "^2.6.10"
+    "mailer-module": "file:extensions/mailer-module"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0-0",
     "cross-env": "^7.0",
-    "laravel-mix": "^5.0",
+    "css-loader": "^5.2.6",
+    "laravel-mix": "^6.0.24",
+    "postcss": "^8.2.8",
     "resolve-url-loader": "^3.1",
     "sass": "^1.17.4",
     "sass-loader": "^10.0",
-    "vue-template-compiler": "^2.6.10"
+    "vue-loader": "^15.9.7",
+    "vue-template-compiler": "^2.6.14",
+    "webpack": "^5.0.0"
   }
 }

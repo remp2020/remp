@@ -5,8 +5,8 @@
     <!-- ARGUMENTS ############################################## -->
     <arg name="encoding" value="UTF-8" />
     <arg name="cache" value=".phpcs.cache" />
-    <!-- do not sniff migrations, assets and Tyzden's migration_scripts -->
-    <arg name="ignore" value="*/migrations/*" />
+    <!-- do not sniff migrations and assets -->
+    <arg name="ignore" value="*/migrations/*,*/assets/*,*/node_modules/*" />
 
     <!-- RULESET ################################################ -->
     <!-- use PSR2 as base for rules -->

@@ -43,7 +43,7 @@
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
-        "remp/multi-armed-bandit": "*",
+        "remp/remp-commons": "*",
         "sentry/sentry-laravel": "^2.5",
         "spatie/laravel-searchable": "^1.9",
         "symfony/psr-http-message-bridge": "^1.0",

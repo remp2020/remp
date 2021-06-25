@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca2b7f09fc8efdb48b81d4a79ca627dd",
+    "content-hash": "262ccee40807cbe05ce03c6edf0eb690",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -5589,7 +5589,7 @@
         },
         {
             "name": "remp/laravel-helpers",
-            "version": "dev-master",
+            "version": "dev-924-js_in_mailer",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-helpers",
@@ -5639,7 +5639,7 @@
         },
         {
             "name": "remp/laravel-sso",
-            "version": "dev-master",
+            "version": "dev-924-js_in_mailer",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-sso",
@@ -5692,7 +5692,7 @@
         },
         {
             "name": "remp/laravel-widgets",
-            "version": "dev-master",
+            "version": "dev-924-js_in_mailer",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-widgets",
@@ -5741,21 +5741,23 @@
             }
         },
         {
-            "name": "remp/multi-armed-bandit",
-            "version": "dev-master",
+            "name": "remp/remp-commons",
+            "version": "dev-924-js_in_mailer",
             "dist": {
                 "type": "path",
-                "url": "../Composer/multi-armed-bandit",
-                "reference": "d6e11ae521b50495e8aeb7625bee84ef027a4e1b"
+                "url": "../Composer/remp-commons",
+                "reference": "dfd52f432e11171d8b3f5ea3ebcc0f0d2735c548"
             },
             "require": {
                 "gburtini/distributions": "^0.0.2",
-                "php": ">=7.0"
+                "guzzlehttp/guzzle": "^7.0",
+                "php": "~7.1"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Remp\\MultiArmedBandit\\": "src/"
+                    "Remp\\Journal\\": "src/journal",
+                    "Remp\\MultiArmedBandit\\": "src/multi-armed-bandit"
                 }
             },
             "autoload-dev": {
@@ -5770,11 +5772,14 @@
                     "email": "dulacka@gmail.com"
                 }
             ],
-            "description": "A package to evaluate two or more multivariate tests with armed bandit",
+            "description": "REMP common tools (for Beam, Campaign and Mailer)",
             "keywords": [
                 "a/b testing",
+                "journal",
+                "laravel",
                 "multi armed bandit",
-                "remp"
+                "remp",
+                "segments"
             ],
             "transport-options": {
                 "symlink": false,
@@ -13348,5 +13353,5 @@
         "ext-json": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.0.0"
 }
