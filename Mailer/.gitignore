@@ -4,7 +4,7 @@ app/config/config.local.neon
 .phpunit.result.cache
 tests/.env_test
 vendor/
-www/assets/vendor/
+www/assets/
 node_modules
 yarn-error.log
 mix-manifest.json

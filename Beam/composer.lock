@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1939c4155487689d624fd912a2a901c0",
+    "content-hash": "80020543d28252c0089142479ca1af78",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -1577,6 +1577,46 @@
                 }
             ],
             "time": "2021-04-26T11:24:25+00:00"
+        },
+        {
+            "name": "gburtini/distributions",
+            "version": "0.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gburtini/Probability-Distributions-for-PHP.git",
+                "reference": "47fa8ae98e50dff2054b2923f591e80b2c4a7d65"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gburtini/Probability-Distributions-for-PHP/zipball/47fa8ae98e50dff2054b2923f591e80b2c4a7d65",
+                "reference": "47fa8ae98e50dff2054b2923f591e80b2c4a7d65",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "gburtini\\Distributions": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Giuseppe Burtini",
+                    "email": "giuseppe@burtini.ca"
+                }
+            ],
+            "description": "PHP implementation of a number of statistical probability distributions: normal, beta, gamma, etc.",
+            "support": {
+                "issues": "https://github.com/gburtini/Probability-Distributions-for-PHP/issues",
+                "source": "https://github.com/gburtini/Probability-Distributions-for-PHP/tree/master"
+            },
+            "time": "2018-04-08T05:56:51+00:00"
         },
         {
             "name": "google/apiclient",
@@ -5495,47 +5535,8 @@
             "time": "2020-08-18T17:17:46+00:00"
         },
         {
-            "name": "remp/journal",
-            "version": "dev-master",
-            "dist": {
-                "type": "path",
-                "url": "../Composer/journal",
-                "reference": "d687f56e94397eae0cd011b4cbf7a3260277ca0f"
-            },
-            "require": {
-                "guzzlehttp/guzzle": "^7.0",
-                "php": "~7.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Remp\\Journal\\": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "rootpd",
-                    "email": "dulacka@gmail.com"
-                }
-            ],
-            "description": "Journal API connector",
-            "keywords": [
-                "journal",
-                "laravel",
-                "remp",
-                "segments"
-            ],
-            "transport-options": {
-                "symlink": false,
-                "relative": true
-            }
-        },
-        {
             "name": "remp/laravel-helpers",
-            "version": "dev-master",
+            "version": "dev-924-js_in_mailer",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-helpers",
@@ -5585,7 +5586,7 @@
         },
         {
             "name": "remp/laravel-sso",
-            "version": "dev-master",
+            "version": "dev-924-js_in_mailer",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-sso",
@@ -5638,7 +5639,7 @@
         },
         {
             "name": "remp/laravel-widgets",
-            "version": "dev-master",
+            "version": "dev-924-js_in_mailer",
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-widgets",
@@ -5680,6 +5681,52 @@
                 "laravel",
                 "remp",
                 "widgets"
+            ],
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            }
+        },
+        {
+            "name": "remp/remp-commons",
+            "version": "dev-924-js_in_mailer",
+            "dist": {
+                "type": "path",
+                "url": "../Composer/remp-commons",
+                "reference": "dfd52f432e11171d8b3f5ea3ebcc0f0d2735c548"
+            },
+            "require": {
+                "gburtini/distributions": "^0.0.2",
+                "guzzlehttp/guzzle": "^7.0",
+                "php": "~7.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Remp\\Journal\\": "src/journal",
+                    "Remp\\MultiArmedBandit\\": "src/multi-armed-bandit"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": []
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "rootpd",
+                    "email": "dulacka@gmail.com"
+                }
+            ],
+            "description": "REMP common tools (for Beam, Campaign and Mailer)",
+            "keywords": [
+                "a/b testing",
+                "journal",
+                "laravel",
+                "multi armed bandit",
+                "remp",
+                "segments"
             ],
             "transport-options": {
                 "symlink": false,
@@ -13637,5 +13684,5 @@
         "ext-pcntl": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.0.0"
 }

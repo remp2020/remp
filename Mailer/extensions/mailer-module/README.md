@@ -13,76 +13,17 @@ Use composer to install the package:
 composer require remp/mailer-module
 ```
 
-Add the following extensions to your `app/config/config.neon` file:
+In `Bootstrap.php` file (where Nette Configurator is initialized), add module's `config.root.neon` file as the first configuration file:
 
-```neon
-extensions:
-	local_configs: Remp\MailerModule\Models\Config\ConfigExtension
-	webpack: Oops\WebpackNetteAdapter\DI\WebpackExtension(true)
-	mailer: Remp\MailerModule\DI\MailerModuleExtension
+```php
+$configurator = new Nette\Configurator;
+$configurator->addConfig(__DIR__ . '/../vendor/remp/mailer-module/src/config/config.root.neon');
+// ... rest of the configuration
 ```
 
 ### Configuration
 
-Please add the following configuration parameters to your `app/config/config.neon` file. These parameters are required by Mailer and can be loaded either from `.env` (as shown here) or can be directly set in `.neon` file.
-
-```neon
-parameters:
-	locale: @environmentConfig::get('LOCALE')
-	timezone: @environmentConfig::get('TIMEZONE')
-	sso_addr: @environmentConfig::get('SSO_ADDR')
-	sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
-	max_result_count: @environmentConfig::get('SEARCH_MAX_RESULT_COUNT')
-	redis:
-		host: @environmentConfig::get('REDIS_HOST')
-		port: @environmentConfig::getInt('REDIS_PORT')
-		db: @environmentConfig::getInt('REDIS_DB')
-	remp:
-		beam:
-			web_addr: @environmentConfig::get('REMP_BEAM_ADDR')
-			token: @environmentConfig::get('REMP_BEAM_API_TOKEN')
-			tracker_addr: @environmentConfig::get('REMP_BEAM_TRACKER_ADDR')
-			tracker_property_token: @environmentConfig::get('REMP_BEAM_TRACKER_PROPERTY_TOKEN')
-			segments_addr: @environmentConfig::get('REMP_BEAM_SEGMENTS_ADDR')
-		pythia:
-			segments_addr: @environmentConfig::get('REMP_PYTHIA_SEGMENTS_ADDR')
-		campaign:
-			web_addr: @environmentConfig::get('REMP_CAMPAIGN_ADDR')
-	preflight:
-		headers:
-			Access-Control-Allow-Headers:
-				- Authorization
-				- X-Requested-With
-				- Content-Type
-	template_editor: @environmentConfig::get('TEMPLATE_EDITOR')
-
-webpack:
-	devServer:
-		enabled: false
-	build:
-		directory: %wwwDir%/assets/vendor
-		publicPath: assets/vendor/
-	manifest:
-		name: mix-manifest.json
-
-application:
-	errorPresenter: Mailer:Error
-	mapping:
-		Api: Tomaj\NetteApi\Presenters\*Presenter
-		*: Remp\*Module\Presenters\*Presenter
-
-session:
-	expiration: 14 days
-	autoStart: true
-
-database:
-	default:
-		dsn: @environmentConfig::getDsn()
-		user: @environmentConfig::get('DB_USER')
-		password: @environmentConfig::get('DB_PASS')
-		options:
-			lazy: yes
-```
+All required configuration options are described in `.env.example` file. Please copy its content into `.env` file in of your project.
 
 ## API Documentation
 

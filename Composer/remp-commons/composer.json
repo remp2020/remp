@@ -1,7 +1,7 @@
 {
-  "name": "remp/multi-armed-bandit",
-  "description": "A package to evaluate two or more multivariate tests with armed bandit",
-  "keywords": ["remp", "a/b testing", "multi armed bandit"],
+  "name": "remp/remp-commons",
+  "description": "REMP common tools (for Beam, Campaign and Mailer)",
+  "keywords": ["laravel", "remp", "journal", "segments", "a/b testing", "multi armed bandit"],
   "license": "MIT",
   "authors": [
     {
@@ -10,14 +10,16 @@
     }
   ],
   "require": {
-    "php": ">=7.0",
+    "php": "~7.1",
+    "guzzlehttp/guzzle": "^7.0",
     "gburtini/distributions": "^0.0.2"
   },
   "require-dev": {
   },
   "autoload": {
     "psr-4": {
-      "Remp\\MultiArmedBandit\\": "src/"
+      "Remp\\Journal\\": "src/journal",
+      "Remp\\MultiArmedBandit\\": "src/multi-armed-bandit"
     }
   },
   "autoload-dev": {

@@ -58,7 +58,7 @@
         "matomo/searchengine-and-social-list": "^3.11",
         "php-amqplib/php-amqplib": "^v2.12",
         "predis/predis": "^1.1",
-        "remp/journal": "*",
+        "remp/remp-commons": "*",
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",

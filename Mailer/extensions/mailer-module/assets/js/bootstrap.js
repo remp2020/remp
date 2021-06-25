@@ -1,7 +1,9 @@
 const global = require('global');
 
+import Vue from 'vue';
+global.Vue = Vue;
+
 global.$ = global.jQuery = require('jquery');
-global.Vue = require('vue');
 global.moment = require('moment');
 global.clipboard = require("./clipboard.js");
 global.salvattore = require("salvattore");

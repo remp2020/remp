@@ -2,6 +2,28 @@
 
 PHP_FOLDERS=app bin extensions tests
 
+js-link-remp:
+	cd ../Package/remp && yarn link
+	yarn link remp
+
+js:
+	make js-link-remp
+	yarn install
+	#yarn upgrade remp --force
+	yarn production
+
+js-dev:
+	make js-link-remp
+	yarn install
+	#yarn upgrade remp --force
+	yarn dev
+
+js-watch:
+	make js-link-remp
+	yarn install
+	#yarn upgrade remp --force
+	yarn watch
+
 sniff:
 	php vendor/bin/phpcs --standard=.phpcs_ruleset.xml ${PHP_FOLDERS} -n -p
 

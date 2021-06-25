@@ -1,8 +1,8 @@
-# Multi Armed Bandit evaluator
+# REMP Commons
 
 ## Installation
 
-To include the SSO connector within the project, update your `composer.json` file accordingly:
+To include this set of tools within the project, update your `composer.json` file accordingly:
 
 ```json
 {
@@ -11,17 +11,19 @@ To include the SSO connector within the project, update your `composer.json` fil
     "repositories": [
         {
             "type": "path",
-            "url": "../Composer/multi-armed-bandit"
+            "url": "../Composer/remp-commons"
         }
     ],
     "require": {
-        // ... 
-        "remp/multi-armed-bandit": "*"
+        // ...
+        "remp/remp-commons": "*"
     }
 }
 ```
 
 ## Usage
+
+### Multi-armed bandit
 
 ```php
 $machine = new Machine(1000);

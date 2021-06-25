@@ -18,7 +18,7 @@ yarn install
 yarn install --no-bin-links
 
 # 3. Generate assets
-yarn run dev // or any other alternative defined within package.json
+make js
 
 # 4. Run migrations
 php bin/command.php migrate:migrate
