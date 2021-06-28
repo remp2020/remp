@@ -26,7 +26,7 @@
                     'priority' => 1,
                 ],
             ],
-            'dataSource' => action('AccountController@json'),
+            'dataSource' => route('accounts.json'),
             'rowActions' => [
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit account'],
             ],

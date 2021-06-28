@@ -54,7 +54,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('dashboard/timeHistogramJson', [DashboardController::class, 'timeHistogram'])->name('dashboard.timeHistogram.json');
     Route::post('dashboard/timeHistogramNewJson', [DashboardController::class, 'timeHistogramNew'])->name('dashboard.timeHistogramNew.json');
 
-    Route::get('accounts/json', 'AccountController@json');
+    Route::get('accounts/json', [AccountController::class, 'json'])->name('accounts.json');
     Route::get('accounts/{account}/properties/json', [PropertyController::class, 'json'])->name('accounts.properties.json');
 
     Route::get('segments/json', [SegmentController::class, 'json'])->name('segments.json');
