@@ -1217,7 +1217,8 @@ parameters based on the used *generator*. It complements generation of HTML/text
 
 | Name | Value | Required | Description |
 | --- |---| --- | --- |
-| source_template_id | *String* | yes | ID of *generator template* to be used. |
+| source_template_id | *String* | yes if CODE not provided  | ID of *generator template* to be used. |
+| source_template_code | *String* | yes if ID not provided | CODE of *generator template* to be used. |
 
 Any other parameters are specific to each generator and require knowledge of the generator implementation.
 See `apiParams()` method of the generator for the list of available/required parameters.
@@ -1238,11 +1239,11 @@ Response:
 
 ```json5
 {
-    "status": "ok",
-    "data": {
-        "htmlContent": " -- generated HTML content of email", // String; generated HTML email
-        "textContent": " -- generated text content of email " // String; generated plain text email
-    }
+  "status": "ok",
+  "data": {
+    "htmlContent": " -- generated HTML content of email", // String; generated HTML email
+    "textContent": " -- generated text content of email " // String; generated plain text email
+  }
 }
 ```
 
