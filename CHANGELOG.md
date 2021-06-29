@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.27.0] - 2021-06-29
+
 ### Project
 
 - Added `--explicit_defaults_for_timestamp` switch to the MySQL docker command to avoid unpredictable behavior when creating database tables - MySQL would set the default `CURRENT_TIMESTAMP` to the first date column of each table. Make sure your production settings match to avoid issues.
@@ -928,7 +930,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.26.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.27.0...master
+[0.26.0]: https://github.com/remp2020/remp/compare/0.26.0...0.27.0
 [0.26.0]: https://github.com/remp2020/remp/compare/0.25.1...0.26.0
 [0.25.1]: https://github.com/remp2020/remp/compare/0.25.0...0.25.1
 [0.25.0]: https://github.com/remp2020/remp/compare/0.24.0...0.25.0
