@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Api\v2;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ArticleUpsertRequestV2 extends FormRequest
+class ArticleUpsertRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

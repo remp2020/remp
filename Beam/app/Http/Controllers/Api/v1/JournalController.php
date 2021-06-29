@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\v1;
 
-use App\Article;
 use App\Helpers\Journal\JournalHelpers;
-use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Remp\Journal\ConcurrentsRequest;
 use Remp\Journal\JournalContract;
