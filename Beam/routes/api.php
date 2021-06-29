@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\v1\AuthorController as AuthorControllerApiV1;
 use App\Http\Controllers\Api\v2\AuthorController as AuthorControllerApiV2;
 use App\Http\Controllers\ConversionController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\JournalController;
+use App\Http\Controllers\Api\v1\JournalController;
 use App\Http\Controllers\JournalProxyController;
 use App\Http\Controllers\Api\v1\TagController as TagControllerApiV1;
 use App\Http\Controllers\Api\v2\TagController as TagControllerApiV2;
@@ -32,8 +32,8 @@ Route::middleware('auth:api')->group(function() {
     Route::apiResource('conversions', ConversionController::class, [
         'only' => ['index', 'store']
     ]);
-    Route::post('articles/unread', [ArticleController::class, 'unreadArticlesForUsers'])->name('articles.unreadArticlesForUsers');
-    Route::post('articles/upsert', [ArticleController::class, 'upsert'])->name('articles.upsert');
+    Route::post('articles/unread', [ArticleControllerApiV1::class, 'unreadArticlesForUsers'])->name('articles.unreadArticlesForUsers');
+    Route::post('articles/upsert', [ArticleControllerApiV1::class, 'upsert'])->name('articles.upsert');
     Route::post('conversions/upsert', [ConversionController::class, 'upsert'])->name('conversions.upsert');
 
     Route::get('article/{article?}', [ArticleDetailsController::class, 'show']);
@@ -59,8 +59,7 @@ Route::middleware('auth:api')->group(function() {
         Route::post('articles/top', [ArticleControllerApiV2::class, 'topArticles'])->name('articles.top.v2');
         Route::post('authors/top', [AuthorControllerApiV2::class, 'topAuthors'])->name('authors.top.v2');
         Route::post('tags/top', [TagControllerApiV2::class, 'topTags'])->name('tags.top.v2');
-
-        Route::post('articles/upsert', [ArticleController::class, 'upsertV2'])->name('articles.upsert.v2');
+        Route::post('articles/upsert', [ArticleControllerApiV2::class, 'upsert'])->name('articles.upsert.v2');
     });
 });
 
