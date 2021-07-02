@@ -11,7 +11,7 @@ class ArticleSeeder extends Seeder
      *
      * @return void
      */
-    public function run(Faker\Generator $faker)
+    public function run(\Faker\Generator $faker)
     {
         /** @var \App\Property $property */
         $properties = \App\Property::all();

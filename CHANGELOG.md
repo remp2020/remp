@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Refactored beam `CompressAggregations` command to run in chunks because of colliding database transactions with `AggregatePageviewLoadJob` command, which caused deadlock. remp/remp#944
 - Added `content_type` filter to the `api/articles/unread` API to exclude unwanted content types. remp/remp#973
 - Added support for remplib.js reinitialization, necessary for correct execution in single-page apps. See [README](./Beam/README.md#single-page-applications) for more information. remp/remp#968
+- Fixed broken `ArticleSeeder` and `EntitySeeder`. 
 
 ### [Campaign]
 

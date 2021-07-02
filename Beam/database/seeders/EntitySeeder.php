@@ -13,18 +13,18 @@ class EntitySeeder extends Seeder
      */
     public function run()
     {
-        $userEntity = new App\Entity();
+        $userEntity = new \App\Entity();
 
         $userEntity->name = "user";
         $userEntity->save();
 
-        $userIdParam = new App\EntityParam();
+        $userIdParam = new \App\EntityParam();
         $userIdParam->name = "id";
-        $userIdParam->type = App\EntityParam::TYPE_STRING;
+        $userIdParam->type = \App\EntityParam::TYPE_STRING;
 
-        $userEmailParam = new App\EntityParam();
+        $userEmailParam = new \App\EntityParam();
         $userEmailParam->name = "email";
-        $userEmailParam->type = App\EntityParam::TYPE_STRING;
+        $userEmailParam->type = \App\EntityParam::TYPE_STRING;
 
 
         $userEntity->params()->saveMany([
