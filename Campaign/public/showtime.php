@@ -97,6 +97,13 @@ function mix($path, $manifestDirectory = '')
 
 class PlainPhpShowtimeResponse implements ShowtimeResponse
 {
+    public function jsonResponse($response, $statusCode = 400) {
+        header('Content-Type: application/json');
+        http_response_code($statusCode);
+        echo json_encode($response);
+        exit;
+    }
+
     /**
      * @param string $callback jsonp callback name
      * @param array $response response to be json-encoded and returned
@@ -299,8 +306,6 @@ JS;
     }
 }
 
-header('Content-Type: application/javascript');
-
 $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
@@ -323,10 +328,16 @@ try {
     $logger->warning('unable to register airbrake notifier: ' . $e->getMessage());
 }
 
+$showtimeResponse = new PlainPhpShowtimeResponse();
 $data = filter_input(INPUT_GET, 'data');
 $callback = filter_input(INPUT_GET, 'callback');
 
+if ($data === null || $callback === null) {
+    $showtimeResponse->jsonResponse(['errors' => ['invalid request, data or callback params missing']]);
+    return;
+}
 
+header('Content-Type: application/javascript');
 
 // dependencies initialization
 $redis = new \Predis\Client([
@@ -338,8 +349,6 @@ $redis = new \Predis\Client([
 ], [
     'prefix' => env('REDIS_PREFIX') ?: '',
 ]);
-
-$showtimeResponse = new PlainPhpShowtimeResponse();
 
 $segmentAggregator = SegmentAggregator::unserializeFromRedis($redis);
 if (!$segmentAggregator) {

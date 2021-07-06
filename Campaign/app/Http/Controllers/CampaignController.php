@@ -498,6 +498,10 @@ class CampaignController extends Controller
         $data = $request->get('data');
         $callback = $request->get('callback');
 
+        if ($data === null || $callback === null) {
+            return response()->json(['errors' => ['invalid request, data or callback params missing']], 400);
+        }
+
         return $showtime->showtime($data, $callback, $controllerShowtimeResponse);
     }
 
