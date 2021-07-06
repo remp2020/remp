@@ -177,6 +177,9 @@ class ArticlesDataTable
                 }
                 return $amounts ?? [0];
             })
+            ->filterColumn('title', function (Builder $query, $value) {
+                $query->where('articles.title', 'like', "%{$value}%");
+            })
             ->filterColumn('content_type', function (Builder $query, $value) {
                 $values = explode(',', $value);
                 $query->whereIn('articles.content_type', $values);
