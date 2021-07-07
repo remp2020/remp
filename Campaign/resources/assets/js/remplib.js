@@ -1,4 +1,4 @@
-import Remplib from 'remp/js/remplib'
+import Remplib from '@remp/js-commons/js/remplib'
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
@@ -318,7 +318,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
                     "updatedAt": now,
                 }
             }
-            
+
             if (campaigns.hasOwnProperty(campaignId)) {
                 campaigns[campaignPublicId].seen = campaigns[campaignId].seen;
                 campaigns[campaignPublicId].count = campaigns[campaignId].count;

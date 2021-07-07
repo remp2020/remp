@@ -1,7 +1,7 @@
 {
   "name": "remp/remp-commons",
   "description": "REMP common tools (for Beam, Campaign and Mailer)",
-  "keywords": ["laravel", "remp", "journal", "segments", "a/b testing", "multi armed bandit"],
+  "keywords": ["laravel", "remp", "journal", "segments", "ab testing", "multi armed bandit"],
   "license": "MIT",
   "authors": [
     {

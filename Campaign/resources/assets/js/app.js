@@ -1,11 +1,11 @@
 require("./bootstrap");
 
-require("remp/js/functions.js");
-require("remp/js/actions.js");
-require("remp/js/datatables.js");
-require("remp/js/chart.js");
-require("remp/js/vuefilters.js");
-require("remp/js/search.js");
+require("@remp/js-commons/js/functions.js");
+require("@remp/js-commons/js/actions.js");
+require("@remp/js-commons/js/datatables.js");
+require("@remp/js-commons/js/chart.js");
+require("@remp/js-commons/js/vuefilters.js");
+require("@remp/js-commons/js/search.js");
 
 require("./banner.js");
 require("./forms/bannerForm.js");

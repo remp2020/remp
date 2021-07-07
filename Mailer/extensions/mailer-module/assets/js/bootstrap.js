@@ -7,7 +7,7 @@ global.$ = global.jQuery = require('jquery');
 global.moment = require('moment');
 global.clipboard = require("./clipboard.js");
 global.salvattore = require("salvattore");
-global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue").default;
+global.SmartRangeSelector = require("@remp/js-commons/js/components/SmartRangeSelector.vue").default;
 global.Chart = require("chart.js");
 global.Waves = require("node-waves");
 global.Nette = require('nette-forms');

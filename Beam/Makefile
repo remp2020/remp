@@ -26,6 +26,25 @@ vet: vet-lib
 	@cd $(SUB_TRACKER) && make vet
 	@cd $(SUB_SEGMENTS) && make vet
 
+js-link-remp:
+	cd ../Package/remp && yarn link
+	yarn link "@remp/js-commons"
+
+js:
+	make js-link-remp
+	yarn install
+	yarn all-production
+
+js-dev:
+	make js-link-remp
+	yarn install
+	yarn all-dev
+
+js-watch:
+	make js-link-remp
+	yarn install
+	yarn all-watch
+
 build:
 	@cd $(SUB_TRACKER) && make build
 	@cd $(SUB_SEGMENTS) && make build

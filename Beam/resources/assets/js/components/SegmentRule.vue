@@ -141,7 +141,7 @@
 </template>
 
 <script>
-    import vSelect from "remp/js/components/vSelect"
+    import vSelect from "@remp/js-commons/js/components/vSelect"
 
     export default {
         name: "segment-rule",

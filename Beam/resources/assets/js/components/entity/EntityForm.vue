@@ -136,7 +136,7 @@
 </template>
 
 <script>
-    import vSelect from "remp/js/components/vSelect";
+    import vSelect from "@remp/js-commons/js/components/vSelect";
     import EntityParam from "./EntityParam";
 
     let props = [

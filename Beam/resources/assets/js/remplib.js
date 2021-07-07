@@ -1,4 +1,4 @@
-import Remplib from 'remp/js/remplib'
+import Remplib from '@remp/js-commons/js/remplib'
 import Hash from 'fnv1a'
 import { throttle } from 'lodash';
 
@@ -17,7 +17,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
         social: null,
 
         campaign_id: null,
- 
+
         _: [],
 
         article: null,
@@ -716,7 +716,7 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
             if (!query) {
                 return;
             }
-            
+
             var vars = query.split('&');
             let trackingParams = ["rtm_source", "rtm_medium", "rtm_campaign", "rtm_content", "rtm_variant"];
             if (this.utmBackwardCompatibilityEnabled === true) {

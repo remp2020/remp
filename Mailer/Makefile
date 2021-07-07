@@ -4,24 +4,21 @@ PHP_FOLDERS=app bin extensions tests
 
 js-link-remp:
 	cd ../Package/remp && yarn link
-	yarn link remp
+	yarn link "@remp/js-commons"
 
 js:
 	make js-link-remp
 	yarn install
-	#yarn upgrade remp --force
 	yarn production
 
 js-dev:
 	make js-link-remp
 	yarn install
-	#yarn upgrade remp --force
 	yarn dev
 
 js-watch:
 	make js-link-remp
 	yarn install
-	#yarn upgrade remp --force
 	yarn watch
 
 sniff:

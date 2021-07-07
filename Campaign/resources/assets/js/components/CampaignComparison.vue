@@ -94,8 +94,8 @@
 
 <script>
     import axios from 'axios'
-    import Loader from 'remp/js/components/Loader'
-    import vSelect from 'remp/js/components/vSelect.vue'
+    import Loader from '@remp/js-commons/js/components/Loader'
+    import vSelect from '@remp/js-commons/js/components/vSelect.vue'
 
     export default {
         components: {

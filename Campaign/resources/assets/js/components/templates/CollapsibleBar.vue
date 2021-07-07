@@ -114,7 +114,7 @@
 </template>
 
 <script type="text/javascript">
-    import vSelect from "remp/js/components/vSelect.vue";
+    import vSelect from "@remp/js-commons/js/components/vSelect.vue";
 
     let props = [
         "_templateId",

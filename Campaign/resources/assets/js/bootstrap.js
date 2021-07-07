@@ -13,8 +13,8 @@ global.salvattore = require("salvattore");
 global.noUiSlider = require("nouislider/distribute/nouislider.js");
 global.Chart = require("chart.js");
 
-global.SmartRangeSelector = require("remp/js/components/SmartRangeSelector.vue").default;
-global.Toggle = require("remp/js/components/Toggle.vue").default;
+global.SmartRangeSelector = require("@remp/js-commons/js/components/SmartRangeSelector.vue").default;
+global.Toggle = require("@remp/js-commons/js/components/Toggle.vue").default;
 global.CampaignStatsRoot = require("./components/CampaignStatsRoot.vue").default;
 global.CampaignComparison = require("./components/CampaignComparison.vue").default;
 
