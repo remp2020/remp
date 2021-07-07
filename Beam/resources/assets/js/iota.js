@@ -1,4 +1,4 @@
-import Remplib from 'remp/js/remplib';
+import Remplib from '@remp/js-commons/js/remplib';
 import Vue from 'vue';
 import IotaTemplate from './components/IotaTemplate';
 import IotaService from './components/IotaService';

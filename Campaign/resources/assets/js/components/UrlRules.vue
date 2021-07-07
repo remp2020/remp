@@ -48,7 +48,7 @@
 
 
 <script type="text/javascript">
-    import vSelect from "remp/js/components/vSelect.vue";
+    import vSelect from "@remp/js-commons/js/components/vSelect.vue";
     import Url from "./Url";
 
     export default {

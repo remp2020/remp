@@ -253,7 +253,7 @@
     import OverlayTwoButtonsSignaturePreview from "./previews/OverlayTwoButtonsSignature";
     import NewsletterRectanglePreview from "./previews/NewsletterRectangle";
 
-    import lib from "remp/js/remplib.js";
+    import lib from "@remp/js-commons/js/remplib.js";
 
     const props = [
         "name",

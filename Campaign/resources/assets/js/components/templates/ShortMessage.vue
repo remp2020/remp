@@ -61,7 +61,7 @@
 </template>
 
 <script type="text/javascript">
-    import vSelect from "remp/js/components/vSelect";
+    import vSelect from "@remp/js-commons/js/components/vSelect";
 
     let props = [
         "_text",

@@ -526,9 +526,9 @@
 </template>
 
 <script type="text/javascript">
-    import vSelect from "remp/js/components/vSelect";
+    import vSelect from "@remp/js-commons/js/components/vSelect";
     import PageviewRules from "./PageviewRules";
-    import FormValidator from "remp/js/components/FormValidator";
+    import FormValidator from "@remp/js-commons/js/components/FormValidator";
     import AbTesting from "./AbTesting";
     import UrlRules from "./UrlRules";
 

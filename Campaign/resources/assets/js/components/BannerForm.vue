@@ -440,8 +440,8 @@
     import ShortMessageTemplate from "./templates/ShortMessage";
     import OverlayRectangleTemplate from "./templates/OverlayRectangle";
     import BannerPreview from "./BannerPreview";
-    import vSelect from "remp/js/components/vSelect";
-    import FormValidator from "remp/js/components/FormValidator";
+    import vSelect from "@remp/js-commons/js/components/vSelect";
+    import FormValidator from "@remp/js-commons/js/components/FormValidator";
     import HtmlOverlayTemplate from "./templates/HtmlOverlay";
     import OverlayTwoButtonsSignatureTemplate from "./templates/OverlayTwoButtonsSignature";
     import NewsletterRectangleTemplate from './templates/NewsletterRectangle';

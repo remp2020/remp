@@ -2,6 +2,25 @@
 
 PHP_FOLDERS=app config
 
+js-link-remp:
+	cd ../Package/remp && yarn link
+	yarn link "@remp/js-commons"
+
+js:
+	make js-link-remp
+	yarn install
+	yarn production
+
+js-dev:
+	make js-link-remp
+	yarn install
+	yarn dev
+
+js-watch:
+	make js-link-remp
+	yarn install
+	yarn watch
+
 sniff:
 	../phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p
 

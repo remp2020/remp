@@ -4,11 +4,11 @@ $white: White;
 
 @import "~bootstrap-select/dist/css/bootstrap-select.min.css";
 @import "~eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css";
-@import "~remp/sass/template.scss";
-@import "~remp/sass/remp.scss";
+@import "~@remp/js-commons/sass/template.scss";
+@import "~@remp/js-commons/sass/remp.scss";
 @import "~google-material-color/dist/palette";
 
-@import "~remp/sass/site-search.scss";
+@import "~@remp/js-commons/sass/site-search.scss";
 
 .pg-item {
   &.green:nth-child(odd) {

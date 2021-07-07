@@ -121,7 +121,7 @@
 
 <script type="text/javascript">
     import RRule from 'rrule'
-    import DateTimePicker from 'remp/js/components/DateTimePickerWrapper'
+    import DateTimePicker from '@remp/js-commons/js/components/DateTimePickerWrapper'
 
     let repeat2freq = {
         'day': RRule.DAILY,
