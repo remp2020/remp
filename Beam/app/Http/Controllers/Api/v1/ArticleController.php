@@ -16,6 +16,7 @@ use App\Section;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Remp\Journal\AggregateRequest;
+use Remp\Journal\JournalContract;
 
 class ArticleController
 {
@@ -121,7 +122,7 @@ class ArticleController
         ]);
     }
 
-    public function unreadArticlesForUsers(UnreadArticlesRequest $request)
+    public function unreadArticlesForUsers(UnreadArticlesRequest $request, JournalContract $journal)
     {
         // Request with timespan 30 days typically takes about 50 seconds,
         // therefore add some safe margin to request execution time
@@ -149,7 +150,7 @@ class ArticleController
         $timeBefore = Carbon::now();
 
         foreach (array_chunk($request->user_ids, 100) as $userIdsChunk) {
-            $usersReadArticles = $this->readArticlesForUsers($readArticlesAfter, $timeBefore, $userIdsChunk);
+            $usersReadArticles = $this->readArticlesForUsers($journal, $readArticlesAfter, $timeBefore, $userIdsChunk);
 
             // Save top articles per user
             foreach ($userIdsChunk as $userId) {
@@ -193,7 +194,7 @@ class ArticleController
         ]);
     }
 
-    private function readArticlesForUsers(Carbon $timeAfter, Carbon $timeBefore, array $userIds): array
+    private function readArticlesForUsers(JournalContract $journal, Carbon $timeAfter, Carbon $timeBefore, array $userIds): array
     {
         $usersReadArticles = [];
         $r = new AggregateRequest('pageviews', 'load');
@@ -202,7 +203,7 @@ class ArticleController
         $r->addGroup('user_id', 'article_id');
         $r->addFilter('user_id', ...$userIds);
 
-        $result = collect($this->journal->count($r));
+        $result = collect($journal->count($r));
         foreach ($result as $item) {
             if ($item->tags->article_id !== '') {
                 $userId = $item->tags->user_id;

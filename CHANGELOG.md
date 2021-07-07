@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed search issues on the author detail page. remp/remp#965
+- Fixed missing journal dependency in the `/api/articles/unread` API. remp/remp#966
 
 ### [Campaign]
 
