@@ -27,12 +27,28 @@ class PhinxRegistrator
         Test::class => 'migrate:test'
     ];
 
+    private $appRootDir;
+
     /**
-     * @param Application $application
+     * @param Application       $application
      * @param EnvironmentConfig $environmentConfig
+     * @param string|null       $appRootDir
      */
-    public function __construct(Application $application, EnvironmentConfig $environmentConfig)
-    {
+    public function __construct(
+        Application $application,
+        EnvironmentConfig $environmentConfig,
+        string $appRootDir = null
+    ) {
+
+        if (is_null($appRootDir)) {
+            // TODO: [refactoring] try to solve this with some ENV / config variable? or change appRootDir to required?
+            // working with assumption callers will be in placed in default mailer-skeleton directories:
+            // - <path-to-project>/bin/command.php
+            // - <path-to-project>/app/bootstrap.php
+            $appRootDir = realpath(dirname($_SERVER["SCRIPT_FILENAME"]) . '/../');
+        }
+        $this->appRootDir = $appRootDir;
+
         $this->environmentConfig = $environmentConfig;
         $config = new Config($this->buildConfig(), __FILE__);
 
@@ -57,9 +73,9 @@ class PhinxRegistrator
         $configData = [
             'paths' => [
                 'migrations' => [
-                    '%%PHINX_CONFIG_DIR%%/../../../../app/migrations',
+                    $this->appRootDir . '/app/migrations',
                     // currently the only extensions module
-                    '%%PHINX_CONFIG_DIR%%/../../../../vendor/remp/mailer-module/src/migrations',
+                    $this->appRootDir . '/vendor/remp/mailer-module/src/migrations',
                 ]
             ],
             'environments' => [
