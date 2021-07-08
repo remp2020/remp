@@ -62,6 +62,7 @@ class TemplateFormFactory implements IFormFactory
 
         $layouts = $this->layoutsRepository->all()->fetchPairs('id', 'name');
         $lists = $this->listsRepository->all()->fetchPairs('id', 'title');
+        $firstList = $this->listsRepository->find(key($lists));
 
         if (isset($id)) {
             $template = $this->templatesRepository->find($id);
@@ -69,7 +70,7 @@ class TemplateFormFactory implements IFormFactory
             $defaults = $template->toArray();
         } else {
             $defaults['mail_layout_id'] = key($layouts);
-            $defaults['from'] = $this->listsRepository->find(key($lists))->mail_from;
+            $defaults['from'] = $firstList->mail_from ?? '';
         }
 
         $form = new Form;
@@ -91,10 +92,16 @@ class TemplateFormFactory implements IFormFactory
 
         $form->addText('description', 'Description');
 
-        $form->addSelect('mail_layout_id', 'Layout', $layouts);
+        $select = $form->addSelect('mail_layout_id', 'Layout', $layouts);
+        if (!$layouts) {
+            $select->addError("No Layouts found, please create some first.");
+        }
 
-        $form->addSelect('mail_type_id', 'Newsletter list', $lists)
+        $field = $form->addSelect('mail_type_id', 'Newsletter list', $lists)
             ->setRequired("Field 'Newsletter list' is required.");
+        if (!$lists) {
+            $field->addError("No Newsletter lists found, please create some first.");
+        }
 
         $form->addText('from', 'From')
             ->addRule(FormRules::ADVANCED_EMAIL, 'Enter correct email')
