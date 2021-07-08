@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.27.1] - 2021-07-08
+
 ### [Beam]
 
 - Fixed search issues on the author detail page. remp/remp#965
@@ -14,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed type error issue in Campaign's showtime request if they were hit directly without any parameters. App now returns correct JSON error. remp/remp#964
+- Fixed yarn lockfile issue causing installations with `--frozen-lockfile` option to fail.
 
 ### [Mailer]
 
@@ -943,8 +946,9 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.27.0...master
-[0.26.0]: https://github.com/remp2020/remp/compare/0.26.0...0.27.0
+[Unreleased]: https://github.com/remp2020/remp/compare/0.27.1...master
+[0.27.1]: https://github.com/remp2020/remp/compare/0.27.0...0.27.1
+[0.27.0]: https://github.com/remp2020/remp/compare/0.26.0...0.27.0
 [0.26.0]: https://github.com/remp2020/remp/compare/0.25.1...0.26.0
 [0.25.1]: https://github.com/remp2020/remp/compare/0.25.0...0.25.1
 [0.25.0]: https://github.com/remp2020/remp/compare/0.24.0...0.25.0
