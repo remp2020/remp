@@ -55,6 +55,7 @@ class MailTypesListingHandler extends BaseHandler
             $item->code = $row->code;
             $item->image_url = $row->image_url;
             $item->preview_url = $row->preview_url;
+            $item->page_url = $row->page_url;
             $item->title = $row->title;
             $item->description = $row->description;
             $item->mail_type_category_id = $row->mail_type_category_id;

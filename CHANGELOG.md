@@ -13,7 +13,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
-- Fixed type error issue in Campaign's showtime request if they were hit directly without any parameters. App now returns correct JSON error. remp/remp#964 
+- Fixed type error issue in Campaign's showtime request if they were hit directly without any parameters. App now returns correct JSON error. remp/remp#964
+
+### [Mailer]
+
+- Added `page_url` to the response resources of the `/api/v1/mailers/mail-types` API. remp/crm#1946
 
 ## [0.27.0] - 2021-06-29
 
