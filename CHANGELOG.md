@@ -12,8 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
-- Fixed broken new email page when no layout or newsletter list was defined.
 - Fixed broken new email template page when no layout or newsletter list was defined.
+- Added `SimpleAuthenticator`, which keeps plain list of emails and passwords that are valid to log in. Mailer can use this authenticator (instead of e.g. Sso `Authenticator`) to make it work without an external authentication system.  
 
 ## [0.27.1] - 2021-07-08
 
