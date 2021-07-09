@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Refactored beam `CompressAggregations` command to run in chunks because of colliding database transactions with `AggregatePageviewLoadJob` command, which caused deadlock. remp/remp#944
 
+### [Campaign]
+
+- Fixed caching of Newsletter rectangle banner, which broke after the recent framework updates and caused configuration not to be available at the time of banner rendering. remp/remp#959
+
 ### [Mailer]
 
 - Fixed broken new email template page when no layout or newsletter list was defined.

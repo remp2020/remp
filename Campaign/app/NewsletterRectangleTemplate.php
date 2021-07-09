@@ -20,7 +20,7 @@ class NewsletterRectangleTemplate extends AbstractTemplate
         'height'
     ];
 
-    private $banner_config = [];
+    public $banner_config = [];
 
     protected $appends = [
         'endpoint',
