@@ -790,8 +790,26 @@ aggregation, so they're displayed right in the job detail.
 
 ### Authentication
 
-The default implementation authenticates via REMP SSO. However, it is possible for Mailer
-to use external authentication without the need of having SSO installed.
+The default implementation authenticates via REMP SSO.
+
+However, the easiest way to start is to use `SimpleAuthenticator` with predefined list of emails and passwords. It requires no external authentication services.
+
+#### Simple authenticator
+
+To install `SimpleAuthenticator`, please add the following to your `config.local.neon` (`services`  section):
+
+```neon
+services:
+    authenticator:
+        factory: Remp\MailerModule\Models\Auth\SimpleAuthenticator
+        setup:
+            - addUser('admin@admin.sk', 'admin_passphrase')
+```
+
+Call `addUser()` for every valid email-password combination you want to add.
+
+#### Custom authentication
+It is possible for Mailer to use external authentication without the need of having SSO installed.
 
 To replace REMP SSO with your custom authentication, you need to:
 
