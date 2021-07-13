@@ -176,6 +176,9 @@ services:
 	content:
 		factory: Remp\MailerModule\Models\PageMeta\Content\GenericPageContent
 
+	shopContent:
+		factory: Remp\MailerModule\Models\PageMeta\Content\GenericShopContent
+
 	# Repositories
 	- Remp\MailerModule\Repositories\AuditLogRepository
 	- Remp\MailerModule\Repositories\ConfigsRepository
