@@ -36,6 +36,9 @@ class ElasticDataRetention extends Command
             'base_uri' => $this->input->getOption('host'),
         ]);
 
+        $this->line('');
+        $this->info('**** ' . self::COMMAND . ' (date: ' . (new Carbon())->format(DATE_RFC3339) . ') ****');
+        
         $targetIndices = sprintf(
             "/%s*%s*",
             $this->input->getOption('match-index'),
@@ -43,9 +46,10 @@ class ElasticDataRetention extends Command
         );
 
         $this->line(sprintf(
-            "Executing data retention for <info>%s%s</info>:",
+            "Executing data retention for <info>%s%s</info> (date: %s)",
             $this->input->getOption('host'),
-            $targetIndices
+            $targetIndices,
+            $this->input->getOption('date')
         ));
 
         $options = [];
@@ -66,12 +70,13 @@ class ElasticDataRetention extends Command
         try {
             $client->delete($targetIndices, $options);
         } catch (ClientException $e) {
-            $body = json_decode($e->getResponse()->getBody());
-            dump($body);
+            //$body = json_decode($e->getResponse()->getBody());
+            //dump($body);
+            $this->line("<error>ERROR</error> Client exception: " . $e->getMessage());
             return 2;
         }
 
-        $this->line('  * Done.');
+        $this->line('  * Done, index deleted.');
         return 0;
     }
 }

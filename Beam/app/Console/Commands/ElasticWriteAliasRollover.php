@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use GuzzleHttp\Client;
 use App\Console\Command;
@@ -33,13 +34,17 @@ class ElasticWriteAliasRollover extends Command
             'base_uri' => $this->input->getOption('host'),
         ]);
 
+        $this->line('');
+        $this->info('**** ' . self::COMMAND . ' (date: ' . (new Carbon())->format(DATE_RFC3339) . ') ****');
+
         $this->line(sprintf(
-            "Executing rollover for <info>%s/%s</info>:",
+            "Executing rollover, host: <info>%s</info>, write-alias: <info>%s</info>, read-alias: %s",
             $this->input->getOption('host'),
-            $this->input->getOption('write-alias')
+            $this->input->getOption('write-alias'),
+            $this->input->getOption('read-alias')
         ));
 
-
+        return 1;
         $options = [];
         if ($this->input->getOption('auth')) {
             $auth = $this->input->getOption('auth');
@@ -67,7 +72,7 @@ class ElasticWriteAliasRollover extends Command
 
         $body = json_decode($response->getBody(), true);
         if (!$body['rolled_over']) {
-            $this->line('  * Condition not matched, done.');
+            $this->line('  * Rollover condition not matched, done.');
             return 3;
         }
 
