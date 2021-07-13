@@ -38,13 +38,12 @@ class ElasticWriteAliasRollover extends Command
         $this->info('**** ' . self::COMMAND . ' (date: ' . (new Carbon())->format(DATE_RFC3339) . ') ****');
 
         $this->line(sprintf(
-            "Executing rollover, host: <info>%s</info>, write-alias: <info>%s</info>, read-alias: %s",
+            "Executing rollover, host: <info>%s</info>, write-alias: <info>%s</info>, read-alias: <info>%s</info>",
             $this->input->getOption('host'),
             $this->input->getOption('write-alias'),
             $this->input->getOption('read-alias')
         ));
-
-        return 1;
+        
         $options = [];
         if ($this->input->getOption('auth')) {
             $auth = $this->input->getOption('auth');
