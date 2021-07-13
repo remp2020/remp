@@ -194,7 +194,7 @@ form elements into the `$form` instance and state the validation rules.
 
             $form->addTextArea('articles', 'Article')
                 ->setAttribute('rows', 7)
-                ->setOption('description', 'Paste article Urls. Each on separate line.')
+                ->setOption('description', 'Paste article URLs. Each on separate line.')
                 ->getControlPrototype()
                 ->setAttribute('class', 'form-control html-editor');
 

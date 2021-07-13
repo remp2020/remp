@@ -6,15 +6,15 @@ namespace Remp\MailerModule\Models\Generators;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
+use Remp\MailerModule\Models\PageMeta\Content\ShopContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\PostInputParam;
 
-class UrlParserGenerator implements IGenerator
+class ShopUrlParserGenerator implements IGenerator
 {
     protected $sourceTemplatesRepository;
 
-    protected $content;
+    protected $shopContent;
 
     public $onSubmit;
 
@@ -22,11 +22,11 @@ class UrlParserGenerator implements IGenerator
 
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
-        ContentInterface $content,
+        ShopContentInterface $shopContent,
         EngineFactory $engineFactory
     ) {
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
-        $this->content = $content;
+        $this->shopContent = $shopContent;
         $this->engineFactory = $engineFactory;
     }
 
@@ -37,9 +37,9 @@ class UrlParserGenerator implements IGenerator
             ->getControlPrototype()
             ->setHtmlAttribute('class', 'form-control html-editor');
 
-        $form->addTextArea('articles', 'Article')
+        $form->addTextArea('products', 'Product')
             ->setHtmlAttribute('rows', 7)
-            ->setOption('description', 'Paste article Urls. Each on separate line.')
+            ->setOption('description', 'Paste products URLs (books and e-books). Each on separate line.')
             ->setRequired(true)
             ->getControlPrototype()
             ->setHtmlAttribute('class', 'form-control html-editor');
@@ -48,8 +48,6 @@ class UrlParserGenerator implements IGenerator
             ->setHtmlAttribute('rows', 6)
             ->getControlPrototype()
             ->setHtmlAttribute('class', 'form-control html-editor');
-
-        $form->addText('rtm_campaign', 'RTM campaign');
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
@@ -72,9 +70,8 @@ class UrlParserGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('articles'))->setRequired(),
+            (new PostInputParam('products'))->setRequired(),
             (new PostInputParam('footer'))->setRequired(),
-            (new PostInputParam('utm_campaign'))->setRequired(),
             (new PostInputParam('intro'))->setRequired(),
         ];
     }
@@ -84,10 +81,10 @@ class UrlParserGenerator implements IGenerator
         $sourceTemplate = $this->sourceTemplatesRepository->find($values['source_template_id']);
 
         $items = [];
-        $urls = explode("\n", trim($values['articles']));
+        $urls = explode("\n", trim($values['products']));
         foreach ($urls as $url) {
             $url = trim($url);
-            $meta = $this->content->fetchUrlMeta($url);
+            $meta = $this->shopContent->fetchUrlMeta($url);
             if ($meta) {
                 $items[$url] = $meta;
             }
@@ -97,9 +94,6 @@ class UrlParserGenerator implements IGenerator
             'intro' => $values['intro'],
             'footer' => $values['footer'],
             'items' => $items,
-            'rtm_campaign' => $values['rtm_campaign'],
-            // UTM Fallback -- will be removed
-            'utm_campaign' => $values['rtm_campaign'],
         ];
 
         $engine = $this->engineFactory->engine();
