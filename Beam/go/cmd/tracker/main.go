@@ -181,7 +181,11 @@ func newProducer(ctx context.Context, config *Config, service *goa.Service) (con
 		for _, addr := range brokerAddrs {
 			service.LogInfo("connecting to kafka broker", "bind", addr)
 		}
-		producer, err := controller.NewKafkaEventProducer(brokerAddrs)
+		saslConfig := &controller.SaslConfig{
+			Username: config.KafkaSaslUser,
+			Password: config.KafkaSaslPasswd,
+		}
+		producer, err := controller.NewKafkaEventProducer(brokerAddrs, saslConfig)
 		if err != nil {
 			return nil, err
 		}
