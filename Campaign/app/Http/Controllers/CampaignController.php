@@ -622,7 +622,7 @@ class CampaignController extends Controller
         Request $request
     ) {
         $variants = $campaign->campaignBanners()->withTrashed()->with("banner")->get();
-        $from = $request->input('from', 'today - 2 days');
+        $from = $request->input('from', 'today - 30 days');
         $to = $request->input('to', 'now');
 
         $variantBannerLinks = [];
