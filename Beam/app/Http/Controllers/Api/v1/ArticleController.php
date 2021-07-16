@@ -133,6 +133,7 @@ class ArticleController
         $readArticlesTimespan = $request->input('read_articles_timespan');
 
         $ignoreAuthors = $request->input('ignore_authors', []);
+        $ignoreContentTypes = $request->input('ignore_content_types', []);
 
         $topArticlesPerCriterion = [];
 
@@ -162,7 +163,7 @@ class ArticleController
                 while (count($topArticlesUrls) < $articlesCount) {
                     if (!$topArticlesPerCriterion[$criterionIndex]) {
                         $criterion = $criteria[$criterionIndex];
-                        $topArticlesPerCriterion[$criterionIndex] = $criterion->getCachedArticles($timespan, $ignoreAuthors);
+                        $topArticlesPerCriterion[$criterionIndex] = $criterion->getCachedArticles($timespan, $ignoreAuthors, $ignoreContentTypes);
                     }
 
                     if ($i >= count($topArticlesPerCriterion[$criterionIndex])) {

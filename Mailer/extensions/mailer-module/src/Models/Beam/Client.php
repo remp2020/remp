@@ -26,8 +26,14 @@ class Client
         }
     }
 
-    public function unreadArticles($timespan, $articlesCount, array $criteria, array $userIds, array $ignoreAuthors = []): array
-    {
+    public function unreadArticles(
+        $timespan,
+        $articlesCount,
+        array $criteria,
+        array $userIds,
+        array $ignoreAuthors = [],
+        array $ignoreContentTypes = []
+    ): array {
         if (!$this->client) {
             throw new \Exception('Beam Client is not configured');
         }
@@ -40,6 +46,7 @@ class Client
                     'articles_count' => $articlesCount,
                     'criteria' => $criteria,
                     'ignore_authors' => $ignoreAuthors,
+                    'ignore_content_types' => $ignoreContentTypes,
                 ]
             ]);
 

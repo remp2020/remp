@@ -344,6 +344,14 @@ SQL;
         return $query;
     }
 
+    public function scopeIgnoreContentTypes(Builder $query, array $contentTypes)
+    {
+        if ($contentTypes) {
+            $query->whereNotIn('content_type', $contentTypes);
+        }
+        return $query;
+    }
+
     public function scopePublishedBetween(Builder $query, Carbon $from = null, Carbon $to = null)
     {
         if ($from) {

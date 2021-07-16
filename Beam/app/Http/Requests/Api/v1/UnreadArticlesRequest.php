@@ -37,6 +37,7 @@ class UnreadArticlesRequest extends FormRequest
                 'regex:' . Misc::TIMESPAN_VALIDATION_REGEX
             ],
             'ignore_authors.*' => 'string',
+            'ignore_content_types.*' => 'string',
         ];
     }
 }
