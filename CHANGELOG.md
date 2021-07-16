@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Refactored beam `CompressAggregations` command to run in chunks because of colliding database transactions with `AggregatePageviewLoadJob` command, which caused deadlock. remp/remp#944
+- Added `content_type` filter to the `api/articles/unread` API to exclude unwanted content types. remp/remp#973
 
 ### [Campaign]
 
@@ -20,7 +21,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Check your configuration if you are registering this generator.
 - Added email generator `ShopUrlParserGenerator` to get informations about products. remp/remp#949
 - Fixed broken new email template page when no layout or newsletter list was defined.
-- Added `SimpleAuthenticator`, which keeps plain list of emails and passwords that are valid to log in. Mailer can use this authenticator (instead of e.g. Sso `Authenticator`) to make it work without an external authentication system.  
+- Added `SimpleAuthenticator`, which keeps plain list of emails and passwords that are valid to log in. Mailer can use this authenticator (instead of e.g. Sso `Authenticator`) to make it work without an external authentication system.
+- Added support for `ignore_content_types` parameter in `UnreadArticlesResolver` used in generated/personalized e-mails. Parameter excludes articles of certain content types and avoids their use in generated e-mails. remp/remp#973
 
 ## [0.27.1] - 2021-07-08
 

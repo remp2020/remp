@@ -35,6 +35,7 @@ class UnreadArticlesResolver
             $item->articlesCount = $parameters['articles_count'];
             $item->criteria = $parameters['criteria'];
             $item->ignoreAuthors = $parameters['ignore_authors'] ?? [];
+            $item->ignoreContentTypes = $parameters['ignore_content_types'] ?? [];
             $item->userIds = [];
             $this->templates[$templateCode] = $item;
         }
@@ -60,7 +61,8 @@ class UnreadArticlesResolver
                     $item->articlesCount,
                     $item->criteria,
                     $userIdsChunk,
-                    $item->ignoreAuthors
+                    $item->ignoreAuthors,
+                    $item->ignoreContentTypes
                 );
 
                 foreach ($results as $userId => $urls) {

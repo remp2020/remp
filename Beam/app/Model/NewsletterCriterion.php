@@ -26,8 +26,12 @@ class NewsletterCriterion extends Enum
         return implode($glue, self::getValues());
     }
 
-    public function getArticles(string $timespan, ?int $articlesCount = null, array $ignoreAuthors = []): Collection
-    {
+    public function getArticles(
+        string $timespan,
+        ?int $articlesCount = null,
+        array $ignoreAuthors = [],
+        array $ignoreContentTypes = []
+    ): Collection {
         $start = Misc::timespanInPast($timespan);
 
         $query = Article::distinct();
@@ -69,7 +73,10 @@ class NewsletterCriterion extends Enum
         $query->publishedBetween($start);
 
         $ignoreAuthorIds = Author::whereIn('name', $ignoreAuthors)->get()->pluck('id')->toArray();
-        return $query->ignoreAuthorIds($ignoreAuthorIds)->get();
+        return $query
+            ->ignoreAuthorIds($ignoreAuthorIds)
+            ->ignoreContentTypes($ignoreContentTypes)
+            ->get();
     }
 
 
@@ -79,13 +86,13 @@ class NewsletterCriterion extends Enum
      *
      * @return array of articles (containing only external_id and url attributes)
      */
-    public function getCachedArticles(string $timespan, array $ignoreAuthors = []): array
+    public function getCachedArticles(string $timespan, array $ignoreAuthors = [], array $ignoreContentTypes = []): array
     {
         $tag = 'top_articles';
         $key = $tag . '|' . $this->getValue() . '|' . $timespan;
 
-        return Cache::tags($tag)->remember($key, 300, function () use ($timespan, $ignoreAuthors) {
-            return $this->getArticles($timespan, null, $ignoreAuthors)->map(function ($article) {
+        return Cache::tags($tag)->remember($key, 300, function () use ($timespan, $ignoreAuthors, $ignoreContentTypes) {
+            return $this->getArticles($timespan, null, $ignoreAuthors, $ignoreContentTypes)->map(function ($article) {
                 $item = new \stdClass();
                 $item->external_id = $article->external_id;
                 $item->url = $article->url;
