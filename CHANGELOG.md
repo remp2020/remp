@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for `ignore_content_types` parameter in `UnreadArticlesResolver` used in generated/personalized e-mails. Parameter excludes articles of certain content types and avoids their use in generated e-mails. remp/remp#973
 - Added public preview for emails (templates), accessible without authentication. Preview link is accessible in each email detail eg.: _(http://mailer.remp.press/template/show/1)_.  remp/remp#581
 - Added API endpoint `/api/v1/mailers/render-template`. Returns a rendered HTML email. remp/remp#581
+- Added widget for `ArticleUrlParserGenerator`. remp/remp#946
 
 ## [0.27.1] - 2021-07-08
 

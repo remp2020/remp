@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Models\Generators;
 
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
+use Remp\Mailer\Components\GeneratorWidgets\Widgets\ArticleUrlParserWidget\ArticleUrlParserWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
@@ -63,7 +64,12 @@ class ArticleUrlParserGenerator implements IGenerator
     {
         try {
             $output = $this->process((array)$values);
-            $this->onSubmit->__invoke($output['htmlContent'], $output['textContent']);
+
+            $addonParams = [
+                'render' => true,
+            ];
+
+            $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);
         } catch (InvalidUrlException $e) {
             $form->addError($e->getMessage());
         }
@@ -111,7 +117,7 @@ class ArticleUrlParserGenerator implements IGenerator
 
     public function getWidgets(): array
     {
-        return [];
+        return [ArticleUrlParserWidget::class];
     }
 
     public function preprocessParameters($data): ?ArrayHash
