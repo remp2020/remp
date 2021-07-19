@@ -141,6 +141,10 @@ export default {
         return this.rempPageviewID;
     },
 
+    resetRempPageviewID: function() {
+        this.rempPageviewID = remplib.uuidv4();
+    },
+
     getCommerceSessionID: function() {
         let commerceSessionID = this.getFromStorage(this.commerceSessionIDKey);
         if (commerceSessionID) {

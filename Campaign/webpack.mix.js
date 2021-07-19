@@ -1,11 +1,13 @@
 const mix = require('laravel-mix')
 
-mix.webpackConfig({
+mix.override((config) => {
+    delete config.watchOptions;
+}).webpackConfig({
     resolve: {
         symlinks: false,
     },
     watchOptions: {
-        ignored: /node_modules([\\]+|\/)+(?!remp)/,
+        ignored: /node_modules([\\]+|\/)+(?!@remp)/
     }
 }).version();
 

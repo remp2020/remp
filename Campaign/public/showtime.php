@@ -288,12 +288,15 @@ var run = function() {
     }, banner.displayDelay);
 };
 
+run();
+
 for (var i=0; i<scripts.length; i++) {
     remplib.loadScript(scripts[i], function() {
         waiting -= 1;
         run();
     });
 }
+
 for (i=0; i<styles.length; i++) {
     remplib.loadStyle(styles[i], function() {
         waiting -= 1;
