@@ -20,8 +20,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
-- **BREAKING** - Renamed `UrlParserGenerator` to `ArticleUrlParserGenerator`. remp/remp#949
+- **BREAKING**: Renamed `UrlParserGenerator` to `ArticleUrlParserGenerator`. remp/remp#949
   - Check your configuration if you are registering this generator.
+- **BREAKING**: Finalized refactoring of `Remp\MailerModule\Repositories\IConversionsRepository` interface, removed obsolete methods. remp/remp#907
+  - Methods `getBatchTemplatesConversions` and `getNonBatchTemplateConversions` were removed, because they encouraged suboptimal (non-time-constrained) implementation.
+  - In your implementation replace them with newly added `getBatchTemplatesConversionsSince` and `getNonBatchTemplatesConversionsSince` respectively.
 - Added email generator `ShopUrlParserGenerator` to get informations about products. remp/remp#949
 - Fixed broken new email template page when no layout or newsletter list was defined.
 - Added `SimpleAuthenticator`, which keeps plain list of emails and passwords that are valid to log in. Mailer can use this authenticator (instead of e.g. Sso `Authenticator`) to make it work without an external authentication system.

@@ -96,7 +96,8 @@ class ProcessConversionStatsCommand extends Command
 
     private function processBatchTemplateConversions(InputInterface $input, OutputInterface $output)
     {
-        $batchTemplatesConversions = $this->conversionsRepository->getBatchTemplatesConversionsSince(DateTime::from($input->getOption('since')));
+        $batchTemplatesConversions = $this->conversionsRepository
+            ->getBatchTemplatesConversionsSince(DateTime::from($input->getOption('since')));
 
         $progressBar = new ProgressBar($output, count($batchTemplatesConversions));
         $progressBar->setFormat('processStats');
@@ -162,61 +163,39 @@ class ProcessConversionStatsCommand extends Command
 
     private function processNonBatchTemplateConversions(InputInterface $input, OutputInterface $output)
     {
-        $templates = $this->templatesRepository->getTable()
-            ->where(':mail_job_batch_templates.id IS NULL')
-            ->fetchAll();
+        $nonBatchTemplatesConversions = $this->conversionsRepository
+            ->getNonBatchTemplatesConversionsSince(DateTime::from($input->getOption('since')));
 
-        if (!count($templates)) {
-            $output->writeln('No non-batch templates to process.');
-            return;
-        }
-
-        $progressBar = new ProgressBar($output, count($templates));
+        $progressBar = new ProgressBar($output, count($nonBatchTemplatesConversions));
         $progressBar->setFormat('processStats');
         $progressBar->start();
 
-        $mailTemplateCodes = [];
-
-        foreach ($templates as $template) {
-            $mailTemplateCodes[$template->code] = $template->code;
-        }
-        $nonBatchTemplatesConversions = $this->conversionsRepository->getNonBatchTemplateConversions(
-            array_values($mailTemplateCodes)
-        );
-
         /** @var ActiveRow $template */
-        foreach ($templates as $template) {
-            $progressBar->setMessage('Processing template <info>' . $template->id . '</info>', 'processing');
-
-            if (!isset($nonBatchTemplatesConversions[$template->code])) {
-                $progressBar->advance();
+        foreach ($nonBatchTemplatesConversions as $mailTemplateCode => $userIds) {
+            $userData = $this->getUserData(array_keys($userIds));
+            $mailTemplate = $this->templatesRepository->getByCode($mailTemplateCode);
+            if (!$mailTemplate) {
                 continue;
             }
-
-            $nonBatchTemplateConversions = $nonBatchTemplatesConversions[$template->code] ?? [];
-            $userData = $this->getUserData(array_keys($nonBatchTemplateConversions));
-
-            foreach ($nonBatchTemplateConversions as $userId => $time) {
+            foreach ($userIds as $userId => $time) {
                 if (!isset($userData[$userId])) {
                     // this might be incorrectly tracker userId; throwing warning won't probably help at this point
                     // as it's not in Beam and the tracking might be already fixed
                     continue;
                 }
                 $latestLog = $this->logsRepository->getTable()
-                    ->select('MAX(id) AS id')
                     ->where([
                         'email' => $userData[$userId],
-                        'mail_template_id' => $template->id,
-                        'mail_job_batch_id' => null,
+                        'mail_template_id' => $mailTemplate->id,
                     ])
                     ->where('created_at < ?', DateTime::from($time))
+                    ->order('id DESC')
                     ->fetch();
 
-                $log = $this->logsRepository->find($latestLog->id);
-                if (!$log) {
+                if (!$latestLog) {
                     continue;
                 }
-                $this->logConversionsRepository->upsert($log, DateTime::from($time));
+                $this->logConversionsRepository->upsert($latestLog, DateTime::from($time));
             }
 
             $progressBar->advance();
