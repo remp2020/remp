@@ -10,11 +10,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Refactored beam `CompressAggregations` command to run in chunks because of colliding database transactions with `AggregatePageviewLoadJob` command, which caused deadlock. remp/remp#944
 - Added `content_type` filter to the `api/articles/unread` API to exclude unwanted content types. remp/remp#973
+- Added support for remplib.js reinitialization, necessary for correct execution in single-page apps. See [README](./Beam/README.md#single-page-applications) for more information. remp/remp#968
 
 ### [Campaign]
 
 - Fixed caching of Newsletter rectangle banner, which broke after the recent framework updates and caused configuration not to be available at the time of banner rendering. remp/remp#959
 - Changed default stats view to include 30 days of data instead of 2 to allow bigger picture in campaign evaluation by default. remp/remp#969 
+- Added support for remplib.js reinitialization, necessary for correct execution in single-page apps. See [README](./Campaign/README.md#single-page-applications) for more information. remp/remp#968
 
 ### [Mailer]
 

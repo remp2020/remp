@@ -13,7 +13,7 @@
         "node": ">=12"
     },
     "dependencies": {
-        "@remp/js-commons": "1.0.0",
+        "@remp/js-commons": "1.1.0",
         "acorn": "^7.4.0",
         "animate.css": "^3.7.2",
         "autosize": "^4.0.2",

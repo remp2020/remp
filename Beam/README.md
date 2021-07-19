@@ -2014,6 +2014,13 @@ is 1 second, but it's safe to raise it to more than 5 seconds as *unload* event 
 
 You can enable the tracking by setting `rempConfig.tracker.readingProgress = { enabled: true }`
 
+##### Single-page applications
+
+If you use single-page application and need to reinitialize JS library after it's been loaded:
+
+1. Update the `rempConfig` variable to reflect the navigation changes.
+2. Call `remplib.tracker.init(rempConfig)` again to reinitialize the JS tracking state. New pageview will be tracked automatically and timespent/progress tracking will be reset.
+
 ##### JS tracking interface
 
 Note: The *source* object is referenced as a parameter in the following API calls. Here's the list of parameters

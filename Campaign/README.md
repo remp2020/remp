@@ -198,6 +198,13 @@ var rempConfig = {
 remplib.campaign.init(rempConfig);
 ```
 
+##### Single-page applications
+
+If you use single-page application and need to reinitialize JS library after it's been loaded:
+
+1. Update the `rempConfig` variable to reflect the navigation changes.
+2. Call `remplib.campaign.init(rempConfig)` again to reinitialize the JS tracking state. All existing banners will hide and campaigns will be evaluated again. 
+
 ##### Segment integration
 
 To determine who to display a campaign to, Campaign is dependent on user segments - effectively lists
