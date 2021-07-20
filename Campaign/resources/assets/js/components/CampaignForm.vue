@@ -785,7 +785,6 @@
                 this.countries.splice(index, 1);
             },
             updatePageviewRules: function (pageviewRules) {
-                console.log('update pageview rules', pageviewRules);
                 this.pageviewRules = pageviewRules.rules;
                 this.oncePerSession = pageviewRules.oncePerSession;
             },
