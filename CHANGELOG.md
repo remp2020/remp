@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed caching of Newsletter rectangle banner, which broke after the recent framework updates and caused configuration not to be available at the time of banner rendering. remp/remp#959
 - Changed default stats view to include 30 days of data instead of 2 to allow bigger picture in campaign evaluation by default. remp/remp#969 
 - Added support for remplib.js reinitialization, necessary for correct execution in single-page apps. See [README](./Campaign/README.md#single-page-applications) for more information. remp/remp#968
+- Fixed unnecessary storing of empty URL/referer filters of "Where to display" section in campaign configuration. remp/remp#975
 
 ### [Mailer]
 
