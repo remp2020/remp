@@ -66,26 +66,26 @@ class ConversionController extends Controller
             ->filterColumn('article.authors[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $filterQuery = \DB::table('articles')
+                    ->select(['articles.id'])
                     ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
                     ->whereIn('article_author.author_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->filterColumn('article.sections[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $filterQuery = \DB::table('articles')
+                    ->select(['articles.id'])
                     ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
                     ->whereIn('article_section.section_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->filterColumn('article.tags[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $filterQuery = \DB::table('articles')
+                    ->select(['articles.id'])
                     ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
                     ->whereIn('article_tag.tag_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->rawColumns(['actions'])
             ->make(true);

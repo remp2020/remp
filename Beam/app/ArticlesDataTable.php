@@ -187,23 +187,23 @@ class ArticlesDataTable
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);
                 $filterQuery = \DB::table('article_section')
+                    ->select(['article_section.article_id'])
                     ->whereIn('article_section.section_id', $values);
-                $articleIds = $filterQuery->pluck('article_section.article_id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->filterColumn('authors[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);
                 $filterQuery = \DB::table('article_author')
+                    ->select(['article_author.article_id'])
                     ->whereIn('article_author.author_id', $values);
-                $articleIds = $filterQuery->pluck('article_author.article_id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->filterColumn('tags[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);
                 $filterQuery = \DB::table('article_tag')
+                    ->select(['article_tag.article_id'])
                     ->whereIn('article_tag.tag_id', $values);
-                $articleIds = $filterQuery->pluck('article_tag.article_id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->orderColumn('avg_sum', 'timespent_sum / pageviews_all $1')
             ->orderColumn('pageviews_all', 'pageviews_all $1')
