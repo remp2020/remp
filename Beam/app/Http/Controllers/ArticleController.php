@@ -216,26 +216,26 @@ class ArticleController extends Controller
             ->filterColumn('authors', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $filterQuery = \DB::table('articles')
+                    ->select(['articles.id'])
                     ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
                     ->whereIn('article_author.author_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $filterQuery = \DB::table('articles')
+                    ->select(['articles.id'])
                     ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
                     ->whereIn('article_section.section_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->filterColumn('tags[, ].name', function (Builder $query, $value) {
                 $values = explode(",", $value);
                 $filterQuery = \DB::table('articles')
+                    ->select(['articles.id'])
                     ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
                     ->whereIn('article_tag.tag_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->rawColumns(['authors'])
             ->make();
@@ -311,26 +311,26 @@ class ArticleController extends Controller
             ->filterColumn('authors', function (Builder $query, $value) {
                 $values = explode(',', $value);
                 $filterQuery = \DB::table('articles')
+                    ->select(['articles.id'])
                     ->join('article_author', 'articles.id', '=', 'article_author.article_id', 'left')
                     ->whereIn('article_author.author_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->filterColumn('sections[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);
                 $filterQuery = \DB::table('articles')
+                    ->select(['articles.id'])
                     ->join('article_section', 'articles.id', '=', 'article_section.article_id', 'left')
                     ->whereIn('article_section.section_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->filterColumn('tags[, ].name', function (Builder $query, $value) {
                 $values = explode(',', $value);
                 $filterQuery = \DB::table('articles')
+                    ->select(['articles.id'])
                     ->join('article_tag', 'articles.id', '=', 'article_tag.article_id', 'left')
                     ->whereIn('article_tag.tag_id', $values);
-                $articleIds = $filterQuery->pluck('articles.id')->toArray();
-                $query->whereIn('articles.id', $articleIds);
+                $query->whereIn('articles.id', $filterQuery);
             })
             ->orderColumn('avg_sum_all', 'timespent_all / pageviews_all $1')
             ->orderColumn('avg_sum_signed_in', 'timespent_signed_in / pageviews_signed_in $1')
