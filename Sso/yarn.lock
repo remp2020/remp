@@ -906,10 +906,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@remp/js-commons@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@remp/js-commons/-/js-commons-1.1.0.tgz#dc0b8820c716eb57acd59fef255442992626bb5c"
-  integrity sha512-2Yn3B/ymoAuwBtVc9rHKVbtcElkvKZIRU3TEzutZsA9kqSN0xZ4mcJHl453xgdQRE4fio9zjzOvIENxcB+GIxQ==
+"@remp/js-commons@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@remp/js-commons/-/js-commons-1.2.0.tgz#844d348a05bd0553ed6438d3c334faf8ef42d8de"
+  integrity sha512-NMEPkxddNVbTRaA0rv5cj7ic/dQcQdVQ+2UYjGO/n1x6lJ1Oo80JsgUCEsmQiChmkiKV93k91ELN8yvVOB2mCQ==
   dependencies:
     chart.js "^2.9.3"
     datatables.net "^1.10.25"
