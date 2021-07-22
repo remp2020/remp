@@ -342,13 +342,13 @@ export default {
             name, '=', value,
             '; expires=', expires.toUTCString(),
             '; domain=', this.cookieDomain,
-            '; path=/;'
+            '; path=/; SameSite=Lax'
         ].join('');
     },
 
     removeCookie: function(name) {
         document.cookie = [
-            name, '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; domain=',
+            name, '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; domain=; SameSite=Lax',
             this.cookieDomain
         ].join('');
     },
