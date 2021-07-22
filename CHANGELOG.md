@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for remplib.js reinitialization, necessary for correct execution in single-page apps. See [README](./Beam/README.md#single-page-applications) for more information. remp/remp#968
 - Fixed broken `ArticleSeeder` and `EntitySeeder`.
 - Fixed possibility of an error on the articles grids if filter matched too many articles. remp/remp#977
+- Added `SameSite=Lax` attribute to all cookies set by `remplib.js`. Missing attribute could possibly lead to issues on Safari, which doesn't defaults to `Lax` like other browsers. remp/remp#957
 
 ### [Campaign]
 
@@ -20,6 +21,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed default stats view to include 30 days of data instead of 2 to allow bigger picture in campaign evaluation by default. remp/remp#969 
 - Added support for remplib.js reinitialization, necessary for correct execution in single-page apps. See [README](./Campaign/README.md#single-page-applications) for more information. remp/remp#968
 - Fixed unnecessary storing of empty URL/referer filters of "Where to display" section in campaign configuration. remp/remp#975
+- Added `SameSite=Lax` attribute to all cookies set by `remplib.js`. Missing attribute could possibly lead to issues on Safari, which doesn't defaults to `Lax` like other browsers. remp/remp#957
 
 ### [Mailer]
 
