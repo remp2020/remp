@@ -530,11 +530,13 @@
             },
             paramsForCustomJavascript: function () {
                 return {
+                    "rtmSource": "remp_campaign",
                     "rtmMedium": this.displayType,
                     "rtmCampaign": this.campaignUuid,
                     "rtmContent": this.uuid,
                     "rtmVariant": this.variantUuid,
                     // kept for backward-compatibility reasons
+                    "utmSource": "remp_campaign",
                     "utmMedium": this.displayType,
                     "utmCampaign": this.campaignUuid,
                     "utmContent": this.uuid,

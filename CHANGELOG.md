@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for remplib.js reinitialization, necessary for correct execution in single-page apps. See [README](./Campaign/README.md#single-page-applications) for more information. remp/remp#968
 - Fixed unnecessary storing of empty URL/referer filters of "Where to display" section in campaign configuration. remp/remp#975
 - Added `SameSite=Lax` attribute to all cookies set by `remplib.js`. Missing attribute could possibly lead to issues on Safari, which doesn't defaults to `Lax` like other browsers. remp/remp#957
+- Added `rtmSource` to campaign's custom JS params, so clients can correctly track events without hardcoding the `rtmSource` to some arbitrary value.
 
 ### [Mailer]
 

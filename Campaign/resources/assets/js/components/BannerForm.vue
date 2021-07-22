@@ -186,7 +186,7 @@
                                     <small class="help-block">Custom JS is run as a function with single a function parameter <i>params</i>.
                                         Object <i>params</i> contains several properties of the banner you can access.
                                         <span data-toggle="tooltip"
-                                              data-original-title="properties: rtmMedium, rtmCampaign, rtmContent, rtmVariant"
+                                              data-original-title="properties: rtmSource, rtmMedium, rtmCampaign, rtmContent, rtmVariant"
                                               class="glyphicon glyphicon-question-sign"></span>
                                     </small>
                                 </div>
