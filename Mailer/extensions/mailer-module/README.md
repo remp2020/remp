@@ -1088,15 +1088,17 @@ Gets list of available email templates.
 | codes | *String[]* | no | If provided, list only email templates for given mail_template codes.
 | mail_type_codes | *String[]* | no | If provided, list only email templates for given mail_type codes.
 | with_mail_types | *Boolean* | no | If true, each returned email template contains additional parameters about assigned mail_type.
+| page | *Integer* | no | Pagination. Select which page to return. Required if with `limit` parameter is used.  
+| limit | *Integer* | no | Pagination. Limit number of records returned for one page. Required if `page` parameter is used.
 
 ##### *Example:*
 
 ```shell
 curl --location --request GET \
-'mailer.remp.press/api/v1/mailers/templates?mail_type_codes[]=onboarding&mail_type_codes[]=system&with_mail_types=true' \
+'mailer.remp.press/api/v1/mailers/templates?mail_type_codes[]=onboarding&mail_type_codes[]=system&with_mail_types=true&page=1&limit=5' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --header 'Accept: application/json' \
---header 'Authorization: Bearer XXX' \
+--header 'Authorization: Bearer XXX'
 ```
 
 Response:
@@ -1246,6 +1248,43 @@ Response:
     "htmlContent": " -- generated HTML content of email", // String; generated HTML email
     "textContent": " -- generated text content of email " // String; generated plain text email
   }
+}
+```
+
+---
+
+#### GET `/api/v1/mailers/render-template`
+
+Gets rendered email content by code. Both HTML and text variants are provided. 
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Params:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| code | *String* | yes | `Code` of template to render.
+
+##### *Example:*
+
+```shell
+curl --location --request GET \
+'mailer.remp.press/api/v1/mailers/render-template?code=demo-email' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer XXX'
+```
+Response:
+
+```json5
+{
+    "status": "ok",
+    "html": "<Rendered HTML of selected template>",
+    "text": "<Rendered Text of selected template>",
 }
 ```
 

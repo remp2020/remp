@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
+use Nette\Utils\Random;
 
 class TemplatesRepository extends Repository
 {
@@ -15,7 +15,7 @@ class TemplatesRepository extends Repository
 
     public function all(): Selection
     {
-        return $this->getTable()->order('created_at DESC');
+        return $this->getTable()->order('created_at DESC, id DESC');
     }
 
     public function pairs(int $listId): array
@@ -70,7 +70,8 @@ class TemplatesRepository extends Repository
             'updated_at' => new DateTime(),
             'extras' => $extrasJson,
             'params' => $paramsJson,
-            'attachments_enabled' => $attachmentsEnabled
+            'attachments_enabled' => $attachmentsEnabled,
+            'public_code' => $this->generatePublicCode(),
         ]);
 
         if (is_numeric($result)) {
@@ -108,6 +109,7 @@ class TemplatesRepository extends Repository
             'extras' => $template->extras,
             'params' => $template->params,
             'attachments_enabled' => $template->attachments_enabled,
+            'public_code' => $this->generatePublicCode(),
         ]);
     }
 
@@ -119,6 +121,11 @@ class TemplatesRepository extends Repository
     public function getByCode($code)
     {
         return $this->getTable()->where('code', $code)->fetch();
+    }
+
+    public function getByPublicCode($publicCode)
+    {
+        return $this->getTable()->where('public_code', $publicCode)->fetch();
     }
 
     public function getUniqueTemplateCode($codeBase)
@@ -187,5 +194,10 @@ class TemplatesRepository extends Repository
             ->fetchAll();
 
         return array_merge($resultsFast, $resultsWild);
+    }
+
+    public function generatePublicCode()
+    {
+        return Random::generate(8);
     }
 }

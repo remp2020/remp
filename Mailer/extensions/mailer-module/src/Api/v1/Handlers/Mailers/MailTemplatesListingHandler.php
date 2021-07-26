@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
+use Nette\Http\Response;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\GetInputParam;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailTemplatesListingHandler extends BaseHandler
 {
-    private $templatesRepository;
+    private TemplatesRepository $templatesRepository;
 
     public function __construct(
         TemplatesRepository $templatesRepository
@@ -27,6 +27,8 @@ class MailTemplatesListingHandler extends BaseHandler
             (new GetInputParam('codes'))->setMulti(),
             (new GetInputParam('mail_type_codes'))->setMulti(),
             new GetInputParam('with_mail_types'),
+            new GetInputParam('page'),
+            new GetInputParam('limit'),
         ];
     }
 
@@ -42,6 +44,24 @@ class MailTemplatesListingHandler extends BaseHandler
             $results->where(['mail_type.code' => $params['mail_type_codes']]);
         }
 
+        if (isset($params['page']) || isset($params['limit'])) {
+            $page = (int) ($params['page'] ?? null);
+            $limit = (int) ($params['limit'] ?? null);
+
+            if ($page <= 0 || $limit <= 0) {
+                return new JsonApiResponse(Response::S400_BAD_REQUEST, [
+                    'status' => 'error',
+                    'code' => 'invalid_pagination_params',
+                    'message' => sprintf(
+                        "Invalid page or limit provided. page: %s, limit: %s",
+                        $params['page'] ?? null,
+                        $params['limit'] ?? null
+                    )
+                ]);
+            }
+            $results->limit($limit, ($page - 1) * $limit);
+        }
+
         $withMailTypes = filter_var($params['with_mail_types'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
         $result = [];
@@ -51,7 +71,7 @@ class MailTemplatesListingHandler extends BaseHandler
                 'name' => $row->name,
                 'description' => $row->description,
                 'mail_type_code' => $row->mail_type->code,
-                'attachments_enabled' => $row->attachments_enabled
+                'attachments_enabled' => (bool) $row->attachments_enabled
             ];
             if ($withMailTypes) {
                 $item['mail_type'] = [
@@ -62,7 +82,7 @@ class MailTemplatesListingHandler extends BaseHandler
                 ];
             }
 
-            $result[] =  $item;
+            $result[] = $item;
         }
 
         return new JsonApiResponse(200, $result);

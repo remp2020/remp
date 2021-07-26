@@ -31,10 +31,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Finalized refactoring of `Remp\MailerModule\Repositories\IConversionsRepository` interface, removed obsolete methods. remp/remp#907
   - Methods `getBatchTemplatesConversions` and `getNonBatchTemplateConversions` were removed, because they encouraged suboptimal (non-time-constrained) implementation.
   - In your implementation replace them with newly added `getBatchTemplatesConversionsSince` and `getNonBatchTemplatesConversionsSince` respectively.
+- **BREAKING**: Removed public preview URL specified by template code. remp/remp#581
+  - Use replacement public preview URL specified by random string (so it's not guessable).
+  - If you need to obtain HTML of email via template code, you can use newly added `/api/v1/mailers/render-template` API
 - Added email generator `ShopUrlParserGenerator` to get informations about products. remp/remp#949
 - Fixed broken new email template page when no layout or newsletter list was defined.
 - Added `SimpleAuthenticator`, which keeps plain list of emails and passwords that are valid to log in. Mailer can use this authenticator (instead of e.g. Sso `Authenticator`) to make it work without an external authentication system.
 - Added support for `ignore_content_types` parameter in `UnreadArticlesResolver` used in generated/personalized e-mails. Parameter excludes articles of certain content types and avoids their use in generated e-mails. remp/remp#973
+- Added public preview for emails (templates), accessible without authentication. Preview link is accessible in each email detail eg.: _(http://mailer.remp.press/template/show/1)_.  remp/remp#581
+- Added API endpoint `/api/v1/mailers/render-template`. Returns a rendered HTML email. remp/remp#581
+
 
 ## [0.27.1] - 2021-07-08
 
