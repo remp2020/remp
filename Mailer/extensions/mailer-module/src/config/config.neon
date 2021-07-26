@@ -134,6 +134,7 @@ services:
 	# API
 	- Tomaj\NetteApi\Link\ApiLink
 	- Tomaj\NetteApi\Misc\IpDetector
+
 	apiDecider:
 		factory: Tomaj\NetteApi\ApiDecider
 		setup:
@@ -163,6 +164,8 @@ services:
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 2, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'send-email'), \Remp\MailerModule\Api\v1\Handlers\Mailers\SendEmailHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mail-type-variants'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeVariantCreateApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'render-template'), \Remp\MailerModule\Api\v1\Handlers\Mailers\RenderTemplateApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+
 	# Generator
 	generator:
 		factory: Remp\MailerModule\Models\Generators\GeneratorFactory
