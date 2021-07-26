@@ -159,8 +159,8 @@ final class TemplatePresenter extends BasePresenter
                 $template->code,
                 "<a href='{$editUrl}'>{$template->subject}</a>",
                 $template->type->title,
-                $template->related('mail_job_batch_template')->sum('opened') + $template->related('mail_logs')->where('mail_job_id IS NULL')->count('opened_at'),
-                $template->related('mail_job_batch_template')->sum('clicked') + $template->related('mail_logs')->where('mail_job_id IS NULL')->count('clicked_at'),
+                $template->related('mail_job_batch_template')->sum('opened') + $template->related('mail_logs', 'mail_template_id')->where('mail_job_id IS NULL')->count('opened_at'),
+                $template->related('mail_job_batch_template')->sum('clicked') + $template->related('mail_logs', 'mail_template_id')->where('mail_job_id IS NULL')->count('clicked_at'),
             ];
         }
         $this->presenter->sendJson($result);

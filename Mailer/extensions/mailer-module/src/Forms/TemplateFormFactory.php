@@ -66,7 +66,7 @@ class TemplateFormFactory implements IFormFactory
 
         if (isset($id)) {
             $template = $this->templatesRepository->find($id);
-            $count = $template->related('mail_logs')->count('*');
+            $count = $template->related('mail_logs', 'mail_template_id')->count('*');
             $defaults = $template->toArray();
         } else {
             $defaults['mail_layout_id'] = key($layouts);
