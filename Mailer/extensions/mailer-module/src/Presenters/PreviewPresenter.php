@@ -27,10 +27,6 @@ final class PreviewPresenter extends Presenter
             throw new BadRequestException();
         }
 
-        if (!$template->mail_type->is_public) {
-            throw new BadRequestException();
-        }
-
         $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template));
         $this->template->content = $mailContent->html();
     }
