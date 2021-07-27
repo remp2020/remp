@@ -8,33 +8,24 @@ final class AddPublicCodeToMailTemplates extends AbstractMigration
 {
     public function up(): void
     {
-        $this->table('mail_templates')
-            ->addColumn('public_code', 'string', ['null' => true, 'after' => 'code'])
-            ->update();
+        $this->execute('SET foreign_key_checks = 0');
 
-        $templates = $this->fetchAll('
-            SELECT * FROM mail_templates
-        ');
+        // so we can use inplace algorithm
+        $this->table('mail_templates')->removeIndex('mail_body_html')->update();
 
-        foreach ($templates as $template) {
-            $templateId = $template['id'];
-            $public_code = Random::generate(8);
+        $this->execute("
+ALTER TABLE mail_templates ADD COLUMN public_code VARCHAR(255) NULL AFTER code, ALGORITHM=INPLACE, LOCK=NONE;
+CREATE UNIQUE INDEX idx_public_code ON mail_templates(public_code);
+UPDATE mail_templates SET public_code = (LEFT(MD5(ROUND(RAND(id)*4294967296)), 8));
+ALTER TABLE mail_templates MODIFY COLUMN public_code VARCHAR(255) NOT NULL AFTER code, ALGORITHM=INPLACE, LOCK=NONE;
+        ");
 
-            $this->execute("
-                UPDATE mail_templates SET public_code = '{$public_code}' WHERE id = {$templateId}
-            ");
-        }
-
-        $this->table('mail_templates')
-            ->changeColumn('public_code', 'string', ['null' => false])
-            ->addIndex('public_code', ['unique' => true])
-            ->update();
+        $this->execute('SET foreign_key_checks = 1');
     }
 
     public function down(): void
     {
-        $this->table('mail_templates')
-            ->removeColumn('public_code')
-            ->update();
+        $this->output->writeln("DOWN migration not possible due to complexity of the migration");
     }
+
 }
