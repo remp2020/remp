@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Model\BaseModel;
+use App\Model\ConversionSource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Misc;
