@@ -40,8 +40,9 @@ class CacheSegmentJob implements ShouldQueue
     public function handle(SegmentAggregator $segmentAggregator)
     {
         $cacheKey = $segmentAggregator::cacheKey($this->campaignSegment);
+        $cacheTimestampKey = "{$cacheKey}|timestamp";
 
-        if (!$this->force && Redis::connection()->scard($cacheKey)) {
+        if (!$this->force && Redis::connection()->get($cacheTimestampKey)) {
             return;
         }
 
@@ -59,6 +60,7 @@ class CacheSegmentJob implements ShouldQueue
             throw $e;
         }
 
+        Redis::connection()->set($cacheTimestampKey, date('U'), 'EX', 60*60*24);
         Redis::connection()->del([$cacheKey]);
         if ($users->isNotEmpty()) {
             Redis::connection()->sadd($cacheKey, $users->toArray());

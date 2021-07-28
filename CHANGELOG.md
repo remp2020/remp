@@ -46,6 +46,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added API endpoint `/api/v1/mailers/render-template`. Returns a rendered HTML email. remp/remp#581
 - Added widget for `ArticleUrlParserGenerator`. remp/remp#946
 - Added demo user subscriptions in `demo:seed` command. 
+- Added the check of cache to prevent display campaigns to users excluded from campaigns. remp/remp#833
 
 ## [0.27.1] - 2021-07-08
 

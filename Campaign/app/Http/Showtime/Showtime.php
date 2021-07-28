@@ -5,6 +5,7 @@ namespace App\Http\Showtime;
 use App\Banner;
 use App\Campaign;
 use App\CampaignBanner;
+use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -492,6 +493,10 @@ class Showtime
             $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
 
             if ($userId) {
+                if (!$this->isCacheValid($campaignSegment)) {
+                    return false;
+                }
+
                 $belongsToSegment = $this->segmentAggregator->checkUser($campaignSegment, (string)$userId);
             } else {
                 $belongsToSegment = $this->segmentAggregator->checkBrowser($campaignSegment, (string)$browserId);
@@ -508,6 +513,20 @@ class Showtime
         }
 
         return true;
+    }
+
+    private function isCacheValid(CampaignSegment $campaignSegment): bool
+    {
+        if (!$this->segmentAggregator->cacheEnabled($campaignSegment)) {
+            return true;
+        }
+
+        $cacheKeyTimeStamp = $this->redis->get(SegmentAggregator::cacheKey($campaignSegment) . '|timestamp');
+        if ($cacheKeyTimeStamp) {
+            return true;
+        }
+
+        return false;
     }
 
     private function loadOneTimeBanner(array $bannerKeys): ?Banner
