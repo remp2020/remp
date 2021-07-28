@@ -121,6 +121,7 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('userpath', [UserPathController::class, 'index'])->name('userpath.index');
     Route::post('userpath/statsJson', [UserPathController::class, 'stats'])->name('userpath.stats');
+    Route::post('userpath/diagram', [UserPathController::class, 'diagramData'])->name('userpath.diagramData');
 
     Route::resource('conversions', ConversionController::class, [
         'only' => ['index', 'store', 'show']

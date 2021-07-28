@@ -8,7 +8,6 @@ use App\Helpers\Journal\JournalHelpers;
 use App\Helpers\Misc;
 use App\Model\ArticleTitle;
 use App\Model\Config\ConversionRateConfig;
-use App\Model\ConversionSource;
 use App\Model\Tag;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -259,6 +258,23 @@ SQL;
     public function getHasTitleVariantsAttribute(): bool
     {
         return count($this->variants_count['title']) > 1;
+    }
+
+    /**
+     * conversion_sources
+     * @return Collection
+     */
+    public function getConversionSources(): Collection
+    {
+        return $this
+            ->conversions()
+            ->with('conversionSources')
+            ->get()
+            ->pluck('conversionSources')
+            ->filter(function ($conversionSource) {
+                return $conversionSource->isNotEmpty();
+            })
+            ->flatten();
     }
 
     // Mutators

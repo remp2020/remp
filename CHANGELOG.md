@@ -711,6 +711,9 @@ Please follow the upgrade steps:
 - Added `more options` dropdown in Author segments index page, dropdown contains redirects to author segments config tab in settings page and to testing configuration (former authors segments config page) remp/remp#494
 - Added/ported validation of author segments configs to respective settings tab, code is prepared to handle validations for other config categories as well, see `SettingsController::update()` remp/remp#494
 - Added button into author segments config tab for testing of author segments config (redirects into testing page). remp/remp#494
+- Added endpoint for conversion sankey diagram data retrieval. remp/remp#551
+- Added sankey d3 plugin node package. remp/remp#551
+- Added sankey diagrams into `user path` section. Currently we are tracking 2 types of conversion sources (first/last visit before conversion) therefore there are 2 sankey diagrams. remp/remp#551
 
 ### [Mailer]
 

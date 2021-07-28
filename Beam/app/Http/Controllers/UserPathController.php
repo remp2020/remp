@@ -5,14 +5,27 @@ namespace App\Http\Controllers;
 use App\Author;
 use App\Conversion;
 use Illuminate\Http\Request;
+use App\Http\Requests\ConversionsSankeyRequest;
+use App\Http\Resources\ConversionsSankeyResource;
+use App\Model\Charts\ConversionsSankeyDiagram;
 use App\Model\ConversionCommerceEvent;
 use App\Model\ConversionGeneralEvent;
 use App\Model\ConversionPageviewEvent;
+use App\Model\ConversionSource;
 use App\Section;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Remp\Journal\JournalContract;
 
 class UserPathController extends Controller
 {
+    private $journal;
+
+    public function __construct(JournalContract $journal)
+    {
+        $this->journal = $journal;
+    }
+
     public function index()
     {
         $authors = Author::all();
@@ -24,6 +37,7 @@ class UserPathController extends Controller
             'sections' => $sections,
             'days' => range(1, 14),
             'sumCategories' => $sumCategories,
+            'conversionSourceTypes' => ConversionSource::getTypes()
         ]);
     }
 
@@ -149,5 +163,22 @@ class UserPathController extends Controller
                 'total' => $total
             ]
         ]);
+    }
+
+    public function diagramData(ConversionsSankeyRequest $request)
+    {
+        $from = Carbon::now($request->get('tz'))->subDays($request->get('interval'));
+        $to = Carbon::now($request->get('tz'));
+
+        $conversionSources = Conversion::whereBetween('paid_at', [$from, $to])
+            ->with('conversionSources')
+            ->has('conversionSources')
+            ->get()
+            ->pluck('conversionSources')
+            ->flatten();
+
+        $conversionsSankeyDiagram = new ConversionsSankeyDiagram($this->journal, $conversionSources, $request->get('conversionSourceType'));
+
+        return new ConversionsSankeyResource($conversionsSankeyDiagram);
     }
 }
