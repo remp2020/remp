@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Models\Generators;
 
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
+use Remp\Mailer\Components\GeneratorWidgets\Widgets\ArticleUrlParserWidget\ArticleUrlParserWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\PageMeta\Content\ShopContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
@@ -105,7 +106,7 @@ class ShopUrlParserGenerator implements IGenerator
 
     public function getWidgets(): array
     {
-        return [];
+        return [ArticleUrlParserWidget::class];
     }
 
     public function preprocessParameters($data): ?ArrayHash

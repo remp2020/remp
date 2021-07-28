@@ -5,6 +5,7 @@ services:
 	- Remp\Mailer\Forms\DennikeTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\Mailer\Forms\TldrTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\Mailer\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
+	articleUrlParserTemplateFormFactory: Remp\Mailer\Forms\ArticleUrlParserTemplateFormFactory()
 
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\NewsfilterWidget\NewsfilterWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\NovydenikNewsfilterWidget\NovydenikNewsfilterWidget
@@ -12,3 +13,4 @@ services:
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\DennikeWidget\DennikeWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\TldrWidget\TldrWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\MMSWidget\MMSWidget
+	- Remp\Mailer\Components\GeneratorWidgets\Widgets\ArticleUrlParserWidget\ArticleUrlParserWidget
