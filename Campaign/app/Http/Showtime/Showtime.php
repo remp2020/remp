@@ -218,9 +218,9 @@ class Showtime
                 $variantUuid = $seenCampaigns->{$campaign->uuid}->variantId ?? null;
             }
 
-            if (isset($seenCampaigns->{$campaign->public_id})) {
+            if (isset($seenCampaigns->{$campaign->public_id}->variantId)) {
                 foreach ($campaign->campaignBanners as $campaignBanner) {
-                    if ($campaignBanner->banner->public_id === $seenCampaigns->{$campaign->public_id}->bannerId) {
+                    if ($campaignBanner->public_id === $seenCampaigns->{$campaign->public_id}->variantId) {
                         $bannerUuid = $campaignBanner->banner->uuid ?? null;
                         $variantUuid = $campaignBanner->uuid ?? null;
                         break;
