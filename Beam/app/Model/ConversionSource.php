@@ -17,7 +17,7 @@ class ConversionSource extends BaseModel
         'referer_medium',
         'referer_source',
         'referer_host_with_path',
-        'pageview_article_external_id',
+        'article_id',
     ];
 
     protected $dates = [
@@ -28,5 +28,13 @@ class ConversionSource extends BaseModel
     public function conversion()
     {
         return $this->belongsTo(Conversion::class);
+    }
+
+    public static function getTypes()
+    {
+        return [
+            self::TYPE_SESSION_LAST,
+            self::TYPE_SESSION_FIRST
+        ];
     }
 }

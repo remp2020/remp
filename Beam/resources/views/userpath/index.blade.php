@@ -70,6 +70,9 @@
 
             <user-path :stats="stats" :loading="loading" :error="error"></user-path>
         </div>
+        <div id="conversions-diagram-vue" class="card-body card-padding">
+            <conversions-sankey-diagram v-for="conversionSourceType in conversionSourceTypes" :data-url="dataUrl" :conversion-source-type="conversionSourceType"></conversions-sankey-diagram>
+        </div>
     </div>
 
     <script type="text/javascript">
@@ -112,6 +115,17 @@
                         that.loading = false;
                     });
                 }
+            }
+        });
+
+        new Vue({
+            el: "#conversions-diagram-vue",
+            components: {
+                ConversionsSankeyDiagram
+            },
+            data: {
+                dataUrl: "{!! route('userpath.diagramData') !!}",
+                conversionSourceTypes: {!! json_encode($conversionSourceTypes) !!}
             }
         });
     </script>
