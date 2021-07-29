@@ -95,6 +95,7 @@ class ArticleUrlParserTemplateFormFactory
         $form->addHidden('text_content');
 
         $defaults = [
+            'name' => 'Vyber ' .  date('d. m. Y'),
             'code' => 'vyber_' . date('dmY'),
             'from' => 'Denník N <info@dennikn.sk>',
         ];
