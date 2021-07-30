@@ -221,8 +221,11 @@ var run = function() {
     banner.campaignPublicId = campaignPublicId;
     banner.variantUuid = variantUuid;
     banner.variantPublicId = variantPublicId;
-    banner.uuid = bannerUuid;
-    banner.publicId = bannerPublicId;
+    
+    if (bannerUuid) {
+        banner.uuid = bannerUuid;
+        banner.publicId = bannerPublicId;    
+    }
 
     if (typeof remplib.campaign.bannerUrlParams !== "undefined") {
         banner.urlParams = remplib.campaign.bannerUrlParams;
