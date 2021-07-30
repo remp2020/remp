@@ -36,6 +36,8 @@ class Showtime
 
     private $alignmentsMap;
 
+    private $variables;
+
     public function __construct(
         ClientInterface $redis,
         SegmentAggregator $segmentAggregator,
@@ -102,6 +104,14 @@ class Showtime
         return $this->alignmentsMap;
     }
 
+    private function getVariables()
+    {
+        if (!$this->variables) {
+            $this->variables = json_decode($this->redis->get(\App\Variable::REDIS_CACHE_KEY), true) ?? [];
+        }
+        return $this->variables;
+    }
+
     public function showtime(string $userData, string $callback, ShowtimeResponse $showtimeResponse)
     {
         try {
@@ -137,6 +147,7 @@ class Showtime
         $positions = $this->getPositionMap();
         $dimensions = $this->getDimensionMap();
         $alignments = $this->getAlignmentsMap();
+        $variables = $this->getVariables();
 
         $displayData = [];
 
@@ -149,7 +160,7 @@ class Showtime
             $banner = $this->loadOneTimeBrowserBanner($browserId);
         }
         if ($banner) {
-            $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions);
+            $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $variables);
             return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData());
         }
 
@@ -164,7 +175,7 @@ class Showtime
             $campaign = unserialize($this->redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"));
             $campaignBannerVariant = $this->shouldDisplay($campaign, $data, $activeCampaigns);
             if ($campaignBannerVariant) {
-                $displayData[] = $showtimeResponse->renderCampaign($campaignBannerVariant, $campaign, $alignments, $dimensions, $positions);
+                $displayData[] = $showtimeResponse->renderCampaign($campaignBannerVariant, $campaign, $alignments, $dimensions, $positions, $variables);
             }
         }
 

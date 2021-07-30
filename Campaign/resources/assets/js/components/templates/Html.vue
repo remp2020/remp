@@ -50,7 +50,10 @@
                                 <label for="html_text" class="fg-label">HTML Text</label>
                                 <textarea v-model="text" class="form-control fg-input remp-banner-text-input" rows="6" name="text" cols="50" id="html_text"></textarea>
                             </div>
-                            <div><small v-html="$parent.fieldParamsMessage"></small></div>
+                            <div>
+                                <small class="help-block" v-html="$parent.fieldParamsMessage"></small>
+                            </div>
+                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
                         </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">
@@ -59,7 +62,7 @@
                                 <label for="css" class="fg-label">Custom CSS</label>
                                 <textarea v-model="css" class="form-control fg-input" rows="6" name="css" cols="50" id="css"></textarea>
                             </div>
-                            <small>Styles in this field are applied globally.<br> Prevent colliding with other styles by prefixing your classes.</small>
+                            <small class="help-block" v-pre>Styles in this field are applied globally.<br> Prevent colliding with other styles by prefixing your classes.<br> You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
                         </div><!-- .input-group -->
 
                         <div class="cp-container">

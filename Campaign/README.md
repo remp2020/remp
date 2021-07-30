@@ -304,6 +304,12 @@ Laravel's queue currently includes
 
 If the data are still valid, job doesn't refresh them.
 
+### Variables
+
+Campaign supports use of variables in your banner template contents, custom javascript and custom css. You can create variables using `Add new variable` in `Variables` main menu section.
+
+You can use created variables by adding `{{ variable_name }}` to one of the fields used in banner content or in custom javascript & css.
+
 ### API Documentation
 
 Campaign provides a simple API for several tasks described bellow.

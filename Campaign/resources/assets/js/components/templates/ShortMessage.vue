@@ -48,7 +48,10 @@
                                 <label for="text" class="fg-label">Text</label>
                                 <input v-model="text" class="form-control fg-input remp-banner-text-input" name="text" id="text" type="text" required>
                             </div>
-                            <div><small v-html="$parent.fieldParamsMessage"></small></div>
+                            <div class="help-block">
+                                <small v-html="$parent.fieldParamsMessage"></small><br>
+                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                            </div>
                         </div>
 
                     </div>
