@@ -32,8 +32,13 @@ class ControllerShowtimeResponse implements ShowtimeResponse
     }
 
 
-    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions): string
-    {
+    public function renderBanner(
+        Banner $banner,
+        array $alignments,
+        array $dimensions,
+        array $positions,
+        array $variables
+    ): string {
         return View::make('banners.preview', [
             'banner' => $banner,
             'variantUuid' => '',
@@ -41,6 +46,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             'positions' => $positions,
             'dimensions' => $dimensions,
             'alignments' => $alignments,
+            'variables' => $variables,
             'controlGroup' => 0
         ])->render();
     }
@@ -50,7 +56,8 @@ class ControllerShowtimeResponse implements ShowtimeResponse
         Campaign $campaign,
         array $alignments,
         array $dimensions,
-        array $positions
+        array $positions,
+        array $variables
     ): string {
         return View::make('banners.preview', [
             'banner' => $variant->banner,
@@ -61,6 +68,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             'positions' => $positions,
             'dimensions' => $dimensions,
             'alignments' => $alignments,
+            'variables' => $variables,
             'controlGroup' => $variant->control_group
         ])->render();
     }

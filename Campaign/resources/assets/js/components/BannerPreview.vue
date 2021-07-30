@@ -334,7 +334,7 @@
             let cssIncludes = (this.cssIncludes) ? this.cssIncludes.filter(cssInclude => cssInclude) : [];
             if (cssIncludes && cssIncludes.length > 0) {
                 for (let ii = 0; ii < cssIncludes.length; ii++) {
-                    lib.loadStyle(cssIncludes[ii]);
+                    lib.loadStyle(this.injectVars(cssIncludes[ii]));
                 }
             }
 
@@ -342,7 +342,7 @@
             if (jsIncludes && jsIncludes.length > 0) {
                 let loadedScriptsCount = 0;
                 jsIncludes.forEach((jsInclude) => {
-                    lib.loadScript(jsInclude, () => {
+                    lib.loadScript(this.injectVars(jsInclude), () => {
                         loadedScriptsCount += 1;
                         if (loadedScriptsCount === jsIncludes.length) {
                             this.runCustomJavascript(this.js);
@@ -350,7 +350,7 @@
                     });
                 });
             } else {
-                this.runCustomJavascript(this.js);
+                this.runCustomJavascript(this.injectVars(this.js));
             }
         },
         data: () => ({
@@ -442,17 +442,21 @@
                 return url;
             },
             injectVars: function(str) {
-                if (!remplib || !remplib.campaign) {
-                    return str;
-                }
                 let re = /\{\{\s?(.*?)\s?\}\}/g;
                 let match;
 
                 while (match = re.exec(str)) {
+                    re.lastIndex = 0;
                     let replRegex = new RegExp(match[0], "g");
                     let replVal = '';
-                    if (remplib.campaign.variables && remplib.campaign.variables.hasOwnProperty(match[1])) {
+                    if (remplib &&
+                        remplib.campaign &&
+                        remplib.campaign.variables &&
+                        remplib.campaign.variables.hasOwnProperty(match[1])
+                    ) {
                         replVal = remplib.campaign.variables[match[1]].value()
+                    } else if (this.variables && this.variables.hasOwnProperty(match[1])) {
+                        replVal = this.variables[match[1]];
                     } else {
                         throw EvalError("cannot render banner, variable [" + match[1] + "] is missing");
                     }
@@ -518,7 +522,7 @@
                       try {
                           // Evaluating JS code using Function with passed params object
                           // https://stackoverflow.com/questions/49125059/how-to-pass-parameters-to-an-eval-based-function-injavascript
-                          let body = 'function(params) { ' + js + ' }';
+                          let body = 'function(params) { ' + that.injectVars(js) + ' }';
                           let wrap = s => "{ return " + body + " };";
                           let func = new Function(wrap(body));
                           func.call(null).call(null, that.paramsForCustomJavascript());

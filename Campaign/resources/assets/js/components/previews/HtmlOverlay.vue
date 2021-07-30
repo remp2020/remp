@@ -249,9 +249,9 @@ export default {
         style.type = 'text/css';
         if (style.styleSheet) {
             // This is required for IE8 and below.
-            style.styleSheet.cssText = styles;
+            style.styleSheet.cssText = this.$parent.injectVars(styles);
         } else {
-            style.appendChild(document.createTextNode(styles));
+            style.appendChild(document.createTextNode(this.$parent.injectVars(styles)));
         }
     },
 }

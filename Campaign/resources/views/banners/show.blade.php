@@ -22,6 +22,7 @@
     var alignments = JSON.parse('{!! json_encode($alignments) !!}');
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
+    var variables = {!! json_encode($variables) !!};
     var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
 
     banner.show = true;
@@ -29,6 +30,7 @@
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
+    banner.variables = variables;
     banner.adminPreview = true;
 
     remplib.banner.bindPreview('#banner-preview', banner);

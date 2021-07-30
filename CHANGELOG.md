@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed unnecessary storing of empty URL/referer filters of "Where to display" section in campaign configuration. remp/remp#975
 - Added `SameSite=Lax` attribute to all cookies set by `remplib.js`. Missing attribute could possibly lead to issues on Safari, which doesn't defaults to `Lax` like other browsers. remp/remp#957
 - Added `rtmSource` to campaign's custom JS params, so clients can correctly track events without hardcoding the `rtmSource` to some arbitrary value.
+- Added support for global campaign/banner variables. See [README](./Campaign/README.md#variables) for more information. remp/remp#972 
 
 ### [Mailer]
 

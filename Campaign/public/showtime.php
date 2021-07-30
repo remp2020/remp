@@ -136,12 +136,12 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         ]);
     }
 
-    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions): string {
-        return $this->renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->control_group, $alignments, $dimensions, $positions, $variant->public_id, $campaign->public_id);
+    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $variables): string {
+        return $this->renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->control_group, $alignments, $dimensions, $positions, $variables, $variant->public_id, $campaign->public_id);
     }
 
-    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions): string {
-        return $this->renderInternal($banner, null, null, 0, $alignments, $dimensions, $positions, null, null);
+    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $variables): string {
+        return $this->renderInternal($banner, null, null, 0, $alignments, $dimensions, $positions, $variables, null, null);
     }
 
     private function renderInternal(
@@ -152,12 +152,14 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         $alignments,
         $dimensions,
         $positions,
+        $variables,
         $variantPublicId,
         $campaignPublicId
     ) {
         $alignmentsJson = json_encode($alignments);
         $dimensionsJson = json_encode($dimensions);
         $positionsJson = json_encode($positions);
+        $variablesJson = json_encode($variables);
 
         $bannerJs = asset(mix('/js/banner.js', '/assets/lib'));
 
@@ -207,6 +209,7 @@ var run = function() {
     var alignments = JSON.parse('{$alignmentsJson}');
     var dimensions = JSON.parse('{$dimensionsJson}');
     var positions = JSON.parse('{$positionsJson}');
+    var variables = {$variablesJson};
 
     if (!isControlGroup) {
         banner = remplib.banner.fromModel(bannerJsonData);
@@ -216,6 +219,7 @@ var run = function() {
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
+    banner.variables = variables;
 
     banner.campaignUuid = campaignUuid;
     banner.campaignPublicId = campaignPublicId;
@@ -286,7 +290,7 @@ var run = function() {
         }
 
     }, banner.displayDelay);
-};
+}
 
 run();
 
