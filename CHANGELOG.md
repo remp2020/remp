@@ -43,6 +43,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added public preview for emails (templates), accessible without authentication. Preview link is accessible in each email detail eg.: _(http://mailer.remp.press/template/show/1)_.  remp/remp#581
 - Added API endpoint `/api/v1/mailers/render-template`. Returns a rendered HTML email. remp/remp#581
 - Added widget for `ArticleUrlParserGenerator`. remp/remp#946
+- Added demo user subscriptions in `demo:seed` command. 
 
 ## [0.27.1] - 2021-07-08
 

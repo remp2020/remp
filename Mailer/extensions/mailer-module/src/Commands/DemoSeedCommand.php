@@ -4,12 +4,14 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Commands;
 
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Models\Users\Dummy;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
+use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,12 +30,17 @@ class DemoSeedCommand extends Command
 
     private $listCategoriesRepository;
 
+    private UserSubscriptionsRepository $userSubscriptionsRepository;
+
+    private Dummy $dummyUserProvider;
+
     public function __construct(
         LayoutsRepository $layoutsRepository,
         TemplatesRepository $templatesRepository,
         SnippetsRepository $snippetRepository,
         ListsRepository $listsRepository,
-        ListCategoriesRepository $listCategoriesRepository
+        ListCategoriesRepository $listCategoriesRepository,
+        UserSubscriptionsRepository $userSubscriptionsRepository
     ) {
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
@@ -41,6 +48,8 @@ class DemoSeedCommand extends Command
         $this->snippetsRepository = $snippetRepository;
         $this->listsRepository = $listsRepository;
         $this->listCategoriesRepository = $listCategoriesRepository;
+        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
+        $this->dummyUserProvider = new Dummy();
     }
 
     protected function configure(): void
@@ -88,10 +97,13 @@ class DemoSeedCommand extends Command
         $output->write('Layouts: ');
         $layout = $this->seedLayouts();
         $output->writeln('<info>OK!</info>');
-
-
+        
         $output->write('Emails: ');
         $this->seedEmails($layout, $list);
+        $output->writeln('<info>OK!</info>');
+
+        $output->write('User subscriptions: ');
+        $this->seedUserSubscriptions($list);
         $output->writeln('<info>OK!</info>');
 
         return Command::SUCCESS;
@@ -132,7 +144,6 @@ class DemoSeedCommand extends Command
 
         return $list;
     }
-
 
     protected function seedSnippets()
     {
@@ -242,8 +253,25 @@ class DemoSeedCommand extends Command
         return $email;
     }
 
+    protected function seedUserSubscriptions($list)
+    {
+        $users = $this->dummyUserProvider->list([], 1);
+        foreach ($users as $userId => $userData) {
+            $this->userSubscriptionsRepository->subscribeUser($list, $userId, $userData['email']);
+        }
+    }
+
     protected function deleteSeedData()
     {
+        // user subscriptions
+        $users = $this->dummyUserProvider->list([], 1);
+        foreach ($users as $userId => $userData) {
+            $this->userSubscriptionsRepository->getTable()->where([
+                'user_id' => $userId,
+                'user_email' => $userData['email'],
+            ])->delete();
+        }
+        
         if ($email = $this->templatesRepository->findBy('code', 'demo-email')) {
             $this->templatesRepository->delete($email);
         }
