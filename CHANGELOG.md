@@ -33,9 +33,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Methods `getBatchTemplatesConversions` and `getNonBatchTemplateConversions` were removed, because they encouraged suboptimal (non-time-constrained) implementation.
   - In your implementation replace them with newly added `getBatchTemplatesConversionsSince` and `getNonBatchTemplatesConversionsSince` respectively.
 - **BREAKING**: Removed public preview URL specified by template code. remp/remp#581
-  - **WARNING**: The database migration can take up to 5-10 minutes, depending on the number of mail templates you currently have.
+  - **IMPORTANT**: The database migration can take up to 5-10 minutes, depending on the number of mail templates you currently have. Our testing migration with 100K templates took around 10 minutes.
   - Use replacement public preview URL specified by random string (so it's not guessable).
   - If you need to obtain HTML of email via template code, you can use newly added `/api/v1/mailers/render-template` API.
+- Changed encoding of `mail_logs.subject` column to `uft8mb4_unicode_ci` to match encoding of `mail_templates.subject`. remp/remp#984
+  - **IMPORTANT**: If you have more then 50M records in the `mail_logs` table, the `MailLogsSubjectEncoding` migration can be time-consuming. Consider raising your deploy timeout limits or mark the migration as complete and run the queries manually. Our testing migration with ~20M records took 3 minutes.
 - Added email generator `ShopUrlParserGenerator` to get informations about products. remp/remp#949
 - Fixed broken new email template page when no layout or newsletter list was defined.
 - Added `SimpleAuthenticator`, which keeps plain list of emails and passwords that are valid to log in. Mailer can use this authenticator (instead of e.g. Sso `Authenticator`) to make it work without an external authentication system.
