@@ -326,6 +326,8 @@ class ShowtimeTest extends TestCase
         ]);
 
         $userData = $this->getUserData();
+
+        $this->segmentAggregator->shouldReceive('cacheEnabled')->andReturn(false, false);
         $this->segmentAggregator->shouldReceive('checkUser')->andReturn(false, true);
 
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
