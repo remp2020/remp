@@ -82,14 +82,25 @@ class DennikeTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        $defaults = [
-            'name' => 'Denník E ' . date('j.n.Y'),
-            'code' => 'dennike_' . date('dmY'),
-            'mail_layout_id' => 33, // layout for subscribers
-            'locked_mail_layout_id' => 33, // layout for non-subscribers
-            'mail_type_id' => 23, // dennike
-            'from' => 'Denník E <e@dennikn.sk>',
-        ];
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 63) {
+            $defaults = [
+                'name' => 'Firemný newsfilter ' . date('j.n.Y'),
+                'code' => 'nwsf_firemny' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 45, // firemny newsfilter
+                'from' => 'Denník E <e@dennikn.sk>',
+            ];
+        } else {
+            $defaults = [
+                'name' => 'Denník E ' . date('j.n.Y'),
+                'code' => 'dennike_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 23, // dennike
+                'from' => 'Denník E <e@dennikn.sk>',
+            ];
+        }
 
         $form->setDefaults($defaults);
 
