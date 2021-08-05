@@ -79,7 +79,7 @@ For dashboard to work correctly, you need to:
 * Push article metadata to Beam via [article tracking API](#post-apiarticlesupsert)
 * Enable *timespent* tracking within this snippet (`rempConfig.tracker.timeSpent = { "enabled": true}` ).
 
-Note: *Timespent* tracking is not mandatory dashboard can utilize regular pageview data instead to calculate number of concurrents. If you don't plan to track timespent, please see [this Telegraf configuration options](https://github.com/remp2020/remp/blob/master/Docker/telegraf/telegraf.conf#L78) so you can switch to pageview-based concurrents instead.
+Note: *Timespent* tracking is not mandatory. Dashboard can utilize regular pageview data instead to calculate number of concurrents. If you don't plan to track timespent, please see [this Telegraf configuration options](https://github.com/remp2020/remp/blob/master/Docker/telegraf/telegraf.conf#L78) so you can switch to pageview-based concurrents instead.
 
 Dashboard allows you to display detail of each article with pageview-related chart containing histogram of visits
 split by traffic source medium (same as in the main dashboard) and also displays article-related events.

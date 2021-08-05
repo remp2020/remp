@@ -13,4 +13,6 @@ type Config struct {
 	MysqlDBName string `envconfig:"mysql_dbname" required:"true"`
 
 	InternalHosts string `envconfig:"internal_hosts" required:"false"`
+
+	TimespentLimit int `envconfig:"timespent_limit" required:"false" default:0`
 }

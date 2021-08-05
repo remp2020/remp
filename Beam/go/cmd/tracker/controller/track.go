@@ -25,6 +25,7 @@ type TrackController struct {
 	PropertyStorage     model.PropertyStorage
 	EntitySchemaStorage model.EntitySchemaStorage
 	InternalHosts       []string
+	TimespentLimit      int
 }
 
 // Event represents Influx event structure
@@ -36,13 +37,14 @@ type Event struct {
 }
 
 // NewTrackController creates a track controller.
-func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage, ih []string) *TrackController {
+func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage, ih []string, tl int) *TrackController {
 	return &TrackController{
 		Controller:          service.NewController("TrackController"),
 		EventProducer:       ep,
 		PropertyStorage:     ps,
 		EntitySchemaStorage: ess,
 		InternalHosts:       ih,
+		TimespentLimit:      tl,
 	}
 }
 
@@ -200,6 +202,10 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		measurement = model.TableTimespent
 		if ctx.Payload.Timespent != nil {
 			fields["timespent"] = ctx.Payload.Timespent.Seconds
+			// limit maximum timespent; filters out broken tracking of open articles (forgotten browser window on different workspace/monitor)
+			if c.TimespentLimit > 0 && ctx.Payload.Timespent.Seconds > c.TimespentLimit {
+				fields["timespent"] = c.TimespentLimit
+			}
 			fields["unload"] = false
 			if ctx.Payload.Timespent.Unload != nil && *ctx.Payload.Timespent.Unload {
 				fields["unload"] = true
