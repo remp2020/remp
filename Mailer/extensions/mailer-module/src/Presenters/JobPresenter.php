@@ -249,12 +249,18 @@ final class JobPresenter extends BasePresenter
 
         $batchUnsubscribeStats = [];
         foreach ($job->related('mail_job_batch') as $batch) {
-            $batchUnsubscribeStats[$batch->id] = $this->userSubscriptionsRepository->getTable()
-                ->where([
-                    'rtm_content' => (string) $batch->id,
-                    'subscribed' => false,
-                ])
-                ->count('*');
+            $batchUnsubscribeStats[$batch->id] = 0;
+
+            foreach ($batch->related('mail_job_batch_templates') as $mjbt) {
+                $batchUnsubscribeStats[$batch->id] += $mjbt->mail_template->mail_type
+                    ->related('mail_user_subscriptions')
+                    ->where([
+                        'rtm_campaign' => $mjbt->mail_template->code,
+                        'rtm_content' => $mjbt->mail_job_batch_id,
+                        'subscribed' => false,
+                    ])
+                    ->count('*');
+            }
         }
 
         $this->template->job = $job;

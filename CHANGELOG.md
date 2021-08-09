@@ -48,6 +48,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added widget for `ArticleUrlParserGenerator`. remp/remp#946
 - Added demo user subscriptions in `demo:seed` command. 
 - Added the check of cache to prevent display campaigns to users excluded from campaigns. remp/remp#833
+- Fixed job unsubscribe stats inconsistency. remp/remp#993
+  - Job detail (left panel) could display unsubscribes for non-related newsletter lists unsubscribed along with the sent newsletter.
 
 ## [0.27.1] - 2021-07-08
 
