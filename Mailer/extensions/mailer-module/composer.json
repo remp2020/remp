@@ -2,6 +2,7 @@
   "name": "remp/mailer-module",
   "description": "REMP Mailer Module",
   "type": "library",
+  "version": "0.28.0",
   "homepage": "https://remp2030.com",
   "license": "MIT",
   "require": {
