@@ -50,6 +50,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added the check of cache to prevent display campaigns to users excluded from campaigns. remp/remp#833
 - Fixed job unsubscribe stats inconsistency. remp/remp#993
   - Job detail (left panel) could display unsubscribes for non-related newsletter lists unsubscribed along with the sent newsletter.
+- Added `ApplicationStatus` component, displaying online/offline status of Mailer workers. As follow up, `MissingConfiguration` component was removed and its functionality was merged into `ApplicationStatus` component. remp/remp#985
 
 ## [0.27.1] - 2021-07-08
 

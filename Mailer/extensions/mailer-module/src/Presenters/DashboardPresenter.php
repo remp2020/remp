@@ -11,12 +11,9 @@ use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\MailTemplateStatsRepository;
 use Remp\MailerModule\Repositories\MailTypeStatsRepository;
-use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 
 final class DashboardPresenter extends BasePresenter
 {
-    private $batchTemplatesRepository;
-    
     private $batchesRepository;
 
     private $listsRepository;
@@ -33,7 +30,6 @@ final class DashboardPresenter extends BasePresenter
 
     public function __construct(
         MailTemplateStatsRepository $mailTemplateStatsRepository,
-        BatchTemplatesRepository $batchTemplatesRepository,
         MailTypeStatsRepository $mailTypeStatsRepository,
         DateFormatterFactory $dateFormatterFactory,
         BatchesRepository $batchesRepository,
@@ -45,7 +41,6 @@ final class DashboardPresenter extends BasePresenter
             ->getInstance(IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 
         $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
-        $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailTypeStatsRepository = $mailTypeStatsRepository;
         $this->batchesRepository = $batchesRepository;
         $this->listsRepository = $listsRepository;

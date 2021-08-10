@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
+use Remp\MailerModule\Models\Mailer\SmtpMailer;
 use Remp\MailerModule\Repositories\ConfigsRepository;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
@@ -43,7 +44,7 @@ class DatabaseSeedCommand extends Command
 
         $output->writeln('Required configuration: ');
         $configValues = [
-            ['default_mailer', 'Default Mailer', null, '', 'string'],
+            ['default_mailer', 'Default Mailer', SmtpMailer::ALIAS, '', 'string'],
         ];
         foreach ($configValues as $configValue) {
             $config = $this->configsRepository->findBy('name', $configValue['0']);

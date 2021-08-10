@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Commands;
 
 use Exception;
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Models\HealthChecker;
 use Remp\MailerModule\Models\Job\BatchEmailGenerator;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Symfony\Component\Console\Command\Command;
@@ -15,22 +16,28 @@ use Tracy\ILogger;
 
 class ProcessJobCommand extends Command
 {
+    public const COMMAND_NAME = "mail:process-job";
+    
     private $batchesRepository;
 
     private $batchEmailGenerator;
 
+    private HealthChecker $healthChecker;
+
     public function __construct(
         BatchesRepository $batchesRepository,
-        BatchEmailGenerator $batchEmailGenerator
+        BatchEmailGenerator $batchEmailGenerator,
+        HealthChecker $healthChecker
     ) {
         parent::__construct();
         $this->batchesRepository = $batchesRepository;
         $this->batchEmailGenerator = $batchEmailGenerator;
+        $this->healthChecker = $healthChecker;
     }
 
     protected function configure(): void
     {
-        $this->setName('mail:process-job')
+        $this->setName(self::COMMAND_NAME)
             ->setDescription('Process job command')
         ;
     }
@@ -70,6 +77,8 @@ class ProcessJobCommand extends Command
         }
 
         $output->writeln('  * no batch to process');
+        
+        $this->healthChecker->ping(self::COMMAND_NAME);
 
         $output->writeln('');
         $output->writeln('Done');

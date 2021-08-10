@@ -64,6 +64,7 @@ services:
 
 	# shutdown hermes and mail worker through hermes_shutdown key in redis (override in local config with second string argument if you want to change key)
 	hermesShutdown: Tomaj\Hermes\Shutdown\PredisShutdown(@redisCache::client())
+	hermesWorkerWaitCallback: Remp\MailerModule\Commands\HermesWorkerWaitCallback
 	hermesRedisDriver:
 		class: Remp\MailerModule\Hermes\RedisDriver
 		setup:
@@ -130,6 +131,8 @@ services:
 	- Remp\MailerModule\Models\Job\BatchEmailGenerator(@mailProcessLogger)
 	- Remp\MailerModule\Models\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Models\Auth\AutoLogin
+	
+	- Remp\MailerModule\Models\HealthChecker(%redis.host%, %redis.port%, %redis.db%)
 
 	# API
 	- Tomaj\NetteApi\Link\ApiLink
@@ -209,9 +212,9 @@ services:
 	# Factories
 	- Remp\MailerModule\Components\DataTable\DataTableFactory
 	- Remp\MailerModule\Components\SendingStats\ISendingStatsFactory
-	- Remp\MailerModule\Components\MissingConfiguration\IMissingConfigurationFactory
 	- Remp\MailerModule\Components\GeneratorWidgets\IGeneratorWidgetsFactory
 	- Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory
+	- Remp\MailerModule\Components\ApplicationStatus\IApplicationStatusFactory
 
 	# Generator Widgets
 	- Remp\MailerModule\Components\GeneratorWidgets\GeneratorWidgetsManager

@@ -6,6 +6,10 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\UI\Presenter;
 use Nette\Http\Response;
 use Nette\Utils\FileSystem;
+use Remp\MailerModule\Commands\HermesWorkerCommand;
+use Remp\MailerModule\Commands\MailWorkerCommand;
+use Remp\MailerModule\Commands\ProcessJobCommand;
+use Remp\MailerModule\Models\HealthChecker;
 use Remp\MailerModule\Models\Job\MailCache;
 use Remp\MailerModule\Repositories\ConfigsRepository;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -13,7 +17,7 @@ use Tracy\Debugger;
 use Tracy\ILogger;
 
 /**
- * Healtg check presenter
+ * Health check presenter
  *
  * Behavior and response should be same or similar to health checks within REMP (package ukfast/laravel-health-check).
  */
@@ -28,15 +32,19 @@ final class HealthPresenter extends Presenter
 
     private $tempDir;
 
+    private HealthChecker $healthChecker;
+
     public function __construct(
         string $tempDir,
         ConfigsRepository $configsRepository,
-        MailCache $mailCache
+        MailCache $mailCache,
+        HealthChecker $healthChecker
     ) {
         parent::__construct();
         $this->configsRepository = $configsRepository;
         $this->mailCache = $mailCache;
         $this->tempDir = $tempDir;
+        $this->healthChecker = $healthChecker;
     }
 
     public function renderDefault(): void
@@ -46,23 +54,18 @@ final class HealthPresenter extends Presenter
         ];
 
         $result['database'] = $this->databaseCheck();
-        if ($result['database']['status'] === self::STATUS_PROBLEM) {
-            $result['status'] = self::STATUS_PROBLEM;
-        }
-
         $result['redis'] = $this->redisCheck();
-        if ($result['redis']['status'] === self::STATUS_PROBLEM) {
-            $result['status'] = self::STATUS_PROBLEM;
-        }
-
         $result['log'] = $this->logCheck();
-        if ($result['log']['status'] === self::STATUS_PROBLEM) {
-            $result['status'] = self::STATUS_PROBLEM;
-        }
-
         $result['storage'] = $this->storageCheck();
-        if ($result['storage']['status'] === self::STATUS_PROBLEM) {
-            $result['status'] = self::STATUS_PROBLEM;
+        $result['mail_worker'] = $this->mailWorkerCheck();
+        $result['hermes_worker'] = $this->hermesWorkerCheck();
+        $result['process_job_command'] = $this->processJobCommandCheck();
+        
+        foreach ($result as $key => $value) {
+            if ($key !== 'status' && $value['status'] === self::STATUS_PROBLEM) {
+                $result['status'] = self::STATUS_PROBLEM;
+                break;
+            }
         }
 
         // set correct response code and return results
@@ -117,6 +120,33 @@ final class HealthPresenter extends Presenter
             ];
         }
 
+        return $result;
+    }
+    
+    private function mailWorkerCheck(): array
+    {
+        $result['status'] = $this->healthChecker->isHealthy(MailWorkerCommand::COMMAND_NAME) ? self::STATUS_OK : self::STATUS_PROBLEM;
+        if (!$result['status']) {
+            $result['message'] = 'Mail worker command is not running';
+        }
+        return $result;
+    }
+
+    private function hermesWorkerCheck(): array
+    {
+        $result['status'] = $this->healthChecker->isHealthy(HermesWorkerCommand::COMMAND_NAME) ? self::STATUS_OK : self::STATUS_PROBLEM;
+        if (!$result['status']) {
+            $result['message'] = 'Hermes worker command is not running';
+        }
+        return $result;
+    }
+
+    private function processJobCommandCheck(): array
+    {
+        $result['status'] = $this->healthChecker->isHealthy(ProcessJobCommand::COMMAND_NAME) ? self::STATUS_OK : self::STATUS_PROBLEM;
+        if (!$result['status']) {
+            $result['message'] = 'Process Job command is not running';
+        }
         return $result;
     }
 
