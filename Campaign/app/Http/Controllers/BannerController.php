@@ -130,6 +130,7 @@ class BannerController extends Controller
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
+            'variables' => Variable::all()->pluck('value', 'name'),
         ]);
     }
 
