@@ -12,6 +12,8 @@ use Tomaj\Hermes\Handler\HandlerInterface;
 
 class HermesWorkerCommand extends Command
 {
+    public const COMMAND_NAME = "worker:hermes";
+    
     private $dispatcher;
 
     private $handlers = [];
@@ -33,7 +35,7 @@ class HermesWorkerCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('worker:hermes')
+        $this->setName(self::COMMAND_NAME)
             ->setDescription('Start hermes offline worker')
             ->addOption(
                 'types',

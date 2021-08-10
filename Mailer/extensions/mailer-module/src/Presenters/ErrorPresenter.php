@@ -4,22 +4,20 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Presenters;
 
 use Nette;
-use Nette\Application\IResponse;
 use Nette\Application\Responses;
-use Remp\MailerModule\Components\MissingConfiguration\IMissingConfigurationFactory;
-use Remp\MailerModule\Components\MissingConfiguration\MissingConfiguration;
+use Remp\MailerModule\Components\ApplicationStatus\ApplicationStatus;
+use Remp\MailerModule\Components\ApplicationStatus\IApplicationStatusFactory;
 use Tracy\Debugger;
-use Tracy\ILogger;
 
 class ErrorPresenter implements Nette\Application\IPresenter
 {
     use Nette\SmartObject;
 
-    private $missingConfigurationFactory;
+    private $applicationStatusFactory;
 
-    public function __construct(IMissingConfigurationFactory $missingConfigurationFactory)
+    public function __construct(IApplicationStatusFactory $applicationStatusFactory)
     {
-        $this->missingConfigurationFactory = $missingConfigurationFactory;
+        $this->applicationStatusFactory = $applicationStatusFactory;
     }
 
     public function run(Nette\Application\Request $request): Nette\Application\Response
@@ -37,8 +35,8 @@ class ErrorPresenter implements Nette\Application\IPresenter
         });
     }
 
-    public function createComponentMissingConfiguration(): MissingConfiguration
+    public function createComponentApplicationStatus(): ApplicationStatus
     {
-        return $this->missingConfigurationFactory->create();
+        return $this->applicationStatusFactory->create();
     }
 }

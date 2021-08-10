@@ -1,0 +1,58 @@
+<a class="application-status-widget" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+    {if $unconfiguredMailer}
+        <span style="color: red;">
+            <i class="zmdi zmdi-alert-triangle"></i>
+            Missing configuration    
+        </span>
+    {elseif $online}
+        <svg style="margin-right: 4px" viewBox="0 0 10 10" width="8" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50%" cy="50%" r="5"  fill="green" />
+        </svg>
+        System online
+    {else}
+        <svg style="margin-right: 4px" viewBox="0 0 10 10" width="8" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50%" cy="50%" r="5"  fill="gray" />
+        </svg>
+        System offline
+    {/if}
+</a>
+
+<style>
+    .missingSettingsLink:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="dropdown-menu" style=" padding: 12px; top: 60px; right: 0; z-index: 10000" aria-labelledby="dropdownMenuLink">
+    {if $unconfiguredMailer}
+        <div style="white-space: nowrap; padding-top: 2px; padding-bottom: 6px;">
+            <a  href="{$settingsLink}" class="missingSettingsLink" style="color: red">
+                <i class="zmdi zmdi-alert-triangle"></i>
+                Missing configuration keys for {$unconfiguredMailer}
+            </a>
+        </div>
+    {/if}
+    {foreach $onlineStatuses as $app => $appOnline}
+        <div style="white-space: nowrap; padding-top: 2px; padding-bottom: 2px">
+            {if $appOnline}
+                <svg style="margin-right: 4px" viewBox="0 0 10 10" width="8" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50%" cy="50%" r="5"  fill="green" />
+                </svg>
+            {else}
+                <svg style="margin-right: 4px" viewBox="0 0 10 10" width="8" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50%" cy="50%" r="5"  fill="gray" />
+                </svg>
+            {/if}
+            <strong>{$app} </strong>
+            {if $appOnline}
+                is running.
+            {else}
+                is not running.
+            {/if}
+        </div>
+        
+    {/foreach}
+</div>
+
+
+

@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\UI\Presenter;
-use Remp\MailerModule\Components\MissingConfiguration\IMissingConfigurationFactory;
-use Remp\MailerModule\Components\MissingConfiguration\MissingConfiguration;
+use Remp\MailerModule\Components\ApplicationStatus\ApplicationStatus;
+use Remp\MailerModule\Components\ApplicationStatus\IApplicationStatusFactory;
 use Remp\MailerModule\Models\EnvironmentConfig;
 use Remp\MailerModule\Forms\IFormFactory;
 
@@ -14,9 +14,9 @@ abstract class BasePresenter extends Presenter
     /** @var EnvironmentConfig @inject */
     public $environmentConfig;
 
-    /** @var IMissingConfigurationFactory @inject */
-    public $missingConfigurationFactory;
-
+    /** @var IApplicationStatusFactory @inject */
+    public $applicationStatusFactory;
+    
     public function startup(): void
     {
         parent::startup();
@@ -47,8 +47,8 @@ abstract class BasePresenter extends Presenter
         }
     }
 
-    public function createComponentMissingConfiguration(): MissingConfiguration
+    public function createComponentApplicationStatus(): ApplicationStatus
     {
-        return $this->missingConfigurationFactory->create();
+        return $this->applicationStatusFactory->create();
     }
 }

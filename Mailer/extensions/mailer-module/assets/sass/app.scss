@@ -29,10 +29,9 @@ $white: White;
   border-color: #f00;
 }
 
-.missing-configuration-widget,
-.missing-configuration-widget:hover {
+.application-status-widget {
   display: inline-block;
-  color: red;
+  color: #333;
   height: 60px;
   line-height: 35px;
 }

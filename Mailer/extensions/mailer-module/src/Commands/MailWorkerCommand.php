@@ -9,6 +9,7 @@ use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
+use Remp\MailerModule\Models\HealthChecker;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Events\MailSentEvent;
 use Remp\MailerModule\Models\Job\MailCache;
@@ -29,6 +30,8 @@ use Tracy\ILogger;
 
 class MailWorkerCommand extends Command
 {
+    public const COMMAND_NAME = "worker:mail";
+    
     const MESSAGES_PER_BATCH = 200;
 
     private $applicationMailer;
@@ -59,6 +62,8 @@ class MailWorkerCommand extends Command
     /** @var DateTime */
     private $startTime;
 
+    private HealthChecker $healthChecker;
+
     public function __construct(
         LoggerInterface $logger,
         Sender $applicationMailer,
@@ -68,7 +73,8 @@ class MailWorkerCommand extends Command
         TemplatesRepository $mailTemplatesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         MailCache $redis,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher,
+        HealthChecker $healthChecker
     ) {
         parent::__construct();
         $this->applicationMailer = $applicationMailer;
@@ -80,6 +86,7 @@ class MailWorkerCommand extends Command
         $this->mailCache = $redis;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
+        $this->healthChecker = $healthChecker;
     }
 
     /**
@@ -94,7 +101,7 @@ class MailWorkerCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('worker:mail')
+        $this->setName(self::COMMAND_NAME)
             ->setDescription('Start worker sending mails')
             ->addOption(
                 'batch',
@@ -127,6 +134,8 @@ class MailWorkerCommand extends Command
                 $this->logger->info($msg);
                 return 0;
             }
+
+            $this->healthChecker->ping(self::COMMAND_NAME);
 
             $batch = $this->mailJobBatchRepository->getBatchToSend();
             if (!$batch) {

@@ -33,12 +33,18 @@ class RedisDriver implements DriverInterface
 
     /** @var array<int, string>  */
     private $queues = [];
+    
+    private ?RedisDriverWaitCallbackInterface $redisDriverWaitCallback;
 
-    public function __construct(HermesTasksRepository $tasksRepository, HermesTasksQueue $tasksQueue)
-    {
+    public function __construct(
+        HermesTasksRepository $tasksRepository,
+        HermesTasksQueue $tasksQueue,
+        ?RedisDriverWaitCallbackInterface $redisDriverWaitCallback = null
+    ) {
         $this->tasksRepository = $tasksRepository;
         $this->tasksQueue = $tasksQueue;
         $this->serializer = new MessageSerializer();
+        $this->redisDriverWaitCallback = $redisDriverWaitCallback;
     }
 
     public function setupPriorityQueue(string $name, int $priority): void
@@ -126,6 +132,10 @@ class RedisDriver implements DriverInterface
                 }
                 $this->incrementProcessedItems();
                 break;
+            }
+            
+            if ($this->redisDriverWaitCallback) {
+                $this->redisDriverWaitCallback->call();
             }
 
             if ($message === null) {
