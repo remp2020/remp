@@ -256,7 +256,7 @@ final class JobPresenter extends BasePresenter
                     ->related('mail_user_subscriptions')
                     ->where([
                         'rtm_campaign' => $mjbt->mail_template->code,
-                        'rtm_content' => $mjbt->mail_job_batch_id,
+                        'rtm_content' => (string) $mjbt->mail_job_batch_id,
                         'subscribed' => false,
                     ])
                     ->count('*');
