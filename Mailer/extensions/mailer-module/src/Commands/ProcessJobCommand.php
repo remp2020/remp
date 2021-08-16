@@ -51,6 +51,8 @@ class ProcessJobCommand extends Command
 
         while ($batch = $this->batchesRepository->getBatchReady()) {
             try {
+                $this->healthChecker->ping(self::COMMAND_NAME, 600);
+
                 $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_PROCESSING);
                 $output->writeln("  * processing mail batch <info>#{$batch->id}</info>");
 
