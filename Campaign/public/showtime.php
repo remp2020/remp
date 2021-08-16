@@ -343,6 +343,20 @@ try {
 } catch (\Exception $e) {
     $logger->warning('unable to register airbrake notifier: ' . $e->getMessage());
 }
+try {
+    $sentryDSN = env('SENTRY_DSN');
+    if (!empty($sentryDSN)) {
+        $client = \Sentry\ClientBuilder::create([
+            'dsn' => $sentryDSN,
+            'environment' => env('APP_ENV', 'production'),
+            'send_default_pii' => true, // enabled to see same details as with laravel sentry
+        ])->getClient();
+        $handler = new \Sentry\Monolog\Handler(new \Sentry\State\Hub($client));
+        $logger->pushHandler($handler);
+    }
+} catch (\Exception $e) {
+    $logger->warning('unable to register sentry notifier: ' . $e->getMessage());
+}
 
 $showtimeResponse = new PlainPhpShowtimeResponse();
 $data = filter_input(INPUT_GET, 'data');
