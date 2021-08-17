@@ -658,12 +658,19 @@ class Tracker {
             };
         }
 
+        let canonicalUrl = null;
+        let canonicalSelector = document.querySelector("link[rel='canonical']");
+        if (canonicalSelector) {
+            canonicalUrl = canonicalSelector.href;
+        }
+
         params["user"] = {
             "id": remplib.getUserId(),
             "browser_id": remplib.getBrowserId(),
             "subscriber": remplib.isUserSubscriber(),
             "subscription_ids": remplib.getSubscriptionIds(),
             "url": window.location.href,
+            "canonical_url": canonicalUrl,
             "referer": document.referrer,
             "user_agent": window.navigator.userAgent,
             "adblock": remplib.usingAdblock,

@@ -14,7 +14,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed broken `ArticleSeeder` and `EntitySeeder`.
 - Fixed possibility of an error on the articles grids if filter matched too many articles. remp/remp#977
 - Added `SameSite=Lax` attribute to all cookies set by `remplib.js`. Missing attribute could possibly lead to issues on Safari, which doesn't defaults to `Lax` like other browsers. remp/remp#957
-- [[Tracker]] Added option to limit tracked time spent for one pageview. Set tracker's ENV variable `TRACKER_TIMESPENT_LIMIT` to desired pageview tracking threshold (in seconds). Helps to filter out tracking of articles opened for too long _(forgotten browser window on different workspace/monitor acts as active in some browsers)_. remp/remp#242
+- [Tracker] Added option to limit tracked time spent for one pageview. Set tracker's ENV variable `TRACKER_TIMESPENT_LIMIT` to desired pageview tracking threshold (in seconds). Helps to filter out tracking of articles opened for too long _(forgotten browser window on different workspace/monitor acts as active in some browsers)_. remp/remp#242
+- [Tracker] Added support for canonical URL tracking to complement full URL tracking. If it's not found in the HTML, no canonical URL is stored and only regular URL is tracked. remp/remp#988
 
 ### [Campaign]
 

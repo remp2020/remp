@@ -53,6 +53,7 @@ type Pageview struct {
 	IP              string    `json:"ip"`
 	UserID          string    `json:"user_id"`
 	URL             string    `json:"url"`
+	CanonicalURL    string    `json:"canonical_url"`
 	UserAgent       string    `json:"user_agent"`
 	BrowserID       string    `json:"browser_id"`
 	SessionID       string    `json:"remp_session_id"`

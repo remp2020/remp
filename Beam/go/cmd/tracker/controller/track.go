@@ -324,6 +324,9 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 		if user.URL != nil {
 			fields["url"] = *user.URL
 		}
+		if user.CanonicalURL != nil {
+			fields["canonical_url"] = *user.CanonicalURL
+		}
 		if user.UserAgent != nil {
 			fields["user_agent"] = *user.UserAgent
 
