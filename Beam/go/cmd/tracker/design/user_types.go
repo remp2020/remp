@@ -13,6 +13,9 @@ var User = Type("User", func() {
 	Attribute("url", String, "URL of the content/conversion point", func() {
 		Format("uri")
 	})
+	Attribute("canonical_url", String, "Canonical URL of the content/conversion point. If not provided, value of url attribute is used.", func() {
+		Format("uri")
+	})
 	Attribute("adblock", Boolean, "Flag whether user has adblock enabled")
 	Attribute("window_height", Number, "Height of the users browser window")
 	Attribute("window_width", Number, "Width of the users browser window")

@@ -398,6 +398,9 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("url", String, "URL of the content/conversion point", func() {
 			Format("uri")
 		})
+		Attribute("canonical_url", String, "Canonical URL of the content/conversion point", func() {
+			Format("uri")
+		})
 		Attribute("user_agent", String, "User agent of client")
 		Attribute("ip_address", String, "IP address of client", func() {
 			Format("ip")
@@ -416,6 +419,7 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("subscriber")
 		Attribute("browser_id")
 		Attribute("url")
+		Attribute("canonical_url")
 		Attribute("user_agent")
 		Attribute("ip_address")
 		Attribute("source")

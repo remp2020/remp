@@ -521,6 +521,9 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 	if p.URL != "" {
 		pageview.User.URL = &p.URL
 	}
+	if p.CanonicalURL != "" {
+		pageview.User.CanonicalURL = &p.CanonicalURL
+	}
 	if p.Referer != "" {
 		pageview.User.Referer = &p.Referer
 	}
