@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'enabled' => env('AIRBRAKE_ENABLED', env('APP_ENV') !== 'local'),
+    'enabled' => env('AIRBRAKE_ENABLED', false),
 
     'projectKey'    => env('AIRBRAKE_API_KEY', ''),
     'host'          => env('AIRBRAKE_API_HOST', 'api.airbrake.io'),

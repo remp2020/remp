@@ -321,7 +321,7 @@ $dotenv->load();
 
 $logger = new Logger('showtime');
 try {
-    $enabledAirbrake = env('AIRBRAKE_ENABLED', env('APP_ENV') !== 'local');
+    $enabledAirbrake = env('AIRBRAKE_ENABLED', false);
     if ($enabledAirbrake) {
         $airbrake = new \Airbrake\Notifier([
             'enabled' => true,
