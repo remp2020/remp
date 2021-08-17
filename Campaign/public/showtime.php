@@ -11,6 +11,7 @@ use App\Http\Showtime\Showtime;
 use App\Http\Showtime\ShowtimeResponse;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -320,6 +321,11 @@ $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 $logger = new Logger('showtime');
+$streamHandler = new \Monolog\Handler\StreamHandler(__DIR__ . '/../storage/logs/laravel.log');
+$formatter = $streamHandler->getFormatter();
+$formatter->setDateFormat('Y-m-d H:i:s');
+$streamHandler->setFormatter($formatter);
+$logger->pushHandler($streamHandler);
 try {
     $enabledAirbrake = env('AIRBRAKE_ENABLED', false);
     if ($enabledAirbrake) {
@@ -332,7 +338,7 @@ try {
         ]);
 
         $logHandler = new MonologHandler($airbrake, Logger::WARNING);
-        $logger->setHandlers([$logHandler]);
+        $logger->pushHandler($logHandler);
     }
 } catch (\Exception $e) {
     $logger->warning('unable to register airbrake notifier: ' . $e->getMessage());
@@ -349,26 +355,31 @@ if ($data === null || $callback === null) {
 
 header('Content-Type: application/javascript');
 
-// dependencies initialization
-$redis = new \Predis\Client([
-    'scheme' => 'tcp',
-    'host'   => env('REDIS_HOST'),
-    'port'   => env('REDIS_PORT') ?: 6379,
-    'password' => env('REDIS_PASSWORD') ?: null,
-    'database' => env('REDIS_DEFAULT_DATABASE') ?: 0,
-], [
-    'prefix' => env('REDIS_PREFIX') ?: '',
-]);
+try {
+    // dependencies initialization
+    $redis = new \Predis\Client([
+        'scheme' => 'tcp',
+        'host'   => env('REDIS_HOST'),
+        'port'   => env('REDIS_PORT') ?: 6379,
+        'password' => env('REDIS_PASSWORD') ?: null,
+        'database' => env('REDIS_DEFAULT_DATABASE') ?: 0,
+    ], [
+        'prefix' => env('REDIS_PREFIX') ?: '',
+    ]);
 
-$segmentAggregator = SegmentAggregator::unserializeFromRedis($redis);
-if (!$segmentAggregator) {
-    $logger->error("unable to get cached segment aggregator, have you run 'campaigns:refresh-cache' command?");
-    $showtimeResponse->error($callback, 500, ['Internal error, application might not have been correctly initialized.']);
+    $segmentAggregator = SegmentAggregator::unserializeFromRedis($redis);
+    if (!$segmentAggregator) {
+        $logger->error("unable to get cached segment aggregator, have you run 'campaigns:refresh-cache' command?");
+        $showtimeResponse->error($callback, 500, ['Internal error, application might not have been correctly initialized.']);
+    }
+
+    $deviceDetector = new LazyDeviceDetector($redis);
+    $maxmindDbPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . env('MAXMIND_DATABASE');
+    $geoReader = new LazyGeoReader($maxmindDbPath);
+
+    $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $deviceDetector, $logger);
+    $showtime->showtime($data, $callback, $showtimeResponse);
+} catch (\Exception $exception) {
+    $logger->error($exception);
+    $showtimeResponse->error($callback, 500, ['Internal error, unable to display campaigns.']);
 }
-
-$deviceDetector = new LazyDeviceDetector($redis);
-$maxmindDbPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . env('MAXMIND_DATABASE');
-$geoReader = new LazyGeoReader($maxmindDbPath);
-
-$showtime = new Showtime($redis, $segmentAggregator, $geoReader, $deviceDetector, $logger);
-$showtime->showtime($data, $callback, $showtimeResponse);
