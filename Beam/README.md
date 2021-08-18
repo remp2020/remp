@@ -1957,6 +1957,7 @@ var rempConfig = {
         author_id: String, // optional, name of the author
         category: String, // optional, category/section of the article
         locked: Boolean, // optional, flag whether content was locked at the time of visit for this pageview
+        contentType: String, // optional, type of the content, 'article' if not specified or 'feed'
         tags: [String, String, String], // optional, any tags associated with the article
         elementFn: Function // callback returning DOM element containing article content
     },

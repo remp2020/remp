@@ -36,6 +36,7 @@ type Pageview struct {
 	TitleVariant  string `json:"title_variant"`
 	ImageVariant  string `json:"image_variant"`
 	AuthorID      string `json:"author_id"`
+	ContentType   string `json:"content_type"`
 
 	RtmSource   string `json:"rtm_source"`
 	RtmCampaign string `json:"rtm_campaign"`
