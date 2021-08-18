@@ -474,6 +474,9 @@ func (p *Pageview) ToMediaType() (*app.Pageview, error) {
 		if p.AuthorID != "" {
 			pageview.Article.AuthorID = &p.AuthorID
 		}
+		if p.ContentType != "" {
+			pageview.Article.ContentType = &p.ContentType
+		}
 	}
 
 	// user data

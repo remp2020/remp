@@ -229,7 +229,6 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	}
 
 	if ctx.Payload.Article != nil {
-		fields[model.FlagArticle] = true
 		at, av := articleValues(ctx.Payload.Article)
 		for key, tag := range at {
 			tags[key] = tag
@@ -310,6 +309,14 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 	if article.Tags != nil {
 		values["tags"] = strings.Join(article.Tags, ",")
 	}
+
+	if article.ContentType != nil {
+		values["content_type"] = *article.ContentType
+	} else {
+		values["content_type"] = "article"
+	}
+	values[model.FlagArticle] = values["content_type"] == "article"
+
 	return tags, values
 }
 

@@ -177,6 +177,7 @@ class Tracker {
             this.article = {
                 id: article.id,
                 author_id: null,
+                content_type: null,
                 category: null,
                 locked: null,
                 tags: [],
@@ -189,6 +190,9 @@ class Tracker {
             }
             if (typeof article.author_id !== 'undefined') {
                 this.article.author_id = article.author_id;
+            }
+            if (typeof article.contentType !== 'undefined') {
+                this.article.content_type = article.contentType;
             }
             if (typeof article.category !== 'undefined') {
                 this.article.category = article.category;

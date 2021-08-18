@@ -96,6 +96,7 @@ var Article = Type("Article", func() {
 	Attribute("category", String, "Page category (homepage, world news...")
 	Attribute("tags", ArrayOf(String), "List of tags (breaking news, trump...")
 	Attribute("author_id", String, "ID of author")
+	Attribute("content_type", String, "Content type, e.g. 'article' (by default)")
 	Attribute("locked", Boolean, "Flag whether content was locked for the visitor")
 	Attribute("variants", HashOf(String, String), "Hash of key-value pairs bearing A/B test variant information (what's A/B-tested / variant label)")
 

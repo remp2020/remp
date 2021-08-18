@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- *remplib.js* - added option to track article's `contentType` when tracking pageviews. remp/remp#988
+    - **Breaking**: Derived parameter `is_article` in Elastic storage is set to `true` only if value of `contentType` is set to `'article'`. Previously, all tracked articles had `is_article` value set to `true`- this may affect Beam segments that worked with `article: true` rule or users processing `is_article` parameter in raw Elastic data.   
 - Refactored beam `CompressAggregations` command to run in chunks because of colliding database transactions with `AggregatePageviewLoadJob` command, which caused deadlock. remp/remp#944
 - Added `content_type` filter to the `api/articles/unread` API to exclude unwanted content types. remp/remp#973
 - Added support for remplib.js reinitialization, necessary for correct execution in single-page apps. See [README](./Beam/README.md#single-page-applications) for more information. remp/remp#968
