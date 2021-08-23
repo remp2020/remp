@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `rtmSource` to campaign's custom JS params, so clients can correctly track events without hardcoding the `rtmSource` to some arbitrary value.
 - Added support for global campaign/banner variables. See [README](./Campaign/README.md#variables) for more information. remp/remp#972 
 - Fixed missing `variables` template param in `BannerController->copy` method. remp/remp#991
+- Fixed inefficient querying of campaign active status on campaign listing. remp/remp#1000
 
 ### [Mailer]
 

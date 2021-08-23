@@ -31,6 +31,8 @@ class Campaign extends Model implements Searchable
     const URL_FILTER_ONLY_AT = 'only_at';
     const URL_FILTER_EXCEPT_AT = 'except_at';
 
+    private static $activeCache;
+
     protected $fillable = [
         'name',
         'signed_in',
@@ -88,10 +90,17 @@ class Campaign extends Model implements Searchable
      */
     public function getActiveAttribute()
     {
-        if ($this->schedules()->runningOrPlanned()->count()) {
-            return true;
+        if (!self::$activeCache) {
+            self::$activeCache = Schedule::runningOrPlanned()
+                ->groupBy('campaign_id')
+                ->selectRaw('COUNT(*) as count, campaign_id')
+                ->get()
+                ->mapWithKeys(function ($row) {
+                    return [$row->campaign_id => $row->count];
+                });
         }
-        return false;
+
+        return self::$activeCache->get($this->id, 0) > 0;
     }
 
     /**
@@ -236,6 +245,9 @@ class Campaign extends Model implements Searchable
 
     public function cache()
     {
+        // dump active cache when we something important changed
+        self::$activeCache = null;
+
         self::refreshActiveCampaignsCache();
 
         $campaign = $this->where(['id' => $this->id])->with([
