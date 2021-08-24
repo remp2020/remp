@@ -130,6 +130,49 @@ class ShowtimeTest extends TestCase
         return json_decode(json_encode($d));
     }
 
+    public function testPageviewAttributesFilter()
+    {
+        $this->scheduleCampaign();
+        $userData = $this->getUserData();
+
+        $activeCampaignUuids = [];
+        $userData->pageviewAttributes = [];
+        $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids);
+        $this->assertNotNull($bannerVariant);
+
+        $this->campaign->update([
+            'pageview_attributes' => [
+                [
+                    'name' => 'test_attr',
+                    'operator' => '=',
+                    'value' => 'test_attr_value'
+                ],
+                [
+                    'name' => 'test_array_attr',
+                    'operator' => '=',
+                    'value' => 'test_array_attr_value1',
+                ],
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids);
+        $this->assertNull($bannerVariant);
+
+        $userData->pageviewAttributes = json_decode(json_encode([
+            'test_attr' => 'test_attr_value',
+            'test_array_attr' => [
+                'test_array_attr_value1',
+                'test_array_attr_value2'
+            ],
+        ]), false);
+
+        $activeCampaignUuids = [];
+        $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids);
+        $this->assertNotNull($bannerVariant);
+        $this->assertNotEmpty($activeCampaignUuids);
+    }
+
     public function testStoppedCampaign()
     {
         $activeCampaignUuids = [];

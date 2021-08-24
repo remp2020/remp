@@ -422,6 +422,29 @@ class Showtime
             }
         }
 
+        // pageview attributes - check if sent pageview attributes match conditions
+        if (!empty($campaign->pageview_attributes)) {
+            if (empty($userData->pageviewAttributes)) {
+                return null;
+            }
+
+            foreach ($campaign->pageview_attributes as $attribute) {
+                $attrName = $attribute['name'];
+                $attrValue = $attribute['value'];
+
+                if (!property_exists($userData->pageviewAttributes, $attrName)) {
+                    return null;
+                }
+                if (is_array($userData->pageviewAttributes->{$attrName})) {
+                    if (!in_array($attrValue, $userData->pageviewAttributes->{$attrName})) {
+                        return null;
+                    }
+                } elseif ($userData->pageviewAttributes->{$attrName} !== $attrValue) {
+                    return null;
+                }
+            }
+        }
+
         // seen count rules
         if ($seenCampaign !== null && $campaign->pageview_rules !== null) {
             $seenCount = $seenCampaign->seen ?? null;

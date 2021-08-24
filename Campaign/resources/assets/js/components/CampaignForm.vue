@@ -162,6 +162,29 @@
                     </div><!-- .panel (user state) -->
 
                     <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingPageviewAttributes">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapsePageviewAttributes" aria-expanded="false" aria-controls="collapsePageviewAttributes" :class="{ green: highlightPageviewAttributesCollapse }">
+                                    Pageview attributes
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapsePageviewAttributes" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingUserProperties">
+                            <div class="panel-body p-l-10 p-r-20">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <pageview-attributes
+                                            :pageviewAttributes="pageviewAttributes"
+                                            @pageviewAttributesModified="updatePageviewAttributes"
+                                        ></pageview-attributes>
+                                    </div>
+                                </div>
+
+                            </div><!-- .panel-body -->
+                        </div>
+                    </div><!-- .panel (pageview attributes) -->
+
+                    <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingInclusiveSegments">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseInclusiveSegments" aria-expanded="false" aria-controls="collapseInclusiveSegments" :class="{ green: highlightSegmentsCollapse }">
@@ -531,6 +554,7 @@
     import FormValidator from "@remp/js-commons/js/components/FormValidator";
     import AbTesting from "./AbTesting";
     import UrlRules from "./UrlRules";
+    import PageviewAttributes from "./PageviewAttributes";
 
     let props = [
         "_name",
@@ -562,6 +586,7 @@
         "_eventTypes",
         "_availableCountries",
         "_countriesBlacklistOptions",
+        "_pageviewAttributes",
 
         "_activationMode",
         "_action"
@@ -572,7 +597,8 @@
             AbTesting,
             FormValidator,
             PageviewRules,
-            UrlRules
+            UrlRules,
+            PageviewAttributes
         },
         created: function(){
             let self = this;
@@ -647,6 +673,7 @@
                 "pageviewRules": {},
                 "availableCountries": null,
                 "countriesBlacklistOptions": null,
+                "pageviewAttributes": [],
 
                 "startTime": null,
                 "endTime": null,
@@ -727,6 +754,9 @@
             },
             highlightABTestingCollapse: function () {
                 return (this.variants.length > 2);
+            },
+            highlightPageviewAttributesCollapse: function () {
+                return (this.pageviewAttributes.length > 0);
             }
         },
         methods: {
@@ -787,6 +817,9 @@
             updatePageviewRules: function (pageviewRules) {
                 this.pageviewRules = pageviewRules.rules;
                 this.oncePerSession = pageviewRules.oncePerSession;
+            },
+            updatePageviewAttributes: function (pageviewAttributes) {
+                this.pageviewAttributes = pageviewAttributes;
             },
         },
         watch: {
