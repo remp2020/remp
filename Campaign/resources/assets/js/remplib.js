@@ -14,6 +14,8 @@ class Campaign {
 
     variables = {};
 
+    pageviewAttributes = {};
+
     campaignsStorageKey = "campaigns";
 
     campaignsSessionStorageKey = "campaigns_session";
@@ -43,9 +45,9 @@ class Campaign {
                 "campaignsSession": remplib.campaign.getCampaignsSessionsForShowtime(),
                 "cache": JSON.parse(localStorage.getItem(remplib.segmentProviderCacheKey)),
                 "userAgent": window.navigator.userAgent,
-                "usingAdblock": remplib.usingAdblock
+                "usingAdblock": remplib.usingAdblock,
+                "pageviewAttributes": remplib.campaign.pageviewAttributes,
             }
-
         },
         processResponse: function(result) {
             if (!result["success"]) {
@@ -68,7 +70,7 @@ class Campaign {
                         try {
                             fn(resolve);
                         } catch (u) {
-                            console.error("remplib: campaign showtime error:", u)
+                            console.error("remplib: campaign showtime error:", u);
                             reject("campaign showtime error: " + u)
                         }
                     }, 500)
@@ -113,6 +115,16 @@ class Campaign {
         remplib.init(config);
 
         this.url = config.campaign.url;
+
+        for (let pageviewAttribute in config.campaign.pageviewAttributes) {
+            if (config.campaign.pageviewAttributes.hasOwnProperty(pageviewAttribute)) {
+                let pageviewAttributeValue = config.campaign.pageviewAttributes[pageviewAttribute];
+                if (typeof pageviewAttribute !== 'string' && !isArray(pageviewAttributeValue)) {
+                    throw "remplib: configuration campaign.pageviewAttributes invalid (supports only strings and array of strings)" + param
+                }
+            }
+        }
+        this.pageviewAttributes = config.campaign.pageviewAttributes;
 
         for (let param in config.campaign.bannerUrlParams) {
             if (config.campaign.bannerUrlParams.hasOwnProperty(param) && typeof (config.campaign.bannerUrlParams[param]) !== "function") {

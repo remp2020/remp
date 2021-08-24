@@ -186,6 +186,22 @@ var rempConfig = {
                     return "foo@example.com"
                 }
             },
+        },
+        
+        // Optional. Pageview attributes are used to provide to Campaign additional information about the pageview.
+        // You can configure your campaigns to be displayed based on these attributes - see "Pageview attributes"
+        // section when editing the campaign.
+        //
+        // The value can be:
+        //   - string: Campaign is displayed when the string matches configured value for given attribute name.
+        //   - array of strings: Campaign is displayed, when one of the provided strings matches the configured value.
+        //
+        // Any other kind of value is ignored and triggers JS console warning.
+        //
+        // All of provided attributes which are not configured in the campaign are ignored during processing.
+        pageviewAttributes: {
+            "attribute_1": "value_1",
+            "attribute_2": ["value_1", "value_2"]
         }
     }
     

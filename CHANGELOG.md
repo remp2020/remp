@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for global campaign/banner variables. See [README](./Campaign/README.md#variables) for more information. remp/remp#972 
 - Fixed missing `variables` template param in `BannerController->copy` method. remp/remp#991
 - Fixed inefficient querying of campaign active status on campaign listing. remp/remp#1000
+- Added support for pageview attributes to showtime request and added ui for configuring pageview attributes to campaign form. See [README](./Campaign/README.md#javascript-snippet) for more information. remp/remp#986
 
 ### [Mailer]
 
