@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- **BREAKING**: Removed auto-enabling of AIRBRAKE error logging in case `AIRBRAKE_ENABLED` is missing. remp/remp#994
 - *remplib.js* - added option to track article's `contentType` when tracking pageviews. remp/remp#988
     - **Breaking**: Derived parameter `is_article` in Elastic storage is set to `true` only if value of `contentType` is set to `'article'`. Previously, all tracked articles had `is_article` value set to `true`- this may affect Beam segments that worked with `article: true` rule or users processing `is_article` parameter in raw Elastic data.   
 - Refactored beam `CompressAggregations` command to run in chunks because of colliding database transactions with `AggregatePageviewLoadJob` command, which caused deadlock. remp/remp#944
@@ -21,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
+- **BREAKING**: Removed auto-enabling of AIRBRAKE error logging in case `AIRBRAKE_ENABLED` is missing. remp/remp#994
 - Fixed caching of Newsletter rectangle banner, which broke after the recent framework updates and caused configuration not to be available at the time of banner rendering. remp/remp#959
 - Changed default stats view to include 30 days of data instead of 2 to allow bigger picture in campaign evaluation by default. remp/remp#969 
 - Added support for remplib.js reinitialization, necessary for correct execution in single-page apps. See [README](./Campaign/README.md#single-page-applications) for more information. remp/remp#968
@@ -57,6 +59,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed job unsubscribe stats inconsistency. remp/remp#993
   - Job detail (left panel) could display unsubscribes for non-related newsletter lists unsubscribed along with the sent newsletter.
 - Added `ApplicationStatus` component, displaying online/offline status of Mailer workers. As follow up, `MissingConfiguration` component was removed and its functionality was merged into `ApplicationStatus` component. remp/remp#985
+
+### [Sso]
+
+- **BREAKING**: Removed auto-enabling of AIRBRAKE error logging in case `AIRBRAKE_ENABLED` is missing. remp/remp#994
 
 ## [0.27.1] - 2021-07-08
 
