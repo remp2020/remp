@@ -82,7 +82,16 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 59) {
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 64) {
+            $defaults = [
+                'name' => 'Školský newsfilter ' . date('j.n.Y'),
+                'code' => 'nwsf_skolsky_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 46, // Školský newsfilter
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 59) {
             $defaults = [
                 'name' => 'Súhrn dňa letnej olympiády ' . date('j.n.Y'),
                 'code' => 'nwsf_let_olympiada_' . date('dmY'),
