@@ -33,6 +33,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed missing `variables` template param in `BannerController->copy` method. remp/remp#991
 - Fixed inefficient querying of campaign active status on campaign listing. remp/remp#1000
 - Added support for pageview attributes to showtime request and added ui for configuring pageview attributes to campaign form. See [README](./Campaign/README.md#javascript-snippet) for more information. remp/remp#986
+- Added error logging from showtime experiment `showtime.php` into `laravel.log`. remp/remp#994
+- Added support for Sentry error logging from showtime experiment `showtime.php`. remp/remp#994
 
 ### [Mailer]
 
