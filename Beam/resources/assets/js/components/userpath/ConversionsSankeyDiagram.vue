@@ -205,8 +205,34 @@
                             : color(d.target.name))
                     .attr("stroke-width", d => Math.max(1, d.width));
 
-                link.append("title")
-                    .text(d => `${d.source.name} → ${d.target.name}\n${format(d.value)}`);
+                let tooltip = d3.select(container)
+                    .append("div")
+                    .style("opacity", 0)
+                    .attr("class", "tooltip")
+                    .style("background-color", "white")
+                    .style("border", "solid")
+                    .style("border-width", "2px")
+                    .style("border-radius", "5px")
+                    .style("padding", "5px");
+
+                let mouseover = function (d) {
+                    tooltip.style("opacity", 1);
+                };
+
+                let mousemove = function (d) {
+                    tooltip
+                        .html(`${d.source.name} -> ${d.target.name}\n${format(d.value)}`)
+                        .style("left", (d3.mouse(this)[0] + 30) + "px")
+                        .style("top", (d3.mouse(this)[1]) + "px");
+                };
+
+                let mouseleave = function (d) {
+                    tooltip.style("opacity", 0);
+                };
+
+                link.on("mouseover", mouseover)
+                    .on("mousemove", mousemove)
+                    .on("mouseleave", mouseleave);
 
                 svg.append("g")
                     .selectAll("text")
