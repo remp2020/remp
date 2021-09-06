@@ -51,6 +51,9 @@ class ElasticDataRetention extends Command
             $targetIndices,
             $this->input->getOption('date')
         ));
+        
+        // Return status 404 in case wildcard match doesn't find an index to delete
+        $targetIndices .= '?allow_no_indices=false';
 
         $options = [];
         if ($this->input->getOption('auth')) {
@@ -70,8 +73,12 @@ class ElasticDataRetention extends Command
         try {
             $client->delete($targetIndices, $options);
         } catch (ClientException $e) {
-            //$body = json_decode($e->getResponse()->getBody());
-            //dump($body);
+            $body = json_decode($e->getResponse()->getBody());
+            if ($e->getCode() === 404 && $body->error->type ?? '' === 'index_not_found_exception') {
+                $this->line('  * No index to delete.');
+                return 0;
+            }
+             
             $this->line("<error>ERROR</error> Client exception: " . $e->getMessage());
             return 2;
         }

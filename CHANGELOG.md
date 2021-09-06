@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Tracker] Added support for canonical URL tracking to complement full URL tracking. If it's not found in the HTML, no canonical URL is stored and only regular URL is tracked. remp/remp#988
 - Added tooltip to the user path chart. remp/remp#551
 - Updated Docker Telegraf configuration to include `canonical_url` in the concurrents data. This will be necessary in the future to correctly display non-article traffic on the main dashboard. remp/remp#472
+- Changed output of `service:elastic-data-retention` Beam command to correctly reflect if index was deleted or not. remp/remp#940
 
 ### [Campaign]
 
