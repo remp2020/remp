@@ -237,6 +237,7 @@ func (sDB *SegmentDB) Get(code string) (*Segment, bool, error) {
 	FROM segments
 	JOIN segment_groups ON segments.segment_group_id = segment_groups.id
 	WHERE segments.code = ?
+	AND segments.active = 1
 	`, code)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -269,6 +270,7 @@ func (sDB *SegmentDB) GetByID(id int) (*Segment, bool, error) {
 	FROM segments
 	JOIN segment_groups ON segments.segment_group_id = segment_groups.id
 	WHERE segments.id = ?
+	AND segments.active = 1
 	`, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -295,7 +297,8 @@ func (sDB *SegmentDB) List() (SegmentCollection, error) {
 		"segment_groups.code AS 'segment_group.code', "+
 		"segment_groups.type AS 'segment_group.type', "+
 		"segment_groups.sorting AS 'segment_group.sorting' "+
-		"FROM segments JOIN segment_groups ON segments.segment_group_id = segment_groups.id")
+		"FROM segments JOIN segment_groups ON segments.segment_group_id = segment_groups.id "+
+		"WHERE segments.active = 1")
 	if err != nil {
 		return nil, err
 	}
