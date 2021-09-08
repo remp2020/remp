@@ -22,6 +22,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added tooltip to the user path chart. remp/remp#551
 - Updated Docker Telegraf configuration to include `canonical_url` in the concurrents data. This will be necessary in the future to correctly display non-article traffic on the main dashboard. remp/remp#472
 - Changed output of `service:elastic-data-retention` Beam command to correctly reflect if index was deleted or not. remp/remp#940
+- [Segments] Fixed ignoring of segment's `active` flag in user/browser segment presence API check. remp/remp#1007
+  - The bug caused that it was possible to check presence of users/browsers in segments even if the segment was not active.
 
 ### [Campaign]
 
