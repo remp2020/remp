@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+        xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
         backupGlobals="false"
         backupStaticAttributes="false"
         bootstrap="bootstrap/autoload.php"
@@ -28,6 +28,7 @@
   </testsuites>
     
   <php>
+    <env name="APP_KEY" value="base64:9jq4gfZZ/gJXsp2h2q325ZJwHf58QPrnaJo+6YnsCzY="/>
     <env name="APP_ENV" value="testing"/>
     <env name="DB_DATABASE" value="remp_test"/>
     <env name="DB_PASSWORD" value="secret"/>

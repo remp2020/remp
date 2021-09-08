@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Model\BaseModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Model\ConversionCommerceEvent;
 use App\Model\ConversionGeneralEvent;
@@ -38,7 +39,7 @@ class Conversion extends BaseModel
     {
         return $this->belongsTo(Article::class);
     }
-
+    
     public function commerceEvents()
     {
         return $this->hasMany(ConversionCommerceEvent::class);
@@ -57,6 +58,15 @@ class Conversion extends BaseModel
     public function conversionSources()
     {
         return $this->hasMany(ConversionSource::class);
+    }
+    
+    // Scopes
+    
+    public function scopeOfSelectedProperty($query)
+    {
+        return $query->whereHas('article', function (Builder $articleQuery) {
+            $articleQuery->ofSelectedProperty();
+        });
     }
 
     public function setArticleExternalIdAttribute($articleExternalId)

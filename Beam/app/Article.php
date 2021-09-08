@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\TokenProvider;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 use Yadakhov\InsertOnDuplicateKey;
@@ -288,7 +289,7 @@ SQL;
     }
 
     // Scopes
-    public function scopeMostReadByTimespent(Builder $query, Carbon $start, string $getBy, int $limit = null)
+    public function scopeMostReadByTimespent(Builder $query, Carbon $start, string $getBy, int $limit = null): Builder
     {
         $innerQuery = ArticleTimespent::where('time_from', '>=', $start)
             ->groupBy('article_id')
@@ -304,7 +305,7 @@ SQL;
         })->orderByDesc('t.total_sum');
     }
 
-    public function scopeMostReadByPageviews(Builder $query, Carbon $start, string $getBy, int $limit = null)
+    public function scopeMostReadByPageviews(Builder $query, Carbon $start, string $getBy, int $limit = null): Builder
     {
         $innerQuery = ArticleTimespent::where('time_from', '>=', $start)
             ->groupBy('article_id')
@@ -320,7 +321,7 @@ SQL;
         })->orderByDesc('t.total_sum');
     }
 
-    public function scopeMostReadByAveragePaymentAmount(Builder $query, Carbon $start, ?int $limit = null)
+    public function scopeMostReadByAveragePaymentAmount(Builder $query, Carbon $start, ?int $limit = null): Builder
     {
         $innerQuery = Conversion::where('paid_at', '>=', $start)
             ->groupBy('article_id')
@@ -336,7 +337,7 @@ SQL;
         })->orderByDesc('c.average');
     }
 
-    public function scopeMostReadByTotalPaymentAmount(Builder $query, Carbon $start, ?int $limit = null)
+    public function scopeMostReadByTotalPaymentAmount(Builder $query, Carbon $start, ?int $limit = null): Builder
     {
         $innerQuery = Conversion::where('paid_at', '>=', $start)
             ->groupBy('article_id')
@@ -352,7 +353,7 @@ SQL;
         })->orderByDesc('c.average');
     }
 
-    public function scopeIgnoreAuthorIds(Builder $query, array $authorIds)
+    public function scopeIgnoreAuthorIds(Builder $query, array $authorIds): Builder
     {
         if ($authorIds) {
             $query->join('article_author', 'articles.id', '=', 'article_author.article_id')
@@ -361,7 +362,7 @@ SQL;
         return $query;
     }
 
-    public function scopeIgnoreContentTypes(Builder $query, array $contentTypes)
+    public function scopeIgnoreContentTypes(Builder $query, array $contentTypes): Builder
     {
         if ($contentTypes) {
             $query->whereNotIn('content_type', $contentTypes);
@@ -369,7 +370,7 @@ SQL;
         return $query;
     }
 
-    public function scopePublishedBetween(Builder $query, Carbon $from = null, Carbon $to = null)
+    public function scopePublishedBetween(Builder $query, Carbon $from = null, Carbon $to = null): Builder
     {
         if ($from) {
             $query->where('published_at', '>=', $from);
@@ -379,7 +380,16 @@ SQL;
         }
         return $query;
     }
-
+    
+    public function scopeOfSelectedProperty(Builder $query): Builder
+    {
+        $tokenProvider = resolve(TokenProvider::class);
+        $propertyUuid = $tokenProvider->getToken();
+        if ($propertyUuid) {
+            $query->where('articles.property_uuid', $propertyUuid);
+        }
+        return $query;
+    }
 
     /**
      * Update or create record in case it doesn't exist.

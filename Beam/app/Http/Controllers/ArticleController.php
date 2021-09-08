@@ -17,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Remp\Journal\JournalContract;
-use Remp\Journal\TokenProvider;
 use Yajra\Datatables\Datatables;
 use Yajra\DataTables\EloquentDataTable;
 
@@ -29,14 +28,11 @@ class ArticleController extends Controller
 
     private $conversionRateConfig;
 
-    private $tokenProvider;
-
-    public function __construct(JournalContract $journal, ConversionRateConfig $conversionRateConfig, TokenProvider $tokenProvider)
+    public function __construct(JournalContract $journal, ConversionRateConfig $conversionRateConfig)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->conversionRateConfig = $conversionRateConfig;
-        $this->tokenProvider = $tokenProvider;
     }
 
     /**
@@ -103,7 +99,8 @@ class ArticleController extends Controller
             ]))
             ->with(['authors', 'sections', 'tags'])
             ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id')
-            ->groupBy(['articles.id', 'articles.title', 'articles.url', 'articles.published_at']);
+            ->groupBy(['articles.id', 'articles.title', 'articles.url', 'articles.published_at'])
+            ->ofSelectedProperty();
 
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'));
@@ -120,10 +117,6 @@ class ArticleController extends Controller
         if ($request->input('conversion_to')) {
             $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'));
             $articlesQuery->where('paid_at', '<=', $conversionTo);
-        }
-        $token = $this->tokenProvider->getToken();
-        if ($token) {
-            $articlesQuery->where('property_uuid', '=', $token);
         }
 
         $articles = $articlesQuery->get();
@@ -161,6 +154,9 @@ class ArticleController extends Controller
         $dt =  $datatables->of($articlesQuery);
 
         return $dt
+            ->addColumn('id', function (Article $author) {
+                return $author->id;
+            })
             ->addColumn('title', function (Article $article) {
                 return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
@@ -206,6 +202,7 @@ class ArticleController extends Controller
             ->orderColumn('amount', 'conversions_sum $1')
             ->orderColumn('average', 'conversions_avg $1')
             ->orderColumn('conversions_rate', DB::raw("FIELD(articles.external_id,". $conversionRates->sort()->keys()->implode(",") .") $1, conversions_count $1"))
+            ->orderColumn('id', 'articles.id $1')
             ->filterColumn('title', function (Builder $query, $value) {
                 $query->where('articles.title', 'like', '%' . $value . '%');
             })
@@ -260,7 +257,8 @@ class ArticleController extends Controller
     {
         $articles = Article::selectRaw('articles.*,' .
             'CASE pageviews_all WHEN 0 THEN 0 ELSE (pageviews_subscribers/pageviews_all)*100 END AS pageviews_subscribers_ratio')
-            ->with(['authors', 'sections', 'tags']);
+            ->with(['authors', 'sections', 'tags'])
+            ->ofSelectedProperty();
 
         if ($request->input('published_from')) {
             $articles->where('published_at', '>=', Carbon::parse($request->input('published_from'), $request->input('tz')));
@@ -268,12 +266,11 @@ class ArticleController extends Controller
         if ($request->input('published_to')) {
             $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz')));
         }
-        $token = $this->tokenProvider->getToken();
-        if ($token) {
-            $articles->where('property_uuid', '=', $token);
-        }
 
         return $datatables->of($articles)
+            ->addColumn('id', function (Article $article) {
+                return $article->id;
+            })
             ->addColumn('title', function (Article $article) {
                 return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
@@ -335,6 +332,7 @@ class ArticleController extends Controller
             ->orderColumn('avg_sum_all', 'timespent_all / pageviews_all $1')
             ->orderColumn('avg_sum_signed_in', 'timespent_signed_in / pageviews_signed_in $1')
             ->orderColumn('avg_sum_subscribers', 'timespent_subscribers / pageviews_subscribers $1')
+            ->orderColumn('id', 'articles.id $1')
             ->rawColumns(['authors'])
             ->make(true);
     }

@@ -79,6 +79,7 @@ class SectionController extends Controller
             'section_id',
             'COUNT(*) as articles_count'
         ]))
+            ->ofSelectedProperty()
             ->leftJoin('articles', 'article_section.article_id', '=', 'articles.id')
             ->groupBy('section_id');
 
@@ -91,6 +92,7 @@ class SectionController extends Controller
             'count(distinct conversions.id) as conversions_count',
             'sum(conversions.amount) as conversions_amount',
         ]))
+            ->ofSelectedProperty()
             ->leftJoin('article_section', 'conversions.article_id', '=', 'article_section.article_id')
             ->leftJoin('articles', 'article_section.article_id', '=', 'articles.id')
             ->groupBy('section_id');
@@ -104,6 +106,7 @@ class SectionController extends Controller
             'COALESCE(SUM(timespent_all) - SUM(timespent_subscribers), 0) AS timespent_not_subscribed',
             'COALESCE(SUM(timespent_subscribers), 0) AS timespent_subscribers',
         ]))
+            ->ofSelectedProperty()
             ->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id')
             ->groupBy('section_id');
 
@@ -139,13 +142,14 @@ class SectionController extends Controller
             ->leftJoin(DB::raw("({$sectionArticlesQuery->toSql()}) as aa"), 'sections.id', '=', 'aa.section_id')->addBinding($sectionArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'sections.id', '=', 'c.section_id')->addBinding($conversionsQuery->getBindings())
             ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'sections.id', '=', 'pv.section_id')->addBinding($pageviewsQuery->getBindings())
+            ->ofSelectedProperty()
             ->groupBy(['sections.name', 'sections.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all',
                 'pageviews_not_subscribed', 'pageviews_subscribers', 'timespent_all', 'timespent_not_subscribed', 'timespent_subscribers']);
 
-        $conversionsQuery = \DB::table('conversions')
-            ->selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, article_section.section_id')
+        $conversionsQuery = Conversion::selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, article_section.section_id')
             ->join('article_section', 'conversions.article_id', '=', 'article_section.article_id')
             ->join('articles', 'article_section.article_id', '=', 'articles.id')
+            ->ofSelectedProperty()
             ->groupBy(['article_section.section_id', 'conversions.currency']);
 
         if ($request->input('content_type') && $request->input('content_type') !== 'all') {
@@ -171,10 +175,16 @@ class SectionController extends Controller
         $conversionCounts = [];
         foreach ($conversionsQuery->get() as $record) {
             $conversionAmounts[$record->section_id][$record->currency] = $record->sum;
-            $conversionCounts[$record->section_id] = $record->count;
+            if (!isset($conversionCounts[$record->section_id])) {
+                $conversionCounts[$record->section_id] = 0;
+            }
+            $conversionCounts[$record->section_id] += $record->count;
         }
 
         return $datatables->of($sections)
+            ->addColumn('id', function (Section $section) {
+                return $section->id;
+            })
             ->addColumn('name', function (Section $section) {
                 return Html::linkRoute('sections.show', $section->name, $section);
             })
@@ -206,6 +216,7 @@ class SectionController extends Controller
             })
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')
+            ->orderColumn('id', 'sections.id $1')
             ->make(true);
     }
 

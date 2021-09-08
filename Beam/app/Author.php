@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Model\BaseModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
@@ -39,5 +40,12 @@ class Author extends BaseModel implements Searchable
     public function conversions()
     {
         return $this->hasManyThrough(Conversion::class, ArticleAuthor::class, 'article_author.author_id', 'conversions.article_id', 'id', 'article_id');
+    }
+    
+    public function scopeOfSelectedProperty($query)
+    {
+        return $query->whereHas('articles', function (Builder $articlesQuery) {
+            $articlesQuery->ofSelectedProperty();
+        });
     }
 }

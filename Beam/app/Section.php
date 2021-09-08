@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Model\BaseModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Section extends BaseModel
@@ -21,6 +22,15 @@ class Section extends BaseModel
 
     public function articles()
     {
-        return $this->hasMany(Article::class);
+        return $this->belongsToMany(Article::class);
+    }
+
+    // Scopes
+
+    public function scopeOfSelectedProperty($query)
+    {
+        return $query->whereHas('articles', function (Builder $articlesQuery) {
+            $articlesQuery->ofSelectedProperty();
+        });
     }
 }

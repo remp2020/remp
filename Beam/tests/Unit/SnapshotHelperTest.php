@@ -4,13 +4,13 @@ namespace Tests\Unit;
 
 use App\Model\ArticleViewsSnapshot;
 use App\Model\Snapshots\SnapshotHelpers;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class SnapshotHelperTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /** @var SnapshotHelpers */
     private $snapshotHelpers;

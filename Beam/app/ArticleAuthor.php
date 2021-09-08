@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Model\BaseModel;
+use Illuminate\Database\Eloquent\Builder;
 
 class ArticleAuthor extends BaseModel
 {
@@ -16,5 +17,12 @@ class ArticleAuthor extends BaseModel
     public function article()
     {
         return $this->belongsTo(Article::class);
+    }
+
+    public function scopeOfSelectedProperty($query)
+    {
+        return $query->whereHas('article', function (Builder $articleQuery) {
+            $articleQuery->ofSelectedProperty();
+        });
     }
 }

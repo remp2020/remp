@@ -38,8 +38,9 @@ class ConversionController extends Controller
     {
         $conversions = Conversion::select('conversions.*', 'articles.content_type')
             ->with(['article', 'article.authors', 'article.sections', 'article.tags'])
+            ->ofSelectedProperty()
             ->join('articles', 'articles.id', '=', 'conversions.article_id');
-
+        
         if ($request->input('conversion_from')) {
             $conversions->where('paid_at', '>=', Carbon::parse($request->input('conversion_from'), $request->input('tz')));
         }
@@ -48,6 +49,9 @@ class ConversionController extends Controller
         }
 
         return $datatables->of($conversions)
+            ->addColumn('id', function (Conversion $conversion) {
+                return $conversion->id;
+            })
             ->addColumn('actions', function (Conversion $conversion) {
                 return [
                     'show' => route('conversions.show', $conversion),
@@ -87,6 +91,7 @@ class ConversionController extends Controller
                     ->whereIn('article_tag.tag_id', $values);
                 $query->whereIn('articles.id', $filterQuery);
             })
+            ->orderColumn('id', 'conversions.id $1')
             ->rawColumns(['actions'])
             ->make(true);
     }
