@@ -4,6 +4,7 @@ namespace App;
 
 use App\Model\BaseModel;
 use App\Model\Tag;
+use Illuminate\Database\Eloquent\Builder;
 
 class TagTagCategory extends BaseModel
 {
@@ -17,5 +18,12 @@ class TagTagCategory extends BaseModel
     public function tagCategory()
     {
         return $this->belongsTo(TagCategory::class);
+    }
+
+    public function scopeOfSelectedProperty($query)
+    {
+        return $query->whereHas('tagCategory', function (Builder $q) {
+            $q->ofSelectedProperty();
+        });
     }
 }

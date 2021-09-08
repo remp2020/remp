@@ -39,14 +39,16 @@ class TagCategoriesDataTable
             'tag_category_id',
             'COUNT(DISTINCT tag_tag_category.tag_id) as tags_count'
         ]))
+            ->ofSelectedProperty()
             ->groupBy('tag_category_id');
 
-        $tagCategoryArticlesQuery = TagTagCategory::selectRaw(implode(',', [
+        $tagCategoryArticlesQuery = ArticleTag::selectRaw(implode(',', [
             'tag_category_id',
-            'COUNT(*) as articles_count'
+            'COUNT(DISTINCT articles.id) as articles_count'
         ]))
-            ->join('article_tag', 'article_tag.tag_id', '=', 'tag_tag_category.tag_id')
-            ->leftJoin('articles', 'article_tag.article_id', '=', 'articles.id')
+            ->join('articles', 'article_tag.article_id', '=', 'articles.id')
+            ->join('tag_tag_category', 'article_tag.tag_id', '=', 'tag_tag_category.tag_id')
+            ->ofSelectedProperty()
             ->groupBy('tag_category_id');
 
         if ($request->input('content_type') && $request->input('content_type') !== 'all') {
@@ -61,6 +63,7 @@ class TagCategoriesDataTable
             ->leftJoin('article_tag', 'conversions.article_id', '=', 'article_tag.article_id')
             ->join('tag_tag_category', 'tag_tag_category.tag_id', '=', 'article_tag.tag_id')
             ->leftJoin('articles', 'article_tag.article_id', '=', 'articles.id')
+            ->ofSelectedProperty()
             ->groupBy('tag_tag_category.tag_category_id');
 
         $pageviewsQuery = Article::selectRaw(implode(',', [
@@ -74,6 +77,7 @@ class TagCategoriesDataTable
         ]))
             ->leftJoin('article_tag', 'articles.id', '=', 'article_tag.article_id')
             ->join('tag_tag_category', 'tag_tag_category.tag_id', '=', 'article_tag.tag_id')
+            ->ofSelectedProperty()
             ->groupBy('tag_tag_category.tag_category_id');
 
         if ($request->input('content_type') && $request->input('content_type') !== 'all') {
@@ -108,14 +112,15 @@ class TagCategoriesDataTable
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'tag_categories.id', '=', 'c.tag_category_id')->addBinding($conversionsQuery->getBindings())
             ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'tag_categories.id', '=', 'pv.tag_category_id')->addBinding($pageviewsQuery->getBindings())
             ->leftJoin(DB::raw("({$tagCategoryTagsQuery->toSql()}) as tct"), 'tag_categories.id', '=', 'tct.tag_category_id')->addBinding($tagCategoryTagsQuery->getBindings())
+            ->ofSelectedProperty()
             ->groupBy(['tag_categories.name', 'tag_categories.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all',
                 'pageviews_not_subscribed', 'pageviews_subscribers', 'timespent_all', 'timespent_not_subscribed', 'timespent_subscribers']);
 
-        $conversionsQuery = \DB::table('conversions')
-            ->selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, tag_tag_category.tag_category_id')
+        $conversionsQuery = Conversion::selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, tag_tag_category.tag_category_id')
             ->join('article_tag', 'conversions.article_id', '=', 'article_tag.article_id')
             ->join('tag_tag_category', 'tag_tag_category.tag_id', '=', 'article_tag.tag_id')
             ->join('articles', 'article_tag.article_id', '=', 'articles.id')
+            ->ofSelectedProperty()
             ->groupBy(['tag_tag_category.tag_category_id', 'conversions.currency']);
 
         if ($request->input('content_type') && $request->input('content_type') !== 'all') {
@@ -141,10 +146,16 @@ class TagCategoriesDataTable
         $conversionCounts = [];
         foreach ($conversionsQuery->get() as $record) {
             $conversionAmounts[$record->tag_category_id][$record->currency] = $record->sum;
-            $conversionCounts[$record->tag_category_id] = $record->count;
+            if (!isset($conversionCounts[$record->tag_category_id])) {
+                $conversionCounts[$record->tag_category_id] = 0;
+            }
+            $conversionCounts[$record->tag_category_id] += $record->count;
         }
 
         return $datatables->of($tagCategories)
+            ->addColumn('id', function (TagCategory $tagCategory) {
+                return $tagCategory->id;
+            })
             ->addColumn('name', function (TagCategory $tagCategory) {
                 return Html::linkRoute('tag-categories.show', $tagCategory->name, $tagCategory);
             })
@@ -176,6 +187,7 @@ class TagCategoriesDataTable
             })
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')
+            ->orderColumn('id', 'tag_categories.id $1')
             ->make(true);
     }
 }

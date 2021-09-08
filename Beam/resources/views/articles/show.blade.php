@@ -42,6 +42,10 @@
                                 <dd>{{$article->content_type}}</dd>
                             </dl>
                             <dl class="dl-horizontal">
+                                <dt>Property</dt>
+                                <dd><a href="{{ route('accounts.properties.index', $article->property->account->id) }}">{{$article->property->name}}</a></dd>
+                            </dl>
+                            <dl class="dl-horizontal">
                                 <dt>URL</dt>
                                 <dd><a href="{{$article->url}}">{{$article->url}}</a></dd>
                             </dl>

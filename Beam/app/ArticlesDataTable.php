@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App;
 
 use App\Model\Tag;
@@ -41,15 +40,16 @@ class ArticlesDataTable
             'timespent_subscribers / pageviews_subscribers as avg_timespent_subscribers',
         ]))
             ->with(['authors', 'sections', 'tags'])
+            ->ofSelectedProperty()
             ->groupBy(['articles.id', 'articles.title', 'articles.published_at', 'articles.url', "articles.pageviews_all",
                 "articles.pageviews_signed_in", "articles.pageviews_subscribers", "articles.timespent_all",
                 "articles.timespent_signed_in", "articles.timespent_subscribers", 'avg_timespent_all',
                 'avg_timespent_signed_in', 'avg_timespent_subscribers']);
 
         // filtering query (used as subquery - joins were messing with counts and sums) to fetch matching conversions
-        $conversionsFilter = \DB::table('conversions')
-            ->distinct()
-            ->join('articles', 'articles.id', '=', 'conversions.article_id');
+        $conversionsFilter = Conversion::distinct()
+            ->join('articles', 'articles.id', '=', 'conversions.article_id')
+            ->ofselectedProperty();
 
         if (isset($this->author)) {
             $articles->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
@@ -103,13 +103,13 @@ class ArticlesDataTable
         $matchedConversions = $conversionsFilter->pluck('conversions.id')->toArray();
 
         // conversion aggregations that are joined to main query (this is required for orderColumn() to work)
-        $conversionsJoin = \DB::table('conversions')
-            ->selectRaw(implode(',', [
+        $conversionsJoin = Conversion::selectRaw(implode(',', [
                 'count(*) as conversions_count',
                 'sum(amount) as conversions_sum',
                 'avg(amount) as conversions_avg',
                 'article_id'
             ]))
+            ->ofSelectedProperty()
             ->groupBy(['article_id']);
 
         if ($matchedConversions) {
@@ -120,12 +120,12 @@ class ArticlesDataTable
             $conversionsJoin->whereRaw('1 = 0');
         }
 
-        $articles->leftJoin(DB::raw("({$conversionsJoin->toSql()}) as conversions"), 'articles.id', '=', 'conversions.article_id')
-            ->addBinding($conversionsJoin->getBindings());
-
+        $articles->leftJoinSub($conversionsJoin, 'conversions', function ($join) {
+            $join->on('articles.id', '=', 'conversions.article_id');
+        });
+        
         // conversion aggregations for displaying (these are grouped also by the currency)
-        $conversionsQuery = \DB::table('conversions')
-            ->selectRaw(implode(',', [
+        $conversionsQuery = Conversion::selectRaw(implode(',', [
                 'count(*) as count',
                 'sum(amount) as sum',
                 'avg(amount) as avg',
@@ -133,6 +133,7 @@ class ArticlesDataTable
                 'article_id'
             ]))
             ->whereIn('id', $matchedConversions)
+            ->ofSelectedProperty()
             ->groupBy(['article_id', 'currency']);
 
         $conversionCount = [];
@@ -149,6 +150,9 @@ class ArticlesDataTable
 
         // final datatable
         return $datatables->of($articles)
+            ->addColumn('id', function (Article $article) {
+                return $article->id;
+            })
             ->addColumn('title', function (Article $article) {
                 return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
             })
@@ -211,6 +215,7 @@ class ArticlesDataTable
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_sum', 'conversions_sum $1')
             ->orderColumn('conversions_avg', 'conversions_avg $1')
+            ->orderColumn('id', 'articles.id $1')
             ->make(true);
     }
 

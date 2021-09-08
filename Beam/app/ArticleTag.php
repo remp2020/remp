@@ -4,6 +4,7 @@ namespace App;
 
 use App\Model\BaseModel;
 use App\Model\Tag;
+use Illuminate\Database\Eloquent\Builder;
 
 class ArticleTag extends BaseModel
 {
@@ -17,5 +18,12 @@ class ArticleTag extends BaseModel
     public function article()
     {
         return $this->belongsTo(Article::class);
+    }
+
+    public function scopeOfSelectedProperty($query)
+    {
+        return $query->whereHas('article', function (Builder $articleQuery) {
+            $articleQuery->ofSelectedProperty();
+        });
     }
 }

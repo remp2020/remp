@@ -105,12 +105,12 @@ class AggregateArticlesViews extends Command
         $days60ago = Carbon::today()->subDays(60);
         $days90ago = Carbon::today()->subDays(90);
 
-        ViewsPerBrowserMv::truncate();
+        ViewsPerBrowserMv::query()->delete();
         $this->aggregateViewsPer('browser', 'total_views_last_30_days', $days30ago);
         $this->aggregateViewsPer('browser', 'total_views_last_60_days', $days60ago);
         $this->aggregateViewsPer('browser', 'total_views_last_90_days', $days90ago);
 
-        ViewsPerUserMv::truncate();
+        ViewsPerUserMv::query()->delete();
         $this->aggregateViewsPer('user', 'total_views_last_30_days', $days30ago);
         $this->aggregateViewsPer('user', 'total_views_last_60_days', $days60ago);
         $this->aggregateViewsPer('user', 'total_views_last_90_days', $days90ago);

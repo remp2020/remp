@@ -75,6 +75,7 @@ class AuthorController extends Controller
             'COUNT(*) as articles_count'
         ]))
             ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
+            ->ofSelectedProperty()
             ->groupBy('author_id');
 
         $conversionsQuery = Conversion::selectRaw(implode(',', [
@@ -84,6 +85,7 @@ class AuthorController extends Controller
         ]))
             ->leftJoin('article_author', 'conversions.article_id', '=', 'article_author.article_id')
             ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
+            ->ofSelectedProperty()
             ->groupBy('author_id');
 
         $pageviewsQuery = Article::selectRaw(implode(',', [
@@ -96,6 +98,7 @@ class AuthorController extends Controller
             'COALESCE(SUM(timespent_subscribers), 0) AS timespent_subscribers',
         ]))
             ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
+            ->ofSelectedProperty()
             ->groupBy('author_id');
 
         if ($request->input('published_from')) {
@@ -124,13 +127,15 @@ class AuthorController extends Controller
             ->leftJoin(DB::raw("({$authorArticlesQuery->toSql()}) as aa"), 'authors.id', '=', 'aa.author_id')->addBinding($authorArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'authors.id', '=', 'c.author_id')->addBinding($conversionsQuery->getBindings())
             ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'authors.id', '=', 'pv.author_id')->addBinding($pageviewsQuery->getBindings())
+            // has to be below manually added bindings
+            ->ofSelectedProperty()
             ->groupBy(['authors.name', 'authors.id', 'articles_count', 'conversions_count', 'conversions_amount', 'pageviews_all',
                 'pageviews_signed_in', 'pageviews_subscribers', 'timespent_all', 'timespent_signed_in', 'timespent_subscribers']);
 
-        $conversionsQuery = \DB::table('conversions')
-            ->selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, article_author.author_id')
+        $conversionsQuery = Conversion::selectRaw('count(distinct conversions.id) as count, sum(amount) as sum, currency, article_author.author_id')
             ->join('article_author', 'conversions.article_id', '=', 'article_author.article_id')
             ->join('articles', 'article_author.article_id', '=', 'articles.id')
+            ->ofSelectedProperty()
             ->groupBy(['article_author.author_id', 'conversions.currency']);
 
         if ($request->input('published_from')) {
@@ -152,10 +157,16 @@ class AuthorController extends Controller
         $conversionCounts = [];
         foreach ($conversionsQuery->get() as $record) {
             $conversionAmounts[$record->author_id][$record->currency] = $record->sum;
-            $conversionCounts[$record->author_id] = $record->count;
+            if (!isset($conversionCounts[$record->author_id])) {
+                $conversionCounts[$record->author_id] = 0;
+            }
+            $conversionCounts[$record->author_id] += $record->count;
         }
 
         return $datatables->of($authors)
+            ->addColumn('id', function (Author $author) {
+                return $author->id;
+            })
             ->addColumn('name', function (Author $author) {
                 return Html::linkRoute('authors.show', $author->name, $author);
             })
@@ -187,6 +198,7 @@ class AuthorController extends Controller
             })
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')
+            ->orderColumn('id', 'authors.id $1')
             ->make(true);
     }
 
