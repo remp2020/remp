@@ -8,6 +8,7 @@ use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Models\Segment\Crm;
 
@@ -27,6 +28,8 @@ class ArticleUrlParserTemplateFormFactory
 
     private $listsRepository;
 
+    private $sourceTamplatesRepository;
+
     public $onUpdate;
 
     public $onSave;
@@ -36,13 +39,15 @@ class ArticleUrlParserTemplateFormFactory
         LayoutsRepository $layoutsRepository,
         ListsRepository $listsRepository,
         JobsRepository $jobsRepository,
-        BatchesRepository $batchesRepository
+        BatchesRepository $batchesRepository,
+        SourceTemplatesRepository $sourceTemplatesRepository
     ) {
         $this->templatesRepository = $templatesRepository;
         $this->layoutsRepository = $layoutsRepository;
         $this->listsRepository = $listsRepository;
         $this->jobsRepository = $jobsRepository;
         $this->batchesRepository = $batchesRepository;
+        $this->sourceTamplatesRepository = $sourceTemplatesRepository;
     }
 
     public function setSegmentCode(string $segmentCode): void
@@ -94,9 +99,11 @@ class ArticleUrlParserTemplateFormFactory
         $form->addHidden('html_content');
         $form->addHidden('text_content');
 
+        $sourceTemplate = $this->sourceTamplatesRepository->find($_POST['source_template_id']);
+
         $defaults = [
-            'name' => 'Vyber ' .  date('d. m. Y'),
-            'code' => 'vyber_' . date('dmY'),
+            'name' => "{$sourceTemplate->title} " . date('d. m. Y'),
+            'code' => "{$sourceTemplate->code}_" . date('Y-m-d'),
             'from' => 'Denník N <info@dennikn.sk>',
         ];
 
