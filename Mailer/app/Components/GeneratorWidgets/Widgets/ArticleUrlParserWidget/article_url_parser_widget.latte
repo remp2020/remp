@@ -3,7 +3,7 @@
       $('[aria-controls="url-parser-preview"]').on('shown.bs.tab', function () {
           var form = $("#" + {$control['templateForm']->getElementPrototype()->getId()})[0];
 
-          if (Nette.validateForm(form)) {
+          if ($('#' + {$control["templateForm"]['mail_type_id']->htmlId}).val()) {
             $.nette.ajax({
                 type: 'POST',
                 url: {link preview!},
@@ -21,6 +21,7 @@
                 }
             });
           } else {
+              alert("Field 'Type' is required.");
               $('[aria-controls="url-parser-form"]').tab('show');
           }
       });
