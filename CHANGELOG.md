@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed output of `service:elastic-data-retention` Beam command to correctly reflect if index was deleted or not. remp/remp#940
 - [Segments] Fixed ignoring of segment's `active` flag in user/browser segment presence API check. remp/remp#1007
   - The bug caused that it was possible to check presence of users/browsers in segments even if the segment was not active.
+- Property filter now correctly filters all sections of Beam, not just the main dashboard data. remp/remp#987
 
 ### [Campaign]
 
