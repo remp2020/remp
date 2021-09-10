@@ -17,8 +17,9 @@ class DenniknContent implements ContentInterface
 {
     private $transport;
 
-    public function __construct(TransportInterface $transport)
-    {
+    public function __construct(
+        TransportInterface $transport
+    ) {
         $this->transport = $transport;
     }
 
@@ -30,7 +31,12 @@ class DenniknContent implements ContentInterface
             if ($content === null) {
                 return null;
             }
-            $meta = $this->parseMeta($content);
+            if (strpos($url, 'obchod.dennikn.sk') !== false) {
+                $meta = $this->parseShopMeta($content);
+            } else {
+                $meta = $this->parseMeta($content);
+            }
+
             if (!$meta) {
                 return null;
             }
@@ -68,6 +74,41 @@ class DenniknContent implements ContentInterface
         $image = $this->processImage($schema->image->url ?? null);
 
         return new Meta($title, $description, $image, $denniknAuthors);
+    }
+
+    public function parseShopMeta(string $content): Meta
+    {
+        preg_match_all('/<script type="application\/ld\+json">(.*?)<\/script>/s', $content, $matches);
+
+        if (!$matches || empty($matches[1])) {
+            return new Meta();
+        }
+
+        try {
+            $schema = Json::decode($matches[1][0]);
+        } catch (JsonException $e) {
+            return new Meta();
+        }
+
+        // authors
+        $authors = [];
+        if (isset($schema->dataFeedElement[0]->author)) {
+            $authors = explode(',', $schema->dataFeedElement[0]->author->name);
+        }
+
+        // title
+        $title = $schema->dataFeedElement[0]->name ?? null;
+
+        // description
+        $description = null;
+        if (isset($schema->dataFeedElement[0]->workExample[0]->abstract)) {
+            $description = str_replace('\n', '', Strings::truncate($schema->dataFeedElement[0]->workExample[0]->abstract, 200));
+        }
+
+        // image
+        $image = $schema->dataFeedElement[0]->workExample[0]->image ?? null;
+
+        return new Meta($title, $description, $image, $authors);
     }
 
     private function processImage(?string $imageUrl): string
