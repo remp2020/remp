@@ -104,7 +104,6 @@ class ArticleUrlParserTemplateFormFactory
         $defaults = [
             'name' => "{$sourceTemplate->title} " . date('d. m. Y'),
             'code' => "{$sourceTemplate->code}_" . date('Y-m-d'),
-            'from' => 'Denník N <info@dennikn.sk>',
         ];
 
         if ($this->layoutCode) {
