@@ -3,7 +3,7 @@
       $('[aria-controls="url-parser-preview"]').on('shown.bs.tab', function () {
           var form = $("#" + {$control['templateForm']->getElementPrototype()->getId()})[0];
 
-          if ($('#' + {$control["templateForm"]['mail_type_id']->htmlId}).val()) {
+          if ($('select[name="mail_type_id"]').val()) {
             $.nette.ajax({
                 type: 'POST',
                 url: {link preview!},
@@ -12,7 +12,7 @@
                     'text_content': {$textContent},
                     'name': $('#' + {$control["templateForm"]['name']->htmlId}).val(),
                     'mail_layout_id': $('input[name="mail_layout_id"]').val(),
-                    'mail_type_id': $('#' + {$control["templateForm"]['mail_type_id']->htmlId}).val(),
+                    'mail_type_id': $('select[name="mail_type_id"]').val(),
                     'from': $('#' + {$control["templateForm"]['from']->htmlId}).val(),
                     'subject': $('#' + {$control["templateForm"]['subject']->htmlId}).val(),
                 },
