@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Added the prefilling of from field into ArticleUrlParserWidget after email's type is selected. remp/remp#999
+
 ## [0.28.0] - 2021-09-09
 
 ### [Beam]

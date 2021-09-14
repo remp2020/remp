@@ -73,7 +73,7 @@
 
               <div class="form-group fg-float m-b-30">
                 {label mail_type_id /}
-                {input mail_type_id, class => 'form-control selectpicker',  data-live-search => 'true'}
+                {input mail_type_id, id => 'mail-type-id', class => 'form-control selectpicker',  data-live-search => 'true'}
               </div>
 
               <div class="form-group fg-float m-b-30">
@@ -121,3 +121,14 @@
 </div>
 
 {include previewCallback}
+
+<script type="application/javascript">
+  let lists = {$lists};
+
+  $('#mail-type-id').on('changed.bs.select', function (e) {
+    let selectedTypeId = $(e.target).val();
+    let fromInput = $('input[name="from"]');
+
+    fromInput.val(lists[selectedTypeId].mail_from);
+  });
+</script>

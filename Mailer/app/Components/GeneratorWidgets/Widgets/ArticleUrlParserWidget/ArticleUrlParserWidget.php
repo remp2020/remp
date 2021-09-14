@@ -64,6 +64,7 @@ class ArticleUrlParserWidget extends BaseControl implements IGeneratorWidget
 
         $this->template->htmlContent = $params['htmlContent'];
         $this->template->textContent = $params['textContent'];
+        $this->template->lists = $this->listsRepository->all()->fetchAssoc('id');
         $this->template->setFile(__DIR__ . '/' . $this->templateName);
         $this->template->render();
     }
