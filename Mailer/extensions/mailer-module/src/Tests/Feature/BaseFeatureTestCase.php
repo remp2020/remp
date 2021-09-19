@@ -8,6 +8,7 @@ use Nette\Utils\Random;
 use Nette\Utils\Strings;
 use PDOException;
 use PHPUnit\Framework\TestCase;
+use Remp\MailerModule\Repositories\AutoLoginTokensRepository;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
@@ -16,6 +17,7 @@ use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
+use Remp\MailerModule\Repositories\LogConversionsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
@@ -27,6 +29,9 @@ class BaseFeatureTestCase extends TestCase
 
     /** @var  Context */
     protected $database;
+
+    /** @var AutoLoginTokensRepository */
+    protected $autoLoginTokensRepository;
 
     /** @var  JobsRepository */
     protected $jobsRepository;
@@ -64,17 +69,22 @@ class BaseFeatureTestCase extends TestCase
     /** @var LogsRepository */
     protected $mailLogsRepository;
 
+    /** @var LogConversionsRepository */
+    protected $mailLogConversionsRepository;
+
     protected function setUp(): void
     {
         $this->container = $GLOBALS['container'];
         $this->database = $this->inject(Context::class);
 
+        $this->autoLoginTokensRepository = $this->inject(AutoLoginTokensRepository::class);
         $this->jobsRepository = $this->inject(JobsRepository::class);
         $this->batchTemplatesRepository = $this->inject(BatchTemplatesRepository::class);
         $this->templatesRepository = $this->inject(TemplatesRepository::class);
         $this->layoutsRepository = $this->inject(LayoutsRepository::class);
         $this->jobQueueRepository = $this->inject(JobQueueRepository::class);
         $this->mailLogsRepository = $this->inject(LogsRepository::class);
+        $this->mailLogConversionsRepository = $this->inject(LogConversionsRepository::class);
         $this->batchesRepository = $this->inject(BatchesRepository::class);
         $this->listsRepository = $this->inject(ListsRepository::class);
         $this->listVariantsRepository = $this->inject(ListVariantsRepository::class);
@@ -90,6 +100,7 @@ class BaseFeatureTestCase extends TestCase
             $property->setAccessible(true);
             return "TRUNCATE `{$property->getValue($repo)}`;";
         }, [
+            $this->autoLoginTokensRepository,
             $this->jobsRepository,
             $this->batchTemplatesRepository,
             $this->templatesRepository,
@@ -98,6 +109,7 @@ class BaseFeatureTestCase extends TestCase
             $this->batchesRepository,
             $this->listsRepository,
             $this->mailLogsRepository,
+            $this->mailLogConversionsRepository,
             $this->listVariantsRepository,
             $this->listCategoriesRepository,
             $this->userSubscriptionsRepository,
@@ -130,7 +142,6 @@ SET FOREIGN_KEY_CHECKS=1;
     protected function createBatch($mailJob, $template, $maxEmailsCount = null)
     {
         $batch = $this->batchesRepository->add($mailJob->id, $maxEmailsCount, null, BatchesRepository::METHOD_RANDOM);
-        $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);
         return $batch;
