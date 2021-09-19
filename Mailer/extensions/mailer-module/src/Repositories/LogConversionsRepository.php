@@ -26,4 +26,15 @@ class LogConversionsRepository extends Repository
             ]);
         }
     }
+
+    public function deleteForMailLogs(array $mailLogIds): int
+    {
+        if (empty($mailLogIds)) {
+            return 0;
+        }
+
+        return $this->getTable()->where([
+            'mail_log_id IN (?)' => $mailLogIds
+        ])->delete();
+    }
 }

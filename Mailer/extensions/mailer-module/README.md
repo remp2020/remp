@@ -1702,6 +1702,52 @@ Response:
 
 ---
 
+#### POST `/api/v1/users/delete`
+
+Removes all user data for given email
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+
+##### *Body:*
+
+```json5
+{
+  "email": "example@example.com" // String; email
+}
+```
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/delete \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "email": "example@example.com"
+}'
+```
+
+Response:
+
+- If user data were removed, response with HTTP code **204 No Content** will be returned.
+- If no logs were found, response with HTTP code **404 Not found** is returned:
+
+
+```json5
+{
+  "status":"error",
+  "code":"user_not_found",
+  "message":"No user data found for email [example@example.com]."
+}
+```
+
+---
+
 
 #### GET `/api/v1/mailers/mail-types`
 

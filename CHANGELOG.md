@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed how unique template code is acquired - instead od suffixing numbers, Mailer now appends random string to the end of mail template code. remp/remp#1027
   - All internal parts of Mailer which didn't use this feature and tried to get the code their own way now use provided `TemplatesRepository::getUniqueTemplateCode()` method.
 - Removed unused repositories `LogEventsRepository` and `UsersRepository` _(leftovers after separation from CRM)_.
+- Added API endpoint `/api/v1/users/delete` to remove all user data for provided email. remp/crm#1392
 
 ## [0.28.0] - 2021-09-09
 
