@@ -48,7 +48,7 @@ class NovydenikShopContent implements ShopContentInterface
         }
 
         try {
-            $schema = Json::decode($matches[1][0]);
+            $schema = Json::decode($matches[1][1]);
         } catch (JsonException $e) {
             return null;
         }
