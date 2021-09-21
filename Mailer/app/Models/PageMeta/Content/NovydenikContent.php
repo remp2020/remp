@@ -54,7 +54,7 @@ class NovydenikContent implements ContentInterface
         }
 
         try {
-            $schema = Json::decode($matches[1][1]);
+            $schema = Json::decode($matches[1][0]);
         } catch (JsonException $e) {
             return new Meta();
         }
@@ -84,7 +84,7 @@ class NovydenikContent implements ContentInterface
         }
 
         try {
-            $schema = Json::decode($matches[1][0]);
+            $schema = Json::decode($matches[1][1]);
         } catch (JsonException $e) {
             return new Meta();
         }
