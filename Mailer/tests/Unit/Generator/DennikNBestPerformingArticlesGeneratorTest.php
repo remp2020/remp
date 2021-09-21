@@ -6,6 +6,7 @@ namespace Tests\Unit\Generator;
 use Nette\Database\Table\Selection;
 use PHPUnit\Framework\TestCase;
 use Remp\Mailer\Models\PageMeta\Content\DenniknContent;
+use Remp\Mailer\Models\PageMeta\Content\DenniknShopContent;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\GenericBestPerformingArticlesGenerator;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
