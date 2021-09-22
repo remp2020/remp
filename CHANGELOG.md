@@ -48,6 +48,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added error logging from showtime experiment `showtime.php` into `laravel.log`. remp/remp#994
 - Added support for Sentry error logging from showtime experiment `showtime.php`. remp/remp#994
 
+### Project
+
+- Removed obsolete `python-minimal` from Dockerfile to fix build error. remp/remp#1012
+
 ### [Mailer]
 
 - **BREAKING**: Renamed `UrlParserGenerator` to `ArticleUrlParserGenerator`. remp/remp#949

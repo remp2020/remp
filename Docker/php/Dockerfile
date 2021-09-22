@@ -1,6 +1,6 @@
 FROM php:7.4-fpm
 
-ENV BUILD_DEPS g++ build-essential libsasl2-dev libssl-dev python-minimal
+ENV BUILD_DEPS g++ build-essential libsasl2-dev libssl-dev
 
 ENV RUN_DEPS libzip-dev libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev libonig-dev
 
