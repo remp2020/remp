@@ -99,6 +99,11 @@ class MailCache
         return $this->connect()->scard(static::REDIS_KEY . $queueId) > 0;
     }
 
+    public function countJobs(int $queueId): int
+    {
+        return $this->connect()->scard(static::REDIS_KEY . $queueId);
+    }
+
     public function jobExists(string $job, int $queueId): bool
     {
         return (bool)$this->connect()->sismember(static::REDIS_KEY . $queueId, $job);

@@ -13,11 +13,11 @@ use Tomaj\Hermes\Emitter;
 class BatchesRepository extends Repository
 {
     const STATUS_CREATED = 'created';
-    const STATUS_UPDATED = 'updated';
-    const STATUS_READY = 'ready';
-    const STATUS_PREPARING = 'preparing';
+    const STATUS_READY_TO_PROCESS_AND_SEND = 'ready_to_process_and_send';
+    const STATUS_READY_TO_PROCESS = 'ready_to_process';
     const STATUS_PROCESSING = 'processing';
     const STATUS_PROCESSED = 'processed';
+    const STATUS_QUEUED = 'queued';
     const STATUS_SENDING = 'sending';
     const STATUS_DONE = 'done';
     const STATUS_USER_STOP = 'user_stopped';
@@ -27,8 +27,8 @@ class BatchesRepository extends Repository
 
     const EDITABLE_STATUSES = [
         BatchesRepository::STATUS_CREATED,
-        BatchesRepository::STATUS_UPDATED,
-        BatchesRepository::STATUS_READY,
+        BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND,
+        BatchesRepository::STATUS_READY_TO_PROCESS,
     ];
 
     protected $tableName = 'mail_job_batch';
@@ -89,7 +89,7 @@ class BatchesRepository extends Repository
     public function getBatchReady(): ?ActiveRow
     {
         return $this->getTable()->select('*')->where([
-            'status' => self::STATUS_READY,
+            'status' => [self::STATUS_READY_TO_PROCESS_AND_SEND, self::STATUS_READY_TO_PROCESS],
             'start_at <= ? OR start_at IS NULL' => new DateTime(),
         ])->limit(1)->fetch();
     }
@@ -99,7 +99,7 @@ class BatchesRepository extends Repository
         return $this->getTable()
             ->select('mail_job_batch.*')
             ->where([
-                'mail_job_batch.status' => [ self::STATUS_PROCESSED, self::STATUS_SENDING ]
+                'mail_job_batch.status' => [ self::STATUS_QUEUED, self::STATUS_SENDING ]
             ])
             ->order(':mail_job_batch_templates.mail_template.mail_type.priority DESC')
             ->limit(1)
@@ -116,7 +116,7 @@ class BatchesRepository extends Repository
         return $this->getTable()
             ->where([
                 'mail_job_batch.status' => [
-                    self::STATUS_READY,
+                    self::STATUS_READY_TO_PROCESS_AND_SEND,
                     self::STATUS_PROCESSING,
                     self::STATUS_PROCESSED,
                     self::STATUS_SENDING
@@ -144,5 +144,16 @@ class BatchesRepository extends Repository
             ->select('*')
             ->where(['mail_job_id' => $jobId])
             ->where(['status NOT IN' => self::EDITABLE_STATUSES]);
+    }
+
+    public function getBatchToRemove(): ?ActiveRow
+    {
+        return $this->getTable()
+            ->where([
+                'status' => self::STATUS_PROCESSED,
+                'updated_at < ?' => new DateTime('- 1 day')
+            ])
+            ->limit(1)
+            ->fetch();
     }
 }

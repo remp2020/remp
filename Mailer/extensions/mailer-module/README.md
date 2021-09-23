@@ -133,13 +133,17 @@ All the other options are related to the *batch* that is created with the *job*.
 * *Number of emails.* Limits number of emails to be sent within the batch.
 * *Start date.* Specifies when the batch should be sent (now or in the future).
 
-When the *job*/*batch* is created, you need to push *"Start sending"* button to trigger the execution. First, the background processor
-will receive necessary information about target group of users and prepares metadata for sending daemon.
+When the *job*/*batch* is created, you need to either push *"Start sending"* or *"Prepare queue" button*.
+After pressing both buttons, the background processor will receive necessary information about target group of users and prepare metadata for sending daemon.
 
-Once the metadata is ready and the *batch* is in the *processed* state, it will be picked up by sending daemon and
-actual emails will be sent via preconfigured Mailer (SMTP, Mailgun, ...).
+Once the metadata is ready, when pressed *"Start sending"* button, the batch will be picked up by sending daemon and
+actual emails will be sent via preconfigured Mailer (SMTP, Mailgun, ...). When "Prepare queue" button was pressed, the *batch*
+is in the *processed* state, all the metadata is prepared and the *number of emails* that will be actually sent is available.
 
 You can create and execute *jobs*/*batches* programmatically by using provided API endpoints.
+
+To remove old *batches* that are in the *processed* state use `mail:remove-old-batches` command. Batch is considered to be old
+when it is in the `processed` state for more than 24 hours. All the metadata prepared when changing state to `processed` can be outdated, and it is not recommended to use for sending emails.
 
 ### Generators
 
