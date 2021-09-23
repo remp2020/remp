@@ -42,6 +42,7 @@ services:
 			- add(Remp\MailerModule\Commands\AggregateMailTemplateStatsCommand())
 			- add(Remp\MailerModule\Commands\HeartbeatCommand())
 			- add(Remp\MailerModule\Commands\MailTypeStatsCommand())
+			- add(Remp\MailerModule\Commands\RemoveOldMailJobBatchesCommand())
 			- add(@hermesWorker)
 			- setCatchExceptions(true)
 

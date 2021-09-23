@@ -248,9 +248,9 @@ final class JobPresenter extends BasePresenter
         }
 
         $batchUnsubscribeStats = [];
+        $batchPreparedEmailsStats = [];
         foreach ($job->related('mail_job_batch') as $batch) {
             $batchUnsubscribeStats[$batch->id] = 0;
-
             foreach ($batch->related('mail_job_batch_templates') as $mjbt) {
                 $batchUnsubscribeStats[$batch->id] += $mjbt->mail_template->mail_type
                     ->related('mail_user_subscriptions')
@@ -261,12 +261,15 @@ final class JobPresenter extends BasePresenter
                     ])
                     ->count('*');
             }
+
+            $batchPreparedEmailsStats[$batch->id] = $this->mailCache->countJobs($batch->id);
         }
 
         $this->template->job = $job;
         $this->template->total_sent = $this->logsRepository->getJobLogs($job->id)->count('*');
         $this->template->jobIsEditable = $this->jobsRepository->isEditable($job->id);
         $this->template->batchUnsubscribeStats = $batchUnsubscribeStats;
+        $this->template->batchPreparedEmailsStats = $batchPreparedEmailsStats;
     }
 
     public function renderEditJob($id)
@@ -303,10 +306,14 @@ final class JobPresenter extends BasePresenter
         $this->redirect('Show', $batchTemplate->mail_job_id);
     }
 
-    public function handleSetBatchReady($id)
+    public function handleSetBatchReadyToSend($id)
     {
         $batch = $this->batchesRepository->find($id);
-        $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY);
+        if ($batch->status === BatchesRepository::STATUS_PROCESSED) {
+            $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_QUEUED);
+        } else {
+            $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);
+        }
 
         $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->mail_job_id);
@@ -360,6 +367,15 @@ final class JobPresenter extends BasePresenter
         $this->batchesRepository->delete($batch);
 
         $this->flashMessage('Batch was removed.');
+        $this->redirect('Show', $batch->mail_job_id);
+    }
+
+    public function handleSetBatchReadyToProcess($id)
+    {
+        $batch = $this->batchesRepository->find($id);
+        $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS);
+
+        $this->flashMessage('Status of batch was changed.');
         $this->redirect('Show', $batch->mail_job_id);
     }
 

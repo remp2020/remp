@@ -8,9 +8,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Changed mail job batch status `STATUS_READY` to `STATUS_READY_TO_PROCESS_AND_SEND` in `BatchesRepository`. remp/remp#995
+  - If you use `STATUS_READY` in your implementation, replace it with `STATUS_READY_TO_PROCESS_AND_SEND`.
+- Added new mail job batch status `STATUS_READY_TO_PROCESS`. remp/remp#995
+- Added option to process mail job batch and get number of emails that will be sent in that batch. New button added to every mail job batch available when mail job batch is in `created` status. remp/remp#995
+- Added `mail:remove-old-batches` command that removes mail job batches in `processed` status older than 24 hours. This prevents from using outdated emails set to send emails. remp/remp#995
 - Added the prefilling of from field into ArticleUrlParserWidget after email's type is selected. remp/remp#999
 - Fixed Article URL parser generator to ignore blank lines causing NULL requests to parse the URLs. remp/remp#1014  
-- Removed obsolete RTM campaign parameter from Article URL parser generator. 
+- Removed obsolete RTM campaign parameter from Article URL parser generator.
 
 ## [0.28.0] - 2021-09-09
 

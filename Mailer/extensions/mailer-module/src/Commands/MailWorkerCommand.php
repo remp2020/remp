@@ -158,7 +158,7 @@ class MailWorkerCommand extends Command
                 continue;
             }
 
-            if ($batch->status === BatchesRepository::STATUS_PROCESSED) {
+            if ($batch->status === BatchesRepository::STATUS_QUEUED) {
                 $this->mailJobBatchRepository->updateStatus($batch, BatchesRepository::STATUS_SENDING);
             }
 

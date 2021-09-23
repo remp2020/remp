@@ -151,7 +151,7 @@ class TldrTemplateFormFactory
             $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
 
-            $batchStatus = BatchesRepository::STATUS_READY;
+            $batchStatus = BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND;
 
             if ($form->getComponent('generate_emails_jobs_created')->isSubmittedBy()) {
                 $batchStatus = BatchesRepository::STATUS_CREATED;

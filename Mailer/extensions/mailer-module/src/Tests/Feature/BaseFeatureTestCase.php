@@ -131,7 +131,7 @@ SET FOREIGN_KEY_CHECKS=1;
         $batch = $this->batchesRepository->add($mailJob->id, $maxEmailsCount, null, BatchesRepository::METHOD_RANDOM);
         $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->addTemplate($batch, $template);
-        $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY);
+        $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);
         return $batch;
     }
 
