@@ -85,6 +85,10 @@ class ShopUrlParserGenerator implements IGenerator
         $urls = explode("\n", trim($values['products']));
         foreach ($urls as $url) {
             $url = trim($url);
+            if (empty($url)) {
+                // people sometimes enter blank lines
+                continue;
+            }
             $meta = $this->shopContent->fetchUrlMeta($url);
             if ($meta) {
                 $items[$url] = $meta;

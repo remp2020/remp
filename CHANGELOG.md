@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added the prefilling of from field into ArticleUrlParserWidget after email's type is selected. remp/remp#999
+- Fixed Article URL parser generator to ignore blank lines causing NULL requests to parse the URLs. remp/remp#1014  
+- Removed obsolete RTM campaign parameter from Article URL parser generator. 
 
 ## [0.28.0] - 2021-09-09
 

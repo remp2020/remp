@@ -50,8 +50,6 @@ class ArticleUrlParserGenerator implements IGenerator
             ->getControlPrototype()
             ->setHtmlAttribute('class', 'form-control html-editor');
 
-        $form->addText('rtm_campaign', 'RTM campaign');
-
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
@@ -93,6 +91,10 @@ class ArticleUrlParserGenerator implements IGenerator
         $urls = explode("\n", trim($values['articles']));
         foreach ($urls as $url) {
             $url = trim($url);
+            if (empty($url)) {
+                // people sometimes enter blank lines
+                continue;
+            }
             $meta = $this->content->fetchUrlMeta($url);
             if ($meta) {
                 $items[$url] = $meta;
@@ -103,9 +105,6 @@ class ArticleUrlParserGenerator implements IGenerator
             'intro' => $values['intro'],
             'footer' => $values['footer'],
             'items' => $items,
-            'rtm_campaign' => $values['rtm_campaign'],
-            // UTM Fallback -- will be removed
-            'utm_campaign' => $values['rtm_campaign'],
         ];
 
         $engine = $this->engineFactory->engine();
