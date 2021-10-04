@@ -8,6 +8,7 @@ use Nette\Utils\JsonException;
 use Remp\MailerModule\Api\InvalidApiInputParamException;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\RawInputParam;
@@ -20,14 +21,18 @@ class MailTypeUpsertHandler extends BaseHandler
 
     private $listCategoriesRepository;
 
+    private $templatesRepository;
+
     public function __construct(
         ListsRepository $listsRepository,
-        ListCategoriesRepository $listCategoriesRepository
+        ListCategoriesRepository $listCategoriesRepository,
+        TemplatesRepository $templatesRepository
     ) {
         parent::__construct();
 
         $this->listsRepository = $listsRepository;
         $this->listCategoriesRepository = $listCategoriesRepository;
+        $this->templatesRepository = $templatesRepository;
     }
 
     public function params(): array
@@ -45,16 +50,53 @@ class MailTypeUpsertHandler extends BaseHandler
             return new JsonApiResponse(400, ['status' => 'error', 'message' => 'input data was not valid JSON']);
         }
 
-        if (!isset($data['mail_type_category_id'])) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Required field missing: mail_type_category_id']);
+        if (isset($data['mail_type_category_id'])) {
+            $listCategory = $this->listCategoriesRepository->find($data['mail_type_category_id']);
+            if (!$listCategory) {
+                return new JsonApiResponse(404, [
+                    'status' => 'error',
+                    'code' => 'list_category_not_found',
+                    'message' => 'Invalid mail_type_category_id provided: ' . $data['mail_type_category_id'],
+                ]);
+            }
         }
-        if (!$this->listCategoriesRepository->find($data['mail_type_category_id'])) {
-            return new JsonApiResponse(400, ['status' => 'error', 'message' => 'Invalid mail_type_category_id provided: ' . $data['mail_type_category_id']]);
+
+        if (array_key_exists('subscribe_mail_template_code', $data)) {
+            if ($data['subscribe_mail_template_code'] !== null) {
+                $template = $this->templatesRepository->getByCode($data['subscribe_mail_template_code']);
+
+                if (!$template) {
+                    return new JsonApiResponse(404, [
+                        'status' => 'error',
+                        'code' => 'subscribe_template_not_found',
+                        'message' => 'No template found for provided subscribe_mail_template_code: ' . $data['subscribe_mail_template_code'],
+                    ]);
+                }
+                if ($template->mail_type->mail_type_category->code !== 'system') {
+                    return new JsonApiResponse(400, [
+                        'status' => 'error',
+                        'code' => 'subscribe_template_not_allowed',
+                        'message' => 'Subscribe_mail_template_id must belong under one of the system category newsletters: ' . $template->mail_type->mail_type_category->code,
+                    ]);
+                }
+
+                $data['subscribe_mail_template_id'] = $template->id;
+            } else {
+                $data['subscribe_mail_template_id'] = null;
+            }
+
+            unset($data['subscribe_mail_template_code']);
         }
 
         try {
             $list = $this->getList($data);
             if ($list) {
+                $data['mail_type_category_id'] ??= $list->mail_type_category_id;
+                $data['priority'] ??= $list->priority;
+                $data['code'] ??= $list->code;
+                $data['title'] ??= $list->title;
+                $data['description'] ??= $list->description;
+
                 $this->listsRepository->update($list, $data);
             } else {
                 $list = $this->addList($data);
@@ -62,6 +104,7 @@ class MailTypeUpsertHandler extends BaseHandler
         } catch (InvalidApiInputParamException $e) {
             return new JsonApiResponse($e->getCode(), [
                 'status' => 'error',
+                'code' => 'invalid_input',
                 'message' => $e->getMessage(),
             ]);
         }
@@ -88,6 +131,7 @@ class MailTypeUpsertHandler extends BaseHandler
                 'updated_at' => $list->updated_at->format(DATE_RFC3339),
                 'is_multi_variant' => (bool) $list->is_multi_variant,
                 'default_variant_id' => $list->default_variant_id,
+                'subscribe_mail_template_code' => $list->subscribe_mail_template->code ?? null,
             ],
         ]);
     }
@@ -156,7 +200,8 @@ class MailTypeUpsertHandler extends BaseHandler
             $params['page_url'] ?? null,
             $params['image_url'] ?? null,
             $params['public_listing'] ?? true,
-            $params['mail_from'] ?? null
+            $params['mail_from'] ?? null,
+            $params['subscribe_mail_template_id'] ?? null
         );
     }
 }

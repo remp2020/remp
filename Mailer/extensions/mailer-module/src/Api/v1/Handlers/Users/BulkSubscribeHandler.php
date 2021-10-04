@@ -62,6 +62,7 @@ class BulkSubscribeHandler extends SubscribeHandler
                 'variant_id' => $variantID,
                 'subscribe' => $item['subscribe'],
                 'rtm_params' => $this->getRtmParams($item),
+                'send_accompanying_emails' => $item['send_accompanying_emails'] ?? true,
             ];
         }
 
@@ -69,7 +70,7 @@ class BulkSubscribeHandler extends SubscribeHandler
             $rtmParams = $item['rtm_params'] ?? [];
 
             if ($user['subscribe'] === true) {
-                $this->userSubscriptionsRepository->subscribeUser($user['list'], $user['user_id'], $user['email'], $user['variant_id']);
+                $this->userSubscriptionsRepository->subscribeUser($user['list'], $user['user_id'], $user['email'], $user['variant_id'], $user['send_accompanying_emails']);
             } else {
                 // if email doesn't exist, no need to unsubscribe
                 if (!empty($this->userSubscriptionsRepository->findByEmail($user['email']))) {

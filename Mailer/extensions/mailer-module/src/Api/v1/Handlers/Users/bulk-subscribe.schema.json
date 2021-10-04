@@ -61,6 +61,9 @@
         },
         "rtm_params": {
           "type": "object"
+        },
+        "send_accompanying_emails": {
+          "type": "boolean"
         }
       }
     }

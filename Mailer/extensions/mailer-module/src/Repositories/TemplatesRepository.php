@@ -200,4 +200,14 @@ class TemplatesRepository extends Repository
     {
         return Random::generate(8);
     }
+
+    public function getByMailTypeIds(array $mailTypeIds)
+    {
+        return $this->getTable()->where('mail_type_id', $mailTypeIds);
+    }
+
+    public function getByMailTypeCategoryCode(string $mailTypeCategoryCode): Selection
+    {
+        return $this->getTable()->where('mail_type.mail_type_category.code = ?', $mailTypeCategoryCode);
+    }
 }

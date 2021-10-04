@@ -1181,6 +1181,7 @@ Please visit `/list/new` to create a newsletter via web admin.
 
   // optional
   "variant_id": 123, // Integer; ID of the newsletter variant to subscribe
+  "send_accompanying_emails": true // Boolean; Whether to send welcome email to the subscribed user. Defaults to TRUE.
 }
 ```
 
@@ -1195,7 +1196,8 @@ curl -X POST \
 	"email": "admin@example.com",
 	"user_id": 123,
 	"list_id": 1,
-	"variant_id": 1
+	"variant_id": 1,
+    "send_accompanying_emails": true
 }'
 ```
 
@@ -1335,7 +1337,9 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
         "utm_medium": "email",
         "utm_campaign": "daily-newsletter-11.3.2019-personalized",
         "utm_content": "26026"
-      }
+      },
+      // optional
+      "send_accompanying_emails": true // Boolean; Flag whether to send welcome or goodbye (not implemented yet) email to the user whom subscription is being changed. Defaults to TRUE.
     }
   //...
   ]
@@ -1354,6 +1358,7 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
 | variant_id | *Integer* | no | Optional ID of variant. |
 | rtm_params | *Object* | no | Optional RTM parameters for pairing which email caused the user to unsubscribe. |
 | utm_params | *Object* | no | (Deprecated) UTM parameters are deprecated, but if no RTM paramters are found, system will try to use these. |
+| send_accompanying_emails | *Boolean* | no | Whether or not to send welcome or goodbye(not implemented yet) email to the user whom subscription is being changed. Defaults to **TRUE**. |
 
 
 ##### *Example:*
@@ -1824,7 +1829,7 @@ Field `id` has higher precedence in finding the existing record.
 {
     "mail_type_category_id": 5, // Integer, required; Reference to mail type category.
     "priority": 100, // Integer, required; Priority of newsletter during sending. Higher number is prioritized in queue.
-    "code": 22, // String, required; URL-friendly slug identifying mail type
+    "code": "premium_newsletter", // String, required; URL-friendly slug identifying mail type
     "title": "Foo Bar", // String, required: Title of mail type
     "description": "Newsletter sent to our premium subscribers", // String, required: Description of list visible in Mailer admin
     "mail_from": "email@example.com", // String, optional; Who should be used as a sender of email type.
@@ -1836,6 +1841,7 @@ Field `id` has higher precedence in finding the existing record.
     "image_url": "http://example.com/image.jpg", // String, optional; URL of image for frontend UI.
     "preview_url": "http://example.com/demo.html", // String, optional; URL of example newsletter to preview content to users.
     "page_url": "http://example.com/page.html", // String, optional; URL of newsletter title page with description and editions.
+    "subscribe_mail_template_code": "generic_newsletter_welcome", // String, optional; Reference to mail template that should be sent to the user as welcome email right after the subscription to the newsletter. Only system emails are supported.
 }
 ```
 
@@ -1880,7 +1886,8 @@ Response:
         "created_at": "2019-06-27T14:08:25+02:00",
         "updated_at": "2019-06-27T14:08:36+02:00",
         "is_multi_variant": false,
-        "default_variant_id": null
+        "default_variant_id": null,
+        "subscribe_mail_template_code": null
     }
 }
 ```

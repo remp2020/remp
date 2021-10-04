@@ -30,7 +30,8 @@ class ListsRepository extends Repository
         ?string $pageUrl = null,
         ?string $imageUrl = null,
         bool $publicListing = true,
-        ?string $mailFrom = null
+        ?string $mailFrom = null,
+        int $subscribeEmailTemplateId = null
     ): ActiveRow {
         $result = $this->insert([
             'mail_type_category_id' => $categoryId,
@@ -47,6 +48,7 @@ class ListsRepository extends Repository
             'image_url' => $imageUrl,
             'preview_url' => $previewUrl,
             'page_url' => $pageUrl,
+            'subscribe_mail_template_id' => $subscribeEmailTemplateId,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime()
         ]);
