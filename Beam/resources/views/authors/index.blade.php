@@ -25,6 +25,20 @@
                 <smart-range-selector from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callbackConversion">
                 </smart-range-selector>
             </div>
+
+            <div class="col-md-2">
+                <h4>Filter by article content type</h4>
+                {!! Form::hidden('content_type', $contentType) !!}
+
+                <v-select
+                        name="content_type_select"
+                        :options="contentTypes"
+                        value="{{$contentType}}"
+                        title="all"
+                        liveSearch="false"
+                        v-on:input="callbackContentType"
+                ></v-select>
+            </div>
         </div>
     </div>
 
@@ -121,6 +135,7 @@
                 'published_to' => '$(\'[name="published_to"]\').val()',
                 'conversion_from' => '$(\'[name="conversion_from"]\').val()',
                 'conversion_to' => '$(\'[name="conversion_to"]\').val()',
+                'content_type' => '$(\'[name="content_type"]\').val()',
                 'tz' => 'Intl.DateTimeFormat().resolvedOptions().timeZone'
             ],
             'refreshTriggers' => [
@@ -140,6 +155,10 @@
                     'event' => 'change',
                     'selector' => '[name="conversion_to"]',
                 ],
+                [
+                    'event' => 'change',
+                    'selector' => '[name="content_type"]',
+                ],
             ],
             'exportColumns' => [0,1,2,3,4,5,6,7,8,9],
         ]) !!}
@@ -149,7 +168,13 @@
         new Vue({
             el: "#smart-range-selectors",
             components: {
-                SmartRangeSelector
+                SmartRangeSelector,
+                vSelect
+            },
+            data: function () {
+                return {
+                    contentTypes: {!! @json($contentTypes) !!}
+                }
             },
             methods: {
                 callbackPublished: function (from, to) {
@@ -159,6 +184,9 @@
                 callbackConversion: function (from, to) {
                     $('[name="conversion_from"]').val(from);
                     $('[name="conversion_to"]').val(to).trigger("change");
+                },
+                callbackContentType: function (contentType) {
+                    $('[name="content_type"]').val(contentType).trigger("change");
                 }
             }
         });

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added article content type filter to authors. remp/remp#1001
+
 ### [Mailer]
 
 - **BREAKING**: Changed mail job batch status `STATUS_READY` to `STATUS_READY_TO_PROCESS_AND_SEND` in `BatchesRepository`. remp/remp#995
