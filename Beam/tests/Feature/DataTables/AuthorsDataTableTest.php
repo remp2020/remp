@@ -29,11 +29,11 @@ class AuthorsDataTableTest extends TestCase
         Property::factory()->create(['uuid' => 'prop_2']);
 
         /** @var Article $prop1SharedArticle */
-        $prop1SharedArticle = Article::factory()->create(['property_uuid' => 'prop_1']);
+        $prop1SharedArticle = Article::factory()->create(['property_uuid' => 'prop_1', 'content_type' => 'article']);
         /** @var Article $prop2Article */
-        $prop2Article = Article::factory()->create(['property_uuid' => 'prop_2']);
+        $prop2Article = Article::factory()->create(['property_uuid' => 'prop_2', 'content_type' => 'article']);
         /** @var Article $prop2SharedArticle */
-        $prop2SharedArticle = Article::factory()->create(['property_uuid' => 'prop_2']);
+        $prop2SharedArticle = Article::factory()->create(['property_uuid' => 'prop_2', 'content_type' => 'blog']);
 
         $this->authors = [
             1 => Author::factory()->create(),
@@ -103,9 +103,33 @@ class AuthorsDataTableTest extends TestCase
         $json->assertJsonPath('data.1.conversions_count', 4);
     }
 
-    private function request()
+    public function testAuthorsContentType()
+    {
+        $json = $this->request('article');
+        $json->assertSuccessful();
+        $json->assertJsonPath('recordsTotal', 2);
+        $json->assertJsonPath('data.0.id', $this->authors[2]->id);
+        $json->assertJsonPath('data.0.articles_count', 2);
+        $json->assertJsonPath('data.0.conversions_count', 5);
+        $json->assertJsonPath('data.1.id', $this->authors[1]->id);
+        $json->assertJsonPath('data.1.articles_count', 1);
+        $json->assertJsonPath('data.1.conversions_count', 2);
+
+        $json = $this->request('blog');
+        $json->assertSuccessful();
+        $json->assertJsonPath('recordsTotal', 2);
+        $json->assertJsonPath('data.0.id', $this->authors[1]->id);
+        $json->assertJsonPath('data.0.articles_count', 1);
+        $json->assertJsonPath('data.0.conversions_count', 4);
+        $json->assertJsonPath('data.1.id', $this->authors[2]->id);
+        $json->assertJsonPath('data.1.articles_count', 1);
+        $json->assertJsonPath('data.1.conversions_count', 4);
+    }
+
+    private function request(string $contentType = null)
     {
         return $this->getJson(route('authors.dtAuthors', [
+            'content_type' => $contentType,
             'columns[0][data]' => 'articles_count',
             'columns[1][data]' => 'id',
             'order[0][column]' => 0,

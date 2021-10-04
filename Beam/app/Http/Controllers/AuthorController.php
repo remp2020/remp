@@ -28,6 +28,11 @@ class AuthorController extends Controller
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->input('conversion_to', 'now'),
+                'contentTypes' => array_merge(
+                    ['all'],
+                    Article::groupBy('content_type')->pluck('content_type')->toArray()
+                ),
+                'contentType' => $request->input('content_type', 'all'),
             ]),
             'json' => AuthorResource::collection(Author::paginate()),
         ]);
@@ -123,6 +128,12 @@ class AuthorController extends Controller
             $conversionsQuery->where('paid_at', '<=', $conversionTo);
         }
 
+        if ($request->input('content_type') && $request->input('content_type') !== 'all') {
+            $authorArticlesQuery->where('content_type', '=', $request->input('content_type'));
+            $conversionsQuery->where('content_type', '=', $request->input('content_type'));
+            $pageviewsQuery->where('content_type', '=', $request->input('content_type'));
+        }
+
         $authors = Author::selectRaw(implode(",", $cols))
             ->leftJoin(DB::raw("({$authorArticlesQuery->toSql()}) as aa"), 'authors.id', '=', 'aa.author_id')->addBinding($authorArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'authors.id', '=', 'c.author_id')->addBinding($conversionsQuery->getBindings())
@@ -151,6 +162,9 @@ class AuthorController extends Controller
         if ($request->input('conversion_to')) {
             $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'));
             $conversionsQuery->where('paid_at', '<=', $conversionTo);
+        }
+        if ($request->input('content_type') && $request->input('content_type') !== 'all') {
+            $conversionsQuery->where('content_type', '=', $request->input('content_type'));
         }
 
         $conversionAmounts = [];
