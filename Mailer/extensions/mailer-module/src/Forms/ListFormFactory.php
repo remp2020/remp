@@ -64,7 +64,11 @@ class ListFormFactory
             $categoryPairs
         )->setRequired("Field 'Category' is required.");
 
-        $systemEmails = $this->templatesRepository->getByMailTypeCategoryCode('system')->fetchPairs('id', 'name');
+        $systemEmails = $this->templatesRepository
+            ->getByMailTypeCategoryCode('system')
+            ->select('mail_templates.id, mail_templates.name')
+            ->fetchPairs('id', 'name');
+
         $form->addSelect(
             'subscribe_mail_template_id',
             'Subscription welcome email',
