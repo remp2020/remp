@@ -72,6 +72,7 @@ services:
 			- setupPriorityQueue('hermes_tasks_high', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_HIGH)
 			- setupPriorityQueue('hermes_tasks', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_MEDIUM)
 			- setupPriorityQueue('hermes_tasks_low', \Remp\MailerModule\Hermes\RedisDriver::PRIORITY_LOW)
+			- setupSleepTime(1)
 	hermesDispatcher:
 		factory: Tomaj\Hermes\Dispatcher(@hermesRedisDriver, @hermesLogger, @hermesShutdown)
 	hermesEmitter:
