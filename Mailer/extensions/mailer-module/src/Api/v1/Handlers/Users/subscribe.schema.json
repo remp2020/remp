@@ -7,7 +7,8 @@
     "user_id": 1,
     "email": "test@test.com",
     "list_id": 1,
-    "variant_id": 1
+    "variant_id": 1,
+    "send_welcome_email": true
   },
     {
       "user_id": 1,
@@ -47,6 +48,9 @@
     },
     "variant_id": {
       "type": "integer"
+    },
+    "send_accompanying_emails": {
+      "type": "boolean"
     }
   }
 }

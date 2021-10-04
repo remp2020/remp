@@ -15,12 +15,18 @@ class ListCategoriesRepository extends Repository
         return $this->getTable()->order('sorting ASC');
     }
 
-    public function add(string $title, int $sorting): ActiveRow
+    public function add(string $title, string $code, int $sorting): ActiveRow
     {
         return $this->getTable()->insert([
             'title' => $title,
+            'code' => $code,
             'sorting' => $sorting,
             'created_at' => new DateTime(),
         ]);
+    }
+
+    public function getByCode(string $code): Selection
+    {
+        return $this->getTable()->where(['code' => $code]);
     }
 }

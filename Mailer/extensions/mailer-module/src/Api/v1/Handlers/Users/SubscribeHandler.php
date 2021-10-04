@@ -66,12 +66,14 @@ class SubscribeHandler extends BaseHandler
         $userID = $payload['user_id'];
         $list = $this->getList($payload);
         $variantID = $this->getVariantID($payload, $list);
+        $sendWelcomeEmail = $payload['send_accompanying_emails'] ?? true;
 
         $this->userSubscriptionsRepository->subscribeUser(
             $list,
             $userID,
             $email,
-            $variantID
+            $variantID,
+            $sendWelcomeEmail
         );
     }
 

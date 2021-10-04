@@ -63,8 +63,8 @@ class DatabaseSeedCommand extends Command
         }
 
         $listCategories = [
-            ['title' => 'Newsletters', 'sorting' => 100],
-            ['title' => 'System', 'sorting' => 999],
+            ['title' => 'Newsletters', 'code' => 'newsletters', 'sorting' => 100],
+            ['title' => 'System', 'code' => 'system', 'sorting' => 999],
         ];
         $output->writeln('Newsletter list categories:');
         foreach ($listCategories as $category) {
@@ -72,7 +72,7 @@ class DatabaseSeedCommand extends Command
                 $output->writeln(" * Newsletter list <info>{$category['title']}</info> exists");
                 continue;
             }
-            $this->listCategoriesRepository->add($category['title'], $category['sorting']);
+            $this->listCategoriesRepository->add($category['title'], $category['code'], $category['sorting']);
             $output->writeln(" * Newsletter list <info>{$category['title']}</info> created");
         }
 

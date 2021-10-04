@@ -14,12 +14,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **BREAKING**: Changed mail job batch status `STATUS_READY` to `STATUS_READY_TO_PROCESS_AND_SEND` in `BatchesRepository`. remp/remp#995
   - If you use `STATUS_READY` in your implementation, replace it with `STATUS_READY_TO_PROCESS_AND_SEND`.
+- **BREAKING**: Added parameter for `code` attribute of mail type category into `ListCategoriesRepository::add()` method. remp/remp#675
+  - The signature of method changed from `(string $title, int $sorting)` to `(string $title, string $code, int $sorting)`. Check your usages of the method and incorporate the changes.
 - Added new mail job batch status `STATUS_READY_TO_PROCESS`. remp/remp#995
 - Added option to process mail job batch and get number of emails that will be sent in that batch. New button added to every mail job batch available when mail job batch is in `created` status. remp/remp#995
 - Added `mail:remove-old-batches` command that removes mail job batches in `processed` status older than 24 hours. This prevents from using outdated emails set to send emails. remp/remp#995
 - Added the prefilling of from field into ArticleUrlParserWidget after email's type is selected. remp/remp#999
 - Fixed Article URL parser generator to ignore blank lines causing NULL requests to parse the URLs. remp/remp#1014  
 - Removed obsolete RTM campaign parameter from Article URL parser generator.
+- Added support for configuration of welcome email for new newsletter subscription. remp/remp#675
+  - Added `subscribe_mail_template_id` into the `mail_types` table. 
+  - Added `subscribe_mail_template_code` parameter to the `/api/v1/mailers/mail-type-upsert` API to configure the welcome email. 
+  - Added new field for the subscription welcome email in the newsletter edit/create form that provides system emails for selection.
+  - Changed signature of `UserSubscriptionsRepository::subscribeUser()` - new `$sendWelcomeEmail` argument was added.
+- Added `code` column into the `mail_type_categories` table. Migration will take care of adding codes into the already existing categories. remp/remp#675
+  - Added respective `code` attributes for mail type categories in `DatabaseSeedCommand`. 
+- Added new emit of `user-subscribed` hermes event when user subscribes to the newsletter. remp/remp#675
+- Added optional boolean `send_accompanying_emails` parameter into the `/api/v1/users/subscribe` and `/api/v1/users/bulk-subscribe` API endpoints. remp/remp#675
+  - This parameter configures whether the subscription of newsletter should also trigger the welcome (and in the future goodbye) email for the newsletter.
 
 ## [0.28.0] - 2021-09-09
 

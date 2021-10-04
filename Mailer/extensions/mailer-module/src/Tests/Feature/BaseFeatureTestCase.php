@@ -5,6 +5,7 @@ namespace Tests\Feature;
 
 use Nette\Database\Context;
 use Nette\Utils\Random;
+use Nette\Utils\Strings;
 use PDOException;
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Repositories\BatchesRepository;
@@ -100,7 +101,7 @@ class BaseFeatureTestCase extends TestCase
             $this->listVariantsRepository,
             $this->listCategoriesRepository,
             $this->userSubscriptionsRepository,
-            $this->userSubscriptionVariantsRepository
+            $this->userSubscriptionVariantsRepository,
         ]));
 
         $db = $this->database->getConnection()->getPdo();
@@ -155,6 +156,16 @@ SET FOREIGN_KEY_CHECKS=1;
         return $this->layoutsRepository->add('Layout', 'layout', '', '');
     }
 
+    protected function createMailTypeCategory($categoryName)
+    {
+        $categoryCode = Strings::webalize($categoryName);
+        $listCategory = $this->listCategoriesRepository->getByCode($categoryCode)->fetch();
+        if (!$listCategory) {
+            $listCategory = $this->listCategoriesRepository->add($categoryName, $categoryCode, 100);
+        }
+        return $listCategory;
+    }
+
     protected function createMailTypeWithCategory(
         string $categoryName = 'category',
         string $typeCode = 'code',
@@ -162,7 +173,8 @@ SET FOREIGN_KEY_CHECKS=1;
         bool $isPublic = true,
         bool $publicListing = true
     ) {
-        $listCategory = $this->listCategoriesRepository->add($categoryName, 100);
+        $listCategory = $this->createMailTypeCategory($categoryName);
+
         return $this->listsRepository->add(
             $listCategory->id,
             1,

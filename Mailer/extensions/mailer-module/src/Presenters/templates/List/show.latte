@@ -84,6 +84,7 @@
                     <li class="list-group-item"><strong>Auto subscribe:</strong> {$list->auto_subscribe|yesNo}</li>
                     <li class="list-group-item"><strong>Locked:</strong> {$list->locked|yesNo}</li>
                     <li class="list-group-item"><strong>Public:</strong> {$list->is_public|yesNo}</li>
+                    <li class="list-group-item"><strong>Welcome Email:</strong> {ifset $list->subscribe_mail_template} <a n:href="Template:Show $list->subscribe_mail_template_id">{$list->subscribe_mail_template->subject}</a>{else}No{/ifset}</li>
                 </ul>
             </div>
         </div>

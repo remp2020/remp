@@ -9,6 +9,7 @@ use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\Sender\MailerFactory;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\TemplatesRepository;
 
 class ListFormFactory
 {
@@ -20,6 +21,9 @@ class ListFormFactory
     /** @var ListCategoriesRepository */
     private $listCategoriesRepository;
 
+    /** @var TemplatesRepository */
+    private $templatesRepository;
+
     private $mailerFactory;
 
     public $onCreate;
@@ -28,11 +32,13 @@ class ListFormFactory
     public function __construct(
         ListsRepository $listsRepository,
         ListCategoriesRepository $listCategoriesRepository,
-        MailerFactory $mailerFactory
+        MailerFactory $mailerFactory,
+        TemplatesRepository $templatesRepository
     ) {
         $this->listsRepository = $listsRepository;
         $this->listCategoriesRepository = $listCategoriesRepository;
         $this->mailerFactory = $mailerFactory;
+        $this->templatesRepository = $templatesRepository;
     }
 
     public function create(?int $id = null): Form
@@ -57,6 +63,13 @@ class ListFormFactory
             'Category',
             $categoryPairs
         )->setRequired("Field 'Category' is required.");
+
+        $systemEmails = $this->templatesRepository->getByMailTypeCategoryCode('system')->fetchPairs('id', 'name');
+        $form->addSelect(
+            'subscribe_mail_template_id',
+            'Subscription welcome email',
+            $systemEmails
+        )->setPrompt('None');
 
         $form->addText('priority', 'Priority')
             ->addRule(Form::INTEGER, "Priority needs to be a number")
@@ -235,7 +248,8 @@ class ListFormFactory
                 $values['page_url'],
                 $values['image_url'],
                 true,
-                $values['mail_from']
+                $values['mail_from'],
+                $values['subscribe_mail_template_id']
             );
             ($this->onCreate)($row);
         }

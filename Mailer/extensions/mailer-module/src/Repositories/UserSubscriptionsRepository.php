@@ -6,6 +6,8 @@ namespace Remp\MailerModule\Repositories;
 use Nette\Caching\IStorage;
 use Nette\Database\Context;
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Hermes\HermesMessage;
+use Tomaj\Hermes\Emitter;
 
 class UserSubscriptionsRepository extends Repository
 {
@@ -15,13 +17,17 @@ class UserSubscriptionsRepository extends Repository
 
     private $userSubscriptionVariantsRepository;
 
+    private $emitter;
+
     public function __construct(
         Context $database,
         UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository,
+        Emitter $emitter,
         IStorage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
         $this->userSubscriptionVariantsRepository = $userSubscriptionVariantsRepository;
+        $this->emitter = $emitter;
     }
 
     public function update(ActiveRow &$row, array $data): bool
@@ -69,14 +75,23 @@ class UserSubscriptionsRepository extends Repository
         ])->select('user_email')->fetchPairs('user_email', 'user_email');
     }
 
-    public function subscribeUser(ActiveRow $mailType, int $userId, string $email, int $variantId = null): void
-    {
+    public function subscribeUser(
+        ActiveRow $mailType,
+        int $userId,
+        string $email,
+        int $variantId = null,
+        bool $sendWelcomeEmail = true
+    ): void {
         if ($variantId == null) {
             $variantId = $mailType->default_variant_id;
         }
 
         // TODO: handle user ID even when searching for actual subscription
-        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch();
+        $actual = $this->getTable()
+            ->where(['user_email' => $email, 'mail_type_id' => $mailType->id])
+            ->limit(1)
+            ->fetch();
+
         if (!$actual) {
             $actual = $this->getTable()->insert([
                 'user_id' => $userId,
@@ -86,6 +101,7 @@ class UserSubscriptionsRepository extends Repository
                 'updated_at' => new DateTime(),
                 'subscribed' => true,
             ]);
+            $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail);
 
             if ($variantId) {
                 if (!$mailType->is_multi_variant) {
@@ -96,6 +112,7 @@ class UserSubscriptionsRepository extends Repository
         } else {
             if (!$actual->subscribed) {
                 $this->update($actual, ['subscribed' => true]);
+                $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail);
             }
 
             if ($variantId) {
@@ -214,5 +231,15 @@ class UserSubscriptionsRepository extends Repository
         }
 
         return $selection;
+    }
+
+    private function emitUserSubscribedEvent($userId, $email, $mailTypeId, $sendWelcomeEmail)
+    {
+        $this->emitter->emit(new HermesMessage('user-subscribed', [
+            'user_id' => $userId,
+            'user_email' => $email,
+            'mail_type_id' => $mailTypeId,
+            'send_welcome_email' => $sendWelcomeEmail,
+        ]));
     }
 }
