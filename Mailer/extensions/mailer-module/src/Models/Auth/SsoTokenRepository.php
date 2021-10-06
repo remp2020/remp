@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Models\Auth;
 
 use Remp\MailerModule\Models\Sso\Client;
-use Tomaj\NetteApi\Misc\BearerTokenRepositoryInterface;
+use Tomaj\NetteApi\Misc\TokenRepositoryInterface;
 
-class SsoTokenRepository implements BearerTokenRepositoryInterface
+class SsoTokenRepository implements TokenRepositoryInterface
 {
     private $client;
 

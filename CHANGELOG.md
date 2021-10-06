@@ -34,6 +34,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - This parameter configures whether the subscription of newsletter should also trigger the welcome (and in the future goodbye) email for the newsletter.
 - Changed Hermes `RedisDriver` sleep time from 5 seconds to 1 second. This should speed up some asynchronous operations. remp/crm#2046
 - Fixed possible notice caused by missing `source_template_id` in the `ArticleUrlParserTemplateFormFactory`. remp/remp#1024
+- Changed implementation of deprecated `Tomaj\NetteApi\Misc\BearerTokenRepositoryInterface` in favor of `Tomaj\NetteApi\Misc\TokenRepositoryInterface`. remp/crm#2052
 
 ## [0.28.0] - 2021-09-09
 
