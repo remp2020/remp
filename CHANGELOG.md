@@ -35,6 +35,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed Hermes `RedisDriver` sleep time from 5 seconds to 1 second. This should speed up some asynchronous operations. remp/crm#2046
 - Fixed possible notice caused by missing `source_template_id` in the `ArticleUrlParserTemplateFormFactory`. remp/remp#1024
 - Changed implementation of deprecated `Tomaj\NetteApi\Misc\BearerTokenRepositoryInterface` in favor of `Tomaj\NetteApi\Misc\TokenRepositoryInterface`. remp/crm#2052
+- Added possibility to send B version of subject from `ArticleUrlParser`. remp/remp#982
 
 ## [0.28.0] - 2021-09-09
 
