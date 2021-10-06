@@ -16,3 +16,5 @@ services:
 	segmentAgreggator:
 		setup:
 			- register(Remp\MailerModule\Models\Segment\Dummy())
+	apiTokenRepository:
+		factory: Tomaj\NetteApi\Misc\StaticTokenRepository(['test': '*'])
