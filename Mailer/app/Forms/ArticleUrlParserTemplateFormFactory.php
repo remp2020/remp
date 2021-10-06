@@ -96,12 +96,14 @@ class ArticleUrlParserTemplateFormFactory
             ->setRequired("Field 'Subject' is required.");
 
         $form->addHidden('mail_layout_id');
+        $form->addHidden('source_template_id');
         $form->addHidden('html_content');
         $form->addHidden('text_content');
 
         $sourceTemplate = $this->sourceTamplatesRepository->find($_POST['source_template_id']);
 
         $defaults = [
+            'source_template_id' => $sourceTemplate->id,
             'name' => "{$sourceTemplate->title} " . date('d. m. Y'),
             'code' => "{$sourceTemplate->code}_" . date('Y-m-d'),
         ];
