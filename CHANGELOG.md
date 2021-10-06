@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added optional boolean `send_accompanying_emails` parameter into the `/api/v1/users/subscribe` and `/api/v1/users/bulk-subscribe` API endpoints. remp/remp#675
   - This parameter configures whether the subscription of newsletter should also trigger the welcome (and in the future goodbye) email for the newsletter.
 - Changed Hermes `RedisDriver` sleep time from 5 seconds to 1 second. This should speed up some asynchronous operations. remp/crm#2046
+- Fixed possible notice caused by missing `source_template_id` in the `ArticleUrlParserTemplateFormFactory`. remp/remp#1024
 
 ## [0.28.0] - 2021-09-09
 
