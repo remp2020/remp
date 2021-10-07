@@ -6,9 +6,9 @@ namespace Remp\MailerModule\Models\Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Nette\Security\AuthenticationException;
-use Tomaj\NetteApi\Misc\TokenRepositoryInterface;
+use Tomaj\NetteApi\Misc\BearerTokenRepositoryInterface;
 
-class RemoteBearerTokenRepository implements TokenRepositoryInterface
+class RemoteBearerTokenRepository implements BearerTokenRepositoryInterface
 {
     const ENDPOINT_CHECK_TOKEN = 'api/v1/token/check';
 
