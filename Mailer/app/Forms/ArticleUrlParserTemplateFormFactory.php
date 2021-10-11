@@ -95,6 +95,15 @@ class ArticleUrlParserTemplateFormFactory
         $form->addText('subject', 'Subject')
             ->setRequired("Field 'Subject' is required.");
 
+        $form->addText('subject_b', 'Subject (B version)')
+            ->setNullable();
+
+        $form->addText('email_count', 'Batch size')
+            ->setNullable();
+
+        $form->addText('start_at', 'Start date')
+            ->setNullable();
+
         $form->addHidden('mail_layout_id');
         $form->addHidden('source_template_id');
         $form->addHidden('html_content');
@@ -132,19 +141,17 @@ class ArticleUrlParserTemplateFormFactory
     {
         $storedCodes = $this->templatesRepository->getTable()
             ->where('code LIKE ?', $code . '%')
-            ->select('code')->fetchAll();
+            ->fetchPairs('code', 'code');
 
-        if ($storedCodes) {
-            $max = 0;
-            foreach ($storedCodes as $c) {
-                $parts = explode('-', $c->code);
-                if (count($parts) > 1) {
-                    $max = max($max, (int) $parts[1]);
-                }
-            }
-            $code .= '-' . ($max + 1);
+        if (!in_array($code, $storedCodes, true)) {
+            return $code;
         }
-        return $code;
+
+        for ($version = 1;; $version++) {
+            if (!in_array("{$code}-{$version}", $storedCodes, true)) {
+                return "{$code}-{$version}";
+            }
+        }
     }
 
     public function formSucceeded(Form $form, $values)
@@ -165,8 +172,28 @@ class ArticleUrlParserTemplateFormFactory
             $jobContext = null;
 
             $mailJob = $this->jobsRepository->add($segmentCode, Crm::PROVIDER_ALIAS, $jobContext);
-            $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
+            $batch = $this->batchesRepository->add(
+                $mailJob->id,
+                (int)$values['email_count'],
+                $values['start_at'],
+                BatchesRepository::METHOD_RANDOM
+            );
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
+
+            if (isset($values['subject_b'])) {
+                $mailTemplateB = $this->templatesRepository->add(
+                    $values['name'],
+                    $this->getUniqueTemplateCode($values['code']),
+                    '',
+                    $values['from'],
+                    $values['subject_b'],
+                    $textBody,
+                    $htmlBody,
+                    (int)$mailLayoutId,
+                    $values['mail_type_id']
+                );
+                $this->batchesRepository->addTemplate($batch, $mailTemplateB);
+            }
 
             $batchStatus = BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND;
             if ($form['generate_emails_jobs_created']->isSubmittedBy()) {
