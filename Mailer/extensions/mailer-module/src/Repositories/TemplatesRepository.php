@@ -130,15 +130,10 @@ class TemplatesRepository extends Repository
 
     public function getUniqueTemplateCode($codeBase)
     {
-        $index = 0;
-        do {
-            $code = $codeBase . '-' . $index;
-            if ($index == 0) {
-                $code = $codeBase;
-            }
-            $index++;
-        } while ($this->exists($code));
-
+        $code = $codeBase;
+        while ($this->exists($code)) {
+            $code = $codeBase . '_' . Random::generate(4);
+        }
         return $code;
     }
 
