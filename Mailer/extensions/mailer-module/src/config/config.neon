@@ -134,7 +134,7 @@ services:
 	- Remp\MailerModule\Models\Job\BatchEmailGenerator(@mailProcessLogger)
 	- Remp\MailerModule\Models\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
 	- Remp\MailerModule\Models\Auth\AutoLogin
-	
+
 	- Remp\MailerModule\Models\HealthChecker(%redis.host%, %redis.port%, %redis.db%)
 
 	# API
@@ -191,7 +191,6 @@ services:
 	# Repositories
 	- Remp\MailerModule\Repositories\AuditLogRepository
 	- Remp\MailerModule\Repositories\ConfigsRepository
-	- Remp\MailerModule\Repositories\UsersRepository
 	- Remp\MailerModule\Repositories\UserSubscriptionsRepository
 	- Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository
 	- Remp\MailerModule\Repositories\LogsRepository

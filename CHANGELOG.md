@@ -38,6 +38,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added possibility to send B version of subject from `ArticleUrlParser`. remp/remp#982
 - Changed how unique template code is acquired - instead od suffixing numbers, Mailer now appends random string to the end of mail template code. remp/remp#1027
   - All internal parts of Mailer which didn't use this feature and tried to get the code their own way now use provided `TemplatesRepository::getUniqueTemplateCode()` method.
+- Removed unused repositories `LogEventsRepository` and `UsersRepository` _(leftovers after separation from CRM)_.
 
 ## [0.28.0] - 2021-09-09
 
