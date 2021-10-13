@@ -8280,12 +8280,12 @@ pre {
 @media (max-width: 991px) {
   /* Header Search */
   .h-search {
-    padding: 40px 40px 0;
+    padding: 40px 40px 0 !important;
     position: absolute;
-    width: 100%;
+    width: 100% !important;
     left: 0;
     top: 0;
-    background-color: #009688;
+    background-color: #00acc1;
     z-index: 1;
     opacity: 0;
     -webkit-transform: translate3d(0, -65px, 0);
@@ -8297,18 +8297,31 @@ pre {
     transform: translate3d(0, 0, 0);
   }
   .hs-input {
-    background-color: #fff;
-    color: #777777;
+    background-color: #fff !important;
+  }
+  .focused .hs-input::-moz-placeholder {
+    color: #5e5e5e !important;
+    opacity: 1;
+  }
+  .focused .hs-input:-ms-input-placeholder {
+    color: #5e5e5e !important;
+    opacity: 1;
+  }
+  .focused .hs-input::-webkit-input-placeholder {
+    color: #5e5e5e !important;
+    opacity: 1;
   }
   .hs-input::-moz-placeholder {
-    color: #cccccc;
+    color: #cccccc !important;
     opacity: 1;
   }
   .hs-input:-ms-input-placeholder {
-    color: #cccccc;
+    color: #cccccc !important;
+    opacity: 1;
   }
   .hs-input::-webkit-input-placeholder {
-    color: #cccccc;
+    color: #cccccc !important;
+    opacity: 1;
   }
   .hs-reset:after {
     -webkit-transform: scale(1) rotate(0deg);
@@ -8332,7 +8345,7 @@ pre {
 @media (max-width: 767px) {
   /* Header Search */
   .h-search {
-    padding: 30px 15px 0;
+    padding: 25px 15px 0 !important;
   }
 }
 /*----------------------------------
