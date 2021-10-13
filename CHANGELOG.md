@@ -36,6 +36,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possible notice caused by missing `source_template_id` in the `ArticleUrlParserTemplateFormFactory`. remp/remp#1024
 - Changed implementation of deprecated `Tomaj\NetteApi\Misc\BearerTokenRepositoryInterface` in favor of `Tomaj\NetteApi\Misc\TokenRepositoryInterface`. remp/crm#2052
 - Added possibility to send B version of subject from `ArticleUrlParser`. remp/remp#982
+- Changed how unique template code is acquired - instead od suffixing numbers, Mailer now appends random string to the end of mail template code. remp/remp#1027
+  - All internal parts of Mailer which didn't use this feature and tried to get the code their own way now use provided `TemplatesRepository::getUniqueTemplateCode()` method.
 
 ## [0.28.0] - 2021-09-09
 

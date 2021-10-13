@@ -137,29 +137,12 @@ class ArticleUrlParserTemplateFormFactory
         return $form;
     }
 
-    private function getUniqueTemplateCode($code)
-    {
-        $storedCodes = $this->templatesRepository->getTable()
-            ->where('code LIKE ?', $code . '%')
-            ->fetchPairs('code', 'code');
-
-        if (!in_array($code, $storedCodes, true)) {
-            return $code;
-        }
-
-        for ($version = 1;; $version++) {
-            if (!in_array("{$code}-{$version}", $storedCodes, true)) {
-                return "{$code}-{$version}";
-            }
-        }
-    }
-
     public function formSucceeded(Form $form, $values)
     {
         $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values, $form) {
             $mailTemplate = $this->templatesRepository->add(
                 $values['name'],
-                $this->getUniqueTemplateCode($values['code']),
+                $this->templatesRepository->getUniqueTemplateCode($values['code']),
                 '',
                 $values['from'],
                 $values['subject'],
@@ -183,7 +166,7 @@ class ArticleUrlParserTemplateFormFactory
             if (isset($values['subject_b'])) {
                 $mailTemplateB = $this->templatesRepository->add(
                     $values['name'],
-                    $this->getUniqueTemplateCode($values['code']),
+                    $this->templatesRepository->getUniqueTemplateCode($values['code']),
                     '',
                     $values['from'],
                     $values['subject_b'],
