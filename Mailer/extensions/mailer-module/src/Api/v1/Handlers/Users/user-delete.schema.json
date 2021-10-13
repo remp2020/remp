@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Remove all user data for provided email",
+  "type": "object",
+  "$id": "POST /api/v1/users/delete",
+  "title": "Delete user from Mailer",
+  "required": ["email"],
+  "examples": [
+    {
+      "email": "anonymize@example.com"
+    }
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email"
+    }
+  }
+}

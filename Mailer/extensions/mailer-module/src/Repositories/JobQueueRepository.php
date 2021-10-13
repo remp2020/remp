@@ -163,4 +163,11 @@ SQL;
 
         return $table->delete();
     }
+
+    public function deleteAllByEmail(string $email): int
+    {
+        return $this->getTable()->where([
+            'email' => $email
+        ])->delete();
+    }
 }

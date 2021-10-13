@@ -36,6 +36,28 @@ class UserSubscriptionVariantsRepository extends Repository
             ->delete();
     }
 
+    public function removeSubscribedVariantsForEmail(string $email): int
+    {
+        /* use nicer delete when bug in nette/database is fixed https://github.com/nette/database/issues/255
+
+        return $this->getTable()
+            ->where('mail_user_subscription.user_email', $email)
+            ->delete();
+        */
+
+        $variantsToRemove = $this->getTable()
+            ->where(['mail_user_subscription.user_email' => $email])
+            ->fetchAll();
+
+        $result = 0;
+        foreach ($variantsToRemove as $variant) {
+            $this->delete($variant);
+            $result++;
+        }
+
+        return $result;
+    }
+
     public function removeSubscribedVariant(ActiveRow $userSubscription, int $variantId): int
     {
         return $this->getTable()->where([

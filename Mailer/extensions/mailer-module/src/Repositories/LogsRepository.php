@@ -55,6 +55,13 @@ class LogsRepository extends Repository
         ];
     }
 
+    public function deleteAllForEmail(string $email): int
+    {
+        return $this->getTable()->where([
+            'email' => $email
+        ])->delete();
+    }
+
     public function getEmailLogs(string $email): Selection
     {
         return $this->getTable()->where('email', $email)->order('created_at DESC');

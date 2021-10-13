@@ -21,4 +21,11 @@ class AutoLoginTokensRepository extends Repository
             'created_at' => new DateTime(),
         ];
     }
+
+    public function deleteAllForEmail(string $email): int
+    {
+        return $this->getTable()->where([
+            'email' => $email
+        ])->delete();
+    }
 }
