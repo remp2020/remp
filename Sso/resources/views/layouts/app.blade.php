@@ -86,6 +86,14 @@
         </div>
     </div>
 
+    <ul class="pull-right h-menu">
+        <li class="hm-search-trigger">
+            <a href="" data-ma-action="search-open">
+                <i class="hm-icon zmdi zmdi-search"></i>
+            </a>
+        </li>
+    </ul>
+
     <div class="media-body h-search">
         <form class="p-relative">
             <input type="text" class="hs-input" placeholder="Search for people, files & reports">

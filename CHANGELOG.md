@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added article content type filter to authors. remp/remp#1001
+- Fixed missing search bar on mobile devices. remp/remp#932
 
 ### [Mailer]
 
@@ -40,6 +41,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - All internal parts of Mailer which didn't use this feature and tried to get the code their own way now use provided `TemplatesRepository::getUniqueTemplateCode()` method.
 - Removed unused repositories `LogEventsRepository` and `UsersRepository` _(leftovers after separation from CRM)_.
 - Added API endpoint `/api/v1/users/delete` to remove all user data for provided email. remp/crm#1392
+- Search bar can be toggled on mobile devices. remp/remp#932
+
+### [Campaign]
+
+- Fixed missing search bar on mobile devices. remp/remp#932
+
+### [Sso]
+
+- Fixed missing search bar on mobile devices. remp/remp#9322
 
 ## [0.28.0] - 2021-09-09
 
