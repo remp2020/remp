@@ -65,10 +65,7 @@ class CampaignController extends Controller
     public function json(Datatables $dataTables, SegmentAggregator $segmentAggregator)
     {
         $campaigns = Campaign::select('campaigns.*')
-            ->with(['segments', 'countries', 'campaignBanners', 'campaignBanners.banner', 'schedules'])
-            ->join('campaign_banners', 'campaign_banners.campaign_id', '=', 'campaigns.id')
-            ->join('banners', 'campaign_banners.banner_id', '=', 'banners.id')
-            ->join('campaign_segments', 'campaign_segments.campaign_id', '=', 'campaigns.id');
+            ->with(['segments', 'countries', 'campaignBanners', 'campaignBanners.banner', 'schedules']);
 
         $segments = $this->getAllSegments($segmentAggregator)->pluck('name', 'code');
 
@@ -114,8 +111,11 @@ class CampaignController extends Controller
             })
             ->filterColumn('variants', function (Builder $query, $value) {
                 $values = explode(',', $value);
-                $query->whereIn('campaign_banners.banner_id', $values)
+                $filterQuery = \DB::table('campaign_banners')
+                    ->select(['campaign_banners.campaign_id'])
+                    ->whereIn('campaign_banners.banner_id', $values)
                     ->where('campaign_banners.proportion', '>', 0);
+                $query->whereIn('campaigns.id', $filterQuery);
             })
             ->addColumn('segments', function (Campaign $campaign) use ($segments) {
                 $segmentNames = [];
@@ -137,7 +137,10 @@ class CampaignController extends Controller
             })
             ->filterColumn('segments', function (Builder $query, $value) {
                 $values = explode(',', $value);
-                $query->whereIn('campaign_segments.code', $values);
+                $filterQuery = \DB::table('campaign_segments')
+                    ->select(['campaign_segments.campaign_id'])
+                    ->whereIn('campaign_segments.code', $values);
+                $query->whereIn('campaigns.id', $filterQuery);
             })
             ->addColumn('countries', function (Campaign $campaign) {
                 return implode(' ', $campaign->countries->pluck('name')->toArray());
