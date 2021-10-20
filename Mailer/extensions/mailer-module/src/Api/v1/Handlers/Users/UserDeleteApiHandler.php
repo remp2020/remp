@@ -46,7 +46,7 @@ class UserDeleteApiHandler extends BaseHandler
         $email = $payload['email'];
 
         try {
-            $result = $this->userManager->deleteUser($email);
+            $result = $this->userManager->deleteUsers([$email]);
         } catch (\Exception $e) {
             $this->logger->error($e);
             return new JsonApiResponse(IResponse::S500_INTERNAL_SERVER_ERROR, []);

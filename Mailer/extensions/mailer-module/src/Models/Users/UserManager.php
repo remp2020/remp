@@ -40,20 +40,29 @@ class UserManager
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
-    public function deleteUser(string $email): bool
+    /**
+     * @param array<string> $emails
+     */
+    public function deleteUsers(array $emails): bool
     {
+        foreach ($emails as $email) {
+            if (strlen(trim($email)) === 0) {
+                throw new \Exception('Email cannot be empty string.');
+            }
+        }
+
         $this->database->beginTransaction();
 
         try {
-            $deletedAutologinTokens = $this->autoLoginTokensRepository->deleteAllForEmail($email);
-            $deletedJobQueues = $this->jobQueueRepository->deleteAllByEmail($email);
+            $deletedAutologinTokens = $this->autoLoginTokensRepository->deleteAllForEmails($emails);
+            $deletedJobQueues = $this->jobQueueRepository->deleteAllByEmails($emails);
 
             // log conversions are internal marker; doesn't contain user data but has to be removed before mail logs
-            $mailLogIds = $this->logsRepository->allForEmail($email)->fetchPairs(null, 'id');
+            $mailLogIds = $this->logsRepository->allForEmails($emails)->fetchPairs(null, 'id');
             $this->logConversionsRepository->deleteForMailLogs($mailLogIds);
 
-            $deletedMailLogs = $this->logsRepository->deleteAllForEmail($email);
-            $deletedUserSubscriptions = $this->userSubscriptionsRepository->deleteAllForEmail($email);
+            $deletedMailLogs = $this->logsRepository->deleteAllForEmails($emails);
+            $deletedUserSubscriptions = $this->userSubscriptionsRepository->deleteAllForEmails($emails);
 
             $this->database->commit();
         } catch (\Exception $e) {

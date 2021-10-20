@@ -53,6 +53,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Added helper class `UserManager` with method `deleteUser()` to manage user deletion. remp/crm#1392
 - Search bar can be toggled on mobile devices. remp/remp#932
 - Improved memory footprint of `Remp\MailerModule\Models\Users\Crm::list` method by decoding JSON in stream. remp/remp#1040
+- Added new command `mail:sync-deleted-users` (`SyncDeletedUsersCommand`) to handle deletion of emails which are not present in CRM _(loads users from implementation of `Remp\MailerModule\Models\Users\IUser` interface)_. remp/crm#1392
 
 ### [Campaign]
 

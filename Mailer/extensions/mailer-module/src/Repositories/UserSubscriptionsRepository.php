@@ -36,12 +36,19 @@ class UserSubscriptionsRepository extends Repository
         return parent::update($row, $data);
     }
 
-    public function deleteAllForEmail(string $email): int
+    /**
+     * @param array<string> $emails
+     */
+    public function deleteAllForEmails(array $emails): int
     {
-        $this->userSubscriptionVariantsRepository->removeSubscribedVariantsForEmail($email);
+        if (count($emails) === 0) {
+            return 0;
+        }
+
+        $this->userSubscriptionVariantsRepository->removeSubscribedVariantsForEmails($emails);
 
         return $this->getTable()->where([
-            'user_email' => $email
+            'user_email' => $emails
         ])->delete();
     }
 
