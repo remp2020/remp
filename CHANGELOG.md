@@ -50,8 +50,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - All internal parts of Mailer which didn't use this feature and tried to get the code their own way now use provided `TemplatesRepository::getUniqueTemplateCode()` method.
 - Removed unused repositories `LogEventsRepository` and `UsersRepository` _(leftovers after separation from CRM)_.
 - Added API endpoint `/api/v1/users/delete` to remove all user data for provided email. remp/crm#1392
+  - Added helper class `UserManager` with method `deleteUser()` to manage user deletion. remp/crm#1392
 - Search bar can be toggled on mobile devices. remp/remp#932
-- Improved memory footprint of `Remp\MailerModule\Models\Users\User::list` method by decoding JSON in stream. remp/remp#1040
+- Improved memory footprint of `Remp\MailerModule\Models\Users\Crm::list` method by decoding JSON in stream. remp/remp#1040
 
 ### [Campaign]
 

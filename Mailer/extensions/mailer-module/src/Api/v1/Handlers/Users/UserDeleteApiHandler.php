@@ -3,14 +3,10 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
-use Nette\Database\Context;
 use Nette\Http\IResponse;
+use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Api\JsonValidationTrait;
-use Remp\MailerModule\Repositories\AutoLoginTokensRepository;
-use Remp\MailerModule\Repositories\JobQueueRepository;
-use Remp\MailerModule\Repositories\LogConversionsRepository;
-use Remp\MailerModule\Repositories\LogsRepository;
-use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
+use Remp\MailerModule\Models\Users\UserManager;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -20,34 +16,18 @@ class UserDeleteApiHandler extends BaseHandler
 {
     use JsonValidationTrait;
 
-    private $database;
+    private $logger;
 
-    private $autoLoginTokensRepository;
-
-    private $jobQueueRepository;
-
-    private $logConversionsRepository;
-
-    private $logsRepository;
-
-    private $userSubscriptionsRepository;
+    private $userManager;
 
     public function __construct(
-        Context $database,
-        AutoLoginTokensRepository $autoLoginTokensRepository,
-        JobQueueRepository $jobQueueRepository,
-        LogConversionsRepository $logConversionsRepository,
-        LogsRepository $logsRepository,
-        UserSubscriptionsRepository $userSubscriptionsRepository
+        LoggerInterface $logger,
+        UserManager $userManager
     ) {
         parent::__construct();
 
-        $this->database = $database;
-        $this->autoLoginTokensRepository = $autoLoginTokensRepository;
-        $this->jobQueueRepository = $jobQueueRepository;
-        $this->logConversionsRepository = $logConversionsRepository;
-        $this->logsRepository = $logsRepository;
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
+        $this->logger = $logger;
+        $this->userManager = $userManager;
     }
 
     public function params(): array
@@ -65,26 +45,14 @@ class UserDeleteApiHandler extends BaseHandler
         }
         $email = $payload['email'];
 
-        $this->database->beginTransaction();
-
         try {
-            $deletedAutologinTokens = $this->autoLoginTokensRepository->deleteAllForEmail($email);
-            $deletedJobQueues = $this->jobQueueRepository->deleteAllByEmail($email);
-
-            // log conversions are internal marker; doesn't contain user data but has to be removed before mail logs
-            $mailLogIds = $this->logsRepository->allForEmail($email)->fetchPairs(null, 'id');
-            $this->logConversionsRepository->deleteForMailLogs($mailLogIds);
-
-            $deletedMailLogs = $this->logsRepository->deleteAllForEmail($email);
-            $deletedUserSubscriptions = $this->userSubscriptionsRepository->deleteAllForEmail($email);
-
-            $this->database->commit();
+            $result = $this->userManager->deleteUser($email);
         } catch (\Exception $e) {
-            $this->database->rollBack();
-            throw $e;
+            $this->logger->error($e);
+            return new JsonApiResponse(IResponse::S500_INTERNAL_SERVER_ERROR, []);
         }
 
-        if ($deletedAutologinTokens === 0 && $deletedJobQueues === 0 && $deletedMailLogs === 0 && $deletedUserSubscriptions === 0) {
+        if ($result === false) {
             return new JsonApiResponse(IResponse::S404_NOT_FOUND, [
                 'status' => 'error',
                 'code' => 'user_not_found',
