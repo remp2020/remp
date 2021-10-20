@@ -15,6 +15,7 @@ use App\Http\Showtime\ControllerShowtimeResponse;
 use App\Http\Showtime\Showtime;
 use App\Schedule;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use View;
 use HTML;
@@ -40,11 +41,22 @@ class CampaignController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(SegmentAggregator $segmentAggregator)
     {
+        $availableSegments = $this->getAllSegments($segmentAggregator)->pluck('name', 'code');
+        $segments = CampaignSegment::get()->mapWithKeys(function ($item) use ($availableSegments) {
+            return [$item->code => $availableSegments->get($item->code) ?? $item->code];
+        });
+        $variants = CampaignBanner::with('banner')
+            ->whereNotNull('banner_id')
+            ->get()
+            ->pluck('banner.name', 'banner.id');
+
         return response()->format([
             'html' => view('campaigns.index', [
                 'beamJournalConfigured' => $this->beamJournalConfigured,
+                'segments' => $segments,
+                'variants' => $variants,
             ]),
             'json' => CampaignResource::collection(Campaign::paginate()),
         ]);
@@ -52,9 +64,11 @@ class CampaignController extends Controller
 
     public function json(Datatables $dataTables, SegmentAggregator $segmentAggregator)
     {
-        $campaigns = Campaign::select()
+        $campaigns = Campaign::select('campaigns.*')
             ->with(['segments', 'countries', 'campaignBanners', 'campaignBanners.banner', 'schedules'])
-            ->get();
+            ->join('campaign_banners', 'campaign_banners.campaign_id', '=', 'campaigns.id')
+            ->join('banners', 'campaign_banners.banner_id', '=', 'banners.id')
+            ->join('campaign_segments', 'campaign_segments.campaign_id', '=', 'campaigns.id');
 
         $segments = $this->getAllSegments($segmentAggregator)->pluck('name', 'code');
 
@@ -98,6 +112,11 @@ class CampaignController extends Controller
 
                 return $variants;
             })
+            ->filterColumn('variants', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $query->whereIn('campaign_banners.banner_id', $values)
+                    ->where('campaign_banners.proportion', '>', 0);
+            })
             ->addColumn('segments', function (Campaign $campaign) use ($segments) {
                 $segmentNames = [];
 
@@ -115,6 +134,10 @@ class CampaignController extends Controller
                 }
 
                 return $segmentNames;
+            })
+            ->filterColumn('segments', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $query->whereIn('campaign_segments.code', $values);
             })
             ->addColumn('countries', function (Campaign $campaign) {
                 return implode(' ', $campaign->countries->pluck('name')->toArray());
