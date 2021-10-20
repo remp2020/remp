@@ -78,16 +78,20 @@
                         'variants' => [
                             'header' => 'Variants',
                             'orderable' => false,
+                            'filter' => $variants,
                             'priority' => 3,
                             'render' => 'array',
                         ],
                         'segments' => [
                             'header' => 'Segments',
+                            'orderable' => false,
+                            'filter' => $segments,
                             'priority' => 10,
                             'render' => 'array',
                         ],
                         'countries' => [
                             'header' => 'Countries',
+                            'orderable' => false,
                             'priority' => 10,
                         ],
                         'active' => [

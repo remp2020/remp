@@ -46,6 +46,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed missing search bar on mobile devices. remp/remp#932
+- Fixed sorting issues on campaigns listing for multi-value columns (sorting was disabled). remp/remp#1034
+- Added banner variant and segment filter to campaigns listing. remp/remp#1034
 
 ### [Sso]
 
