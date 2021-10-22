@@ -83,7 +83,16 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('article_id');
 
         $sourceTemplateId = $_POST['source_template_id'] ?? null;
-        if ($sourceTemplateId == 64) {
+        if ($sourceTemplateId == 65) {
+            $defaults = [
+                'name' => 'Vlhová newsletter ' . date('j.n.Y'),
+                'code' => 'nwsf_vlhova_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 47, // Vlhová newsletter
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif ($sourceTemplateId == 64) {
             $defaults = [
                 'name' => 'Školský newsfilter ' . date('j.n.Y'),
                 'code' => 'nwsf_skolsky_' . date('dmY'),
