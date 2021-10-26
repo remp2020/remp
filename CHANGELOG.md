@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added article content type filter to authors. remp/remp#1001
 - Fixed missing search bar on mobile devices. remp/remp#932
+- Added support for Redis Sentinel cluster in the app configuration. remp/remp#1035
+  - Added new `REDIS_SENTINEL_SERVICE` environment variable to configure name of the Sentinel service. If used, sentinel hosts are expected to be configured in comma-separated `REDIS_URL` environment variable. 
 
 ### [Mailer]
 
@@ -48,10 +50,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed missing search bar on mobile devices. remp/remp#932
 - Fixed sorting issues on campaigns listing for multi-value columns (sorting was disabled). remp/remp#1034
 - Added banner variant and segment filter to campaigns listing. remp/remp#1034
+- Added support for Redis Sentinel cluster in the app configuration. remp/remp#1035
+  - Added new `REDIS_SENTINEL_SERVICE` environment variable to configure name of the Sentinel service. If used, sentinel hosts are expected to be configured in comma-separated `REDIS_URL` environment variable.
 
 ### [Sso]
 
 - Fixed missing search bar on mobile devices. remp/remp#9322
+- Added support for Redis Sentinel cluster in the app configuration. remp/remp#1035
+  - Added new `REDIS_SENTINEL_SERVICE` environment variable to configure name of the Sentinel service. If used, sentinel hosts are expected to be configured in comma-separated `REDIS_URL` environment variable.
 
 ## [0.28.0] - 2021-09-09
 

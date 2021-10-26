@@ -1,6 +1,46 @@
 <?php
 
-use Illuminate\Support\Str;
+if (!function_exists('configure_redis')) {
+    function configure_redis($database)
+    {
+        // If the app uses Redis Sentinel, different configuration is necessary.
+        //
+        // Default database and password need to be set within options.parameters to be actually used.
+        if ($sentinelService = env('REDIS_SENTINEL_SERVICE')) {
+            $redisClient = env('REDIS_CLIENT', 'predis');
+            if ($redisClient !== 'predis') {
+                throw new \Exception("Unable to configure Redis Sentinel for client '{$redisClient}', only 'predis' is supported. You can configure the client via 'REDIS_CLIENT' environment variable.");
+            }
+
+            $redisUrl = env('REDIS_URL');
+            if ($redisUrl === null) {
+                throw new \Exception("Unable to configure Redis Sentinel. Use 'REDIS_URL' environment variable to configure comma-separated sentinel instances.");
+            }
+
+            $config = explode(',', $redisUrl);
+            $config['options'] = [
+                'replication' => 'sentinel',
+                'service' => $sentinelService,
+                'parameters' => [
+                    'database' => $database,
+                ],
+            ];
+            if ($password = env('REDIS_PASSWORD')) {
+                $config['options']['parameters']['password'] = $password;
+            }
+            return $config;
+        }
+
+        // default configuration supporting both url-based and host-port-database-based config.
+        return [
+            'url' => env('REDIS_URL'),
+            'host'     => env('REDIS_HOST', '127.0.0.1'),
+            'password' => env('REDIS_PASSWORD'),
+            'port' => env('REDIS_PORT', '6379'),
+            'database' => $database,
+        ];
+    }
+}
 
 return [
 
@@ -129,37 +169,10 @@ return [
             'prefix' => env('REDIS_PREFIX', ''),
         ],
 
-        'default' => [
-            'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST', '127.0.0.1'),
-            'password' => env('REDIS_PASSWORD', null),
-            'port' => env('REDIS_PORT', '6379'),
-            'database' => env('REDIS_DEFAULT_DATABASE', '0'),
-        ],
-
-        'session' => [
-            'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST', '127.0.0.1'),
-            'password' => env('REDIS_PASSWORD', null),
-            'port' => env('REDIS_PORT', '6379'),
-            'database' => env('REDIS_SESSION_DATABASE', '1'),
-        ],
-
-        'cache' => [
-            'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST', '127.0.0.1'),
-            'password' => env('REDIS_PASSWORD', null),
-            'port' => env('REDIS_PORT', '6379'),
-            'database' => env('REDIS_CACHE_DATABASE', '2'),
-        ],
-
-        'queue' => [
-            'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST', '127.0.0.1'),
-            'password' => env('REDIS_PASSWORD', null),
-            'port' => env('REDIS_PORT', '6379'),
-            'database' => env('REDIS_QUEUE_DATABASE', '3'),
-        ],
+        'default' => configure_redis(env('REDIS_DEFAULT_DATABASE', '0')),
+        'session' => configure_redis(env('REDIS_SESSION_DATABASE', '1')),
+        'cache' => configure_redis(env('REDIS_CACHE_DATABASE', '2')),
+        'queue' => configure_redis(env('REDIS_QUEUE_DATABASE', '3')),
 
     ],
 

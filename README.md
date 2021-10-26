@@ -119,7 +119,7 @@ services:
 
 ```
 
-You can also override enviroment variables in `.env` file of each project. After [first run](#3-first-run) this file contains default values _(copy of `.env.example`)_.
+You can also override environment variables in `.env` file of each project. After [first run](#3-first-run) this file contains default values _(copy of `.env.example`)_.
 
 #### 5. Hosts
 
