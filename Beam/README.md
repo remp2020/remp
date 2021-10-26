@@ -59,6 +59,10 @@ curl -XPUT -H "Content-Type: application/json" elasticsearch:9200/entities -d '{
 
 *These commands need to be run just once. Every further execution would result in BadRequest returned by Elasticsearch that inidices or document types are already present.*
 
+#### Redis Sentinel
+
+Application supports Redis to be configured with the Sentinel cluster. In order to enable the integration, see `.env.example` file and `REDIS_SENTINEL_SERVICE` variable.
+
 ### Technical feature description
 
 ##### Dashboard

@@ -37,6 +37,10 @@ php artisan db:seed
 - MySQL 5.7
 - Redis 3.2
 
+##### Redis Sentinel
+
+Application supports Redis to be configured with the Sentinel cluster. In order to enable the integration, see `.env.example` file and `REDIS_SENTINEL_SERVICE` variable.
+
 ## SSO flow
 
 ### Base flow of actions
