@@ -156,14 +156,14 @@ For example the generator can require list of URLs to your articles. When it get
 the URLs, extracts title, excerpt and image of the article and injects that into the prepared generator template.
 Person preparing the email has a guarantee that he/she won't create invalid HTML (due to typo) and the whole process
 is sped up as the only thing he/she needs to enter are article URLs. The flow we just described matches with how
-[`UrlParserGenerator`](app/models/Generators/UrlParserGenerator.php) works.
+[`ArticleUrlParserGenerator`](./src/Models/Generators/ArticleUrlParserGenerator.php) works.
 
 Each prepared *generator template* is directly linked to a generator implementation. It's therefore guaranteed that the
 variables used within generator template will always be provided (unless the implementation contains a bug).
 
 #### Implementing generator
 
-To create a new generator, you need to implement [`Remp\MailerModule\Generators\IGenerator` interface](app/models/Generators/IGenerator.php).
+To create a new generator, you need to implement [`Remp\MailerModule\Generators\IGenerator` interface](./src/Models/Generators/IGenerator.php).
 Methods are described below with references to `UrlParserGenerator`:
 
 * `generateForm(Form $form)`. Generators need a way how to get arbitrary input from user. This method should add new
@@ -374,7 +374,7 @@ To determine who to send an email to, Mailer is dependent on user segments - eff
 which should receive a newsletter. You can register as many segment providers as you want, the only condition
 is that the providers should work with the same user-base (one user ID has to always point to the) same user.
 
-The implementation is required to implement [`Remp\MailerModule\Segments\ISegment`](app/models/Segments/ISegment.php)
+The implementation is required to implement [`Remp\MailerModule\Models\Segment\ISegment`](./src/Models/Segment/ISegment.php)
 interface.
 
 There are three methods to implement:
@@ -428,12 +428,12 @@ There are three methods to implement:
 
 ##### Dummy implementation
 
-See the [`Remp\MailerModule\Segments\Dummy`](app/models/Segments/Dummy.php) implementation as a reference
+See the [`Remp\MailerModule\Models\Segment\Dummy`](./src/Models/Segment/Dummy.php) implementation as a reference
 example.
 
 ##### REMP CRM implementation
 
-See the [`Remp\MailerModule\Segments\Crm`](app/models/Segments/Crm.php) implementation to check how you can
+See the [`Remp\MailerModule\Models\Segment\Crm`](./src/Models/Segment/Crm.php) implementation to check how you can
 initialize your class the dependencies, structure the request and process the result
 
 The constructor accept two parameters. They should come from `app/config/config.local.neon` file:
@@ -456,7 +456,7 @@ services:
 As segments are working only with user IDs, and some of them might not be valid or active anymore, Mailer
 requires an implementation that returns user information based on the ID.
 
-The implementation is required to implement [`Remp\MailerModule\Users\IUser`](app/models/Users/IUsers.php)
+The implementation is required to implement [`Remp\MailerModule\Models\Users\IUser`](./src/Models/Users/IUser.php)
 interface.
 
 * `list($userIds, $page): array`: Returns the user information (primarily email address) for requested users based on
@@ -482,11 +482,11 @@ interface.
 
 ##### Dummy implementation
 
-See the [`Remp\MailerModule\Users\Dummy`](app/models/Users/Dummy.php) implementation as a reference example.
+See the [`Remp\MailerModule\Models\Users\Dummy`](./src/Models/Users/Dummy.php) implementation as a reference example.
 
 ##### REMP CRM implementation
 
-See the [`Remp\MailerModule\Users\Crm`](app/models/Users/Crm.php) implementation to check how you can
+See the [`Remp\MailerModule\Models\Users\Crm`](./src/Models/Users/Crm.php) implementation to check how you can
 initialize your class the dependencies, structure the request and process the result
 
 The constructor accept two parameters. They should come from `app/config/config.local.neon` file:
@@ -547,8 +547,8 @@ against your APIs with your update logic.
 
 By default application includes implementation of:
 
-- [SmtpMailer](./app/models/Mailers/SmtpMailer.php)
-- [MailgunMailer](./app/models/Mailers/SmtpMailer.php)
+- [SmtpMailer](./src/Models/Mailer/SmtpMailer.php)
+- [MailgunMailer](./src/Models/Mailer/MailgunMailer.php)
 
 You can select the default mailer on the settings page: http://mailer.remp.press/settings/
 
@@ -556,7 +556,7 @@ You can select the default mailer on the settings page: http://mailer.remp.press
 
 You can add your own implementation of Mailer to the service of your choice.
 
-The implementation is required to extend [`Remp\MailerModule\Mailers\Mailer`](app/models/Mailers/Mailer.php)
+The implementation is required to extend [`Remp\MailerModule\Models\Mailer`](./src/Models/Mailer/Mailer.php)
 abstract class.
 
 * `protected $alias = String`: Class attribute for identification of implementation,
@@ -624,9 +624,9 @@ an API handler to receive the stats and process them.
 
 Our Mailgun webhook implementation validates the request and marks the event to be processed later asynchronously.
 
-* API handler: [`Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler`](app/Api/v2/Handlers/Mailers/MailgunEventsHandler.php):
+* API handler: [`Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler`](./src/Api/v2/Handlers/Mailers/MailgunEventsHandler.php):
   Mind the event type in `HermesMessage` constructor. It has to be the same as you'll use in `config.local.neon` below.
-* Background event processing: [Remp\MailerModule\Hermes\MailgunEventHandler](app/hermes/MailgunEventHandler.php)
+* Background event processing: [Remp\MailerModule\Hermes\MailgunEventHandler](./src/Hermes/MailgunEventHandler.php)
 
 To add your own API handler and background event processing, create your implementations and register them in
 `config.local.neon` file:
@@ -652,7 +652,7 @@ servers at the time of sending the newsletter.
 
 Our Mailgun events API implementation runs as daemon end fetches the new data every 15 seconds.
 
-* Daemon: [Remp\MailerModule\CommandsMailgunEventsCommand](app/Commands/MailgunEventsCommand.php)
+* Daemon: [Remp\MailerModule\Commands\MailgunEventsCommand](./src/Commands/MailgunEventsCommand.php)
 
 Your implementation then needs to be added also to the `config.local.neon` file:
 
