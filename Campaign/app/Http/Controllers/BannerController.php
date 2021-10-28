@@ -13,6 +13,7 @@ use App\Models\Alignment\Map as AlignmentMap;
 use App\Variable;
 use Carbon\Carbon;
 use HTML;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Yajra\Datatables\Datatables;
@@ -50,8 +51,7 @@ class BannerController extends Controller
     public function json(Datatables $dataTables)
     {
         $banners = Banner::select()
-            ->with('campaigns')
-            ->get();
+            ->with('campaigns');
 
         return $dataTables->of($banners)
             ->addColumn('actions', function (Banner $banner) {
@@ -63,6 +63,9 @@ class BannerController extends Controller
             })
             ->addColumn('name', function (Banner $banner) {
                 return Html::linkRoute('banners.edit', $banner->name, $banner);
+            })
+            ->filterColumn('name', function (Builder $query, $value) {
+                $query->where('banners.name', 'like', "%{$value}%");
             })
             ->addColumn('active', function (Banner $banner) {
                 foreach ($banner->campaigns as $campaign) {

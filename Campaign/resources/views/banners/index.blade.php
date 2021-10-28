@@ -28,16 +28,19 @@
                 ],
                 'position' => [
                     'priority' => 2,
+                    'searchable' => false,
                 ],
                 'created_at' => [
                     'header' => 'Created at',
                     'render' => 'date',
                     'priority' => 3,
+                    'searchable' => false,
                 ],
                 'updated_at' => [
                     'header' => 'Updated at',
                     'render' => 'date',
                     'priority' => 4,
+                    'searchable' => false,
                 ],
             ],
             'dataSource' => route('banners.json'),

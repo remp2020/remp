@@ -52,6 +52,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added banner variant and segment filter to campaigns listing. remp/remp#1034
 - Added support for Redis Sentinel cluster in the app configuration. remp/remp#1035
   - Added new `REDIS_SENTINEL_SERVICE` environment variable to configure name of the Sentinel service. If used, sentinel hosts are expected to be configured in comma-separated `REDIS_URL` environment variable.
+- Fixed banner and campaign listings search. Grid was not able to search within campaign names (which is the main point of this search). remp/remp#1038
 
 ### [Sso]
 
