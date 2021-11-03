@@ -38,11 +38,20 @@ class SyncDeletedUsersCommand extends Command
         $this->setName('mail:sync-deleted-users')
             ->setDescription("Sync deleted users. Compares Mailer's users with CRM users and deletes user data for anonymized users.")
             ->addOption(
+                'delete-deactivated',
+                null,
+                InputOption::VALUE_NONE,
+                "Deletes also deactivated accounts.\nDoesn't affect anonymized accounts - user data for these are always removed."
+            )
+            ->addOption(
                 'from-user-id',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Start sync of deleted users from provided user_id. Helpful if you want to run command in batches.'
-            );
+                "Start sync of deleted users from provided user_id.\nHelpful if you want to run command in batches."
+            )
+            ->addUsage('--delete-deactivated')
+            ->addUsage('--from-user-id=42')
+            ->addUsage('--from-user-id=42 --delete-deactivated');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -50,10 +59,17 @@ class SyncDeletedUsersCommand extends Command
         $output->writeln('');
         $output->writeln('<info>***** DELETE USERS ANONYMIZED IN CRM *****</info>');
 
+        // include deactivated in UserProvider::list() in comparison with Mailer users
+        $includeDeactivated = true;
+        if ($input->getOption('delete-deactivated')) {
+            $output->writeln("<info>***** <comment>--delete-deactivated</comment> used. Sync will remove also <comment>deactivated, non-anonymized</comment> users.</info>");
+            $includeDeactivated = false;
+        }
+
         $lastUserId = 0;
         $fromUserId = $input->getOption('from-user-id');
         if ($fromUserId) {
-            $output->writeln("<info>***** <comment>--from-user-id</comment> used. Sync will start from user ID [{$fromUserId}]. **</info>");
+            $output->writeln("<info>***** <comment>--from-user-id</comment> used. Sync will start from user ID [<comment>{$fromUserId}</comment>].</info>");
             $lastUserId = $fromUserId;
         }
 
@@ -72,7 +88,7 @@ class SyncDeletedUsersCommand extends Command
             $lastUserId = $maxUserId;
 
             /** @var array<int, array> $crmUsers */
-            $crmUsers = $this->userProvider->list($mailerUserIds, 1);
+            $crmUsers = $this->userProvider->list($mailerUserIds, 1, $includeDeactivated);
 
             // compare mailer & crm users; get missing emails
             /** @var array<int, string> $missingUsers */

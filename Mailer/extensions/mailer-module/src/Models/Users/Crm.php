@@ -28,13 +28,14 @@ class Crm implements IUser
         ]);
     }
 
-    public function list(array $userIds, int $page): array
+    public function list(array $userIds, int $page, bool $includeDeactivated = false): array
     {
         try {
             $response = $this->client->post(self::ENDPOINT_LIST, [
                 'form_params' => [
                     'user_ids' => Json::encode($userIds),
                     'page' => $page,
+                    'include_deactivated' => $includeDeactivated,
                 ],
             ]);
 

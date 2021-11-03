@@ -12,5 +12,5 @@ interface IUser
      * @param int $page Page to obtain. Numbering starts with 1.
      * @return array
      */
-    public function list(array $userIds, int $page): array;
+    public function list(array $userIds, int $page, bool $includeDeactivated = false): array;
 }
