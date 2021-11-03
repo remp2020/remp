@@ -61,6 +61,10 @@ Route::middleware('auth:api')->group(function() {
         Route::post('tags/top', [TagControllerApiV2::class, 'topTags'])->name('tags.top.v2');
         Route::post('articles/upsert', [ArticleControllerApiV2::class, 'upsert'])->name('articles.upsert.v2');
     });
+
+    Route::get('authors', [\App\Http\Controllers\AuthorController::class, 'index'])->name('authors.index');
+    Route::get('sections', [\App\Http\Controllers\SectionController::class, 'index'])->name('sections.index');
+    Route::get('tags', [\App\Http\Controllers\TagController::class, 'index'])->name('tags.index');
 });
 
 Route::get('/journal/{group}/categories/{category}/actions', [JournalController::class, 'actions']);
