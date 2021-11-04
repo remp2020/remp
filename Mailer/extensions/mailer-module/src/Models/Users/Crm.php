@@ -6,8 +6,9 @@ namespace Remp\MailerModule\Models\Users;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Psr7\StreamWrapper;
+use JsonMachine\JsonMachine;
 use Nette\Utils\Json;
-use Nette\Utils\JsonException;
 use Tracy\Debugger;
 
 class Crm implements IUser
@@ -36,6 +37,19 @@ class Crm implements IUser
                     'page' => $page,
                 ],
             ]);
+
+            $stream = StreamWrapper::getResource($response->getBody());
+            try {
+                $users = [];
+                foreach (JsonMachine::fromStream($stream, "/users") as $user) {
+                    $users[] = [
+                        'id' => $user['id'],
+                        'email' => $user['email'],
+                    ];
+                }
+            } finally {
+                fclose($stream);
+            }
         } catch (ConnectException $e) {
             throw new UserException("could not connect CRM user base: {$e->getMessage()}");
         } catch (ClientException $e) {
@@ -43,13 +57,6 @@ class Crm implements IUser
             return [];
         }
 
-        try {
-            $result = Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
-            $response = null;
-            return $result['users'];
-        } catch (JsonException $e) {
-            Debugger::log("could not decode JSON response: {$response->getBody()->getContents()}", Debugger::WARNING);
-            return [];
-        }
+        return $users;
     }
 }

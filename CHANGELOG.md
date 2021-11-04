@@ -44,6 +44,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Removed unused repositories `LogEventsRepository` and `UsersRepository` _(leftovers after separation from CRM)_.
 - Added API endpoint `/api/v1/users/delete` to remove all user data for provided email. remp/crm#1392
 - Search bar can be toggled on mobile devices. remp/remp#932
+- Improved memory footprint of `Remp\MailerModule\Models\Users\User::list` method by decoding JSON in stream. remp/remp#1040
 
 ### [Campaign]
 
