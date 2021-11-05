@@ -5,13 +5,16 @@ namespace Remp\MailerModule\Models\Beam;
 
 use GuzzleHttp\Client;
 use Remp\Journal\Journal;
-use Remp\MailerModule\Models\RedisCache;
+use Remp\MailerModule\Models\RedisClientFactory;
+use Remp\MailerModule\Models\RedisClientTrait;
 
 class JournalFactory
 {
+    use RedisClientTrait;
+
     private $client;
-    
-    public function __construct(?string $baseUrl, ?RedisCache $redisCache)
+
+    public function __construct(?string $baseUrl, RedisClientFactory $redisClientFactory)
     {
         if ($baseUrl) {
             $client = new Client([
@@ -21,7 +24,7 @@ class JournalFactory
                 ]
             ]);
 
-            $this->client = new Journal($client, $redisCache->client());
+            $this->client = new Journal($client, $redisClientFactory->getClient());
         }
     }
 

@@ -9,6 +9,7 @@ parameters:
 		host: @environmentConfig::get('REDIS_HOST')
 		port: @environmentConfig::getInt('REDIS_PORT')
 		db: @environmentConfig::getInt('REDIS_DB')
+		password: @environmentConfig::get('REDIS_PASSWORD')
 	remp:
 		beam:
 			web_addr: @environmentConfig::get('REMP_BEAM_ADDR')
