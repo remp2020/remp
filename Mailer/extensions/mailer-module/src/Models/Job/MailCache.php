@@ -3,14 +3,16 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Job;
 
-use Predis\Client;
+use Remp\MailerModule\Models\RedisClientFactory;
+use Remp\MailerModule\Models\RedisClientTrait;
 
 class MailCache
 {
+    use RedisClientTrait;
+
     const REDIS_KEY = 'mail-queue-';
     const REDIS_PRIORITY_QUEUES_KEY = 'priority-mail-queues';
 
-    /** @var Client */
     private $redis;
 
     private $host;
@@ -19,26 +21,9 @@ class MailCache
 
     private $db;
 
-    public function __construct(string $host = '127.0.0.1', int $port = 6379, int $db = 0)
+    public function __construct(RedisClientFactory $redisClientFactory)
     {
-        $this->host = $host;
-        $this->port = $port;
-        $this->db = $db;
-    }
-
-    private function connect(): Client
-    {
-        if (!$this->redis) {
-            $this->redis = new Client([
-                'scheme' => 'tcp',
-                'host'   => $this->host,
-                'port'   => $this->port,
-            ]);
-
-            $this->redis->select($this->db);
-        }
-
-        return $this->redis;
+        $this->redisClientFactory = $redisClientFactory;
     }
 
     /**
@@ -48,7 +33,7 @@ class MailCache
      */
     public function ping(string $message = null)
     {
-        return $this->connect()->ping($message);
+        return $this->redis()->ping($message);
     }
 
     /**
@@ -81,62 +66,62 @@ class MailCache
             return false;
         }
 
-        return (bool)$this->connect()->sadd(static::REDIS_KEY . $queueId, [$job]);
+        return (bool)$this->redis()->sadd(static::REDIS_KEY . $queueId, [$job]);
     }
 
     public function getJob(int $queueId): ?string
     {
-        return $this->connect()->spop(static::REDIS_KEY . $queueId);
+        return $this->redis()->spop(static::REDIS_KEY . $queueId);
     }
 
     public function getJobs(int $queueId, int $count = 1): array
     {
-        return (array) $this->connect()->spop(static::REDIS_KEY . $queueId, $count);
+        return (array) $this->redis()->spop(static::REDIS_KEY . $queueId, $count);
     }
 
     public function hasJobs(int $queueId): bool
     {
-        return $this->connect()->scard(static::REDIS_KEY . $queueId) > 0;
+        return $this->redis()->scard(static::REDIS_KEY . $queueId) > 0;
     }
 
     public function countJobs(int $queueId): int
     {
-        return $this->connect()->scard(static::REDIS_KEY . $queueId);
+        return $this->redis()->scard(static::REDIS_KEY . $queueId);
     }
 
     public function jobExists(string $job, int $queueId): bool
     {
-        return (bool)$this->connect()->sismember(static::REDIS_KEY . $queueId, $job);
+        return (bool)$this->redis()->sismember(static::REDIS_KEY . $queueId, $job);
     }
 
     // Mail queue
     public function removeQueue(int $queueId): bool
     {
-        $res1 = $this->connect()->del([static::REDIS_KEY . $queueId]);
-        $res2 = $this->connect()->zrem(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
+        $res1 = $this->redis()->del([static::REDIS_KEY . $queueId]);
+        $res2 = $this->redis()->zrem(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
         return $res1 && $res2;
     }
 
     public function pauseQueue(int $queueId): int
     {
-        return $this->connect()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [$queueId => 0]);
+        return $this->redis()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [$queueId => 0]);
     }
 
     public function restartQueue(int $queueId, int $priority): int
     {
-        return $this->connect()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [$queueId => $priority]);
+        return $this->redis()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [$queueId => $priority]);
     }
 
     public function isQueueActive(int $queueId): bool
     {
-        return $this->connect()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId) > 0;
+        return $this->redis()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId) > 0;
     }
 
     public function isQueueTopPriority(int $queueId): bool
     {
-        $selectedQueueScore = $this->connect()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
+        $selectedQueueScore = $this->redis()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
 
-        $topPriorityQueue = $this->connect()->zrevrangebyscore(
+        $topPriorityQueue = $this->redis()->zrevrangebyscore(
             static::REDIS_PRIORITY_QUEUES_KEY,
             '+inf',
             1,

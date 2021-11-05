@@ -19,6 +19,27 @@ $configurator->addConfig(__DIR__ . '/../vendor/remp/mailer-module/src/config/con
 // ... rest of the configuration
 ```
 
+## Configuration
+
+### Redis
+
+You can configure default Redis keys prefix, which is used if implementation using `RedisClientTrait` enables prefixing via `useRedisKeysPrefix()` method.
+
+```neon
+mailer:
+    redis_client_factory:
+        prefix: foo_
+```
+
+You can then turn on prefixing for specific service (using `RedisClientTrait`) by calling `useRedisKeysPrefix()` method in configuration.
+
+```neon
+services:
+    mailCache:
+        setup:
+            - useRedisKeysPrefix()
+```
+
 ## Technical feature description
 
 ### Mailers setup

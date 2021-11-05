@@ -31,6 +31,8 @@ services:
 			- register('twig', Remp\MailerModule\Models\ContentGenerator\Engine\TwigEngine())
 			- defaultEngine('twig')
 
+	redisClientFactory: Remp\MailerModule\Models\RedisClientFactory(%redis.host%, %redis.port%, %redis.db%, %redis.password%, %redis_client_factory.prefix%)
+
 	console:
 		factory: Symfony\Component\Console\Application
 		setup:
@@ -64,7 +66,7 @@ services:
 		factory: Remp\MailerModule\Models\Formatters\DateFormatterFactory(%locale%, %timezone%)
 
 	# shutdown hermes and mail worker through hermes_shutdown key in redis (override in local config with second string argument if you want to change key)
-	hermesShutdown: Tomaj\Hermes\Shutdown\PredisShutdown(@redisCache::client())
+	hermesShutdown: Tomaj\Hermes\Shutdown\PredisShutdown(@redisClientFactory::getClient())
 	hermesWorkerWaitCallback: Remp\MailerModule\Commands\HermesWorkerWaitCallback
 	hermesRedisDriver:
 		class: Remp\MailerModule\Hermes\RedisDriver
@@ -77,10 +79,9 @@ services:
 		factory: Tomaj\Hermes\Dispatcher(@hermesRedisDriver, @hermesLogger, @hermesShutdown)
 	hermesEmitter:
 		factory: Tomaj\Hermes\Emitter(@hermesRedisDriver, @hermesLogger)
-	- Remp\MailerModule\Hermes\HermesTasksQueue(%redis.host%, %redis.port%, %redis.db%)
+	- Remp\MailerModule\Hermes\HermesTasksQueue
 	- Remp\MailerModule\Repositories\HermesTasksRepository
 
-	redisCache: Remp\MailerModule\Models\RedisCache(%redis.host%, %redis.port%, %redis.db%)
 	hermesWorker:
 		factory: Remp\MailerModule\Commands\HermesWorkerCommand
 		setup:
@@ -132,10 +133,10 @@ services:
 	- Remp\MailerModule\Models\Config\Config
 	- Remp\MailerModule\Models\Sender
 	- Remp\MailerModule\Models\Job\BatchEmailGenerator(@mailProcessLogger)
-	- Remp\MailerModule\Models\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)
+	- Remp\MailerModule\Models\Job\MailCache
 	- Remp\MailerModule\Models\Auth\AutoLogin
 
-	- Remp\MailerModule\Models\HealthChecker(%redis.host%, %redis.port%, %redis.db%)
+	- Remp\MailerModule\Models\HealthChecker
 
 	# API
 	- Tomaj\NetteApi\Link\ApiLink

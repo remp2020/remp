@@ -19,6 +19,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - If you use `STATUS_READY` in your implementation, replace it with `STATUS_READY_TO_PROCESS_AND_SEND`.
 - **BREAKING**: Added parameter for `code` attribute of mail type category into `ListCategoriesRepository::add()` method. remp/remp#675
   - The signature of method changed from `(string $title, int $sorting)` to `(string $title, string $code, int $sorting)`. Check your usages of the method and incorporate the changes.
+- **BREAKING**: Changed initialization of DI services using Redis. If you use any of the following services, please amend your initialization in your `config.neon`. remp/remp#1035
+  - Change `Tomaj\Hermes\Shutdown\PredisShutdown(@redisCache::client())` to `Tomaj\Hermes\Shutdown\PredisShutdown(@redisClientFactory::getClient())`
+  - Change `Remp\MailerModule\Hermes\HermesTasksQueue(%redis.host%, %redis.port%, %redis.db%)` to `Remp\MailerModule\Hermes\HermesTasksQueue`
+  - Change `Remp\MailerModule\Models\Job\MailCache(%redis.host%, %redis.port%, %redis.db%)` to `Remp\MailerModule\Models\Job\MailCache`
+  - Change `Remp\MailerModule\Models\HealthChecker(%redis.host%, %redis.port%, %redis.db%)` to `Remp\MailerModule\Models\HealthChecker`
+- **BREAKING**: Removed class `Remp\MailerModule\Models\RedisCache` in favor of `Remp\MailerModule\Models\RedisClientFactory`. remp/remp#1035
+  - If you used `RedisCache` in your extensions, replace it with the use of `RedisTrait` and `RedisClientFactory`.
 - Added new mail job batch status `STATUS_READY_TO_PROCESS`. remp/remp#995
 - Added option to process mail job batch and get number of emails that will be sent in that batch. New button added to every mail job batch available when mail job batch is in `created` status. remp/remp#995
 - Added `mail:remove-old-batches` command that removes mail job batches in `processed` status older than 24 hours. This prevents from using outdated emails set to send emails. remp/remp#995
