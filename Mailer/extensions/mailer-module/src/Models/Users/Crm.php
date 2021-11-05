@@ -42,7 +42,7 @@ class Crm implements IUser
             try {
                 $users = [];
                 foreach (JsonMachine::fromStream($stream, "/users") as $user) {
-                    $users[] = [
+                    $users[$user['id']] = [
                         'id' => $user['id'],
                         'email' => $user['email'],
                     ];
