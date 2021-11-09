@@ -1,12 +1,18 @@
 php:
 	intl.default_locale: sk_SK
 
+#parameters:
+#	crm:
+#		addr: @environmentConfig::get('CRM_ADDR')
+#		api_token: @environmentConfig::get('CRM_API_TOKEN')
+
 services:
     # All console commands you need to use should be registered here
     # This is a set that we recommend to use
     console:
         setup:
             - add(Remp\MailerModule\Commands\SyncUserSubscriptionsCommand())
+            # - add(Remp\MailerModule\Commands\SyncDeletedUsersCommand())
             - add(Remp\MailerModule\Commands\MailgunEventsCommand())
             # If you're using Beam, you can enable this command to pull conversions from there
             # - add(Remp\MailerModule\Commands\ProcessConversionStatsCommand())
@@ -48,8 +54,10 @@ services:
             - pushHandler(Monolog\Handler\StreamHandler("%appDir%/../log/hermes.log"))
             - pushHandler(Monolog\Handler\ErrorLogHandler())
 
-    # This is a reference IUser implementation.
+    # This is a reference Remp\MailerModule\Models\Users\IUser implementation.
     # You should make your own implementation against your CRM system and register it here.
+    # Or use our CRM implementation:
+    # - Remp\MailerModule\Models\Users\Crm(%crm.addr%, %crm.api_token%)
     - Remp\MailerModule\Models\Users\Dummy
 
     # To be able to send an email, you need to provide at least one ISegment implementation

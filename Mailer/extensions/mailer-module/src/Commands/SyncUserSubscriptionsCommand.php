@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
+use Remp\MailerModule\Models\Users\IUser;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
-use Remp\MailerModule\Models\Users\IUser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -78,6 +78,9 @@ class SyncUserSubscriptionsCommand extends Command
             }
             $page++;
         }
+
+        $output->writeln('');
+        $output->writeln('<info>Done.</info>');
 
         return Command::SUCCESS;
     }

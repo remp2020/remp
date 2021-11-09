@@ -26,6 +26,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Change `Remp\MailerModule\Models\HealthChecker(%redis.host%, %redis.port%, %redis.db%)` to `Remp\MailerModule\Models\HealthChecker`
 - **BREAKING**: Removed class `Remp\MailerModule\Models\RedisCache` in favor of `Remp\MailerModule\Models\RedisClientFactory`. remp/remp#1035
   - If you used `RedisCache` in your extensions, replace it with the use of `RedisTrait` and `RedisClientFactory`.
+- **BREAKING**: Added flag to include deactivated users into interface method `Remp\MailerModule\Models\Users\IUser::list()`. remp/crm#1392
+  - Default state is same as before _(returned only active users)_.
+  - This is breaking change because now interface suggests that only active users are returned.
+  - If you have own implementation of interface `IUser`, you should add new flag `$includeDeactivated` and handle it accordingly.
 - Added new mail job batch status `STATUS_READY_TO_PROCESS`. remp/remp#995
 - Added option to process mail job batch and get number of emails that will be sent in that batch. New button added to every mail job batch available when mail job batch is in `created` status. remp/remp#995
 - Added `mail:remove-old-batches` command that removes mail job batches in `processed` status older than 24 hours. This prevents from using outdated emails set to send emails. remp/remp#995
@@ -50,8 +54,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - All internal parts of Mailer which didn't use this feature and tried to get the code their own way now use provided `TemplatesRepository::getUniqueTemplateCode()` method.
 - Removed unused repositories `LogEventsRepository` and `UsersRepository` _(leftovers after separation from CRM)_.
 - Added API endpoint `/api/v1/users/delete` to remove all user data for provided email. remp/crm#1392
+  - Added helper class `UserManager` with method `deleteUser()` to manage user deletion. remp/crm#1392
 - Search bar can be toggled on mobile devices. remp/remp#932
-- Improved memory footprint of `Remp\MailerModule\Models\Users\User::list` method by decoding JSON in stream. remp/remp#1040
+- Improved memory footprint of `Remp\MailerModule\Models\Users\Crm::list` method by decoding JSON in stream. remp/remp#1040
+- Added new command `mail:sync-deleted-users` (`SyncDeletedUsersCommand`) to handle deletion of emails which are not present in CRM _(loads users from implementation of `Remp\MailerModule\Models\Users\IUser` interface)_. remp/crm#1392
 
 ### [Campaign]
 

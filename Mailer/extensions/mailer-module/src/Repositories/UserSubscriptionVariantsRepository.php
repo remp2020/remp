@@ -36,7 +36,10 @@ class UserSubscriptionVariantsRepository extends Repository
             ->delete();
     }
 
-    public function removeSubscribedVariantsForEmail(string $email): int
+    /**
+     * @param array<string> $emails
+     */
+    public function removeSubscribedVariantsForEmails(array $emails): int
     {
         /* use nicer delete when bug in nette/database is fixed https://github.com/nette/database/issues/255
 
@@ -46,13 +49,15 @@ class UserSubscriptionVariantsRepository extends Repository
         */
 
         $variantsToRemove = $this->getTable()
-            ->where(['mail_user_subscription.user_email' => $email])
+            ->where(['mail_user_subscription.user_email' => $emails])
             ->fetchAll();
 
         $result = 0;
         foreach ($variantsToRemove as $variant) {
-            $this->delete($variant);
-            $result++;
+            $deleted = $this->delete($variant);
+            if ($deleted) {
+                $result++;
+            }
         }
 
         return $result;

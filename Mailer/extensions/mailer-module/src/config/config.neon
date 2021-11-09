@@ -49,6 +49,8 @@ services:
 			- setCatchExceptions(true)
 
 	# Loggers
+	apiLogger:
+		factory: Monolog\Logger('api-logger')
 	commandsLogger:
 		factory: Monolog\Logger('commands-logger')
 	mailProcessLogger:
@@ -138,6 +140,8 @@ services:
 
 	- Remp\MailerModule\Models\HealthChecker
 
+	- Remp\MailerModule\Models\Users\UserManager
+
 	# API
 	- Tomaj\NetteApi\Link\ApiLink
 	- Tomaj\NetteApi\Misc\IpDetector
@@ -157,7 +161,7 @@ services:
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'is-unsubscribed'), \Remp\MailerModule\Api\v1\Handlers\Users\IsUnsubscribedHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'logs'), \Remp\MailerModule\Api\v1\Handlers\Users\LogsHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'logs-count-per-status'), \Remp\MailerModule\Api\v1\Handlers\Users\LogsCountPerStatusHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
-			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'delete'), \Remp\MailerModule\Api\v1\Handlers\Users\UserDeleteApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'users', 'delete'), \Remp\MailerModule\Api\v1\Handlers\Users\UserDeleteApiHandler(@apiLogger), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mailgun'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailgunEventsHandler(), \Tomaj\NetteApi\Authorization\NoAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'generate-mail'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'preprocess-generator-parameters'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailGeneratorPreprocessHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())

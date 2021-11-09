@@ -22,10 +22,17 @@ class AutoLoginTokensRepository extends Repository
         ];
     }
 
-    public function deleteAllForEmail(string $email): int
+    /**
+     * @param array<string> $emails
+     */
+    public function deleteAllForEmails(array $emails): int
     {
+        if (count($emails) === 0) {
+            return 0;
+        }
+
         return $this->getTable()->where([
-            'email' => $email
+            'email' => $emails
         ])->delete();
     }
 }
