@@ -34,7 +34,7 @@ class AuthorController extends Controller
                 ),
                 'contentType' => $request->input('content_type', 'all'),
             ]),
-            'json' => AuthorResource::collection(Author::paginate()),
+            'json' => AuthorResource::collection(Author::paginate($request->get('per_page', 15)))->preserveQuery(),
         ]);
     }
 

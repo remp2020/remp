@@ -57,13 +57,12 @@ class ArticleController extends Controller
         }
 
         if (!$articles) {
-            $articles = Article::paginate();
+            $articles = Article::paginate($request->get('per_page', 15));
         }
 
-        $articleResource = new ArticleResource($articles);
         return response()->format([
             'html' => redirect()->route('articles.pageviews'),
-            'json' => $articleResource,
+            'json' => ArticleResource::collection($articles)->preserveQuery(),
         ]);
     }
 

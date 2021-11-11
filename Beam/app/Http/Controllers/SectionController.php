@@ -34,7 +34,7 @@ class SectionController extends Controller
                 'conversionTo' => $request->input('conversion_to', 'now'),
                 'contentType' => $request->input('content_type', 'all'),
             ]),
-            'json' => SectionResource::collection(Section::paginate()),
+            'json' => SectionResource::collection(Section::paginate($request->get('per_page', 15)))->preserveQuery(),
         ]);
     }
 

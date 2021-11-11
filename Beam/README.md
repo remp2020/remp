@@ -1724,8 +1724,14 @@ Returns list of articles specified by ids or external ids.
 | Name | Value | Required | Description |
 | --- |---| --- | --- |
 | Authorization | Bearer *String* | yes | API token. |
-| Content-Type | application/json | yes |  |
 | Accept | application/json | yes |  |
+
+##### *Parameters:*
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| ids | String | no | Article's IDs separated by comma. |
+| external_ids | String | no | Article's external IDs separated by comma. |
+| per_page | Integer | no |  Number of items displayed per page. |
 
 ##### *Examples:*
 
@@ -1737,7 +1743,6 @@ curl -X GET \
   http://beam.remp.press/api/articles?external_ids=123,231 \
   -H 'Accept: application/json' \
   -H 'Authorization: Bearer XXX' \
-  -H 'Content-Type: application/json'
 ```
 
 </details>
@@ -1749,9 +1754,7 @@ curl -X GET \
 $context = stream_context_create([
         'http' => [
             'method' => 'GET',
-            'header' => "Content-Type: type=application/json\r\n"
-                . "Accept: application/json\r\n"
-                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+            'header' => "Accept: application/json\r\n"
                 . "Authorization: Bearer XXX",
         ]
     ]
@@ -1786,6 +1789,298 @@ $response = file_get_contents("http://beam.remp.press/api/articles?external_ids=
       "updated_at": "2021-04-14 06:27:13"
     }
   ]
+}
+```
+
+---
+
+##### GET `/api/authors`
+
+Returns list of authors.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Accept | application/json | yes |  |
+
+##### *Parameters:*
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| per_page | Integer | no |  Number of items displayed per page. |
+
+##### *Examples:*
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl -X GET \
+  http://beam.remp.press/api/authors \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX' \
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' =>  "Accept: application/json\r\n"
+                . "Authorization: Bearer XXX",
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/authors", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+{
+    "data": [
+        {
+            "external_id": "ext-1",
+            "name": "Mr. Damian White",
+            "created_at": "2020-08-14T12:18:37.000000Z",
+            "updated_at": "2020-08-14T12:18:37.000000Z"
+        },
+        {
+            "external_id": "ext-2",
+            "name": "Mac Schroeder",
+            "created_at": "2020-08-14T12:18:37.000000Z",
+            "updated_at": "2020-08-14T12:18:37.000000Z"
+        },
+        // ...
+    ]
+}
+```
+
+---
+
+##### GET `/api/conversions`
+
+Returns list of conversions.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Accept | application/json | yes |  |
+
+##### *Parameters:*
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| conversion_from | String | no | RFC3339 datetime from which will be items filtered. |
+| conversion_to | String | no | RFC3339 datetime to which will be items filtered. |
+| per_page | Integer | no |  Number of items displayed per page. |
+
+##### *Examples:*
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl -X GET \
+  http://beam.remp.press/api/conversions?conversion_from=2018-06-05T06:03:05Z \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX' \
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' =>  "Accept: application/json\r\n"
+                . "Authorization: Bearer XXX",
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/conversions?conversion_from=2018-06-05T06:03:05Z", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+{
+    "data": [
+        {
+            "id": 1441,
+            "article_id": 114,
+            "user_id": null,
+            "amount": 25,
+            "currency": "EUR",
+            "paid_at": "2020-11-07T06:30:53.000000Z",
+            "transaction_id": "08ad9d77-bbaf-31d2-9db1-04225ded1e72",
+            "events_aggregated": true,
+            "source_processed": true,
+            "created_at": "2020-11-09T09:57:37.000000Z",
+            "updated_at": "2020-11-09T09:57:37.000000Z",
+            "article_external_id": "cd14dfb5-3af2-3a73-b6ab-78b9dca2e975"
+        },
+        //....
+    ]
+}
+```
+
+---
+
+##### GET `/api/sections`
+
+Returns list of sections.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Accept | application/json | yes |  |
+
+##### *Parameters:*
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| per_page | Integer | no |  Number of items displayed per page. |
+
+##### *Examples:*
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl -X GET \
+  http://beam.remp.press/api/sections \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX' \
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' =>  "Accept: application/json\r\n"
+                . "Authorization: Bearer XXX",
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/sections", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+{
+    "data": [
+        {
+            "external_id": null,
+            "name": "reinger",
+            "created_at": "2020-08-14T12:18:36.000000Z",
+            "updated_at": "2020-08-14T12:18:36.000000Z"
+        },
+        {
+            "external_id": null,
+            "name": "blick",
+            "created_at": "2020-08-14T12:18:36.000000Z",
+            "updated_at": "2020-08-14T12:18:36.000000Z"
+        }
+        // ...
+    ]
+}
+```
+
+---
+
+##### GET `/api/tags`
+
+Returns list of tags.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Accept | application/json | yes |  |
+
+##### *Parameters:*
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| per_page | Integer | no |  Number of items displayed per page. |
+
+##### *Examples:*
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl -X GET \
+  http://beam.remp.press/api/tags \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX' \
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' =>  "Accept: application/json\r\n"
+                . "Authorization: Bearer XXX",
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/tags", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+{
+    "data": [
+        {
+            "external_id": null,
+            "name": "reinger",
+            "created_at": "2020-08-14T12:18:36.000000Z",
+            "updated_at": "2020-08-14T12:18:36.000000Z"
+        },
+        {
+            "external_id": null,
+            "name": "blick",
+            "created_at": "2020-08-14T12:18:36.000000Z",
+            "updated_at": "2020-08-14T12:18:36.000000Z"
+        }
+        // ...
+    ]
 }
 ```
 

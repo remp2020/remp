@@ -30,7 +30,7 @@ class TagController extends Controller
                 'conversionTo' => $request->input('conversion_to', 'now'),
                 'contentType' => $request->input('content_type', 'all'),
             ]),
-            'json' => TagResource::collection(Tag::paginate()),
+            'json' => TagResource::collection(Tag::paginate($request->get('per_page', 15)))->preserveQuery(),
         ]);
     }
 

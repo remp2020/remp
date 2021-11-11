@@ -23,6 +23,27 @@ class ArticleResource extends JsonResource
     {
         $values = parent::toArray($request);
 
+        foreach ($this->authors as $author) {
+            $values['authors'][] = [
+                'id' => $author->id,
+                'external_id' => $author->external_id,
+            ];
+        }
+
+        foreach ($this->tags as $tag) {
+            $values['tags'][] = [
+                'id' => $tag->id,
+                'external_id' => $tag->external_id,
+            ];
+        }
+
+        foreach ($this->sections as $section) {
+            $values['sections'][] = [
+                'id' => $section->id,
+                'external_id' => $section->external_id,
+            ];
+        }
+
         $extended = (bool) $request->input('extended', false);
         if ($extended) {
             $values['unique_browsers_count'] = $this->unique_browsers_count;

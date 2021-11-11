@@ -21,6 +21,16 @@ class ConversionController extends Controller
 {
     public function index(Request $request)
     {
+        $conversions = new Conversion();
+        $conversionFrom = $request->get('conversion_from');
+        if ($conversionFrom) {
+            $conversions = $conversions->where('paid_at', '>=', Carbon::parse($conversionFrom));
+        }
+        $conversionTo = $request->get('conversion_to');
+        if ($conversionTo) {
+            $conversions = $conversions->where('paid_at', '<=', Carbon::parse($conversionTo));
+        }
+
         return response()->format([
             'html' => view('conversions.index', [
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
@@ -30,7 +40,7 @@ class ConversionController extends Controller
                 'conversionFrom' => $request->get('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->get('conversion_to', 'now'),
             ]),
-            'json' => ConversionResource::collection(Conversion::paginate()),
+            'json' => ConversionResource::collection($conversions->paginate($request->get('per_page', 15)))->preserveQuery(),
         ]);
     }
 
