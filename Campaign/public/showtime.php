@@ -11,7 +11,6 @@ use App\Http\Showtime\Showtime;
 use App\Http\Showtime\ShowtimeResponse;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -346,11 +345,20 @@ try {
 try {
     $sentryDSN = env('SENTRY_DSN');
     if (!empty($sentryDSN)) {
-        $client = \Sentry\ClientBuilder::create([
+        $sentryClientOptions = [
             'dsn' => $sentryDSN,
             'environment' => env('APP_ENV', 'production'),
             'send_default_pii' => true, // enabled to see same details as with laravel sentry
-        ])->getClient();
+        ];
+
+        $sampleRate = env('SENTRY_SHOWTIME_SAMPLERATE', 1);
+        if (is_numeric($sampleRate)) {
+            $sentryClientOptions['sample_rate'] = (float) $sampleRate;
+        } else {
+            $logger->warning("invalid SENTRY_SHOWTIME_SAMPLERATE='{$sampleRate}' configured, defaulting to '1'.");
+        }
+
+        $client = \Sentry\ClientBuilder::create($sentryClientOptions)->getClient();
         $handler = new \Sentry\Monolog\Handler(new \Sentry\State\Hub($client));
         $logger->pushHandler($handler);
     }
