@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.29.0] - 2021-11-18
+
+### Project
+
+- Removed obsolete `python-minimal` from Dockerfile to fix build error. remp/remp#1012
+
 ### [Beam]
 
 - Added article content type filter to authors. remp/remp#1001
@@ -14,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Added new `REDIS_SENTINEL_SERVICE` environment variable to configure name of the Sentinel service. If used, sentinel hosts are expected to be configured in comma-separated `REDIS_URL` environment variable. 
 - Added `article_external_id` into response of API call `/api/conversions`. remp/remp#1031
 - Added information about article's tags, authors and sections into API call `/api/articles`. remp/remp#1031
+- Property filter now correctly filters all sections of Beam, not just the main dashboard data. remp/remp#987
 
 ### [Mailer]
 
@@ -97,7 +104,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed output of `service:elastic-data-retention` Beam command to correctly reflect if index was deleted or not. remp/remp#940
 - [Segments] Fixed ignoring of segment's `active` flag in user/browser segment presence API check. remp/remp#1007
   - The bug caused that it was possible to check presence of users/browsers in segments even if the segment was not active.
-- Property filter now correctly filters all sections of Beam, not just the main dashboard data. remp/remp#987
 
 ### [Campaign]
 
@@ -114,10 +120,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for pageview attributes to showtime request and added ui for configuring pageview attributes to campaign form. See [README](./Campaign/README.md#javascript-snippet) for more information. remp/remp#986
 - Added error logging from showtime experiment `showtime.php` into `laravel.log`. remp/remp#994
 - Added support for Sentry error logging from showtime experiment `showtime.php`. remp/remp#994
-
-### Project
-
-- Removed obsolete `python-minimal` from Dockerfile to fix build error. remp/remp#1012
 
 ### [Mailer]
 
