@@ -6,6 +6,7 @@ use App\Article;
 use App\Author;
 use App\Helpers\Misc;
 use App\Http\Requests\Api\v1\ArticleUpsertRequest;
+use App\Http\Requests\Api\v1\ReadArticlesRequest;
 use App\Http\Requests\Api\v1\TopArticlesSearchRequest;
 use App\Http\Requests\Api\v1\UnreadArticlesRequest;
 use App\Http\Resources\ArticleResource;
@@ -17,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
+use Remp\Journal\ListRequest;
 
 class ArticleController
 {
@@ -215,5 +217,47 @@ class ArticleController
             }
         }
         return $usersReadArticles;
+    }
+
+    public function readArticles(ReadArticlesRequest $request, JournalContract $journal)
+    {
+        $from = $request->input('from');
+        $to = $request->input('to');
+        $userId = $request->input('user_id');
+        $browserId = $request->input('browser_id');
+
+        $r = new ListRequest('pageviews');
+        $r->addFilter('action', 'load');
+        $r->addGroup('user_id', 'browser_id', 'article_id', 'time');
+        if ($from) {
+            $r->setTimeAfter(Carbon::parse($from));
+        }
+        if ($to) {
+            $r->setTimeBefore(Carbon::parse($to));
+        }
+        if ($userId) {
+            $r->addFilter('user_id', $userId);
+        }
+        if ($browserId) {
+            $r->addFilter('browser_id', $browserId);
+        }
+
+        $articles = [];
+        $result = $journal->list($r);
+        foreach ($result as $item) {
+            if ($item->tags->article_id !== '') {
+                $articleId = $item->tags->article_id;
+                if (!array_key_exists($articleId, $articles)) {
+                    $articles[$articleId] = $item->tags;
+                } else if (strtotime($articles[$articleId]->time) < strtotime($item->tags->time)) {
+                    $articles[$articleId] = $item->tags;
+                }
+            }
+        }
+
+        // sort by time
+        uasort($articles, fn($a, $b) => strtotime($b->time) <=> strtotime($a->time));
+
+        return response()->json(array_values($articles));
     }
 }

@@ -33,6 +33,7 @@ Route::middleware('auth:api')->group(function() {
         'only' => ['index', 'store']
     ]);
     Route::post('articles/unread', [ArticleControllerApiV1::class, 'unreadArticlesForUsers'])->name('articles.unreadArticlesForUsers');
+    Route::post('articles/read', [ArticleControllerApiV1::class, 'readArticles'])->name('articles.readArticles');
     Route::post('articles/upsert', [ArticleControllerApiV1::class, 'upsert'])->name('articles.upsert');
     Route::post('conversions/upsert', [ConversionController::class, 'upsert'])->name('conversions.upsert');
 

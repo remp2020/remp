@@ -732,6 +732,99 @@ Any create/update matching is based on the article's `external_id`. You're free 
 
 ---
 
+##### POST `/api/articles/read`
+
+List already read articles based on filter.
+
+##### *Headers:*
+
+| Name | Value | Required | Description |
+| --- |---| --- | --- |
+| Authorization | Bearer *String* | yes | API token. |
+| Content-Type | application/json | yes |  |
+| Accept | application/json | yes |  |
+
+##### *Body:*
+
+```json5
+{
+    "user_id": "5", // String; Required if browser_id not set; ID of user in your CMS,
+    "browser_id": "qwerty123", // String; Required if user_id not set; ID of browser that made article pageview,
+    "from": "2021-06-05T06:03:05Z", // RFC3339-based time from which to take pageviews
+    "to": "2021-07-05T06:03:05Z" // RFC3339-based time to which to take pageviews
+}
+```
+
+##### *Examples:*
+
+<details>
+<summary>curl</summary>
+
+```shell
+curl -X POST \
+  http://beam.remp.press/api/articles/read \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "user_id": "5",
+    "browser_id": "qwerty123",
+    "from": "2021-06-05T06:03:05Z",
+    "to": "2021-07-05T06:03:05Z"
+}'
+```
+
+</details>
+
+<details>
+<summary>raw PHP</summary>
+
+```php
+$payload = [
+    "user_id" => "5",
+    "browser_id" => "qwerty123",
+    "from" => "2021-06-05T06:03:05Z",
+    "to" => "2021-07-05T06:03:05Z"
+];
+$jsonPayload = json_encode($payload);
+$context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: type=application/json\r\n"
+                . "Accept: application/json\r\n"
+                . "Content-Length: " . strlen($jsonPayload) . "\r\n"
+                . "Authorization: Bearer XXX",
+            'content' => $jsonPayload,
+        ]
+    ]
+);
+$response = file_get_contents("http://beam.remp.press/api/articles/read ", false, $context);
+// process response (raw JSON string)
+```
+
+</details>
+
+##### *Response:*
+
+```json5
+[
+    {
+        "article_id": "2546241",
+        "browser_id": "qwerty123",
+        "time": "2021-06-10T06:03:05Z",
+        "user_id": "5"
+    },
+    {
+        "article_id": "2551289",
+        "browser_id": "qwerty123",
+        "time": "2021-06-09T06:03:05Z",
+        "user_id": "5"
+    }
+]
+```
+
+---
+
 ##### POST `api/conversions/upsert`
 
 Beam admin provides statistics about article/author performance. One of the metrics used are conversions.

@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `article_external_id` into response of API call `/api/conversions`. remp/remp#1031
 - Added information about article's tags, authors and sections into API call `/api/articles`. remp/remp#1031
 - Property filter now correctly filters all sections of Beam, not just the main dashboard data. remp/remp#987
+- Added `api/articles/read` API to list already read articles. remp/remp#1030
 
 ### [Mailer]
 
