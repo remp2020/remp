@@ -78,7 +78,7 @@ After pulling new code, if changes where made to `Docker/php/Dockerfile` or any 
 docker-compose up --build
 ```
 
-> The appliance was tested with Docker CE 17.12.0 and Docker Compose 1.16.1.
+> The appliance was tested with Docker CE 20.10.11 and Docker Compose 1.26.2.
 
 #### 3. First run
 

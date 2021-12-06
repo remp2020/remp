@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Project
 
 - Removed obsolete `python-minimal` from Dockerfile to fix build error. remp/remp#1012
+- Bumped reference version of Elasticsearch and Kibana to 7.15.2. remp/remp#1043
+- Bumped reference version of Go in Docker images to 1.17.4. 
 
 ### [Beam]
 

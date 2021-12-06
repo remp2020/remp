@@ -1,4 +1,4 @@
-FROM golang:1.15
+FROM golang:1.17.4
 
 RUN go get golang.org/x/tools/cmd/goimports
 

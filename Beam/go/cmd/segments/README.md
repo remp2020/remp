@@ -1,11 +1,17 @@
 # REMP Segments/Journal
 
-Segments (also known as Journal) is read-only API to acquire information about segments defined via web administration interface. 
+Segments (also known as Journal) is read-only API to acquire aggregations over the tracked data. 
 
 It provides:
 
 - Segment API for checking members of segments.
 - Journal API for acquiring raw events and aggregated statistics about events.
+
+## Dependencies
+
+- Go ^1.15
+- Elasticsearch ^7.15 (eventhough any 7.* should be OK)
+- MySQL ^8.0
 
 ## Building
 
