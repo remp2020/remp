@@ -554,14 +554,14 @@ class CampaignController extends Controller
 
         $segments = $data['segments'] ?? [];
 
-        foreach ($segments as $r) {
+        foreach ($segments as $segment) {
             /** @var CampaignSegment $campaignSegment */
-            $campaignSegment = CampaignSegment::findOrNew($r['id']);
-            $campaignSegment->code = $r['code'];
-            $campaignSegment->provider = $r['provider'];
-            $campaignSegment->campaign_id = $campaign->id;
-            $campaignSegment->inclusive = $r['inclusive'];
-            $campaignSegment->save();
+            CampaignSegment::firstOrCreate([
+                'campaign_id' => $campaign->id,
+                'code' => $segment['code'],
+                'provider' => $segment['provider'],
+                'inclusive' => $segment['inclusive']
+            ]);
         }
 
         if (isset($data['removedSegments'])) {
