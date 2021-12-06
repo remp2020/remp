@@ -78,6 +78,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Added new `REDIS_SENTINEL_SERVICE` environment variable to configure name of the Sentinel service. If used, sentinel hosts are expected to be configured in comma-separated `REDIS_URL` environment variable.
 - Fixed banner and campaign listings search. Grid was not able to search within campaign names (which is the main point of this search). remp/remp#1038
 - Added `SENTRY_SHOWTIME_SAMPLERATE` env variable to configure sample rate of showtime logs/errors. remp/remp#1029
+- Fixed campaign segments deleting when copying campaigns. After copying and creating a new campaign, the original had deleted segments originally assigned to it. remp/remp#1037
 
 ### [Sso]
 
