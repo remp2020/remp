@@ -36,28 +36,24 @@ class DenniknContent implements ContentInterface
             } else {
                 $meta = $this->parseMeta($content);
             }
-
-            if (!$meta) {
-                return null;
-            }
         } catch (RequestException $e) {
             throw new InvalidUrlException("Invalid URL: {$url}", 0, $e);
         }
         return $meta;
     }
 
-    public function parseMeta(string $content): Meta
+    public function parseMeta(string $content): ?Meta
     {
         preg_match_all('/<script id="schema" type="application\/ld\+json">(.*?)<\/script>/', $content, $matches);
 
         if (!$matches) {
-            return new Meta();
+            return null;
         }
 
         try {
             $schema = Json::decode($matches[1][0]);
         } catch (JsonException $e) {
-            return new Meta();
+            return null;
         }
 
         // author
@@ -76,18 +72,18 @@ class DenniknContent implements ContentInterface
         return new Meta($title, $description, $image, $denniknAuthors);
     }
 
-    public function parseShopMeta(string $content): Meta
+    public function parseShopMeta(string $content): ?Meta
     {
         preg_match_all('/<script type="application\/ld\+json">(.*?)<\/script>/s', $content, $matches);
 
         if (!$matches || empty($matches[1])) {
-            return new Meta();
+            return null;
         }
 
         try {
             $schema = Json::decode($matches[1][0]);
         } catch (JsonException $e) {
-            return new Meta();
+            return null;
         }
 
         // authors

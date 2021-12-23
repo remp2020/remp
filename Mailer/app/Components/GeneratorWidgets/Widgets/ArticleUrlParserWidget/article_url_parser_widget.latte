@@ -40,6 +40,18 @@
   <div class="card-header">
     <h2>Newsletter details<small></small></h2>
   </div>
+
+  {if count($errors) > 0}
+  <div class="alert alert-danger" role="alert">
+      There are URLs Mailer couldn't process and were ignored:
+      <ul>
+          <li n:foreach="$errors as $error">
+              {$error}
+          </li>
+      </ul>
+  </div>
+  {/if}
+
   <div class="card-body card-padding">
     <div role="tabpanel">
       <ul class="tab-nav" role="tablist">

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Fixed inconsistent `PageMeta` use where constructor allowed to enter nullable values if they weren't present, but getter didn't allow to return them. remp/remp#1055
+
 ## [0.29.0] - 2021-11-18
 
 ### Project

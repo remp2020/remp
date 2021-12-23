@@ -65,6 +65,7 @@ class ArticleUrlParserGenerator implements IGenerator
 
             $addonParams = [
                 'render' => true,
+                'errors' => $output['errors'],
             ];
 
             $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);
@@ -88,6 +89,8 @@ class ArticleUrlParserGenerator implements IGenerator
         $sourceTemplate = $this->sourceTemplatesRepository->find($values['source_template_id']);
 
         $items = [];
+        $errors = [];
+
         $urls = explode("\n", trim($values['articles']));
         foreach ($urls as $url) {
             $url = trim($url);
@@ -98,6 +101,8 @@ class ArticleUrlParserGenerator implements IGenerator
             $meta = $this->content->fetchUrlMeta($url);
             if ($meta) {
                 $items[$url] = $meta;
+            } else {
+                $errors[] = $url;
             }
         }
 
@@ -111,6 +116,7 @@ class ArticleUrlParserGenerator implements IGenerator
         return [
             'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
             'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
+            'errors' => $errors,
         ];
     }
 
