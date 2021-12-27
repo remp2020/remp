@@ -99,6 +99,10 @@ export default {
       );
     },
     fetchCommerceStats: function(deviceType = "all") {
+      if (!this.articleIds.length) {
+        return;
+      }
+
       const payload = {
         filter_by: [
           {
@@ -133,6 +137,10 @@ export default {
     },
 
     fetchPageviewStats: function(now, deviceType = "all", subscriber = "true") {
+      if (!this.articleIds.length) {
+        return;
+      }
+
       for (let range of this.pageviewMinuteRanges) {
         const payload = {
           filter_by: [
@@ -198,6 +206,9 @@ export default {
       deviceType = "all",
       subscriber = "true"
     ) {
+      if (!this.articleIds.length) {
+        return;
+      }
       for (let range of this.variantsMinuteRanges) {
         const variantPayload = {
           filter_by: [
@@ -282,6 +293,11 @@ export default {
       articleLocked = "false",
       timeframe = 10 * 60 * 1000
     ) {
+      if (!this.articleDetailId) {
+        console.warn("remplib: Unable to fetch reading progress stats. Config states we're on article, but iota.articleSelector doesn't match any");
+        return;
+      }
+
       const payload = {
         filter_by: [],
         count_histogram: {
@@ -321,6 +337,9 @@ export default {
         payload
       )
         .then(function(response) {
+          if (!response.data.length) {
+            return;
+          }
           EventHub.$emit(
             "read-progress-data-changed",
             response.data[0].count,

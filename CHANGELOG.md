@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed possibly too broad scope of IOTA requests. remp/remp#1050
+  - If the articleSelector didn't match any articles, request was made without an `article_id` filter which could cause temporary Elastic unavailability.
+
 ### [Mailer]
 
 - Fixed inconsistent `PageMeta` use where constructor allowed to enter nullable values if they weren't present, but getter didn't allow to return them. remp/remp#1055
