@@ -56,7 +56,7 @@ class UnSubscribeHandler extends BaseHandler
             $list = $this->listsRepository->find($payload['list_id']);
         }
 
-        if ($list === false) {
+        if (!$list) {
             return new JsonApiResponse(404, ['status' => 'error', 'message' => 'list not found']);
         }
 
