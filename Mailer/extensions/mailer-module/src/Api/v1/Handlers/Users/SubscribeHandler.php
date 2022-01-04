@@ -92,7 +92,7 @@ class SubscribeHandler extends BaseHandler
             $list = $this->listsRepository->find($payload['list_id']);
         }
 
-        if ($list === false) {
+        if (!$list) {
             throw new InvalidApiInputParamException('List not found.', 404);
         }
 
@@ -114,7 +114,7 @@ class SubscribeHandler extends BaseHandler
         }
 
         $variant = $this->listVariantsRepository->findByIdAndMailTypeId($payload['variant_id'], $list->id);
-        if ($variant === false) {
+        if (!$variant) {
             throw new InvalidApiInputParamException(
                 "Variant with ID [{$payload['variant_id']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
                 404
