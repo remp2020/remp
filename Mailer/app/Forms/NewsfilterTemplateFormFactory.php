@@ -83,7 +83,16 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('article_id');
 
         $sourceTemplateId = $_POST['source_template_id'] ?? null;
-        if ($sourceTemplateId == 66) {
+        if ($sourceTemplateId == 68) {
+            $defaults = [
+                'name' => 'Týždeň v zdraví ' . date('j.n.Y'),
+                'code' => 'nwsf_tyzdenvzdravi_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 51, // Týždeň v zdraví
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif ($sourceTemplateId == 66) {
             $defaults = [
                 'name' => 'Greenfilter ' . date('j.n.Y'),
                 'code' => 'nwsf_greenfilter_' . date('dmY'),
