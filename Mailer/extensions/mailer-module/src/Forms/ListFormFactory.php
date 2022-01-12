@@ -15,16 +15,13 @@ class ListFormFactory
 {
     use SmartObject;
 
-    /** @var ListsRepository */
-    private $listsRepository;
+    private ListsRepository $listsRepository;
 
-    /** @var ListCategoriesRepository */
-    private $listCategoriesRepository;
+    private ListCategoriesRepository $listCategoriesRepository;
 
-    /** @var TemplatesRepository */
-    private $templatesRepository;
+    private TemplatesRepository $templatesRepository;
 
-    private $mailerFactory;
+    private MailerFactory $mailerFactory;
 
     public $onCreate;
     public $onUpdate;
@@ -157,6 +154,7 @@ class ListFormFactory
         $form->addCheckbox('auto_subscribe', 'Auto subscribe');
         $form->addCheckbox('locked', 'Locked');
         $form->addCheckbox('is_public', 'Public');
+        $form->addCheckbox('public_listing', 'List publicly');
 
         $form->addHidden('id', $id);
 
@@ -245,6 +243,7 @@ class ListFormFactory
                 $values['title'],
                 $values['sorting'],
                 $values['auto_subscribe'],
+                $values['public_listing'],
                 $values['locked'],
                 $values['is_public'],
                 $values['description'],
