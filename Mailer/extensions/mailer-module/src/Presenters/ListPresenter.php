@@ -3,16 +3,20 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use DateInterval;
 use DateTimeZone;
+use IntlDateFormatter;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
-use Remp\MailerModule\Components\DataTable\DataTable;
-use Remp\MailerModule\Hermes\RedisDriver;
-use Remp\MailerModule\Repositories\ActiveRow;
+use Nette\Utils\DateTime;
 use Nette\Utils\Json;
+use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
+use Remp\MailerModule\Hermes\RedisDriver;
+use Remp\MailerModule\Models\Formatters\DateFormatterFactory;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\MailTemplateStatsRepository;
@@ -20,10 +24,6 @@ use Remp\MailerModule\Repositories\MailTypeStatsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tomaj\Hermes\Emitter;
-use Nette\Utils\DateTime;
-use DateInterval;
-use IntlDateFormatter;
-use Remp\MailerModule\Models\Formatters\DateFormatterFactory;
 
 final class ListPresenter extends BasePresenter
 {
@@ -102,8 +102,8 @@ final class ListPresenter extends BasePresenter
                 'render' => 'boolean',
                 'priority' => 2,
             ])
-            ->setColSetting('is_public', [
-                'header' => 'public',
+            ->setColSetting('public_listing', [
+                'header' => 'publicly listed',
                 'render' => 'boolean',
                 'priority' => 3,
             ])
@@ -144,6 +144,7 @@ final class ListPresenter extends BasePresenter
                 $list->code,
                 $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
                 $list->auto_subscribe,
+                $list->public_listing,
                 $list->locked,
                 $list->is_public,
             ];

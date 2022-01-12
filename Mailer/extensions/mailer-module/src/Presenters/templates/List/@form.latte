@@ -117,7 +117,10 @@
                 <div class="toggle-switch" data-ts-color="cyan">
                     {label auto_subscribe:, class => 'ts-label'}
                     {input auto_subscribe:, hidden => 'hidden'}
-                    <label for="frm-listForm-auto_subscribe" class="ts-helper"></label>
+                    <label for="{$form['auto_subscribe']->htmlId}" class="ts-helper"></label>
+                    <small class="help-block">
+                        Toggles whether user should be automatically subscribed to the newsletter after the registration.
+                    </small>
                 </div>
             </div>
 
@@ -125,7 +128,10 @@
                 <div class="toggle-switch" data-ts-color="cyan">
                     {label locked:, class => 'ts-label'}
                     {input locked:, hidden => 'hidden'}
-                    <label for="frm-listForm-locked" class="ts-helper"></label>
+                    <label for="{$form['locked']->htmlId}" class="ts-helper"></label>
+                    <small class="help-block">
+                        Toggles whether user should be able to change subscription settings of this newsletter.
+                    </small>
                 </div>
             </div>
 
@@ -133,7 +139,18 @@
                 <div class="toggle-switch" data-ts-color="cyan">
                     {label is_public:, class => 'ts-label'}
                     {input is_public:, hidden => 'hidden'}
-                    <label for="frm-listForm-is_public" class="ts-helper"></label>
+                    <label for="{$form['is_public']->htmlId}" class="ts-helper"></label>
+                </div>
+            </div>
+
+            <div class="form-group m-b-30">
+                <div class="toggle-switch" data-ts-color="cyan">
+                    {label public_listing:, class => 'ts-label'}
+                    {input public_listing:, hidden => 'hidden'}
+                    <label for="{$form['public_listing']->htmlId}" class="ts-helper" ></label>
+                    <small class="help-block">
+                        Configures whether the newsletter should be publicly available for the subscribers in their subscription settings.
+                    </small>
                 </div>
             </div>
 
