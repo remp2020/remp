@@ -34,6 +34,13 @@ return [
 
     'traces_sample_rate' => (float)(env('SENTRY_TRACES_SAMPLE_RATE', 0.0)),
 
+    'sample_rate' => (static function () {
+        if (!app()->runningInConsole() && url()->getRequest()->path() === 'campaigns/showtime') {
+            return (float)(env('SENTRY_SHOWTIME_SAMPLERATE', 1.0));
+        }
+        return 1.0;
+    })(),
+
     'controllers_base_namespace' => env('SENTRY_CONTROLLERS_BASE_NAMESPACE', 'App\\Http\\Controllers'),
 
 ];
