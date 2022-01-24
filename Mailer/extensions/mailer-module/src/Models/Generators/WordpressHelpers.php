@@ -5,7 +5,7 @@ namespace Remp\MailerModule\Models\Generators;
 
 class WordpressHelpers
 {
-    public function wpautop(string $pee, bool $br = true): string
+    public function wpautop(string $pee, bool $br = false): string
     {
         $pre_tags = array();
         if (trim($pee) === '') {

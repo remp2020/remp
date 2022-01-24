@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed inconsistent `PageMeta` use where constructor allowed to enter nullable values if they weren't present, but getter didn't allow to return them. remp/remp#1055
 - Fixed incorrect handling of return values (null vs bool) caused by Nette 3.0 upgrade. remp/remp#1057
 - Added checkbox for hidding newsletter from public newsletter settings. remp/remp#1025
+- Fixed WP-based generator issue causing unnecessary `<br />` tags being appended to the `<a>` links. remp/remp#1065
 
 ## [0.29.0] - 2021-11-18
 
