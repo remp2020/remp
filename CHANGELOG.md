@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed possibly too broad scope of IOTA requests. remp/remp#1050
   - If the articleSelector didn't match any articles, request was made without an `article_id` filter which could cause temporary Elastic unavailability.
+- Added option to configure `--step=` of `pageviews:aggregate-articles-views` command to avoid Elasticsearch's _"Trying to create too many buckets"_ error. remp/remp#1050
 
 ### [Campaign]
 

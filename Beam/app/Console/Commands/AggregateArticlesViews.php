@@ -19,7 +19,12 @@ class AggregateArticlesViews extends Command
     const TIMESPENT_IGNORE_THRESHOLD_SECS = 3600;
 
     // TODO remove skip-temp-aggregation after temp aggregation tables are no longer used
-    protected $signature = self::COMMAND . ' {--date=} {--date-from=} {--date-to=} {--skip-temp-aggregation}';
+    protected $signature = self::COMMAND . ' 
+        {--date= : Date you want to aggregate.} 
+        {--date-from= : Start of a date range you want to aggregate. Needs to be combined with --date-to.}
+        {--date-to= : End of a date range you want to aggregate. Needs to be combined with --date-from.}
+        {--step=40 : Time frame (in minutes) which aggregation should use to request the date. Bigger the traffic, smaller the window. If the time-frame is too broad, it might cause Segments API to return an error due to the amount of buckets necessary to generate in Elasticsearch.}
+        {--skip-temp-aggregation}';
 
     protected $description = 'Aggregate pageviews and time spent data for each user and article for yesterday';
 
@@ -38,6 +43,12 @@ class AggregateArticlesViews extends Command
         $this->line('<info>***** Aggregatting article views *****</info>');
         $this->line('');
 
+        $step = filter_var($this->option('step'), FILTER_VALIDATE_INT);
+        if (!$step) {
+            $this->error('Invalid --step option (expecting integer): ' . $this->option('step'));
+            return self::FAILURE;
+        }
+
         // TODO set this up depending finalized conditions
         // First delete data older than 30 days
         $dateThreshold = Carbon::today()->subDays(30)->toDateString();
@@ -48,23 +59,23 @@ class AggregateArticlesViews extends Command
         if ($dateFrom || $dateTo) {
             if (!$dateFrom) {
                 $this->error('Missing --date-from option');
-                return;
+                return self::FAILURE;
             }
             if (!$dateTo) {
                 $this->error('Missing --date-to option');
-                return;
+                return self::FAILURE;
             }
 
             $from = Carbon::parse($dateFrom)->startOfDay();
             $to = Carbon::parse($dateTo)->startOfDay();
 
             while ($from->lte($to)) {
-                $this->aggregateDay($from);
+                $this->aggregateDay($from, $step);
                 $from->addDay();
             }
         } else {
             $date = $this->option('date') ? Carbon::parse($this->option('date')) : Carbon::yesterday();
-            $this->aggregateDay($date);
+            $this->aggregateDay($date, $step);
         }
 
         // Update 'materialized view' to test author segments conditions
@@ -74,15 +85,15 @@ class AggregateArticlesViews extends Command
         }
 
         $this->line(' <info>OK!</info>');
-        return 0;
+        return self::SUCCESS;
     }
 
-    private function aggregateDay(Carbon $startDate)
+    private function aggregateDay(Carbon $startDate, int $step)
     {
         ArticleAggregatedView::where('date', $startDate)->delete();
 
         // Aggregate pageviews and timespent data in time windows
-        $timeWindowMinutes = 40; // in minutes
+        $timeWindowMinutes = $step; // in minutes
         $timeWindowsCount = 1440 / $timeWindowMinutes; // 1440 - number of minutes in day
 
         $timeAfter = $startDate;
