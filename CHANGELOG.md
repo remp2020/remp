@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possibly too broad scope of IOTA requests. remp/remp#1050
   - If the articleSelector didn't match any articles, request was made without an `article_id` filter which could cause temporary Elastic unavailability.
 - Added option to configure `--step=` of `pageviews:aggregate-articles-views` command to avoid Elasticsearch's _"Trying to create too many buckets"_ error. remp/remp#1050
+- Fixed retrieval of browser_id in `conversions:aggregate-events` command which leads to more thorough definition of user's conversion path. remp/remp#1049
+  - Previously some events (mainly pageviews) could have been not matched correctly and missing in the aggregated data.
 
 ### [Campaign]
 

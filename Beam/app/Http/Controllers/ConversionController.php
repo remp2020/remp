@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Author;
 use App\Conversion;
+use App\Model\ConversionCommerceEvent;
+use App\Model\ConversionGeneralEvent;
+use App\Model\ConversionPageviewEvent;
 use Illuminate\Http\Request;
 use App\Http\Requests\ConversionRequest;
 use App\Http\Requests\ConversionUpsertRequest;
@@ -124,6 +127,7 @@ class ConversionController extends Controller
 
         $events = [];
 
+        /** @var ConversionPageviewEvent $event */
         foreach ($conversion->pageviewEvents()->where('time', '>=', $from)->get() as $event) {
             $obj = new \stdClass();
             $obj->name = 'pageview';
@@ -131,41 +135,45 @@ class ConversionController extends Controller
             $obj->tags = [];
 
             if ($event->article) {
-                $t = new \stdClass();
-                $t->title = $event->article->title;
-                $t->href = route('articles.show', ['article' => $event->article->id]);
-                $obj->tags[] = $t;
+                $obj->tags[] = (object) [
+                    'title' => $event->article->title,
+                    'href' => route('articles.show', ['article' => $event->article->id]),
+                ];
+                $obj->tags[] = (object) [
+                    'title' => $event->locked ? 'Locked' : 'Unlocked',
+                ];
+
+                if ($event->timespent) {
+                    $obj->tags[] = (object) [
+                        'title' => "Timespent: {$event->timespent} s",
+                    ];
+                }
             }
 
-            if ($event->timespent) {
-                $t = new \stdClass();
-                $t->title = "Timespent: {$event->timespent} s";
-                $obj->tags[] = $t;
-            }
-
-            if ($event->locked === false) {
-                $t = new \stdClass();
-                $t->title = 'Unlocked';
-                $obj->tags[] = $t;
-            }
-
-            if ($event->signed_in === false) {
-                $t = new \stdClass();
-                $t->title = 'Signed in';
-                $obj->tags[] = $t;
-            }
+            $obj->tags[] = (object) [
+                'title' => $event->signed_in ? 'Signed in' : 'Anonymous',
+            ];
 
             $events[$event->time->toDateTimeString()] = $obj;
         }
 
+        /** @var ConversionCommerceEvent $event */
         foreach ($conversion->commerceEvents()->where('time', '>=', $from)->get() as $event) {
             $obj = new \stdClass();
             $obj->name = "commerce:$event->step";
             $obj->time = $event->time;
-            $obj->tags = [];
+            $obj->tags[] = (object) [
+                'title' => "Funnel: {$event->funnel_id}",
+            ];
+            if ($event->amount) {
+                $obj->tags[] = (object) [
+                    'title' => "Amount: {$event->amount} {$event->currency}",
+                ];
+            }
             $events[$event->time->toDateTimeString()] = $obj;
         }
 
+        /** @var ConversionGeneralEvent $event */
         foreach ($conversion->generalEvents()->where('time', '>=', $from)->get() as $event) {
             $obj = new \stdClass();
             $obj->name = "{$event->action}:{$event->category}";
