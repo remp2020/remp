@@ -91,10 +91,7 @@ class BaseFeatureTestCase extends TestCase
         $this->listCategoriesRepository = $this->inject(ListCategoriesRepository::class);
         $this->userSubscriptionsRepository = $this->inject(UserSubscriptionsRepository::class);
         $this->userSubscriptionVariantsRepository = $this->inject(UserSubscriptionVariantsRepository::class);
-    }
 
-    protected function tearDown(): void
-    {
         $truncateTables = implode(' ', array_map(function ($repo) {
             $property = (new \ReflectionClass($repo))->getProperty('tableName');
             $property->setAccessible(true);
@@ -127,6 +124,12 @@ SET FOREIGN_KEY_CHECKS=1;
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        \Mockery::close();
     }
 
     protected function inject($className)
