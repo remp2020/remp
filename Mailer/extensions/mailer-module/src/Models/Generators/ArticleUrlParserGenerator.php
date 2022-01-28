@@ -8,6 +8,7 @@ use Nette\Utils\ArrayHash;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\ArticleUrlParserWidget\ArticleUrlParserWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
+use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\PostInputParam;
 
@@ -98,10 +99,14 @@ class ArticleUrlParserGenerator implements IGenerator
                 // people sometimes enter blank lines
                 continue;
             }
-            $meta = $this->content->fetchUrlMeta($url);
-            if ($meta) {
-                $items[$url] = $meta;
-            } else {
+            try {
+                $meta = $this->content->fetchUrlMeta($url);
+                if ($meta) {
+                    $items[$url] = $meta;
+                } else {
+                    $errors[] = $url;
+                }
+            } catch (InvalidUrlException $e) {
                 $errors[] = $url;
             }
         }
