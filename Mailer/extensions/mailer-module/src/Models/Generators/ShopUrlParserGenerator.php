@@ -7,6 +7,7 @@ use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\ArticleUrlParserWidget\ArticleUrlParserWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
+use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Models\PageMeta\Content\ShopContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\PostInputParam;
@@ -82,6 +83,8 @@ class ShopUrlParserGenerator implements IGenerator
         $sourceTemplate = $this->sourceTemplatesRepository->find($values['source_template_id']);
 
         $items = [];
+        $errors = [];
+
         $urls = explode("\n", trim($values['products']));
         foreach ($urls as $url) {
             $url = trim($url);
@@ -89,9 +92,16 @@ class ShopUrlParserGenerator implements IGenerator
                 // people sometimes enter blank lines
                 continue;
             }
-            $meta = $this->shopContent->fetchUrlMeta($url);
-            if ($meta) {
-                $items[$url] = $meta;
+
+            try {
+                $meta = $this->shopContent->fetchUrlMeta($url);
+                if ($meta) {
+                    $items[$url] = $meta;
+                } else {
+                    $errors[] = $url;
+                }
+            } catch (InvalidUrlException $e) {
+                $errors[] = $url;
             }
         }
 
@@ -105,6 +115,7 @@ class ShopUrlParserGenerator implements IGenerator
         return [
             'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
             'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
+            'errors' => $errors,
         ];
     }
 
