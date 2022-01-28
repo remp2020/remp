@@ -171,7 +171,7 @@ class Sender
         $this->setMessageHeaders($message, $senderId, $this->params);
 
         if ($this->context) {
-            $alreadySent = $this->logsRepository->alreadySentContext($this->context);
+            $alreadySent = $this->logsRepository->alreadySentContext($recipient['email'], $this->context);
             if ($alreadySent) {
                 return 0;
             }

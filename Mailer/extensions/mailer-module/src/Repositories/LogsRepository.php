@@ -198,9 +198,10 @@ class LogsRepository extends Repository
         return array_diff($emails, $alreadySentEmails);
     }
 
-    public function alreadySentContext(string $context): bool
+    public function alreadySentContext(string $email, string $context): bool
     {
         return $this->getTable()->where([
+            'mail_logs.email' => $email,
             'mail_logs.context' => $context,
         ])->count('*') > 0;
     }

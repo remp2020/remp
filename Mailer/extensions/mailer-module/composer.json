@@ -8,6 +8,7 @@
     "php": "^7.4",
     "ext-intl": "*",
     "ext-json": "*",
+    "ext-pdo": "*",
     "deployer/deployer": "^6.0",
     "deployer/recipes": "^6.0",
     "embed/embed": "^4.3",

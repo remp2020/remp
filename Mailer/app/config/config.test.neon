@@ -13,6 +13,12 @@ parameters:
 
 services:
 	- Remp\MailerModule\Models\Users\Dummy
+	hermesMemoryDriver:
+		factory: Remp\MailerModule\Hermes\MemoryDriver
+	hermesDispatcher:
+		factory: Tomaj\Hermes\Dispatcher(@hermesMemoryDriver, @hermesLogger, @hermesShutdown)
+	hermesEmitter:
+		factory: Tomaj\Hermes\Emitter(@hermesMemoryDriver, @hermesLogger)
 	segmentAgreggator:
 		setup:
 			- register(Remp\MailerModule\Models\Segment\Dummy())
