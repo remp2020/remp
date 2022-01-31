@@ -1,5 +1,4 @@
 <style type="text/css">
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 @import url('../../../sass/transitions.scss');
 
 .html-preview-link {
@@ -12,7 +11,6 @@
 }
 
 .html-preview-box {
-    font-family: Noto Sans, sans-serif;
     color: white;
     white-space: pre-line;
     display: block;
@@ -66,7 +64,7 @@ a.html-preview-close::after {
         dimensionOptions[dimensions]
     ]">
         <transition appear v-bind:name="transition">
-            <div class="html-preview-box" v-bind:style="[
+            <div class="html-preview-box sans-serif" v-bind:style="[
                 boxStyles,
                 dimensionOptions[dimensions],
                 customBoxStyles

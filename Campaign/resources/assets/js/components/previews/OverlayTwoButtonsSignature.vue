@@ -1,6 +1,4 @@
 <style type="text/css">
-    @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
-    @import url('https://fonts.googleapis.com/css?family=Noto+Serif');
     @import url('../../../sass/transitions.scss');
 
     .preview-admin-close {
@@ -14,14 +12,6 @@
         background-color: #fff;
         padding: 2px;
         z-index: 100001;
-    }
-
-    .serif {
-        font-family: 'Noto Serif', serif;
-    }
-
-    .sans-serif {
-        font-family: 'Noto Sans', sans-serif;
     }
 
     .overlay-with-two-btn-signature-background {

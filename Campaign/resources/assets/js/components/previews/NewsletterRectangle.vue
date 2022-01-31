@@ -1,5 +1,4 @@
 <style type="text/css">
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 @import url('../../../sass/transitions.scss');
 
 .newsletter-rectangle-preview-close {

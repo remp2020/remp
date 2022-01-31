@@ -1,5 +1,4 @@
 <style type="text/css">
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 @import url('../../../sass/transitions.scss');
 
 .medium-rectangle-preview-close {
@@ -38,7 +37,6 @@ a.medium-rectangle-preview-close::after {
 }
 
 .medium-rectangle-preview-box {
-    font-family: Noto Sans, sans-serif;
     white-space: pre-line;
     overflow: hidden;
     position: relative;
@@ -78,7 +76,7 @@ a.medium-rectangle-preview-close::after {
         _position
     ]">
         <transition appear v-bind:name="transition">
-            <div class="medium-rectangle-preview-box" v-bind:style="[boxStyles]">
+            <div class="medium-rectangle-preview-box sans-serif" v-bind:style="[boxStyles]">
                 <a class="medium-rectangle-preview-close" title="Close banner" href="javascript://"
                    v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed"
                    v-bind:style="[closeStyles]"><span>{{ closeText }}</span></a>

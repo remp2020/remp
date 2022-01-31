@@ -1,5 +1,4 @@
 <style type="text/css">
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 @import url('../../../sass/transitions.scss');
 
 .collapsible-bar-wrap {
@@ -30,7 +29,6 @@
 }
 
 .collapsible-bar-preview-box {
-    font-family: Noto Sans, sans-serif;
     white-space: pre-line;
     display: flex;
     overflow: hidden;
@@ -62,7 +60,6 @@
     text-align: center;
     padding: 5px 0;
     background-color: #fff;
-    font-family: Noto Sans, sans-serif;
     font-size: 14px;
     color: #5e5e5e;
     min-height: 31px;
@@ -109,7 +106,7 @@
 <template>
     <div class="collapsible-bar-wrap"
          v-bind:style="[containerStyles]">
-        <div class="collapsible-bar-header">
+        <div class="collapsible-bar-header sans-serif">
             {{ headerText }}
 
             <div class="collapsible-bar-toggle">
@@ -133,7 +130,7 @@
                    class="collapsible-bar-preview-link">
 
                     <transition appear name="slide">
-                        <div class="collapsible-bar-preview-box" v-bind:style="[ boxStyles ]">
+                        <div class="collapsible-bar-preview-box sans-serif" v-bind:style="[ boxStyles ]">
 
                             <div class="collapsible-bar-main"
                                  v-html="$parent.injectVars(mainText)"></div>

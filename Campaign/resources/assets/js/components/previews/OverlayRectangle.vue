@@ -1,5 +1,4 @@
 <style type="text/css">
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 @import url('../../../sass/transitions.scss');
 
 .overlay-rectangle-preview-close {
@@ -62,7 +61,6 @@ a.overlay-rectangle-preview-close::after {
 
 .overlay-rectangle-overlay {
     position: fixed;
-    font-family: Noto Sans, sans-serif;
     top: 0;
     left: 0;
     width: 100%;
@@ -159,7 +157,7 @@ a.overlay-rectangle-preview-close::after {
            v-if="isVisible && !closeable && adminPreview">CLOSE BANNER</a>
         <transition appear name="fade">
 
-            <div class="overlay-rectangle-overlay" v-if="isVisible">
+            <div class="overlay-rectangle-overlay sans-serif" v-if="isVisible">
                 <transition appear v-bind:name="transition">
                     <div class="overlay-rectangle-wrap" :class="{ closeable: closeable }">
 
