@@ -306,6 +306,21 @@ When implemented, create a segment provider providing the instance of your imple
 should set `\App\Contracts\SegmentAggregator::TAG` to the class so your implementation would get also
 registered to the `SegmentAggregator`.
 
+##### Banner custom styles
+
+Banners use default system fonts. If you want to use your own fonts you can add styles for `.remp-banner .serif` and `.remp-banner .sans-serif` to custom css field, or directly to web page using campaign showtime functionality.
+
+Example:
+```css
+.remp-banner .serif {
+    font-family: 'Lumin Serif', serif;
+}
+
+.remp-banner .sans-serif {
+    font-family: 'Lumin Sans', sans-serif;
+}
+```
+
 ### Admin integration with Beam Journal
 
 Beam Journal API (also known as Segments API) provides API for retrieving information about ongoing campaigns.

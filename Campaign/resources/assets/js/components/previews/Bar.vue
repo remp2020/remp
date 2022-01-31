@@ -1,5 +1,4 @@
 <style type="text/css">
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 @import url('../../../sass/transitions.scss');
 
 .bar-preview-close {
@@ -38,7 +37,6 @@ a.bar-preview-close::after {
 }
 
 .bar-preview-box {
-    font-family: Noto Sans, sans-serif;
     white-space: pre-line;
     display: flex;
     overflow: hidden;
@@ -90,7 +88,7 @@ a.bar-preview-close::after {
         _position
     ]">
         <transition appear v-bind:name="transition">
-            <div class="bar-preview-box" v-bind:style="[boxStyles]">
+            <div class="bar-preview-box sans-serif" v-bind:style="[boxStyles]">
                 <a class="bar-preview-close" title="Close banner" href="javascript://"
                    v-bind:class="[{hidden: !closeable}]"
                    v-on:click.stop="$parent.closed"

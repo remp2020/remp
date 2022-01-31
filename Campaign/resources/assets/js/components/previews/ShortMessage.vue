@@ -1,5 +1,4 @@
 <style type="text/css">
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 @import url('../../../sass/transitions.scss');
 
 .short-message-preview-close {
@@ -33,7 +32,6 @@ a.short-message-preview-close::after {
 }
 
 .short-message-preview-box {
-    font-family: Noto Sans, sans-serif;
     white-space: pre-line;
     overflow: hidden;
     position: relative;
@@ -65,7 +63,7 @@ a.short-message-preview-close::after {
         _position
     ]">
         <transition appear v-bind:name="transition">
-            <div class="short-message-preview-box"
+            <div class="short-message-preview-box sans-serif"
                  v-bind:style="[boxStyles]"
                  v-bind:class="{'short-message-closable': closeable}"
             >

@@ -16,6 +16,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added custom configuration for `CampaignController::showtime` Sentry sample rate. remp/remp#1029
 
+### [Campaign]
+
+- **BREAKING**: Removed loading `Noto Sans` and `Noto Sans Serif` fonts from campaign banner previews and use default system serif and sans-serif fonts. remp/remp#1041
+  - You can change used fonts by adding `font-face` style to `.remp-banner .serif` and `.remp-banner .sans-serif` classes.
+
 ### [Mailer]
 
 - **BREAKING**: The `/api/v1/mailers/send-email` API now validates context separately for each email address. This is a bugfix, but we label it as breaking because someone could depend on this behavior. remp/crm#2226
