@@ -184,7 +184,6 @@ SET FOREIGN_KEY_CHECKS=1;
         string $categoryName = 'category',
         string $typeCode = 'code',
         string $typeName = 'name',
-        bool $isPublic = true,
         bool $publicListing = true
     ) {
         $listCategory = $this->createMailTypeCategory($categoryName);
@@ -197,7 +196,6 @@ SET FOREIGN_KEY_CHECKS=1;
             1,
             true,
             false,
-            $isPublic,
             'XXX',
             null,
             null,

@@ -25,6 +25,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **BREAKING**: The `/api/v1/mailers/send-email` API now validates context separately for each email address. This is a bugfix, but we label it as breaking because someone could depend on this behavior. remp/crm#2226
   - Previously the handler validated context globally, which was not intentional. It could have prevented a notification with the same context to be sent to different users. This change unifies the behavior with jobs - they checked the email-context pair since the beginning.
+- **BREAKING**: Removed obsolete column `is_public` from `mail_types` table also from related code and API call. remp/remp#1061
+  - Check your usage of `is_public` column - replace with `public_listing` column or remove.
+  - The signature of method changed `ListsRepository::add()`. Check your usages of the method and incorporate the changes.
 - Fixed inconsistent `PageMeta` use where constructor allowed to enter nullable values if they weren't present, but getter didn't allow to return them. remp/remp#1055
 - Fixed incorrect handling of return values (null vs bool) caused by Nette 3.0 upgrade. remp/remp#1057
 - Added checkbox for hidding newsletter from public newsletter settings. remp/remp#1025

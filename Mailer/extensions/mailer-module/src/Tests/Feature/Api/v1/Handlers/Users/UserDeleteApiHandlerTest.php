@@ -109,8 +109,7 @@ class UserDeleteApiHandlerTest extends BaseApiHandlerTestCase
         $mailType = $this->createMailTypeWithCategory(
             "category1",
             "code1",
-            "name1",
-            true
+            "name1"
         );
         $mailLayout = $this->createMailLayout();
         $mailTemplate = $this->createTemplate($mailLayout, $mailType, 'mail_template_code_1');

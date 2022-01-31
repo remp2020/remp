@@ -80,7 +80,7 @@ class ArticleUrlParserTemplateFormFactory
             ->setRequired("Field 'Identifier' is required.");
 
         $mailTypes = $this->listsRepository->getTable()
-            ->where(['is_public' => true])
+            ->where(['public_listing' => true])
             ->order('sorting ASC')
             ->fetchPairs('id', 'title');
 

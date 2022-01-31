@@ -1903,7 +1903,6 @@ Field `id` has higher precedence in finding the existing record.
     "sorting": 100, // Integer, optional; Indicator of how the mail types should be sorted in API and web. Sorting is in ascending order.
     "locked": false, // Boolean, optional; Flag indicating whether users should be able to subscribe/unsubscribe from the list (e.g. you want your system emails locked and subscribed for everyone)
     "auto_subscribe": false, // Boolean, optional; Flag indicating whether users should be subscribed to this list automatically
-    "is_public": false, // Boolean, optional; Flag whether the list should be available in Mailer admin for selection. Defaults to true.
     "public_listing": false, // Boolean, optional; Flag whether the user should see the newsletter. Defaults to false.
     "image_url": "http://example.com/image.jpg", // String, optional; URL of image for frontend UI.
     "preview_url": "http://example.com/demo.html", // String, optional; URL of example newsletter to preview content to users.
@@ -1944,7 +1943,6 @@ Response:
         "priority": 100,
         "mail_type_category_id": 5,
         "locked": false,
-        "is_public": false,
         "public_listing": true,
         "auto_subscribe": false,
         "image_url": null,

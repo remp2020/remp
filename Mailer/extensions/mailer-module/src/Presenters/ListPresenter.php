@@ -146,7 +146,6 @@ final class ListPresenter extends BasePresenter
                 $list->auto_subscribe,
                 $list->public_listing,
                 $list->locked,
-                $list->is_public,
             ];
         }
 

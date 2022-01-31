@@ -78,8 +78,7 @@ class MailTypeVariantCreateApiHandlerTest extends BaseApiHandlerTestCase
         $mailType = $this->createMailTypeWithCategory(
             "category1",
             "code1",
-            "name1",
-            true
+            "name1"
         );
 
         return [
