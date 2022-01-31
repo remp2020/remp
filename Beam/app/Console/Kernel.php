@@ -81,7 +81,10 @@ class Kernel extends ConsoleKernel
      */
     private function authorSegments(Schedule $schedule)
     {
-        $schedule->command(AggregateArticlesViews::COMMAND, ['--skip-temp-aggregation'])
+        $schedule->command(AggregateArticlesViews::COMMAND, [
+            '--skip-temp-aggregation',
+            '--step' => config('system.commands.aggregate_article_views.default_step'),
+        ])
             ->dailyAt('01:00')
             ->runInBackground()
             ->withoutOverlapping(config('system.commands_overlapping_expires_at'))

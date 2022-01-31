@@ -15,5 +15,10 @@ if (!empty($definition)) {
 
 return [
     'commands_memory_limits' => $limits,
-    'commands_overlapping_expires_at' => env('COMMANDS_OVERLAPPING_EXPIRES_AT', 15)
+    'commands_overlapping_expires_at' => env('COMMANDS_OVERLAPPING_EXPIRES_AT', 15),
+    'commands' => [
+        'aggregate_article_views' => [
+            'default_step' => env('AGGREGATE_ARTICLE_VIEWS_DEFAULT_STEP'),
+        ],
+    ],
 ];
