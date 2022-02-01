@@ -137,7 +137,6 @@ class DemoSeedCommand extends Command
                 100,
                 false,
                 false,
-                true,
                 'Example mail list'
             );
         }

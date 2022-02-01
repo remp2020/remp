@@ -64,7 +64,7 @@ class NewsfilterTemplateFormFactory
 
         $form->addSelect('locked_mail_layout_id', 'Template for non-subscribers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
-        $mailTypes = $this->listsRepository->getTable()->where(['is_public' => true])->order('sorting ASC')->fetchPairs('id', 'code');
+        $mailTypes = $this->listsRepository->getTable()->where(['public_listing' => true])->order('sorting ASC')->fetchPairs('id', 'code');
 
         $form->addSelect('mail_type_id', 'Type', $mailTypes)
             ->setRequired("Field 'Type' is required.");

@@ -153,7 +153,6 @@ class ListFormFactory
 
         $form->addCheckbox('auto_subscribe', 'Auto subscribe');
         $form->addCheckbox('locked', 'Locked');
-        $form->addCheckbox('is_public', 'Public');
         $form->addCheckbox('public_listing', 'List publicly');
 
         $form->addHidden('id', $id);
@@ -243,14 +242,12 @@ class ListFormFactory
                 $values['title'],
                 $values['sorting'],
                 $values['auto_subscribe'],
-                $values['public_listing'],
                 $values['locked'],
-                $values['is_public'],
                 $values['description'],
                 $values['preview_url'],
                 $values['page_url'],
                 $values['image_url'],
-                true,
+                $values['public_listing'],
                 $values['mail_from'],
                 $values['subscribe_mail_template_id']
             );

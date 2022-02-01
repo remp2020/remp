@@ -19,8 +19,8 @@ class MailTypesListingHandlerTest extends BaseApiHandlerTestCase
 
     public function testListWithFilters()
     {
-        $this->createMailTypeWithCategory("category1", "code1", "name1", true, true);
-        $this->createMailTypeWithCategory("category1", "code2", "name2", false, false);
+        $this->createMailTypeWithCategory("category1", "code1", "name1", true);
+        $this->createMailTypeWithCategory("category1", "code2", "name2", false);
 
         $params = ['public_listing' => 1];
         $handler = $this->getHandler(MailTypesListingHandler::class);
