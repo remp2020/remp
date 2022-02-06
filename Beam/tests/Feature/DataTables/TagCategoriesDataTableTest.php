@@ -35,28 +35,37 @@ class TagCategoriesDataTableTest extends TestCase
 
         Property::factory()->create(['uuid' => 'prop_1']);
         Property::factory()->create(['uuid' => 'prop_2']);
+        Property::factory()->create(['uuid' => 'prop_3']);
+        Property::factory()->create(['uuid' => 'prop_4']);
 
         $this->articles = [
             'prop1' => Article::factory()->create(['property_uuid' => 'prop_1']),
             'prop1_shared' => Article::factory()->create(['property_uuid' => 'prop_1']),
             'prop2' => Article::factory()->create(['property_uuid' => 'prop_2']),
             'prop2_shared' => Article::factory()->create(['property_uuid' => 'prop_2']),
+            'prop3' => Article::factory()->create(['property_uuid' => 'prop_3']),
+            'prop4' => Article::factory()->create(['property_uuid' => 'prop_4']),
         ];
 
         $this->tags = [
             1 => Tag::factory()->create(),
             2 => Tag::factory()->create(),
+            3 => Tag::factory()->create(),
+            4 => Tag::factory()->create(),
         ];
 
         $this->tagCategories = [
             1 => TagCategory::factory()->create(),
             2 => TagCategory::factory()->create(),
+            3 => TagCategory::factory()->create(),  // has prop_3 only tag
         ];
 
         // assign tag categories
         $this->tags[1]->tagCategories()->attach($this->tagCategories[1]);
         $this->tags[1]->tagCategories()->attach($this->tagCategories[2]);
         $this->tags[2]->tagCategories()->attach($this->tagCategories[2]);
+        $this->tags[3]->tagCategories()->attach($this->tagCategories[3]);
+        $this->tags[4]->tagCategories()->attach($this->tagCategories[3]);
 
         // assign tags
         $this->articles['prop1']->tags()->attach($this->tags[1]);
@@ -65,6 +74,8 @@ class TagCategoriesDataTableTest extends TestCase
         $this->articles['prop2']->tags()->attach($this->tags[2]);
         $this->articles['prop2_shared']->tags()->attach($this->tags[1]);
         $this->articles['prop2_shared']->tags()->attach($this->tags[2]);
+        $this->articles['prop3']->tags()->attach($this->tags[3]);
+        $this->articles['prop4']->tags()->attach($this->tags[4]);
 
         // assign conversions
         $this->articles['prop1']->conversions()->saveMany(
@@ -85,7 +96,7 @@ class TagCategoriesDataTableTest extends TestCase
     {
         $json = $this->requestTagCategories();
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
+        $json->assertJsonPath('recordsTotal', 3);
         $json->assertJsonPath('data.0.id', $this->tagCategories[2]->id);
         $json->assertJsonPath('data.0.tags_count', 2);
         $json->assertJsonPath('data.0.articles_count', 4);
@@ -94,6 +105,10 @@ class TagCategoriesDataTableTest extends TestCase
         $json->assertJsonPath('data.1.tags_count', 1);
         $json->assertJsonPath('data.1.articles_count', 3);
         $json->assertJsonPath('data.1.conversions_count', 7);
+        $json->assertJsonPath('data.2.id', $this->tagCategories[3]->id);
+        $json->assertJsonPath('data.2.tags_count', 2);
+        $json->assertJsonPath('data.2.articles_count', 2);
+        $json->assertJsonPath('data.2.conversions_count', 0);
     }
 
     public function testPropertyTagCategories()
@@ -123,6 +138,15 @@ class TagCategoriesDataTableTest extends TestCase
         $json->assertJsonPath('data.1.tags_count', 1);
         $json->assertJsonPath('data.1.articles_count', 1);
         $json->assertJsonPath('data.1.conversions_count', 4);
+
+        $this->setProperty('prop_3');
+        $json = $this->requestTagCategories();
+        $json->assertSuccessful();
+        $json->assertJsonPath('recordsTotal', 1);
+        $json->assertJsonPath('data.0.id', $this->tagCategories[3]->id);
+        $json->assertJsonPath('data.0.tags_count', 1);
+        $json->assertJsonPath('data.0.articles_count', 1);
+        $json->assertJsonPath('data.0.conversions_count', 0);
     }
 
     public function testAllTagCategoryArticles()

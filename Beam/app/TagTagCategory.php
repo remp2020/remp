@@ -22,8 +22,8 @@ class TagTagCategory extends BaseModel
 
     public function scopeOfSelectedProperty($query)
     {
-        return $query->whereHas('tagCategory', function (Builder $q) {
-            $q->ofSelectedProperty();
+        return $query->whereHas('tag', function (Builder $tagQuery) {
+            $tagQuery->ofSelectedProperty();
         });
     }
 }
