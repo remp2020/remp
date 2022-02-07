@@ -5,6 +5,7 @@ namespace App;
 use App\Model\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Remp\Journal\TokenProvider;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
@@ -44,8 +45,13 @@ class Author extends BaseModel implements Searchable
     
     public function scopeOfSelectedProperty($query)
     {
-        return $query->whereHas('articles', function (Builder $articlesQuery) {
-            $articlesQuery->ofSelectedProperty();
-        });
+        $tokenProvider = resolve(TokenProvider::class);
+        $propertyUuid = $tokenProvider->getToken();
+        if ($propertyUuid) {
+            $query->whereHas('articles', function (Builder $articlesQuery) {
+                $articlesQuery->ofSelectedProperty();
+            });
+        }
+        return $query;
     }
 }
