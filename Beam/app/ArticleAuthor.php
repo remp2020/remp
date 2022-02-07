@@ -4,6 +4,7 @@ namespace App;
 
 use App\Model\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
+use Remp\Journal\TokenProvider;
 
 class ArticleAuthor extends BaseModel
 {
@@ -21,8 +22,13 @@ class ArticleAuthor extends BaseModel
 
     public function scopeOfSelectedProperty($query)
     {
-        return $query->whereHas('article', function (Builder $articleQuery) {
-            $articleQuery->ofSelectedProperty();
-        });
+        $tokenProvider = resolve(TokenProvider::class);
+        $propertyUuid = $tokenProvider->getToken();
+        if ($propertyUuid) {
+            $query->whereHas('article', function (Builder $articleQuery) {
+                $articleQuery->ofSelectedProperty();
+            });
+        }
+        return $query;
     }
 }

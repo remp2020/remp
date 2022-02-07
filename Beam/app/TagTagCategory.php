@@ -5,6 +5,7 @@ namespace App;
 use App\Model\BaseModel;
 use App\Model\Tag;
 use Illuminate\Database\Eloquent\Builder;
+use Remp\Journal\TokenProvider;
 
 class TagTagCategory extends BaseModel
 {
@@ -22,8 +23,13 @@ class TagTagCategory extends BaseModel
 
     public function scopeOfSelectedProperty($query)
     {
-        return $query->whereHas('tag', function (Builder $tagQuery) {
-            $tagQuery->ofSelectedProperty();
-        });
+        $tokenProvider = resolve(TokenProvider::class);
+        $propertyUuid = $tokenProvider->getToken();
+        if ($propertyUuid) {
+            $query->whereHas('tag', function (Builder $tagQuery) {
+                $tagQuery->ofSelectedProperty();
+            });
+        }
+        return $query;
     }
 }

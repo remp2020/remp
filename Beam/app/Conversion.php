@@ -11,6 +11,7 @@ use App\Model\ConversionPageviewEvent;
 use App\Model\ConversionSource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
+use Remp\Journal\TokenProvider;
 
 class Conversion extends BaseModel
 {
@@ -64,9 +65,14 @@ class Conversion extends BaseModel
     
     public function scopeOfSelectedProperty($query)
     {
-        return $query->whereHas('article', function (Builder $articleQuery) {
-            $articleQuery->ofSelectedProperty();
-        });
+        $tokenProvider = resolve(TokenProvider::class);
+        $propertyUuid = $tokenProvider->getToken();
+        if ($propertyUuid) {
+            $query->whereHas('article', function (Builder $articleQuery) {
+                $articleQuery->ofSelectedProperty();
+            });
+        }
+        return $query;
     }
 
     public function setArticleExternalIdAttribute($articleExternalId)

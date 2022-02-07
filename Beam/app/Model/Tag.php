@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Article;
 use App\TagCategory;
+use Remp\Journal\TokenProvider;
 
 class Tag extends BaseModel
 {
@@ -35,8 +36,13 @@ class Tag extends BaseModel
 
     public function scopeOfSelectedProperty($query)
     {
-        return $query->whereHas('articles', function (Builder $articlesQuery) {
-            $articlesQuery->ofSelectedProperty();
-        });
+        $tokenProvider = resolve(TokenProvider::class);
+        $propertyUuid = $tokenProvider->getToken();
+        if ($propertyUuid) {
+            $query->whereHas('articles', function (Builder $articlesQuery) {
+                $articlesQuery->ofSelectedProperty();
+            });
+        }
+        return $query;
     }
 }
