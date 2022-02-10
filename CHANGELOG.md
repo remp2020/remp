@@ -20,12 +20,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
-- Added custom configuration for `CampaignController::showtime` Sentry sample rate. remp/remp#1029
-
-### [Campaign]
-
 - **BREAKING**: Removed loading `Noto Sans` and `Noto Sans Serif` fonts from campaign banner previews and use default system serif and sans-serif fonts. remp/remp#1041
   - You can change used fonts by adding `font-face` style to `.remp-banner .serif` and `.remp-banner .sans-serif` classes.
+- Added custom configuration for `CampaignController::showtime` Sentry sample rate. remp/remp#1029
 
 ### [Mailer]
 
@@ -33,10 +30,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Previously the handler validated context globally, which was not intentional. It could have prevented a notification with the same context to be sent to different users. This change unifies the behavior with jobs - they checked the email-context pair since the beginning.
 - **BREAKING**: Removed obsolete column `is_public` from `mail_types` table also from related code and API call. remp/remp#1061
   - Check your usage of `is_public` column - replace with `public_listing` column or remove.
-  - The signature of method changed `ListsRepository::add()`. Check your usages of the method and incorporate the changes.
+  - The signature of method `ListsRepository::add()` changed. Check your usages of the method and incorporate the changes.
 - Fixed inconsistent `PageMeta` use where constructor allowed to enter nullable values if they weren't present, but getter didn't allow to return them. remp/remp#1055
 - Fixed incorrect handling of return values (null vs bool) caused by Nette 3.0 upgrade. remp/remp#1057
-- Added checkbox for hidding newsletter from public newsletter settings. remp/remp#1025
+- Added checkbox for hiding newsletter from public newsletter settings. remp/remp#1025
 - Fixed WP-based generator issue causing unnecessary `<br />` tags being appended to the `<a>` links. remp/remp#1065
 - Fixed error in `ArticleUrlParserGenerator` caused by invalid URL. Mailer would crash instead of displaying error to the user. remp/remp#1066
 - Added migration to add index on `email` column in `autologin_tokens` table. remp/remp#1067
@@ -1134,7 +1131,9 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.28.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.30.0...master
+[0.30.0]: https://github.com/remp2020/remp/compare/0.29.0...0.30.0
+[0.29.0]: https://github.com/remp2020/remp/compare/0.28.0...0.29.0
 [0.28.0]: https://github.com/remp2020/remp/compare/0.27.1...0.28.0
 [0.27.1]: https://github.com/remp2020/remp/compare/0.27.0...0.27.1
 [0.27.0]: https://github.com/remp2020/remp/compare/0.26.0...0.27.0
