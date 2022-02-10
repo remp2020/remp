@@ -49,6 +49,9 @@
     "variant_id": {
       "type": "integer"
     },
+    "variant_code": {
+      "type": "string"
+    },
     "send_accompanying_emails": {
       "type": "boolean"
     }

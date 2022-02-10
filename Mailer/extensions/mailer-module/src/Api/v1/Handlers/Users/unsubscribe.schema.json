@@ -45,6 +45,12 @@
         {"type": "null"}
       ]
     },
+    "variant_code": {
+      "anyOf": [
+        {"type": "string"},
+        {"type": "null"}
+      ]
+    },
     "utm_params": {
       "title": "Utm params",
       "type": "object",

@@ -27,6 +27,11 @@ class ListVariantsRepository extends Repository
         return $this->getTable()->where(['id' => $id, 'mail_type_id' => $mailTypeId])->fetch();
     }
 
+    public function findByCodeAndMailTypeId(string $code, int $mailTypeId): ?ActiveRow
+    {
+        return $this->getTable()->where(['code' => $code, 'mail_type_id' => $mailTypeId])->fetch();
+    }
+
     public function tableFilter(string $query, string $order, string $orderDirection, ?array $listIds = null, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
