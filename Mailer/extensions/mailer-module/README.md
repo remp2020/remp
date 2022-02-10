@@ -910,12 +910,12 @@ real token API token which can be acquired in the REMP SSO.
 
 API responses can contain following HTTP codes:
 
-| Value | Description |
-| --- | --- |
-| 200 OK | Successful response, default value |
-| 400 Bad Request | Invalid request (missing required parameters) |
-| 403 Forbidden | The authorization failed (provided token was not valid) |
-| 404 Not found | Referenced resource wasn't found |
+| Value           | Description                                             |
+|-----------------|---------------------------------------------------------|
+| 200 OK          | Successful response, default value                      |
+| 400 Bad Request | Invalid request (missing required parameters)           |
+| 403 Forbidden   | The authorization failed (provided token was not valid) |
+| 404 Not found   | Referenced resource wasn't found                        |
 
 If possible, the response includes `application/json` encoded payload with a message explaining
 the error further.
@@ -930,16 +930,16 @@ option.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Params:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| email | *String* | yes | Email address of user. |
-| user_id | *String/Integer* _(validated by FILTER_VALIDATE_INT)_ | yes | ID of user. |
+| Name    | Value                                                 | Required | Description            |
+|---------|-------------------------------------------------------|----------|------------------------|
+| email   | *String*                                              | yes      | Email address of user. |
+| user_id | *String/Integer* _(validated by FILTER_VALIDATE_INT)_ | yes      | ID of user.            |
 
 ##### *Example:*
 
@@ -971,9 +971,9 @@ option.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -994,10 +994,10 @@ option.
 
 ###### *Properties of one user*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| email | *String* | yes | Email address of user. |
-| user_id | *String/Integer* _(validated by FILTER_VALIDATE_INT)_ | yes | ID of user. |
+| Name    | Value                                                 | Required | Description            |
+|---------|-------------------------------------------------------|----------|------------------------|
+| email   | *String*                                              | yes      | Email address of user. |
+| user_id | *String/Integer* _(validated by FILTER_VALIDATE_INT)_ | yes      | ID of user.            |
 
 ##### *Example:*
 
@@ -1073,9 +1073,9 @@ API call that checks if user is unsubscribed from given newsletter list.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -1116,9 +1116,9 @@ API call to get subscribed newsletter lists and their variants.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -1185,9 +1185,9 @@ Please visit `/list/new` to create a newsletter via web admin.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -1202,6 +1202,7 @@ Please visit `/list/new` to create a newsletter via web admin.
 
   // optional
   "variant_id": 123, // Integer; ID of the newsletter variant to subscribe
+  "variant_code": "author.123", // String; Code of the newsletter variant to subscribe
   "send_accompanying_emails": true // Boolean; Whether to send welcome email to the subscribed user. Defaults to TRUE.
 }
 ```
@@ -1251,9 +1252,9 @@ of emails won't be available.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -1268,6 +1269,7 @@ of emails won't be available.
 
     // optional
     "variant_id": 1, // Integer;  ID of newsletter variant to unsubscribe
+    "variant_code": "author.123", // String; Code of the newsletter variant to subscribe
 
     // optional RTM parameters for tracking "what" made the user unsubscribe
     "rtm_params": { // Object; optional RTM parameters for pairing which email caused the user to unsubscribe. RTM params are generated into the email links automatically.
@@ -1323,9 +1325,9 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -1342,6 +1344,7 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
       "list_code": "alerts", // String; code of the newsletter list you're subscribing the user to
 
       "variant_id": 3, // Integer; ID of the variant of newsletter list you're subscribing user to. Must belong to provided list.
+      "variant_code": "author.123", // String; Code of the newsletter variant to subscribe
 
       "subscribe": false, // Boolean; indicates if you want to subscribe or unsubscribe user
 
@@ -1369,17 +1372,17 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
 
 ###### *Properties of one users element*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| email | *String* | yes | Email address of user. |
-| user_id | *String/Integer* _(validated by FILTER_VALIDATE_INT)_ | yes | ID of user. |
-| subscribe | *Boolean* | yes | Flag to indicate if user should subscribed or un-subscribed. |
-| list_id | *Integer* | yes _(use list_id or list_code)_ | ID of mail list. |
-| list_code | *String* | yes _(use list_id or list_code)_ | Code of mail list. |
-| variant_id | *Integer* | no | Optional ID of variant. |
-| rtm_params | *Object* | no | Optional RTM parameters for pairing which email caused the user to unsubscribe. |
-| utm_params | *Object* | no | (Deprecated) UTM parameters are deprecated, but if no RTM paramters are found, system will try to use these. |
-| send_accompanying_emails | *Boolean* | no | Whether or not to send welcome or goodbye(not implemented yet) email to the user whom subscription is being changed. Defaults to **TRUE**. |
+| Name                     | Value                                                 | Required                         | Description                                                                                                                                |
+|--------------------------|-------------------------------------------------------|----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| email                    | *String*                                              | yes                              | Email address of user.                                                                                                                     |
+| user_id                  | *String/Integer* _(validated by FILTER_VALIDATE_INT)_ | yes                              | ID of user.                                                                                                                                |
+| subscribe                | *Boolean*                                             | yes                              | Flag to indicate if user should subscribed or un-subscribed.                                                                               |
+| list_id                  | *Integer*                                             | yes _(use list_id or list_code)_ | ID of mail list.                                                                                                                           |
+| list_code                | *String*                                              | yes _(use list_id or list_code)_ | Code of mail list.                                                                                                                         |
+| variant_id               | *Integer*                                             | no                               | Optional ID of variant.                                                                                                                    |
+| rtm_params               | *Object*                                              | no                               | Optional RTM parameters for pairing which email caused the user to unsubscribe.                                                            |
+| utm_params               | *Object*                                              | no                               | (Deprecated) UTM parameters are deprecated, but if no RTM paramters are found, system will try to use these.                               |
+| send_accompanying_emails | *Boolean*                                             | no                               | Whether or not to send welcome or goodbye(not implemented yet) email to the user whom subscription is being changed. Defaults to **TRUE**. |
 
 
 ##### *Example:*
@@ -1531,16 +1534,16 @@ subscription information is being stored on *user_id*/*email* level.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Params:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| original_email | *String* | yes | Original email address of user. |
-| new_email | *String* | yes | New email address of user. |
+| Name           | Value    | Required | Description                     |
+|----------------|----------|----------|---------------------------------|
+| original_email | *String* | yes      | Original email address of user. |
+| new_email      | *String* | yes      | New email address of user.      |
 
 ##### *Example:*
 
@@ -1568,9 +1571,9 @@ Returns number of emails matching the status based on given timeframe. Count is 
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -1618,9 +1621,9 @@ Returns mail logs based on given criteria
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -1729,9 +1732,9 @@ Removes all user data for given email
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -1777,16 +1780,16 @@ new *email* template via API.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Params:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| code | *String* | no | Filter only newsletter (mail type) with specific code. Returns array with either 0 or 1 element. |
-| public_listing | *Boolean* | no | Flag whether only newsletters (mail types) hat should/shouldn't be available to be listed publicly should be returned. |
+| Name           | Value     | Required | Description                                                                                                            |
+|----------------|-----------|----------|------------------------------------------------------------------------------------------------------------------------|
+| code           | *String*  | no       | Filter only newsletter (mail type) with specific code. Returns array with either 0 or 1 element.                       |
+| public_listing | *Boolean* | no       | Flag whether only newsletters (mail types) hat should/shouldn't be available to be listed publicly should be returned. |
 
 ##### *Example:*
 
@@ -1844,9 +1847,9 @@ Get available categories of newsletters.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Example:*
 
@@ -1886,9 +1889,9 @@ Field `id` has higher precedence in finding the existing record.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -1965,9 +1968,9 @@ Get available mail templates. Possible filtering by `mail_type_code` to get only
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Example:*
 
@@ -2003,19 +2006,19 @@ Gets list of available email templates.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Params:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| codes | *String[]* | no | If provided, list only email templates for given mail_template codes.
-| mail_type_codes | *String[]* | no | If provided, list only email templates for given mail_type codes.
-| with_mail_types | *Boolean* | no | If true, each returned email template contains additional parameters about assigned mail_type.
-| page | *Integer* | no | Pagination. Select which page to return. Required if with `limit` parameter is used.  
-| limit | *Integer* | no | Pagination. Limit number of records returned for one page. Required if `page` parameter is used.
+| Name            | Value      | Required | Description                                                                                      |
+|-----------------|------------|----------|--------------------------------------------------------------------------------------------------|
+| codes           | *String[]* | no       | If provided, list only email templates for given mail_template codes.                            |
+| mail_type_codes | *String[]* | no       | If provided, list only email templates for given mail_type codes.                                |
+| with_mail_types | *Boolean*  | no       | If true, each returned email template contains additional parameters about assigned mail_type.   |
+| page            | *Integer*  | no       | Pagination. Select which page to return. Required if with `limit` parameter is used.             |
+| limit           | *Integer*  | no       | Pagination. Limit number of records returned for one page. Required if `page` parameter is used. |
 
 ##### *Example:*
 
@@ -2053,25 +2056,25 @@ Creates new email template. Endpoint complements creation of template via web in
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Params:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| name | *String* | yes | User-friendly name of the email. It's displayed only in the administration parts of the system. |
-| code | *String* | yes | Computer-friendly name of the email (slug). Primarily being used when referencing single email that's being sent manually. |
-| description | *String* | yes | Internal description, so you know even after a year what the purpose of email was. |
-| mail_layout_id | *String* | yes | ID of layout to be used for email. If you're providing full HTML/text content, we recommend creating "empty" layout only with *content* within body. |
-| mail_type_code | *String* | yes | Code of newsletter list the email should belong to. Before the email is sent to specific end-user, Mailer checks whether the user is subscribed to this newsletter or not. If he/she is not, the email will not be sent. |
-| from | *String* | yes | Who should be used as a sender of email. |
-| subject | *String* | yes | Email subject. |
-| template_text | *String* | yes | Text version used as a fallback by email clients. |
-| template_html | *String* | yes | HTML (primary) version of email that people will see. HTML version is being previewed in the form for creation of new email. |
-| click_tracking | *Boolean* | no | Boolean flag to determine whether click tracking should be attempted on created template. If not provided, system's default settings is used. |
-| extras | *String* | no | JSON-encoded arbitrary metadata used internally for email personalization and just-in-time (per-user when sending) email content injection |
+| Name           | Value     | Required | Description                                                                                                                                                                                                              |
+|----------------|-----------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| name           | *String*  | yes      | User-friendly name of the email. It's displayed only in the administration parts of the system.                                                                                                                          |
+| code           | *String*  | yes      | Computer-friendly name of the email (slug). Primarily being used when referencing single email that's being sent manually.                                                                                               |
+| description    | *String*  | yes      | Internal description, so you know even after a year what the purpose of email was.                                                                                                                                       |
+| mail_layout_id | *String*  | yes      | ID of layout to be used for email. If you're providing full HTML/text content, we recommend creating "empty" layout only with *content* within body.                                                                     |
+| mail_type_code | *String*  | yes      | Code of newsletter list the email should belong to. Before the email is sent to specific end-user, Mailer checks whether the user is subscribed to this newsletter or not. If he/she is not, the email will not be sent. |
+| from           | *String*  | yes      | Who should be used as a sender of email.                                                                                                                                                                                 |
+| subject        | *String*  | yes      | Email subject.                                                                                                                                                                                                           |
+| template_text  | *String*  | yes      | Text version used as a fallback by email clients.                                                                                                                                                                        |
+| template_html  | *String*  | yes      | HTML (primary) version of email that people will see. HTML version is being previewed in the form for creation of new email.                                                                                             |
+| click_tracking | *Boolean* | no       | Boolean flag to determine whether click tracking should be attempted on created template. If not provided, system's default settings is used.                                                                            |
+| extras         | *String*  | no       | JSON-encoded arbitrary metadata used internally for email personalization and just-in-time (per-user when sending) email content injection                                                                               |
 
 ##### *Example:*
 
@@ -2102,9 +2105,9 @@ parameters based on the used *generator*. It complements generation of HTML/text
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Example:*
 
@@ -2139,16 +2142,16 @@ parameters based on the used *generator*. It complements generation of HTML/text
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Params:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| source_template_id | *String* | yes if CODE not provided  | ID of *generator template* to be used. |
-| source_template_code | *String* | yes if ID not provided | CODE of *generator template* to be used. |
+| Name                 | Value    | Required                 | Description                              |
+|----------------------|----------|--------------------------|------------------------------------------|
+| source_template_id   | *String* | yes if CODE not provided | ID of *generator template* to be used.   |
+| source_template_code | *String* | yes if ID not provided   | CODE of *generator template* to be used. |
 
 Any other parameters are specific to each generator and require knowledge of the generator implementation.
 See `apiParams()` method of the generator for the list of available/required parameters.
@@ -2185,15 +2188,15 @@ Gets rendered email content by code. Both HTML and text variants are provided.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Params:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| code | *String* | yes | `Code` of template to render.
+| Name | Value    | Required | Description                   |
+|------|----------|----------|-------------------------------|
+| code | *String* | yes      | `Code` of template to render. |
 
 ##### *Example:*
 
@@ -2222,9 +2225,9 @@ Lists all available segments that can be used in *jobs*.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Example:*
 
@@ -2261,19 +2264,19 @@ Endpoint complements manual job creation via web interface.
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Params:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| segment_code | *String* | yes | Code of the segment to be used. |
-| segment_provider | *String* | yes | Segment provider owning the segment. |
-| template_id | *String* | yes | ID of *email*. |
-| context | *String* | no | Context to be used. |
-| mail_type_variant_code | *String* | no | Specify mail type variant code to be used. |
+| Name                   | Value    | Required | Description                                |
+|------------------------|----------|----------|--------------------------------------------|
+| segment_code           | *String* | yes      | Code of the segment to be used.            |
+| segment_provider       | *String* | yes      | Segment provider owning the segment.       |
+| template_id            | *String* | yes      | ID of *email*.                             |
+| context                | *String* | no       | Context to be used.                        |
+| mail_type_variant_code | *String* | no       | Specify mail type variant code to be used. |
 
 ##### *Example:*
 
@@ -2305,9 +2308,9 @@ See [`preprocessParameters()` bullet of Implementing Generator section](#impleme
 
 ##### *Headers:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| Authorization | Bearer *String* | yes | API token. |
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
 
 ##### *Body:*
 
@@ -2386,14 +2389,14 @@ testing purposes and completeness.
 
 ##### *Params:*
 
-| Name | Value | Required | Description |
-| --- |---| --- | --- |
-| mail_sender_id | *String* | yes | Back-reference to specific email Mailer sent. |
-| timestamp | *String* | yes | Timestamp when event occurred. |
-| token | *String* | yes | Verification field. |
-| signature | *String* | yes | Verification field. |
-| recipient | *String* | yes | Email address of recipient. |
-| event | *String* | yes | Type of email that occurred. |
+| Name           | Value    | Required | Description                                   |
+|----------------|----------|----------|-----------------------------------------------|
+| mail_sender_id | *String* | yes      | Back-reference to specific email Mailer sent. |
+| timestamp      | *String* | yes      | Timestamp when event occurred.                |
+| token          | *String* | yes      | Verification field.                           |
+| signature      | *String* | yes      | Verification field.                           |
+| recipient      | *String* | yes      | Email address of recipient.                   |
+| event          | *String* | yes      | Type of email that occurred.                  |
 
 ##### *Example:*
 

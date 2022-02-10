@@ -109,18 +109,27 @@ class SubscribeHandler extends BaseHandler
      */
     protected function getVariantID(array $payload, ActiveRow $list): ?int
     {
-        if (!isset($payload['variant_id'])) {
-            return $list->default_variant_id;
+        if (isset($payload['variant_id'])) {
+            $variant = $this->listVariantsRepository->findByIdAndMailTypeId($payload['variant_id'], $list->id);
+            if (!$variant) {
+                throw new InvalidApiInputParamException(
+                    "Variant with ID [{$payload['variant_id']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
+                    404
+                );
+            }
+            return $variant->id;
+        }
+        if (isset($payload['variant_code'])) {
+            $variant = $this->listVariantsRepository->findByCodeAndMailTypeId($payload['variant_code'], $list->id);
+            if (!$variant) {
+                throw new InvalidApiInputParamException(
+                    "Variant with code [{$payload['variant_code']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
+                    404
+                );
+            }
+            return $variant->id;
         }
 
-        $variant = $this->listVariantsRepository->findByIdAndMailTypeId($payload['variant_id'], $list->id);
-        if (!$variant) {
-            throw new InvalidApiInputParamException(
-                "Variant with ID [{$payload['variant_id']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
-                404
-            );
-        }
-
-        return $variant->id;
+        return $list->default_variant_id;
     }
 }

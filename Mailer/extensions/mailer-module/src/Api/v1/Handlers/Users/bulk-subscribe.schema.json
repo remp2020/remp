@@ -53,6 +53,9 @@
         "variant_id": {
           "type": "integer"
         },
+        "variant_code": {
+          "type": "string"
+        },
         "subscribe": {
           "type": "boolean"
         },

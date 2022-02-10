@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
 use Nette\Utils\Strings;
+use Remp\MailerModule\Api\InvalidApiInputParamException;
 use Remp\MailerModule\Api\JsonValidationTrait;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
@@ -60,12 +62,13 @@ class UnSubscribeHandler extends BaseHandler
             return new JsonApiResponse(404, ['status' => 'error', 'message' => 'list not found']);
         }
 
-        if (isset($payload['variant_id'])) {
-            $variant = $this->listVariantsRepository->findByIdAndMailTypeId($payload['variant_id'], $list->id);
-            if (!$variant) {
-                return new JsonApiResponse(404, ['status' => 'error', 'message' => 'variant not found']);
-            }
+        try {
+            $variant = $this->getVariant($payload, $list);
+        } catch (InvalidApiInputParamException $e) {
+            return new JsonApiResponse($e->getCode(), ['status' => 'error', 'message' => $e->getMessage()]);
+        }
 
+        if ($variant) {
             $userSubscription = $this->userSubscriptionsRepository->getUserSubscription($list, $payload['user_id'], $payload['email']);
             if (!$userSubscription) {
                 return new JsonApiResponse(200, ['status' => 'ok']);
@@ -91,5 +94,31 @@ class UnSubscribeHandler extends BaseHandler
             }
         }
         return $rtmParams;
+    }
+
+    protected function getVariant(array $payload, ActiveRow $list): ?ActiveRow
+    {
+        if (isset($payload['variant_id'])) {
+            $variant = $this->listVariantsRepository->findByIdAndMailTypeId($payload['variant_id'], $list->id);
+            if (!$variant) {
+                throw new InvalidApiInputParamException(
+                    "Variant with ID [{$payload['variant_id']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
+                    404
+                );
+            }
+            return $variant;
+        }
+        if (isset($payload['variant_code'])) {
+            $variant = $this->listVariantsRepository->findByCodeAndMailTypeId($payload['variant_code'], $list->id);
+            if (!$variant) {
+                throw new InvalidApiInputParamException(
+                    "Variant with code [{$payload['variant_code']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
+                    404
+                );
+            }
+            return $variant;
+        }
+
+        return $list->default_variant;
     }
 }
