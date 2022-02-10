@@ -1,4 +1,4 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.0
 
 ADD create-indexes.sh .
 RUN chmod +x create-indexes.sh

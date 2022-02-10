@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.30.0] - 2022-02-10
+
+### Project
+
+- Bumped reference version of Elasticsearch and Kibana to 7.17.0.
+
 ### [Beam]
 
 - Fixed possibly too broad scope of IOTA requests. remp/remp#1050

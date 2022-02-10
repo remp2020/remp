@@ -175,7 +175,7 @@ services:
       - "elastic-data:/usr/share/elasticsearch/data"
 
   kibana:
-    image: "docker.elastic.co/kibana/kibana:7.15.2"
+    image: "docker.elastic.co/kibana/kibana:7.17.0"
 
   beam_tracker:
     build: "./Beam/go/cmd/tracker"
