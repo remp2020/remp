@@ -108,21 +108,29 @@ class AggregateConversionEvents extends Command
 
         $this->line("Aggregating conversion <info>#{$conversion->id}</info>");
 
+        $userBrowserIds = array_unique(
+            array_merge(
+                $this->getBrowsersForUser($conversion, $days, 'pageviews', 'load'),
+                $this->getBrowsersForUser($conversion, $days, 'commerce'),
+                $this->getBrowsersForUser($conversion, $days, 'events'),
+            )
+        );
+
         try {
             $pageviewEvents = $this->loadPageviewEvents(
                 $conversion,
-                $this->getBrowsersForUser($conversion, $days, 'pageviews', 'load'),
+                $userBrowserIds,
                 $days
             );
 
             $commerceEvents = $this->loadCommerceEvents(
                 $conversion,
-                $this->getBrowsersForUser($conversion, $days, 'commerce'),
+                $userBrowserIds,
                 $days
             );
             $generalEvents = $this->loadGeneralEvents(
                 $conversion,
-                $this->getBrowsersForUser($conversion, $days, 'events'),
+                $userBrowserIds,
                 $days
             );
 

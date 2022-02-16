@@ -1,3 +1,5 @@
+#!/bin/bash
+
 BLEEDING=0
 MODULE=
 
