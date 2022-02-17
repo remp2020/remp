@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed retrieval of browser_id in `conversions:aggregate-events` command which leads to more thorough definition of user's conversion path. remp/remp#1049
+  - Previously some events (mainly pageviews) could have been not matched correctly and missing in the aggregated data.
+- Fixed occasional incorrect page_progress parameter being tracked causing progress update not to be tracked at all.
+  - Due to JS floating points being JS floating points sometimes the page_progress was >1 which server refused to accept.  
+
 ## [0.30.0] - 2022-02-10
 
 ### Project
@@ -17,8 +24,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possibly too broad scope of IOTA requests. remp/remp#1050
   - If the articleSelector didn't match any articles, request was made without an `article_id` filter which could cause temporary Elastic unavailability.
 - Added option to configure `--step=` of `pageviews:aggregate-articles-views` command to avoid Elasticsearch's _"Trying to create too many buckets"_ error. remp/remp#1050
-- Fixed retrieval of browser_id in `conversions:aggregate-events` command which leads to more thorough definition of user's conversion path. remp/remp#1049
-  - Previously some events (mainly pageviews) could have been not matched correctly and missing in the aggregated data.
 
 ### [Campaign]
 

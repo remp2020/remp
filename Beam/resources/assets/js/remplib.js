@@ -855,7 +855,8 @@ class Tracker {
     pageProgress() {
         const root = remplib.tracker.getRootElement();
         const scrollTop = window.pageYOffset || root.scrollTop || document.body.scrollTop || 0;
-        return (scrollTop + root.clientHeight) / root.scrollHeight;
+        // floats could generate number slightly higher than 1.0
+        return Math.min((scrollTop + root.clientHeight) / root.scrollHeight, 1);
     }
 
     getRootElement() {
