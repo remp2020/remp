@@ -253,15 +253,21 @@ SQL;
 
     private function groupDataFor($groupParameter)
     {
-        $this->line("Computing total pageviews for parameter '$groupParameter'");
+        $this->getOutput()->write("Computing total pageviews for parameter '$groupParameter': ");
         $totalPageviews = $this->aggregatedPageviewsFor($groupParameter);
-        $this->line("Done");
+        $this->line(count($totalPageviews));
 
         $segments = [];
-        $this->line("Computing segment items for parameter '$groupParameter'");
+
+        $processed = 0;
+        $step = 500;
+
+        $bar = $this->output->createProgressBar(count($totalPageviews));
+        $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:1s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+        $bar->setMessage("Computing segment items for parameter '$groupParameter'");
 
         foreach (array_chunk($totalPageviews, 500, true) as $totalPageviewsChunk) {
-            $forItems = array_keys($totalPageviewsChunk);
+            $forItems = array_map('strval', array_keys($totalPageviewsChunk));
 
             $queryItems =  DB::table(ArticleAggregatedView::getTableName())->select(
                 $groupParameter,
@@ -289,10 +295,13 @@ SQL;
                     $segments[$item->section_id][] = $item->$groupParameter;
                 }
             }
+
+            $processed += $step;
+            $bar->setProgress($processed);
         }
 
-        $this->line("Done");
-
+        $bar->finish();
+        $this->line('');
         return $segments;
     }
 

@@ -45,6 +45,7 @@ class ComputeAuthorsSegments extends Command
 
     public function handle()
     {
+        ini_set('memory_limit', -1);
         // Using Cursor on large number of results causing memory issues
         // https://github.com/laravel/framework/issues/14919
         DB::connection()->getPdo()->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
@@ -253,15 +254,21 @@ SQL;
 
     private function groupDataFor($groupParameter)
     {
-        $this->line("Computing total pageviews for parameter '$groupParameter'");
+        $this->getOutput()->write("Computing total pageviews for parameter '$groupParameter': ");
         $totalPageviews = $this->aggregatedPageviewsFor($groupParameter);
-        $this->line("Done");
+        $this->line(count($totalPageviews));
 
         $segments = [];
-        $this->line("Computing segment items for parameter '$groupParameter'");
 
-        foreach (array_chunk($totalPageviews, 500, true) as $totalPageviewsChunk) {
-            $forItems = array_keys($totalPageviewsChunk);
+        $processed = 0;
+        $step = 500;
+
+        $bar = $this->output->createProgressBar(count($totalPageviews));
+        $bar->setFormat('%message%: %current%/%max% [%bar%] %percent:1s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+        $bar->setMessage("Computing segment items for parameter '$groupParameter'");
+
+        foreach (array_chunk($totalPageviews, $step, true) as $totalPageviewsChunk) {
+            $forItems = array_map('strval', array_keys($totalPageviewsChunk));
 
             $queryItems =  DB::table(ArticleAggregatedView::getTableName())->select(
                 $groupParameter,
@@ -289,10 +296,13 @@ SQL;
                     $segments[$item->author_id][] = $item->$groupParameter;
                 }
             }
+
+            $processed += $step;
+            $bar->setProgress($processed);
         }
 
-        $this->line("Done");
-
+        $bar->finish();
+        $this->line('');
         return $segments;
     }
 
