@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.30.1] - 2022-02-22
+
 ### [Beam]
 
 - Fixed retrieval of browser_id in `conversions:aggregate-events` command which leads to more thorough definition of user's conversion path. remp/remp#1049
@@ -1139,7 +1141,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.30.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.30.1...master
+[0.30.1]: https://github.com/remp2020/remp/compare/0.30.0...0.30.1
 [0.30.0]: https://github.com/remp2020/remp/compare/0.29.0...0.30.0
 [0.29.0]: https://github.com/remp2020/remp/compare/0.28.0...0.29.0
 [0.28.0]: https://github.com/remp2020/remp/compare/0.27.1...0.28.0
