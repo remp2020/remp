@@ -13,6 +13,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added caching mechanism for dashboard values (unique browser count) to avoid unnecessary requests for non-critical values. remp/remp#1090
   - The values are now periodically refreshed in the background every minute.
 
+### [Mailer]
+
+- Added HTML beautifier for HTML content of emails. remp/remp#684
+  - WYSIWYG used to generate unformatted HTML which was hard to edit. All emails are now automatically beautified when they're edited.
+
 ## [0.30.2] - 2022-02-26
 
 ### [Beam]

@@ -1,6 +1,6 @@
 import MailPreview from '../components/MailPreview.vue';
 import icons from "trumbowyg/dist/ui/icons.svg";
-import "trumbowyg/dist/ui/trumbowyg.css"
+import "trumbowyg/dist/ui/trumbowyg.css";
 import "trumbowyg/dist/trumbowyg.js";
 import "./trumbowyg-snippets-plugin.js";
 
@@ -8,13 +8,15 @@ $.trumbowyg.svgPath = icons;
 
 window.remplib = typeof(remplib) === 'undefined' ? {} : window.remplib;
 
+let beautify = require('js-beautify').html;
+
 (function() {
     'use strict';
     remplib.templateForm = {
         textareaSelector: '.js-mail-body-html-input',
         codeMirror: (element) => {
             return CodeMirror( element, {
-                value: $(remplib.templateForm.textareaSelector).val(),
+                value: beautify($(remplib.templateForm.textareaSelector).val()),
                 theme: 'base16-dark',
                 mode: 'htmlmixed',
                 indentUnit: 4,
@@ -45,7 +47,12 @@ window.remplib = typeof(remplib) === 'undefined' ? {} : window.remplib;
         trumbowyg: (element) => {
             let buttons = $.trumbowyg.defaultOptions.btns;
             let plugins = {};
-            const snippetsData = $(element).data('snippets')
+            const snippetsData = $(element).data('snippets');
+
+            const viewHTMLButton = 'viewHTML';
+            buttons = $.grep(buttons, function (value) {
+                return value.toString() !== viewHTMLButton;
+            });
 
             if (snippetsData) {
                 buttons.push([['snippets']]);
@@ -104,9 +111,9 @@ window.remplib = typeof(remplib) === 'undefined' ? {} : window.remplib;
         showCodemirror: (codeMirror, trumbowyg) => {
             trumbowyg.data('trumbowyg').$box.hide();
 
-            // load changed data from trumbowyg
+            // load changed and beautified data from trumbowyg
             if (remplib.templateForm.trumbowygChanged) {
-                codeMirror.doc.setValue(trumbowyg.trumbowyg('html'));
+                codeMirror.doc.setValue(beautify(trumbowyg.trumbowyg('html')));
                 remplib.templateForm.trumbowygChanged = false;
             }
 
