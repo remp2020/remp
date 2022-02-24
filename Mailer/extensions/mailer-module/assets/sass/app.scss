@@ -53,7 +53,7 @@ $white: White;
 
 .CodeMirror {
   margin-top: 1.5rem;
-  height: auto;
+  height: 100%;
 }
 
 .m-tbl-15 {
@@ -66,4 +66,66 @@ $white: White;
   margin-top: 15px !important;
   margin-bottom: 15px !important;
   margin-right: 15px !important;
+}
+
+.editor-choice-container {
+  display: flex;
+  align-items: center;
+}
+
+.fullscreen-edit-btn-div {
+  text-align: right;
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+}
+
+.fullscreen-edit {
+  @at-root body#{&} {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #email-editors, #previewFrameWrap {
+    position: fixed;
+    top: 0;
+    width: 50%;
+    margin: 0;
+    padding: 0;
+    z-index: 99999;
+    background: white;
+  }
+
+  #email-editors {
+    left: 0;
+    border-right: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  #previewFrameWrap {
+    right: 0;
+    border-left: 1px solid rgba(0, 0, 0, 0.15);
+    height: 100vh !important;
+    overflow: auto !important;
+  }
+
+  .editor-choice-container {
+    margin: 10px;
+  }
+
+  .trumbowyg-box {
+    border: none !important;
+  }
+
+  .trumbowyg-editor {
+    height: calc(100vh - var(--trumbowyg-header-height) - var(--editor-choice-height)) !important;
+    overflow: auto !important;
+  }
+
+  .CodeMirror-scroll {
+    height: calc(100vh - var(--editor-choice-height)) !important;
+    overflow: auto !important;
+    margin: 0px !important;
+    padding: 0px !important;
+  }
 }

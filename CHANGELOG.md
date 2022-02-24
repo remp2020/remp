@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added HTML beautifier for HTML content of emails. remp/remp#684
   - WYSIWYG used to generate unformatted HTML which was hard to edit. All emails are now automatically beautified when they're edited.
+- Added email fullscreen edit option for medium and wider devices. remp/remp#678
+  - This feature is available in email edit page for both HTML and WYSIWYG editor
 
 ## [0.30.2] - 2022-02-26
 

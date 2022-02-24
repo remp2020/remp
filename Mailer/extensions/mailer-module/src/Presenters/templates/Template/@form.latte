@@ -83,23 +83,28 @@
                     </div>
                 </div>
 
-                <div class="js-editor-choice">
-                    <label class="radio radio-inline m-r-20">
-                        <input type="radio" name="js-editor-choice" value="code" {if $templateEditor != 'wysiwyg'}checked="checked"{/if} class="js-editor-choice">
-                        <i class="input-helper"></i>
-                        HTML Code View
-                    </label>
-                    <label class="radio radio-inline m-r-20">
-                        <input type="radio" name="js-editor-choice" value="editor" {if $templateEditor == 'wysiwyg'}checked="checked"{/if} class="js-editor-choice">
-                        <i class="input-helper"></i>
-                        Editor View (WYSIWYG)
-                    </label>
-                </div>
+                <div id="email-editors">
+                    <div class="m-b-10 editor-choice-container row">
+                        <div class="js-editor-choice col-sm-7">
+                            <label class="radio radio-inline m-r-20">
+                                <input type="radio" name="js-editor-choice" value="code" {if $templateEditor != 'wysiwyg'}checked="checked"{/if} class="js-editor-choice">
+                                <i class="input-helper"></i>
+                                HTML Code View
+                            </label>
+                            <label class="radio radio-inline m-r-20" style="margin-left: 0;">
+                                <input type="radio" name="js-editor-choice" value="editor" {if $templateEditor == 'wysiwyg'}checked="checked"{/if} class="js-editor-choice">
+                                <i class="input-helper"></i>
+                                Editor View (WYSIWYG)
+                            </label>
+                        </div>
+                        <div class="col-sm-5 fullscreen-edit-btn-div">
+                            <button id="fullscreen-edit-btn" type="button" class="btn palette-Cyan bg"><i class="zmdi zmdi-fullscreen"></i> <span>Fullscreen edit</span></button>
+                        </div>
+                    </div>
 
-                <div class="form-group m-b-30">
                     {input mail_body_html, class => 'form-control js-mail-body-html-input js-html-editor', data-snippets => json_encode($snippets) }
+                    <div class="js-codemirror"></div>
                 </div>
-                <div class="js-codemirror"></div>
             </div>
         </div>
     </div>
