@@ -10,6 +10,7 @@ $colors: (
 .ri-metrics {
   font-family: sans-serif;
   font-weight: 400;
+  position: relative;
   &__inline-metric {
     position: absolute;
     z-index: 999999;

@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added support for displaying canonical URLs for non-article pageviews on Beam dashboard. remp/remp#832
+- Added missing style (`display:relative`) in IOTA template badge. remp/web#1736
 
 ## [0.30.1] - 2022-02-22
 
