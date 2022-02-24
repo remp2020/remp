@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added support for displaying canonical URLs for non-article pageviews on Beam dashboard. remp/remp#832
+
 ## [0.30.1] - 2022-02-22
 
 ### [Beam]
