@@ -523,14 +523,14 @@ class DashboardController extends Controller
 
         // records are already sorted
         $records = $this->journalHelper->currentConcurrentsCount(function (ConcurrentsRequest $req) use ($filterFrontPage, $frontpageReferers) {
-            $req->addGroup('article_id');
+            $req->addGroup('article_id', 'canonical_url');
             if ($filterFrontPage) {
                 $req->addFilter('derived_referer_host_with_path', ...$frontpageReferers);
             }
         }, $timeBefore);
 
         $topPages = [];
-        $i = 0;
+        $articleCounter = 0;
         $totalConcurrents = 0;
         $tz = new \DateTimeZone('UTC');
         $journalInterval = new JournalInterval($tz, '1day');
@@ -547,32 +547,53 @@ class DashboardController extends Controller
         foreach ($records as $record) {
             $totalConcurrents += $record->count;
 
-            if ($i >= self::NUMBER_OF_ARTICLES) {
+            if ($articleCounter >= self::NUMBER_OF_ARTICLES) {
                 continue;
             }
 
-            $obj = new \stdClass();
-            $obj->count = $record->count;
-            $obj->external_article_id = $record->tags->article_id;
-
-            if (!$record->tags->article_id) {
-                $obj->title = 'Landing page';
-                $obj->landing_page = true;
-            } else {
+            $article = null;
+            if ($record->tags->article_id) {
+                // check if the article is recognized
                 $article = $articles[$record->tags->article_id] ?? null;
                 if (!$article) {
                     continue;
                 }
+                $key = $record->tags->article_id;
+            } else {
+                $key = $record->tags->canonical_url ?? '';
+            }
 
+            // Some articles might have multiple canonical URLs. Merge them.
+            if (isset($topPages[$key])) {
+                $obj = $topPages[$key];
+                $obj->count += $record->count;
+            } else {
+                $obj = new \stdClass();
+                $obj->count = $record->count;
+                $obj->external_article_id = $record->tags->article_id;
+                if ($record->tags->article_id) {
+                    $articleCounter++;
+                }
+            }
+
+            if ($article) {
                 $obj->landing_page = false;
                 $obj->title = $article->title;
                 $obj->published_at = $article->published_at->toAtomString();
                 $obj->conversions_count = (clone $article)->conversions->count();
                 $obj->article = $article;
+            } else {
+                $obj->title = $record->tags->canonical_url ?: 'Landing page / Other pages';
+                $obj->landing_page = true;
             }
-            $topPages[] = $obj;
-            $i++;
+
+            $topPages[$key] = $obj;
         }
+
+        usort($topPages, function ($a, $b) {
+            return -($a->count <=> $b->count);
+        });
+        $topPages = array_slice($topPages, 0, 30);
 
         // Add chart data into top articles
         $topPages = $this->addOverviewChartData($topPages, $journalInterval);
