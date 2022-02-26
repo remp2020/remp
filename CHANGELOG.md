@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.30.2] - 2022-02-26
+
+### [Beam]
+
+- Fixed XSS vulnerability on the SSO authentication error callback page.
+
+### [Campaign]
+
+- Fixed XSS vulnerability on the SSO authentication error callback page.
+
+### [Sso]
+
+- Fixed XSS vulnerability on the SSO authentication error callback page.
+
 ## [0.30.1] - 2022-02-22
 
 ### [Beam]
@@ -1141,7 +1155,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.30.1...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.30.2...master
+[0.30.2]: https://github.com/remp2020/remp/compare/0.30.1...0.30.2
 [0.30.1]: https://github.com/remp2020/remp/compare/0.30.0...0.30.1
 [0.30.0]: https://github.com/remp2020/remp/compare/0.29.0...0.30.0
 [0.29.0]: https://github.com/remp2020/remp/compare/0.28.0...0.29.0
