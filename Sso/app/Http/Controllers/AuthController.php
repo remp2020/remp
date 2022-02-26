@@ -163,6 +163,14 @@ class AuthController extends Controller
 
     public function error(Request $request)
     {
-        return 'error during login: ' . $request->get('error');
+        $message = $request->get('error');
+        return response()->format([
+            'html' => view('auth.error', [
+                'message' => $message,
+            ]),
+            'json' => [
+                'message' => $message,
+            ],
+        ]);
     }
 }
