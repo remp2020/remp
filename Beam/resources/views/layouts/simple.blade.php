@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!--[if IE 9 ]><html class="ie9"><![endif]-->
 @include('layouts._head')
 
 <body data-ma-header="cyan-600">

@@ -11,6 +11,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for displaying canonical URLs for non-article pageviews on Beam dashboard. remp/remp#832
 - Added missing style (`display:relative`) in IOTA template badge. remp/web#1736
 
+## [0.30.2] - 2022-02-26
+
+### [Beam]
+
+- Fixed XSS vulnerability on the SSO authentication error callback page.
+
+### [Campaign]
+
+- Fixed XSS vulnerability on the SSO authentication error callback page.
+
+### [Sso]
+
+- Fixed XSS vulnerability on the SSO authentication error callback page.
+
 ## [0.30.1] - 2022-02-22
 
 ### [Beam]
