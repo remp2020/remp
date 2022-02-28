@@ -8,6 +8,7 @@ use App\Console\Commands\AggregatePageviews;
 use App\Console\Commands\CompressSnapshots;
 use App\Console\Commands\ComputeAuthorsSegments;
 use App\Console\Commands\ComputeSectionSegments;
+use App\Console\Commands\DashboardRefresh;
 use App\Console\Commands\DeleteOldAggregations;
 use App\Console\Commands\ProcessPageviewSessions;
 use App\Console\Commands\SendNewslettersCommand;
@@ -39,6 +40,7 @@ class Kernel extends ConsoleKernel
         $this->concurrentsSnapshots($schedule);
         $this->aggregations($schedule);
         $this->authorSegments($schedule);
+        $this->dashboard($schedule);
 
         // All other unrelated commands
 
@@ -139,6 +141,15 @@ class Kernel extends ConsoleKernel
             ->runInBackground()
             ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/compress_aggregations.log'));
+    }
+
+    private function dashboard(Schedule $schedule)
+    {
+        $schedule->command(DashboardRefresh::COMMAND)
+            ->everyMinute()
+            ->runInBackground()
+            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
+            ->appendOutputTo(storage_path('logs/dashboard_refresh.log'));
     }
 
     /**

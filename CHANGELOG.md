@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added support for displaying canonical URLs for non-article pageviews on Beam dashboard. remp/remp#832
 - Added missing style (`display:relative`) in IOTA template badge. remp/web#1736
+- Added caching mechanism for dashboard values (unique browser count) to avoid unnecessary requests for non-critical values. remp/remp#1090
+  - The values are now periodically refreshed in the background every minute.
 
 ## [0.30.2] - 2022-02-26
 

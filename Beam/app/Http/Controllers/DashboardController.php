@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Log;
@@ -535,10 +536,11 @@ class DashboardController extends Controller
         $tz = new \DateTimeZone('UTC');
         $journalInterval = new JournalInterval($tz, '1day');
 
-        $articleQuery = Article::whereIn(
-            'external_id',
-            array_filter($records->pluck('tags.article_id')->toArray())
-        );
+        $articleQuery = Article::with(['dashboardArticle', 'conversions'])
+            ->whereIn(
+                'external_id',
+                array_filter($records->pluck('tags.article_id')->toArray())
+            );
 
         $articles = [];
         foreach ($articleQuery->get() as $article) {
@@ -597,11 +599,18 @@ class DashboardController extends Controller
 
         // Add chart data into top articles
         $topPages = $this->addOverviewChartData($topPages, $journalInterval);
-
-        // Top articles without landing page(s)
         $topArticles = collect($topPages)->filter(function ($item) {
             return !empty($item->external_article_id);
         })->pluck('article');
+
+        /** @var Article $article */
+        foreach ($topArticles as $article) {
+            $article->dashboardArticle()->updateOrCreate([], [
+                'last_dashboard_time' => Carbon::now(),
+            ]);
+        }
+
+        $externalIdsToUniqueUsersCount = $this->getUniqueBrowserCountData($topArticles);
 
         // Timespent is computed as average of timespent values 2 hours in the past
         $externalIdsToTimespent = $this->journalHelper->timespentForArticles(
@@ -609,7 +618,6 @@ class DashboardController extends Controller
             (clone $timeBefore)->subHours(2)
         );
 
-        $externalIdsToUniqueUsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($topArticles);
         // Check for A/B titles/images for last 5 minutes
         $externalIdsToAbTestFlags = $this->journalHelper->abTestFlagsForArticles($topArticles, Carbon::now()->subMinutes(5));
 
@@ -721,6 +729,38 @@ class DashboardController extends Controller
         }
 
         return $articlesChartData;
+    }
+
+    private function getUniqueBrowserCountData(Collection $articles): array
+    {
+        $articles = (clone $articles)->keyBy('external_id');
+        $result = [];
+
+        /** @var Article $article */
+        foreach ($articles as $article) {
+            if ($article->dashboardArticle && $article->dashboardArticle->unique_browsers) {
+                $result[$article->external_id] = $article->dashboardArticle->unique_browsers;
+                $articles->forget($article->external_id);
+            }
+        }
+
+        // Check if we have stats for all articles. If we do, return immediately.
+        if (!$articles->count()) {
+            return $result;
+        }
+
+        // If some articles are missing the stats, make the realtime call.
+        $realtimeResults = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
+        foreach ($realtimeResults as $externalArticleId => $count) {
+            /** @var Article $article */
+            $article = $articles->get($externalArticleId);
+            $article->dashboardArticle()->updateOrCreate([], [
+                'unique_browsers' => (int) $count,
+            ]);
+            $result[$externalArticleId] = (int) $count;
+        }
+
+        return $result;
     }
 
     private function getOverviewChartDataFromJournal(array $articleIds, JournalInterval $journalInterval)
