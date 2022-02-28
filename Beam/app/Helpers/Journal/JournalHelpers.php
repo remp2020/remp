@@ -75,7 +75,9 @@ class JournalHelpers
                 $minimalPublishedTime = $article->published_at;
             }
         }
-        $externalArticleIds = $articles->pluck('external_id')->toArray();
+
+        // sort article IDs to help journal caching mechanism cache this payload
+        $externalArticleIds = $articles->pluck('external_id')->sortDesc(SORT_NUMERIC)->toArray();
 
         $r = (new AggregateRequest('pageviews', 'load'))
             ->setTime($minimalPublishedTime, Carbon::now())

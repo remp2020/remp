@@ -111,6 +111,11 @@ class Article extends BaseModel implements Searchable
         return $this->hasMany(ArticleTitle::class);
     }
 
+    public function dashboardArticle()
+    {
+        return $this->hasOne(DashboardArticle::class);
+    }
+
     // Accessors
 
     /**
