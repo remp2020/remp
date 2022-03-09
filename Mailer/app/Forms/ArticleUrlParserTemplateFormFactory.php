@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Remp\Mailer\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Security\User;
+use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
@@ -30,6 +32,10 @@ class ArticleUrlParserTemplateFormFactory
 
     private $sourceTamplatesRepository;
 
+    private $permissionManager;
+
+    private $user;
+
     public $onUpdate;
 
     public $onSave;
@@ -40,7 +46,9 @@ class ArticleUrlParserTemplateFormFactory
         ListsRepository $listsRepository,
         JobsRepository $jobsRepository,
         BatchesRepository $batchesRepository,
-        SourceTemplatesRepository $sourceTemplatesRepository
+        SourceTemplatesRepository $sourceTemplatesRepository,
+        PermissionManager $permissionManager,
+        User $user
     ) {
         $this->templatesRepository = $templatesRepository;
         $this->layoutsRepository = $layoutsRepository;
@@ -48,6 +56,8 @@ class ArticleUrlParserTemplateFormFactory
         $this->jobsRepository = $jobsRepository;
         $this->batchesRepository = $batchesRepository;
         $this->sourceTamplatesRepository = $sourceTemplatesRepository;
+        $this->permissionManager = $permissionManager;
+        $this->user = $user;
     }
 
     public function setSegmentCode(string $segmentCode): void
@@ -123,10 +133,12 @@ class ArticleUrlParserTemplateFormFactory
 
         $form->setDefaults($defaults);
 
-        $withJobs = $form->addSubmit('generate_emails_jobs', 'system.save');
-        $withJobs->getControlPrototype()
-            ->setName('button')
-            ->setHtml('Generate newsletter batch and start sending');
+        if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
+            $withJobs = $form->addSubmit('generate_emails_jobs', 'system.save');
+            $withJobs->getControlPrototype()
+                ->setName('button')
+                ->setHtml('Generate newsletter batch and start sending');
+        }
 
         $withJobsCreated = $form->addSubmit('generate_emails_jobs_created', 'system.save');
         $withJobsCreated->getControlPrototype()

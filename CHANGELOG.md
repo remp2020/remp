@@ -74,6 +74,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed error in `ArticleUrlParserGenerator` caused by invalid URL. Mailer would crash instead of displaying error to the user. remp/remp#1066
 - Added migration to add index on `email` column in `autologin_tokens` table. remp/remp#1067
 - Added options to specify `variant_code` in the subscribe/unsubscribe APIs to complement subscription through `variant_id`. remp/crm#2212
+- Added support for managing roles and privileges to Mailer. See [README](./Mailer/extensions/mailer-module/README.md#permission-management) for more information. remp/remp#1087
 
 ## [0.29.0] - 2021-11-18
 

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Remp\MailerModule\DI;
 
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\FactoryDefinition;
+use Nette\DI\InvalidConfigurationException;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
+use Remp\MailerModule\Latte\PermissionMacros;
 
 final class MailerModuleExtension extends CompilerExtension
 {
@@ -21,6 +24,29 @@ final class MailerModuleExtension extends CompilerExtension
                 ])
             ]),
         ]);
+    }
+
+    public function beforeCompile()
+    {
+        parent::beforeCompile();
+
+        $builder = $this->getContainerBuilder();
+        $latteFactoryDefinition = $builder->getDefinition('latte.latteFactory');
+        if (!$latteFactoryDefinition instanceof FactoryDefinition) {
+            throw new InvalidConfigurationException(
+                sprintf(
+                    'latte.latteFactory service definition must be of type %s, not %s',
+                    FactoryDefinition::class,
+                    get_class($latteFactoryDefinition)
+                )
+            );
+        }
+
+        $permissionmanager = $builder->getDefinition('permissionManager');
+        $resultDefinition = $latteFactoryDefinition->getResultDefinition();
+        $resultDefinition
+            ->addSetup('?->addProvider(?, ?)', ['@self', 'permissionManager', $permissionmanager])
+            ->addSetup('?->onCompile[] = function ($engine) { ' . PermissionMacros::class . '::install($engine->getCompiler()); }', ['@self']);
     }
 
     public function loadConfiguration()

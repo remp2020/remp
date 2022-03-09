@@ -6,8 +6,9 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\UI\Presenter;
 use Remp\MailerModule\Components\ApplicationStatus\ApplicationStatus;
 use Remp\MailerModule\Components\ApplicationStatus\IApplicationStatusFactory;
-use Remp\MailerModule\Models\EnvironmentConfig;
 use Remp\MailerModule\Forms\IFormFactory;
+use Remp\MailerModule\Models\Auth\PermissionManager;
+use Remp\MailerModule\Models\EnvironmentConfig;
 
 abstract class BasePresenter extends Presenter
 {
@@ -16,6 +17,9 @@ abstract class BasePresenter extends Presenter
 
     /** @var IApplicationStatusFactory @inject */
     public $applicationStatusFactory;
+
+    /** @var PermissionManager @inject */
+    public $permissionManager;
     
     public function startup(): void
     {
