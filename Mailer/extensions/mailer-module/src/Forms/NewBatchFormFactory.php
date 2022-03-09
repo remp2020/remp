@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Security\User;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
+use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
@@ -32,6 +34,10 @@ class NewBatchFormFactory
 
     private $segmentAggregator;
 
+    private $permissionManager;
+
+    private $user;
+
     public $onSuccess;
 
     public function __construct(
@@ -40,7 +46,9 @@ class NewBatchFormFactory
         TemplatesRepository $templatesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         ListsRepository $listsRepository,
-        Aggregator $segmentAggregator
+        Aggregator $segmentAggregator,
+        PermissionManager $permissionManager,
+        User $user
     ) {
         $this->jobsRepository = $jobsRepository;
         $this->batchesRepository = $batchesRepository;
@@ -48,6 +56,8 @@ class NewBatchFormFactory
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->listsRepository = $listsRepository;
         $this->segmentAggregator = $segmentAggregator;
+        $this->permissionManager = $permissionManager;
+        $this->user = $user;
     }
 
     public function create(?int $jobId)
@@ -113,10 +123,12 @@ class NewBatchFormFactory
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
 
-        $form->addSubmit(self::FORM_ACTION_SAVE_START, 'Save and start sending')
-            ->getControlPrototype()
-            ->setName('button')
-            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and start');
+        if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
+            $form->addSubmit(self::FORM_ACTION_SAVE_START, 'Save and start sending')
+                ->getControlPrototype()
+                ->setName('button')
+                ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and start');
+        }
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
         return $form;
@@ -152,9 +164,11 @@ class NewBatchFormFactory
             );
         }
 
-        $buttonSaveStart = $form[self::FORM_ACTION_SAVE_START];
-        if ($buttonSaveStart->isSubmittedBy()) {
-            $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);
+        if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
+            $buttonSaveStart = $form[self::FORM_ACTION_SAVE_START];
+            if ($buttonSaveStart->isSubmittedBy()) {
+                $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);
+            }
         }
 
         ($this->onSuccess)($batch->job);

@@ -10,6 +10,9 @@ services:
 			- setParam(max_result_count, %max_result_count%)
 			- setParam(template_editor, %template_editor%)
 
+	permissionManager:
+		factory: Remp\MailerModule\Models\Auth\PermissionManager
+
 	# Latte filters
 	filterLoader:
 		factory: Remp\MailerModule\Filters\FilterLoader

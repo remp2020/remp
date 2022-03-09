@@ -40,6 +40,31 @@ services:
             - useRedisKeysPrefix()
 ```
 
+### Permission management
+
+You can setup and control privileges for different roles by calling these setup method calls in your configuration file:
+
+```neon
+services:
+    permissionManager:
+        setup:
+            # creates role `manager` with access to batch (resource) privileges `start` and `stop`
+            - allow('manager', 'batch', ['start', 'stop'])
+            # assigns `manager` role to user with email `manager@example.com`
+            - assignRole('manager@example.com', 'manager')
+```
+
+**If you don't register privilege to any role, it's allowed for everyone by default because of backward compatibility.**
+
+List of allowable privileges:
+
+| resource | privilege | description                              |
+|----------|-----------|------------------------------------------|
+| batch    | start     | Allows user to start sending mail batch. |
+| batch    | stop      | Allows user to stop sending mail batch.  |
+| batch    | process   | Allows user to process mail batch.       |
+
+
 ## Technical feature description
 
 ### Mailers setup

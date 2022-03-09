@@ -62,7 +62,9 @@
             <div class="row form-group">
                 <div class="col-sm-12">
                     {input save, class => 'btn btn-info waves-effect'}
-                    {input save_start, class => 'btn btn-info waves-effect'}
+                    {if isset($form['save_start'])}
+                        {input save_start, class => 'btn btn-info waves-effect'}
+                    {/if}
                 </div>
             </div>
         </div>

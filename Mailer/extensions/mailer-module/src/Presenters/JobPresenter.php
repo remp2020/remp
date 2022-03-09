@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use Nette\Application\ForbiddenRequestException;
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
-use Remp\MailerModule\Repositories\ActiveRow;
+use Nette\Http\IResponse;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
@@ -17,6 +18,8 @@ use Remp\MailerModule\Forms\JobFormFactory;
 use Remp\MailerModule\Forms\NewBatchFormFactory;
 use Remp\MailerModule\Forms\NewTemplateFormFactory;
 use Remp\MailerModule\Models\Job\MailCache;
+use Remp\MailerModule\Models\Segment\Aggregator;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
@@ -25,7 +28,6 @@ use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
-use Remp\MailerModule\Models\Segment\Aggregator;
 use Tracy\Debugger;
 
 final class JobPresenter extends BasePresenter
@@ -308,6 +310,12 @@ final class JobPresenter extends BasePresenter
 
     public function handleSetBatchReadyToSend($id)
     {
+        if (!$this->permissionManager->isAllowed($this->getUser(), 'batch', 'start')) {
+            throw new ForbiddenRequestException(
+                "You don't have permission to run this action. (batch/start)",
+                IResponse::S403_FORBIDDEN
+            );
+        }
         $batch = $this->batchesRepository->find($id);
         if ($batch->status === BatchesRepository::STATUS_PROCESSED) {
             $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_QUEUED);
@@ -321,6 +329,12 @@ final class JobPresenter extends BasePresenter
 
     public function handleSetBatchSend($id)
     {
+        if (!$this->permissionManager->isAllowed($this->getUser(), 'batch', 'start')) {
+            throw new ForbiddenRequestException(
+                "You don't have permission to run this action. (batch/start)",
+                IResponse::S403_FORBIDDEN
+            );
+        }
         $batch = $this->batchesRepository->find($id);
         $priority = $this->batchesRepository->getBatchPriority($batch);
         $this->mailCache->restartQueue($batch->id, $priority);
@@ -332,6 +346,12 @@ final class JobPresenter extends BasePresenter
 
     public function handleSetBatchUserStop($id)
     {
+        if (!$this->permissionManager->isAllowed($this->getUser(), 'batch', 'stop')) {
+            throw new ForbiddenRequestException(
+                "You don't have permission to run this action. (batch/stop)",
+                IResponse::S403_FORBIDDEN
+            );
+        }
         $batch = $this->batchesRepository->find($id);
         $this->mailCache->pauseQueue($batch->id);
         $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_USER_STOP);
@@ -372,6 +392,12 @@ final class JobPresenter extends BasePresenter
 
     public function handleSetBatchReadyToProcess($id)
     {
+        if (!$this->permissionManager->isAllowed($this->getUser(), 'batch', 'process')) {
+            throw new ForbiddenRequestException(
+                "You don't have permission to run this action. (batch/process)",
+                IResponse::S403_FORBIDDEN
+            );
+        }
         $batch = $this->batchesRepository->find($id);
         $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS);
 

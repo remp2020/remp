@@ -89,13 +89,26 @@
                     </div>
                     <div class="card-body">
                         {if $batch->related('mail_job_batch_templates')->count('*') > 0}
-                            <a n:if="in_array($batch->status, ['created', 'processed'])" n:href="SetBatchReadyToSend! $batch->id" class="btn bg palette-Cyan-600 btn-icon-text waves-effect m-tbl-15"><i class="zmdi zmdi-play"></i> START SENDING <span n:if="$batch->status === 'processed'">({$batchPreparedEmailsStats[$batch->id] ?? 0})</span></a>
-                            <a n:if="in_array($batch->status, ['worker_stopped', 'user_stopped'])" n:href="SetBatchSend! $batch->id" class="btn bg palette-Cyan-600 btn-icon-text waves-effect m-tbl-15"><i class="zmdi zmdi-play"></i> CONTINUE SENDING</a>
-                            <a n:if="in_array($batch->status, ['processing', 'queued', 'sending'])" n:href="SetBatchUserStop! $batch->id" class="btn bg palette-Pink-400 btn-icon-text waves-effect m-tbl-15"><i class="zmdi zmdi-pause"></i> PAUSE SENDING</a>
-                            <a n:if="in_array($batch->status, ['ready_to_process_and_send'])" n:href="SetBatchCreated! $batch->id" class="btn bg palette-Pink-400 btn-icon-text waves-effect m-tbl-15"><i class="zmdi zmdi-pause"></i> PAUSE SENDING</a>
-                            <a n:if="in_array($batch->status, ['done'])" class="btn btn-default waves-effect m-tbl-15" disabled="disabled">ALL SENT</a>
+                            <div class="m-tbl-15">
+                            {ifAllowed $user, 'batch', 'start'}
+                                <a n:if="in_array($batch->status, ['created', 'processed'])" n:href="SetBatchReadyToSend! $batch->id" class="btn bg palette-Cyan-600 btn-icon-text waves-effect"><i class="zmdi zmdi-play"></i> START SENDING <span n:if="$batch->status === 'processed'">({$batchPreparedEmailsStats[$batch->id] ?? 0})</span></a>
+                                {/ifAllowed}
 
-                            <a n:if="in_array($batch->status, ['created'])" n:href="SetBatchReadyToProcess! $batch->id" class="btn bg palette-Cyan-600 btn-icon-text waves-effect m-tbr-15" data-toggle="tooltip" data-placement="top" title="Prepares set of recipients but doesn't send any emails. Use to get number of total recipients."><i class="zmdi zmdi-brightness-5"></i> PREPARE QUEUE</a>
+                                {ifAllowed $user, 'batch', 'start'}
+                                <a n:if="in_array($batch->status, ['worker_stopped', 'user_stopped'])" n:href="SetBatchSend! $batch->id" class="btn bg palette-Cyan-600 btn-icon-text waves-effect"><i class="zmdi zmdi-play"></i> CONTINUE SENDING</a>
+                                {/ifAllowed}
+
+                                {ifAllowed $user, 'batch', 'stop'}
+                                <a n:if="in_array($batch->status, ['processing', 'queued', 'sending'])" n:href="SetBatchUserStop! $batch->id" class="btn bg palette-Pink-400 btn-icon-text waves-effect"><i class="zmdi zmdi-pause"></i> PAUSE SENDING</a>
+                                {/ifAllowed}
+
+                                <a n:if="in_array($batch->status, ['ready_to_process_and_send'])" n:href="SetBatchCreated! $batch->id" class="btn bg palette-Pink-400 btn-icon-text waves-effect"><i class="zmdi zmdi-pause"></i> PAUSE SENDING</a>
+                                <a n:if="in_array($batch->status, ['done'])" class="btn btn-default waves-effect" disabled="disabled">ALL SENT</a>
+
+                                {ifAllowed $user, 'batch', 'process'}
+                                <a n:if="in_array($batch->status, ['created'])" n:href="SetBatchReadyToProcess! $batch->id" class="btn bg palette-Cyan-600 btn-icon-text waves-effect" data-toggle="tooltip" data-placement="top" title="Prepares set of recipients but doesn't send any emails. Use to get number of total recipients."><i class="zmdi zmdi-brightness-5"></i> PREPARE QUEUE</a>
+                                {/ifAllowed}
+                            </div>
                         {/if}
                         <ul class="list-group">
                             <li class="list-group-item"><strong>Status:</strong> {$batch->status}</li>
