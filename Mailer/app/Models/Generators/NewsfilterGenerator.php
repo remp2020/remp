@@ -98,6 +98,7 @@ class NewsfilterGenerator implements IGenerator
             '/\[\/?lock\]/i' => "",
             '/\[lock newsletter\]/i' => "",
             '/\[lock\]/i' => "",
+            '/\[lock e\]/i' => "",
 
             // remove new style of shortcodes
             '/<div.*?class=".*?">/is' => '',
