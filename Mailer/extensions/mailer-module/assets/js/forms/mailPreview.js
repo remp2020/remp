@@ -17,7 +17,6 @@ let beautify = require('js-beautify').html;
         codeMirror: (element) => {
             return CodeMirror( element, {
                 value: beautify($(remplib.templateForm.textareaSelector).val()),
-                theme: 'base16-dark',
                 mode: 'htmlmixed',
                 indentUnit: 4,
                 indentWithTabs: true,
@@ -41,7 +40,8 @@ let beautify = require('js-beautify').html;
                     'doctype-first': false,
                     'alt-require': false,
                     'space-tab-mixed-disabled': 'tab'
-                }
+                },
+                scrollbarStyle: null,
             });
         },
         trumbowyg: (element) => {
@@ -49,15 +49,14 @@ let beautify = require('js-beautify').html;
             let plugins = {};
             const snippetsData = $(element).data('snippets');
 
-            const viewHTMLButton = 'viewHTML';
+            const buttonsToRemove = ['fullscreen', 'viewHTML'];
             buttons = $.grep(buttons, function (value) {
-                return value.toString() !== viewHTMLButton;
+                return !buttonsToRemove.includes(value.toString());
             });
 
             if (snippetsData) {
                 buttons.push([['snippets']]);
                 for (const item in snippetsData) {
-                    // let html = `<div contentEditable="false">{{ include('${snippetsData[item].name}') }}</div>`;
                     let html = `{{ include('${snippetsData[item].code}') }}`;
                     snippetsData[item].html = html;
                 }
@@ -128,6 +127,8 @@ let beautify = require('js-beautify').html;
             else {
                 remplib.templateForm.showCodemirror(codeMirror, trumbowyg);
             }
+
+            remplib.templateForm.updateFullscreenGUIHeightVariables();
         },
         init: () => {
             // initialize preview right away so user can see the email
@@ -141,6 +142,7 @@ let beautify = require('js-beautify').html;
             const codeMirror = remplib.templateForm.codeMirror($('.js-codemirror')[0]);
             const trumbowyg = remplib.templateForm.trumbowyg('.js-html-editor');
 
+            remplib.templateForm.fullscreenEditToggle();
             remplib.templateForm.syncCodeMirrorWithPreview(vue, codeMirror);
             remplib.templateForm.syncTrumbowygWithPreview(vue, trumbowyg);
 
@@ -182,6 +184,32 @@ let beautify = require('js-beautify').html;
                 $('body').trigger('preview:change');
                 remplib.templateForm.codeMirrorChanged = true;
             });
+        },
+        fullscreenEditToggle: () => {
+            $('#fullscreen-edit-btn').click(function () {
+                $('body').toggleClass('fullscreen-edit');
+                $(this).children('span').text(
+                    $(this).children('span').text() == 'Fullscreen edit' ? 'Exit fullscreen' : 'Fullscreen edit'
+                );
+
+                remplib.templateForm.updateFullscreenGUIHeightVariables();
+            });
+        },
+        updateFullscreenGUIHeightVariables: () => {
+            if ($('.fullscreen-edit').length === 0) {
+                return;
+            }
+
+            //calculating height for SCSS vars (see app.scss) so the editors are correctly stretched to 100% of viewport height
+            $(':root').css({
+                '--editor-choice-height': $('.fullscreen-edit .editor-choice-container').outerHeight(true) + 'px',
+            });
+
+            if (remplib.templateForm.editorChoice() === 'editor') {
+                $(':root').css({
+                    '--trumbowyg-header-height': $('.fullscreen-edit .trumbowyg-button-pane').outerHeight(true) + 'px',
+                });
+            }
         }
     }
 
