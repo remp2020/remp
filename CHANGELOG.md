@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.31.0] - 2022-03-14
+
 ### [Beam]
 
 - Added support for displaying canonical URLs for non-article pageviews on Beam dashboard. remp/remp#832
@@ -15,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- Added configurable permission manager currently allowing limiting access to batch execution. See [README](https://github.com/remp2020/remp/tree/master/Mailer/extensions/mailer-module#permission-management) for more information. remp/remp#1087 
 - Added HTML beautifier for HTML content of emails. remp/remp#684
   - WYSIWYG used to generate unformatted HTML which was hard to edit. All emails are now automatically beautified when they're edited.
 - Added email fullscreen edit option for medium and wider devices. remp/remp#678
@@ -1170,7 +1173,9 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.30.1...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.31.0...master
+[0.31.0]: https://github.com/remp2020/remp/compare/0.30.2...0.31.0
+[0.30.2]: https://github.com/remp2020/remp/compare/0.30.1...0.30.2
 [0.30.1]: https://github.com/remp2020/remp/compare/0.30.0...0.30.1
 [0.30.0]: https://github.com/remp2020/remp/compare/0.29.0...0.30.0
 [0.29.0]: https://github.com/remp2020/remp/compare/0.28.0...0.29.0
