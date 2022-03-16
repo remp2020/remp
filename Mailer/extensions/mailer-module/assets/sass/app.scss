@@ -129,3 +129,11 @@ $white: White;
     padding: 0px !important;
   }
 }
+
+.tab-nav li.active {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.fg-line:not([class*=has-]):after {
+  background: none;
+}

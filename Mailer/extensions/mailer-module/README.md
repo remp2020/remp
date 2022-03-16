@@ -64,6 +64,18 @@ List of allowable privileges:
 | batch    | stop      | Allows user to stop sending mail batch.  |
 | batch    | process   | Allows user to process mail batch.       |
 
+### Email's localization
+
+You can add support for another languages by adding array of secondary locales in the configuration of localization service:
+
+```neon
+services:
+    localizationConfig:
+        setup:
+            - addSecondaryLocales(['cs'])
+```
+
+Default locale is setted by using `.env` variable `LOCALE`.
 
 ## Technical feature description
 
@@ -2539,7 +2551,8 @@ Endpoint for sending single email without creating a job. It should be primarily
       "content": "-- base64 encoded content of attachment --" // if content is not provided, Mailer attempts to open file based on provided path in "file" property
     }
   ],
-  "schedule_at": "2019-09-23T08:50:03+00:00" // optional: RFC3339-formatted date when email should be sent; if not provided, email is scheduled to be sent immediately
+  "schedule_at": "2019-09-23T08:50:03+00:00", // optional: RFC3339-formatted date when email should be sent; if not provided, email is scheduled to be sent immediately
+  "locale": "en" // optional: specify language version of email
 }
 ```
 

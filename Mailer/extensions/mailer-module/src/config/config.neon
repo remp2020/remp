@@ -10,6 +10,9 @@ services:
 			- setParam(max_result_count, %max_result_count%)
 			- setParam(template_editor, %template_editor%)
 
+	localizationConfig:
+		factory: Remp\MailerModule\Models\Config\LocalizationConfig(@environmentConfig::get('LOCALE'))
+
 	permissionManager:
 		factory: Remp\MailerModule\Models\Auth\PermissionManager
 
@@ -146,6 +149,8 @@ services:
 
 	- Remp\MailerModule\Models\Users\UserManager
 
+	- Remp\MailerModule\Models\MailTranslator
+
 	# API
 	- Tomaj\NetteApi\Link\ApiLink
 	- Tomaj\NetteApi\Misc\IpDetector
@@ -220,6 +225,9 @@ services:
 	- Remp\MailerModule\Repositories\MailTypesRepository
 	- Remp\MailerModule\Repositories\MailTemplateStatsRepository
 	- Remp\MailerModule\Repositories\MailTypeStatsRepository
+	- Remp\MailerModule\Repositories\TemplateTranslationsRepository
+	- Remp\MailerModule\Repositories\LayoutTranslationsRepository
+	- Remp\MailerModule\Repositories\SnippetTranslationsRepository
 
 	# Factories
 	- Remp\MailerModule\Components\DataTable\DataTableFactory

@@ -7,6 +7,7 @@ use Http\Discovery\Exception\NotFoundException;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Remp\MailerModule\Forms\IFormFactory;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
@@ -17,10 +18,12 @@ use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Forms\TemplateFormFactory;
 use Remp\MailerModule\Forms\TemplateTestFormFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
+use Remp\MailerModule\Repositories\LayoutTranslationsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
+use Remp\MailerModule\Repositories\TemplateTranslationsRepository;
 
 final class TemplatePresenter extends BasePresenter
 {
@@ -46,6 +49,10 @@ final class TemplatePresenter extends BasePresenter
 
     private $generatorInputFactory;
 
+    private LayoutTranslationsRepository $layoutTranslationsRepository;
+
+    private TemplateTranslationsRepository $templateTranslationsRepository;
+
     public function __construct(
         TemplatesRepository $templatesRepository,
         LogsRepository $logsRepository,
@@ -57,7 +64,9 @@ final class TemplatePresenter extends BasePresenter
         ContentGenerator $contentGenerator,
         DataTableFactory $dataTableFactory,
         ISendingStatsFactory $sendingStatsFactory,
-        GeneratorInputFactory $generatorInputFactory
+        GeneratorInputFactory $generatorInputFactory,
+        LayoutTranslationsRepository $layoutTranslationsRepository,
+        TemplateTranslationsRepository $templateTranslationsRepository
     ) {
         parent::__construct();
         $this->templatesRepository = $templatesRepository;
@@ -71,6 +80,8 @@ final class TemplatePresenter extends BasePresenter
         $this->dataTableFactory = $dataTableFactory;
         $this->sendingStatsFactory = $sendingStatsFactory;
         $this->generatorInputFactory = $generatorInputFactory;
+        $this->layoutTranslationsRepository = $layoutTranslationsRepository;
+        $this->templateTranslationsRepository = $templateTranslationsRepository;
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -262,15 +273,26 @@ final class TemplatePresenter extends BasePresenter
         $this->template->snippets = $snippets;
         $this->template->lists = $lists;
         $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
+        $this->template->editedLocale = null;
     }
 
-    public function renderEdit($id): void
+    public function renderEdit($id, string $editedLocale = null): void
     {
         $template = $this->templatesRepository->find($id);
         if (!$template) {
             throw new BadRequestException();
         }
         $layouts = $this->layoutsRepository->getTable()->fetchAssoc('id');
+        if ($editedLocale && $editedLocale !== $this->localizationConfig->getDefaultLocale()) {
+            $layoutTranslations = $this->layoutTranslationsRepository->getTranslationsForLocale($editedLocale)
+                ->fetchAssoc('mail_layout_id');
+            foreach ($layouts as $layoutId => $layout) {
+                if (isset($layoutTranslations[$layoutId])) {
+                    $layouts[$layoutId] = $layoutTranslations[$layoutId];
+                }
+            }
+        }
+
         $snippets = $this->snippetsRepository->getTable()->select('code')->group('code')->fetchAssoc('code');
         $lists = $this->listsRepository->all()->fetchAssoc('id');
 
@@ -279,16 +301,17 @@ final class TemplatePresenter extends BasePresenter
         $this->template->snippets = $snippets;
         $this->template->lists = $lists;
         $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
+        $this->template->editedLocale = $editedLocale;
     }
 
-    public function renderPreview($id, $type = 'html'): void
+    public function renderPreview($id, $type = 'html', $lang = null): void
     {
         $template = $this->templatesRepository->find($id);
         if (!$template) {
             throw new BadRequestException();
         }
 
-        $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template));
+        $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template, [], null, $lang));
         $this->template->content = ($type === 'html')
             ? $mailContent->html()
             : "<pre>{$mailContent->text()}</pre>";
@@ -298,18 +321,20 @@ final class TemplatePresenter extends BasePresenter
     {
         $template = $this->templatesRepository->find($id);
         $newTemplate = $this->templatesRepository->duplicate($template);
+        $this->templateTranslationsRepository->duplicate($template, $newTemplate);
         $this->flashMessage('Email was duplicated.');
         $this->redirect('edit', $newTemplate->id);
     }
 
     public function createComponentTemplateForm(): Form
     {
-        $id = null;
-        if (isset($this->params['id'])) {
-            $id = (int)$this->params['id'];
+        $id = isset($this->params['id']) ? (int)$this->params['id'] : null;
+        $lang = $this->getParameter('editedLocale');
+        if ($lang && $lang === $this->localizationConfig->getDefaultLocale()) {
+            $lang = null;
         }
 
-        $form = $this->templateFormFactory->create($id);
+        $form = $this->templateFormFactory->create($id, $lang);
 
         $presenter = $this;
         $this->templateFormFactory->onCreate = function ($template, $buttonSubmitted) use ($presenter) {
@@ -348,5 +373,14 @@ final class TemplatePresenter extends BasePresenter
         }
 
         return $templateStats;
+    }
+
+    protected function redirectBasedOnButtonSubmitted(string $buttonSubmitted, int $itemID = null): void
+    {
+        if ($buttonSubmitted === IFormFactory::FORM_ACTION_SAVE_CLOSE || is_null($itemID)) {
+            $this->redirect('Default');
+        } else {
+            $this->redirect('Edit', ['id' => $itemID, 'editedLocale' => $this->getParameter('editedLocale')]);
+        }
     }
 }

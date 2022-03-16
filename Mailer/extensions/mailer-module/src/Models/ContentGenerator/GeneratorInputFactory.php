@@ -7,7 +7,7 @@ use Remp\MailerModule\Repositories\SnippetsRepository;
 
 class GeneratorInputFactory
 {
-    private $snippetsRepository;
+    private SnippetsRepository $snippetsRepository;
 
     public function __construct(SnippetsRepository $snippetsRepository)
     {
@@ -17,13 +17,15 @@ class GeneratorInputFactory
     public function create(
         IRow $mailTemplate,
         array $params = [],
-        ?int $batchId = null
+        ?int $batchId = null,
+        string $locale = null
     ): GeneratorInput {
         return new GeneratorInput(
             $this->snippetsRepository,
             $mailTemplate,
             $params,
-            $batchId
+            $batchId,
+            $locale
         );
     }
 }

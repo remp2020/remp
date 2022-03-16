@@ -83,6 +83,11 @@ services:
 #			- addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(), 'us')
 #			- addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(), 'eu')
 
+    # Setup of secondary locales
+    localizationConfig:
+        setup:
+            - addSecondaryLocales(['hu'])
+
 # local_configs override DBs configs records.
 local_configs:
 

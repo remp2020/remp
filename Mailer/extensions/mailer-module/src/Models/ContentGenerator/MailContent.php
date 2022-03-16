@@ -4,14 +4,17 @@ namespace Remp\MailerModule\Models\ContentGenerator;
 
 class MailContent
 {
-    private $html;
+    private string $html;
 
-    private $text;
+    private string $text;
 
-    public function __construct(string $html, string $text)
+    private string $subject;
+
+    public function __construct(string $html, string $text, string $subject)
     {
         $this->html = $html;
         $this->text = $text;
+        $this->subject = $subject;
     }
 
     public function html(): string
@@ -22,5 +25,10 @@ class MailContent
     public function text(): string
     {
         return $this->text;
+    }
+
+    public function subject(): string
+    {
+        return $this->subject;
     }
 }

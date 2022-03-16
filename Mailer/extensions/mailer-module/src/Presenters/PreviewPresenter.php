@@ -20,14 +20,14 @@ final class PreviewPresenter extends Presenter
     /** @var GeneratorInputFactory @inject */
     public $generatorInputFactory;
 
-    public function renderPublic($id): void
+    public function renderPublic(string $id, ?string $lang = null): void
     {
         $template = $this->templatesRepository->getByPublicCode($id);
         if (!$template) {
             throw new BadRequestException();
         }
 
-        $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template));
+        $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template, [], null, $lang));
         $this->template->content = $mailContent->html();
     }
 }

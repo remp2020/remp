@@ -15,19 +15,19 @@ use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\TemplatesCodeNotUniqueException;
 use Remp\MailerModule\Repositories\TemplatesRepository;
+use Remp\MailerModule\Repositories\TemplateTranslationsRepository;
 
 class TemplateFormFactory implements IFormFactory
 {
     use SmartObject;
 
-    /** @var TemplatesRepository */
-    private $templatesRepository;
+    private TemplatesRepository $templatesRepository;
 
-    /** @var LayoutsRepository */
-    private $layoutsRepository;
+    private LayoutsRepository $layoutsRepository;
 
-    /** @var ListsRepository */
-    private $listsRepository;
+    private ListsRepository $listsRepository;
+
+    private TemplateTranslationsRepository $templateTranslationsRepository;
 
     public $onCreate;
 
@@ -45,7 +45,8 @@ class TemplateFormFactory implements IFormFactory
         ListsRepository $listsRepository,
         ContentGenerator $contentGenerator,
         Explorer $database,
-        GeneratorInputFactory $generatorInputFactory
+        GeneratorInputFactory $generatorInputFactory,
+        TemplateTranslationsRepository $templateTranslationsRepository
     ) {
         $this->templatesRepository = $templatesRepository;
         $this->layoutsRepository = $layoutsRepository;
@@ -53,9 +54,10 @@ class TemplateFormFactory implements IFormFactory
         $this->contentGenerator = $contentGenerator;
         $this->database = $database;
         $this->generatorInputFactory = $generatorInputFactory;
+        $this->templateTranslationsRepository = $templateTranslationsRepository;
     }
 
-    public function create(?int $id = null): Form
+    public function create(?int $id = null, ?string $lang = null): Form
     {
         $count = 0;
         $defaults = [];
@@ -68,6 +70,15 @@ class TemplateFormFactory implements IFormFactory
             $template = $this->templatesRepository->find($id);
             $count = $template->related('mail_logs', 'mail_template_id')->count('*');
             $defaults = $template->toArray();
+            if (isset($lang)) {
+                $templateTranslation = $template->related('mail_template_translations', 'mail_template_id')
+                    ->where('locale', $lang)
+                    ->fetch();
+
+                $defaults['subject'] = $templateTranslation->subject ?? '';
+                $defaults['mail_body_text'] = $templateTranslation->mail_body_text ?? '';
+                $defaults['mail_body_html'] = $templateTranslation->mail_body_html ?? '';
+            }
         } else {
             $defaults['mail_layout_id'] = key($layouts);
             $defaults['from'] = $firstList->mail_from ?? '';
@@ -77,6 +88,7 @@ class TemplateFormFactory implements IFormFactory
         $form->addProtection();
 
         $form->addHidden('id', $id);
+        $form->addHidden('lang', $lang);
 
         $form->addText('name', 'Name')
             ->setRequired("Field 'Name' is required.");
@@ -160,8 +172,24 @@ class TemplateFormFactory implements IFormFactory
         try {
             $row = null;
             $callback = null;
+
+            $lang = $values['lang'] ?? null;
+            unset($values['lang']);
+
             if (!empty($values['id'])) {
                 $row = $this->templatesRepository->find($values['id']);
+                if ($lang) {
+                    $this->templateTranslationsRepository->upsert(
+                        $row,
+                        $lang,
+                        $values['subject'],
+                        $values['mail_body_text'],
+                        $values['mail_body_html']
+                    );
+
+                    unset($values['subject'], $values['mail_body_text'], $values['mail_body_html']);
+                }
+
                 $this->templatesRepository->update($row, (array) $values);
                 $callback = $this->onUpdate;
             } else {

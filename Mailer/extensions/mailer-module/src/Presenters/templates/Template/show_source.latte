@@ -1,0 +1,69 @@
+{var $translatedTemplate = $template->related('mail_template_translations', 'mail_template_id')->where('locale', $lang)->fetch()}
+
+<div role="tabpanel" id="tab-{$lang}" class="tab-pane animated fadeIn {$lang === $locale ? 'active'}">
+    <div role="tabpanel" class="tab-pane animated fadeIn {$lang === $locale ? 'active'}" id="tab-{$lang}">
+        <div class="card-header">
+            {if $lang === $locale}
+                <strong>Subject:</strong> {$template->subject}
+            {else}
+                <strong>Subject:</strong> {$translatedTemplate->subject ?? $template->subject}
+            {/if}
+
+            <div class="actions">
+                <a n:href="Preview:Public $mailTemplate->public_code, lang => ($lang === $locale) ? null : $lang">
+                    <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-eye"></i> Public preview</button>
+                </a>
+            </div>
+
+        </div>
+        <div class="card-body">
+            <ul class="tab-nav tn-justified tn-icon" role="tablist">
+                <li role="presentation" class="active">
+                    <a class="col-sx-6" href="#tab-{$lang}-1" aria-controls="tab-{$lang}-1" role="tab" data-toggle="tab" aria-expanded="true">
+                        HTML Preview
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="col-sx-6" href="#tab-{$lang}-2" aria-controls="tab-{$lang}-2" role="tab" data-toggle="tab" aria-expanded="true">
+                        Text Version
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="col-xs-6" href="#tab-{$lang}-3" aria-controls="tab-{$lang}-3" role="tab" data-toggle="tab" aria-expanded="true">
+                        HTML Version
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content p-0">
+                <div role="tabpanel" class="tab-pane animated fadeIn active" id="tab-{$lang}-1">
+                    <div id="mail-preview">
+                        <iframe src="{plink Preview $mailTemplate->id, type => 'html', lang => $lang}" style="width: 100%; border: none; min-height: 700px;"></iframe>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane animated fadeIn" id="tab-{$lang}-2">
+                    <pre class="palette-White bg b-0">
+                        <code class="nohighlight">
+                            {if $lang === $locale}
+                                {$mailTemplate->mail_body_text}
+                            {else}
+                                {$translatedTemplate->mail_body_text ?? $template->mail_body_text}
+                            {/if}
+                        </code>
+                    </pre>
+                </div>
+                <div role="tabpanel" class="tab-pane animated fadeIn" id="tab-{$lang}-3">
+                    <pre class="palette-White bg b-0">
+                        <code class="html">
+                            {if $lang === $locale}
+                                {$mailTemplate->mail_body_html}
+                            {else}
+                                {$translatedTemplate->mail_body_html ?? $template->mail_body_html}
+                            {/if}
+                        </code>
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
