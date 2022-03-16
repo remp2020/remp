@@ -293,11 +293,6 @@ export default {
       articleLocked = "false",
       timeframe = 10 * 60 * 1000
     ) {
-      if (!this.articleDetailId) {
-        console.warn("remplib: Unable to fetch reading progress stats. Config states we're on article, but iota.articleSelector doesn't match any");
-        return;
-      }
-
       const payload = {
         filter_by: [],
         count_histogram: {
@@ -307,6 +302,10 @@ export default {
       };
 
       if (this.onArticleDetail) {
+        if (!this.articleDetailId) {
+          console.warn("remplib: Unable to fetch reading progress stats. Config states we're on article, but iota.articleSelector doesn't match any");
+          return;
+        }
         payload.filter_by.push(
           {
             tag: "article_id",
