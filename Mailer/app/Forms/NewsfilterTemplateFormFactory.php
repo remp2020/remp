@@ -93,7 +93,16 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('article_id');
 
         $sourceTemplateId = $_POST['source_template_id'] ?? null;
-        if ($sourceTemplateId == 67) {
+        if ($sourceTemplateId == 69) {
+            $defaults = [
+                'name' => 'Boxová ulička ' . date('j.n.Y'),
+                'code' => 'nwsf_boxova_ulicka_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 52, // Boxová ulička
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif ($sourceTemplateId == 67) {
             $defaults = [
                 'name' => 'Týždeň v práve Rada Procházku ' . date('j.n.Y'),
                 'code' => 'nwsf_pravoprochazka_' . date('dmY'),
