@@ -53,10 +53,10 @@
             <div class="card-header">
                 <h2>Show banner <small>{{ $banner->name }}</small></h2>
                 <div class="actions">
-                    <a href="{{ route('banners.edit', $banner) }}" class="btn palette-Cyan bg waves-effect">Edit banner</a>
+                    <a href="{{ route('banners.edit', $banner) }}" class="btn palette-Cyan bg waves-effect">
+                        <i class="zmdi zmdi-palette-Cyan zmdi-edit"></i> Edit
+                    </a>
                 </div>
-            </div>
-            <div class="card-body card-padding">
             </div>
         </div>
     </div>
@@ -134,6 +134,15 @@
             </div>
             <div class="card-body">
                 <ul class="list-group">
+                    <li class="list-group-item">
+                        <strong>ID: </strong> {{ $banner->id }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>UUID: </strong> {{ $banner->uuid }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Public ID: </strong> {{ $banner->public_id }}
+                    </li>
                     @if ($banner->position)
                     <li class="list-group-item">
                         <strong>Position: </strong>{{ $positions[$banner->position]->name }}
@@ -163,6 +172,23 @@
                 </ul>
             </div>
         </div>
+
+        @if (count($banner->campaigns))
+        <div class="card">
+            <div class="card-header">
+                <h2>Used in campaigns</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    @foreach($banner->campaigns as $campaign)
+                        <li class="list-group-item">
+                            <a href="{{ route('campaigns.show', $campaign) }}">{{ $campaign->name }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+        @endif
     </div>
 
     <div class="col-md-8">

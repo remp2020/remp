@@ -14,11 +14,25 @@
                 <h2>Settings</h2>
 
                 <div class="actions">
-                    <a href="{{ route('campaigns.edit', ['campaign' => $campaign])  }}" class="btn palette-Cyan bg waves-effect">Edit</a>
+                    <a href="{{ route('campaigns.edit', ['campaign' => $campaign])  }}" class="btn palette-Cyan bg waves-effect">
+                        <i class="zmdi zmdi-palette-Cyan zmdi-edit"></i> Edit
+                    </a>
+                    <a href="{{ route('campaigns.stats', ['campaign' => $campaign])  }}" class="btn palette-Cyan bg waves-effect">
+                        <i class="zmdi zmdi-palette-Cyan zmdi-chart"></i> Stats
+                    </a>
                 </div>
             </div>
             <div class="card-body">
                 <ul class="list-group">
+                    <li class="list-group-item">
+                        <strong>ID: </strong> {{ $campaign->id }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>UUID: </strong> {{ $campaign->uuid }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Public ID: </strong> {{ $campaign->public_id }}
+                    </li>
                     <li class="list-group-item">
                         <strong>Variants:</strong>
                         <ul>

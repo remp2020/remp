@@ -10,6 +10,11 @@
     <div class="card">
         <div class="card-header">
             <h2>Edit banner <small>{{ $banner->name }}</small></h2>
+            <div class="actions">
+                <a href="{{ route('banners.show', $banner) }}" class="btn palette-Cyan bg waves-effect">
+                    <i class="zmdi zmdi-palette-Cyan zmdi-eye"></i> Show
+                </a>
+            </div>
         </div>
     </div>
 

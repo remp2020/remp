@@ -3,6 +3,12 @@
         <!-- variant color box -->
         <td class="table-td-color" :class="['color-' + index]"><div></div></td>
 
+        <td class="table-td-actions">
+          <a v-if="index != $parent.variants.length - 1 && bannerUrl" :href="bannerUrl" class="btn-xs palette-Grey-200 bg waves-effect">
+            <i class="zmdi zmdi-palette-Cyan zmdi-eye"></i> Show
+          </a>
+        </td>
+
         <!-- variant select -->
         <td class="table-td-banner">
             <input type="hidden" :name="'variants[' + index + '][banner_id]'" :value="variant.banner_id">
@@ -12,17 +18,20 @@
                 :value="variant.banner_id"
                 :title="'No alternative'"
                 :options.sync="$parent.variantOptions"
+                :dataType="index.toString()"
                 v-if="index != $parent.variants.length - 1 && index != 0"
             ></v-select>
 
             <div v-if="index == $parent.variants.length -1">Control Group</div>
 
-            <span v-if="index == 0" title="This banner can be changed only in previous step.">{{ $parent.getVariantOptionByValue($parent.bannerId).label }}</span>
+            <div v-if="index == 0" title="This banner can be changed only in previous step.">
+              {{ $parent.getVariantOptionByValue($parent.bannerId).label }}
+            </div>
         </td>
 
         <!-- proportion value -->
         <td style="text-align: right; min-width: 90px;">
-            <input type="number" min="0" max="100" class="ab-testing-input form-control" :class="['ab-testing-input-' + index]" :name="'variants[' + index + '][proportion]'" :value="variant.val" @change="$parent.handleInputUpdate($event, index)" :id="'ab-testing-input-' + index">&nbsp;&nbsp;%
+            <input type="number" min="0" max="100" class="ab-testing-input form-control" :class="['ab-testing-input-' + index]" :name="'variants[' + index + '][proportion]'" :value="variant.proportion" @change="$parent.handleInputUpdate($event, index)" :id="'ab-testing-input-' + index">&nbsp;&nbsp;%
         </td>
 
         <!-- remove variant button -->
@@ -58,8 +67,30 @@
             "index",
             "banner_id",
         ],
+        data() {
+            return {
+                selectedBannerId: null,
+            };
+        },
+        created: function() {
+            this.selectedBannerId = this.variant.banner_id;
+            this.$on('vselect-changed', function(data){
+              if (data.type !== this.index.toString()) {
+                return;
+              }
+              this.selectedBannerId = parseInt(data.value);
+            });
+        },
         mounted: function () {
             this.renderProportionInputValues();
+        },
+        computed: {
+            bannerUrl: function() {
+              if (!this.selectedBannerId) {
+                  return;
+              }
+              return "/banners/" + this.selectedBannerId;
+            },
         },
         methods: {
             renderProportionInputValues: function () {

@@ -264,6 +264,11 @@
     width: 20px;
 }
 
+.table > tbody > tr > td.table-td-actions {
+    width: 50px;
+    vertical-align: bottom;
+}
+
 .table-td-color > div {
     width: 20px;
     height: 20px;

@@ -16,9 +16,14 @@
 
                                 <small v-if="name">{{ name }}</small>
                             </h2>
-                            <a v-if="statsLink" :href="statsLink" class="btn btn-sm palette-Cyan bg waves-effect pull-right">
-                                <i class="zmdi zmdi-palette-Cyan zmdi-chart"></i>&nbsp;&nbsp;Stats
-                            </a>
+                            <div class="actions">
+                                <a v-if="statsLink" :href="statsLink" class="btn btn palette-Cyan bg waves-effect">
+                                  <i class="zmdi zmdi-palette-Cyan zmdi-chart"></i> Stats
+                                </a>
+                                <a v-if="showLink" :href="showLink" class="btn palette-Cyan bg waves-effect">
+                                  <i class="zmdi zmdi-palette-Cyan zmdi-eye"></i> Show
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -576,6 +581,8 @@
         "_refererFilter",
         "_refererPatterns",
         "_statsLink",
+        "_showLink",
+        "_editLink",
 
         "_banners",
         "_availableSegments",
