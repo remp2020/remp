@@ -18,6 +18,8 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class NovydenikNewsfilterGenerator implements IGenerator
 {
+    use RulesTrait;
+
     public $onSubmit;
 
     private $mailSourceTemplateRepository;
@@ -71,83 +73,17 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $post = $values['newsfilter_html'];
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
-        [
-            $captionTemplate,
-            $captionWithLinkTemplate,
-            $liTemplate,
-            $hrTemplate,
-            $spacerTemplate,
-            $imageTemplate
-        ] = $this->getTemplates();
-
-
-        $rules = [
-            // remove shortcodes
-            "/\[greybox\]/is" => "",
-            "/\[\/greybox\]/is" => "",
+        $generatorRules = [
             "/https:\/\/denikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
-            "/\[pullboth.*?\/pullboth\]/is" => "",
-            "/<script.*?\/script>/is" => "",
-            "/\[iframe.*?\]/is" => "",
-            '/\[\/?lock\]/i' => "",
-            '/\[lock newsletter\]/i' => "",
-            '/\[lock\]/i' => "",
-
-            // remove iframes
-            "/<iframe.*?\/iframe>/is" => "",
-
-            // remove paragraphs
-            '/<p.*?>(.*?)<\/p>/is' => "$1",
-
-            // replace em-s
             "/<em.*?>(.*?)<\/em>/is" => "<i>$1</i>",
-
-            // remove new lines from inside caption shortcode
-            "/\[caption.*?\/caption\]/is" => function ($matches) {
-                return str_replace(array("\n\r", "\n", "\r"), '', $matches[0]);
-            },
-
-            // replace captions
-            '/\[caption.*?\].*?href="(.*?)".*?src="(.*?)".*?\/a>(.*?)\[\/caption\]/im' => $captionWithLinkTemplate,
-            '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
-
-            // replace link shortcodes
             '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) {
                 $url = "https://denikn.cz/{$matches[1]}";
                 $meta = $this->content->fetchUrlMeta($url);
                 return '<a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
             },
-
-            // replace hrefs
             '/<a(?!.*skipregex).*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="padding:0;margin:0;line-height:1.3;color:#b00c28;text-decoration:none;">$2</a>',
-
-            // replace h2
-            '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
-
-            // replace images
-            '/<img.*?src="(.*?)".*?>/is' => $imageTemplate,
-
-            // replace ul & /ul
-            '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
-
-            '/<\/ul>/is' => '</tbody></table>' . PHP_EOL,
-
-            // replace li
-            '/<li>(.*?)<\/li>/is' => $liTemplate,
-
-            // hr
-            '/(<hr>|<hr \/>)/is' => $hrTemplate,
-
-            // parse embeds
-            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => function ($matches) {
-                return $this->embedParser->parse($matches[0]);
-            },
-
-            // remove br from inside of a
-            '/<a.*?\/a>/is' => function ($matches) {
-                return str_replace('<br />', '', $matches[0]);
-            }
         ];
+        $rules = $this->getRules($generatorRules);
 
         foreach ($rules as $rule => $replace) {
             if (is_array($replace) || is_callable($replace)) {
