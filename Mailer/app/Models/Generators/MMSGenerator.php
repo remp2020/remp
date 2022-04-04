@@ -18,6 +18,8 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class MMSGenerator implements IGenerator
 {
+    use RulesTrait;
+
     public $onSubmit;
 
     private $mailSourceTemplateRepository;
@@ -69,92 +71,15 @@ class MMSGenerator implements IGenerator
     public function process(array $values): array
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values['source_template_id']);
-        $content = $this->content;
 
         $post = $values['mms_html'];
 
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
-        [
-            $captionTemplate,
-            $captionWithLinkTemplate,
-            $liTemplate,
-            $hrTemplate,
-            $spacerTemplate,
-            $imageTemplate
-        ] = $this->getTemplates();
-
-        $rules = [
-            // remove shortcodes
-            "/\[greybox\].*?\[\/greybox\]/is" => "",
-            "/\[pullboth.*?\/pullboth\]/is" => "",
-            "/<script.*?\/script>/is" => "",
-            "/\[iframe.*?\]/is" => "",
-            '/\[\/?lock\]/i' => "",
-            '/\[lock newsletter\]/i' => "",
-            '/\[lock\]/i' => "",
-
-            // remove iframes
-            "/<iframe.*?\/iframe>/is" => "",
-
-            // remove paragraphs
-            '/<p.*?>(.*?)<\/p>/is' => "$1",
+        $generatorRules = [
             '/<span.*?>(.*?)<\/span>/is' => "$1",
-
-            // replace em-s
-            "/<em.*?>(.*?)<\/em>/is" => "<i style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;\">$1</i><br>",
-
-            // remove new lines from inside caption shortcode
-            "/\[caption.*?\/caption\]/is" => function ($matches) {
-                return str_replace(array("\n\r", "\n", "\r"), '', $matches[0]);
-            },
-
-            // replace captions
-            '/\[caption.*?\].*?href="(.*?)".*?src="(.*?)".*?\/a>(.*?)\[\/caption\]/im' => $captionWithLinkTemplate,
-            '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
-
-            // replace link shortcodes
-            '/\[articlelink.*?id="(.*?)".*?]/is' => function ($matches) use ($content) {
-                $url = "https://dennikn.sk/{$matches[1]}";
-                $meta = $content->fetchUrlMeta($url);
-                return '<a href="' . $url . '" style="color:#181818;padding:0;margin:0;line-height:1.3;color:#1F3F83;text-decoration:underline;">' . $meta->getTitle() . '</a>';
-            },
-
-            // replace hrefs
-            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;color:#1F3F83;text-decoration:underline;">$2</a>',
-
-            // replace h2
-            '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">$1</h2>' . PHP_EOL,
-
-            // replace images
-            '/<img.*?src="(.*?)".*?>/is' => $imageTemplate,
-
-            // replace ul & /ul
-            '/<ul>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',
-
-            '/<\/ul>/is' => '</tbody></table>' . PHP_EOL,
-
-            // replace li
-            '/<li>(.*?)<\/li>/is' => $liTemplate,
-
-            // hr
-            '/(<hr>|<hr \/>)/is' => $hrTemplate,
-
-            // parse embeds
-            '/^\s*(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\s*$/im' => function ($matches) {
-                return $this->embedParser->parse($matches[0]);
-            },
-
-            // remove br from inside of a
-            '/<a.*?\/a>/is' => function ($matches) {
-                return str_replace('<br />', '', $matches[0]);
-            },
-
-            // remove new style of shortcodes
-            '/<div.*?class=".*?">/is' => '',
-            '/<\/div>/is' => '',
         ];
-
+        $rules = $this->getRules($generatorRules);
 
         foreach ($rules as $rule => $replace) {
             if (is_array($replace) || is_callable($replace)) {
@@ -174,6 +99,7 @@ class MMSGenerator implements IGenerator
         [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;\">", [$post, $lockedPost]);
 
         $imageHtml = '';
+        [$captionTemplate,,,,,$imageTemplate] = $this->getTemplates();
 
         if (isset($values['image_title']) && isset($values['image_url'])) {
             $imageHtml = str_replace('$1', $values['image_url'], $captionTemplate);

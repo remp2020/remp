@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added navigation links within the forms and UI to simplify following paths between banners and campaigns. remp/remp#1099
 
+### [Mailer]
+
+- Added support for `greybox` tag in generators. remp/remp#1060
+
 ## [0.31.0] - 2022-03-14
 
 ### [Beam]
