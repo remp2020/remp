@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added support for `greybox` tag in generators. remp/remp#1060
+- Added `List-Unsubscribe` header to outgoing emails. remp/remp#813 
 
 ## [0.31.0] - 2022-03-14
 
