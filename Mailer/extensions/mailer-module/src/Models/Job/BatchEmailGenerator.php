@@ -5,18 +5,20 @@ namespace Remp\MailerModule\Models\Job;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Remp\MailerModule\Repositories\ActiveRow;
-use Remp\MailerModule\Models\Beam\UserUnreadArticlesResolveException;
 use Remp\MailerModule\Models\Beam\UnreadArticlesResolver;
+use Remp\MailerModule\Models\Beam\UserUnreadArticlesResolveException;
+use Remp\MailerModule\Models\Segment\Aggregator;
+use Remp\MailerModule\Models\Users\IUser;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
-use Remp\MailerModule\Models\Segment\Aggregator;
-use Remp\MailerModule\Models\Users\IUser;
 
 class BatchEmailGenerator
 {
     const BEAM_UNREAD_ARTICLES_RESOLVER = 'beam-unread-articles';
+
+    private int $deleteLimit = 10000;
 
     private $mailJobsRepository;
 
@@ -56,8 +58,14 @@ class BatchEmailGenerator
         $this->logger = $logger;
     }
 
+    public function setDeleteLimit($limit): void
+    {
+        $this->deleteLimit = $limit;
+    }
+
     protected function insertUsersIntoJobQueue(ActiveRow $batch, &$userMap): array
     {
+        $this->logger->info('Clearing batch', ['batchId' => $batch->id]);
         $this->mailJobQueueRepository->clearBatch($batch);
 
         $batchInsert = 200;
@@ -68,8 +76,18 @@ class BatchEmailGenerator
 
         $job = $batch->job;
 
+        $this->logger->info('Fetching users from the segment', [
+            'batchId' => $batch->id,
+            'provider' => $batch->mail_job->segment_provider,
+            'code' => $batch->mail_job->segment_code,
+        ]);
         $userIds = $this->segmentAggregator->users(['provider' => $batch->mail_job->segment_provider, 'code' => $batch->mail_job->segment_code]);
 
+        $this->logger->info('Processing users from the segment to mail_job_queue', [
+            'batchId' => $batch->id,
+            'provider' => $batch->mail_job->segment_provider,
+            'code' => $batch->mail_job->segment_code,
+        ]);
         foreach (array_chunk($userIds, 1000, true) as $userIdsChunk) {
             $page = 1;
             while ($users = $this->userProvider->list($userIdsChunk, $page)) {
@@ -109,16 +127,24 @@ class BatchEmailGenerator
     {
         $job = $batch->job;
 
-        $this->mailJobQueueRepository->removeUnsubscribed($batch);
+        $this->logger->info('Removing unsubscribed', ['batchId' => $batch->id]);
+        $this->mailJobQueueRepository->removeUnsubscribed($batch, $this->deleteLimit);
         if ($job->mail_type_variant_id) {
-            $this->mailJobQueueRepository->removeOtherVariants($batch, $job->mail_type_variant_id);
+            $this->logger->info('Removing other variants', ['batchId' => $batch->id]);
+            $this->mailJobQueueRepository->removeOtherVariants($batch, $job->mail_type_variant_id, $this->deleteLimit);
         }
         if ($job->context) {
-            $this->mailJobQueueRepository->removeAlreadySentContext($batch, $job->context);
+            $this->logger->info('Removing already sent context', ['batchId' => $batch->id]);
+            $this->mailJobQueueRepository->removeAlreadySentContext($batch, $job->context, $this->deleteLimit);
         }
-        $this->mailJobQueueRepository->removeAlreadyQueued($batch);
-        $this->mailJobQueueRepository->removeAlreadySent($batch);
-        $this->mailJobQueueRepository->stripEmails($batch, $batch->max_emails);
+        $this->logger->info('Removing already queued in other job batch', ['batchId' => $batch->id]);
+        $this->mailJobQueueRepository->removeAlreadyQueued($batch, $this->deleteLimit);
+        $this->logger->info('Removing already sent template', ['batchId' => $batch->id]);
+        $this->mailJobQueueRepository->removeAlreadySent($batch, $this->deleteLimit);
+        if ($batch->max_emails) {
+            $this->logger->info('Removing emails above configured count', ['batchId' => $batch->id]);
+            $this->mailJobQueueRepository->stripEmails($batch, $batch->max_emails, $this->deleteLimit);
+        }
 
         // Count remaining users
         $templateUsersCount = [];
@@ -136,6 +162,9 @@ class BatchEmailGenerator
     public function generate(ActiveRow $batch)
     {
         $userMap = [];
+        $this->logger->info('Acquiring users for batch', [
+            'batchId' => $batch->id,
+        ]);
 
         $templateUsersCount = $this->insertUsersIntoJobQueue($batch, $userMap);
         foreach ($templateUsersCount as $templateId => $count) {

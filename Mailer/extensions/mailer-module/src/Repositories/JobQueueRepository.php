@@ -3,13 +3,15 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use Nette\Utils\Json;
+
 class JobQueueRepository extends Repository
 {
     protected $tableName = 'mail_job_queue';
 
-    const STATUS_NEW = 'new';
-    const STATUS_DONE = 'done';
-    const STATUS_ERROR = 'error';
+    public const STATUS_NEW = 'new';
+    public const STATUS_DONE = 'done';
+    public const STATUS_ERROR = 'error';
 
     public function multiInsert(array $rows): void
     {
@@ -23,7 +25,7 @@ class JobQueueRepository extends Repository
                 'sorting' => $row['sorting'],
                 'email' => $row['email'],
                 'context' => $row['context'],
-                'params' => $row['params'] ?? [],
+                'params' => $row['params'] ?? Json::encode([]),
             ];
         }
         $this->database->query("INSERT INTO {$this->tableName}", $insertLogsData);
@@ -34,7 +36,7 @@ class JobQueueRepository extends Repository
         return $this->getTable()->where(['mail_batch_id' => $batch->id])->delete();
     }
 
-    public function stripEmails(ActiveRow $batch, $leaveEmails): void
+    public function stripEmails(ActiveRow $batch, int $leaveEmails, int $limit = 10000): void
     {
         if (!$leaveEmails) {
             return;
@@ -42,26 +44,57 @@ class JobQueueRepository extends Repository
 
         $total = $this->getTable()->where(['mail_batch_id' => $batch->id])->count('*');
         $remove = $total - $leaveEmails;
-        if ($remove > 0) {
-            $this->getDatabase()->query("DELETE FROM {$this->tableName} WHERE mail_batch_id={$batch->id} ORDER BY RAND() LIMIT $remove");
+        if ($remove <= 0) {
+            return;
+        }
+
+        $sql = <<<SQL
+SELECT id FROM {$this->tableName}
+  WHERE mail_batch_id = {$batch->id}
+ORDER BY RAND()
+LIMIT ?
+SQL;
+        while ($remove > $limit) {
+            $ids = $this->getDatabase()->query($sql, $limit)->fetchPairs(null, 'id');
+            $this->deleteAllByIds($ids);
+        }
+
+        $ids = $this->getDatabase()->query($sql, $remove)->fetchPairs(null, 'id');
+        $this->deleteAllByIds($ids);
+    }
+
+    public function removeAlreadySent(ActiveRow $batch, int $limit = 10000): void
+    {
+        $job = $batch->job;
+        $sql = <<<SQL
+SELECT id FROM {$this->tableName}
+    WHERE mail_batch_id = {$batch->id}
+      AND email IN (SELECT email FROM mail_logs WHERE mail_job_id = {$job->id})
+LIMIT $limit
+SQL;
+
+        while ($ids = $this->getDatabase()->query($sql)->fetchPairs(null, 'id')) {
+            $this->deleteAllByIds($ids);
         }
     }
 
-    public function removeAlreadySent(ActiveRow $batch): void
+    public function removeAlreadyQueued(ActiveRow $batch, int $limit = 10000): void
     {
         $job = $batch->job;
-        $this->getDatabase()->query("DELETE FROM {$this->tableName} WHERE mail_batch_id={$batch->id} AND email IN (SELECT email FROM mail_logs WHERE mail_job_id = {$job->id})");
+        $sql = <<<SQL
+SELECT mjq1.id FROM mail_job_queue mjq1
+    JOIN mail_job_queue mjq2 ON mjq1.email = mjq2.email
+  WHERE mjq1.mail_batch_id = $batch->id
+    AND mjq2.mail_batch_id IN (SELECT id FROM mail_job_batch WHERE mail_job_id = $job->id AND id <> $batch->id)
+LIMIT $limit
+SQL;
+
+        while ($ids = $this->getDatabase()->query($sql)->fetchPairs(null, 'id')) {
+            $this->deleteAllByIds($ids);
+        }
     }
 
-    public function removeAlreadyQueued(ActiveRow $batch): void
-    {
-        $job = $batch->job;
-        $this->getDatabase()->query("DELETE mjq1.* FROM mail_job_queue mjq1 JOIN mail_job_queue mjq2 ON mjq1.email = mjq2.email
-  WHERE mjq1.mail_batch_id = {$batch->id} AND mjq2.mail_batch_id IN (SELECT id FROM mail_job_batch WHERE mail_job_id = {$job->id} AND id <> {$batch->id})
-");
-    }
-
-    public function removeUnsubscribed(ActiveRow $batch): void
+    public function removeUnsubscribed(ActiveRow $batch, int $limit = 10000): void
     {
         $q = $this->getTable()
             ->select('mail_template_id')
@@ -70,9 +103,9 @@ class JobQueueRepository extends Repository
 
         foreach ($q as $row) {
             $sql = <<<SQL
-DELETE FROM mail_job_queue
-WHERE mail_job_queue.mail_batch_id = ?
-AND mail_job_queue.mail_template_id = ?
+SELECT id FROM mail_job_queue
+WHERE mail_job_queue.mail_batch_id = $batch->id
+AND mail_job_queue.mail_template_id = $row->mail_template_id
 AND mail_job_queue.id NOT IN (
 
   SELECT id FROM (
@@ -82,24 +115,24 @@ AND mail_job_queue.id NOT IN (
       ON mail_job_queue.mail_template_id = mail_templates.id
     INNER JOIN mail_user_subscriptions
       ON mail_user_subscriptions.mail_type_id = mail_templates.mail_type_id
-      AND subscribed = 1
+      AND mail_user_subscriptions.subscribed = 1
       AND mail_job_queue.email = mail_user_subscriptions.user_email
-    WHERE mail_job_queue.mail_batch_id = ?
-    AND  mail_job_queue.mail_template_id = ?
-
+    WHERE mail_job_queue.mail_batch_id = $batch->id
+    AND  mail_job_queue.mail_template_id = $row->mail_template_id
   ) t1
-
-);
+)
+LIMIT $limit;
 SQL;
-            $this->getDatabase()->query($sql, $batch->id, $row->mail_template_id, $batch->id, $row->mail_template_id);
+            while ($ids = $this->getDatabase()->query($sql)->fetchPairs(null, 'id')) {
+                $this->deleteAllByIds($ids);
+            }
         }
     }
 
-    public function removeOtherVariants(ActiveRow $batch, int $variantId): void
+    public function removeOtherVariants(ActiveRow $batch, int $variantId, int $limit = 10000): void
     {
         $sql = <<<SQL
-
-DELETE FROM mail_job_queue
+SELECT id FROM mail_job_queue
 WHERE mail_job_queue.id IN (
 
   SELECT * FROM (
@@ -116,30 +149,43 @@ WHERE mail_job_queue.id IN (
         )
   ) t1
 )
+LIMIT $limit
 SQL;
 
-        $this->getDatabase()->query($sql);
+        while ($ids = $this->getDatabase()->query($sql)->fetchPairs(null, 'id')) {
+            $this->deleteAllByIds($ids);
+        }
     }
 
-    public function removeAlreadySentContext(ActiveRow $batch, string $context): void
+    public function removeAlreadySentContext(ActiveRow $batch, string $context, int $limit = 10000): void
     {
         $sql = <<<SQL
-DELETE q.*
-  FROM mail_job_queue q JOIN mail_logs ml ON q.mail_batch_id = ? AND q.email = ml.email AND ml.context = ?
+SELECT q.id
+  FROM mail_job_queue q
+      JOIN mail_logs ml ON q.mail_batch_id = ? AND q.email = ml.email AND ml.context = ?
+LIMIT $limit
 SQL;
-        $this->getDatabase()->query($sql, $batch->id, $context);
 
-        $query = "DELETE mjq1.* 
-            FROM mail_job_queue mjq1 
-            INNER JOIN mail_job_queue mjq2 ON mjq1.email = mjq2.email AND 
-              mjq2.context = mjq1.context AND 
-              mjq2.mail_batch_id != {$batch->id}
-            WHERE mjq1.mail_batch_id = {$batch->id}";
+        while ($ids = $this->getDatabase()->query($sql, $batch->id, $context)->fetchPairs(null, 'id')) {
+            $this->deleteAllByIds($ids);
+        }
 
-        $this->getDatabase()->query($query);
+        $sql = <<<SQL
+SELECT mjq1.id 
+    FROM mail_job_queue mjq1 
+    INNER JOIN mail_job_queue mjq2 ON mjq1.email = mjq2.email AND 
+      mjq2.context = mjq1.context AND 
+      mjq2.mail_batch_id != {$batch->id}
+    WHERE mjq1.mail_batch_id = {$batch->id}
+LIMIT $limit
+SQL;
+
+        while ($ids = $this->getDatabase()->query($sql)->fetchPairs(null, 'id')) {
+            $this->deleteAllByIds($ids);
+        }
     }
 
-    public function getBatchEmails(ActiveRow $mailBatch, int $lastId, $count = null): Selection
+    public function getBatchEmails(ActiveRow $mailBatch, int $lastId = 0, $count = null): Selection
     {
         $selection = $this->getTable()->where(['id > ?' => $lastId, 'mail_batch_id' => $mailBatch->id])->order('id ASC');
         if ($count !== null) {
@@ -175,6 +221,20 @@ SQL;
 
         return $this->getTable()->where([
             'email' => $emails
+        ])->delete();
+    }
+
+    /**
+     * @param array<int> $ids
+     */
+    public function deleteAllByIds(array $ids): int
+    {
+        if (count($ids) === 0) {
+            return 0;
+        }
+
+        return $this->getTable()->where([
+            'id' => $ids
         ])->delete();
     }
 }

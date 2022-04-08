@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added support for `greybox` tag in generators. remp/remp#1060
 - Added `List-Unsubscribe` header to outgoing emails. remp/remp#813 
+- Changed batch email generator filter strategy. remp/remp#1086
+  - Split complex `DELETE` queries in filter job queue functions into two step queries: `SELECT` array of ids to remove and simple `DELETE` query. In this way we want to prevent from potential deadlock that may occur in complex `DELETE` queries.
 
 ## [0.31.0] - 2022-03-14
 
