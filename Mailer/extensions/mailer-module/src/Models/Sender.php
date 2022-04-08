@@ -348,7 +348,7 @@ class Sender
         // intentional string type-case, integer would be ignored
         $message->setHeader('X-Mailer-Click-Tracking', (string) $this->template->click_tracking);
 
-        if (isset($templateParams['unsubscribe'])) {
+        if (isset($templateParams['unsubscribe']) && !$this->template->mail_type->locked) {
             $message->setHeader('List-Unsubscribe', '<' . $templateParams['unsubscribe'] . '>');
         }
     }
