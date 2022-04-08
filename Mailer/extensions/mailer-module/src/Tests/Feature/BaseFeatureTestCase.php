@@ -150,10 +150,10 @@ SET FOREIGN_KEY_CHECKS=1;
         return $batch;
     }
 
-    protected function createJobAndBatch($template, $mailTypeVariant = null, $context = null)
+    protected function createJobAndBatch($template, $mailTypeVariant = null, $context = null, $maxEmailsCount = null)
     {
         $mailJob = $this->createJob($context, $mailTypeVariant);
-        return $this->createBatch($mailJob, $template);
+        return $this->createBatch($mailJob, $template, $maxEmailsCount);
     }
 
     protected function createTemplate($layout, $mailType, $code = null)

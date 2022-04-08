@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Mails;
 
+use Nette\Utils\DateTime;
 use Remp\MailerModule\Models\Beam\UnreadArticlesResolver;
 use Remp\MailerModule\Models\Job\MailCache;
 use Remp\MailerModule\Models\Segment\Aggregator;
@@ -48,6 +49,51 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         return $userList;
     }
 
+    public function testFilteringUnsubscribed()
+    {
+        // Prepare data
+        $mailType = $this->createMailTypeWithCategory();
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+        $batch = $this->createJobAndBatch($template);
+
+        $userList = $this->generateUsers(100);
+
+        $userProvider = $this->createMock(IUser::class);
+        $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
+            if ($page === 1) {
+                return array_intersect_key($userList, array_flip($ids));
+            }
+
+            return [];
+        });
+
+        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+            'users' => array_keys($userList)
+        ]);
+
+        $subscribedUserKeys = array_rand($userList, 6);
+        foreach ($subscribedUserKeys as $key) {
+            $this->subscribeUsers($mailType, [$userList[$key]]);
+        }
+
+        // Test generator
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        $userMap = [];
+
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        // keep only subscribed users
+        $this->assertEquals(6, $this->jobQueueCount($batch, $template));
+
+        $expectedUsers = $this->getUserEmailsByKeys($userList, $subscribedUserKeys);
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing($expectedUsers, $actualUsers);
+    }
+
     public function testFilteringOtherVariants()
     {
         // Prepare data
@@ -59,22 +105,36 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $template = $this->createTemplate($layout, $mailType);
         $batch = $this->createJobAndBatch($template, $mailTypeVariant1);
 
-        $userList = $this->generateUsers(4);
+        $userList = $this->generateUsers(100);
 
         $userProvider = $this->createMock(IUser::class);
-        $userProvider->method('list')->will($this->onConsecutiveCalls($userList, []));
+        $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
+            if ($page === 1) {
+                return array_intersect_key($userList, array_flip($ids));
+            }
+
+            return [];
+        });
 
         $aggregator = $this->createConfiguredMock(Aggregator::class, [
             'users' => array_keys($userList)
         ]);
 
+        $mailVariantUserKeys = [];
         // Split user subscription into two variants
         foreach ($userList as $i => $item) {
+            if ($i % 2) {
+                $mailVariantUserKeys[] = $i;
+                $variantId = $mailTypeVariant1->id;
+            } else {
+                $variantId = $mailTypeVariant2->id;
+            }
+
             $this->userSubscriptionsRepository->subscribeUser(
                 $mailType,
                 $item['id'],
                 $item['email'],
-                $i % 2 === 0 ? $mailTypeVariant1->id : $mailTypeVariant2->id
+                $variantId
             );
         }
 
@@ -86,7 +146,227 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $generator->insertUsersIntoJobQueue($batch, $userMap);
         $generator->filterQueue($batch);
 
-        $this->assertEquals(2, $this->jobQueueRepository->totalCount());
+        $this->assertEquals(50, $this->jobQueueCount($batch, $template));
+
+        $expectedUsers = $this->getUserEmailsByKeys($userList, $mailVariantUserKeys);
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing($expectedUsers, $actualUsers);
+    }
+
+    public function testFilteringAlreadySentContext()
+    {
+        // Prepare data
+        $mailType = $this->createMailTypeWithCategory();
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+        $context = 'context';
+        $batch = $this->createJobAndBatch($template, null, $context);
+
+        $userList = $this->generateUsers(100);
+
+        $userProvider = $this->createMock(IUser::class);
+        $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
+            if ($page === 1) {
+                return array_intersect_key($userList, array_flip($ids));
+            }
+
+            return [];
+        });
+
+        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+            'users' => array_keys($userList)
+        ]);
+
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        // subscribe users
+        $this->subscribeUsers($mailType, $userList);
+
+        // Simulate some users have already received the same email (create mail_logs entries with same context)
+        foreach (array_rand($userList, 7) as $key) {
+            $this->mailLogsRepository->add(
+                $userList[$key]['email'],
+                $template->subject,
+                $template->id,
+                $batch->mail_job_id,
+                $batch->id,
+                null,
+                null,
+                $context
+            );
+            unset($userList[$key]);
+        }
+
+        // Simulate already queued in another batch with same context
+        $anotherBatch = $this->createBatch($batch->job, $template);
+        $insert = [];
+        foreach (array_rand($userList, 10) as $key) {
+            $user = $userList[$key];
+            $insert[] = [
+                'batch' => $anotherBatch->id,
+                'templateId' => $template->id,
+                'email' => $user['email'],
+                'sorting' => mt_rand(),
+                'context' => $anotherBatch->mail_job->context,
+            ];
+            unset($userList[$key]);
+        }
+        $this->jobQueueRepository->multiInsert($insert);
+
+        $userMap = [];
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        $this->assertEquals(83, $this->jobQueueCount($batch, $template));
+
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing(array_map(fn($user) => $user['email'], $userList), $actualUsers);
+    }
+
+    public function testFilteringAlreadyQueued()
+    {
+        // Prepare data
+        $mailType = $this->createMailTypeWithCategory();
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+        $batch = $this->createJobAndBatch($template);
+
+        $userList = $this->generateUsers(100);
+
+        $userProvider = $this->createMock(IUser::class);
+        $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
+            if ($page === 1) {
+                return array_intersect_key($userList, array_flip($ids));
+            }
+
+            return [];
+        });
+
+        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+            'users' => array_keys($userList)
+        ]);
+
+        // subscribe users
+        $this->subscribeUsers($mailType, $userList);
+
+        $anotherBatch = $this->createBatch($batch->job, $template);
+        $insert = [];
+        foreach (array_rand($userList, 15) as $key) {
+            $user = $userList[$key];
+            $insert[] = [
+                'batch' => $anotherBatch->id,
+                'templateId' => $template->id,
+                'email' => $user['email'],
+                'sorting' => mt_rand(),
+                'context' => null,
+            ];
+            unset($userList[$key]);
+        }
+        $this->jobQueueRepository->multiInsert($insert);
+
+        // Test generator
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        $userMap = [];
+
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        $this->assertEquals(85, $this->jobQueueCount($batch, $template));
+
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing(array_map(fn($user) => $user['email'], $userList), $actualUsers);
+    }
+
+    public function testFilteringAlreadySent()
+    {
+        // Prepare data
+        $mailType = $this->createMailTypeWithCategory();
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+        $batch = $this->createJobAndBatch($template);
+
+        $userList = $this->generateUsers(100);
+
+        $userProvider = $this->createMock(IUser::class);
+        $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
+            if ($page === 1) {
+                return array_intersect_key($userList, array_flip($ids));
+            }
+
+            return [];
+        });
+
+        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+            'users' => array_keys($userList)
+        ]);
+
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        // subscribe users
+        $this->subscribeUsers($mailType, $userList);
+
+        // Simulate some users have already received the same email (create mail_logs entries)
+        foreach (array_rand($userList, 7) as $key) {
+            $user = $userList[$key];
+            $this->mailLogsRepository->add(
+                $user['email'],
+                $template->subject,
+                $template->id,
+                $batch->mail_job_id,
+                $batch->id,
+            );
+            unset($userList[$key]);
+        }
+
+        $userMap = [];
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        $this->assertEquals(93, $this->jobQueueCount($batch, $template));
+
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing(array_map(fn($user) => $user['email'], $userList), $actualUsers);
+    }
+
+    public function testFilteringStripEmails()
+    {
+        // Prepare data
+        $mailType = $this->createMailTypeWithCategory();
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+        $batch = $this->createJobAndBatch($template, null, null, 35);
+
+        $userList = $this->generateUsers(100);
+
+        $userProvider = $this->createMock(IUser::class);
+        $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
+            if ($page === 1) {
+                return array_intersect_key($userList, array_flip($ids));
+            }
+
+            return [];
+        });
+
+        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+            'users' => array_keys($userList)
+        ]);
+
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        // subscribe users
+        $this->subscribeUsers($mailType, $userList);
+
+        $userMap = [];
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        // max emails count set on batch
+        $this->assertEquals(35, $this->jobQueueCount($batch, $template));
     }
 
     public function testFiltering2()
@@ -131,6 +411,9 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         // Filter those that won't be sent
         $generator1->filterQueue($batch1);
         $this->assertEquals(count($subscribedUsers1), $this->jobQueueCount($batch1, $template1));
+
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch1)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing(array_map(fn($user) => $user['email'], $subscribedUsers1), $actualUsers);
 
 
         ////////////
@@ -187,5 +470,33 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             'mail_batch_id' => $batch->id,
             'mail_template_id' => $template->id,
         ])->count('*');
+    }
+
+    private function subscribeUsers($mailType, $users): void
+    {
+        foreach (array_chunk($users, 1000, true) as $usersChunk) {
+            $insert = [];
+            foreach ($usersChunk as $user) {
+                $insert[] = [
+                    'user_id' => $user['id'],
+                    'user_email' => $user['email'],
+                    'mail_type_id' => $mailType->id,
+                    'created_at' => new DateTime(),
+                    'updated_at' => new DateTime(),
+                    'subscribed' => true,
+                ];
+            }
+            $this->database->query("INSERT INTO mail_user_subscriptions", $insert);
+        }
+    }
+
+    private function getUserEmailsByKeys($users, $keys): array
+    {
+        $result = [];
+        foreach ($keys as $key) {
+            $result[] = $users[$key]['email'];
+        }
+
+        return $result;
     }
 }
