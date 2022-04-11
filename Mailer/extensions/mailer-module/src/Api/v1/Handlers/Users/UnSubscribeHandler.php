@@ -68,15 +68,17 @@ class UnSubscribeHandler extends BaseHandler
             return new JsonApiResponse($e->getCode(), ['status' => 'error', 'message' => $e->getMessage()]);
         }
 
+        $sendGoodbyeEmail = $payload['send_accompanying_emails'] ?? true;
+
         if ($variant) {
             $userSubscription = $this->userSubscriptionsRepository->getUserSubscription($list, $payload['user_id'], $payload['email']);
             if (!$userSubscription) {
                 return new JsonApiResponse(200, ['status' => 'ok']);
             }
 
-            $this->userSubscriptionsRepository->unsubscribeUserVariant($userSubscription, $variant, $this->getRtmParams($payload));
+            $this->userSubscriptionsRepository->unsubscribeUserVariant($userSubscription, $variant, $this->getRtmParams($payload), $sendGoodbyeEmail);
         } else {
-            $this->userSubscriptionsRepository->unsubscribeUser($list, $payload['user_id'], $payload['email'], $this->getRtmParams($payload));
+            $this->userSubscriptionsRepository->unsubscribeUser($list, $payload['user_id'], $payload['email'], $this->getRtmParams($payload), $sendGoodbyeEmail);
         }
 
         return new JsonApiResponse(200, ['status' => 'ok']);

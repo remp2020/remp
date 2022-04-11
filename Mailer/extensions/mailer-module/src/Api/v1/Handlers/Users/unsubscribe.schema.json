@@ -8,13 +8,15 @@
     "user_id": 1,
     "email": "test@test.com",
     "list_id": 1,
-    "variant_id": 1
+    "variant_id": 1,
+    "send_accompanying_emails": true
   },
   {
     "user_id": 1,
     "email": "test@test.com",
     "list_code": "123",
-    "variant_id": null
+    "variant_id": null,
+    "send_accompanying_emails": true
   }],
   "required": [
     "email",
@@ -50,6 +52,9 @@
         {"type": "string"},
         {"type": "null"}
       ]
+    },
+    "send_accompanying_emails": {
+      "type": "boolean"
     },
     "utm_params": {
       "title": "Utm params",

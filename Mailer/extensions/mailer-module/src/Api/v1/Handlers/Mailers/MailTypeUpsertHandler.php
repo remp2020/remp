@@ -88,6 +88,33 @@ class MailTypeUpsertHandler extends BaseHandler
             unset($data['subscribe_mail_template_code']);
         }
 
+        if (array_key_exists('unsubscribe_mail_template_code', $data)) {
+            if ($data['unsubscribe_mail_template_code'] !== null) {
+                $template = $this->templatesRepository->getByCode($data['unsubscribe_mail_template_code']);
+
+                if (!$template) {
+                    return new JsonApiResponse(404, [
+                        'status' => 'error',
+                        'code' => 'unsubscribe_template_not_found',
+                        'message' => 'No template found for provided unsubscribe_mail_template_code: ' . $data['unsubscribe_mail_template_code'],
+                    ]);
+                }
+                if ($template->mail_type->mail_type_category->code !== 'system') {
+                    return new JsonApiResponse(400, [
+                        'status' => 'error',
+                        'code' => 'unsubscribe_template_not_allowed',
+                        'message' => 'Unsubscribe_mail_template_id must belong under one of the system category newsletters: ' . $template->mail_type->mail_type_category->code,
+                    ]);
+                }
+
+                $data['unsubscribe_mail_template_id'] = $template->id;
+            } else {
+                $data['unsubscribe_mail_template_id'] = null;
+            }
+
+            unset($data['unsubscribe_mail_template_code']);
+        }
+
         try {
             $list = $this->getList($data);
             if ($list) {
@@ -131,6 +158,7 @@ class MailTypeUpsertHandler extends BaseHandler
                 'is_multi_variant' => (bool) $list->is_multi_variant,
                 'default_variant_id' => $list->default_variant_id,
                 'subscribe_mail_template_code' => $list->subscribe_mail_template->code ?? null,
+                'unsubscribe_mail_template_code' => $list->unsubscribe_mail_template->code ?? null,
             ],
         ]);
     }

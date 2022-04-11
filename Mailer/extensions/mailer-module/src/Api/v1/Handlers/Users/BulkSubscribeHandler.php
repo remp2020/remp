@@ -74,7 +74,7 @@ class BulkSubscribeHandler extends SubscribeHandler
             } else {
                 // if email doesn't exist, no need to unsubscribe
                 if (!empty($this->userSubscriptionsRepository->findByEmail($user['email']))) {
-                    $this->userSubscriptionsRepository->unsubscribeUser($user['list'], $user['user_id'], $user['email'], $rtmParams);
+                    $this->userSubscriptionsRepository->unsubscribeUser($user['list'], $user['user_id'], $user['email'], $rtmParams, $user['send_accompanying_emails']);
                 }
             }
         }

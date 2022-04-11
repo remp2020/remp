@@ -49,6 +49,14 @@
             </div>
 
             <div class="form-group fg-float m-b-30">
+                {label unsubscribe_mail_template_id}
+                {input unsubscribe_mail_template_id, class => 'selectpicker', data-live-search => 'true', data-live-search-normalize => 'true'}
+                <small class="help-block">
+                    Email sent to the users when they unsubscribe from the newsletter. You can only select emails belonging to the <em>system</em> newsletter lists.
+                </small>
+            </div>
+
+            <div class="form-group fg-float m-b-30">
                 {label mailer_alias}
                 {input mailer_alias, class => 'selectpicker', data-live-search => 'true', data-live-search-normalize => 'true'}
                 <small class="help-block">
