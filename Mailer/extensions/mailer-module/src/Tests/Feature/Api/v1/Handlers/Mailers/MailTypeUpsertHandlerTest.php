@@ -32,6 +32,8 @@ class MailTypeUpsertHandlerTest extends BaseApiHandlerTestCase
         $testedMailType = $this->createMailTypeWithCategory('newsletters', 'editorial');
         $welcomeEmail1 = $this->createTemplate($layout, $systemMailType);
         $welcomeEmail2 = $this->createTemplate($layout, $systemMailType);
+        $goodbyeEmail1 = $this->createTemplate($layout, $systemMailType);
+        $goodbyeEmail2 = $this->createTemplate($layout, $systemMailType);
 
         // assign "subscribe" email
         $response = $this->request([
@@ -67,6 +69,41 @@ class MailTypeUpsertHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals(200, $response->getCode());
         $testedMailType = $this->listsRepository->find($testedMailType->id);
         $this->assertNull($testedMailType->subscribe_mail_template_id);
+
+        // assign "unsubscribe" email
+        $response = $this->request([
+            'code' => $testedMailType->code,
+            'unsubscribe_mail_template_code' => $goodbyeEmail1->code,
+        ]);
+        $this->assertEquals(200, $response->getCode());
+        $testedMailType = $this->listsRepository->find($testedMailType->id);
+        $this->assertEquals($goodbyeEmail1->id, $testedMailType->unsubscribe_mail_template_id);
+
+        // change "unsubscribe" email
+        $response = $this->request([
+            'code' => $testedMailType->code,
+            'unsubscribe_mail_template_code' => $goodbyeEmail2->code,
+        ]);
+        $this->assertEquals(200, $response->getCode());
+        $testedMailType = $this->listsRepository->find($testedMailType->id);
+        $this->assertEquals($goodbyeEmail2->id, $testedMailType->unsubscribe_mail_template_id);
+
+        // try to change "unsubscribe" email to nonexisting mail
+        $response = $this->request([
+            'code' => $testedMailType->code,
+            'unsubscribe_mail_template_code' => 'foo',
+        ]);
+        $this->assertEquals(404, $response->getCode());
+        $this->assertEquals('unsubscribe_template_not_found', $response->getPayload()['code']);
+
+        // unassign unsubscribe email
+        $response = $this->request([
+            'code' => $testedMailType->code,
+            'unsubscribe_mail_template_code' => null,
+        ]);
+        $this->assertEquals(200, $response->getCode());
+        $testedMailType = $this->listsRepository->find($testedMailType->id);
+        $this->assertNull($testedMailType->unsubscribe_mail_template_id);
     }
 
     public function testMailTypeSubscribeTemplateManipulation()

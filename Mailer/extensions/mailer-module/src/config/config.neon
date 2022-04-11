@@ -96,6 +96,7 @@ services:
 			- add('send-email', Remp\MailerModule\Hermes\SendEmailHandler())
 #			- add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
 			- add('user-subscribed', Remp\MailerModule\Hermes\SubscribeHandler())
+			- add('user-unsubscribed', Remp\MailerModule\Hermes\UnsubscribeHandler())
 
 	eventDispatcher:
 		factory: League\Event\EventDispatcher

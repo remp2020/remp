@@ -85,6 +85,7 @@
                     <li class="list-group-item"><strong>Locked:</strong> {$list->locked|yesNo}</li>
                     <li class="list-group-item"><strong>Publicly listed:</strong> {$list->public_listing|yesNo}</li>
                     <li class="list-group-item"><strong>Welcome e-mail:</strong> {ifset $list->subscribe_mail_template} <a n:href="Template:Show $list->subscribe_mail_template_id">{$list->subscribe_mail_template->subject}</a>{else}No{/ifset}</li>
+                    <li class="list-group-item"><strong>Goodbye e-mail:</strong> {ifset $list->unsubscribe_mail_template} <a n:href="Template:Show $list->unsubscribe_mail_template_id">{$list->unsubscribe_mail_template->subject}</a>{else}No{/ifset}</li>
                 </ul>
             </div>
         </div>

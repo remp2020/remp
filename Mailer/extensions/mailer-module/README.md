@@ -1228,7 +1228,7 @@ Please visit `/list/new` to create a newsletter via web admin.
   // optional
   "variant_id": 123, // Integer; ID of the newsletter variant to subscribe
   "variant_code": "author.123", // String; Code of the newsletter variant to subscribe
-  "send_accompanying_emails": true // Boolean; Whether to send welcome email to the subscribed user. Defaults to TRUE.
+  "send_accompanying_emails": true // Boolean; Whether to send welcome or goodbye email to the subscribed/unsubscribed user. Defaults to TRUE.
 }
 ```
 
@@ -1388,7 +1388,7 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
         "utm_content": "26026"
       },
       // optional
-      "send_accompanying_emails": true // Boolean; Flag whether to send welcome or goodbye (not implemented yet) email to the user whom subscription is being changed. Defaults to TRUE.
+      "send_accompanying_emails": true // Boolean; Flag whether to send welcome or goodbye email to the user whom subscription is being changed. Defaults to TRUE.
     }
   //...
   ]
@@ -1407,7 +1407,7 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
 | variant_id               | *Integer*                                             | no                               | Optional ID of variant.                                                                                                                    |
 | rtm_params               | *Object*                                              | no                               | Optional RTM parameters for pairing which email caused the user to unsubscribe.                                                            |
 | utm_params               | *Object*                                              | no                               | (Deprecated) UTM parameters are deprecated, but if no RTM paramters are found, system will try to use these.                               |
-| send_accompanying_emails | *Boolean*                                             | no                               | Whether or not to send welcome or goodbye(not implemented yet) email to the user whom subscription is being changed. Defaults to **TRUE**. |
+| send_accompanying_emails | *Boolean*                                             | no                               | Whether or not to send welcome or goodbye email to the user whom subscription is being changed. Defaults to **TRUE**. |
 
 
 ##### *Example:*
@@ -1936,6 +1936,7 @@ Field `id` has higher precedence in finding the existing record.
     "preview_url": "http://example.com/demo.html", // String, optional; URL of example newsletter to preview content to users.
     "page_url": "http://example.com/page.html", // String, optional; URL of newsletter title page with description and editions.
     "subscribe_mail_template_code": "generic_newsletter_welcome", // String, optional; Reference to mail template that should be sent to the user as welcome email right after the subscription to the newsletter. Only system emails are supported.
+    "unsubscribe_mail_template_code": "generic_newsletter_goodbye", // String, optional; Reference to mail template that should be sent to the user as goodbye email right after the unsubscribing from the newsletter. Only system emails are supported.
 }
 ```
 
@@ -1980,7 +1981,8 @@ Response:
         "updated_at": "2019-06-27T14:08:36+02:00",
         "is_multi_variant": false,
         "default_variant_id": null,
-        "subscribe_mail_template_code": null
+        "subscribe_mail_template_code": null,
+        "unsubscribe_mail_template_code": null
     }
 }
 ```

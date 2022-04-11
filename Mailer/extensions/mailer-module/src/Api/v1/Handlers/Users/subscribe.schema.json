@@ -8,7 +8,7 @@
     "email": "test@test.com",
     "list_id": 1,
     "variant_id": 1,
-    "send_welcome_email": true
+    "send_accompanying_emails": true
   },
     {
       "user_id": 1,

@@ -20,6 +20,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `List-Unsubscribe` header to outgoing emails. remp/remp#813 
 - Changed batch email generator filter strategy. remp/remp#1086
   - Split complex `DELETE` queries in filter job queue functions into two step queries: `SELECT` array of ids to remove and simple `DELETE` query. In this way we want to prevent from potential deadlock that may occur in complex `DELETE` queries.
+- Added support for configuration of goodbye email for unsubscribed users. remp/remp#1063
+  - Added `unsubscribe_mail_template_id` into the `mail_types` table.
+  - Added `unsubscribe_mail_template_code` parameter to the `/api/v1/mailers/mail-type-upsert` API to configure the welcome email.
+  - Added new field for the subscription goodbye email in the newsletter edit/create form that provides system emails for selection.
+  - Changed signature of `UserSubscriptionsRepository::unsubscribeUser()` and `UserSubscriptionsRepository::unsubscribeUserVariant()` - new `$sendGoodbyeEmail` argument was added.
+- Added new emit of `user-unsubscribed` hermes event when user unsubscribes from the newsletter. remp/remp#1063
 
 ## [0.31.0] - 2022-03-14
 

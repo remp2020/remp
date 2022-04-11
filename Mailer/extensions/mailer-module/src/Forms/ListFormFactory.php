@@ -72,6 +72,12 @@ class ListFormFactory
             $systemEmails
         )->setPrompt('None');
 
+        $form->addSelect(
+            'unsubscribe_mail_template_id',
+            'Unsubscribe goodbye email',
+            $systemEmails
+        )->setPrompt('None');
+
         $form->addText('priority', 'Priority')
             ->addRule(Form::INTEGER, "Priority needs to be a number")
             ->setRequired("Field 'Priority' is required.");
@@ -249,7 +255,8 @@ class ListFormFactory
                 $values['image_url'],
                 $values['public_listing'],
                 $values['mail_from'],
-                $values['subscribe_mail_template_id']
+                $values['subscribe_mail_template_id'],
+                $values['unsubscribe_mail_template_id'],
             );
             ($this->onCreate)($row);
         }
