@@ -341,7 +341,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $template = $this->createTemplate($layout, $mailType);
         $batch = $this->createJobAndBatch($template, null, null, 35);
 
-        $userList = $this->generateUsers(100);
+        $userList = $this->generateUsers(50000);
 
         $userProvider = $this->createMock(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {

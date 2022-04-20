@@ -57,6 +57,7 @@ SQL;
         while ($remove > $limit) {
             $ids = $this->getDatabase()->query($sql, $limit)->fetchPairs(null, 'id');
             $this->deleteAllByIds($ids);
+            $remove -= $limit;
         }
 
         $ids = $this->getDatabase()->query($sql, $remove)->fetchPairs(null, 'id');
