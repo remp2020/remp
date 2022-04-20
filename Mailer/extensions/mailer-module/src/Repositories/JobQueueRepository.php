@@ -196,6 +196,11 @@ SQL;
         return $selection;
     }
 
+    public function getBatchUsersCount(ActiveRow $mailBatch): int
+    {
+        return $this->getTable()->where(['mail_batch_id' => $mailBatch->id])->count('*');
+    }
+
     public function getJob(string $email, int $batchId): ?ActiveRow
     {
         return $this->getTable()->where(['email' => $email, 'mail_batch_id' => $batchId])->limit(1)->fetch();

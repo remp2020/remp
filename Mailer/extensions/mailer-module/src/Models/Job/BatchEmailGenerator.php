@@ -129,21 +129,27 @@ class BatchEmailGenerator
 
         $this->logger->info('Removing unsubscribed', ['batchId' => $batch->id]);
         $this->mailJobQueueRepository->removeUnsubscribed($batch, $this->deleteLimit);
+        $this->logger->info('Users left in queue: ' . $this->mailJobQueueRepository->getBatchUsersCount($batch), ['batchId' => $batch->id]);
         if ($job->mail_type_variant_id) {
             $this->logger->info('Removing other variants', ['batchId' => $batch->id]);
             $this->mailJobQueueRepository->removeOtherVariants($batch, $job->mail_type_variant_id, $this->deleteLimit);
+            $this->logger->info('Users left in queue: ' . $this->mailJobQueueRepository->getBatchUsersCount($batch), ['batchId' => $batch->id]);
         }
         if ($job->context) {
             $this->logger->info('Removing already sent context', ['batchId' => $batch->id]);
             $this->mailJobQueueRepository->removeAlreadySentContext($batch, $job->context, $this->deleteLimit);
+            $this->logger->info('Users left in queue: ' . $this->mailJobQueueRepository->getBatchUsersCount($batch), ['batchId' => $batch->id]);
         }
         $this->logger->info('Removing already queued in other job batch', ['batchId' => $batch->id]);
         $this->mailJobQueueRepository->removeAlreadyQueued($batch, $this->deleteLimit);
+        $this->logger->info('Users left in queue: ' . $this->mailJobQueueRepository->getBatchUsersCount($batch), ['batchId' => $batch->id]);
         $this->logger->info('Removing already sent template', ['batchId' => $batch->id]);
         $this->mailJobQueueRepository->removeAlreadySent($batch, $this->deleteLimit);
+        $this->logger->info('Users left in queue: ' . $this->mailJobQueueRepository->getBatchUsersCount($batch), ['batchId' => $batch->id]);
         if ($batch->max_emails) {
             $this->logger->info('Removing emails above configured count', ['batchId' => $batch->id]);
             $this->mailJobQueueRepository->stripEmails($batch, $batch->max_emails, $this->deleteLimit);
+            $this->logger->info('Users left in queue: ' . $this->mailJobQueueRepository->getBatchUsersCount($batch), ['batchId' => $batch->id]);
         }
 
         // Count remaining users
