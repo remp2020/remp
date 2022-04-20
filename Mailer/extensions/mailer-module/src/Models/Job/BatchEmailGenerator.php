@@ -126,6 +126,7 @@ class BatchEmailGenerator
     protected function filterQueue($batch): array
     {
         $job = $batch->job;
+        $this->logger->info('Users in queue before filter: ' . $this->mailJobQueueRepository->getBatchUsersCount($batch), ['batchId' => $batch->id]);
 
         $this->logger->info('Removing unsubscribed', ['batchId' => $batch->id]);
         $this->mailJobQueueRepository->removeUnsubscribed($batch, $this->deleteLimit);
