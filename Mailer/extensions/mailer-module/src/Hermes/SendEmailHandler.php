@@ -6,11 +6,14 @@ namespace Remp\MailerModule\Hermes;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Models\Sender;
 use Tomaj\Hermes\Handler\HandlerInterface;
+use Tomaj\Hermes\Handler\RetryTrait;
 use Tomaj\Hermes\MessageInterface;
 use Tracy\Debugger;
 
 class SendEmailHandler implements HandlerInterface
 {
+    use RetryTrait;
+
     private $templatesRepository;
 
     private $sender;
