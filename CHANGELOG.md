@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Added new field for the subscription goodbye email in the newsletter edit/create form that provides system emails for selection.
   - Changed signature of `UserSubscriptionsRepository::unsubscribeUser()` and `UserSubscriptionsRepository::unsubscribeUserVariant()` - new `$sendGoodbyeEmail` argument was added.
 - Added new emit of `user-unsubscribed` hermes event when user unsubscribes from the newsletter. remp/remp#1063
+- Added retry ability to the hermes handler sending one-time emails. remp/remp#935
+  - Until now, if there was an error during sending (Mailgun was unavailable, network was down), Mailer didn't try to send the email again.
 
 ## [0.31.0] - 2022-03-14
 
