@@ -71,7 +71,7 @@
                                 </tr>
                             </thead>
                             <tbody name="table-row" is="transition-group">
-                                <tr v-for="article in articles" v-bind:key="article.external_article_id">
+                                <tr v-for="article in articles" v-bind:key="article.landing_page ? article.title : article.external_article_id">
                                     <td style="text-align: right"><span class="concurrents-count">
                                             <animated-integer :value="article.count"></animated-integer>
                                         </span>

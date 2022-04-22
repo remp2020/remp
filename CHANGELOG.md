@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed IOTA issue with reading progress not being loaded on non-article pages. remp/remp#1096
+- Fixed dashboard refresh issue if multiple landing pages were present on the dashboard. remp/remp#1112
 
 ### [Campaign]
 
