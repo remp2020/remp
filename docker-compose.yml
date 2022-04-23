@@ -25,7 +25,7 @@ services:
     command: /bin/bash -c "envsubst '$$NGINX_PORT' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
 
   mysql:
-    image: "mysql:5.7" # minimal 5.7.8
+    image: "mysql:8.0"
     volumes:
       - "mysql-data:/var/lib/mysql"
       - "./Docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql"
@@ -40,7 +40,7 @@ services:
     restart: "unless-stopped"
 
   redis:
-    image: "redis:3.2"
+    image: "redis:6.2"
     volumes:
       - "redis-data:/data"
 
@@ -175,7 +175,7 @@ services:
       - "elastic-data:/usr/share/elasticsearch/data"
 
   kibana:
-    image: "docker.elastic.co/kibana/kibana:7.17.0"
+    image: "docker.elastic.co/kibana/kibana:7.17.3"
 
   beam_tracker:
     build: "./Beam/go/cmd/tracker"
