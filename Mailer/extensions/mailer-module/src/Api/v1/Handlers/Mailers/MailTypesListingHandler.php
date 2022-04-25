@@ -27,7 +27,7 @@ class MailTypesListingHandler extends BaseHandler
     public function params(): array
     {
         return [
-            new GetInputParam('code'),
+            (new GetInputParam('code'))->setMulti(),
             new GetInputParam('public_listing'),
         ];
     }

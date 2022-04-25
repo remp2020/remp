@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Until now, if there was an error during sending (Mailgun was unavailable, network was down), Mailer didn't try to send the email again.
 - Fixed bug in `/api/v1/users/is-unsubscribed` response generation, altering response schema. remp/crm#1100
   - The endpoint never correctly generated the response, and it needed to be altered to be valid JSON. Since the endpoint never worked correctly, we mark this as bugfix and not a breaking change.
+- Changed `/api/v1/mailers/mail-types` API to allow multiple `code` params to be specified as a filter. remp/crm#2387
 
 ## [0.31.0] - 2022-03-14
 
