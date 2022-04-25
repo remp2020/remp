@@ -4,12 +4,11 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
 use Nette\Http\Response;
+use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
-use Remp\MailerModule\Api\JsonValidationTrait;
 use Tomaj\NetteApi\Response\ResponseInterface;
 
 class IsUnsubscribedHandler extends BaseHandler
@@ -43,6 +42,8 @@ class IsUnsubscribedHandler extends BaseHandler
 
         $userUnsubscribed = $this->userSubscriptionsRepository->isUserUnsubscribed($payload['user_id'], $payload['list_id']);
         $emailUnsubscribed = $this->userSubscriptionsRepository->isEmailUnsubscribed($payload['email'], $payload['list_id']);
-        return new JsonApiResponse(Response::S200_OK, $userUnsubscribed && $emailUnsubscribed);
+        return new JsonApiResponse(Response::S200_OK, [
+            'is_unsubscribed' => $userUnsubscribed && $emailUnsubscribed,
+        ]);
     }
 }
