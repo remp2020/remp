@@ -296,7 +296,7 @@ class Sender
 
         $attachmentSize = $this->setMessageAttachments($message);
 
-        $this->setMessageHeaders($message, '%recipient.mail_sender_id%', $templateParams);
+        $this->setMessageHeaders($message, '%recipient.mail_sender_id%', $templateParams, true);
 
         $insertLogsData = [];
         foreach ($templateParams as $email => $params) {
@@ -334,8 +334,23 @@ class Sender
         return $attachmentSize;
     }
 
-    private function setMessageHeaders(Message $message, $mailSenderId, ?array $templateParams): void
+    private function setMessageHeaders(Message $message, $mailSenderId, ?array $templateParams, bool $isBatch = false): void
     {
+        if (!$this->template->mail_type->locked) {
+            if ($isBatch) {
+                $message->setHeader('List-Unsubscribe', '%recipient.list_unsubscribe%');
+                foreach ($templateParams as $key => $variables) {
+                    if (isset($variables['unsubscribe'])) {
+                        $templateParams[$key]['list_unsubscribe'] = "<{$variables['unsubscribe']}>";
+                    }
+                }
+            } else {
+                if (isset($templateParams['unsubscribe'])) {
+                    $message->setHeader('List-Unsubscribe', "<{$templateParams['unsubscribe']}>");
+                }
+            }
+        }
+
         $message->setHeader('X-Mailer-Variables', Json::encode([
             'template' => $this->template->code,
             'job_id' => $this->jobId,
@@ -347,10 +362,6 @@ class Sender
         $message->setHeader('X-Mailer-Template-Params', Json::encode($templateParams));
         // intentional string type-case, integer would be ignored
         $message->setHeader('X-Mailer-Click-Tracking', (string) $this->template->click_tracking);
-
-        if (isset($templateParams['unsubscribe']) && !$this->template->mail_type->locked) {
-            $message->setHeader('List-Unsubscribe', '<' . $templateParams['unsubscribe'] . '>');
-        }
     }
 
     /**
