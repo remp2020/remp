@@ -1130,7 +1130,9 @@ curl -X POST \
 Response:
 
 ```json5
-true
+{
+  "is_unsubscribed": true
+}
 ```
 
 ---

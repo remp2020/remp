@@ -29,6 +29,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added new emit of `user-unsubscribed` hermes event when user unsubscribes from the newsletter. remp/remp#1063
 - Added retry ability to the hermes handler sending one-time emails. remp/remp#935
   - Until now, if there was an error during sending (Mailgun was unavailable, network was down), Mailer didn't try to send the email again.
+- Fixed bug in `/api/v1/users/is-unsubscribed` response generation, altering response schema. remp/crm#1100
+  - The endpoint never correctly generated the response, and it needed to be altered to be valid JSON. Since the endpoint never worked correctly, we mark this as bugfix and not a breaking change.
 
 ## [0.31.0] - 2022-03-14
 
