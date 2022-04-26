@@ -9,24 +9,29 @@ use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\SnippetFormFactory;
 use Remp\MailerModule\Repositories\SnippetsRepository;
+use Remp\MailerModule\Repositories\SnippetTranslationsRepository;
 
 final class SnippetPresenter extends BasePresenter
 {
-    private $snippetsRepository;
+    private SnippetsRepository $snippetsRepository;
 
-    private $snippetFormFactory;
+    private SnippetFormFactory $snippetFormFactory;
 
-    private $dataTableFactory;
+    private DataTableFactory $dataTableFactory;
+
+    private SnippetTranslationsRepository $snippetTranslationsRepository;
 
     public function __construct(
         SnippetsRepository $snippetsRepository,
         SnippetFormFactory $snippetFormFactory,
-        DataTableFactory $dataTableFactory
+        DataTableFactory $dataTableFactory,
+        SnippetTranslationsRepository $snippetTranslationsRepository
     ) {
         parent::__construct();
         $this->snippetsRepository = $snippetsRepository;
         $this->snippetFormFactory = $snippetFormFactory;
         $this->dataTableFactory = $dataTableFactory;
+        $this->snippetTranslationsRepository = $snippetTranslationsRepository;
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -107,6 +112,7 @@ final class SnippetPresenter extends BasePresenter
     public function handleDelete($id): void
     {
         $snippet = $this->snippetsRepository->find($id);
+        $this->snippetTranslationsRepository->getTranslationsForSnippet($snippet)->delete();
         $this->snippetsRepository->delete($snippet);
         $this->flashMessage("Snippet {$snippet->name} was deleted.");
         $this->redirect('default');

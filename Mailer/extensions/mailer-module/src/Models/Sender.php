@@ -12,7 +12,6 @@ use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Models\Auth\AutoLogin;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
-use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Mailer\Mailer;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
@@ -43,6 +42,8 @@ class Sender
     /** @var string */
     private $context;
 
+    private $locale;
+
     private $mailerFactory;
 
     private $autoLogin;
@@ -50,8 +51,6 @@ class Sender
     private $userSubscriptionsRepository;
 
     private $logsRepository;
-
-    private $engineFactory;
 
     private $contentGenerator;
 
@@ -62,7 +61,6 @@ class Sender
         AutoLogin $autoLogin,
         UserSubscriptionsRepository $userSubscriptionsRepository,
         LogsRepository $logsRepository,
-        EngineFactory $engineFactory,
         ContentGenerator $contentGenerator,
         GeneratorInputFactory $generatorInputFactory
     ) {
@@ -70,7 +68,6 @@ class Sender
         $this->autoLogin = $autoLogin;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
         $this->logsRepository = $logsRepository;
-        $this->engineFactory = $engineFactory;
         $this->contentGenerator = $contentGenerator;
         $this->generatorInputFactory = $generatorInputFactory;
     }
@@ -128,6 +125,13 @@ class Sender
         return $this;
     }
 
+    public function setLocale(string $locale = null): self
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
     public function send(bool $checkEmailSubscribed = true): int
     {
         if (count($this->recipients) > 1) {
@@ -150,13 +154,16 @@ class Sender
         $message = new Message();
         $message->addTo($recipient['email'], $recipient['name']);
         $message->setFrom($this->template->from);
-        $message->setSubject($this->generateSubject($this->template->subject, $this->params));
 
-        $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create(
+        $generatorInput = $this->generatorInputFactory->create(
             $this->template,
             $this->params,
-            $this->batchId
-        ));
+            $this->batchId,
+            $this->locale
+        );
+
+        $mailContent = $this->contentGenerator->render($generatorInput);
+        $message->setSubject($mailContent->subject());
 
         if ($this->template->mail_body_text) {
             $message->setBody($mailContent->text());
@@ -261,8 +268,6 @@ class Sender
             ]);
         }
 
-        $message->setSubject($this->generateSubject($this->template->subject, $transformedParams));
-
         $generatorInput = $this->generatorInputFactory->create(
             $this->template,
             $transformedParams,
@@ -278,6 +283,8 @@ class Sender
         }
 
         $mailContent = $this->contentGenerator->render($generatorInput);
+        $message->setSubject($mailContent->subject());
+
         if ($this->template->mail_body_text) {
             $message->setBody($mailContent->text());
         }
@@ -388,6 +395,7 @@ class Sender
         $this->params = [];
         $this->attachments = [];
         $this->context = null;
+        $this->locale = null;
 
         return $this;
     }
@@ -395,11 +403,6 @@ class Sender
     public function supportsBatch()
     {
         return $this->getMailer()->supportsBatch();
-    }
-
-    private function generateSubject(string $subjectTemplate, array  $params): string
-    {
-        return $this->engineFactory->engine()->render($subjectTemplate, $params);
     }
 
     private function generateServiceParams(?string $autologin)

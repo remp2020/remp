@@ -13,12 +13,23 @@
 
     <div role="tabpanel">
         <ul class="tab-nav" role="tablist">
-            <li class="active"><a href="#general" aria-controls="general" role="tab" data-toggle="tab" aria-expanded="true">General</a></li>
-            <li class=""><a href="#email" aria-controls="email" role="tab" data-toggle="tab" aria-expanded="false">Email Composition</a></li>
+            <li n:class="$editedLocale ? inactive : active">
+                <a href="#general" aria-controls="general" role="tab" data-toggle="tab" aria-expanded="true">General</a>
+            </li>
+            <li n:class="$editedLocale ? controlled">
+                <a href="#email" data-url="{plink this editedLocale => $locale}" aria-controls="tab-{$locale}" role="tab" data-toggle="tab" aria-expanded="false">{if $langs}{$locale}{/if} content </a>
+            </li>
+            <li n:foreach="$langs as $lang" class="controlled">
+                {if $lang === $editedLocale}
+                    <a href="#email" data-url="{plink this editedLocale => $lang}" aria-controls="tab-{$lang}" role="tab" data-toggle="tab" aria-expanded="false">{$lang} content</a>
+                {else}
+                    <a href="#email" data-url="{plink this editedLocale => $lang}" aria-controls="tab-{$lang}" aria-expanded="false">{$lang} content</a>
+                {/if}
+            </li>
         </ul>
 
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active m-t-30" id="general">
+        <div class="tab-content p-10">
+            <div role="tabpanel" class="tab-pane m-t-30 active" id="general">
                 <div class="form-group fg-float">
                     <div class="fg-line">
                         {input name, class => 'form-control fg-input'}
@@ -56,13 +67,6 @@
                 </div>
 
                 <div class="form-group fg-float">
-                    <div class="fg-line">
-                        {input subject, class => 'form-control fg-input'}
-                        {label subject, class => 'fg-label' /}
-                    </div>
-                </div>
-
-                <div class="form-group fg-float">
                     {label click_tracking /}
                     <i title="Works only if selected mailer supports email tracking." class="zmdi zmdi-info"></i>
                     {input click_tracking, class => 'selectpicker'}
@@ -77,6 +81,13 @@
                 </div>
 
                 <div class="form-group fg-float" style="margin-top: 50px">
+                    <div class="fg-line">
+                        {input subject, class => 'form-control fg-input'}
+                        {label subject, class => 'fg-label' /}
+                    </div>
+                </div>
+
+                <div class="form-group fg-float">
                     <div class="fg-line">
                         {input mail_body_text, class => 'form-control fg-input auto-size'}
                         {label mail_body_text, class => 'fg-label' /}
@@ -155,5 +166,11 @@
         let fromInput = $('input[name="from"]');
 
         fromInput.val(lists[selectedTypeId].mail_from);
+    });
+
+    let form = $("#" + {$control['templateForm']->getElementPrototype()->getId()});
+    let formChanged = false;
+    form.change(function() {
+      formChanged = true;
     });
 </script>

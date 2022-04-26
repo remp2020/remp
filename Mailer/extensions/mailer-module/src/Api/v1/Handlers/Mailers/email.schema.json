@@ -30,6 +30,9 @@
     "schedule_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "locale": {
+      "type": "string"
     }
   },
   "definitions": {

@@ -28,15 +28,46 @@
             </div>
 
             <div class="form-group fg-float m-b-30">
-                <div class="fg-line">
-                    {input text, class => 'form-control fg-input auto-size'}
-                    {label text, class => 'fg-label' /}
-                </div>
+                <ul n:if="$langs" class="tab-nav" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#tab-{$locale}" role="tab" data-toggle="tab" aria-expanded="true">{$locale}</a>
+                    </li>
+                    <li role="presentation" n:foreach="$langs as $lang">
+                        <a href="#tab-{$lang}" role="tab" data-lang="{$lang}" data-toggle="tab" aria-expanded="false">{$lang}</a>
+                    </li>
+                </ul>
             </div>
 
-            <div class="form-group m-b-30">
-                {label html /}
-                {input html, class => 'form-control html-editor'}
+            <div class="tab-content">
+                <div id="tab-{$locale}" role="tabpanel" class="tab-pane animated fadeIn active">
+                    <div class="form-group fg-float m-b-30">
+                        <div class="fg-line">
+                            {input text, class => 'form-control fg-input auto-size'}
+                            {label text, class => 'fg-label' /}
+                        </div>
+                    </div>
+
+                    <div class="form-group m-b-30">
+                        {label html /}
+                        {input html, class => 'form-control html-editor'}
+                    </div>
+                </div>
+
+                <div n:foreach="$langs as $lang" role="tabpanel" class="tab-pane animated fadeIn" id="tab-{$lang}">
+                    {formContainer $lang}
+                        <div class="form-group fg-float m-b-30">
+                            <div class="fg-line">
+                                {input text, class => 'form-control fg-input auto-size'}
+                                {label text, class => 'fg-label' /}
+                            </div>
+                        </div>
+
+                        <div class="form-group m-b-30">
+                            {label html /}
+                            {input html, class => 'form-control html-editor'}
+                        </div>
+                    {/formContainer}
+                </div>
             </div>
 
             <div class="fg-line">
@@ -44,24 +75,16 @@
                 {input save_close, class => 'btn btn-info waves-effect'}
             </div>
         </div>
-
-        <div class="col-sm-5 col-lg-offset-1">
-            <div id="mail-preview">
-                <mail-preview></mail-preview>
-            </div>
-        </div>
     </div>
-
-    <script type="text/javascript">
-        $(function() {
-            let cm = $('.CodeMirror')[0].CodeMirror;
-            let vm = remplib.templateForm.bind(
-                '#mail-preview',
-                cm.getValue()
-            );
-            cm.on('change', function() {
-                vm.htmlContent = cm.getValue();
-            });
-        });
-    </script>
 {/form}
+
+<script type="text/javascript">
+    let refreshed = [];
+    $('a[data-toggle="tab"]').one('shown.bs.tab', function (e) {
+        let lang = e.target.getAttribute('data-lang');
+        if (lang && !refreshed.includes(lang)) {
+            $('#tab-' + lang + ' .CodeMirror')[0].CodeMirror.refresh();
+            refreshed.push(lang);
+        }
+    });
+</script>

@@ -97,6 +97,7 @@ class SendEmailHandler extends BaseHandler
             'params' => $payload['params'] ?? [],
             'context' => $payload['context'] ?? null,
             'attachments' => $payload['attachments'] ?? [],
+            'locale' => $payload['locale'] ?? null,
         ], null, null, $executeAt), RedisDriver::PRIORITY_HIGH);
 
         return new JsonApiResponse(Response::S202_ACCEPTED, ['status' => 'ok', 'message' => "Email was scheduled to be sent."]);

@@ -13,3 +13,10 @@
         {include '@form.latte'}
     </div>
 </div>
+
+<script type="text/javascript">
+    $('li.controlled').on('click', function(e) {
+        e.preventDefault();
+        alert('You have to save the primary language version.');
+    });
+</script>

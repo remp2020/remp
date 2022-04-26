@@ -4,31 +4,42 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Database\Table\ActiveRow;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Forms\Rules\StringValidator;
+use Remp\MailerModule\Models\Config\LocalizationConfig;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\SnippetsRepository;
+use Remp\MailerModule\Repositories\SnippetTranslationsRepository;
 
 class SnippetFormFactory implements IFormFactory
 {
     use SmartObject;
 
-    private $snippetsRepository;
+    private SnippetsRepository $snippetsRepository;
+
+    private SnippetTranslationsRepository $snippetTranslationsRepository;
+
+    private array $locales;
 
     public $onCreate;
 
     public $onUpdate;
 
-    private $listsRepository;
+    private ListsRepository $listsRepository;
 
     public function __construct(
         ListsRepository $listsRepository,
-        SnippetsRepository $snippetsRepository
+        SnippetsRepository $snippetsRepository,
+        SnippetTranslationsRepository $snippetTranslationsRepository,
+        LocalizationConfig $localizationConfig
     ) {
         $this->snippetsRepository = $snippetsRepository;
         $this->listsRepository = $listsRepository;
+        $this->snippetTranslationsRepository = $snippetTranslationsRepository;
+        $this->locales = $localizationConfig->getSecondaryLocales();
     }
 
     public function create(?int $id = null): Form
@@ -37,6 +48,9 @@ class SnippetFormFactory implements IFormFactory
         if ($id !== null) {
             $snippet = $this->snippetsRepository->find($id);
             $defaults = $snippet->toArray();
+
+            $snippetTranslations = $this->snippetTranslationsRepository->getTranslationsForSnippet($snippet)
+                ->fetchAssoc('locale');
         }
 
         $form = new Form;
@@ -60,6 +74,17 @@ class SnippetFormFactory implements IFormFactory
             ->setHtmlAttribute('rows', 3);
 
         $form->addTextArea('html', 'HTML version');
+
+        $translationFields = [];
+        foreach ($this->locales as $locale) {
+            $translationFields[$locale] = $form->addContainer($locale);
+            $translationFields[$locale]->addTextArea('text', 'Text version')
+                ->setHtmlAttribute('rows', 3);
+            $translationFields[$locale]->addTextArea('html', 'HTML version');
+
+            $defaults[$locale]['text'] = $snippetTranslations[$locale]['text'] ?? '';
+            $defaults[$locale]['html'] = $snippetTranslations[$locale]['html'] ?? '';
+        }
 
         $form->setDefaults($defaults);
 
@@ -111,13 +136,39 @@ class SnippetFormFactory implements IFormFactory
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
         }
 
+        $values = (array) $values;
+
+        $translations = [];
+        foreach ($this->locales as $locale) {
+            $translations[$locale]['html'] = $values[$locale]['html'];
+            $translations[$locale]['text'] = $values[$locale]['text'];
+            unset($values[$locale]);
+        }
+
         if (!empty($values['id'])) {
             $row = $this->snippetsRepository->find($values['id']);
-            $this->snippetsRepository->update($row, (array) $values);
+
+            $this->snippetsRepository->update($row, $values);
+            $this->storeSnippetTranslations($row, $translations);
+
             ($this->onUpdate)($row, $buttonSubmitted);
         } else {
             $row = $this->snippetsRepository->add($values['name'], $values['code'], $values['text'], $values['html'], $values['mail_type_id']);
+            $this->storeSnippetTranslations($row, $translations);
+
             ($this->onCreate)($row, $buttonSubmitted);
+        }
+    }
+
+    private function storeSnippetTranslations(ActiveRow $snippet, $values)
+    {
+        foreach ($this->locales as $locale) {
+            $this->snippetTranslationsRepository->upsert(
+                $snippet,
+                $locale,
+                $values[$locale]['text'],
+                $values[$locale]['html']
+            );
         }
     }
 }

@@ -43,6 +43,28 @@
     </div>
 </div>
 
+<script type="text/javascript">
+    $('li.controlled').on('click', function(e) {
+        e.preventDefault();
+        let url = e.target.getAttribute('data-url');
+
+        if (formChanged) {
+            if (confirm('Please save your changes or will be lost. Are you sure you want to continue?')) {
+                window.location.href = url;
+            }
+            return;
+        }
+        window.location.href = url;
+    });
+
+    let lang = {$editedLocale};
+    if (lang) {
+        $(function() {
+            $('[aria-controls="tab-' + lang + '"]').tab('show');
+        });
+    }
+</script>
+
 {/block}
 
 {define jsInit}

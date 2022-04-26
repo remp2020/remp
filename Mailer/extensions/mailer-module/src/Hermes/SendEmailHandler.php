@@ -39,7 +39,8 @@ class SendEmailHandler implements HandlerInterface
             ->reset()
             ->setTemplate($mailTemplate)
             ->addRecipient($payload['email'])
-            ->setParams($payload['params'] ?? []);
+            ->setParams($payload['params'] ?? [])
+            ->setLocale($payload['locale'] ?? null);
 
         if ($mailTemplate->attachments_enabled) {
             foreach ($payload['attachments'] ?? [] as $attachment) {

@@ -4,25 +4,36 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Database\Table\ActiveRow;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
+use Remp\MailerModule\Models\Config\LocalizationConfig;
 use Remp\MailerModule\Repositories\LayoutsRepository;
+use Remp\MailerModule\Repositories\LayoutTranslationsRepository;
 
 class LayoutFormFactory implements IFormFactory
 {
     use SmartObject;
 
-    /** @var LayoutsRepository */
-    private $layoutsRepository;
+    private LayoutsRepository $layoutsRepository;
+
+    private LayoutTranslationsRepository $layoutTranslationsRepository;
+
+    private array $locales;
 
     public $onCreate;
 
     public $onUpdate;
 
-    public function __construct(LayoutsRepository $layoutsRepository)
-    {
+    public function __construct(
+        LayoutsRepository $layoutsRepository,
+        LayoutTranslationsRepository $layoutTranslationsRepository,
+        LocalizationConfig $localizationConfig
+    ) {
         $this->layoutsRepository = $layoutsRepository;
+        $this->layoutTranslationsRepository = $layoutTranslationsRepository;
+        $this->locales = $localizationConfig->getSecondaryLocales();
     }
 
     public function create(?int $id = null): Form
@@ -32,6 +43,9 @@ class LayoutFormFactory implements IFormFactory
         if ($id !== null) {
             $layout = $this->layoutsRepository->find($id);
             $defaults = $layout->toArray();
+
+            $layoutTranslations = $this->layoutTranslationsRepository->getAllTranslationsForLayout($layout)
+                ->fetchAssoc('locale');
         }
 
         $form = new Form;
@@ -60,6 +74,17 @@ class LayoutFormFactory implements IFormFactory
 
         $form->addTextArea('layout_html', 'HTML version');
 
+        $translationFields = [];
+        foreach ($this->locales as $locale) {
+            $translationFields[$locale] = $form->addContainer($locale);
+            $translationFields[$locale]->addTextArea('layout_text', 'Text version')
+                ->setHtmlAttribute('rows', 3);
+            $translationFields[$locale]->addTextArea('layout_html', 'HTML version');
+
+            $defaults[$locale]['layout_text'] = $layoutTranslations[$locale]['layout_text'] ?? '';
+            $defaults[$locale]['layout_html'] = $layoutTranslations[$locale]['layout_html'] ?? '';
+        }
+
         $form->setDefaults($defaults);
 
         $form->addSubmit(self::FORM_ACTION_SAVE, self::FORM_ACTION_SAVE)
@@ -87,9 +112,19 @@ class LayoutFormFactory implements IFormFactory
             $buttonSubmitted = self::FORM_ACTION_SAVE_CLOSE;
         }
 
+        $values = (array) $values;
+
+        $translations = [];
+        foreach ($this->locales as $locale) {
+            $translations[$locale]['layout_text'] = $values[$locale]['layout_text'];
+            $translations[$locale]['layout_html'] = $values[$locale]['layout_html'];
+            unset($values[$locale]);
+        }
+
         if (!empty($values['id'])) {
             $row = $this->layoutsRepository->find($values['id']);
-            $this->layoutsRepository->update($row, (array) $values);
+            $this->layoutsRepository->update($row, $values);
+            $this->storeLayoutTranslations($row, $translations);
             ($this->onUpdate)($row, $buttonSubmitted);
         } else {
             $row = $this->layoutsRepository->add(
@@ -98,7 +133,20 @@ class LayoutFormFactory implements IFormFactory
                 $values['layout_text'],
                 $values['layout_html']
             );
+            $this->storeLayoutTranslations($row, $translations);
             ($this->onCreate)($row, $buttonSubmitted);
+        }
+    }
+
+    private function storeLayoutTranslations(ActiveRow $layout, array $values)
+    {
+        foreach ($this->locales as $locale) {
+            $this->layoutTranslationsRepository->upsert(
+                $layout,
+                $locale,
+                $values[$locale]['layout_text'],
+                $values[$locale]['layout_html']
+            );
         }
     }
 }

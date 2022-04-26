@@ -20,9 +20,6 @@
             <a n:href="Duplicate! $mailTemplate->id">
                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-copy"></i> Duplicate</button>
             </a>
-            <a n:href="Preview:Public $mailTemplate->public_code">
-                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-eye"></i> Public preview</button>
-            </a>
         </div>
     </div>
 </div>
@@ -37,7 +34,6 @@
                 <ul class="list-group">
                     <li class="list-group-item"><strong>Code:</strong> {$mailTemplate->code}</li>
                     <li class="list-group-item"><strong>From:</strong> {$mailTemplate->from}</li>
-                    <li class="list-group-item"><strong>Subject:</strong> {$mailTemplate->subject}</li>
                     <li class="list-group-item"><strong>Layout:</strong> <a n:href="Layout:Edit $mailTemplate->mail_layout_id">{$mailTemplate->mail_layout->name}</a></li>
                     <li class="list-group-item"><strong>List:</strong> <a n:href="List:Show $mailTemplate->mail_type_id">{$mailTemplate->mail_type->title}</a></li>
                     <li class="list-group-item"><strong>Created:</strong> {$mailTemplate->created_at}</li>
@@ -66,43 +62,21 @@
             </div>
         </div>
 
+        <ul n:if="$langs" class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
+            <li class="active">
+                <a href="#tab-{$locale}" role="tab" data-toggle="tab" aria-expanded="true">{$locale}</a>
+            </li>
+            <li n:foreach="$langs as $lang">
+                <a href="#tab-{$lang}" role="tab" data-toggle="tab" aria-expanded="false">{$lang}</a>
+            </li>
+        </ul>
 
         <div class="card">
-            <div class="card-header">
-                <h2><i class="zmdi zmdi-code"></i> Source</h2>
-            </div>
-            <div class="card-body">
-                <ul class="tab-nav tn-justified tn-icon" role="tablist">
-                    <li role="presentation" class="active">
-                        <a class="col-sx-6" href="#tab-1" aria-controls="tab-1" role="tab" data-toggle="tab" aria-expanded="true">
-                            HTML Preview
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a class="col-sx-6" href="#tab-2" aria-controls="tab-2" role="tab" data-toggle="tab" aria-expanded="true">
-                            Text Version
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a class="col-xs-6" href="#tab-3" aria-controls="tab-3" role="tab" data-toggle="tab" aria-expanded="true">
-                            HTML Version
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="tab-content p-0">
-                    <div role="tabpanel" class="tab-pane animated fadeIn active" id="tab-1">
-                        <div id="mail-preview">
-                            <iframe src="{plink Preview $mailTemplate->id, type => 'html'}" style="width: 100%; border: none; min-height: 700px;"></iframe>
-                        </div>
-                    </div>
-                    <div role="tabpanel" class="tab-pane animated fadeIn" id="tab-2">
-                        <pre class="palette-White bg b-0"><code class="nohighlight">{$mailTemplate->mail_body_text}</code></pre>
-                    </div>
-                    <div role="tabpanel" class="tab-pane animated fadeIn" id="tab-3">
-                        <pre class="palette-White bg b-0"><code class="html">{$mailTemplate->mail_body_html}</code></pre>
-                    </div>
-                </div>
+            <div class="tab-content p-t-0">
+                {include 'show_source.latte', template => $mailTemplate, lang => $locale}
+                {foreach $langs as $lang}
+                    {include 'show_source.latte', template => $mailTemplate, lang => $lang}
+                {/foreach}
             </div>
         </div>
         {*<div class="card">*}

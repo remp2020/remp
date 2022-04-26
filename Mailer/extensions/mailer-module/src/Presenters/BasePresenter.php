@@ -8,6 +8,7 @@ use Remp\MailerModule\Components\ApplicationStatus\ApplicationStatus;
 use Remp\MailerModule\Components\ApplicationStatus\IApplicationStatusFactory;
 use Remp\MailerModule\Forms\IFormFactory;
 use Remp\MailerModule\Models\Auth\PermissionManager;
+use Remp\MailerModule\Models\Config\LocalizationConfig;
 use Remp\MailerModule\Models\EnvironmentConfig;
 
 abstract class BasePresenter extends Presenter
@@ -20,6 +21,9 @@ abstract class BasePresenter extends Presenter
 
     /** @var PermissionManager @inject */
     public $permissionManager;
+
+    /** @var LocalizationConfig @inject */
+    public $localizationConfig;
     
     public function startup(): void
     {
@@ -32,6 +36,7 @@ abstract class BasePresenter extends Presenter
         $this->template->currentUser = $this->getUser();
         $this->template->linkedServices = $this->environmentConfig->getLinkedServices();
         $this->template->locale = $this->environmentConfig->getParam('locale');
+        $this->template->langs = $this->localizationConfig->getSecondaryLocales();
     }
 
     /**
