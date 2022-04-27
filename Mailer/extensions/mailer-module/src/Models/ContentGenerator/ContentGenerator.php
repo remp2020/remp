@@ -52,12 +52,14 @@ class ContentGenerator
         $textBody = $this->generate($template->getTextBody(), $params);
         $text = $this->wrapLayout($template->getSubject(), $textBody, $layout->getText(), $params);
 
+        $subject = $this->generate($template->getSubject(), $params);
+
         foreach ($this->replaceList as $replace) {
             $html = $replace->replace($html, $generatorInput);
             $text = $replace->replace($text, $generatorInput);
         }
 
-        return new MailContent($html, $text, $template->getSubject());
+        return new MailContent($html, $text, $subject);
     }
 
     public function getEmailParams(GeneratorInput $generatorInput, array $emailParams): array
@@ -74,11 +76,11 @@ class ContentGenerator
         return $outputParams;
     }
 
-    private function generate(string $bodyTemplate, array $params): string
+    private function generate(string $content, array $params): string
     {
         $params['time'] = $this->time;
 
-        return $this->engineFactory->engine()->render($bodyTemplate, $params);
+        return $this->engineFactory->engine()->render($content, $params);
     }
 
     private function wrapLayout(string $subject, string $renderedTemplateContent, string $layoutContent, array $params): string
