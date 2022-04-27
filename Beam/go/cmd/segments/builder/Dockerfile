@@ -1,6 +1,6 @@
-FROM golang:1.17.4
+FROM golang:1.18.1
 
-RUN go get golang.org/x/tools/cmd/goimports
+RUN go install golang.org/x/tools/cmd/goimports@latest
 
 RUN mkdir -p /src/build
 
