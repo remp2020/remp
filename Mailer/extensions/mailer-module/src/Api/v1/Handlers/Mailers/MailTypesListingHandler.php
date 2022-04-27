@@ -28,6 +28,7 @@ class MailTypesListingHandler extends BaseHandler
     {
         return [
             (new GetInputParam('code'))->setMulti(),
+            (new GetInputParam('mail_type_category_code'))->setMulti(),
             new GetInputParam('public_listing'),
         ];
     }
@@ -38,6 +39,9 @@ class MailTypesListingHandler extends BaseHandler
 
         if (isset($params['code'])) {
             $results->where(['code' => $params['code']]);
+        }
+        if (isset($params['mail_type_category_code'])) {
+            $results->where(['mail_type_category.code' => $params['mail_type_category_code']]);
         }
 
         if (isset($params['public_listing'])) {

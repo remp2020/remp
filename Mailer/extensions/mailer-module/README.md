@@ -1825,10 +1825,11 @@ new *email* template via API.
 
 ##### *Params:*
 
-| Name           | Value     | Required | Description                                                                                                            |
-|----------------|-----------|----------|------------------------------------------------------------------------------------------------------------------------|
-| code           | *String*  | no       | Filter only newsletter (mail type) with specific code. Returns array with either 0 or 1 element.                       |
-| public_listing | *Boolean* | no       | Flag whether only newsletters (mail types) hat should/shouldn't be available to be listed publicly should be returned. |
+| Name                    | Value     | Required | Description                                                                                                            |
+|-------------------------|-----------|----------|------------------------------------------------------------------------------------------------------------------------|
+| code                    | *String*  | no       | Filter only newsletters (mail types) with specific code. Multiple codes can be requested.                              |
+| mail_type_category_code | *String*  | no       | Filter only newsletters (mail types) of specific category. Multiple categories can be requested.                       |
+| public_listing          | *Boolean* | no       | Flag whether only newsletters (mail types) hat should/shouldn't be available to be listed publicly should be returned. |
 
 ##### *Example:*
 

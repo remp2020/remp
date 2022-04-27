@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed bug in `/api/v1/users/is-unsubscribed` response generation, altering response schema. remp/crm#1100
   - The endpoint never correctly generated the response, and it needed to be altered to be valid JSON. Since the endpoint never worked correctly, we mark this as bugfix and not a breaking change.
 - Changed `/api/v1/mailers/mail-types` API to allow multiple `code` params to be specified as a filter. remp/crm#2387
+- Added filtering by `mail_type_category_code` to the `/api/v1/mailers/mail-types` API. remp/crm#2387
 - Added support for the localization of emails. remp/remp#1085
   - The UI stays same until you add secondary locale in the configuration of `Remp\MailerModule\Models\Config\LocalizationConfig`.
   - Emails are sent in default configured locale until the translation is not available in secondary configured locale.
