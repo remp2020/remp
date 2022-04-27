@@ -112,6 +112,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added migration to add index on `email` column in `autologin_tokens` table. remp/remp#1067
 - Added options to specify `variant_code` in the subscribe/unsubscribe APIs to complement subscription through `variant_id`. remp/crm#2212
 - Added support for managing roles and privileges to Mailer. See [README](./Mailer/extensions/mailer-module/README.md#permission-management) for more information. remp/remp#1087
+- Refactored mailer log filter (because of performance issues). remp/remp#1095
+- Added `allowSearch` setting to DataTable component. remp/remp#1095
 
 ## [0.29.0] - 2021-11-18
 
