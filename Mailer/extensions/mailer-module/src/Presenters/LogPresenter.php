@@ -3,24 +3,57 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use Crm\ApplicationModule\Repository\AuditLogRepository;
+use Nette\Application\UI\Form;
+use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Repositories\LogsRepository;
+use Remp\MailerModule\Repositories\TemplatesRepository;
+use Tomaj\Form\Renderer\BootstrapInlineRenderer;
 
 final class LogPresenter extends BasePresenter
 {
+    /** @persistent */
+    public $email;
+
+    /** @persistent */
+    public $created_at_from;
+
+    /** @persistent */
+    public $created_at_to;
+
+    /** @persistent */
+    public $mail_template_code;
+
     private $logsRepository;
 
     private $dataTableFactory;
 
+    private $templatesRepository;
+
     public function __construct(
         LogsRepository $logsRepository,
-        DataTableFactory $dataTableFactory
+        DataTableFactory $dataTableFactory,
+        TemplatesRepository $templatesRepository
     ) {
         parent::__construct();
         $this->logsRepository = $logsRepository;
         $this->dataTableFactory = $dataTableFactory;
+        $this->templatesRepository = $templatesRepository;
+    }
+
+    public function startup(): void
+    {
+        parent::startup();
+
+        if ($this->created_at_from === null) {
+            $this->created_at_from = (new DateTime())->modify('-1 day')->format('m/d/Y H:i A');
+        }
+        if ($this->created_at_to === null) {
+            $this->created_at_to = (new DateTime())->format('m/d/Y H:i A');
+        }
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -55,25 +88,71 @@ final class LogPresenter extends BasePresenter
                 'orderable' => false,
                 'priority' => 3,
             ])
-            ->setTableSetting('order', Json::encode([[0, 'DESC']]));
+            ->setTableSetting('order', Json::encode([[0, 'DESC']]))
+            ->setTableSetting('allowSearch', false);
 
         return $dataTable;
+    }
+
+    private function isFilterActive()
+    {
+        if ($this->email) {
+            return true;
+        }
+        if ($this->mail_template_code) {
+            return true;
+        }
+        if ($this->created_at_from) {
+            return true;
+        }
+        if ($this->created_at_to) {
+            return true;
+        }
+        return false;
     }
 
     public function renderDefaultJsonData(): void
     {
         $request = $this->request->getParameters();
 
-        $logsCount = $this->logsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
-            ->count('*');
+        $mailTemplateId = null;
+        if ($this->mail_template_code) {
+            $mailTemplate = $this->templatesRepository->getByCode($this->mail_template_code);
+            if ($mailTemplate) {
+                $mailTemplateId = $mailTemplate->id;
+            } else {
+                $this->mail_template_code = null;
+            }
+        }
 
-        $logs = $this->logsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['length'], (int)$request['start'])
-            ->fetchAll();
+        $logsCount = 0;
+        $logs = [];
+        if ($this->isFilterActive()) {
+            $logsCount = $this->logsRepository
+                ->tableFilter(
+                    $this->email ?? '',
+                    $request['columns'][$request['order'][0]['column']]['name'],
+                    $request['order'][0]['dir'],
+                    null,
+                    null,
+                    $mailTemplateId,
+                    $this->created_at_from ? DateTime::createFromFormat('m/d/Y H:i A', $this->created_at_from) : null,
+                    $this->created_at_to ? DateTime::createFromFormat('m/d/Y H:i A', $this->created_at_to) : null,
+                )->count('*');
+            $logs = $this->logsRepository
+                ->tableFilter(
+                    $this->email ?? '',
+                    $request['columns'][$request['order'][0]['column']]['name'],
+                    $request['order'][0]['dir'],
+                    (int)$request['length'],
+                    (int)$request['start'],
+                    $mailTemplateId,
+                    $this->created_at_from ? DateTime::createFromFormat('m/d/Y H:i A', $this->created_at_from) : null,
+                    $this->created_at_to ? DateTime::createFromFormat('m/d/Y H:i A', $this->created_at_to) : null,
+                )->fetchAll();
+        }
 
         $result = [
-            'recordsTotal' => $this->logsRepository->totalCount(),
             'recordsFiltered' => $logsCount,
             'data' => []
         ];
@@ -88,7 +167,7 @@ final class LogPresenter extends BasePresenter
                     'url' => $this->link(
                         'Template:Show',
                         ['id' => $log->mail_template_id]
-                    ), 'text' => $log->mail_template->code
+                    ), 'text' => $log->mail_template->code ?? null
                 ],
                 $log->attachment_size,
                 [
@@ -102,5 +181,49 @@ final class LogPresenter extends BasePresenter
             ];
         }
         $this->presenter->sendJson($result);
+    }
+
+    public function createComponentFilterLogsForm()
+    {
+        $form = new Form;
+        $form->setRenderer(new BootstrapInlineRenderer());
+        $form->setHtmlAttribute('class', 'form-logs-filter');
+
+        $form->addText('email', 'E-mail');
+
+        $form->addText('mail_template_code', 'Mail template code');
+
+        $form->addText('created_at_from', 'Sent from')->setRequired('Field `Sent from` is required');
+
+        $form->addText('created_at_to', 'Sent to')->setRequired('Field `Sent to` is required');
+
+        $form->addSubmit('send', 'Filter')
+            ->getControlPrototype()
+            ->setName('button')
+            ->setHtml('<i class="fa fa-filter"></i> Filter');
+
+        $presenter = $this;
+        $form->addSubmit('cancel', 'Cancel')->onClick[] = function () use ($presenter) {
+            $presenter->redirect('Log:Default', [
+                'email' => null,
+                'mail_template_code' => null,
+                'created_at_from' => null,
+                'created_at_to' => null,
+            ]);
+        };
+
+        $form->onSuccess[] = [$this, 'adminFilterSubmitted'];
+        $form->setDefaults([
+            'email' => $this->email,
+            'created_at_from' => $this->created_at_from,
+            'created_at_to' => $this->created_at_to,
+            'mail_template_code' => $this->mail_template_code,
+        ]);
+        return $form;
+    }
+
+    public function adminFilterSubmitted($form, $values)
+    {
+        $this->redirect($this->action, (array) $values);
     }
 }

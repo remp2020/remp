@@ -135,8 +135,16 @@ class LogsRepository extends Repository
             ->fetch();
     }
 
-    public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null, ?int $templateId = null): Selection
-    {
+    public function tableFilter(
+        string $query,
+        string $order,
+        string $orderDirection,
+        ?int $limit = null,
+        ?int $offset = null,
+        ?int $templateId = null,
+        ?DateTime $createdAtFrom = null,
+        ?DateTime $createdAtTo = null
+    ): Selection {
         $selection = $this->getTable()
             ->order($order . ' ' . strtoupper($orderDirection));
 
@@ -144,13 +152,16 @@ class LogsRepository extends Repository
             $selection->where('mail_template_id = ?', $templateId);
         }
 
-        if (!empty($query)) {
-            $where = [];
-            foreach ($this->dataTableSearchable as $col) {
-                $where[$col . ' LIKE ?'] = '%' . $query . '%';
-            }
+        if ($createdAtFrom !== null) {
+            $selection->where('created_at >= ?', $createdAtFrom);
+        }
 
-            $selection->whereOr($where);
+        if ($createdAtTo !== null) {
+            $selection->where('created_at <= ?', $createdAtTo);
+        }
+
+        if (!empty($query)) {
+            $selection->where('email = ?', $query);
         }
 
         if ($limit !== null) {
