@@ -1,7 +1,7 @@
 # REMP Tracker
 
 This is a gateway for storing both user and system events. Tracker validates the request and posts Influx-formatted
-set of data to Kafka. For generic events, it also creates a Kafka topic based on provided `$category_$action`.
+set of data to a message broker implementation (either Kafka or Pub/Sub).
 
 ## Building
 
@@ -20,7 +20,7 @@ This tarball can be safely used within any Docker image, including `alpine` or `
 
 ### go
 
-If you have Go 1.13+ environment set up, you can run the build manually by running
+If you have Go 1.18+ environment set up, you can run the build manually by running
 
 ```bash
 make build

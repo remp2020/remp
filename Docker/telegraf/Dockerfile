@@ -1,4 +1,4 @@
-FROM remp/telegraf:1.17.3
+FROM remp/telegraf:1.22.1
 
 ENV DOCKERIZE_VERSION v0.6.1
 

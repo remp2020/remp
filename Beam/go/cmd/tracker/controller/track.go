@@ -4,24 +4,23 @@ import (
 	"beam/cmd/tracker/app"
 	"beam/cmd/tracker/refererparser"
 	"beam/model"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/avct/uasurfer"
 	"github.com/goadesign/goa"
 	"github.com/google/uuid"
-	influxClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
 )
 
 // TrackController implements the track resource.
 type TrackController struct {
 	*goa.Controller
-	EventProducer       sarama.AsyncProducer
+	EventProducer       EventProducer
 	PropertyStorage     model.PropertyStorage
 	EntitySchemaStorage model.EntitySchemaStorage
 	InternalHosts       []string
@@ -37,7 +36,7 @@ type Event struct {
 }
 
 // NewTrackController creates a track controller.
-func NewTrackController(service *goa.Service, ep sarama.AsyncProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage, ih []string, tl int) *TrackController {
+func NewTrackController(service *goa.Service, ep EventProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage, ih []string, tl int) *TrackController {
 	return &TrackController{
 		Controller:          service.NewController("TrackController"),
 		EventProducer:       ep,
@@ -113,16 +112,9 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 	}
 
 	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
-	if err := c.pushInternal(model.TableCommerce, ctx.Payload.System.Time, tags, fields); err != nil {
+	if err := c.pushInternal(ctx.Context, model.TableCommerce, ctx.Payload.System.Time, tags, fields); err != nil {
 		return err
 	}
-
-	topic := fmt.Sprintf("%s_%s", "commerce", ctx.Payload.Step)
-	value, err := json.Marshal(ctx.Payload)
-	if err != nil {
-		return errors.Wrap(err, "unable to marshal payload for kafka")
-	}
-	c.pushPublic(topic, value)
 
 	return ctx.Accepted()
 }
@@ -163,18 +155,9 @@ func (c *TrackController) Event(ctx *app.EventTrackContext) error {
 	tags["category"] = ctx.Payload.Category
 	tags["action"] = ctx.Payload.Action
 
-	if err := c.pushInternal(model.TableEvents, ctx.Payload.System.Time, tags, fields); err != nil {
+	if err := c.pushInternal(ctx.Context, model.TableEvents, ctx.Payload.System.Time, tags, fields); err != nil {
 		return err
 	}
-
-	// push public
-
-	topic := fmt.Sprintf("%s_%s", ctx.Payload.Category, ctx.Payload.Action)
-	value, err := json.Marshal(ctx.Payload)
-	if err != nil {
-		return errors.Wrap(err, "unable to marshal payload for kafka")
-	}
-	c.pushPublic(topic, value)
 
 	return ctx.Accepted()
 }
@@ -192,14 +175,14 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	tags := map[string]string{}
 	fields := map[string]interface{}{}
 
-	var measurement string
+	var table string
 	switch ctx.Payload.Action {
 	case model.ActionPageviewLoad:
 		tags["action"] = model.ActionPageviewLoad
-		measurement = model.TablePageviews
+		table = model.TablePageviews
 	case model.ActionPageviewTimespent:
 		tags["action"] = model.ActionPageviewTimespent
-		measurement = model.TableTimespent
+		table = model.TableTimespent
 		if ctx.Payload.Timespent != nil {
 			fields["timespent"] = ctx.Payload.Timespent.Seconds
 			// limit maximum timespent; filters out broken tracking of open articles (forgotten browser window on different workspace/monitor)
@@ -213,7 +196,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 		}
 	case model.ActionPageviewProgress:
 		tags["action"] = model.ActionPageviewProgress
-		measurement = model.TableProgress
+		table = model.TableProgress
 		if ctx.Payload.Progress != nil {
 			fields["page_progress"] = ctx.Payload.Progress.PageRatio
 			if ctx.Payload.Progress.ArticleRatio != nil {
@@ -243,7 +226,7 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 	tags["category"] = model.CategoryPageview
 
 	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
-	if err := c.pushInternal(measurement, ctx.Payload.System.Time, tags, fields); err != nil {
+	if err := c.pushInternal(ctx.Context, table, ctx.Payload.System.Time, tags, fields); err != nil {
 		return err
 	}
 
@@ -278,7 +261,7 @@ func (c *TrackController) Entity(ctx *app.EntityTrackContext) error {
 	fields := ctx.Payload.EntityDef.Data
 	fields["remp_entity_id"] = ctx.Payload.EntityDef.ID
 
-	if err := c.pushInternal(model.TableEntities, ctx.Payload.System.Time, nil, fields); err != nil {
+	if err := c.pushInternal(ctx.Context, model.TableEntities, ctx.Payload.System.Time, nil, fields); err != nil {
 		return err
 	}
 
@@ -472,9 +455,8 @@ func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User
 	return tags, fields
 }
 
-// pushInternal pushes new event to the InfluxDB.
-func (c *TrackController) pushInternal(measurement string, time time.Time,
-	tags map[string]string, fields map[string]interface{}) error {
+// pushInternal pushes new event to message broker
+func (c *TrackController) pushInternal(ctx context.Context, table string, time time.Time, tags map[string]string, fields map[string]interface{}) error {
 
 	collected := make(map[string]interface{})
 	for key, tag := range tags {
@@ -490,20 +472,7 @@ func (c *TrackController) pushInternal(measurement string, time time.Time,
 	data := make(map[string]interface{})
 	data["_json"] = string(json)
 
-	p, err := influxClient.NewPoint(measurement, nil, data, time)
-	if err != nil {
-		return err
-	}
-	c.EventProducer.Input() <- &sarama.ProducerMessage{
-		Topic: "beam_events",
-		Value: sarama.StringEncoder(p.String()),
-	}
-	return nil
-}
+	c.EventProducer.Produce(ctx, table, time, data)
 
-func (c *TrackController) pushPublic(topic string, value []byte) {
-	c.EventProducer.Input() <- &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.ByteEncoder(value),
-	}
+	return nil
 }

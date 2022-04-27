@@ -2218,7 +2218,7 @@ and running and is completely optional.
 Beam Tracker serves as a tool for tracking events via API. Once it's built and running, endpoints can be
 discovered by accessing `/swagger.json` path.
 
-Tracker pushes events to Kafka in Influx format into `beam_events` topic. For all `/track/event` calls,
+Tracker pushes events to a message broker (by default Kafka or Google Pub/Sub) in Influx format into `beam_events` topic. For all `/track/event` calls,
 Tracker also pushes raw JSON event to its own topic based on the event *category* and *action*.
 
 For example for payload
@@ -2242,6 +2242,37 @@ to track more extensive data including UTM parameters, reference to sales funnel
 are required for A/B test statistics used in Campaign and Mailer**.
 * *Generic events.* You can track any kind of generic event in your system. All events can be later used
 to build user segments.
+
+### Message Broker (Kafka or Google Cloud Pub/Sub)
+
+By default, Tracker uses Kafka as a message broker to push messages into data storage.
+
+Alternatively, Tracker can be configured to use Google Cloud Pub/Sub service. It has some advantages, such as you don't need to maintain your own Kafka server. To configure, please follow the steps:
+
+In `.env`  configuration file, fill out the variables:
+
+```neon
+TRACKER_BROKER_IMPL=pubsub # instead of 'kafka' 
+
+# Your Pub/Sub project ID
+TRACKER_PUBSUB_PROJECT_ID=
+
+# Pub/Sub topic ID
+TRACKER_PUBSUB_TOPIC_ID=
+
+# If tracker is NOT running in Google Cloud Environment
+# (where credentials are passed automatically if service account is attached),
+# please specify path to the service account JSON keys.
+GOOGLE_APPLICATION_CREDENTIALS="/path/to/keys/file.json"
+```
+
+To work with Pub/Sub service, you need to create a Google service account. Please follow [the documentation](https://cloud.google.com/iam/docs/creating-managing-service-accounts) for further instruction. 
+After you create the service account, make sure you assign  **Pub/Sub Publisher** and  **Pub/Sub Viewer** permissions to the account, since these are required by the Tracker.
+
+Last, configure Telegraf instance to consume messages from Pub/Sub. Please see the [Telegraf section](#replacing-kafka-with-pubsub) for more information. 
+
+_Note: Telegraf also requires Google service account to read data from a Pub/Sub subscription. 
+If you use the same service account for both Tracker and Telegraf, assign **Pub/Sub Subscriber** permission to the aforementioned service account._  
 
 ### Tracker integration with CMS/CRM
 
@@ -2540,6 +2571,15 @@ You can then run the telegraf by running the binary and passing the path to conf
 ```
 /home/user/telegraf --config /home/user/workspace/remp/Docker/telegraf/telegraf.conf
 ```
+
+#### Replacing Kafka with Pub/Sub
+
+By default, Telegraf consumes messages from Kafka. In addition to Kafka, Remp also supports Pub/Sub message broker. 
+To replace the implementation, uncomment `[[inputs.cloud_pubsub]]` section in the Telegraf configuration  file(`telegraf.conf`) and set up required variables accordingly. 
+
+One of the variables (`credentials_file`) requires you to point to a JSON file containing Google service account keys.
+To create a Google service account, consult [the documentation](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
+In addition, make sure the service account has **Pub/Sub Subscriber** permission assigned to the particular subscription (variable `subscription`), since it's required for consuming messages.
 
 #### Build Dependencies
 

@@ -16,7 +16,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/go-sql-driver/mysql"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
@@ -39,6 +38,8 @@ func main() {
 	stop := make(chan os.Signal, 3)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
+	ctx, cancelCtx := context.WithCancel(context.Background())
+
 	service := goa.New("tracker")
 
 	service.Use(middleware.RequestID())
@@ -49,14 +50,10 @@ func main() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
-	// kafka init
+	// Broker init
 
-	brokerAddrs := strings.Split(c.BrokerAddrs, ",")
-	for _, addr := range brokerAddrs {
-		service.LogInfo("connecting to broker", "bind", addr)
-	}
-
-	eventProducer, err := newProducer(brokerAddrs)
+	service.LogInfo("initializing message broker producer", "implementation", c.BrokerImpl)
+	eventProducer, err := newProducer(ctx, &c, service)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -89,7 +86,6 @@ func main() {
 	// server cancellation
 
 	var wg sync.WaitGroup
-	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
@@ -178,26 +174,28 @@ func main() {
 	service.LogInfo("bye bye")
 }
 
-func newProducer(brokerList []string) (sarama.AsyncProducer, error) {
-
-	config := sarama.NewConfig()
-	config.ClientID = "beam-tracker"
-	config.Producer.RequiredAcks = sarama.WaitForLocal       // Only wait for the leader to ack
-	config.Producer.Compression = sarama.CompressionSnappy   // Compress messages
-	config.Producer.Flush.Frequency = 500 * time.Millisecond // Flush batches every 500ms
-
-	producer, err := sarama.NewAsyncProducer(brokerList, config)
-	if err != nil {
-		return nil, err
-	}
-
-	// We will just log to STDOUT if we're not able to produce messages.
-	// Note: messages will only be returned here after all retry attempts are exhausted.
-	go func() {
-		for err := range producer.Errors() {
-			log.Println("Failed to write kafka producer entry:", err)
+func newProducer(ctx context.Context, config *Config, service *goa.Service) (controller.EventProducer, error) {
+	switch config.BrokerImpl {
+	case "kafka":
+		brokerAddrs := strings.Split(config.BrokerAddrs, ",")
+		for _, addr := range brokerAddrs {
+			service.LogInfo("connecting to kafka broker", "bind", addr)
 		}
-	}()
+		producer, err := controller.NewKafkaEventProducer(brokerAddrs)
+		if err != nil {
+			return nil, err
+		}
+		return producer, nil
 
-	return producer, nil
+	case "pubsub":
+		service.LogInfo("connecting to pubsub", "projectID", config.PubSubProjectId, "topicID", config.PubSubTopicId)
+		producer, err := controller.NewPubSubEventProducer(ctx, config.PubSubProjectId, config.PubSubTopicId)
+		if err != nil {
+			return nil, err
+		}
+		return producer, nil
+
+	default:
+		return nil, errors.Errorf("unknown broker implementation %q", config.BrokerImpl)
+	}
 }

@@ -9,7 +9,7 @@ It provides:
 
 ## Dependencies
 
-- Go ^1.15
+- Go ^1.18
 - Elasticsearch ^7.15 (eventhough any 7.* should be OK)
 - MySQL ^8.0
 
@@ -30,7 +30,7 @@ This tarball can be safely used within any Docker image, including `alpine` or `
 
 ### go
 
-If you have Go 1.13+ environment set up, you can run the build manually by running
+If you have Go 1.18+ environment set up, you can run the build manually by running
 
 ```bash
 make build
