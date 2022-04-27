@@ -56,7 +56,7 @@
         "vue-template-compiler": "^2.6.10"
     },
     "devDependencies": {
-        "axios": "^0.21.1",
+        "axios": "^0.21.2",
         "cross-env": "^7.0",
         "css-loader": "*",
         "laravel-mix": "^6.0.12",
