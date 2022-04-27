@@ -29,7 +29,7 @@
                 <div class="col-md-3">
                     <div class="form-group fg-float">
                         <div class="fg-line">
-                            {input created_at_from, class => 'form-control fg-input date-time-picker'}
+                            {input created_at_from, class => 'form-control fg-input created-at-time-picker'}
                             {label created_at_from, class => 'fg-label' /}
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                 <div class="col-md-3">
                     <div class="form-group fg-float">
                         <div class="fg-line">
-                            {input created_at_to, class => 'form-control fg-input date-time-picker'}
+                            {input created_at_to, class => 'form-control fg-input created-at-time-picker'}
                             {label created_at_to, class => 'fg-label' /}
                         </div>
                     </div>
@@ -58,3 +58,11 @@
         margin-top: 30px;
     }
 </style>
+
+<script>
+    $(function () {
+        $('.created-at-time-picker').datetimepicker({
+            format: 'MM/DD/YYYY HH:mm A'
+        })
+    });
+</script>
