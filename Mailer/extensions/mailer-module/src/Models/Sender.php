@@ -163,6 +163,7 @@ class Sender
         );
 
         $mailContent = $this->contentGenerator->render($generatorInput);
+        $this->params = $this->contentGenerator->getEmailParams($generatorInput, $this->params);
         $message->setSubject($mailContent->subject());
 
         if ($this->template->mail_body_text) {
