@@ -10,6 +10,7 @@ class TemplateTranslationsRepository extends Repository
     public function upsert(
         ActiveRow $mailTemplate,
         string $locale,
+        string $from,
         string $subject,
         string $mailBodyText,
         string $mailBodyHtml
@@ -17,6 +18,7 @@ class TemplateTranslationsRepository extends Repository
         $data = [
             'mail_template_id' => $mailTemplate->id,
             'locale' => $locale,
+            'from' => $from,
             'subject' => $subject,
             'mail_body_text' => $mailBodyText,
             'mail_body_html' => $mailBodyHtml,
@@ -41,6 +43,7 @@ class TemplateTranslationsRepository extends Repository
             $this->insert([
                 'mail_template_id' => $duplicatedMailTemplate->id,
                 'locale' => $templateTranslation->locale,
+                'from' => $templateTranslation->from,
                 'subject' => $templateTranslation->subject,
                 'mail_body_text' => $templateTranslation->mail_body_text,
                 'mail_body_html' => $templateTranslation->mail_body_html,

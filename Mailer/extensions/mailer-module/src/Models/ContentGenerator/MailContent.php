@@ -10,11 +10,14 @@ class MailContent
 
     private string $subject;
 
-    public function __construct(string $html, string $text, string $subject)
+    private string $from;
+
+    public function __construct(string $html, string $text, string $subject, string $from)
     {
         $this->html = $html;
         $this->text = $text;
         $this->subject = $subject;
+        $this->from = $from;
     }
 
     public function html(): string
@@ -30,5 +33,10 @@ class MailContent
     public function subject(): string
     {
         return $this->subject;
+    }
+
+    public function from(): string
+    {
+        return $this->from;
     }
 }

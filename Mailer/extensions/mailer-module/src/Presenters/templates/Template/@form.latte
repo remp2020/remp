@@ -60,13 +60,6 @@
                 </div>
 
                 <div class="form-group fg-float">
-                    <div class="fg-line">
-                        {input from, class => 'form-control fg-input'}
-                        {label from, class => 'fg-label' /}
-                    </div>
-                </div>
-
-                <div class="form-group fg-float">
                     {label click_tracking /}
                     <i title="Works only if selected mailer supports email tracking." class="zmdi zmdi-info"></i>
                     {input click_tracking, class => 'selectpicker'}
@@ -84,7 +77,14 @@
                     {input mail_layout_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
                 </div>
 
-                <div class="form-group fg-float" style="margin-top: 50px">
+                <div class="form-group fg-float">
+                    <div class="fg-line">
+                        {input from, class => 'form-control fg-input'}
+                        {label from, class => 'fg-label' /}
+                    </div>
+                </div>
+
+                <div class="form-group fg-float">
                     <div class="fg-line">
                         {input subject, class => 'form-control fg-input'}
                         {label subject, class => 'fg-label' /}
