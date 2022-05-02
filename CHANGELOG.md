@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.32.0] - 2022-05-02
+
 ### [Beam]
 
 - Fixed IOTA issue with reading progress not being loaded on non-article pages. remp/remp#1096
@@ -36,7 +38,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added filtering by `mail_type_category_code` to the `/api/v1/mailers/mail-types` API. remp/crm#2387
 - Added support for the localization of emails. remp/remp#1085
   - The UI stays same until you add secondary locale in the configuration of `Remp\MailerModule\Models\Config\LocalizationConfig`.
-  - Emails are sent in default configured locale until the translation is not available in secondary configured locale.
+  - Emails are sent in default configured locale until the translation is available in secondary configured locale.
 
 ## [0.31.0] - 2022-03-14
 
@@ -1207,7 +1209,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.31.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.32.0...master
+[0.32.0]: https://github.com/remp2020/remp/compare/0.31.0...0.32.0
 [0.31.0]: https://github.com/remp2020/remp/compare/0.30.2...0.31.0
 [0.30.2]: https://github.com/remp2020/remp/compare/0.30.1...0.30.2
 [0.30.1]: https://github.com/remp2020/remp/compare/0.30.0...0.30.1
