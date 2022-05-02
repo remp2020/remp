@@ -68,6 +68,7 @@ class ContentGenerator
 
         foreach ($emailParams as $name => $value) {
             if (!is_string($value)) {
+                $outputParams[$name] = $value;
                 continue;
             }
 
