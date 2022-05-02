@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [0.32.0] - 2022-05-02
 
+### [Mailer]
+
+- Added option to select the locale of testing email. remp/remp#1118
+- Added alert message about missing template translation. remp/remp#1118
+
 ### [Beam]
 
 - Fixed IOTA issue with reading progress not being loaded on non-article pages. remp/remp#1096

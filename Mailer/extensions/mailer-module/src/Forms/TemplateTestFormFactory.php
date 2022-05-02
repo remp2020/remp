@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Forms;
 use Nette\Application\UI\Form;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
+use Remp\MailerModule\Models\Config\LocalizationConfig;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Models\Sender;
 
@@ -13,18 +14,22 @@ class TemplateTestFormFactory
 {
     use SmartObject;
 
-    /** @var TemplatesRepository */
-    private $templateRepository;
+    private TemplatesRepository $templateRepository;
 
-    /** @var Sender */
-    private $sender;
+    private Sender $sender;
+
+    private LocalizationConfig $localizationConfig;
 
     public $onSuccess;
 
-    public function __construct(TemplatesRepository $templateRepository, Sender $sender)
-    {
+    public function __construct(
+        TemplatesRepository $templateRepository,
+        Sender $sender,
+        LocalizationConfig $localizationConfig
+    ) {
         $this->templateRepository = $templateRepository;
         $this->sender = $sender;
+        $this->localizationConfig = $localizationConfig;
     }
 
     public function create(int $id): Form
@@ -35,6 +40,12 @@ class TemplateTestFormFactory
         $form->addText('email', 'Email')
             ->addRule(Form::EMAIL)
             ->setRequired("Field 'Email' is required.");
+
+        if ($this->localizationConfig->getSecondaryLocales()) {
+            $options = array_combine($this->localizationConfig->getAvailableLocales(), $this->localizationConfig->getAvailableLocales());
+            $form->addSelect('locale', 'locale', $options);
+            $form->setDefaults(['locale' => $this->localizationConfig->getDefaultLocale()]);
+        }
 
         $form->addSubmit('save', 'Send')
             ->getControlPrototype()
@@ -51,9 +62,14 @@ class TemplateTestFormFactory
     public function formSucceeded(Form $form, ArrayHash $values): void
     {
         $template = $this->templateRepository->find($values['id']);
-        $this->sender->setTemplate($template)
-            ->addRecipient($values['email'])
-            ->send(false);
+        $sender = $this->sender->setTemplate($template)
+            ->addRecipient($values['email']);
+
+        if (isset($values['locale']) && $values['locale']) {
+            $sender->setLocale($values['locale']);
+        }
+
+        $sender->send(false);
 
         ($this->onSuccess)($template);
     }
