@@ -23,7 +23,7 @@ clean:
 
 gen:
 	set -e
-	go get github.com/goadesign/goa/...@v1
+	go install github.com/goadesign/goa/...@v1
 	goagen app -d=$(DESIGN_PKG)
 	goagen swagger -d=$(DESIGN_PKG)
 
