@@ -67,8 +67,12 @@ class ContentGenerator
         $outputParams = [];
 
         foreach ($emailParams as $name => $value) {
+            if (!is_string($value)) {
+                continue;
+            }
+
             foreach ($this->replaceList as $replace) {
-                $value = $replace->replace((string)$value, $generatorInput);
+                $value = $replace->replace($value, $generatorInput);
             }
             $outputParams[$name] = $value;
         }
