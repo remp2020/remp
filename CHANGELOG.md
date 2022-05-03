@@ -6,12 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-## [0.32.0] - 2022-05-02
-
 ### [Mailer]
 
 - Added option to select the locale of testing email. remp/remp#1118
 - Added alert message about missing template translation. remp/remp#1118
+
+## [0.32.0] - 2022-05-02
 
 ### [Beam]
 
