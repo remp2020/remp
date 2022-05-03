@@ -31,10 +31,7 @@ class LocalizationConfig
 
     public function getAvailableLocales(): array
     {
-        $locales = $this->getSecondaryLocales();
-        $locales[] = $this->getDefaultLocale();
-
-        return $locales;
+        return array_merge([$this->getDefaultLocale()], $this->getSecondaryLocales());
     }
 
     public function isTranslatable(string $locale = null): bool
