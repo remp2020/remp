@@ -402,6 +402,7 @@
 
                             if (href) {
                                 hrefs[ii].setAttribute('href', this.addUrlParams(href, linkParams));
+                                hrefs[ii].setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
                             }
                         }
                     });

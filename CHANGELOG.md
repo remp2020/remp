@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Added referrer policy (`no-referrer-when-downgrade`) to banner links. remp/remp#1123
+  - Default referrer policy in browsers is now stricter and we were not providing correct (whole) referrers to target pages.
+
 ### [Mailer]
 
 - Added option to select the locale of testing email. remp/remp#1118
