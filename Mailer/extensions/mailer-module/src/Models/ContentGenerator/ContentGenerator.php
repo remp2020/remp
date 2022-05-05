@@ -59,7 +59,7 @@ class ContentGenerator
             $text = $replace->replace($text, $generatorInput);
         }
 
-        return new MailContent($html, $text, $subject);
+        return new MailContent($html, $text, $subject, $template->getFrom());
     }
 
     public function getEmailParams(GeneratorInput $generatorInput, array $emailParams): array

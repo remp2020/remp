@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added option to select the locale of testing email. remp/remp#1118
 - Added alert message about missing template translation. remp/remp#1118
+- Added `from` field of template between the translated items of template. remp/remp#1119
 
 ## [0.32.0] - 2022-05-02
 

@@ -75,6 +75,7 @@ class TemplateFormFactory implements IFormFactory
                     ->where('locale', $lang)
                     ->fetch();
 
+                $defaults['from'] = $templateTranslation->from ?? '';
                 $defaults['subject'] = $templateTranslation->subject ?? '';
                 $defaults['mail_body_text'] = $templateTranslation->mail_body_text ?? '';
                 $defaults['mail_body_html'] = $templateTranslation->mail_body_html ?? '';
@@ -182,12 +183,13 @@ class TemplateFormFactory implements IFormFactory
                     $this->templateTranslationsRepository->upsert(
                         $row,
                         $lang,
+                        $values['from'],
                         $values['subject'],
                         $values['mail_body_text'],
                         $values['mail_body_html']
                     );
 
-                    unset($values['subject'], $values['mail_body_text'], $values['mail_body_html']);
+                    unset($values['from'], $values['subject'], $values['mail_body_text'], $values['mail_body_html']);
                 }
 
                 $this->templatesRepository->update($row, (array) $values);

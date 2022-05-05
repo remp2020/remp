@@ -153,7 +153,6 @@ class Sender
 
         $message = new Message();
         $message->addTo($recipient['email'], $recipient['name']);
-        $message->setFrom($this->template->from);
 
         $generatorInput = $this->generatorInputFactory->create(
             $this->template,
@@ -164,7 +163,9 @@ class Sender
 
         $mailContent = $this->contentGenerator->render($generatorInput);
         $this->params = $this->contentGenerator->getEmailParams($generatorInput, $this->params);
+
         $message->setSubject($mailContent->subject());
+        $message->setFrom($mailContent->from());
 
         if ($this->template->mail_body_text) {
             $message->setBody($mailContent->text());
@@ -214,7 +215,6 @@ class Sender
         $templateParams = [];
 
         $message = new Message();
-        $message->setFrom($this->template->from);
 
         $subscribedEmails = [];
         foreach ($this->recipients as $recipient) {
@@ -284,6 +284,8 @@ class Sender
         }
 
         $mailContent = $this->contentGenerator->render($generatorInput);
+
+        $message->setFrom($mailContent->from());
         $message->setSubject($mailContent->subject());
 
         if ($this->template->mail_body_text) {

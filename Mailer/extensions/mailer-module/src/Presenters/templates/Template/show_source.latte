@@ -4,9 +4,13 @@
     <div role="tabpanel" class="tab-pane animated fadeIn {$lang === $locale ? 'active'}" id="tab-{$lang}">
         <div class="card-header">
             {if $lang === $locale}
-                <strong>Subject:</strong> {$template->subject}
+                <p><strong>From:</strong> {$template->from}</p>
+                <p><strong>Subject:</strong> {$template->subject}</p>
+                <hr>
             {else}
-                <strong>Subject:</strong> {$translatedTemplate->subject ?? $template->subject}
+                <p><strong>From:</strong> {$translatedTemplate->from ?? $template->from}</p>
+                <p><strong>Subject:</strong> {$translatedTemplate->subject ?? $template->subject}</p>
+                <hr>
             {/if}
 
             <div class="actions">
