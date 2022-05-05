@@ -1,6 +1,6 @@
 {form snippetForm}
     {input id}
-    <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
+    <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger m-b-30" role="alert">
         {$error}<br>
     </div>
 

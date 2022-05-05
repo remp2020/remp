@@ -103,11 +103,8 @@ class SnippetFormFactory implements IFormFactory
         return $form;
     }
 
-    public function validateSnippetForm(Form $form): void
+    public function validateSnippetForm(Form $form, ArrayHash $values): void
     {
-        $snippet = null;
-
-        $values = $form->getValues();
         if (!empty($values->id)) {
             $snippet = $this->snippetsRepository->find($values->id);
             $values->code = $snippet->code;
@@ -121,8 +118,6 @@ class SnippetFormFactory implements IFormFactory
             } else {
                 $form->addError("Snippet with code \"{$values->code}\" and without the mail type already exists.");
             }
-
-            return;
         }
     }
 
