@@ -6,12 +6,12 @@ namespace Remp\Mailer\Forms;
 use Nette\Application\UI\Form;
 use Nette\Security\User;
 use Remp\MailerModule\Models\Auth\PermissionManager;
+use Remp\MailerModule\Models\Segment\Crm;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
-use Remp\MailerModule\Models\Segment\Crm;
 
 class NewsfilterTemplateFormFactory
 {
@@ -93,7 +93,16 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('article_id');
 
         $sourceTemplateId = $_POST['source_template_id'] ?? null;
-        if ($sourceTemplateId == 70) {
+        if ($sourceTemplateId == 76) {
+            $defaults = [
+                'name' => 'Napunk newsfilter ' . date('Y. n. j.'),
+                'code' => 'napunk_nwsf_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 55, // Napunk newsfilter
+                'from' => 'Napunk <napunk@napunk.sk>',
+            ];
+        } elseif ($sourceTemplateId == 70) {
             $defaults = [
                 'name' => 'Vývoj bojov ' . date('j.n.Y'),
                 'code' => 'nwsf_vyvoj_bojov_' . date('dmY'),
