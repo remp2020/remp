@@ -17,7 +17,7 @@
                 <a href="#general" aria-controls="general" role="tab" data-toggle="tab" aria-expanded="true">General</a>
             </li>
             <li n:class="$editedLocale ? controlled">
-                <a href="#email" data-url="{plink this editedLocale => $locale}" aria-controls="tab-{$locale}" role="tab" data-toggle="tab" aria-expanded="false">{if $langs}{$locale}{/if} content </a>
+                <a href="#email" data-url="{plink this editedLocale => $locale}" aria-controls="tab-{$locale}" role="tab" data-toggle="tab" aria-expanded="false">Default content ({$locale})</a>
             </li>
             <li n:foreach="$langs as $lang" class="controlled">
                 {if $lang === $editedLocale}
@@ -71,6 +71,10 @@
                 <div n:if="$editedLocale && $editedLocale !== $locale && !$mailTemplate->related('mail_template_translations', 'mail_template_id')->where('locale', $editedLocale)->fetch()" class="alert bg palette-Grey-200">
                     <i class="zmdi zmdi-alert-circle-o"></i>
                     <strong>{$lang}</strong> translation doesn't exist yet, default (<strong>{$locale}</strong>) is always used when sending the email
+                </div>
+                <div n:if="!$editedLocale || $editedLocale === $locale" class="alert bg palette-Grey-200">
+                    <i class="zmdi zmdi-alert-circle-o"></i>
+                    This content will be sent if <strong>{$locale}</strong> locale is used or another translation is not available.
                 </div>
                 <div class="form-group js-mail-layouts-templates" data-mail-layouts="{json_encode($layouts)}">
                     {label mail_layout_id /}
