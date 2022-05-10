@@ -41,7 +41,6 @@ let beautify = require('js-beautify').html;
                     'alt-require': false,
                     'space-tab-mixed-disabled': 'tab'
                 },
-                scrollbarStyle: null,
             });
         },
         trumbowyg: (element) => {

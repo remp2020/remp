@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `from` field of template between the translated items of template. remp/remp#1119
 - Fixed warning in the snippet form after submitting invalid values. remp/remp#1124
 - Added info about default content of translated items. remp/remp#1126
+- Fixed missing horizontal scrolling in the template code editor. remp/remp#1116
 
 ## [0.32.0] - 2022-05-02
 
