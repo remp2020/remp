@@ -1,14 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
+namespace Remp\MailerModule\Api\v2\Handlers\Mailers;
 
 use Nette\Http\Response;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\GetInputParam;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
 
@@ -27,7 +26,8 @@ class MailTypesListingHandler extends BaseHandler
     public function params(): array
     {
         return [
-            new GetInputParam('code'),
+            (new GetInputParam('code'))->setMulti(),
+            (new GetInputParam('mail_type_category_code'))->setMulti(),
             new GetInputParam('public_listing'),
         ];
     }
@@ -38,6 +38,9 @@ class MailTypesListingHandler extends BaseHandler
 
         if (isset($params['code'])) {
             $results->where(['code' => $params['code']]);
+        }
+        if (isset($params['mail_type_category_code'])) {
+            $results->where(['mail_type_category.code' => $params['mail_type_category_code']]);
         }
 
         if (isset($params['public_listing'])) {

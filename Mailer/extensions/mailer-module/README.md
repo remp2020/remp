@@ -1825,17 +1825,16 @@ new *email* template via API.
 
 ##### *Params:*
 
-| Name                    | Value     | Required | Description                                                                                                            |
-|-------------------------|-----------|----------|------------------------------------------------------------------------------------------------------------------------|
-| code                    | *String*  | no       | Filter only newsletters (mail types) with specific code. Multiple codes can be requested.                              |
-| mail_type_category_code | *String*  | no       | Filter only newsletters (mail types) of specific category. Multiple categories can be requested.                       |
-| public_listing          | *Boolean* | no       | Flag whether only newsletters (mail types) hat should/shouldn't be available to be listed publicly should be returned. |
+| Name           | Value     | Required | Description                                                                                                            |
+|----------------|-----------|----------|------------------------------------------------------------------------------------------------------------------------|
+| code           | *String*  | no       | Filter only newsletter (mail type) with specific code.                                                                 |
+| public_listing | *Boolean* | no       | Flag whether only newsletters (mail types) hat should/shouldn't be available to be listed publicly should be returned. |
 
 ##### *Example:*
 
 ```shell
 curl -X GET \
-  http://mailer.remp.press/api/v1/mailers/mail-types?public_listing=1 \
+  http://mailer.remp.press/api/v1/mailers/mail-types?public_listing=1&code=demo-weekly-newsletter \
   -H 'Authorization: Bearer XXX'
 ```
 
@@ -1846,20 +1845,59 @@ Response:
   "status": "ok",
   "data": [
     {
-      "id": 2,
-      "code": "123",
-      "image_url": "",
-      "preview_url": "",
-      "page_url": "",
-      "title": "Test",
-      "description": "",
+      "id": 1,
+      "code": "demo-weekly-newsletter",
+      "image_url": null,
+      "preview_url": null,
+      "page_url": null,
+      "title": "DEMO Weekly newsletter",
+      "description": "Example mail list",
       "locked": false,
       "is_multi_variant": true,
       "variants": {
-        "4": "test2",
-        "5": "test4"
+        "2": "test",
+        "3": "test2"
       }
-    },
+    }
+  ]
+}
+```
+
+---
+
+#### GET `/api/v2/mailers/mail-types`
+
+Lists all available *newsletter lists* (mail types). *Code* of the newsletter is required when creating
+new *email* template via API.
+
+##### *Headers:*
+
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
+
+##### *Params:*
+
+| Name                    | Value      | Required | Description                                                                                                            |
+|-------------------------|------------|----------|------------------------------------------------------------------------------------------------------------------------|
+| code                    | *String[]* | no       | Filter only newsletters (mail types) with specific code. Multiple codes can be requested.                              |
+| mail_type_category_code | *String*   | no       | Filter only newsletters (mail types) of specific category. Multiple categories can be requested.                       |
+| public_listing          | *Boolean*  | no       | Flag whether only newsletters (mail types) hat should/shouldn't be available to be listed publicly should be returned. |
+
+##### *Example:*
+
+```shell
+curl -X GET \
+  http://mailer.remp.press/api/v1/mailers/mail-types?public_listing=1&code[]=demo-weekly-newsletter \
+  -H 'Authorization: Bearer XXX'
+```
+
+Response:
+
+```json5
+{
+  "status": "ok",
+  "data": [
     {
       "id": 1,
       "code": "demo-weekly-newsletter",

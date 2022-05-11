@@ -17,9 +17,10 @@ class MailTypesListingHandlerTest extends BaseApiHandlerTestCase
         $this->assertCount(0, $response->getPayload()['data']);
     }
 
-    public function testListPublic()
+    public function testListWithFilters()
     {
-        $this->createMailTypes();
+        $this->createMailTypeWithCategory("category1", "code1", "name1", true);
+        $this->createMailTypeWithCategory("category1", "code2", "name2", false);
 
         $params = ['public_listing' => 1];
         $handler = $this->getHandler(MailTypesListingHandler::class);
@@ -28,9 +29,10 @@ class MailTypesListingHandlerTest extends BaseApiHandlerTestCase
         $this->assertCount(1, $response->getPayload()['data']);
     }
 
-    public function testListByCode()
+    public function testListWithCode()
     {
-        $this->createMailTypes();
+        $this->createMailTypeWithCategory("category1", "code1", "name1");
+        $this->createMailTypeWithCategory("category1", "code2", "name2");
 
         $params = ['code' => 'code2'];
         $handler = $this->getHandler(MailTypesListingHandler::class);
@@ -39,43 +41,15 @@ class MailTypesListingHandlerTest extends BaseApiHandlerTestCase
         $this->assertCount(1, $response->getPayload()['data']);
     }
 
-    public function testListByUnknownCode()
+    public function testListWithUnknownCode()
     {
-        $this->createMailTypes();
+        $this->createMailTypeWithCategory("category1", "code1", "name1");
+        $this->createMailTypeWithCategory("category1", "code2", "name2");
 
-        $params = ['code' => 'codeZ'];
+        $params = ['code' => 'code3'];
         $handler = $this->getHandler(MailTypesListingHandler::class);
         $response =  $handler->handle($params);
         $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
         $this->assertCount(0, $response->getPayload()['data']);
-    }
-
-    public function testListByCategoryCode()
-    {
-        $this->createMailTypes();
-
-        $params = ['mail_type_category_code' => 'category2'];
-        $handler = $this->getHandler(MailTypesListingHandler::class);
-        $response =  $handler->handle($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
-        $this->assertCount(1, $response->getPayload()['data']);
-    }
-
-    public function testListPublicByCategoryCode()
-    {
-        $this->createMailTypes();
-
-        $params = ['mail_type_category_code' => 'category2', 'public_listing' => 1];
-        $handler = $this->getHandler(MailTypesListingHandler::class);
-        $response =  $handler->handle($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
-        $this->assertCount(0, $response->getPayload()['data']);
-    }
-
-    private function createMailTypes()
-    {
-        $this->createMailTypeWithCategory("category1", "code1", "name1", true);
-        $this->createMailTypeWithCategory("category1", "code2", "name2", false);
-        $this->createMailTypeWithCategory("category2", "code3", "name3", false);
     }
 }
