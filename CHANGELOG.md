@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for `group` in options for `ButtonSwitcher`. Groups allow to visually separate options. remp/remp#1110
 - Added `First day`, `First 7 days` and `First 14 days` options to `PageLoadsGraph`. remp/remp#1110
 
+## [0.32.2] - 2022-05-11
+
 ### [Campaign]
 
 - Added referrer policy (`no-referrer-when-downgrade`) to banner links. remp/remp#1123
@@ -27,7 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed accidental breaking change in `/api/v1/mailers/mail-types` causing `code` filter not to work anymore. remp/remp#1127
   - New features of the API including the breaking change were now moved to the `/api/v2/mailers/mail-types`.
 
-## [0.32.0] - 2022-05-02
+## [0.32.1] - 2022-05-02
 
 ### [Beam]
 
@@ -1232,8 +1234,9 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.32.0...master
-[0.32.0]: https://github.com/remp2020/remp/compare/0.31.0...0.32.0
+[Unreleased]: https://github.com/remp2020/remp/compare/0.32.2...master
+[0.32.2]: https://github.com/remp2020/remp/compare/0.32.1...0.32.2
+[0.32.1]: https://github.com/remp2020/remp/compare/0.31.0...0.32.1
 [0.31.0]: https://github.com/remp2020/remp/compare/0.30.2...0.31.0
 [0.30.2]: https://github.com/remp2020/remp/compare/0.30.1...0.30.2
 [0.30.1]: https://github.com/remp2020/remp/compare/0.30.0...0.30.1
