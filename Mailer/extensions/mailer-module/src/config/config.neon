@@ -178,6 +178,7 @@ services:
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailCreateTemplateHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'jobs'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailJobCreateApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-types'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 2, 'mailers', 'mail-types'), \Remp\MailerModule\Api\v2\Handlers\Mailers\MailTypesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-type-categories'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeCategoriesHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'mail-type-upsert'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeUpsertHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTemplatesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())

@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed warning in the snippet form after submitting invalid values. remp/remp#1124
 - Added info about default content of translated items. remp/remp#1126
 - Fixed missing horizontal scrolling in the template code editor. remp/remp#1116
+- Fixed accidental breaking change in `/api/v1/mailers/mail-types` causing `code` filter not to work anymore. remp/remp#1127
+  - New features of the API including the breaking change were now moved to the `/api/v2/mailers/mail-types`.
 
 ## [0.32.0] - 2022-05-02
 
