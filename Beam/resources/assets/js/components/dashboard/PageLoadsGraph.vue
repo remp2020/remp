@@ -2,10 +2,13 @@
     <div class="chartContainer">
 
         <button-switcher :options="[
-                    {text: 'Today', value: 'today'},
-                    {text: '7 days', value: '7days'},
-                    {text: '30 days', value: '30days'},
-                    {text: 'Since publishing', value: 'all'}]"
+                    {text: 'Since publishing', value: 'all', group: 0},
+                    {text: 'Today', value: 'today', group: 1},
+                    {text: '7 days', value: '7days', group: 1},
+                    {text: '30 days', value: '30days', group: 1},
+                    {text: 'First day', value: 'first1day', group: 2},
+                    {text: 'First 7 days', value: 'first7days', group: 2},
+                    {text: 'First 14 days', value: 'first14days', group: 2}]"
                          v-model="interval">
         </button-switcher>
 

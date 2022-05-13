@@ -17,7 +17,7 @@ use Remp\Journal\JournalContract;
 
 class ArticleDetailsController extends Controller
 {
-    private const ALLOWED_INTERVALS = 'today,7days,30days,all';
+    private const ALLOWED_INTERVALS = 'today,1day,7days,30days,all,first1day,first7days,first14days';
 
     private $journal;
 
