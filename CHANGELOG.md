@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added support for `group` in options for `ButtonSwitcher`. Groups allow to visually separate options. remp/remp#1110
+- Added `First day`, `First 7 days` and `First 14 days` options to `PageLoadsGraph`. remp/remp#1110
+
 ### [Campaign]
 
 - Added referrer policy (`no-referrer-when-downgrade`) to banner links. remp/remp#1123

@@ -76,6 +76,33 @@ class JournalInterval
                 $this->intervalText = $intervalText;
                 $this->intervalMinutes = $intervalMinutes;
                 break;
+            case 'first1day':
+                if (!$article) {
+                    throw new InvalidArgumentException("Missing article for 'first1day' option");
+                }
+                $this->timeAfter = (clone $article->published_at)->tz($tz);
+                $this->timeBefore = $this->timeAfter->copy()->addDay();
+                $this->intervalText = '20m';
+                $this->intervalMinutes = 20;
+                break;
+            case 'first7days':
+                if (!$article) {
+                    throw new InvalidArgumentException("Missing article for 'first7days' option");
+                }
+                $this->timeAfter = (clone $article->published_at)->tz($tz);
+                $this->timeBefore = $this->timeAfter->copy()->addDays(7);
+                $this->intervalText = '1h';
+                $this->intervalMinutes = 60;
+                break;
+            case 'first14days':
+                if (!$article) {
+                    throw new InvalidArgumentException("Missing article for 'first14days' option");
+                }
+                $this->timeAfter = (clone $article->published_at)->tz($tz);
+                $this->timeBefore = $this->timeAfter->copy()->addDays(14);
+                $this->intervalText = '1h';
+                $this->intervalMinutes = 60;
+                break;
             default:
                 throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,1day,7days,30days,all] values, instead '$interval' provided");
         }
