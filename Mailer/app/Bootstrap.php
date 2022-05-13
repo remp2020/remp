@@ -30,7 +30,7 @@ final class Bootstrap
         }
 
         // terminal
-        if (!isset($_SERVER['HTTP_HOST']) && isset($_SERVER['SHELL'])) {
+        if (self::isCli()) {
             $configurator->setDebugMode(true);
         }
 
@@ -51,5 +51,14 @@ final class Bootstrap
         $configurator->addConfig(__DIR__ . '/config/config.local.neon');
 
         return $configurator;
+    }
+
+    public static function isCli()
+    {
+        return PHP_SAPI === 'cli'
+            || PHP_SAPI === 'phpdbg'
+            || isset($_SERVER['SHELL'])
+            || isset($_SERVER['TERM'])
+            || defined('STDIN');
     }
 }

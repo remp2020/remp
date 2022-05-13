@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "66e6de62df47ad6dce43c0d55ff88c06",
+    "content-hash": "52599839c84b256eaf268f0804fd812c",
     "packages": [
         {
             "name": "brick/math",
@@ -4660,11 +4660,11 @@
         },
         {
             "name": "remp/mailer-module",
-            "version": "dev-master",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "extensions/mailer-module",
-                "reference": "35cf4d533dde0b8d7f92a4cd2027771995d2c68e"
+                "reference": "1315de7f8d442a8ce12fe3711c0de4f31cdf6467"
             },
             "require": {
                 "deployer/deployer": "^6.0",
@@ -4672,6 +4672,7 @@
                 "embed/embed": "^4.3",
                 "ext-intl": "*",
                 "ext-json": "*",
+                "ext-pdo": "*",
                 "guzzlehttp/guzzle": "^7.0",
                 "halaxa/json-machine": "^0.3",
                 "justinrainbow/json-schema": "^5.2",
@@ -4721,6 +4722,39 @@
                 "MIT"
             ],
             "description": "REMP Mailer Module",
+            "homepage": "https://remp2030.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "remp/newrelic-module",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "extensions/newrelic-module",
+                "reference": "8efe85a7d4ef21bfb154d8e5c3a8f664de0c9a98"
+            },
+            "require": {
+                "nette/application": "^3.0",
+                "nette/di": "^3.0",
+                "php": "^7.4",
+                "tracy/tracy": "^2.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Remp\\NewrelicModule\\": "src/"
+                },
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "REMP Newrelic Module",
             "homepage": "https://remp2030.com",
             "transport-options": {
                 "symlink": true,
@@ -10933,11 +10967,12 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "remp/mailer-module": 20,
+        "remp/newrelic-module": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }

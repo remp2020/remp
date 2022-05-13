@@ -137,6 +137,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for managing roles and privileges to Mailer. See [README](./Mailer/extensions/mailer-module/README.md#permission-management) for more information. remp/remp#1087
 - Refactored mailer log filter (because of performance issues). remp/remp#1095
 - Added `allowSearch` setting to DataTable component. remp/remp#1095
+- Created `NewrelicModule` extension. remp/remp#1115
+	- Added `NewrelicRequestListener` which handles naming request transactions.
 
 ## [0.29.0] - 2021-11-18
 

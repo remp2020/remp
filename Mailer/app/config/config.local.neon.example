@@ -1,6 +1,9 @@
 php:
 	intl.default_locale: sk_SK
 
+extensions:
+#	newrelic: Remp\NewrelicModule\DI\NewrelicModuleExtension
+
 #parameters:
 #	crm:
 #		addr: @environmentConfig::get('CRM_ADDR')
