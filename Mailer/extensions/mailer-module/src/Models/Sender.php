@@ -188,7 +188,7 @@ class Sender
 
         $this->logsRepository->add(
             $recipient['email'],
-            $this->template->subject,
+            $message->getSubject(),
             $this->template->id,
             $this->jobId,
             $this->batchId,

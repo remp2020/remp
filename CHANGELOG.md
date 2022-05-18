@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for `group` in options for `ButtonSwitcher`. Groups allow to visually separate options. remp/remp#1110
 - Added `First day`, `First 7 days` and `First 14 days` options to `PageLoadsGraph`. remp/remp#1110
 
+### [Mailer]
+
+- Fixed logs subject not storing the translated version of sent email. remp/remp#1130
+
 ## [0.32.2] - 2022-05-11
 
 ### [Campaign]
