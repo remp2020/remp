@@ -144,8 +144,8 @@ final class ListPresenter extends BasePresenter
                 $list->code,
                 $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
                 $list->auto_subscribe,
-                $list->public_listing,
                 $list->locked,
+                $list->public_listing,
             ];
         }
 
