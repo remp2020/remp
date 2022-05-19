@@ -12,6 +12,9 @@ type Config struct {
 	MysqlPasswd string `envconfig:"mysql_passwd" required:"true"`
 	MysqlDBName string `envconfig:"mysql_dbname" required:"true"`
 
+	KafkaSaslUser   string `envconfig:"kafka_sasl_user" required:"false"`
+	KafkaSaslPasswd string `envconfig:"kafka_sasl_passwd" required:"false"`
+
 	InternalHosts string `envconfig:"internal_hosts" required:"false"`
 
 	TimespentLimit int `envconfig:"timespent_limit" required:"false" default:0`
