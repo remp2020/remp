@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Fixed logs subject not storing the translated version of sent email. remp/remp#1130
+- Fixed mixed up columns "Locked" and "Publicly listed" in Newsletter lists table. remp/remp#1131
 
 ## [0.32.2] - 2022-05-11
 
