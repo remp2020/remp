@@ -7,6 +7,6 @@ class YesNoFilter
 {
     public function process(int $input): string
     {
-        return (boolean)$input ? 'Yes' : 'No';
+        return (boolean) $input ? 'Yes' : 'No';
     }
 }

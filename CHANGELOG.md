@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## [0.32.3] - 2022-05-26
 
 - Fixed deprecated warning because of using `Latte#addFilter()` method. remp/crm#1135
+- Fixed the filter loading issue. remp/crm#1135
 
 ## [0.32.2] - 2022-05-11
 
