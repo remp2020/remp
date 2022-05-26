@@ -24,7 +24,7 @@ services:
 
 	nette.latteFactory:
 		setup:
-			- addFilter(null, [@filterLoader, 'load'])
+			- addFilterLoader([@filterLoader, 'load'])
 
 	mailWorkerCommand:
 		factory: Remp\MailerModule\Commands\MailWorkerCommand(@commandsLogger)
