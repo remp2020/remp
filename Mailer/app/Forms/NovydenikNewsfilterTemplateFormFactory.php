@@ -188,13 +188,13 @@ class NovydenikNewsfilterTemplateFormFactory
         $form->setDefaults($defaults);
 
         if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
-            $withJobs = $form->addSubmit('generate_emails_jobs', 'system.save');
+            $withJobs = $form->addSubmit('generate_emails_jobs');
             $withJobs->getControlPrototype()
                 ->setName('button')
                 ->setHtml('Generate newsletter batch and start sending');
         }
 
-        $withJobsCreated = $form->addSubmit('generate_emails_jobs_created', 'system.save');
+        $withJobsCreated = $form->addSubmit('generate_emails_jobs_created');
         $withJobsCreated->getControlPrototype()
             ->setName('button')
             ->setHtml('Generate newsletter batch');

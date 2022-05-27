@@ -136,7 +136,7 @@ class ConfigFormFactory
             }
         }
 
-        $form->addSubmit('save', 'Save')
+        $form->addSubmit('save')
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');

@@ -118,13 +118,13 @@ class NewBatchFormFactory
 
         $form->addHidden('job_id', $jobId);
 
-        $form->addSubmit('save', 'Save')
+        $form->addSubmit('save')
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
 
         if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
-            $form->addSubmit(self::FORM_ACTION_SAVE_START, 'Save and start sending')
+            $form->addSubmit(self::FORM_ACTION_SAVE_START)
                 ->getControlPrototype()
                 ->setName('button')
                 ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and start');

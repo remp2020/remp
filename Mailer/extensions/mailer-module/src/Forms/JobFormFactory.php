@@ -69,7 +69,7 @@ class JobFormFactory
             ->setHtmlAttribute('data-live-search-normalize', 'true')
             ->setDefaultValue($job->segment_provider . '::' . $job->segment_code);
 
-        $form->addSubmit('save', 'Save')
+        $form->addSubmit('save')
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
