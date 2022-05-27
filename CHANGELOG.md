@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed mixed up columns "Locked" and "Publicly listed" in Newsletter lists table. remp/remp#1131
 - Fixed deprecated warning because of using `Latte#addFilter()` method. remp/remp#1135
 - Fixed the filter loading issue. remp/remp#1135
+- Fixed Latte deprecation issues introduced in the latest version of the templating engine. remp/remp#1136
 
 ## [0.32.2] - 2022-05-11
 

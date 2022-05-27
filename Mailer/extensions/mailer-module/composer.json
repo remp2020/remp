@@ -34,7 +34,7 @@
     "oops/webpack-nette-adapter": "^1.0",
     "php-amqplib/php-amqplib": "^2.7",
     "predis/predis": "^1.1",
-    "remp/remp-commons": "dev-master|0.27.1",
+    "remp/remp-commons": "@dev|^0.32",
     "robmorgan/phinx": "^0.12",
     "rootpd/nette-sentry": "^1.1",
     "slim/psr7": "^1.3",

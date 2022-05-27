@@ -90,7 +90,7 @@
                     <div class="card-body">
                         {if $batch->related('mail_job_batch_templates')->count('*') > 0}
                             <div class="m-tbl-15">
-                            {ifAllowed $user, 'batch', 'start'}
+                                {ifAllowed $user, 'batch', 'start'}
                                 <a n:if="in_array($batch->status, ['created', 'processed'])" n:href="SetBatchReadyToSend! $batch->id" class="btn bg palette-Cyan-600 btn-icon-text waves-effect"><i class="zmdi zmdi-play"></i> START SENDING <span n:if="$batch->status === 'processed'">({$batchPreparedEmailsStats[$batch->id] ?? 0})</span></a>
                                 {/ifAllowed}
 
@@ -126,7 +126,7 @@
             </div>
             <div class="col-md-8">
                 <div class="card collapse z-depth-1" id="new-template-form-batch-{$batch->id}">
-                    {snippet batches-$batch->id}
+                    {snippet batches-{$batch->id}}
                     <div class="card-header">
                         <h2>Add Email</h2>
                         <ul class="actions">
@@ -163,7 +163,7 @@
                     </div>
                     <div class="card-body">
                         {var $id = $email->id}
-                        {control jobBatchTemplateStats-$id}
+                        {control jobBatchTemplateStats-{$id}}
                     </div>
                 </div>
 
