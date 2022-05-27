@@ -197,7 +197,7 @@ final class LogPresenter extends BasePresenter
 
         $form->addText('created_at_to', 'Sent to')->setRequired('Field `Sent to` is required');
 
-        $form->addSubmit('send', 'Filter')
+        $form->addSubmit('send')
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="fa fa-filter"></i> Filter');

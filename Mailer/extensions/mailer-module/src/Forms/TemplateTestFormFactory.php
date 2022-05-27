@@ -47,7 +47,7 @@ class TemplateTestFormFactory
             $form->setDefaults(['locale' => $this->localizationConfig->getDefaultLocale()]);
         }
 
-        $form->addSubmit('save', 'Send')
+        $form->addSubmit('save')
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Send');

@@ -53,7 +53,7 @@ class NewTemplateFormFactory
         $form->addSelect('template_id', 'Email', $templateList);
         $form->addHidden('batch_id', $batchId);
 
-        $form->addSubmit('save', 'Save')
+        $form->addSubmit('save')
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');

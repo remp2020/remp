@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed deprecated warning because of using `Latte#addFilter()` method. remp/remp#1135
 - Fixed the filter loading issue. remp/remp#1135
 - Fixed Latte deprecation issues introduced in the latest version of the templating engine. remp/remp#1136
+- Removed captions from the submit buttons in favor of HTML content with icons. remp/remp#1138
 
 ## [0.32.2] - 2022-05-11
 

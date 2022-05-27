@@ -63,12 +63,12 @@ class EditBatchFormFactory implements IFormFactory
 
         $form->addHidden('id', $batch->id);
 
-        $form->addSubmit(self::FORM_ACTION_SAVE, self::FORM_ACTION_SAVE)
+        $form->addSubmit(self::FORM_ACTION_SAVE)
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-check"></i> Save');
 
-        $form->addSubmit(self::FORM_ACTION_SAVE_CLOSE, self::FORM_ACTION_SAVE_CLOSE)
+        $form->addSubmit(self::FORM_ACTION_SAVE_CLOSE)
             ->getControlPrototype()
             ->setName('button')
             ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and close');
