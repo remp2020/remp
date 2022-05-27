@@ -6,7 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-## [0.32.3] - 2022-05-26
+## [0.32.5] - 2022-05-27
+
+- Fixed Latte deprecation issues introduced in the latest version of the templating engine. remp/remp#1136
+
+## [0.32.4] - 2022-05-26
 
 - Fixed deprecated warning because of using `Latte#addFilter()` method. remp/crm#1135
 - Fixed the filter loading issue. remp/crm#1135

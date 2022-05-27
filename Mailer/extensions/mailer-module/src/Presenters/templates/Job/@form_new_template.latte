@@ -1,4 +1,4 @@
-{form newTemplateForm-$batchId}
+{form newTemplateForm-{$batchId}}
     <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
     {$error}<br>
     </div>
