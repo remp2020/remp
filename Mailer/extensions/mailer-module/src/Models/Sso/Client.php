@@ -30,13 +30,8 @@ class Client
 
     /**
      * introspect attempts to obtain user data based on the provided SSO $token.
-     *
-     * @param $token
-     * @return array
-     * @throws SsoExpiredException
-     * @throws \Nette\Security\AuthenticationException
      */
-    public function introspect($token)
+    public function introspect(string $token): array
     {
         try {
             $response = $this->client->request('GET', self::ENDPOINT_INTROSPECT, [
@@ -65,13 +60,8 @@ class Client
 
     /**
      * Return true if token is valid, otherwise return false
-     *
-     * @param $token string
-     * @return bool
-     * @throws \Remp\MailerModule\Models\Sso\SsoException
-     * @throws \RuntimeException
      */
-    public function validToken($token)
+    public function validToken(string $token): bool
     {
         try {
             $response = $this->client->request('GET', self::ENDPOINT_CHECK_TOKEN, [
@@ -92,7 +82,7 @@ class Client
         return $response->getStatusCode() === 200;
     }
 
-    public function refresh($token)
+    public function refresh(string $token): array
     {
         try {
             $response = $this->client->request('POST', self::ENDPOINT_REFRESH, [

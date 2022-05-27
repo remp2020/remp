@@ -213,7 +213,7 @@ class TemplateFormFactory implements IFormFactory
             $this->contentGenerator->render($this->generatorInputFactory->create($row));
         } catch (TemplatesCodeNotUniqueException $e) {
             $this->database->rollback();
-            $form['code']->addError($e->getMessage());
+            $form->getComponent('code')->addError($e->getMessage());
             return;
         } catch (\Exception $exception) {
             $this->database->rollback();

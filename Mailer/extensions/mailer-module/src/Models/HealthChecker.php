@@ -17,7 +17,7 @@ class HealthChecker
     public function ping(string $processId, int $ttlSeconds = 300): bool
     {
         return (bool) $this->redis()->set(
-            static::REDIS_KEY . $processId,
+            self::REDIS_KEY . $processId,
             '1',
             'EX', // EX - Set the specified expire time, in seconds.
             $ttlSeconds
@@ -26,6 +26,6 @@ class HealthChecker
 
     public function isHealthy(string $processId): bool
     {
-        return $this->redis()->get(static::REDIS_KEY . $processId) !== null;
+        return $this->redis()->get(self::REDIS_KEY . $processId) !== null;
     }
 }

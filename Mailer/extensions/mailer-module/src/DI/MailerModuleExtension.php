@@ -54,7 +54,8 @@ final class MailerModuleExtension extends CompilerExtension
         $builder = $this->getContainerBuilder();
 
         // set extension parameters for use in config
-        $builder->parameters['redis_client_factory'] = (array) $this->config->redis_client_factory;
+        $config = (object) $this->getConfig();
+        $builder->parameters['redis_client_factory'] = (array) $config->redis_client_factory;
 
         // load services from config and register them to Nette\DI Container
         $this->compiler->loadDefinitionsFromConfig(

@@ -5,10 +5,10 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
-use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\SourceTemplateFormFactory;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
 final class GeneratorPresenter extends BasePresenter
@@ -129,8 +129,9 @@ final class GeneratorPresenter extends BasePresenter
 
     public function handleRenderSorting($sorting): void
     {
-        // set sorting value
-        $this['mailSourceTemplateForm']['sorting']->setValue($sorting);
+        /** @var \Nette\Forms\Form $form */
+        $form = $this['mailSourceTemplateForm'];
+        $form['sorting']->setValue($sorting);
 
         $this->redrawControl('wrapper');
         $this->redrawControl('sortingAfterSnippet');

@@ -146,7 +146,6 @@ class DemoSeedCommand extends Command
 
     protected function seedSnippets()
     {
-        /** @var ActiveRow $layout */
         $snippet = $this->snippetsRepository->findBy('code', 'demo-snippet');
         $snippetEmail = $this->snippetsRepository->findBy('code', 'demo-snippet-email');
         if ($snippet && $snippetEmail) {

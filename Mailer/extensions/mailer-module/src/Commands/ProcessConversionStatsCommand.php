@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
-use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Models\Users\IUser;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\IConversionsRepository;
 use Remp\MailerModule\Repositories\LogConversionsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
-use Remp\MailerModule\Models\Users\IUser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -170,7 +169,6 @@ class ProcessConversionStatsCommand extends Command
         $progressBar->setFormat('processStats');
         $progressBar->start();
 
-        /** @var ActiveRow $template */
         foreach ($nonBatchTemplatesConversions as $mailTemplateCode => $userIds) {
             $userData = $this->getUserData(array_keys($userIds));
             $mailTemplate = $this->templatesRepository->getByCode($mailTemplateCode);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Models\FormRenderer;
 
 use Nette\Forms\Control;
+use Nette\Forms\Controls\BaseControl;
 use Nette\Forms\Controls\Button;
 use Nette\Forms\Controls\Checkbox;
 use Nette\Forms\Controls\CheckboxList;
@@ -117,6 +118,9 @@ class MaterialRenderer extends DefaultFormRenderer
      */
     public function renderPair(Control $control): string
     {
+        if (!$control instanceof BaseControl) {
+            throw new \Exception('Unable to use MaterialRenderer, control needs to extend Nette\Forms\Controls\BaseControl');
+        }
         $outer = $pair = $this->getWrapper('pair container');
 
         $isTextInput = $control instanceof TextInput;
@@ -128,6 +132,7 @@ class MaterialRenderer extends DefaultFormRenderer
 
         $pair->addHtml($this->renderMaterialLabel($control, $isTextInput));
         $pair->addHtml($this->renderControl($control));
+
         $pair->class($this->getValue($control->isRequired() ? 'pair .required' : 'pair .optional'), true);
         $pair->class($control->hasErrors() ? $this->getValue('pair .error') : null, true);
         $pair->class($control->getOption('class'), true);
@@ -135,16 +140,11 @@ class MaterialRenderer extends DefaultFormRenderer
             $pair->class($this->getValue('pair .odd'), true);
         }
         $pair->id = $control->getOption('id');
+
         return $outer->render(0);
     }
 
-    /**
-     * Renders 'label' part of visual row of controls.
-     * @param IControl $control
-     * @param bool $animatedLabel
-     * @return Html
-     */
-    public function renderMaterialLabel(IControl $control, bool $animatedLabel)
+    public function renderMaterialLabel(BaseControl $control, bool $animatedLabel): Html
     {
         $label = $control->getLabel();
         if ($label instanceof Html) {

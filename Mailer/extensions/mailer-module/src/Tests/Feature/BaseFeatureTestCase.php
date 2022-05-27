@@ -211,6 +211,6 @@ SET FOREIGN_KEY_CHECKS=1;
 
     protected function createMailUserSubscription($mailType, int $userID = 123, string $email = 'example@example.com', int $variantID = null)
     {
-        return $this->userSubscriptionsRepository->subscribeUser($mailType, $userID, $email, $variantID);
+        $this->userSubscriptionsRepository->subscribeUser($mailType, $userID, $email, $variantID);
     }
 }
