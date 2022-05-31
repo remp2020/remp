@@ -177,7 +177,7 @@ class MailWorkerCommand extends Command
                     break;
                 }
 
-                if ($sendAsBatch) {
+                if ($sendAsBatch && $this->applicationMailer->supportsBatch()) {
                     $rawJobs = $this->mailCache->getJobs($batch->id, self::MESSAGES_PER_BATCH);
                     if (empty($rawJobs)) {
                         break;
@@ -240,8 +240,6 @@ class MailWorkerCommand extends Command
                         if ($sendAsBatch && $email->supportsBatch()) {
                             $output->writeln("sending {$templateCode} (batch {$batch->id}) as a batch");
 
-                            // TODO temporarily trying to catch all possible errors to debug https://gitlab.com/remp/remp/issues/502
-                            // remove once it's fixed
                             try {
                                 $sentCount = $email->sendBatch($this->logger);
                             } catch (Throwable $throwable) {
