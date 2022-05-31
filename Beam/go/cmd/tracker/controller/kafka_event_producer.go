@@ -52,6 +52,7 @@ func NewKafkaEventProducer(brokerAddrs []string, saslConfig *SaslConfig) (*Kafka
 	}, nil
 }
 
+// Produce generates a message in the influx-data format and passes it to the configured Kafka instance.
 func (kep KafkaEventProducer) Produce(ctx context.Context, table string, time time.Time, data map[string]any) error {
 	p, err := influxClient.NewPoint(table, nil, data, time)
 	if err != nil {
@@ -64,6 +65,7 @@ func (kep KafkaEventProducer) Produce(ctx context.Context, table string, time ti
 	return nil
 }
 
+// Close closes the connection to the Kafka event producer.
 func (kep KafkaEventProducer) Close() error {
 	return kep.EventProducer.Close()
 }

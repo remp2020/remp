@@ -17,10 +17,10 @@ type Config struct {
 
 	InternalHosts string `envconfig:"internal_hosts" required:"false"`
 
-	TimespentLimit int `envconfig:"timespent_limit" required:"false" default:0`
+	TimespentLimit int `envconfig:"timespent_limit" required:"false" default:"0"`
 
 	BrokerImpl string `envconfig:"broker_impl" required:"false" default:"kafka"`
 
-	PubSubProjectId string `envconfig:"pubsub_project_id" required:"false"`
-	PubSubTopicId   string `envconfig:"pubsub_topic_id" required:"false"`
+	PubSubProjectID string `envconfig:"pubsub_project_id" required:"false"`
+	PubSubTopicID   string `envconfig:"pubsub_topic_id" required:"false"`
 }

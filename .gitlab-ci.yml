@@ -16,7 +16,7 @@ syntax:7.4:
 
 sniffer:
   stage: test
-  image: remp/php-ci:7.4.15
+  image: remp/php-ci:7.4.29
   tags:
     - docker
   script:
@@ -25,16 +25,25 @@ sniffer:
 
 phpstan:
   stage: test
-  image: remp/php-ci:7.4.15
+  image: remp/php-ci:7.4.29
   tags:
     - docker
   script:
     - make composer-install
     - make phpstan
 
+latte_lint:
+  stage: test
+  image: remp/php-ci:7.4.29
+  tags:
+    - docker
+  script:
+    - make composer-install
+    - make latte-lint
+
 tests:
   stage: test
-  image: remp/php-ci:7.4.15
+  image: remp/php-ci:7.4.29
   tags:
     - docker
   script:
@@ -42,9 +51,9 @@ tests:
     - make copy-env    
     - make phpunit
   services:
-    - name: mysql:5.7.21
+    - name: mysql:8.0.29
       alias: mysql
-    - name: redis:3.2
+    - name: redis:6.2
       alias: redis
   variables:
       MYSQL_DATABASE: remp_test

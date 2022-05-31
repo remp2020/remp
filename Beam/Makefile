@@ -20,7 +20,7 @@ lint: lint-lib
 	@cd $(SUB_SEGMENTS) && make lint
 
 vet-lib:
-	@go vet $$(go list ./... | grep -vE '(/vendor|/cmd)')
+	@go vet $$(go list go/... | grep -vE '(/vendor|/cmd)')
 
 vet: vet-lib
 	@cd $(SUB_TRACKER) && make vet

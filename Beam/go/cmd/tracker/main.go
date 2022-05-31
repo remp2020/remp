@@ -192,8 +192,8 @@ func newProducer(ctx context.Context, config *Config, service *goa.Service) (con
 		return producer, nil
 
 	case "pubsub":
-		service.LogInfo("connecting to pubsub", "projectID", config.PubSubProjectId, "topicID", config.PubSubTopicId)
-		producer, err := controller.NewPubSubEventProducer(ctx, config.PubSubProjectId, config.PubSubTopicId)
+		service.LogInfo("connecting to pubsub", "projectID", config.PubSubProjectID, "topicID", config.PubSubTopicID)
+		producer, err := controller.NewPubSubEventProducer(ctx, config.PubSubProjectID, config.PubSubTopicID)
 		if err != nil {
 			return nil, err
 		}

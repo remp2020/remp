@@ -46,6 +46,9 @@ phpstan:
 lint:
 	cd $(SUB_BEAM) && make lint
 
+latte-lint:
+	cd $(SUB_MAILER) && make latte-lint
+
 vet:
 	cd $(SUB_BEAM) && make vet
 

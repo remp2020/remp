@@ -48,8 +48,8 @@ install: gen
 
 lint:
 	set -e; \
-	for package in $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test)'); \
+	for package in $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test|/data)'); \
 	do golint -set_exit_status=true $$package; done
 
 vet:
-	go vet $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test)')
+	go vet $$(go list ./... | grep -vE '(/app|/design|/swagger|/client|/tool|/test|/data)')

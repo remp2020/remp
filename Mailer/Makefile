@@ -31,4 +31,7 @@ syntax:
 	find ${PHP_FOLDERS} -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
 
 phpstan:
-	php vendor/bin/phpstan analyse --configuration=.phpstan.neon --level=1 --memory-limit=1G app tests extensions
+	php vendor/bin/phpstan analyse --level=1 --memory-limit=1G app tests extensions
+
+latte-lint:
+	php vendor/bin/latte-lint app extensions

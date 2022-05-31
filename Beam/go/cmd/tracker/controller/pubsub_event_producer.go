@@ -10,26 +10,26 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Implementation of EventProducer
+// PubSubEventProducer is a Cloud PubSub implementation of EventProducer interface.
 type PubSubEventProducer struct {
 	client pubsub.Client
 	topic  pubsub.Topic
 }
 
 // NewPubSubEventProducer creates new PubSubEventProducer
-func NewPubSubEventProducer(ctx context.Context, projectId string, topicId string) (*PubSubEventProducer, error) {
-	client, err := pubsub.NewClient(ctx, projectId)
+func NewPubSubEventProducer(ctx context.Context, projectID string, topicID string) (*PubSubEventProducer, error) {
+	client, err := pubsub.NewClient(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}
 
-	topic := client.Topic(topicId)
+	topic := client.Topic(topicID)
 	ok, err := topic.Exists(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if !ok {
-		return nil, errors.Errorf("PubSub: topic %q doesn't exist.", topicId)
+		return nil, errors.Errorf("PubSub: topic %q doesn't exist.", topicID)
 	}
 
 	return &PubSubEventProducer{
@@ -38,6 +38,7 @@ func NewPubSubEventProducer(ctx context.Context, projectId string, topicId strin
 	}, nil
 }
 
+// Produce generates a message and passes it to the configured Cloud Pub/Sub interface.
 func (psep PubSubEventProducer) Produce(ctx context.Context, table string, time time.Time, data map[string]any) error {
 	p, err := influxClient.NewPoint(table, nil, data, time)
 	if err != nil {
@@ -58,6 +59,7 @@ func (psep PubSubEventProducer) Produce(ctx context.Context, table string, time 
 	return nil
 }
 
+// Close closes the connection with the Cloud Pub/Sub client.
 func (psep PubSubEventProducer) Close() error {
 	return psep.client.Close()
 }
