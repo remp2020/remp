@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `First day`, `First 7 days` and `First 14 days` options to `PageLoadsGraph`. remp/remp#1110
 - [Tracker]: Added support for SASL Kafka authentication in Tracker. remp/remp#971
 
+### [Campaign]
+
+- Added option to toggle between mobile and desktop banner preview on banner edit page. remp/remp#1071 
+
 ### [Mailer]
 
 - Fixed logs subject not storing the translated version of sent email. remp/remp#1130
