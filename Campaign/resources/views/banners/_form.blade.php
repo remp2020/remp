@@ -16,7 +16,9 @@
     var alignments = JSON.parse('{!! json_encode($alignments) !!}');
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
+
     var variables = {!! json_encode($variables) !!};
+    variables = variables.length === 0 ? {} : variables;
 
     var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
     banner.show = true;

@@ -388,6 +388,9 @@
                 if (!this.paramsAdded) {
                     this.$nextTick(function () {
                         let wrap = document.getElementById(this.wrapperId);
+                        if (!wrap) {
+                            return;
+                        }
                         let hrefs = wrap.getElementsByTagName('a');
 
                         for(let ii = 0; ii < hrefs.length; ii++) {

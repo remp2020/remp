@@ -2,6 +2,10 @@
     .cp-value {
         cursor: pointer;
     }
+
+    #preview {
+        background: #e1e1e1;
+    }
 </style>
 
 <template>
@@ -381,6 +385,8 @@
                 </li>
                 <li class="pull-right">
                     <button type="button" class="btn btn-default" v-on:click="show = !show">Toggle banner</button>
+                    <button type="button" class="btn btn-default" v-if="mobile" v-on:click="mobile = !mobile"><i class="zmdi zmdi-desktop-windows"></i> Toggle desktop</button>
+                    <button type="button" class="btn btn-default" v-if="!mobile" v-on:click="mobile = !mobile"><i class="zmdi zmdi-smartphone-android"></i> Toggle mobile</button>
                 </li>
             </ul>
 
@@ -388,8 +394,8 @@
                 <div class="tab-content p-0">
                     <div role="tabpanel" class="active tab-pane" id="preview">
                         <div class="card-body" id="banner-preview">
-                            <div class="p-relative" style="height: 800px">
-                                <banner-preview
+                            <div class="p-relative" style="height: 800px" v-bind:style="[previewStyles]">
+                                <banner-preview-frame
                                         :alignmentOptions="alignmentOptions"
                                         :dimensionOptions="dimensionOptions"
                                         :positionOptions="positionOptions"
@@ -421,7 +427,7 @@
                                         :jsIncludes="jsIncludes"
                                         :cssIncludes="cssIncludes"
                                         :manualEventsTracking="manualEventsTracking"
-                                ></banner-preview>
+                                ></banner-preview-frame>
                             </div>
                         </div>
                     </div>
@@ -444,6 +450,7 @@
     import ShortMessageTemplate from "./templates/ShortMessage";
     import OverlayRectangleTemplate from "./templates/OverlayRectangle";
     import BannerPreview from "./BannerPreview";
+    import BannerPreviewFrame from "./BannerPreviewFrame";
     import vSelect from "@remp/js-commons/js/components/vSelect";
     import FormValidator from "@remp/js-commons/js/components/FormValidator";
     import HtmlOverlayTemplate from "./templates/HtmlOverlay";
@@ -506,7 +513,8 @@
             FormValidator,
             OverlayRectangleTemplate,
             OverlayTwoButtonsSignatureTemplate,
-            NewsletterRectangleTemplate
+            NewsletterRectangleTemplate,
+            BannerPreviewFrame
         },
         name: 'banner-form',
         props: props,
@@ -552,6 +560,7 @@
             positionOptions: [],
             variables: {},
             show: true,
+            mobile: true,
 
             submitAction: null,
 
@@ -592,7 +601,16 @@
                 set: function (value) {
                     this.cssIncludes = value ? value.split("\n") : null;
                 }
-            }
+            },
+            previewStyles: function () {
+                if (this.mobile) {
+                    return {
+                        maxWidth: "360px",
+                        margin: "auto",
+                    }
+                }
+                return {}
+            },
         },
         methods: {
             openClientSiteAndSendKeepAliveMessages() {
