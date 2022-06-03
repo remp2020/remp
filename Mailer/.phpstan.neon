@@ -2,6 +2,7 @@ includes:
 	- vendor/spaze/phpstan-disallowed-calls/disallowed-dangerous-calls.neon
 	- vendor/spaze/phpstan-disallowed-calls/disallowed-execution-calls.neon
 	- vendor/spaze/phpstan-disallowed-calls/disallowed-loose-calls.neon
+	- vendor/spaze/phpstan-disallowed-calls/disallowed-insecure-calls.neon
 
 parameters:
 	scanDirectories:
