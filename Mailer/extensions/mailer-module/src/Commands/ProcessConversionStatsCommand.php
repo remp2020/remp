@@ -79,12 +79,12 @@ class ProcessConversionStatsCommand extends Command
         );
 
         // batch template conversions (from jobs)
-        if (in_array('job_batch', $input->getOption('mode'))) {
+        if (in_array('job_batch', $input->getOption('mode'), true)) {
             $this->processBatchTemplateConversions($input, $output);
         }
 
         // non batch template conversions (direct sends)
-        if (in_array('direct', $input->getOption('mode'))) {
+        if (in_array('direct', $input->getOption('mode'), true)) {
             $this->processNonBatchTemplateConversions($input, $output);
         }
 

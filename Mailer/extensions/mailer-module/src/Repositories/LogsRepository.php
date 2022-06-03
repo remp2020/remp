@@ -227,7 +227,7 @@ class LogsRepository extends Repository
         if (!isset($this->eventMap[$externalEvent])) {
             return null;
         }
-        if ($externalEvent === 'failed' && in_array($reason, $this->bouncesMap)) {
+        if ($externalEvent === 'failed' && in_array($reason, $this->bouncesMap, true)) {
             return $this->bouncesMap[$reason];
         }
         return $this->eventMap[$externalEvent];

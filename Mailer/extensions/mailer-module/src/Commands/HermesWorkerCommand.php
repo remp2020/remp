@@ -54,7 +54,7 @@ class HermesWorkerCommand extends Command
         $filteredTypes = $input->getOption('types');
         $registered = [];
         foreach ($this->handlers as $type => $handlers) {
-            if (!empty($filteredTypes) && !in_array($type, $filteredTypes)) {
+            if (!empty($filteredTypes) && !in_array($type, $filteredTypes, true)) {
                 continue;
             }
 
