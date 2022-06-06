@@ -60,7 +60,7 @@ class ListsRepository extends Repository
         return $result;
     }
 
-    public function update(ActiveRow &$row, array $data): bool
+    public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
     {
         unset($data['id']);
         $data['updated_at'] = new DateTime();
@@ -116,7 +116,7 @@ class ListsRepository extends Repository
             ->limit($limit)
             ->fetchAssoc('id');
 
-        return $results ?? [];
+        return $results;
     }
 
     public function getUsedMailersAliases(): array

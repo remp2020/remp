@@ -34,7 +34,7 @@ class LayoutsRepository extends Repository
         return $result;
     }
 
-    public function update(ActiveRow &$row, array $data): bool
+    public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
     {
         $data['updated_at'] = new DateTime();
         return parent::update($row, $data);
@@ -70,10 +70,10 @@ class LayoutsRepository extends Repository
 
         $results = $this->all()
             ->select(implode(',', array_merge(['id'], $searchable)))
-            ->whereOr($where ?? [])
+            ->whereOr($where)
             ->limit($limit)
             ->fetchAssoc('id');
 
-        return $results ?? [];
+        return $results;
     }
 }

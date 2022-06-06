@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Caching\Storage;
-use Nette\Utils\DateTime;
 use Nette\Database\Context;
+use Nette\Utils\DateTime;
 
 class Repository
 {
@@ -54,13 +54,13 @@ class Repository
      * Update updates provided record with given $data array and mutates the provided instance. Operation is logged
      * to audit log.
      *
-     * @param ActiveRow $row
+     * @param ActiveRow|\Nette\Database\Table\ActiveRow $row
      * @param array $data values to update
      * @return bool
      *
      * @throws \Exception
      */
-    public function update(ActiveRow &$row, array $data): bool
+    public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
     {
         $oldValues = [];
         if ($row instanceof ActiveRow) {
@@ -130,7 +130,7 @@ class Repository
     /**
      * Insert inserts data to the repository. If single ActiveRow is returned, it attempts to log audit information.
      *
-     * @param $data
+     * @param array $data
      * @return bool|int|ActiveRow
      */
     public function insert(array $data)

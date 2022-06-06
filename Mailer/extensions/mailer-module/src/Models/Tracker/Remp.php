@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Tracker;
 
-use Nette\Utils\DateTime;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Nette\Utils\DateTime;
+use Nette\Utils\Json;
 use Ramsey\Uuid\Uuid;
 use Tracy\Debugger;
 use Tracy\Logger;
@@ -50,7 +51,8 @@ class Remp implements ITracker
                 'json' => $payload,
             ]);
         } catch (ClientException $e) {
-            Debugger::log("Host: [{$this->trackerHost}], Payload: [{$payload}], response: [{$e->getResponse()->getBody()}]", Logger::ERROR);
+            $jsonPayload = Json::encode($payload);
+            Debugger::log("Host: [{$this->trackerHost}], Payload: [{$jsonPayload}], response: [{$e->getResponse()->getBody()}]", Logger::ERROR);
         }
     }
 }

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Remp\NewrelicModule\DI;
 
-use Remp\NewrelicModule\Listener\NewrelicRequestListener;
 use Nette\Application\Application;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\ServiceDefinition;
+use Remp\NewrelicModule\Listener\NewrelicRequestListener;
+use Tracy\Debugger;
 
 final class NewrelicModuleExtension extends CompilerExtension
 {
@@ -19,9 +21,22 @@ final class NewrelicModuleExtension extends CompilerExtension
             ->setType(NewrelicRequestListener::class)
             ->setAutowired(false);
         $applicationService = $builder->getByType(Application::class) ?: 'application';
+
         if ($builder->hasDefinition($applicationService)) {
-            $builder->getDefinition($applicationService)
-                ->addSetup('$service->onRequest[] = ?', [[$this->prefix('@newrelicRequestListener'), 'onRequest']]);
+            $applicationServiceDefinition = $builder->getDefinition($applicationService);
+            if (!$applicationServiceDefinition instanceof ServiceDefinition) {
+                Debugger::log(
+                    "Unable to initialize NewrelicModuleExtension, 'application' is not a service definition",
+                    Debugger::ERROR
+                );
+                return;
+            }
+            $applicationServiceDefinition->addSetup(
+                '$service->onRequest[] = ?',
+                [
+                    [$this->prefix('@newrelicRequestListener'), 'onRequest'],
+                ]
+            );
         }
     }
 }

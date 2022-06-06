@@ -55,7 +55,9 @@ class RemoteUser
             return ['status' => 'error', 'error' => 'not admin', 'message' => 'Your are not admin user'];
         }
 
-        if (in_array('superadmin', $responseData['user']['roles']) || in_array('remp/mailer', $responseData['user']['roles'])) {
+        if (in_array('superadmin', $responseData['user']['roles'], true)
+            || in_array('remp/mailer', $responseData['user']['roles'], true)
+        ) {
             $data = ['status' => 'ok', 'data' => $responseData];
         } else {
             return ['status' => 'error', 'error' => 'not admin', 'message' => 'Your are not authorized for this app'];

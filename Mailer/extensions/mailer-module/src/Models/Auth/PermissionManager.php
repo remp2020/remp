@@ -27,7 +27,7 @@ class PermissionManager
      */
     public function isAllowed(User $user, string $resource, string $privilege): bool
     {
-        $email = $user->getIdentity()->email;
+        $email = $user->getIdentity()->getData()['email'];
 
         // if privilege is not registered for any role we want to allow action for backwards compatibility
         if (!isset($this->privileges[$resource][$privilege])) {

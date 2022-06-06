@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Exception;
-use Nette\Utils\DateTime;
 use Nette\Caching\IStorage;
 use Nette\Database\Context;
+use Nette\Utils\DateTime;
 
 class JobsRepository extends Repository
 {
@@ -77,7 +77,7 @@ class JobsRepository extends Repository
         return $selection;
     }
 
-    public function update(ActiveRow &$row, array $data): bool
+    public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
     {
         $this->getDatabase()->beginTransaction();
 

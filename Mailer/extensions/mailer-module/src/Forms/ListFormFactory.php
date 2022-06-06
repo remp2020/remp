@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\BaseControl;
+use Nette\Forms\Controls\SelectBox;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\Sender\MailerFactory;
@@ -14,6 +16,11 @@ use Remp\MailerModule\Repositories\TemplatesRepository;
 class ListFormFactory
 {
     use SmartObject;
+
+    private const SORTING = 'sorting';
+    private const SORTING_AFTER = 'sorting_after';
+    private const MAIL_TYPE_CATEGORY = 'mail_type_category_id';
+    private const LIST_ID = 'id';
 
     private ListsRepository $listsRepository;
 
@@ -131,30 +138,30 @@ class ListFormFactory
             $orderOptions['after'] = 'After';
         }
 
-        $form->addRadioList('sorting', 'Order', $orderOptions)->setRequired("Field 'Order' is required.");
+        $form->addRadioList(self::SORTING, 'Order', $orderOptions)->setRequired("Field 'Order' is required.");
 
         if ($list !== null) {
             $keys = array_keys($sortingPairs);
             if (reset($keys) === $list->sorting) {
-                $defaults['sorting'] = 'begin';
-                unset($defaults['sorting_after']);
+                $defaults[self::SORTING] = 'begin';
+                unset($defaults[self::SORTING_AFTER]);
             } elseif (end($keys) === $list->sorting) {
-                $defaults['sorting'] = 'end';
-                unset($defaults['sorting_after']);
+                $defaults[self::SORTING] = 'end';
+                unset($defaults[self::SORTING_AFTER]);
             } else {
-                $defaults['sorting'] = 'after';
+                $defaults[self::SORTING] = 'after';
                 foreach ($sortingPairs as $sorting => $_) {
                     if ($list->sorting <= $sorting) {
                         break;
                     }
-                    $defaults['sorting_after'] = $sorting;
+                    $defaults[self::SORTING_AFTER] = $sorting;
                 }
             }
 
             unset($sortingPairs[$list->sorting]);
         }
 
-        $form->addSelect('sorting_after', null, $sortingPairs)
+        $form->addSelect(self::SORTING_AFTER, null, $sortingPairs)
                 ->setPrompt('Choose newsletter list');
 
         $form->addCheckbox('auto_subscribe', 'Auto subscribe');
@@ -191,50 +198,50 @@ class ListFormFactory
             ->order('mail_types.sorting')
             ->fetchAll();
 
-        switch ($values['sorting']) {
+        switch ($values[self::SORTING]) {
             case 'begin':
                 $first = reset($listsInCategory);
-                $values['sorting'] = $first ? $first->sorting - 1 : 1;
+                $values[self::SORTING] = $first ? $first->sorting - 1 : 1;
                 break;
 
             case 'after':
                 // fix missing form value because of dynamically loading select options
                 // in ListPresenter->handleRenderSorting
-                if ($values['sorting_after'] === null) {
+                if ($values[self::SORTING_AFTER] === null) {
                     $formHttpData = $form->getHttpData();
 
                     // + add validation
-                    if (empty($formHttpData['sorting_after'])) {
+                    if (empty($formHttpData[self::SORTING_AFTER])) {
                         $form->addError("Field 'Order' is required.");
                         return;
                     }
-                    $values['sorting_after'] = $formHttpData['sorting_after'];
+                    $values[self::SORTING_AFTER] = $formHttpData[self::SORTING_AFTER];
                 }
 
-                $values['sorting'] = $values['sorting_after'];
+                $values[self::SORTING] = $values[self::SORTING_AFTER];
 
                 if (!$list ||
-                    $values['mail_type_category_id'] != $list->mail_type_category_id ||
-                    ($list && $list->sorting > $values['sorting_after'])
+                    $values[self::MAIL_TYPE_CATEGORY] != $list->mail_type_category_id ||
+                    ($list && $list->sorting > $values[self::SORTING_AFTER])
                 ) {
-                    $values['sorting'] += 1;
+                    $values[self::SORTING] += 1;
                 }
                 break;
             default:
             case 'end':
                 $last = end($listsInCategory);
-                $values['sorting'] = $last ? $last->sorting + 1 : 1;
+                $values[self::SORTING] = $last ? $last->sorting + 1 : 1;
                 break;
         }
 
         $this->listsRepository->updateSorting(
-            $values['mail_type_category_id'],
-            $values['sorting'],
+            $values[self::MAIL_TYPE_CATEGORY],
+            $values[self::SORTING],
             $list->mail_type_category_id ?? null,
             $list->sorting ?? null
         );
 
-        unset($values['sorting_after']);
+        unset($values[self::SORTING_AFTER]);
 
         if ($list) {
             $this->listsRepository->update($list, (array) $values);
@@ -242,11 +249,11 @@ class ListFormFactory
             ($this->onUpdate)($list);
         } else {
             $row = $this->listsRepository->add(
-                $values['mail_type_category_id'],
+                $values[self::MAIL_TYPE_CATEGORY],
                 $values['priority'],
                 $values['code'],
                 $values['title'],
-                $values['sorting'],
+                $values[self::SORTING],
                 $values['auto_subscribe'],
                 $values['locked'],
                 $values['description'],
@@ -260,5 +267,27 @@ class ListFormFactory
             );
             ($this->onCreate)($row);
         }
+    }
+
+    public function getSortingControl(Form $form): BaseControl
+    {
+        return $form[self::SORTING];
+    }
+
+    public function getMailTypeCategoryIdControl(Form $form): BaseControl
+    {
+        return $form[self::MAIL_TYPE_CATEGORY];
+    }
+
+    public function getListIdControl(Form $form): BaseControl
+    {
+        return $form[self::LIST_ID];
+    }
+
+    public function getSortingAfterControl(Form $form): SelectBox
+    {
+        /** @var SelectBox $sortingAfter */
+        $sortingAfter = $form[self::SORTING_AFTER];
+        return $sortingAfter;
     }
 }

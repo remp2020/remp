@@ -81,7 +81,7 @@ class TemplatesRepository extends Repository
         return $result;
     }
 
-    public function update(ActiveRow &$row, array $data): bool
+    public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
     {
         // if code changed, check if it's unique
         if (isset($data['code']) && $row['code'] != $data['code'] && $this->exists($data['code'])) {

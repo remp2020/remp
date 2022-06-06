@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\Mailer\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\SubmitButton;
 use Nette\Security\User;
 use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Models\Segment\Crm;
@@ -15,6 +16,9 @@ use Remp\MailerModule\Repositories\TemplatesRepository;
 
 class NewsfilterTemplateFormFactory
 {
+    private const FORM_ACTION_WITH_JOBS_CREATED = 'generate_emails_jobs_created';
+    private const FORM_ACTION_WITH_JOBS_STARTED = 'generate_emails_jobs';
+
     private $activeUsersSegment;
 
     private $inactiveUsersSegment;
@@ -333,13 +337,13 @@ class NewsfilterTemplateFormFactory
         $form->setDefaults($defaults);
 
         if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
-            $withJobs = $form->addSubmit('generate_emails_jobs');
+            $withJobs = $form->addSubmit(self::FORM_ACTION_WITH_JOBS_STARTED);
             $withJobs->getControlPrototype()
                 ->setName('button')
                 ->setHtml('Generate newsletter batch and start sending');
         }
 
-        $withJobsCreated = $form->addSubmit('generate_emails_jobs_created');
+        $withJobsCreated = $form->addSubmit(self::FORM_ACTION_WITH_JOBS_CREATED);
         $withJobsCreated->getControlPrototype()
             ->setName('button')
             ->setHtml('Generate newsletter batch');
@@ -373,7 +377,10 @@ class NewsfilterTemplateFormFactory
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
 
             $batchStatus = BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND;
-            if ($form['generate_emails_jobs_created']->isSubmittedBy()) {
+
+            /** @var SubmitButton $withJobsCreatedSubmit */
+            $withJobsCreatedSubmit = $form[self::FORM_ACTION_WITH_JOBS_CREATED];
+            if ($withJobsCreatedSubmit->isSubmittedBy()) {
                 $batchStatus = BatchesRepository::STATUS_CREATED;
             }
 

@@ -5,19 +5,19 @@ namespace Remp\MailerModule\Models;
 
 use Nette\Mail\Message;
 use Nette\Utils\AssertionException;
-use Remp\MailerModule\Models\Config\ConfigNotExistsException;
-use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
-use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Models\Auth\AutoLogin;
+use Remp\MailerModule\Models\Config\ConfigNotExistsException;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Models\Mailer\Mailer;
-use Remp\MailerModule\Repositories\LogsRepository;
-use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
 use Remp\MailerModule\Models\Sender\MailerFactory;
 use Remp\MailerModule\Models\Sender\MailerNotExistsException;
+use Remp\MailerModule\Repositories\ActiveRow;
+use Remp\MailerModule\Repositories\LogsRepository;
+use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 
 class Sender
 {
@@ -176,7 +176,7 @@ class Sender
 
         $attachmentSize = $this->setMessageAttachments($message);
 
-        $senderId = md5($recipient['email'] . microtime(true));
+        $senderId = $this->getSenderId($recipient['email']);
         $this->setMessageHeaders($message, $senderId, $this->params);
 
         if ($this->context) {
@@ -254,7 +254,7 @@ class Sender
             }
 
             $p = array_merge($this->params, $recipient['params'] ?? []);
-            $p['mail_sender_id'] = md5($recipient['email'] . microtime(true));
+            $p['mail_sender_id'] = $this->getSenderId($recipient['email']);
             $p['autologin'] = "?token={$autologinTokens[$recipient['email']]}";
             $p['email'] = $recipient['email'];
             $p = array_merge($p, $this->generateServiceParams($p['autologin']));
@@ -418,5 +418,11 @@ class Sender
             $params['settings'] = $_ENV['SETTINGS_URL'] . $autologin;
         }
         return $params;
+    }
+
+    private function getSenderId(string $email): string
+    {
+        $time = microtime(true);
+        return hash("crc32c", $email . $time) . (int) $time;
     }
 }

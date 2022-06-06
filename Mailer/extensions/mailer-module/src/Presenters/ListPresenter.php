@@ -415,18 +415,20 @@ final class ListPresenter extends BasePresenter
 
     public function handleRenderSorting($categoryId, $sorting): void
     {
+        $factory = $this->listFormFactory;
+
         // set sorting value
-        $this['listForm']['sorting']->setValue($sorting);
+        $factory->getSortingControl($this['listForm'])->setValue($sorting);
 
         // handle newsletter list category change
-        if ($this['listForm']['mail_type_category_id']->getValue() !== $categoryId) {
+        if ($factory->getMailTypeCategoryIdControl($this['listForm'])->getValue() !== $categoryId) {
             $lists = $this->listsRepository->findByCategory((int)$categoryId);
-            if ($listId = $this['listForm']['id']->getValue()) {
+            if ($listId = $factory->getListIdControl($this['listForm'])->getValue()) {
                 $lists = $lists->where('id != ?', $listId);
             }
 
             $lists = $lists->order('sorting ASC')->fetchPairs('sorting', 'title');
-            $this['listForm']['sorting_after']->setItems($lists);
+            $factory->getSortingAfterControl($this['listForm'])->setItems($lists);
         }
 
         $this->redrawControl('wrapper');

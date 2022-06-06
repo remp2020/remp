@@ -4,16 +4,17 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\SubmitButton;
 use Nette\Security\User;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\Auth\PermissionManager;
+use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
-use Remp\MailerModule\Models\Segment\Aggregator;
 use Tracy\Debugger;
 
 class NewBatchFormFactory
@@ -165,6 +166,7 @@ class NewBatchFormFactory
         }
 
         if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
+            /** @var SubmitButton $buttonSaveStart */
             $buttonSaveStart = $form[self::FORM_ACTION_SAVE_START];
             if ($buttonSaveStart->isSubmittedBy()) {
                 $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);

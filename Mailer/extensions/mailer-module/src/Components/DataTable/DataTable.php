@@ -86,7 +86,7 @@ class DataTable extends Control
             ], $this->template->colSettings[$colName]);
         }
 
-        $this->template->tableId = 'dt-' . md5(Json::encode([
+        $this->template->tableId = 'dt-' . hash("crc32c", Json::encode([
             $this->template->sourceUrl,
             $this->template->colSettings,
             $this->template->tableSettings,

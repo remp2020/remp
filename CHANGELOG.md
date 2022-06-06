@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Removed captions from the submit buttons in favor of HTML content with icons. remp/remp#1138
 - Fixed fallback for non-batch sending in `mail:worker` command. remp/remp#1139
   - If the worker was run with `--batch` flag and the configured mailer didn't support batch sending, the fallback would execute incorrect branch and the sending would end up with error.
+- Changed the hash function generating Sender-ID header.
 
 ## [0.32.2] - 2022-05-11
 

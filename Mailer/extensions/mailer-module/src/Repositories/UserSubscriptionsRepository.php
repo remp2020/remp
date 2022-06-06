@@ -30,7 +30,7 @@ class UserSubscriptionsRepository extends Repository
         $this->emitter = $emitter;
     }
 
-    public function update(ActiveRow &$row, array $data): bool
+    public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
     {
         $data['updated_at'] = new DateTime();
         return parent::update($row, $data);

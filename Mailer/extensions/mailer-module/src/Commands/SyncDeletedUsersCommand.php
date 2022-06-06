@@ -5,7 +5,6 @@ namespace Remp\MailerModule\Commands;
 
 use Remp\MailerModule\Models\Users\IUser;
 use Remp\MailerModule\Models\Users\UserManager;
-use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -76,7 +75,6 @@ class SyncDeletedUsersCommand extends Command
         $output->writeln('');
 
         // fetch & compare & remove user subscriptions in batches
-        /** @var array<int, ActiveRow> $userSubscriptions */
         while ($userSubscriptions = $this->userSubscriptionsRepository->getTable()
             ->where('user_id >= ', $lastUserId)
             ->limit(self::LIMIT)
