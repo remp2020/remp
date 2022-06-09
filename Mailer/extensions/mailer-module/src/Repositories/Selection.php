@@ -11,6 +11,8 @@ use Nette\Database\Table\Selection as NetteSelection;
 
 class Selection extends NetteSelection
 {
+    use DateFieldsProcessorTrait;
+
     /**
      * @inheritdoc
      */
@@ -23,9 +25,6 @@ class Selection extends NetteSelection
         parent::__construct($explorer, $conventions, $tableName, $cacheStorage);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function createSelectionInstance(string $table = null): NetteSelection
     {
         return new self(
@@ -36,12 +35,15 @@ class Selection extends NetteSelection
         );
     }
 
-    /**
-     * @inheritdoc
-     */
     public function createRow(array $row): Nette\Database\Table\ActiveRow
     {
         return new ActiveRow($row, $this);
+    }
+
+    public function condition($condition, array $params, $tableChain = null): void
+    {
+        $params = $this->processDateFields($params);
+        parent::condition($condition, $params, $tableChain);
     }
 
     public function insert(iterable $data): ActiveRow
