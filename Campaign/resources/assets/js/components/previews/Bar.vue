@@ -2,32 +2,44 @@
 @import url('../../../sass/transitions.scss');
 
 .bar-preview-close {
-    position: absolute;
-    display: block;
-    top: 0px;
-    right: 0px;
-    width: 40px;
-    height: 40px;
+    order: 2;
+    align-self: flex-start;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 14px;
+    margin: 0 5px;
     text-decoration: none;
 }
 
-a.bar-preview-close::after {
-    content: "\00d7";
-    font-size: 24px;
-    font-weight: normal;
-    display: block;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
+.bar-preview-close.hidden {
+    display: none;
 }
 
 .bar-button-margin {
     margin-right: 25px;
 }
 
-.bar-preview-close.hidden {
+.bar-wrap {
+    width: 100%;
+    overflow: hidden;
+}
+
+.bar-header {
+    font-size: 14px;
+    color: #5e5e5e;
+    min-height: 35px;
+    justify-content: flex-end;
     display: none;
+}
+
+.bar-close {
+    text-transform: uppercase;
+    color: #000;
+    padding: 0 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .bar-preview-link {
@@ -41,7 +53,7 @@ a.bar-preview-close::after {
     display: flex;
     overflow: hidden;
     position: relative;
-    padding: 0 18px;
+    padding: 5px 18px;
     width: 100%;
     min-height: 68px;
     justify-content: space-between;
@@ -53,6 +65,8 @@ a.bar-preview-close::after {
     font-size: 17px;
     word-wrap: break-word;
     padding-right: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .bar-button {
@@ -62,47 +76,103 @@ a.bar-preview-close::after {
     font-size: 14px;
     text-align: center;
     cursor: pointer;
+    white-space: nowrap;
+}
+
+.bar-button-wrap {
+    order: 1;
+    margin-left: auto;
 }
 
 @media (max-width: 640px) {
     .bar-preview-box {
-        flex-direction: column;
-        padding: 9px;
+        flex-wrap: wrap;
+        padding: 9px 20px;
     }
 
     .bar-main {
         text-align: center;
         margin-bottom: 9px;
+        padding: 0 25px;
+        flex: 1;
     }
 
     .bar-button {
         padding: 5px 15px;
+        width: fit-content;
+        margin: auto;
+    }
+
+    .bar-button-wrap {
+        order: 2;
+        flex-basis: 100%;
+    }
+
+    .bar-preview-close {
+        order: 1;
+    }
+}
+
+@media (max-width: 500px) {
+    .bar-close-text-filled-bar {
+        display: flex;
+    }
+
+    .bar-close-text-filled-button {
+        display: none;
+    }
+
+    .bar-main {
+        padding: 0;
     }
 }
 </style>
 
 <template>
-    <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}" v-if="isVisible"
-       class="bar-preview-link" v-bind:style="[
+  <div class="bar-wrap"
+       v-bind:style="[
         linkStyles,
-        _position
-    ]">
+        _position,
+        boxStyles
+    ]"
+       v-if="isVisible">
+    <div class="bar-header sans-serif"
+         v-if="closeable"
+         v-bind:class="{'bar-close-text-filled-bar': closeText}">
+      <div class="bar-close"
+           v-on:click.stop="$parent.closed"
+           v-bind:style="closeStyles">
+          <div>
+              {{ closeText }}
+              <span style="font-size: 18px">&#215;</span>
+          </div>
+
+      </div>
+    </div>
+
+    <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}"
+       class="bar-preview-link">
         <transition appear v-bind:name="transition">
             <div class="bar-preview-box sans-serif" v-bind:style="[boxStyles]">
                 <a class="bar-preview-close" title="Close banner" href="javascript://"
-                   v-bind:class="[{hidden: !closeable}]"
+                   v-bind:class="[{hidden: !closeable, 'bar-close-text-filled-button': closeText}]"
                    v-on:click.stop="$parent.closed"
-                   v-bind:style="closeStyles"></a>
+                   v-bind:style="closeStyles">
+                    <span>{{ closeText }} <span style="font-size: 18px">&#215;</span></span>
+                </a>
                 <div class="bar-main" v-html="$parent.injectVars(mainText)"></div>
-                <div class="bar-button"
-                     v-if="buttonText.length > 0"
-                     v-bind:class="{'bar-button-margin': closeable}"
-                     v-on:click="$parent.clicked($event, !$parent.url)"
-                     v-html="$parent.injectVars(buttonText)"
-                     v-bind:style="[buttonStyles]"></div>
+                <div class="bar-button-wrap">
+                    <div class="bar-button"
+                         v-if="buttonText.length > 0"
+                         v-bind:class="{'bar-button-margin': closeable}"
+                         v-on:click="$parent.clicked($event, !$parent.url)"
+                         v-html="$parent.injectVars(buttonText)"
+                         v-bind:style="[buttonStyles]"></div>
+                </div>
             </div>
         </transition>
     </a>
+  </div>
 </template>
 
 <script>
@@ -127,6 +197,7 @@ export default {
         "offsetHorizontal",
         "targetUrl",
         "closeable",
+        "closeText",
         "displayType",
         "forcedPosition",
         "uuid",
