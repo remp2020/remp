@@ -9,6 +9,8 @@ use Nette\Utils\DateTime;
 
 class Repository
 {
+    use DateFieldsProcessorTrait;
+
     protected $database;
 
     protected $auditLogRepository;
@@ -62,10 +64,8 @@ class Repository
      */
     public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
     {
-        $oldValues = [];
-        if ($row instanceof ActiveRow) {
-            $oldValues = $row->toArray();
-        }
+        $data = $this->processDateFields($data);
+        $oldValues = $row->toArray();
 
         $res = $this->getTable()->wherePrimary($row->getPrimary())->update($data);
         if (!$res) {
@@ -135,6 +135,7 @@ class Repository
      */
     public function insert(array $data)
     {
+        $data = $this->processDateFields($data);
         $row = $this->getTable()->insert($data);
         if (!$row instanceof ActiveRow) {
             return $row;
