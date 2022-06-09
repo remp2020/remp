@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed the hash function generating Sender-ID header.
 - Added trait for processing dates to the application's default timezone before they're used in the selection or insertion. remp/remp#1144
 - Fixed bug possibly causing conversions happening early after the job was created not to be attributed to the job correctly. remp/remp#1144
+- Fixed "Invalid datetime format" bug with hermes error logging to the database. remp/remp#1145
 
 ## [0.32.2] - 2022-05-11
 
