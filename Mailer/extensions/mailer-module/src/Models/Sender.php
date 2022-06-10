@@ -176,7 +176,7 @@ class Sender
         $attachmentSize = $this->setMessageAttachments($message);
 
         $senderId = md5($recipient['email'] . microtime(true));
-        $this->setMessageHeaders($message, $senderId, [$recipient['email'] => []);
+        $this->setMessageHeaders($message, $senderId, [$recipient['email'] => $this->params]);
 
         if ($this->context) {
             $alreadySent = $this->logsRepository->alreadySentContext($recipient['email'], $this->context);
@@ -348,14 +348,16 @@ class Sender
         if (!$this->template->mail_type->locked) {
             if ($isBatch) {
                 $message->setHeader('List-Unsubscribe', '%recipient.list_unsubscribe%');
-                foreach ($templateParams as $key => $variables) {
+                foreach ($templateParams as $email => $variables) {
                     if (isset($variables['unsubscribe'])) {
-                        $templateParams[$key]['list_unsubscribe'] = "<{$variables['unsubscribe']}>";
+                        $templateParams[$email]['list_unsubscribe'] = "<{$variables['unsubscribe']}>";
                     }
                 }
             } else {
-                if (isset($templateParams['unsubscribe'])) {
-                    $message->setHeader('List-Unsubscribe', "<{$templateParams['unsubscribe']}>");
+                foreach ($templateParams as $email => $variables) {
+                    if (isset($variables['unsubscribe'])) {
+                        $message->setHeader('List-Unsubscribe', "<{$variables['unsubscribe']}>");
+                    }
                 }
             }
         }

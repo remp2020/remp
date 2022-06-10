@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.32.6] - 2022-06-10
+
+- Fixed Mailgun sending issue for non-batch emails. remp/remp#1146
+  - The reported error was _"The parameters passed to the API were invalid. Check your inputs! 'recipient-variables' parameter is not a valid JSON"_.
+
 ## [0.32.5] - 2022-05-27
 
 - Fixed Latte deprecation issues introduced in the latest version of the templating engine. remp/remp#1136
