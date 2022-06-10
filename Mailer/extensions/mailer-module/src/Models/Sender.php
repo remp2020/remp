@@ -162,7 +162,6 @@ class Sender
         );
 
         $mailContent = $this->contentGenerator->render($generatorInput);
-        $this->params = $this->contentGenerator->getEmailParams($generatorInput, $this->params);
 
         $message->setSubject($mailContent->subject());
         $message->setFrom($mailContent->from());
@@ -177,7 +176,7 @@ class Sender
         $attachmentSize = $this->setMessageAttachments($message);
 
         $senderId = $this->getSenderId($recipient['email']);
-        $this->setMessageHeaders($message, $senderId, $this->params);
+        $this->setMessageHeaders($message, $senderId, [$recipient['email'] => []]);
 
         if ($this->context) {
             $alreadySent = $this->logsRepository->alreadySentContext($recipient['email'], $this->context);
