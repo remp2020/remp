@@ -11,7 +11,6 @@ use Mailgun\HttpClient\HttpClientConfigurator;
 use Mailgun\Mailgun;
 use Nette\Mail\Message;
 use Nette\Utils\Json;
-use Nette\Utils\Random;
 use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
 
@@ -90,31 +89,29 @@ class MailgunMailer extends Mailer
         }
 
         $recipientVariablesHeader = Json::decode($recipientVariablesHeaderJson, Json::FORCE_ARRAY);
-        $to = [];
-        foreach ($toHeader as $email => $name) {
-            if (count($toHeader) > 1 && !isset($recipientVariablesHeader[$email])) {
-                throw new MailerBatchException("unsafe use of Mailgun mailer with multiple recipients: recipient variables (X-Mailer-Template-Params header) missing for email: {$email}");
-            }
-            $to[] = $email;
-        }
 
-        $messageIdHeader = "%recipient.message_id%";
-        foreach ($recipientVariablesHeader as $key => $variables) {
+        $to = [];
+        $now = microtime(true);
+        $messageIdHeader = null;
+
+        foreach ($toHeader as $email => $name) {
             $messageId = sprintf(
                 "remp_mailer_%s_%s@%s",
-                microtime(true),
-                Random::generate(16),
+                hash("crc32c", $email . $now),
+                (int) $now,
                 $this->option('domain')
             );
 
-            if (!is_array($variables)) {
-                // single email sending, header contains array of params for single address, we can set the header directly
+            if (count($toHeader) > 1) {
+                if (!isset($recipientVariablesHeader[$email])) {
+                    throw new MailerBatchException("unsafe use of Mailgun mailer with multiple recipients: recipient variables (X-Mailer-Template-Params header) missing for email: {$email}");
+                }
+                $messageIdHeader = "%recipient.message_id%";
+                $recipientVariablesHeader[$email]['message_id'] = $messageId;
+            } else {
                 $messageIdHeader = $messageId;
-                break;
             }
-
-            // batch sending, header contains array of params per each email address in batch
-            $recipientVariablesHeader[$key]['message_id'] = $messageId;
+            $to[] = $email;
         }
 
         $attachments = [];
