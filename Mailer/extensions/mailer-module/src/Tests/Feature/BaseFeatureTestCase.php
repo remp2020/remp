@@ -95,7 +95,7 @@ class BaseFeatureTestCase extends TestCase
         $truncateTables = implode(' ', array_map(function ($repo) {
             $property = (new \ReflectionClass($repo))->getProperty('tableName');
             $property->setAccessible(true);
-            return "TRUNCATE `{$property->getValue($repo)}`;";
+            return "DELETE FROM `{$property->getValue($repo)}`;";
         }, [
             $this->autoLoginTokensRepository,
             $this->jobsRepository,
