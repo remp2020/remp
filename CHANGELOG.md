@@ -43,6 +43,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Added migration to update `mail_types` with priority 0 to default value. remp/remp#1134
 - Fixed possibility of stuck MySQL query when removing unsubscribed users from the mail job queue. remp/remp#1148
 - Added mail generator for Napunk to overide default slovak email lock message. remp/remp#1129
+- Changed the behaviour of mail template form - template content is editable after general information is saved. remp/remp#1122
 
 ## [0.32.2] - 2022-05-11
 
