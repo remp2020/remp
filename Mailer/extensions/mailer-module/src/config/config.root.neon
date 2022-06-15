@@ -51,7 +51,7 @@ application:
 
 session:
 	expiration: 14 days
-	autoStart: true
+	autoStart: smart
 
 database:
 	default:

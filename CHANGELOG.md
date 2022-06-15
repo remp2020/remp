@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed bug possibly causing conversions happening early after the job was created not to be attributed to the job correctly. remp/remp#1144
 - Fixed "Invalid datetime format" bug with hermes error logging to the database. remp/remp#1145
 - Fix Mailgun API error with wrong `recipient-variables` parameter. remp/remp#1146
+- Fixed API triggering unnecessary session initiation. remp/remp#1149
 
 ## [0.32.2] - 2022-05-11
 
