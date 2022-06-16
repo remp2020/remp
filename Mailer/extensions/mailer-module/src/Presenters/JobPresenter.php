@@ -317,6 +317,11 @@ final class JobPresenter extends BasePresenter
             );
         }
         $batch = $this->batchesRepository->find($id);
+        $priority = $this->batchesRepository->getBatchPriority($batch);
+        if (!$priority) {
+            $this->flashMessage("You can't send batch which mail type have priority set to 0.");
+            $this->redirect('Show', $batch->mail_job_id);
+        }
         if ($batch->status === BatchesRepository::STATUS_PROCESSED) {
             $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_QUEUED);
         } else {
@@ -337,6 +342,10 @@ final class JobPresenter extends BasePresenter
         }
         $batch = $this->batchesRepository->find($id);
         $priority = $this->batchesRepository->getBatchPriority($batch);
+        if (!$priority) {
+            $this->flashMessage("You can't send batch which mail type have priority set to 0.");
+            $this->redirect('Show', $batch->mail_job_id);
+        }
         $this->mailCache->restartQueue($batch->id, $priority);
         $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_SENDING);
 
