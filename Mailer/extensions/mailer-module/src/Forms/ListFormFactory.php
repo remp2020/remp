@@ -87,6 +87,7 @@ class ListFormFactory
 
         $form->addText('priority', 'Priority')
             ->addRule(Form::INTEGER, "Priority needs to be a number")
+            ->addRule(Form::MIN, "Priority needs to be greater than 0", 1)
             ->setRequired("Field 'Priority' is required.");
 
         $codeInput = $form->addText('code', 'Code')
