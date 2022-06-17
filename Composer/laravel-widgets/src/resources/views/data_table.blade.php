@@ -83,9 +83,17 @@
                     @isset($col['orderSequence'])
                     orderSequence: {!! @json($col['orderSequence']) !!},
                     @endisset
-                    @if (isset($col['render']))
-                    render: $.fn.dataTables.render[{!! @json($col['render']) !!}]({!! @json($col['renderParams'] ?? '') !!})
-                    @endif
+                    render: function () {
+                        @if (isset($col['render']))
+                        if (typeof $.fn.dataTables.render[{!! @json($col['render']) !!}] === 'function') {
+                            return $.fn.dataTables.render[{!! @json($col['render']) !!}]({!! @json($col['renderParams'] ?? '') !!});
+                        }
+                        if (typeof $.fn.dataTable.render[{!! @json($col['render']) !!}] === 'function') {
+                            return $.fn.dataTable.render[{!! @json($col['render']) !!}]({!! @json($col['renderParams'] ?? '') !!});
+                        }
+                        @endif
+                        return $.fn.dataTable.render.text({!! @json($col['renderParams'] ?? '') !!});
+                    }(),
                 },
                 @endforeach
                 @if (!empty($rowActions))

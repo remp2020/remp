@@ -21,6 +21,7 @@
                     'campaign' => [
                         'header' => 'Campaign',
                         'priority' => 1,
+                        'render' => 'link',
                     ],
                     'status' => [
                         'header' => 'Status',
@@ -74,6 +75,7 @@
                     'colSettings' => [
                         'name' => [
                             'priority' => 1,
+                            'render' => 'link',
                         ],
                         'variants' => [
                             'header' => 'Variants',

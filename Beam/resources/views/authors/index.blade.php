@@ -54,6 +54,7 @@
                     'orderable' => false,
                     'filter' => $authors,
                     'priority' => 1,
+                    'render' => 'link',
                 ],
                 'articles_count' => [
                     'header' => 'articles',

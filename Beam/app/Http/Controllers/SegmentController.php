@@ -44,7 +44,10 @@ class SegmentController extends Controller
                 ];
             })
             ->addColumn('name', function (Segment $segment) {
-                return Html::linkRoute('segments.edit', $segment->name, $segment);
+                return [
+                    'url' => route('segments.edit', ['segment' => $segment]),
+                    'text' => $segment->name,
+                ];
             })
             ->rawColumns(['active', 'actions'])
             ->make(true);

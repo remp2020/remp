@@ -151,7 +151,10 @@ class TagsDataTable
                 return $tag->id;
             })
             ->addColumn('name', function (Tag $tag) {
-                return Html::linkRoute('tags.show', $tag->name, $tag);
+                return [
+                    'url' => route('tags.show', ['tag' => $tag]),
+                    'text' => $tag->name,
+                ];
             })
             ->filterColumn('name', function (Builder $query, $value) use ($request) {
                 if ($request->input('search')['value'] === $value) {

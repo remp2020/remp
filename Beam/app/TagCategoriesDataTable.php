@@ -157,7 +157,10 @@ class TagCategoriesDataTable
                 return $tagCategory->id;
             })
             ->addColumn('name', function (TagCategory $tagCategory) {
-                return Html::linkRoute('tag-categories.show', $tagCategory->name, $tagCategory);
+                return [
+                    'url' => route('tag-categories.show', $tagCategory->id),
+                    'text' => $tagCategory->name,
+                ];
             })
             ->filterColumn('name', function (Builder $query, $value) use ($request) {
                 if ($request->input('search')['value'] === $value) {

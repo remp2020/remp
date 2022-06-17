@@ -24,12 +24,14 @@
                             'orderable' => false,
                             'filter' => $mediums,
                             'priority' => 1,
+                            'render' => 'text',
                         ],
                         'source' => [
                             'header' => 'source',
                             'orderable' => false,
                             'filter' => $sources,
                             'priority' => 1,
+                            'render' => 'text',
                         ],
                         'visits_count' => [
                             'header' => 'visits count',

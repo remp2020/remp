@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- Added support for `number` and `text` DataTables renderers. remp/remp#852
+
 ### [Beam]
 
 - Added support for `group` in options for `ButtonSwitcher`. Groups allow to visually separate options. remp/remp#1110

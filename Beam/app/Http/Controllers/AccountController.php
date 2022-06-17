@@ -32,7 +32,10 @@ class AccountController extends Controller
                 ];
             })
             ->addColumn('name', function (Account $account) {
-                return Html::linkRoute('accounts.edit', $account->name, $account);
+                return [
+                    'url' => route('accounts.edit', ['account' => $account]),
+                    'text' => $account->name,
+                ];
             })
             ->rawColumns(['actions'])
             ->make(true);

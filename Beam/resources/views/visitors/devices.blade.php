@@ -23,11 +23,13 @@
                             'header' => 'client name',
                             'orderable' => false,
                             'priority' => 1,
+                            'render' => 'text',
                         ],
                         'client_type' => [
                             'header' => 'client type',
                             'orderable' => false,
                             'priority' => 1,
+                            'render' => 'text',
                         ],
                         'visits_count' => [
                             'header' => 'visits count',
@@ -77,19 +79,22 @@
                             'header' => 'brand',
                             'orderable' => false,
                             'filter' => $brands,
-                            'priority' => 1
+                            'priority' => 1,
+                            'render' => 'text',
                         ],
                         'model' => [
                             'header' => 'model',
                             'orderable' => false,
                             'filter' => $models,
-                            'priority' => 1
+                            'priority' => 1,
+                            'render' => 'text',
                         ],
                         'os_name' => [
                             'header' => 'OS',
                             'orderable' => false,
                             'filter' => $osNames,
-                            'priority' => 1
+                            'priority' => 1,
+                            'render' => 'text',
                         ],
                         'visits_count' => [
                             'header' => 'visits count',

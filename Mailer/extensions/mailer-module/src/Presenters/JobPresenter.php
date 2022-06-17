@@ -133,30 +133,35 @@ final class JobPresenter extends BasePresenter
                 'orderable' => false,
                 'filter' => $mailTypePairs,
                 'priority' => 2,
+                'render' => 'raw',
             ])
             ->setColSetting('sent_count', [
                 'header' => 'sent',
                 'orderable' => false,
                 'priority' => 1,
                 'class' => 'text-right',
+                'render' => 'raw',
             ])
             ->setColSetting('opened_count', [
                 'header' => 'opened',
                 'orderable' => false,
                 'priority' => 3,
                 'class' => 'text-right',
+                'render' => 'raw',
             ])
             ->setColSetting('clicked_count', [
                 'header' => 'clicked',
                 'orderable' => false,
                 'priority' => 3,
                 'class' => 'text-right',
+                'render' => 'raw',
             ])
             ->setColSetting('unsubscribed_count', [
                 'header' => 'unsubscribed',
                 'orderable' => false,
                 'priority' => 3,
                 'class' => 'text-right',
+                'render' => 'raw',
             ])
             ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show job')
             ->setTableSetting('order', Json::encode([[0, 'DESC']]))

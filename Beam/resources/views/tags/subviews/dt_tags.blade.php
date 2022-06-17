@@ -5,6 +5,7 @@
                     'orderable' => false,
                     'filter' => $tags,
                     'priority' => 1,
+                    'render' => 'link',
                 ],
                 'articles_count' => [
                     'header' => 'articles',

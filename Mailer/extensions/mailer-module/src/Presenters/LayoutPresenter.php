@@ -35,6 +35,7 @@ final class LayoutPresenter extends BasePresenter
         $dataTable
             ->setColSetting('name', [
                 'priority' => 1,
+                'render' => 'link',
             ])
             ->setColSetting('code', [
                 'priority' => 1,
@@ -73,7 +74,10 @@ final class LayoutPresenter extends BasePresenter
                 'actions' => [
                     'edit' => $editUrl,
                 ],
-                "<a href='{$editUrl}'>{$layout->name}</a>",
+                [
+                    'url' => $editUrl,
+                    'text' => $layout->name,
+                ],
                 $layout->code,
                 $layout->created_at,
             ];

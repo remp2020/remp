@@ -186,7 +186,10 @@ class SectionController extends Controller
                 return $section->id;
             })
             ->addColumn('name', function (Section $section) {
-                return Html::linkRoute('sections.show', $section->name, $section);
+                return [
+                    'url' => route('sections.show', ['section' => $section]),
+                    'text' => $section->name,
+                ];
             })
             ->filterColumn('name', function (Builder $query, $value) use ($request) {
                 if ($request->input('search')['value'] === $value) {
