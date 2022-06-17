@@ -54,6 +54,7 @@
                     'orderable' => false,
                     'filter' => $sections,
                     'priority' => 1,
+                    'render' => 'link',
                 ],
                 'articles_count' => [
                     'header' => 'articles',

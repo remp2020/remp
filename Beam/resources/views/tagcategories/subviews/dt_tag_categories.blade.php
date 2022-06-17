@@ -5,6 +5,7 @@
                     'orderable' => false,
                     'filter' => $tagCategories,
                     'priority' => 1,
+                    'render' => 'link',
                 ],
                 'tags_count' => [
                     'header' => 'tags',

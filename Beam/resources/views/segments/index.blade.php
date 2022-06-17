@@ -19,6 +19,7 @@
             'colSettings' => [
                 'name' => [
                     'priority' => 1,
+                    'render' => 'link'
                 ],
                 'code' => [
                     'priority' => 2,

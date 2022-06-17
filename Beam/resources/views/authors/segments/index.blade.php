@@ -25,9 +25,11 @@
             'colSettings' => [
                 'name' => [
                     'priority' => 2,
+                    'render' => 'text',
                 ],
                 'code' => [
                     'priority' => 2,
+                    'render' => 'text',
                 ],
                 'users_count' => [
                     'header' => 'Users count',

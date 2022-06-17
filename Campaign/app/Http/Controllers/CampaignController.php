@@ -79,7 +79,10 @@ class CampaignController extends Controller
                 ];
             })
             ->addColumn('name', function (Campaign $campaign) {
-                return Html::linkRoute('campaigns.show', $campaign->name, $campaign);
+                return [
+                    'url' => route('campaigns.edit', ['campaign' => $campaign]),
+                    'text' => $campaign->name,
+                ];
             })
             ->filterColumn('name', function (Builder $query, $value) {
                 $query->where('campaigns.name', 'like', "%{$value}%");

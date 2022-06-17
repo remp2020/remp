@@ -33,6 +33,7 @@
                     'header' => 'article',
                     'orderable' => false,
                     'priority' => 1,
+                    'render' => 'link'
                 ],
                 'content_type' => [
                     'header' => 'Type',

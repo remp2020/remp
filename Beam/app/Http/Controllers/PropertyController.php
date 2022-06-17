@@ -43,7 +43,10 @@ class PropertyController extends Controller
                 ];
             })
             ->addColumn('name', function (Property $property) use ($account) {
-                return Html::linkRoute('accounts.properties.edit', $property->name, [$account, $property]);
+                return [
+                    'url' => route('accounts.properties.edit', ['account' => $account, 'property' => $property]),
+                    'text' => $property->name,
+                ];
             })
             ->rawColumns(['actions'])
             ->setRowId('id')

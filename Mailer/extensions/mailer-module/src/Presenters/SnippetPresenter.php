@@ -40,6 +40,7 @@ final class SnippetPresenter extends BasePresenter
         $dataTable
             ->setColSetting('name', [
                 'priority' => 1,
+                'render' => 'link',
             ])
             ->setColSetting('code', [
                 'priority' => 1,
@@ -90,7 +91,10 @@ final class SnippetPresenter extends BasePresenter
                     'edit' => $editUrl,
                     'delete' => $deleteUrl
                 ],
-                "<a href='{$editUrl}'>{$snippet->name}</a>",
+                [
+                    'url' => $editUrl,
+                    'text' => $snippet->name,
+                ],
                 $snippet->code,
                 $snippet->mail_type->title ?? null,
                 $snippet->created_at,

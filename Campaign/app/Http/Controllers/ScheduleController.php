@@ -74,7 +74,10 @@ class ScheduleController extends Controller
                 ];
             })
             ->addColumn('campaign', function (Schedule $schedule) {
-                return Html::linkRoute('campaigns.edit', $schedule->campaign->name, $schedule->campaign);
+                return [
+                    'url' => route('campaigns.edit', ['campaign' => $schedule->campaign]),
+                    'text' => $schedule->campaign->name,
+                ];
             })
             ->addColumn('variants', function (Schedule $schedule) {
                 $data = $schedule->campaign->campaignBanners->all();

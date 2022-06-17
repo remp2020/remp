@@ -38,6 +38,7 @@
                 'title' => [
                     'orderable' => false,
                     'priority' => 1,
+                    'render' => 'link',
                 ],
                 'conversions_count' => [
                     'header' => 'conversions',
@@ -81,6 +82,7 @@
                     'orderable' => false,
                     'filter' => $authors,
                     'priority' => 2,
+                    'render' => 'raw',
                 ],
                 'sections[, ].name' => [
                     'header' => 'sections',

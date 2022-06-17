@@ -100,6 +100,7 @@ final class TemplatePresenter extends BasePresenter
             ])
             ->setColSetting('subject', [
                 'priority' => 1,
+                'render' => 'link'
             ])
             ->setColSetting('type', [
                 'orderable' => false,
@@ -168,7 +169,10 @@ final class TemplatePresenter extends BasePresenter
                 ],
                 $template->created_at,
                 $template->code,
-                "<a href='{$editUrl}'>{$template->subject}</a>",
+                [
+                    'url' => $editUrl,
+                    'text' => $template->subject
+                ],
                 $template->type->title,
                 $template->related('mail_job_batch_template')->sum('opened') + $template->related('mail_logs', 'mail_template_id')->where('mail_job_id IS NULL')->count('opened_at'),
                 $template->related('mail_job_batch_template')->sum('clicked') + $template->related('mail_logs', 'mail_template_id')->where('mail_job_id IS NULL')->count('clicked_at'),

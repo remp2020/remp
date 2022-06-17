@@ -21,6 +21,7 @@
                 'colSettings' => [
                     'name' => [
                         'priority' => 1,
+                        'render' => 'link',
                     ],
                     'uuid' => [
                         'header' => 'token',

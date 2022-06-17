@@ -29,7 +29,10 @@ class EntitiesController extends Controller
 
         return $datatables->of($entities)
             ->addColumn('name', function (Entity $entity) {
-                return Html::linkRoute('entities.edit', $entity->name, $entity);
+                return [
+                    'url' => route('entities.edit', ['entity' => $entity]),
+                    'text' => $entity->name,
+                ];
             })
             ->addColumn('params', function (Entity $entity) {
                 $params = [];

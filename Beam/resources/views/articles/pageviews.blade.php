@@ -33,6 +33,7 @@
                 'title' => [
                     'orderable' => false,
                     'priority' => 1,
+                    'render' => 'link'
                 ],
                 'pageviews_all' => [
                     'header' => 'all pageviews',
@@ -102,6 +103,7 @@
                     'orderable' => false,
                     'filter' => $authors,
                     'priority' => 3,
+                    'render' => 'raw',
                 ],
                 'sections[, ].name' => [
                     'header' => 'sections',

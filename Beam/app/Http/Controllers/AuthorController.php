@@ -182,7 +182,10 @@ class AuthorController extends Controller
                 return $author->id;
             })
             ->addColumn('name', function (Author $author) {
-                return Html::linkRoute('authors.show', $author->name, $author);
+                return [
+                    'url' => route('authors.show', ['author' => $author]),
+                    'text' => $author->name,
+                ];
             })
             ->filterColumn('name', function (Builder $query, $value) use ($request) {
                 if ($request->input('search')['value'] === $value) {

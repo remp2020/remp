@@ -19,6 +19,7 @@
             'colSettings' => [
                 'name' => [
                     'priority' => 1,
+                    'render' => 'link',
                 ],
                 'created_at' => [
                     'header' => 'created at',

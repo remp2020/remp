@@ -90,9 +90,17 @@
                     {ifset $colSetting['visible']}
                     'visible': {$colSetting['visible']},
                     {/ifset}
-                    {ifset $colSetting['render']}
-                    'render': $.fn.dataTables.render.{$colSetting['render']|noescape}()
-                    {/ifset}
+                    'render': function () {
+                        {ifset $colSetting['render']}
+                        if (typeof $.fn.dataTables.render.{$colSetting['render']|noescape} === 'function') {
+                            return $.fn.dataTables.render.{$colSetting['render']|noescape}();
+                        }
+                        if (typeof $.fn.dataTable.render.{$colSetting['render']|noescape} === 'function') {
+                            return $.fn.dataTable.render.{$colSetting['render']|noescape}();
+                        }
+                        {/ifset}
+                        return $.fn.dataTable.render.text();
+                    }(),
                 },
                 {/foreach}
                 {if !empty($rowActions)}

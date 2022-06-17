@@ -157,7 +157,10 @@ class ArticleController extends Controller
                 return $author->id;
             })
             ->addColumn('title', function (Article $article) {
-                return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
+                return [
+                    'url' => route('articles.show', ['article' => $article->id]),
+                    'text' => $article->title,
+                ];
             })
             ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueBrowsersCount) {
                 $uniqueCount = $externalIdsToUniqueBrowsersCount->get($article->external_id, 0);
@@ -271,7 +274,10 @@ class ArticleController extends Controller
                 return $article->id;
             })
             ->addColumn('title', function (Article $article) {
-                return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
+                return [
+                    'url' => route('articles.show', ['article' => $article->id]),
+                    'text' => $article->title,
+                ];
             })
             ->addColumn('avg_sum_all', function (Article $article) {
                 if (!$article->timespent_all || !$article->pageviews_all) {

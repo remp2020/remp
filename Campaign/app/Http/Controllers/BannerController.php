@@ -62,7 +62,10 @@ class BannerController extends Controller
                 ];
             })
             ->addColumn('name', function (Banner $banner) {
-                return Html::linkRoute('banners.edit', $banner->name, $banner);
+                return [
+                    'url' => route('banners.edit', ['banner' => $banner]),
+                    'text' => $banner->name,
+                ];
             })
             ->filterColumn('name', function (Builder $query, $value) {
                 $query->where('banners.name', 'like', "%{$value}%");

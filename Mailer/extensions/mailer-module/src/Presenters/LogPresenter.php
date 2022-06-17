@@ -67,9 +67,11 @@ final class LogPresenter extends BasePresenter
             ])
             ->setColSetting('email', [
                 'priority' => 1,
+                'render' => 'text',
             ])
             ->setColSetting('subject', [
                 'priority' => 1,
+                'render' => 'text',
             ])
             ->setColSetting('mail_template_id', [
                 'header' => 'template code',

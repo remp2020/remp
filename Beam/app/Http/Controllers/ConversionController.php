@@ -71,7 +71,10 @@ class ConversionController extends Controller
                 ];
             })
             ->addColumn('article.title', function (Conversion $conversion) {
-                return \Html::link(route('articles.show', ['article' => $conversion->article->id]), $conversion->article->title);
+                return [
+                    'url' => route('articles.show', $conversion->article->id),
+                    'text' => $conversion->article->title,
+                ];
             })
             ->filterColumn('article.title', function (Builder $query, $value) {
                 $query->where('articles.title', 'like', '%' . $value . '%');

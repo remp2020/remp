@@ -85,9 +85,11 @@ final class ListPresenter extends BasePresenter
             ])
             ->setColSetting('title', [
                 'priority' => 1,
+                'render' => 'link'
             ])
             ->setColSetting('code', [
                 'priority' => 2,
+                'render' => 'text',
             ])
             ->setColSetting('subscribed', [
                 'render' => 'number',
@@ -140,7 +142,10 @@ final class ListPresenter extends BasePresenter
                     'sentEmailsDetail' => $sentEmailsDetail,
                 ],
                 $list->type_category->title ?? null,
-                "<a href='{$showUrl}'>{$list->title}</a>",
+                [
+                    'url' => $showUrl,
+                    'text' => $list->title,
+                ],
                 $list->code,
                 $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),
                 $list->auto_subscribe,
@@ -262,6 +267,7 @@ final class ListPresenter extends BasePresenter
             ])
             ->setColSetting('subject', [
                 'priority' => 1,
+                'render' => 'text'
             ])
             ->setColSetting('opened', [
                 'priority' => 2,
@@ -324,10 +330,12 @@ final class ListPresenter extends BasePresenter
             ->setColSetting('title', [
                 'header' => 'Title',
                 'priority' => 1,
+                'render' => 'text',
             ])
             ->setColSetting('code', [
                 'header' => 'Code',
                 'priority' => 1,
+                'render' => 'code',
             ])
             ->setColSetting('count', [
                 'priority' => 1,
@@ -375,7 +383,7 @@ final class ListPresenter extends BasePresenter
         foreach ($variants as $variant) {
             $result['data'][] = [
                 $variant->title,
-                "<code>{$variant->code}</code>",
+                $variant->code,
                 $variant->count,
             ];
         }
@@ -625,6 +633,7 @@ final class ListPresenter extends BasePresenter
             ->setColSetting('user_email', [
                 'header' => 'user email',
                 'priority' => 1,
+                'render' => 'text',
             ])
             ->setColSetting('updated_at', [
                 'header' => 'subscribed at',

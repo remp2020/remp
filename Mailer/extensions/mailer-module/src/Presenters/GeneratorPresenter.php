@@ -37,12 +37,15 @@ final class GeneratorPresenter extends BasePresenter
         $dataTable
             ->setColSetting('title', [
                 'priority' => 1,
+                'render' => 'link',
             ])
             ->setColSetting('code', [
                 'priority' => 1,
+                'render' => 'code',
             ])
             ->setColSetting('generator', [
                 'priority' => 2,
+                'render' => 'code',
             ])
             ->setColSetting('created_at', [
                 'header' => 'created at',
@@ -89,9 +92,12 @@ final class GeneratorPresenter extends BasePresenter
                     'edit' => $editUrl,
                     'generate' => $generateUrl,
                 ],
-                "<a href='{$editUrl}'>{$sourceTemplate->title}</a>",
-                "<code>{$sourceTemplate->code}</code>",
-                "<code>{$sourceTemplate->generator}</code>",
+                [
+                    'url' => $editUrl,
+                    'text' => $sourceTemplate->title,
+                ],
+                $sourceTemplate->code,
+                $sourceTemplate->generator,
                 $sourceTemplate->created_at,
                 $sourceTemplate->updated_at,
             ];

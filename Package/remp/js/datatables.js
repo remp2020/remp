@@ -251,9 +251,18 @@ $.fn.dataTables = {
         },
         link: function () {
             return function(data) {
-                return '<a href="' + data.url + '">' + data.text + '</a>';
+                return '<a href="' + window.encodeURI(data.url) + '">' + $.fn.dataTable.render.text().display(data.text) + '</a>';
             }
-
+        },
+        code: function () {
+            return function (data) {
+                return "<code>" + $.fn.dataTable.render.text().display(data) + "</code>";
+            }
+        },
+        raw: function () {
+            return function (data) {
+                return data;
+            }
         },
         bytes: function () {
             return function (data) {

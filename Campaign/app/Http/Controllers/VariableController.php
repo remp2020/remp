@@ -32,8 +32,11 @@ class VariableController extends Controller
                     'edit' => route('variables.edit', $variable),
                 ];
             })
-            ->addColumn('name', function (Variable $banner) {
-                return \Html::linkRoute('variables.edit', $banner->name, $banner);
+            ->addColumn('name', function (Variable $variable) {
+                return [
+                    'url' => route('variables.edit', ['variable' => $variable]),
+                    'text' => $variable->name,
+                ];
             })
             ->setRowId('id')
             ->make(true);

@@ -20,6 +20,7 @@
                 'name' => [
                     'orderable' => true,
                     'priority' => 1,
+                    'render' => 'link',
                 ],
                 'params' => [
                     'header' => 'Params',
