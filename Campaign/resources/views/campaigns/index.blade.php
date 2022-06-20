@@ -99,6 +99,7 @@
                         'active' => [
                             'header' => 'Is active',
                             'priority' => 5,
+                            'render' => 'raw',
                         ],
                         'signed_in' => [
                             'header' => 'Signed-in state',

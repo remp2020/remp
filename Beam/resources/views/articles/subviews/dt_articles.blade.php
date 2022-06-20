@@ -3,6 +3,7 @@
                     'title' => [
                         'orderable' => false,
                         'priority' => 1,
+                        'render' => 'link',
                     ],
                     'pageviews_all' => [
                         'header' => 'all pageviews',

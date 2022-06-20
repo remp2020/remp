@@ -154,7 +154,10 @@ class ArticlesDataTable
                 return $article->id;
             })
             ->addColumn('title', function (Article $article) {
-                return Html::link(route('articles.show', ['article' => $article->id]), $article->title);
+                return [
+                    'url' => route('articles.show', ['article' => $article->id]),
+                    'text' => $article->title,
+                ];
             })
             ->addColumn('conversions_count', function (Article $article) use ($conversionCount) {
                 return $conversionCount[$article->id] ?? 0;
