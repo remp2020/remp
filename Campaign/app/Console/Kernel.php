@@ -56,11 +56,13 @@ class Kernel extends ConsoleKernel
                 foreach ($campaign->segments as $campaignSegment) {
                     $schedule->job(new CacheSegmentJob($campaignSegment, true))
                         ->hourly()
-                        ->withoutOverlapping(config('system.commands_overlapping_expires_at'));
+                        ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
+                        ->appendOutputTo(storage_path('logs/cache_segments.log'));
 
                     $schedule->job(new CacheSegmentJob($campaignSegment, false))
                         ->everyMinute()
-                        ->withoutOverlapping(config('system.commands_overlapping_expires_at'));
+                        ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
+                        ->appendOutputTo(storage_path('logs/cache_segments.log'));
                 }
             }
         } catch (\PDOException $e) {

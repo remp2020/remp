@@ -143,7 +143,7 @@ class StatsHelper
     public function addCalculatedValues($data)
     {
         // calculate ctr & conversions
-        if (isset($data['show_count'])) {
+        if (isset($data['show_count']) && $data['show_count'] > 0) {
             if ($data['click_count']) {
                 $data['ctr'] = ($data['click_count'] / $data['show_count']) * 100;
             }
