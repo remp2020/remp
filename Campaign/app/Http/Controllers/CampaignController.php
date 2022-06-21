@@ -173,7 +173,7 @@ class CampaignController extends Controller
             ->addColumn('devices', function (Campaign $campaign) {
                 return count($campaign->devices) == count($campaign->getAllDevices()) ? 'all' : implode(' ', $campaign->devices);
             })
-            ->rawColumns(['actions', 'active', 'signed_in', 'once_per_session', 'variants', 'is_running', 'segments'])
+            ->rawColumns(['name.text', 'actions', 'active', 'signed_in', 'once_per_session', 'variants', 'is_running', 'segments'])
             ->setRowId('id')
             ->make(true);
     }

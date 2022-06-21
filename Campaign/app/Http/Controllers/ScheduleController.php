@@ -129,7 +129,7 @@ class ScheduleController extends Controller
                 }
                 throw new \Exception('unhandled schedule status');
             })
-            ->rawColumns(['actions', 'action_methods', 'status', 'campaign'])
+            ->rawColumns(['campaign.text', 'actions', 'action_methods', 'status', 'campaign'])
             ->setRowId('id')
             ->make(true);
     }
