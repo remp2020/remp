@@ -35,11 +35,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added trait for processing dates to the application's default timezone before they're used in the selection or insertion. remp/remp#1144
 - Fixed bug possibly causing conversions happening early after the job was created not to be attributed to the job correctly. remp/remp#1144
 - Fixed "Invalid datetime format" bug with hermes error logging to the database. remp/remp#1145
-- Fix Mailgun API error with wrong `recipient-variables` parameter. remp/remp#1146
+- Fixed Mailgun API error with wrong `recipient-variables` parameter. remp/remp#1146
 - Fixed API triggering unnecessary session initiation. remp/remp#1149
 - **IMPORTANT**: Fixed mail type priority can't be 0. remp/remp#1134
   - Added validation to add/edit newsletter list form and `JobPresenter::handleSetBatchReadyToSend`, `JobPresenter::handleSetBatchSend` methods. remp/remp#1134
   - Added migration to update `mail_types` with priority 0 to default value. remp/remp#1134
+- Fixed possibility of stuck MySQL query when removing unsubscribed users from the mail job queue. remp/remp#1148
 
 ## [0.32.2] - 2022-05-11
 

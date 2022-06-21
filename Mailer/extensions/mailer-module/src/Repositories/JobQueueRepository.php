@@ -104,24 +104,17 @@ SQL;
 
         foreach ($q as $row) {
             $sql = <<<SQL
-SELECT id FROM mail_job_queue
+SELECT mail_job_queue.id
+FROM mail_job_queue
+INNER JOIN mail_templates 
+    ON mail_job_queue.mail_template_id = mail_templates.id
+LEFT JOIN mail_user_subscriptions
+    ON mail_user_subscriptions.mail_type_id = mail_templates.mail_type_id
+    AND mail_user_subscriptions.subscribed = 1
+    AND mail_job_queue.email = mail_user_subscriptions.user_email
 WHERE mail_job_queue.mail_batch_id = $batch->id
-AND mail_job_queue.mail_template_id = $row->mail_template_id
-AND mail_job_queue.id NOT IN (
-
-  SELECT id FROM (
-
-    SELECT mail_job_queue.id FROM mail_job_queue
-    INNER JOIN mail_templates 
-      ON mail_job_queue.mail_template_id = mail_templates.id
-    INNER JOIN mail_user_subscriptions
-      ON mail_user_subscriptions.mail_type_id = mail_templates.mail_type_id
-      AND mail_user_subscriptions.subscribed = 1
-      AND mail_job_queue.email = mail_user_subscriptions.user_email
-    WHERE mail_job_queue.mail_batch_id = $batch->id
     AND  mail_job_queue.mail_template_id = $row->mail_template_id
-  ) t1
-)
+    AND mail_user_subscriptions.subscribed IS NULL
 LIMIT $limit;
 SQL;
             while ($ids = $this->getDatabase()->query($sql)->fetchPairs(null, 'id')) {
@@ -133,22 +126,16 @@ SQL;
     public function removeOtherVariants(ActiveRow $batch, int $variantId, int $limit = 10000): void
     {
         $sql = <<<SQL
-SELECT id FROM mail_job_queue
-WHERE mail_job_queue.id IN (
-
-  SELECT * FROM (
-    
-    SELECT id FROM mail_job_queue
-      WHERE mail_job_queue.mail_batch_id = {$batch->id}
-        AND mail_job_queue.email NOT IN (
-          SELECT mail_user_subscriptions.user_email
-          FROM mail_user_subscriptions
-          INNER JOIN mail_user_subscription_variants
+SELECT mail_job_queue.id
+FROM mail_job_queue
+WHERE mail_job_queue.mail_batch_id = {$batch->id}
+    AND mail_job_queue.email NOT IN (
+        SELECT mail_user_subscriptions.user_email
+        FROM mail_user_subscriptions
+        INNER JOIN mail_user_subscription_variants
             ON mail_user_subscription_variants.mail_user_subscription_id = mail_user_subscriptions.id
             AND mail_user_subscription_variants.mail_type_variant_id = '{$variantId}'
             AND mail_user_subscriptions.subscribed = 1
-        )
-  ) t1
 )
 LIMIT $limit
 SQL;
