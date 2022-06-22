@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Added validation to add/edit newsletter list form and `JobPresenter::handleSetBatchReadyToSend`, `JobPresenter::handleSetBatchSend` methods. remp/remp#1134
   - Added migration to update `mail_types` with priority 0 to default value. remp/remp#1134
 - Fixed possibility of stuck MySQL query when removing unsubscribed users from the mail job queue. remp/remp#1148
+- Added mail generator for Napunk to overide default slovak email lock message. remp/remp#1129
 
 ## [0.32.2] - 2022-05-11
 

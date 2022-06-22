@@ -134,11 +134,11 @@ final class GeneratorPresenter extends BasePresenter
         return $form;
     }
 
-    public function handleRenderSorting($sorting): void
+    public function handleRenderSorting($sortingValue): void
     {
         /** @var BaseControl $sorting */
         $sorting = $this['mailSourceTemplateForm']['sorting'];
-        $sorting->setValue($sorting);
+        $sorting->setValue($sortingValue);
 
         $this->redrawControl('wrapper');
         $this->redrawControl('sortingAfterSnippet');
