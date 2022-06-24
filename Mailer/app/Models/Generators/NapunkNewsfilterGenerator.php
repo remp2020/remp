@@ -11,24 +11,11 @@ use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
 class NapunkNewsfilterGenerator extends NewsfilterGenerator
 {
-    public function __construct(
-        SourceTemplatesRepository $mailSourceTemplateRepository,
-        WordpressHelpers $helpers,
-        ContentInterface $content,
-        EmbedParser $embedParser,
-        ArticleLocker $articleLocker,
-        EngineFactory $engineFactory
-    ) {
-        parent::__construct(
-            $mailSourceTemplateRepository,
-            $helpers,
-            $content,
-            $embedParser,
-            $articleLocker,
-            $engineFactory
-        );
+    public function process(array $values): array
+    {
+        $this->articleLocker->setLockText('Ezt a cikket csak a Napunk előfizetői olvashatják végig.');
+        $this->articleLocker->setupLockLink('Csatlakozz hozzánk', 'https://predplatne.dennikn.sk/napunk-start');
 
-        $articleLocker->setLockText('Ezt a cikket csak a Napunk előfizetői olvashatják végig.');
-        $articleLocker->setupLockLink('Csatlakozz hozzánk', 'https://predplatne.dennikn.sk/napunk-start');
+        return parent::process($values);
     }
 }
