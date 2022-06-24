@@ -19,9 +19,6 @@ class NapunkNewsfilterGenerator extends NewsfilterGenerator
         ArticleLocker $articleLocker,
         EngineFactory $engineFactory
     ) {
-        $articleLocker->setLockText('Ezt a cikket csak a Napunk előfizetői olvashatják végig.');
-        $articleLocker->setupLockLink('Csatlakozz hozzánk', 'https://predplatne.dennikn.sk/napunk-start');
-
         parent::__construct(
             $mailSourceTemplateRepository,
             $helpers,
@@ -30,5 +27,8 @@ class NapunkNewsfilterGenerator extends NewsfilterGenerator
             $articleLocker,
             $engineFactory
         );
+
+        $articleLocker->setLockText('Ezt a cikket csak a Napunk előfizetői olvashatják végig.');
+        $articleLocker->setupLockLink('Csatlakozz hozzánk', 'https://predplatne.dennikn.sk/napunk-start');
     }
 }
