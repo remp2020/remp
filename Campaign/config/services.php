@@ -21,7 +21,7 @@ return [
     ],
 
     'maxmind' => [
-        'database' => base_path(env('MAXMIND_DATABASE')),
+        'database' => realpath(env('MAXMIND_DATABASE')) ?: base_path(env('MAXMIND_DATABASE')),
     ],
 
     'postmark' => [

@@ -396,7 +396,7 @@ try {
     }
 
     $deviceDetector = new LazyDeviceDetector($redis);
-    $maxmindDbPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . env('MAXMIND_DATABASE');
+    $maxmindDbPath = realpath(env('MAXMIND_DATABASE')) ?: __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . env('MAXMIND_DATABASE');
     $geoReader = new LazyGeoReader($maxmindDbPath);
 
     $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $deviceDetector, $logger);
