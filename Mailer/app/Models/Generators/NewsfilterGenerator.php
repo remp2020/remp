@@ -30,7 +30,7 @@ class NewsfilterGenerator implements IGenerator
 
     private $embedParser;
 
-    private $articleLocker;
+    protected $articleLocker;
 
     private $engineFactory;
 
