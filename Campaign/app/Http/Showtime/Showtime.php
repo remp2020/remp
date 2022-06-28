@@ -372,12 +372,15 @@ class Showtime
             // load country ISO code based on IP
             try {
                 $countryCode = $this->geoReader->countryCode($this->getRequest()->ip());
-            } catch (\MaxMind\Db\Reader\InvalidDatabaseException | \GeoIp2\Exception\AddressNotFoundException $e) {
-                $this->logger->error("Unable to load country for campaign [{$campaign->uuid}] with country rules: " . $e->getMessage());
+                if ($countryCode === null) {
+                    $this->logger->debug("Unable to identify country for campaign '{$campaign->id}'.");
+                    return null;
+                }
+            } catch (\MaxMind\Db\Reader\InvalidDatabaseException $e) {
+                $this->logger->error("Unable to identify country for campaign '{$campaign->id}': " . $e->getMessage());
                 return null;
-            }
-            if ($countryCode === null) {
-                $this->logger->error("Unable to load country for campaign [{$campaign->uuid}] with country rules");
+            } catch (\GeoIp2\Exception\AddressNotFoundException $e) {
+                $this->logger->debug("Unable to identify country for campaign '{$campaign->id}': " . $e->getMessage());
                 return null;
             }
 
