@@ -396,7 +396,12 @@ try {
     }
 
     $deviceDetector = new LazyDeviceDetector($redis);
-    $maxmindDbPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . env('MAXMIND_DATABASE');
+
+    if (file_exists(env('MAXMIND_DATABASE'))) {
+        $maxmindDbPath = env('MAXMIND_DATABASE');
+    } else {
+        $maxmindDbPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . env('MAXMIND_DATABASE');
+    }
     $geoReader = new LazyGeoReader($maxmindDbPath);
 
     $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $deviceDetector, $logger);
