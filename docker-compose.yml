@@ -48,11 +48,13 @@ services:
     image: "mailhog/mailhog:v1.0.0"
     environment:
       MH_HOSTNAME: "mailhog.remp.press"
+    restart: "unless-stopped"
 
   adminer:
     build: "./Docker/php"
     volumes:
       - ".:/var/www/html:rw"
+    restart: "unless-stopped"
 
   # campaign
 
@@ -142,6 +144,7 @@ services:
     hostname: "zookeeper"
     ports:
       - "2181:2181"
+    restart: "unless-stopped"
 
   kafka:
     image: "wurstmeister/kafka"
@@ -158,6 +161,7 @@ services:
       KAFKA_RESERVED_BROKER_MAX_ID: "1001"
     volumes:
       - "kafka-data:/data"
+    restart: "unless-stopped"
 
   telegraf:
     build: "./Docker/telegraf"
@@ -173,9 +177,11 @@ services:
     volumes:
       - "./Docker/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
       - "elastic-data:/usr/share/elasticsearch/data"
+    restart: "unless-stopped"
 
   kibana:
     image: "docker.elastic.co/kibana/kibana:7.17.3"
+    restart: "unless-stopped"
 
   beam_tracker:
     build: "./Beam/go/cmd/tracker"
