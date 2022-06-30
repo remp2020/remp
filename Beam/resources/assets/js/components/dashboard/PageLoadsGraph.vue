@@ -20,9 +20,9 @@
 
         <div class="m-t-20 m-b-20" v-if="tagLabels">
             <div v-bind:style="{color: item.color}" v-for="(item, tag) in tagLabels">
-                <b>{{tag}}</b>:
+                <b>{{tag}}</b>: <span v-html="item.pageloads_count"></span>
                 <span v-for="(label, index) in item.labels">
-                    {{label}} <span style="color: #000;" v-if="index < item.labels.length - 1"> | </span>
+                    <span>{{label}}</span> <span style="color: #000;" v-if="index < item.labels.length - 1"> | </span>
                 </span>
             </div>
         </div>

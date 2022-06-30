@@ -69,7 +69,7 @@ class ArticleDetailsController extends Controller
             ->groupBy('variant');
 
         $data['events'] = [];
-
+        $pageviewSums = [];
         foreach ($articleTitles as $variant => $variantTitles) {
             $variantTitle = $variantTitles[0];
 
@@ -101,11 +101,19 @@ class ArticleDetailsController extends Controller
                 ];
             }
 
+            $pageviewSums[$variant] = 0;
+            foreach ($data['results'] as $resultRow) {
+                if (isset($resultRow[$variant])) {
+                    $pageviewSums[$variant] += $resultRow[$variant];
+                }
+            }
+
             $data['tagLabels'][$variant] = (object) [
                 'color' => $tagToColor[$variant],
-                'labels' => $variantTitles->pluck('title')->map(function ($title) {
-                    return html_entity_decode($title, ENT_QUOTES);
-                })->toArray(),
+                'labels' => $variantTitles->map(function ($variantTitle) {
+                    return html_entity_decode($variantTitle->title, ENT_QUOTES);
+                }),
+                'pageloads_count' =>  ($type === 'title' ? ' <span style="color: black;">(' . $pageviewSums[$variantTitle->variant] . ' internal pageviews)</span> ' : '')
             ];
         }
         return response()->json($data);
