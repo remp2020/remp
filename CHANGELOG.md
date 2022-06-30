@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for `group` in options for `ButtonSwitcher`. Groups allow to visually separate options. remp/remp#1110
 - Added `First day`, `First 7 days` and `First 14 days` options to `PageLoadsGraph`. remp/remp#1110
 - [Tracker]: Added support for SASL Kafka authentication in Tracker. remp/remp#971
+- Added overall internal pageviews count to article title ab testing histogram. remp/remp#1125
 
 ### [Campaign]
 
