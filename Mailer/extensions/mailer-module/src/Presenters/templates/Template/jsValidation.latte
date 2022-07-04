@@ -1,0 +1,27 @@
+<script>
+    Nette.validators.RempMailerModuleFormsRulesFormRules_validateAdvancedEmail = function (element, args, value) {
+        const regexp = /^(.+) +<(.*)>$/i;
+        const email = value.match(regexp);
+        if (email !== null) {
+            value = email[2];
+        }
+        return Nette.validateRule(element, ':email', args, { 'value': value });
+    };
+</script>
+<script n:if="$form->getErrors()">
+    console.log({$form->getErrors()});
+    $(function() {
+        let index = 0;
+        {foreach $form->getErrors() as $error}
+        index += 250;
+        window.setTimeout(function() {
+            $.notify({
+                message: {$error}
+            }, {
+                allow_dismiss: false,
+                type: 'danger'
+            });
+        }, index);
+        {/foreach}
+    });
+</script>

@@ -1,0 +1,57 @@
+{input id}
+
+<div class="form-group fg-float">
+    <div class="fg-line">
+        {input name, class => 'form-control fg-input'}
+        {label name, class => 'fg-label' /}
+    </div>
+</div>
+
+<div class="form-group fg-float">
+    <div class="fg-line">
+        {input code, class => 'form-control fg-input'}
+        {label code, class => 'fg-label' /}
+    </div>
+    {if $form['code']->hasErrors()}
+        <span class="field_error">{$form['code']->error}</span>
+    {/if}
+</div>
+
+{if $presenter->getAction() === "new"}
+    <div class="form-group fg-float m-t-30">
+        <div class="fg-line">
+            {input from, class => 'form-control fg-input'}
+            {label from, class => 'fg-label' /}
+        </div>
+    </div>
+
+    <div class="form-group fg-float">
+        <div class="fg-line">
+            {input subject, class => 'form-control fg-input'}
+            {label subject, class => 'fg-label' /}
+        </div>
+    </div>
+{/if}
+
+<div class="form-group fg-float">
+    <div class="fg-line">
+        {input description, class => 'form-control fg-input'}
+        {label description, class => 'fg-label' /}
+    </div>
+</div>
+
+<div class="form-group fg-float">
+    {label mail_type_id /}
+    {input mail_type_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+</div>
+
+<div class="form-group js-mail-layouts-templates" data-mail-layouts="{json_encode($layouts)}">
+    {label mail_layout_id /}
+    {input mail_layout_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+</div>
+
+<div class="form-group fg-float">
+    {label click_tracking /}
+    <i title="Works only if selected mailer supports email tracking." class="zmdi zmdi-info"></i>
+    {input click_tracking, class => 'selectpicker'}
+</div>

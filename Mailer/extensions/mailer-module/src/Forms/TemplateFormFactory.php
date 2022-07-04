@@ -139,7 +139,7 @@ class TemplateFormFactory implements IFormFactory
         $form->addSubmit(self::FORM_ACTION_SAVE)
             ->getControlPrototype()
             ->setName('button')
-            ->setHtml('<i class="zmdi zmdi-check"></i> Save');
+            ->setHtml($id ? '<i class="zmdi zmdi-check"></i> Save' : '<i class="zmdi zmdi-caret-right"></i> Continue');
 
         $form->addSubmit(self::FORM_ACTION_SAVE_CLOSE)
             ->getControlPrototype()
