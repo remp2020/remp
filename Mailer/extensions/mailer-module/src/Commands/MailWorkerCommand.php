@@ -152,9 +152,7 @@ class MailWorkerCommand extends Command
 
             if (!$this->mailCache->hasJobs($batch->id)) {
                 $output->writeln("Queue <info>{$batch->id}</info> has no more jobs, cleaning up...");
-                $this->mailCache->removeQueue($batch->id);
-                $this->mailJobBatchRepository->updateStatus($batch, BatchesRepository::STATUS_DONE);
-                $this->mailJobQueueRepository->clearBatch($batch);
+                $this->stopBatchSending($batch, BatchesRepository::STATUS_DONE);
                 continue;
             }
 
@@ -177,7 +175,14 @@ class MailWorkerCommand extends Command
                     break;
                 }
 
-                if ($sendAsBatch && $this->applicationMailer->supportsBatch()) {
+                $mailJobBatchTemplate = $this->batchTemplatesRepository->findByBatchId($batch->id)->fetch();
+                if (!$mailJobBatchTemplate) {
+                    $this->stopBatchSending($batch, BatchesRepository::STATUS_WORKER_STOP);
+                    $this->logger->error('Mail job batch template not found for batch: ' . $batch->id);
+                    continue 2;
+                }
+
+                if ($sendAsBatch && $this->applicationMailer->getMailerByTemplate($mailJobBatchTemplate)->supportsBatch()) {
                     $rawJobs = $this->mailCache->getJobs($batch->id, self::MESSAGES_PER_BATCH);
                     if (empty($rawJobs)) {
                         break;
@@ -336,5 +341,12 @@ class MailWorkerCommand extends Command
         }
 
         return $filteredJobs;
+    }
+
+    private function stopBatchSending(ActiveRow $batch, string $batchStatus): void
+    {
+        $this->mailCache->removeQueue($batch->id);
+        $this->mailJobBatchRepository->updateStatus($batch, $batchStatus);
+        $this->mailJobQueueRepository->clearBatch($batch);
     }
 }

@@ -44,6 +44,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possibility of stuck MySQL query when removing unsubscribed users from the mail job queue. remp/remp#1148
 - Added mail generator for Napunk to overide default slovak email lock message. remp/remp#1129
 - Changed the behaviour of mail template form - template content is editable after general information is saved. remp/remp#1122
+- Refactored mailer batches to allow templates from only one mail type. remp/remp#1140
+  - Fixed decide sending mailer in `MailWorkerCommand` depending on template mail type.
 
 ## [0.32.2] - 2022-05-11
 
