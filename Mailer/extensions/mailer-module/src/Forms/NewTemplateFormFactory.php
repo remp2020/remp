@@ -41,15 +41,10 @@ class NewTemplateFormFactory
         $form = new Form;
         $form->addProtection();
 
-        $listPairs = $this->listsRepository->all()->fetchPairs('id', 'title');
-        $form->addSelect('mail_type_id', 'Newsletter list', $listPairs)
-            ->setPrompt('Select newsletter list');
+        $batchTemplate = $this->batchTemplatesRepository->findByBatchId((int) $batchId)->fetch();
+        $mailTypeId = $batchTemplate->mail_template->mail_type_id;
 
-        if (isset($_POST['mail_type_id'])) {
-            $templateList = $this->templatesRepository->pairs((int) $_POST['mail_type_id']);
-        } else {
-            $templateList = null;
-        }
+        $templateList = $this->templatesRepository->pairs($mailTypeId);
         $form->addSelect('template_id', 'Email', $templateList);
         $form->addHidden('batch_id', $batchId);
 

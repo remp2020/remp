@@ -419,23 +419,29 @@ final class JobPresenter extends BasePresenter
         $this->redirect('Show', $batch->mail_job_id);
     }
 
-    public function handleTemplatesByListId($listId, $sourceForm, $sourceField, $targetField, $snippet = null)
+    public function handleTemplatesByListId($listId, $sourceForm, $sourceField, array $targetFields, array $snippets = null)
     {
         $emptyValue = empty($listId);
         if (!empty($listId)) {
             $this[$sourceForm][$sourceField]
                 ->setDefaultValue($listId);
-            $this[$sourceForm][$targetField]
-                ->setItems($this->templatesRepository->pairs((int) $listId));
+            foreach ($targetFields as $targetField) {
+                $this[$sourceForm][$targetField]
+                    ->setItems($this->templatesRepository->pairs((int) $listId));
+            }
         } else {
             $this[$sourceForm][$sourceField]
                 ->setDefaultValue(null);
-            $this[$sourceForm][$targetField]
-                ->setItems([]);
+            foreach ($targetFields as $targetField) {
+                $this[$sourceForm][$targetField]
+                    ->setItems([]);
+            }
         }
 
-        if ($snippet) {
-            $this->redrawControl($snippet);
+        if ($snippets) {
+            foreach ($snippets as $snippet) {
+                $this->redrawControl($snippet);
+            }
         }
         $this->redrawControl('wrapper');
         $this->redrawControl('batchesWrapper');

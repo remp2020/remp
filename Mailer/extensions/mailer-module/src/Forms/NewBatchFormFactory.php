@@ -90,7 +90,7 @@ class NewBatchFormFactory
 
         $listPairs = $this->listsRepository->all()->fetchPairs('id', 'title');
 
-        $form->addSelect('mail_type_id', 'Email A alternative', $listPairs)
+        $form->addSelect('mail_type_id', 'Newsletter list', $listPairs)
             ->setPrompt('Select newsletter list');
 
         if (isset($_POST['mail_type_id'])) {
@@ -98,19 +98,11 @@ class NewBatchFormFactory
         } else {
             $templateList = null;
         }
-        $form->addSelect('template_id', null, $templateList)
+        $form->addSelect('template_id', 'Email A alternative', $templateList)
             ->setPrompt('Select email')
             ->setRequired('Email for A alternative is required');
 
-        $form->addSelect('b_mail_type_id', 'Email B alternative (optional, can be added later)', $listPairs)
-            ->setPrompt('Select newsletter list');
-
-        if (isset($_POST['b_mail_type_id'])) {
-            $templateList = $this->templatesRepository->pairs((int) $_POST['b_mail_type_id']);
-        } else {
-            $templateList = null;
-        }
-        $form->addSelect('b_template_id', null, $templateList)
+        $form->addSelect('b_template_id', 'Email B alternative', $templateList)
             ->setPrompt('Select alternative email');
 
         $form->addText('email_count', 'Number of emails');

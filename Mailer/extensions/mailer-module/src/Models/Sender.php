@@ -384,9 +384,15 @@ class Sender
     public function getMailer($alias = null): Mailer
     {
         if ($alias === null && $this->template !== null) {
-            $alias = $this->template->mail_type->mailer_alias;
+            return $this->getMailerByTemplate($this->template);
         }
 
+        return $this->mailerFactory->getMailer($alias);
+    }
+
+    public function getMailerByTemplate($template)
+    {
+        $alias = $template->mail_type->mailer_alias;
         return $this->mailerFactory->getMailer($alias);
     }
 
