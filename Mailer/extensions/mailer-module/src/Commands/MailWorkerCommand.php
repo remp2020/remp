@@ -182,7 +182,7 @@ class MailWorkerCommand extends Command
                     continue 2;
                 }
 
-                if ($sendAsBatch && $this->applicationMailer->getMailerByTemplate($mailJobBatchTemplate)->supportsBatch()) {
+                if ($sendAsBatch && $this->applicationMailer->getMailerByTemplate($mailJobBatchTemplate->mail_template)->supportsBatch()) {
                     $rawJobs = $this->mailCache->getJobs($batch->id, self::MESSAGES_PER_BATCH);
                     if (empty($rawJobs)) {
                         break;
