@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Filters;
 
-use Nette\Utils\Strings;
-
 class FilterLoader
 {
     /** All registered filters */
@@ -29,6 +27,6 @@ class FilterLoader
      */
     public function register(string $name, callable $callback): void
     {
-        $this->filters[Strings::lower($name)] = $callback;
+        $this->filters[$name] = $callback;
     }
 }
