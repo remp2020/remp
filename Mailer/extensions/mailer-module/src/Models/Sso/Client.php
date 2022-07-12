@@ -31,7 +31,7 @@ class Client
     /**
      * introspect attempts to obtain user data based on the provided SSO $token.
      */
-    public function introspect(string $token): array
+    public function introspect(?string $token): array
     {
         try {
             $response = $this->client->request('GET', self::ENDPOINT_INTROSPECT, [

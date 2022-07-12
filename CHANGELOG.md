@@ -46,6 +46,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed the behaviour of mail template form - template content is editable after general information is saved. remp/remp#1122
 - Refactored mailer batches to allow templates from only one mail type. remp/remp#1140
   - Fixed decide sending mailer in `MailWorkerCommand` depending on template mail type.
+- Fixed type error authentication issue when Mailer uses REMP SSO for authentication. remp/remp#1161
 
 ## [0.32.2] - 2022-05-11
 
