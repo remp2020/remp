@@ -2,12 +2,12 @@
     <div id="chartContainer" >
         <div class="card card-chart">
             <div class="card-header">
-                <h2>Article Page Loads
-                </h2>
+                <h2>Article Traffic Graph</h2>
             </div>
             <div class="card-body card-padding">
                 <page-loads-graph
-                        :intervalGraph="!snapshotsDataSource"
+                        :show-data-source-switcher="true"
+                        :default-graph-data-source="defaultGraphDataSource"
                         :event-options="[{text: 'Conversions', value: 'conversions', checked: true}, {text: 'Title changes', value: 'title_changes', checked: false}]"
                         :external-events="externalEvents"
                         :url="url">
@@ -66,9 +66,8 @@
             type: Boolean,
             default: false
         },
-        snapshotsDataSource: {
-            type: Boolean,
-            default: false
+        defaultGraphDataSource: {
+            type: String
         },
         externalEvents: {
             type: Array,

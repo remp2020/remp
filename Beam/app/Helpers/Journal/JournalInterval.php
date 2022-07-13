@@ -131,4 +131,10 @@ class JournalInterval
 
         throw new \Exception("No fitting rule for article {$article->id}");
     }
+
+    public function setIntervalMinutes($minutes): void
+    {
+        $this->intervalMinutes = $minutes;
+        $this->intervalText = $minutes . 'm';
+    }
 }

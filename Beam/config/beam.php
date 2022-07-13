@@ -25,6 +25,19 @@ return [
     */
     'pageview_graph_data_source' => env('PAGEVIEW_GRAPH_DATA_SOURCE', 'journal'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Article traffic graph data source
+    |--------------------------------------------------------------------------
+    |
+    | Valid values:
+    | snapshots - load data stored in DB snapshots of Journal API (data represents recorded concurrents for points in time)
+    | journal - load data directly from Journal API (data represents total number of pageviews for specific intervals).
+    | pageviews - (default for now) load data from article_pageviews DB table.
+    |
+    */
+    'article_traffic_graph_data_source' => env('ARTICLE_TRAFFIC_GRAPH_DATA_SOURCE', 'pageviews'),
+
     // Temporarily disable property token filtering for debugging
     'disable_token_filtering' => env('DISABLE_TOKEN_FILTERING', false)
 ];
