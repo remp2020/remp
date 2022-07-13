@@ -1,6 +1,7 @@
 <style>
-    div.btn-group:not(:first-child) {
-        margin-left: 10px;
+    div.btn-group {
+        margin-right: 10px;
+        margin-bottom: 5px;
     }
 </style>
 

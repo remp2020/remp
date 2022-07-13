@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `First day`, `First 7 days` and `First 14 days` options to `PageLoadsGraph`. remp/remp#1110
 - [Tracker]: Added support for SASL Kafka authentication in Tracker. remp/remp#971
 - Added overall internal pageviews count to article title ab testing histogram. remp/remp#1125
+- Changed `pageviews:aggregate-load` command to aggregate pageviews into 20-minute intervals. remp/remp#652
+- Added `pageviews` data source to load data for time histogram for specific article. remp/remp#652
+- Added option to switch between `pageviews`, `snapshots` and `journal` data sources in article page loads graph on article detail page. remp/remp#652
 
 ### [Campaign]
 

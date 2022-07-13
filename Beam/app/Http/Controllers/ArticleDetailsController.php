@@ -9,6 +9,7 @@ use App\Helpers\Journal\JournalInterval;
 use App\Http\Requests\ArticlesListRequest;
 use App\Http\Resources\ArticleResource;
 use App\Model\ConversionSource;
+use App\Model\Pageviews\PageviewsHelper;
 use App\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -19,20 +20,20 @@ class ArticleDetailsController extends Controller
 {
     private const ALLOWED_INTERVALS = 'today,1day,7days,30days,all,first1day,first7days,first14days';
 
-    private $journal;
+    private JournalContract $journal;
 
-    private $journalHelper;
+    private JournalHelpers $journalHelper;
 
-    private $snapshotHelpers;
+    private SnapshotHelpers $snapshotHelpers;
 
-    private $pageviewGraphDataSource;
+    private PageviewsHelper $pageviewsHelper;
 
-    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers)
+    public function __construct(JournalContract $journal, SnapshotHelpers $snapshotHelpers, PageviewsHelper $pageviewsHelper)
     {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->snapshotHelpers = $snapshotHelpers;
-        $this->pageviewGraphDataSource = config('beam.pageview_graph_data_source');
+        $this->pageviewsHelper = $pageviewsHelper;
     }
 
     public function variantsHistogram(Article $article, Request $request)
@@ -124,6 +125,27 @@ class ArticleDetailsController extends Controller
         return $this->journalHelper->refererMediumLabel($item->referer_medium);
     }
 
+    private function histogramFromPageviews(Article $article, JournalInterval $journalInterval)
+    {
+        $tag = 'pageviews';
+        $records = $this->pageviewsHelper->pageviewsHistogram($journalInterval, $article->id);
+
+        $results = [];
+        foreach ($records as $item) {
+            $zuluTime = Carbon::parse($item->time)->toIso8601ZuluString();
+            $results[$zuluTime]= [$tag => $item->count, 'Date' => $zuluTime];
+        }
+
+        return [
+            'publishedAt' => $article->published_at->toIso8601ZuluString(),
+            'intervalMinutes' => $journalInterval->intervalMinutes,
+            'results' => array_values($results),
+            'minDate' => $journalInterval->timeAfter->toIso8601ZuluString(),
+            'maxDate' => $journalInterval->timeBefore->toIso8601ZuluString(),
+            'tags' => [$tag]
+        ];
+    }
+
     private function histogramFromSnapshots(Article $article, JournalInterval $journalInterval)
     {
         $records = $this->snapshotHelpers->concurrentsHistogram($journalInterval, $article->external_id, true);
@@ -169,16 +191,20 @@ class ArticleDetailsController extends Controller
 
         $tz = new \DateTimeZone($request->get('tz', 'UTC'));
         $journalInterval = new JournalInterval($tz, $request->get('interval'), $article);
+        $dataSource = $request->get('dataSource');
 
-        switch ($this->pageviewGraphDataSource) {
+        switch ($dataSource) {
             case 'snapshots':
                 $data = $this->histogramFromSnapshots($article, $journalInterval);
                 break;
             case 'journal':
                 $data = $this->histogram($article, $journalInterval, 'derived_referer_medium');
                 break;
+            case 'pageviews':
+                $data = $this->histogramFromPageviews($article, $journalInterval);
+                break;
             default:
-                throw new \Exception("unknown pageviews data source {$this->pageviewGraphDataSource}");
+                throw new \Exception("unknown pageviews data source {$dataSource}");
         }
 
         $data['colors'] = array_values(Colors::assignColorsToMediumRefers($data['tags']));
@@ -431,7 +457,6 @@ class ArticleDetailsController extends Controller
                 'mediumColors' => Colors::assignColorsToMediumRefers($mediums),
                 'visitedFrom' => $request->input('visited_from', 'today - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
-                'snapshotsDataSource' => $this->pageviewGraphDataSource === 'snapshots',
                 'externalEvents' => $externalEvents,
             ]),
             'json' => new ArticleResource($article),

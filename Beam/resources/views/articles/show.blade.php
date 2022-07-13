@@ -170,9 +170,9 @@
                 :has-image-variants="{{$article->has_image_variants ? 'true' : 'false'}}"
                 :url="url"
                 :variants-url="variantsUrl"
-                :snapshots-data-source="{{$snapshotsDataSource ? 'true' : 'false'}}"
+                :default-graph-data-source="defaultGraphDataSource"
                 :external-events="externalEvents"
-                ref="histogram" >
+                ref="histogram">
         </article-details>
 
     </div>
@@ -195,6 +195,7 @@
                     url: "{!! route('articles.timeHistogram.json', $article->id) !!}",
                     variantsUrl: "{!! route('articles.variantsHistogram.json', $article->id) !!}",
                     externalEvents: {!! @json($externalEvents) !!},
+                    defaultGraphDataSource: "{!! config('beam.article_traffic_graph_data_source') !!}",
                 }
             }
         })

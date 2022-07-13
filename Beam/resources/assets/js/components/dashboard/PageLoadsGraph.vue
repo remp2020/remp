@@ -1,6 +1,15 @@
 <template>
     <div class="chartContainer">
 
+        <button-switcher v-if="showDataSourceSwitcher" :options="[
+                    {text: 'Pageviews with sources', value: 'journal'},
+                    {text: 'Concurrents with sources', value: 'snapshots'},
+                    {text: 'Pageviews', value: 'pageviews'},
+                    ]"
+                     :classes="['pull-right']"
+                     v-model="dataSource">
+        </button-switcher>
+
         <button-switcher :options="[
                     {text: 'Since publishing', value: 'all', group: 0},
                     {text: 'Today', value: 'today', group: 1},
@@ -61,7 +70,7 @@
         <div class="legend-wrapper">
             <div v-if="highlightedRow" v-show="legend.visible" v-bind:style="{ left: legend.left }" class="article-graph-legend">
 
-                <div v-if="intervalGraph" class="legend-title">{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</div>
+                <div v-if="dataSource" class="legend-title">{{highlightedRow.startDate | formatDate(data.intervalMinutes)}}</div>
                 <div v-else class="legend-title">{{highlightedRow.startDate | filterLegendTitle}}</div>
 
                 <table>
@@ -196,14 +205,18 @@
             type: Boolean,
             default: true
         },
-        intervalGraph: {
-            type: Boolean,
-            default: true
+        defaultGraphDataSource: {
+            type: String,
+            default: 'pageviews'
         },
         externalEvents: {
             type: Array,
             default: () => [],
-        }
+        },
+        showDataSourceSwitcher: {
+            type: Boolean,
+            default: false
+        },
     }
 
     Vue.filter('formatDate', formatInterval)
@@ -226,6 +239,7 @@
                 tagLabels: null,
                 loading: false,
                 interval: 'all',
+                dataSource: this.defaultGraphDataSource,
                 highlightedRow: null,
                 legend: {
                     visible: false,
@@ -246,6 +260,9 @@
                 this.fillData()
             },
             interval(value) {
+                this.reload()
+            },
+            dataSource(value) {
                 this.reload()
             },
             selectedEvents(values) {
@@ -610,6 +627,7 @@
                         params: Object.assign({
                             tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
                             interval: this.interval,
+                            dataSource: this.dataSource,
                             events: this.selectedEvents.map(option => option.value),
                             externalEvents: this.selectedExternalEvents.map(option => option.value)
                         }, this.urlParams)
