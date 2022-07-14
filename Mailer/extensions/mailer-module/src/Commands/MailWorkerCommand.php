@@ -10,6 +10,7 @@ use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Models\HealthChecker;
+use Remp\MailerModule\Models\Mailer\EmailAllowList;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Events\MailSentEvent;
 use Remp\MailerModule\Models\Job\MailCache;
@@ -48,6 +49,8 @@ class MailWorkerCommand extends Command
 
     private $mailCache;
 
+    private $emailAllowList;
+
     private $eventDispatcher;
 
     private $isFirstLine = true;
@@ -73,6 +76,7 @@ class MailWorkerCommand extends Command
         TemplatesRepository $mailTemplatesRepository,
         BatchTemplatesRepository $batchTemplatesRepository,
         MailCache $redis,
+        EmailAllowList $emailAllowList,
         EventDispatcher $eventDispatcher,
         HealthChecker $healthChecker
     ) {
@@ -84,6 +88,7 @@ class MailWorkerCommand extends Command
         $this->mailTemplateRepository = $mailTemplatesRepository;
         $this->batchTemplatesRepository = $batchTemplatesRepository;
         $this->mailCache = $redis;
+        $this->emailAllowList = $emailAllowList;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
         $this->healthChecker = $healthChecker;
@@ -203,7 +208,7 @@ class MailWorkerCommand extends Command
 
                 foreach ($jobsByTemplateCode as $templateCode => $jobs) {
                     $originalCount = count($jobs);
-                    $jobs = $this->filterAlreadySentJobs($jobs, $batch);
+                    $jobs = $this->filterJobs($jobs, $batch);
                     $jobsCount = count($jobs);
                     $filteredCount = $originalCount - $jobsCount;
 
@@ -302,7 +307,7 @@ class MailWorkerCommand extends Command
                         'mail_job_batch_id' => $batch->id,
                     ])->fetch();
                     $this->batchTemplatesRepository->update($jobBatchTemplate, [
-                        'sent+=' => count($jobs),
+                        'sent+=' => $sentCount,
                     ]);
                 }
             }
@@ -318,7 +323,7 @@ class MailWorkerCommand extends Command
         }
     }
 
-    private function filterAlreadySentJobs(array $jobs, ActiveRow $batch)
+    private function filterJobs(array $jobs, ActiveRow $batch): array
     {
         $emailsByTemplateCodes = [];
         $jobsByEmails = [];
@@ -337,7 +342,9 @@ class MailWorkerCommand extends Command
         // extract list of allowed jobs based on allowed emails
         $filteredJobs = [];
         foreach ($filteredEmails as $filteredEmail) {
-            $filteredJobs[] = $jobsByEmails[$filteredEmail];
+            if ($this->emailAllowList->isAllowed($filteredEmail)) {
+                $filteredJobs[] = $jobsByEmails[$filteredEmail];
+            }
         }
 
         return $filteredJobs;

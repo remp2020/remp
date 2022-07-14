@@ -11,6 +11,7 @@ use Remp\MailerModule\Models\Auth\AutoLogin;
 use Remp\MailerModule\Models\Config\ConfigNotExistsException;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
+use Remp\MailerModule\Models\Mailer\EmailAllowList;
 use Remp\MailerModule\Models\Mailer\Mailer;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
 use Remp\MailerModule\Models\Sender\MailerFactory;
@@ -56,13 +57,16 @@ class Sender
 
     private $generatorInputFactory;
 
+    public $emailAllowList;
+
     public function __construct(
         MailerFactory $mailerFactory,
         AutoLogin $autoLogin,
         UserSubscriptionsRepository $userSubscriptionsRepository,
         LogsRepository $logsRepository,
         ContentGenerator $contentGenerator,
-        GeneratorInputFactory $generatorInputFactory
+        GeneratorInputFactory $generatorInputFactory,
+        EmailAllowList $emailAllowList
     ) {
         $this->mailerFactory = $mailerFactory;
         $this->autoLogin = $autoLogin;
@@ -70,6 +74,7 @@ class Sender
         $this->logsRepository = $logsRepository;
         $this->contentGenerator = $contentGenerator;
         $this->generatorInputFactory = $generatorInputFactory;
+        $this->emailAllowList = $emailAllowList;
     }
 
     public function addRecipient(string $email, string $name = null, array $params = []): self
@@ -140,6 +145,10 @@ class Sender
         $recipient = reset($this->recipients);
 
         if ($checkEmailSubscribed && !$this->userSubscriptionsRepository->isEmailSubscribed($recipient['email'], $this->template->mail_type->id)) {
+            return 0;
+        }
+
+        if (!$this->emailAllowList->isAllowed($recipient['email'])) {
             return 0;
         }
 
@@ -237,6 +246,10 @@ class Sender
         $transformedParams = [];
         foreach ($this->recipients as $recipient) {
             if (!isset($subscribedEmails[$recipient['email']]) || !$subscribedEmails[$recipient['email']]) {
+                continue;
+            }
+
+            if (!$this->emailAllowList->isAllowed($recipient['email'])) {
                 continue;
             }
 
