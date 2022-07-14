@@ -25,8 +25,8 @@ class AggregatePageviewTimespentJob extends Command
         $articleId = $this->option('article_id') ?? null;
         $now = $this->option('now') ? Carbon::parse($this->option('now')) : Carbon::now();
 
-        $timeBefore = $now->minute(0)->second(0)->microsecond(0);
-        $timeAfter = (clone $timeBefore)->subHour();
+        $timeBefore = $now->floorMinutes(20);
+        $timeAfter = (clone $timeBefore)->subMinutes(20);
 
         $this->line(sprintf("Fetching aggregated timespent data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
 
