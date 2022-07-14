@@ -54,7 +54,7 @@ SELECT /*+ SET_VAR(cte_max_recursion_depth = 1M) */
        COALESCE(SUM(article_pageviews.sum), 0) as sum
 FROM seq
          LEFT JOIN article_pageviews ON (
-            article_pageviews.article_id = ? AND article_pageviews.time_from <= seq.interval_from AND article_pageviews.time_to >= seq.interval_to
+            article_pageviews.article_id = ? AND article_pageviews.time_from >= seq.interval_from AND article_pageviews.time_to <= seq.interval_to
         )
 GROUP BY seq.interval_from, seq.interval_to
 SQL;
