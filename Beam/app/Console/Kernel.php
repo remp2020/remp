@@ -111,16 +111,16 @@ class Kernel extends ConsoleKernel
      */
     private function aggregations(Schedule $schedule)
     {
-        // Aggregates current hour (may not be completed yet)
-        $schedule->command(AggregatePageviews::COMMAND, ["--now='+1 hour'"])
+        // Aggregates current 20-minute interval (may not be completed yet)
+        $schedule->command(AggregatePageviews::COMMAND, ["--now='+20 minutes'"])
             ->everyMinute()
             ->runInBackground()
             ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
             ->appendOutputTo(storage_path('logs/aggregate_pageviews.log'));
 
-        // Aggregates last full hour only once
+        // Aggregates last 20-minute interval only once
         $schedule->command(AggregatePageviews::COMMAND)
-            ->hourlyAt(1)
+            ->cron('1-59/20 * * * *')
             ->runInBackground()
             ->appendOutputTo(storage_path('logs/aggregate_pageviews.log'));
         
