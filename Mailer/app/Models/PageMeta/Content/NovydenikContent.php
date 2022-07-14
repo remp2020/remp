@@ -49,7 +49,7 @@ class NovydenikContent implements ContentInterface
     {
         preg_match_all('/<script id="schema" type="application\/ld\+json">(.*?)<\/script>/', $content, $matches);
 
-        if (!$matches) {
+        if (!$matches || empty($matches[1])) {
             return null;
         }
 
