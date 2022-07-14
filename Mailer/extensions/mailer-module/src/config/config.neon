@@ -104,6 +104,8 @@ services:
 	eventDispatcher:
 		factory: League\Event\EventDispatcher
 
+	emailAllowList: Remp\MailerModule\Models\Mailer\EmailAllowList
+
 	segmentAgreggator:
 		factory: Remp\MailerModule\Models\Segment\Aggregator
 

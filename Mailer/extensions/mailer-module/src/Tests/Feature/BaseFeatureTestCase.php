@@ -19,6 +19,7 @@ use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\LogConversionsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
+use Remp\MailerModule\Repositories\Repository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository;
@@ -92,11 +93,7 @@ class BaseFeatureTestCase extends TestCase
         $this->userSubscriptionsRepository = $this->inject(UserSubscriptionsRepository::class);
         $this->userSubscriptionVariantsRepository = $this->inject(UserSubscriptionVariantsRepository::class);
 
-        $truncateTables = implode(' ', array_map(function ($repo) {
-            $property = (new \ReflectionClass($repo))->getProperty('tableName');
-            $property->setAccessible(true);
-            return "DELETE FROM `{$property->getValue($repo)}`;";
-        }, [
+        $repositories = [
             $this->autoLoginTokensRepository,
             $this->jobsRepository,
             $this->batchTemplatesRepository,
@@ -111,18 +108,10 @@ class BaseFeatureTestCase extends TestCase
             $this->listCategoriesRepository,
             $this->userSubscriptionsRepository,
             $this->userSubscriptionVariantsRepository,
-        ]));
+        ];
 
-        $db = $this->database->getConnection()->getPdo();
-        $sql = "
-SET FOREIGN_KEY_CHECKS=0;
-{$truncateTables}
-SET FOREIGN_KEY_CHECKS=1;
-";
-        try {
-            $db->exec($sql);
-        } catch (PDOException $e) {
-            echo $e->getMessage();
+        foreach ($repositories as $repository) {
+            $this->truncate($repository);
         }
     }
 
@@ -202,6 +191,29 @@ SET FOREIGN_KEY_CHECKS=1;
             null,
             $publicListing
         );
+    }
+
+    protected function truncate(Repository $repository)
+    {
+        $truncateTables = implode(' ', array_map(function ($repo) {
+            $property = (new \ReflectionClass($repo))->getProperty('tableName');
+            $property->setAccessible(true);
+            return "DELETE FROM `{$property->getValue($repo)}`;";
+        }, [
+            $repository,
+        ]));
+
+        $db = $this->database->getConnection()->getPdo();
+        $sql = "
+SET FOREIGN_KEY_CHECKS=0;
+{$truncateTables}
+SET FOREIGN_KEY_CHECKS=1;
+";
+        try {
+            $db->exec($sql);
+        } catch (\PDOException $e) {
+            echo $e->getMessage();
+        }
     }
 
     protected function createMailTypeVariant($mailType, string $title = 'variant', string $code = 'variant', int $sorting = 100)

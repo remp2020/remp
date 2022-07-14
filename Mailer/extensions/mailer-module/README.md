@@ -77,6 +77,30 @@ services:
 
 Default locale is setted by using `.env` variable `LOCALE`.
 
+### Email allow list
+
+Mailer supports allow listing email addresses to prevent sending emails to unwanted email addresses. This feature is not active by default.
+To activate allow list you have to specify one or more allowed email addresses in application configuration:
+
+```neon
+services:
+    emailAllowList:
+        setup:
+            - allow("example1@example.com")
+            - allow("example2@example.com")
+```
+
+To allow all email addresses from specified domain you have to use double @ because Nette handles single @ as reference
+to other service.
+
+```neon
+services:
+    emailAllowList:
+        setup:
+            - allow("@@example.com")
+            - allow("@@example2.com")
+```
+
 ## Technical feature description
 
 ### Mailers setup

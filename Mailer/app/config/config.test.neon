@@ -24,3 +24,6 @@ services:
 			- register(Remp\MailerModule\Models\Segment\Dummy())
 	apiTokenRepository:
 		factory: Tomaj\NetteApi\Misc\StaticTokenRepository(['test': '*'])
+	mailFactory:
+		setup:
+			- addMailer(Tests\Feature\Mails\TestMailer())
