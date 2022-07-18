@@ -7,13 +7,17 @@ use Nette\Utils\DateTime;
 
 class ListsRepository extends Repository
 {
+    use SoftDeleteTrait;
+
     protected $tableName = 'mail_types';
 
     protected $dataTableSearchable = ['code', 'title', 'description'];
 
     public function all(): Selection
     {
-        return $this->getTable()->order('sorting ASC');
+        return $this->getTable()
+            ->where('deleted_at', null)
+            ->order('sorting ASC');
     }
 
     public function add(
@@ -101,7 +105,9 @@ class ListsRepository extends Repository
 
     public function tableFilter(): Selection
     {
-        return $this->getTable()->order('mail_type_category.sorting, mail_types.sorting');
+        return $this->getTable()
+            ->where('deleted_at', null)
+            ->order('mail_type_category.sorting, mail_types.sorting');
     }
 
     public function search(string $term, int $limit): array
@@ -122,6 +128,13 @@ class ListsRepository extends Repository
     public function getUsedMailersAliases(): array
     {
         return $this->getTable()->select('DISTINCT mailer_alias')
-            ->where('mailer_alias IS NOT NULL')->fetchPairs(null, 'mailer_alias');
+            ->where('deleted_at', null)
+            ->where('mailer_alias IS NOT NULL')
+            ->fetchPairs(null, 'mailer_alias');
+    }
+
+    public function canBeDeleted(ActiveRow $list): bool
+    {
+        return !(bool) $list->related('mail_templates')->where('deleted_at', null)->count('*');
     }
 }

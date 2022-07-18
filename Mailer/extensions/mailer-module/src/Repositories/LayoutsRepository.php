@@ -7,13 +7,17 @@ use Nette\Utils\DateTime;
 
 class LayoutsRepository extends Repository
 {
+    use SoftDeleteTrait;
+
     protected $tableName = 'mail_layouts';
 
     protected $dataTableSearchable = ['name', 'code', 'layout_text', 'layout_html'];
 
     public function all(): Selection
     {
-        return $this->getTable()->order('name ASC');
+        return $this->getTable()
+            ->where('deleted_at', null)
+            ->order('name ASC');
     }
 
     public function add(string $name, string $code, string $layoutText, string $layoutHtml): ActiveRow
@@ -43,6 +47,7 @@ class LayoutsRepository extends Repository
     public function tableFilter(string $query, string $order, string $orderDirection, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
+            ->where('deleted_at', null)
             ->order($order . ' ' . strtoupper($orderDirection));
 
         if (!empty($query)) {
@@ -75,5 +80,10 @@ class LayoutsRepository extends Repository
             ->fetchAssoc('id');
 
         return $results;
+    }
+
+    public function canBeDeleted(ActiveRow $layout): bool
+    {
+        return !(bool) $layout->related('mail_templates')->where('deleted_at', null)->count('*');
     }
 }

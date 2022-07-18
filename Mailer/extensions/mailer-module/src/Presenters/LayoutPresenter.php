@@ -45,7 +45,10 @@ final class LayoutPresenter extends BasePresenter
                 'render' => 'date',
                 'priority' => 2,
             ])
-            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit layout');
+            ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit layout')
+            ->setRowAction('delete', 'palette-Red zmdi-delete', 'Delete layout', [
+                'onclick' => 'return confirm(\'Are you sure you want to delete this item?\');'
+            ]);
 
         return $dataTable;
     }
@@ -70,9 +73,11 @@ final class LayoutPresenter extends BasePresenter
 
         foreach ($layouts as $layout) {
             $editUrl = $this->link('Edit', $layout->id);
+            $deleteUrl = $this->link('Delete!', $layout->id);
             $result['data'][] = [
                 'actions' => [
                     'edit' => $editUrl,
+                    'delete' => $deleteUrl,
                 ],
                 [
                     'url' => $editUrl,
@@ -115,5 +120,19 @@ final class LayoutPresenter extends BasePresenter
         };
 
         return $form;
+    }
+
+    public function handleDelete($id): void
+    {
+        $layout = $this->layoutsRepository->find($id);
+
+        if ($this->layoutsRepository->canBeDeleted($layout)) {
+            $this->layoutsRepository->softDelete($layout);
+            $this->flashMessage("Layout {$layout->name} was deleted.");
+            $this->redirect('default');
+        } else {
+            $this->flashMessage("There are emails using layout {$layout->name}.", 'danger');
+            $this->redirect('Template:default', ['layout' => $layout->id]);
+        }
     }
 }

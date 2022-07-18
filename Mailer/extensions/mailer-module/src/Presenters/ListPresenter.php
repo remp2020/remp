@@ -112,6 +112,9 @@ final class ListPresenter extends BasePresenter
             ->setAllColSetting('orderable', false)
             ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show list')
             ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit list')
+            ->setRowAction('delete', 'palette-Red zmdi-delete', 'Delete list', [
+                'onclick' => 'return confirm(\'Are you sure you want to delete this item?\');'
+            ])
             ->setRowAction('sentEmailsDetail', 'palette-Cyan zmdi-chart', 'List stats')
             ->setTableSetting('displayNavigation', false)
             ->setTableSetting('rowGroup', 0);
@@ -134,11 +137,13 @@ final class ListPresenter extends BasePresenter
         foreach ($lists as $list) {
             $showUrl = $this->link('Show', $list->id);
             $editUrl = $this->link('Edit', $list->id);
+            $deleteUrl = $this->link('Delete!', $list->id);
             $sentEmailsDetail = $this->link('sentEmailsDetail', $list->id);
             $result['data'][] = [
                 'actions' => [
                     'show' => $showUrl,
                     'edit' => $editUrl,
+                    'delete' => $deleteUrl,
                     'sentEmailsDetail' => $sentEmailsDetail,
                 ],
                 $list->type_category->title ?? null,
@@ -291,7 +296,7 @@ final class ListPresenter extends BasePresenter
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], [$request['listId']], (int)$request['length'], (int)$request['start'])
+            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], [$request['listId']], null, (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
@@ -672,5 +677,19 @@ final class ListPresenter extends BasePresenter
             ];
         }
         $this->presenter->sendJson($result);
+    }
+
+    public function handleDelete($id): void
+    {
+        $list = $this->listsRepository->find($id);
+
+        if ($this->listsRepository->canBeDeleted($list)) {
+            $this->listsRepository->softDelete($list);
+            $this->flashMessage("List {$list->code} was deleted.");
+            $this->redirect('default');
+        } else {
+            $this->flashMessage("There are emails using list {$list->code}.", 'danger');
+            $this->redirect('Template:default', ['type' => $list->id]);
+        }
     }
 }
