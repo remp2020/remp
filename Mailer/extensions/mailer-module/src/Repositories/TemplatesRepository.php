@@ -8,6 +8,8 @@ use Nette\Utils\Random;
 
 class TemplatesRepository extends Repository
 {
+    use SoftDeleteTrait;
+
     protected $tableName = 'mail_templates';
 
     protected $dataTableSearchable = ['name', 'code', 'description', 'subject'];
@@ -15,7 +17,9 @@ class TemplatesRepository extends Repository
 
     public function all(): Selection
     {
-        return $this->getTable()->order('created_at DESC, id DESC');
+        return $this->getTable()
+            ->where('mail_templates.deleted_at', null)
+            ->order('mail_templates.created_at DESC, mail_templates.id DESC');
     }
 
     public function pairs(int $listId): array
@@ -137,9 +141,10 @@ class TemplatesRepository extends Repository
         return $code;
     }
 
-    public function tableFilter(string $query, string $order, string $orderDirection, ?array $listId = null, ?int $limit = null, ?int $offset = null): Selection
+    public function tableFilter(string $query, string $order, string $orderDirection, ?array $mailTypeIds = null, ?array $mailLayoutIds = null, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
+            ->where('deleted_at', null)
             ->order($order . ' ' . strtoupper($orderDirection));
 
         if (!empty($query)) {
@@ -154,9 +159,15 @@ class TemplatesRepository extends Repository
             $selection->whereOr($where);
         }
 
-        if ($listId !== null) {
+        if ($mailTypeIds !== null) {
             $selection->where([
-                'mail_type_id' => $listId
+                'mail_type_id' => $mailTypeIds
+            ]);
+        }
+
+        if ($mailLayoutIds !== null) {
+            $selection->where([
+                'mail_layout_id' => $mailLayoutIds
             ]);
         }
 
@@ -198,11 +209,11 @@ class TemplatesRepository extends Repository
 
     public function getByMailTypeIds(array $mailTypeIds)
     {
-        return $this->getTable()->where('mail_type_id', $mailTypeIds);
+        return $this->all()->where('mail_type_id', $mailTypeIds);
     }
 
     public function getByMailTypeCategoryCode(string $mailTypeCategoryCode): Selection
     {
-        return $this->getTable()->where('mail_type.mail_type_category.code = ?', $mailTypeCategoryCode);
+        return $this->all()->where('mail_type.mail_type_category.code = ?', $mailTypeCategoryCode);
     }
 }

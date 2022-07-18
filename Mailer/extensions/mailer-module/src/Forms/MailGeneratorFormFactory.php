@@ -33,9 +33,8 @@ class MailGeneratorFormFactory
         $form->addProtection();
 
         $keys = $this->mailGeneratorFactory->keys();
-        $pairs = $this->sourceTemplatesRepository->getTable()
+        $pairs = $this->sourceTemplatesRepository->all()
             ->where(['generator' => $keys])
-            ->order('sorting ASC')
             ->fetchPairs('id', 'title');
 
         $form->addSelect('source_template_id', 'Generator', $pairs)
@@ -43,15 +42,17 @@ class MailGeneratorFormFactory
             ->setHtmlAttribute('class', 'form-control selectpicker')
             ->setHtmlAttribute('data-live-search', 'true');
 
+        $generator = $template = null;
         if ($sourceTemplateId) {
             $template = $this->sourceTemplatesRepository->find($sourceTemplateId);
             $generator = $template->generator;
         } else {
-            $tmpl = $this->sourceTemplatesRepository->getTable()
-                ->order('sorting ASC')
+            $tmpl = $this->sourceTemplatesRepository->all()
                 ->fetch();
-            $template = $tmpl;
-            $generator = $tmpl->generator;
+            if ($tmpl) {
+                $template = $tmpl;
+                $generator = $tmpl->generator;
+            }
         }
 
         if ($generator && $template) {

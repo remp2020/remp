@@ -131,6 +131,15 @@
                 },
                 {/if}
             ],
+            'searchCols': [
+                {foreach $colSettings as $colSetting}
+                    {ifset $colSetting['search']}
+                        {'search': {$colSetting['search']}},
+                    {else}
+                        null,
+                    {/ifset}
+                {/foreach}
+            ],
             {ifset $tableSettings['rowGroup']}
             'rowGroup':  {
                 'dataSrc': {$tableSettings['rowGroup']}

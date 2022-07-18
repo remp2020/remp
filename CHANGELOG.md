@@ -53,6 +53,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed internal content parsers which could throw notices if parsed URL doesn't contain JSON schema. remp/remp#1162
 - Added support for allow listing emails in Mailer. remp/remp#1150
   - Added tests for application `Sender` and `EmailAllowList` classes.
+- Added soft delete for emails, layouts, newsletter lists and generator templates. remp/remp#1075
 
 ## [0.32.2] - 2022-05-11
 
