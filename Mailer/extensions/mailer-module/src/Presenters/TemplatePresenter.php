@@ -87,6 +87,7 @@ final class TemplatePresenter extends BasePresenter
     public function createComponentDataTableDefault(): DataTable
     {
         $mailTypePairs = $this->listsRepository->all()->fetchPairs('id', 'title');
+        $mailLayoutPairs = $this->layoutsRepository->all()->fetchPairs('id', 'name');
 
         $dataTable = $this->dataTableFactory->create();
         $dataTable
@@ -106,6 +107,13 @@ final class TemplatePresenter extends BasePresenter
                 'orderable' => false,
                 'filter' => $mailTypePairs,
                 'priority' => 1,
+                'search' => $this->params['type'] ?? null,
+            ])
+            ->setColSetting('layout', [
+                'orderable' => false,
+                'filter' => $mailLayoutPairs,
+                'priority' => 1,
+                'search' => $this->params['layout'] ?? null,
             ])
             ->setColSetting('opened', [
                 'priority' => 3,
@@ -120,6 +128,9 @@ final class TemplatePresenter extends BasePresenter
             ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show template')
             ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit template')
             ->setRowAction('duplicate', 'palette-Cyan zmdi-copy', 'Duplicate template')
+            ->setRowAction('delete', 'palette-Red zmdi-delete', 'Delete template', [
+                'onclick' => 'return confirm(\'Are you sure you want to delete this item?\');'
+            ])
             ->setTableSetting('order', Json::encode([[0, 'DESC']]))
             ->setTableSetting('exportColumns', [0,1,2,3,4,5]);
 
@@ -130,26 +141,18 @@ final class TemplatePresenter extends BasePresenter
     {
         $request = $this->request->getParameters();
 
-        $listIds = null;
-        foreach ($request['columns'] as $column) {
-            if ($column['name'] !== 'type') {
-                continue;
-            }
-            if (!empty($column['search']['value'])) {
-                $listIds = explode(',', $column['search']['value']);
-            }
-            break;
-        }
+        $mailTypeIds = $this->getColumnValue('type', $request['columns']);
+        $mailLayoutIds = $this->getColumnValue('layout', $request['columns']);
 
         $query = $request['search']['value'];
         $order = $request['columns'][$request['order'][0]['column']]['name'];
         $orderDir = $request['order'][0]['dir'];
         $templatesCount = $this->templatesRepository
-            ->tableFilter($query, $order, $orderDir, $listIds)
+            ->tableFilter($query, $order, $orderDir, $mailTypeIds, $mailLayoutIds)
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($query, $order, $orderDir, $listIds, (int)$request['length'], (int)$request['start'])
+            ->tableFilter($query, $order, $orderDir, $mailTypeIds, $mailLayoutIds, (int)$request['length'], (int)$request['start'])
             ->fetchAll();
 
         $result = [
@@ -166,6 +169,7 @@ final class TemplatePresenter extends BasePresenter
                     'show' => $this->link('Show', $template->id),
                     'edit' => $this->link('Edit', $template->id),
                     'duplicate' => $this->link('Duplicate!', $template->id),
+                    'delete' => $this->link('Delete!', $template->id),
                 ],
                 $template->created_at,
                 $template->code,
@@ -174,11 +178,27 @@ final class TemplatePresenter extends BasePresenter
                     'text' => $template->subject
                 ],
                 $template->type->title,
+                $template->mail_layout->name,
                 $template->related('mail_job_batch_template')->sum('opened') + $template->related('mail_logs', 'mail_template_id')->where('mail_job_id IS NULL')->count('opened_at'),
                 $template->related('mail_job_batch_template')->sum('clicked') + $template->related('mail_logs', 'mail_template_id')->where('mail_job_id IS NULL')->count('clicked_at'),
             ];
         }
         $this->presenter->sendJson($result);
+    }
+
+    private function getColumnValue($columnName, $columns)
+    {
+        foreach ($columns as $column) {
+            if ($column['name'] !== $columnName) {
+                continue;
+            }
+            if (!empty($column['search']['value'])) {
+                return explode(',', $column['search']['value']);
+            }
+            break;
+        }
+
+        return null;
     }
 
     public function renderShow($id): void
@@ -269,7 +289,7 @@ final class TemplatePresenter extends BasePresenter
 
     public function renderNew(): void
     {
-        $layouts = $this->layoutsRepository->getTable()->fetchPairs('id', 'layout_html');
+        $layouts = $this->layoutsRepository->all()->fetchPairs('id', 'layout_html');
         $snippets = $this->snippetsRepository->getTable()->select('code')->group('code')->fetchAssoc('code');
         $lists = $this->listsRepository->all()->fetchAssoc('id');
 
@@ -286,7 +306,7 @@ final class TemplatePresenter extends BasePresenter
         if (!$template) {
             throw new BadRequestException();
         }
-        $layouts = $this->layoutsRepository->getTable()->fetchAssoc('id');
+        $layouts = $this->layoutsRepository->all()->fetchAssoc('id');
         if ($editedLocale && $editedLocale !== $this->localizationConfig->getDefaultLocale()) {
             $layoutTranslations = $this->layoutTranslationsRepository->getTranslationsForLocale($editedLocale)
                 ->fetchAssoc('mail_layout_id');
@@ -386,5 +406,13 @@ final class TemplatePresenter extends BasePresenter
         } else {
             $this->redirect('Edit', ['id' => $itemID, 'editedLocale' => $this->getParameter('editedLocale')]);
         }
+    }
+
+    public function handleDelete($id): void
+    {
+        $template = $this->templatesRepository->find($id);
+        $this->templatesRepository->softDelete($template);
+        $this->flashMessage("Template {$template->name} was deleted.");
+        $this->redirect('default');
     }
 }

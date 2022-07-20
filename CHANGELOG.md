@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Tracker]: Added support for SASL Kafka authentication in Tracker. remp/remp#971
 - Added overall internal pageviews count to article title ab testing histogram. remp/remp#1125
 - Changed commands called in `pageviews:aggregate` command to aggregate pageviews into 20-minute intervals. remp/remp#652
+  - Due to the interval change, duplicates may arise in `article_pageviews`. We recommend running `data:delete-duplicate-pageviews` command after migration to clean up data.
 - Added `pageviews` data source to load data for time histogram for specific article. remp/remp#652
 - Added option to switch between `pageviews`, `snapshots` and `journal` data sources in article page loads graph on article detail page. remp/remp#652
 - Fixed site layout on mobile.
@@ -55,6 +56,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed internal content parsers which could throw notices if parsed URL doesn't contain JSON schema. remp/remp#1162
 - Added support for allow listing emails in Mailer. remp/remp#1150
   - Added tests for application `Sender` and `EmailAllowList` classes.
+- Added soft delete for emails, layouts, newsletter lists and generator templates. remp/remp#1075
 - Fixed site layout on mobile.
 
 ## [0.32.2] - 2022-05-11

@@ -7,13 +7,17 @@ use Nette\Utils\DateTime;
 
 class SourceTemplatesRepository extends Repository
 {
+    use SoftDeleteTrait;
+
     protected $tableName = 'mail_source_template';
 
     protected $dataTableSearchable = ['title'];
 
     public function all(): Selection
     {
-        return $this->getTable()->order('sorting ASC');
+        return $this->getTable()
+            ->where('deleted_at', null)
+            ->order('sorting ASC');
     }
 
     public function add(string $title, string $code, string $generator, string $html, string $text, int $sorting = 100): ActiveRow
@@ -42,7 +46,7 @@ class SourceTemplatesRepository extends Repository
 
     public function tableFilter(string $query, ?string $order, ?string $orderDirection, ?int $limit = null, ?int $offset = null): Selection
     {
-        $selection = $this->getTable();
+        $selection = $this->getTable()->where('deleted_at', null);
         if ($order && $orderDirection) {
             $selection->order($order . ' ' . strtoupper($orderDirection));
         } else {

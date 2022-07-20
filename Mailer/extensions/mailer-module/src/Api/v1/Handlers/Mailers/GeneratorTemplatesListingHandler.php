@@ -37,9 +37,8 @@ class GeneratorTemplatesListingHandler extends BaseHandler
         if (!$generator) {
             $generator = $this->generatorFactory->keys();
         }
-        $results = $this->sourceTemplatesRepository->getTable()
+        $results = $this->sourceTemplatesRepository->all()
             ->where(['generator' => $generator])
-            ->order('sorting ASC')
             ->select('id,title')
             ->fetchAll();
 

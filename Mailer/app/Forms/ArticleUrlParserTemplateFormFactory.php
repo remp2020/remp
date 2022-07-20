@@ -93,9 +93,8 @@ class ArticleUrlParserTemplateFormFactory
         $form->addText('code', 'Identifier')
             ->setRequired("Field 'Identifier' is required.");
 
-        $mailTypes = $this->listsRepository->getTable()
+        $mailTypes = $this->listsRepository->all()
             ->where(['public_listing' => true])
-            ->order('sorting ASC')
             ->fetchPairs('id', 'title');
 
         $form->addSelect('mail_type_id', 'Type', $mailTypes)

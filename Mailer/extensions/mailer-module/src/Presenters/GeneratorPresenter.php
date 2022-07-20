@@ -58,6 +58,9 @@ final class GeneratorPresenter extends BasePresenter
                 'priority' => 3,
             ])
             ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit generator')
+            ->setRowAction('delete', 'palette-Red zmdi-delete', 'Delete generator', [
+                'onclick' => 'return confirm(\'Are you sure you want to delete this item?\');'
+            ])
             ->setRowAction('generate', 'palette-Cyan zmdi-spellcheck', 'Generate emails')
             ->setTableSetting('order', '[]');
 
@@ -87,10 +90,12 @@ final class GeneratorPresenter extends BasePresenter
         foreach ($sourceTemplates as $i => $sourceTemplate) {
             $editUrl = $this->link('Edit', $sourceTemplate->id);
             $generateUrl = $this->link('Generate', $sourceTemplate->id);
+            $deleteUrl = $this->link('Delete!', $sourceTemplate->id);
             $result['data'][] = [
                 'actions' => [
                     'edit' => $editUrl,
                     'generate' => $generateUrl,
+                    'delete' => $deleteUrl,
                 ],
                 [
                     'url' => $editUrl,
@@ -142,5 +147,13 @@ final class GeneratorPresenter extends BasePresenter
 
         $this->redrawControl('wrapper');
         $this->redrawControl('sortingAfterSnippet');
+    }
+
+    public function handleDelete($id): void
+    {
+        $sourceTemplate = $this->sourceTemplatesRepository->find($id);
+        $this->sourceTemplatesRepository->softDelete($sourceTemplate);
+        $this->flashMessage("Generator {$sourceTemplate->title} was deleted.");
+        $this->redirect('default');
     }
 }
