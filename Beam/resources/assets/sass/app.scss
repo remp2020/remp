@@ -15,3 +15,54 @@ $typeahead-line-height: 1.5em;
 @import "~@remp/js-commons/sass/site-search.scss";
 
 @import "./beam.scss";
+
+.navbar-default {
+    border-radius: 0px;
+}
+
+.navbar-nav .dropdown {
+    z-index: 11;
+    margin-top: 4px;
+    margin-left: 2px;
+}
+
+.remp-menu .svg-logo {
+    @media (max-witdh: 799px) {
+        width: 100px;
+    }
+}
+
+.display-on-computer {
+    @media (max-width: 799px) {
+        display: none;
+    }
+}
+
+@media (max-width: 799px) {
+    
+    .navbar-brand 
+    {
+        position: absolute;
+        right: 0px;
+        top: 8px;
+        z-index: 12;
+    }
+    
+    .remp-menu .svg-logo {
+        width: 100px;
+    }
+}
+
+@media (max-width: 1199px) {
+    #header {
+        padding-top: 0px;
+    }
+
+    #s-main-menu {
+        padding-top: 20px;
+    }
+
+    #s-main-menu form {
+        padding-bottom: 16px;
+    }
+}

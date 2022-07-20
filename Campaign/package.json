@@ -15,7 +15,7 @@
         "all-dev": "node_modules/npm-run-all/bin/npm-run-all/index.js dev lib-dev",
         "all-watch": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch",
         "all-watch-poll": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch-poll lib-watch-poll",
-        "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch",
+        "all-hot": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel hot lib-hot",
         "development": ""
     },
     "engines": {

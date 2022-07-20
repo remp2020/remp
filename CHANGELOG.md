@@ -20,11 +20,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Due to the interval change, duplicates may arise in `article_pageviews`. We recommend running `data:delete-duplicate-pageviews` command after migration to clean up data.
 - Added `pageviews` data source to load data for time histogram for specific article. remp/remp#652
 - Added option to switch between `pageviews`, `snapshots` and `journal` data sources in article page loads graph on article detail page. remp/remp#652
+- Fixed site layout on mobile.
 
 ### [Campaign]
 
 - Added option to toggle between mobile and desktop banner preview on banner edit page. remp/remp#1071
 - Fixed bar banner close text display. remp/crm#1068
+- Fixed site layout on mobile.
 
 ### [Mailer]
 
@@ -55,6 +57,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for allow listing emails in Mailer. remp/remp#1150
   - Added tests for application `Sender` and `EmailAllowList` classes.
 - Added soft delete for emails, layouts, newsletter lists and generator templates. remp/remp#1075
+- Fixed site layout on mobile.
 
 ## [0.32.2] - 2022-05-11
 

@@ -50,7 +50,7 @@
                     <div class="svg-logo"></div>
                 </a>
             </div>
-            <ul class="nav navbar-nav navbar-remp">
+            <ul class="nav navbar-nav navbar-remp display-on-computer">
                 <li n:class="$service[url] == '/' ? active" n:foreach="$linkedServices as $key => $service">
                     <a n:ifset="$service[url]" href="{$service[url]}"><i class="zmdi zmdi-{$service[icon]} zmdi-hc-fw"></i> {$key}</a>
                 </li>
@@ -78,7 +78,7 @@
                 </li>
             </ul>
 
-            <ul class="nav navbar-right">
+            <ul class="nav navbar-right display-on-computer">
                 <li>
                     {control applicationStatus}
                 </li>
