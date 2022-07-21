@@ -11,7 +11,7 @@
                     <div class="svg-logo"></div>
                 </a>
             </div>
-            <ul class="nav navbar-nav navbar-remp">
+            <ul class="nav navbar-nav navbar-remp display-on-computer">
                 @foreach(config('services.remp.linked') as $key => $service)
                     @isset($service['url'])
                         <li @class(['active' => $service['url'] === '/'])>
