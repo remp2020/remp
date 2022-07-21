@@ -24,10 +24,12 @@
                         'campaign' => [
                             'header' => 'Campaign',
                             'priority' => 1,
+                            'render' => 'link',
                         ],
                         'variants' => [
                             'header' => 'Variants',
                             'orderable' => false,
+                            'filter' => $variants,
                             'priority' => 3,
                             'render' => 'array',
                         ],
@@ -48,6 +50,7 @@
                         ],
                         'updated_at' => [
                             'header' => 'Updated at',
+                            'render' => 'date',
                             'priority' => 3,
                         ],
                     ],
@@ -59,7 +62,7 @@
                         ['name' => 'stop', 'class' => 'zmdi-palette-Cyan zmdi-stop'],
                         ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete'],
                     ],
-                    'order' => [5, 'desc'],
+                    'order' => [4, 'asc'],
                 ]) !!}
                 </div>
             </div>

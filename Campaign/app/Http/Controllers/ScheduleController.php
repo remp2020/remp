@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Campaign;
+use App\CampaignBanner;
 use App\Http\Requests\ScheduleRequest;
 use App\Http\Resources\ScheduleResource;
 use App\Schedule;
 use Carbon\Carbon;
-use HTML;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Remp\LaravelHelpers\Resources\JsonResource;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -17,9 +18,16 @@ class ScheduleController extends Controller
 {
     public function index()
     {
+        $variants = CampaignBanner::with('banner')
+            ->whereNotNull('banner_id')
+            ->get()
+            ->pluck('banner.name', 'banner.id');
+
         return response()->format([
-            'html' => view('schedule.index'),
-            'json' => Schedule::paginate(),
+            'html' => view('schedule.index', [
+                'variants' => $variants
+            ]),
+            'json' => ScheduleResource::collection(Schedule::paginate()),
         ]);
     }
 
@@ -41,9 +49,7 @@ class ScheduleController extends Controller
     public function json(Request $request, Datatables $dataTables, Campaign $campaign = null)
     {
         $scheduleSelect = Schedule::select()
-            ->with(['campaign'])
-            ->orderBy('start_time', 'ASC')
-            ->orderBy('end_time', 'ASC');
+            ->join('campaigns', 'schedules.campaign_id', '=', 'campaigns.id');
 
         if (!is_null($campaign)) {
             $scheduleSelect->where('campaign_id', '=', $campaign->id);
@@ -61,9 +67,8 @@ class ScheduleController extends Controller
         if (is_numeric($request->limit)) {
             $scheduleSelect->limit($request->limit);
         }
-        $schedule = $scheduleSelect->get();
 
-        return $dataTables->of($schedule)
+        return $dataTables->of($scheduleSelect)
             ->addColumn('actions', function (Schedule $s) {
                 return [
                     'edit' => !$s->isStopped() ? route('schedule.edit', $s) : null,
@@ -78,6 +83,14 @@ class ScheduleController extends Controller
                     'url' => route('campaigns.edit', ['campaign' => $schedule->campaign]),
                     'text' => $schedule->campaign->name,
                 ];
+            })
+            ->filterColumn('campaign', function (Builder $query, $value) {
+                $query->whereHas('campaign', function (Builder $query) use ($value) {
+                    $query->where('campaigns.name', 'like', "%{$value}%");
+                });
+            })
+            ->orderColumn('campaign', function (Builder $query, $order) {
+                $query->orderBy('campaigns.name', $order);
             })
             ->addColumn('variants', function (Schedule $schedule) {
                 $data = $schedule->campaign->campaignBanners->all();
@@ -105,6 +118,15 @@ class ScheduleController extends Controller
                 }
                 return $variants;
             })
+            ->filterColumn('variants', function (Builder $query, $value) {
+                $values = explode(',', $value);
+                $filterQuery = \DB::table('schedules')
+                    ->select(['schedules.id'])
+                    ->join('campaign_banners', 'campaign_banners.campaign_id', '=', 'schedules.campaign_id')
+                    ->whereIn('campaign_banners.banner_id', $values)
+                    ->where('campaign_banners.proportion', '>', 0);
+                $query->whereIn('schedules.id', $filterQuery);
+            })
             ->addColumn('action_methods', [
                 'start' => 'POST',
                 'pause' => 'POST',
@@ -128,6 +150,15 @@ class ScheduleController extends Controller
                     return [['class' => 'badge-default', 'text' => 'Finished']];
                 }
                 throw new \Exception('unhandled schedule status');
+            })
+            ->orderColumn('created_at', function (Builder $query, $order) {
+                $query->orderBy('schedules.created_at', $order);
+            })
+            ->orderColumn('updated_at', function (Builder $query, $order) {
+                $query->orderBy('schedules.updated_at', $order);
+            })
+            ->orderColumn('status', function (Builder $query, $order) {
+                $query->orderBy('status', $order);
             })
             ->rawColumns(['campaign.text', 'actions', 'action_methods', 'status', 'campaign'])
             ->setRowId('id')
