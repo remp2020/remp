@@ -298,3 +298,48 @@ tr th.sorting_desc:hover:before {
 .table-responsive {
     overflow-x: initial;
 }
+
+.navbar-default {
+    border-radius: 0px;
+}
+
+.navbar-brand {
+    @media (max-width: 799px) {
+        position:absolute;
+        right: 0px;
+        top: 8px;
+        z-index: 12;
+    }
+}
+
+.navbar-nav .dropdown {
+    z-index: 11;
+    margin-top: 4px;
+    margin-left: 2px;
+}
+
+.display-on-computer {
+    @media (max-width: 799px) {
+        display: none;
+    }
+}
+
+.remp-menu .svg-logo {
+    @media (max-width: 799px) {
+      width: 100px;
+    }
+}
+  
+@media (max-width: 1199px) {
+    #header {
+        padding-top: 0px;
+    }
+  
+    #s-main-menu {
+        padding-top: 20px;
+    }
+  
+    #s-main-menu form {
+        padding-bottom: 16px;
+    }
+}

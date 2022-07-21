@@ -59,6 +59,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added soft delete for emails, layouts, newsletter lists and generator templates. remp/remp#1075
 - Fixed site layout on mobile.
 
+### [Sso]
+
+- Fixed site layout on mobile.
+
 ## [0.32.2] - 2022-05-11
 
 ### [Campaign]
