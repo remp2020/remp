@@ -71,6 +71,7 @@
 
     {include jsCallback, form => $form}
     {include onChangeCallback, input => mail_type_id, targets => [template_id, b_template_id]}
+    {include onChangeStartTimeCallback, form => $form, input => start_at, button => save_start}
 {/form}
 
 
@@ -116,5 +117,18 @@
                 }
             });
         });
+    </script>
+{/define}
+
+{define onChangeStartTimeCallback}
+    <script type="application/javascript">
+        let button = $('button[name={$button}]')[0];
+        $('#' + {$control[$form->name][$input]->htmlId}).on('dp.hide', function(e) {
+            if (e.target.value) {
+                button.innerHTML = '<i class="zmdi zmdi-mail-send"></i> Save and start sending at the scheduled time';
+            } else {
+                button.innerHTML = '<i class="zmdi zmdi-mail-send"></i> Save and start sending now';
+            }
+        })
     </script>
 {/define}
