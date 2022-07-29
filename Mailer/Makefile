@@ -34,4 +34,5 @@ phpstan:
 	php vendor/bin/phpstan analyse --configuration=.phpstan.neon --memory-limit=1G app tests extensions
 
 latte-lint:
-	php vendor/bin/latte-lint app extensions
+	php bin/latte-lint.php app
+	php bin/latte-lint.php extensions
