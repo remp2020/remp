@@ -30,6 +30,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **IMPORTANT**: Added soft delete for emails, layouts, newsletter lists and generator templates. remp/remp#1075
+  - The database migration is blocking to maintain consistency and might take 5-10 minutes for bigger instances. Please schedule the release to the off-peak hours.
+- **IMPORTANT**: Fixed mail type priority can't be 0. remp/remp#1134
+  - Added validation to add/edit newsletter list form and `JobPresenter::handleSetBatchReadyToSend`, `JobPresenter::handleSetBatchSend` methods.
+  - Added migration to update `mail_types` with priority 0 to default value.
 - Fixed logs subject not storing the translated version of sent email. remp/remp#1130
 - Fixed mixed up columns "Locked" and "Publicly listed" in Newsletter lists table. remp/remp#1131
 - Fixed deprecated warning because of using `Latte#addFilter()` method. remp/remp#1135
@@ -44,9 +49,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed "Invalid datetime format" bug with hermes error logging to the database. remp/remp#1145
 - Fixed Mailgun API error with wrong `recipient-variables` parameter. remp/remp#1146
 - Fixed API triggering unnecessary session initiation. remp/remp#1149
-- **IMPORTANT**: Fixed mail type priority can't be 0. remp/remp#1134
-  - Added validation to add/edit newsletter list form and `JobPresenter::handleSetBatchReadyToSend`, `JobPresenter::handleSetBatchSend` methods. remp/remp#1134
-  - Added migration to update `mail_types` with priority 0 to default value. remp/remp#1134
 - Fixed possibility of stuck MySQL query when removing unsubscribed users from the mail job queue. remp/remp#1148
 - Added mail generator for Napunk to overide default slovak email lock message. remp/remp#1129
 - Changed the behaviour of mail template form - template content is editable after general information is saved. remp/remp#1122
