@@ -76,7 +76,7 @@ class EditBatchFormFactory implements IFormFactory
         $form->setDefaults([
             'method' => $batch->method,
             'max_emails' => $batch->max_emails,
-            'start_at' => $batch->start_at,
+            'start_at' => $batch->start_at->format(DATE_RFC3339),
             'id' => $batch->id,
         ]);
 

@@ -61,6 +61,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added soft delete for emails, layouts, newsletter lists and generator templates. remp/remp#1075
 - Fixed site layout on mobile.
 - Fixed snippets in text versions of emails (HTML versions were inserted instead of text). remp/remp#1164
+- Changed the batch form action buttons to improve users experience. remp/remp#1157
 
 ### [Sso]
 

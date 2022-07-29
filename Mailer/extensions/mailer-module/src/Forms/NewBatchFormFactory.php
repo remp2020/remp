@@ -114,13 +114,13 @@ class NewBatchFormFactory
         $form->addSubmit('save')
             ->getControlPrototype()
             ->setName('button')
-            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save');
+            ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save draft');
 
         if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
             $form->addSubmit(self::FORM_ACTION_SAVE_START)
                 ->getControlPrototype()
                 ->setName('button')
-                ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and start');
+                ->setHtml('<i class="zmdi zmdi-mail-send"></i> Save and start sending now');
         }
 
         $form->onSuccess[] = [$this, 'formSucceeded'];

@@ -91,7 +91,9 @@
                         {if $batch->related('mail_job_batch_templates')->count('*') > 0}
                             <div class="m-tbl-15">
                                 {ifAllowed $user, 'batch', 'start'}
-                                <a n:if="in_array($batch->status, ['created', 'processed'])" n:href="SetBatchReadyToSend! $batch->id" class="btn bg palette-Cyan-600 btn-icon-text waves-effect"><i class="zmdi zmdi-play"></i> START SENDING <span n:if="$batch->status === 'processed'">({$batchPreparedEmailsStats[$batch->id] ?? 0})</span></a>
+                                <a n:if="in_array($batch->status, ['created', 'processed'])" n:href="SetBatchReadyToSend! $batch->id" class="btn bg palette-Cyan-600 btn-icon-text waves-effect">
+                                    <i class="zmdi zmdi-play"></i> {if $batch->start_at < new Nette\Utils\DateTime()}START SENDING NOW{else}START SENDING AT THE SCHEDULED TIME{/if} <span n:if="$batch->status === 'processed'">({$batchPreparedEmailsStats[$batch->id] ?? 0})</span>
+                                </a>
                                 {/ifAllowed}
 
                                 {ifAllowed $user, 'batch', 'start'}
