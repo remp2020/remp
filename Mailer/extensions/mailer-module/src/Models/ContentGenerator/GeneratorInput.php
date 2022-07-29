@@ -53,6 +53,8 @@ class GeneratorInput
         $additionalParams = [
             'snippets' => $this->snippetsRepository
                 ->getSnippetsForMailType($this->mailTemplate->mail_type_id)->fetchPairs('code', 'html'),
+            'snippets_text' => $this->snippetsRepository
+                ->getSnippetsForMailType($this->mailTemplate->mail_type_id)->fetchPairs('code', 'text'),
         ];
 
         if ($this->mailTemplate->params) {

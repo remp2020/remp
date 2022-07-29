@@ -49,6 +49,11 @@ class ContentGenerator
         $htmlBody = $this->generate($template->getHtmlBody(), $params);
         $html = $this->wrapLayout($template->getSubject(), $htmlBody, $layout->getHtml(), $params);
 
+        // replace HTML snippets with their text versions
+        if (isset($params['snippets']) && isset($params['snippets_text'])) {
+            $params['snippets'] = $this->mailTranslator->translateSnippets($params['snippets_text'], $generatorInput->locale());
+        }
+
         $textBody = $this->generate($template->getTextBody(), $params);
         $text = $this->wrapLayout($template->getSubject(), $textBody, $layout->getText(), $params);
 
