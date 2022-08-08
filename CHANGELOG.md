@@ -6,8 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.33.0] - 2022-08-08
+
 ### Project
 
+- **IMPORTANT**: This is the last version supporting PHP 7.4. Future versions will require upgrade to PHP 8.0.
 - Added support for `number` and `text` DataTables renderers. remp/remp#852
 
 ### [Beam]
@@ -58,7 +61,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed internal content parsers which could throw notices if parsed URL doesn't contain JSON schema. remp/remp#1162
 - Added support for allow listing emails in Mailer. remp/remp#1150
   - Added tests for application `Sender` and `EmailAllowList` classes.
-- Added soft delete for emails, layouts, newsletter lists and generator templates. remp/remp#1075
 - Fixed site layout on mobile.
 - Fixed snippets in text versions of emails (HTML versions were inserted instead of text). remp/remp#1164
 - Changed the batch form action buttons to improve users experience. remp/remp#1157
@@ -1290,7 +1292,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.32.2...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.33.0...master
+[0.33.0]: https://github.com/remp2020/remp/compare/0.32.2...0.33.0
 [0.32.2]: https://github.com/remp2020/remp/compare/0.32.1...0.32.2
 [0.32.1]: https://github.com/remp2020/remp/compare/0.31.0...0.32.1
 [0.31.0]: https://github.com/remp2020/remp/compare/0.30.2...0.31.0
