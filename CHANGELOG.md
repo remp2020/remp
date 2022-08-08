@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added option to toggle between mobile and desktop banner preview on banner edit page. remp/remp#1071
 - Fixed bar banner close text display. remp/crm#1068
 - Fixed site layout on mobile.
+- Added improvements to the campaign schedules view page. remp/remp#1158
 
 ### [Mailer]
 

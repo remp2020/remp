@@ -5,8 +5,10 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 
-class Schedule extends Model
+class Schedule extends Model implements Searchable
 {
     const STATUS_READY = 'ready';
     const STATUS_EXECUTED = 'executed';
@@ -135,5 +137,10 @@ class Schedule extends Model
                         ->orWhere('end_time', '>=', Carbon::now());
                 }
             );
+    }
+
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->name);
     }
 }
