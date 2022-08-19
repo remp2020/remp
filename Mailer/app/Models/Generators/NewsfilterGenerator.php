@@ -13,6 +13,7 @@ use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
 use Remp\MailerModule\Models\Generators\WordpressHelpers;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
+use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\PostInputParam;
 
@@ -75,13 +76,19 @@ class NewsfilterGenerator implements IGenerator
         $post = $this->parseOls($post);
 
         $lockedPost = $this->articleLocker->getLockedPost($post);
+        $errors = [];
 
         $generatorRules = [
             '/<h2.*?>.*?\*.*?<\/h2>/im' => '<div style="color:#181818;padding:0;line-height:1.3;font-weight:bold;text-align:center;margin:0 0 30px 0;font-size:24px;">*</div>',
             "/https:\/\/dennikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
-            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) {
+            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) use (&$errors) {
                 $url = "https://dennikn.sk/{$matches[1]}";
-                $meta = $this->content->fetchUrlMeta($url);
+                try {
+                    $meta = $this->content->fetchUrlMeta($url);
+                } catch (InvalidUrlException $e) {
+                    $errors[$matches[1]] = "Unable to fetch metadata for [articlelink id={$matches[1]}], the article doesn't exist";
+                    return null;
+                }
                 return 'Čítajte viac: <a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">' . $meta->getTitle() . '</a>';
             },
         ];
@@ -128,6 +135,7 @@ class NewsfilterGenerator implements IGenerator
             'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
             'lockedHtmlContent' => $engine->render($sourceTemplate->content_html, $lockedParams),
             'lockedTextContent' => strip_tags($engine->render($sourceTemplate->content_text, $lockedParams)),
+            'errors' => $errors,
         ];
     }
 
@@ -142,6 +150,7 @@ class NewsfilterGenerator implements IGenerator
             'from' => $values->from,
             'render' => true,
             'articleId' => $values->article_id,
+            'errors' => $output['errors'],
         ];
 
         $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);

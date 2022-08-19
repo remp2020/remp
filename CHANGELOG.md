@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Fixed crashing Newsfilter generator if `articlelink` tag pointed to the article that doesn't exist. remp/remp#1066
+
 ## [0.33.0] - 2022-08-08
 
 ### Project
