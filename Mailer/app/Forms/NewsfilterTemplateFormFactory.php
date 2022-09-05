@@ -97,7 +97,16 @@ class NewsfilterTemplateFormFactory
         $form->addHidden('article_id');
 
         $sourceTemplateId = $_POST['source_template_id'] ?? null;
-        if ($sourceTemplateId == 76) {
+        if ($sourceTemplateId == 77) {
+            $defaults = [
+                'name' => 'Pod slnkom Jany Shemesh ' . date('Y. n. j.'),
+                'code' => 'pod_slnkom_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 59, // Pod slnkom Jany Shemesh
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
+        } elseif ($sourceTemplateId == 76) {
             $defaults = [
                 'name' => 'Napunk newsfilter ' . date('Y. n. j.'),
                 'code' => 'napunk_nwsf_' . date('dmY'),
