@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Fixed incorrect links for schedules edit. remp/remp#1181
+
 ### [Mailer]
 
 - Fixed crashing Newsfilter generator if `articlelink` tag pointed to the article that doesn't exist. remp/remp#1066
