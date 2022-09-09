@@ -48,7 +48,7 @@ class ScheduleController extends Controller
      */
     public function json(Request $request, Datatables $dataTables, Campaign $campaign = null)
     {
-        $scheduleSelect = Schedule::select()
+        $scheduleSelect = Schedule::select('schedules.*')
             ->join('campaigns', 'schedules.campaign_id', '=', 'campaigns.id');
 
         if (!is_null($campaign)) {
