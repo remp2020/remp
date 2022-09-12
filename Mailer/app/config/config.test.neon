@@ -27,3 +27,7 @@ services:
 	mailFactory:
 		setup:
 			- addMailer(Tests\Feature\Mails\TestMailer())
+
+	allowedDomainManager:
+		setup:
+			- addDomain('expresso.pt')

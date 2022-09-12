@@ -91,6 +91,10 @@ services:
         setup:
             - addSecondaryLocales(['hu'])
 
+#	allowedDomainManager:
+#		setup:
+#			- addDomain('dennikn.sk')
+
 # local_configs override DBs configs records.
 local_configs:
 

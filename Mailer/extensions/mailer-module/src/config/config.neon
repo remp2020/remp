@@ -109,10 +109,18 @@ services:
 	segmentAgreggator:
 		factory: Remp\MailerModule\Models\Segment\Aggregator
 
+	allowedDomainManager: Remp\MailerModule\Models\ContentGenerator\AllowedDomainManager
+
+	anchorRtmReplace: Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace
+	urlRtmReplace: Remp\MailerModule\Models\ContentGenerator\Replace\UrlRtmReplace
+	textUrlRtmReplace: Remp\MailerModule\Models\ContentGenerator\Replace\TextUrlRtmReplace
+
 	contentGenerator:
 		factory: Remp\MailerModule\Models\ContentGenerator\ContentGenerator
 		setup:
-			- register(Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace())
+			- register(@anchorRtmReplace)
+			- register(@urlRtmReplace)
+			- register(@textUrlRtmReplace)
 	generatorInputFactory: Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory
 
 	mailgunMailer:

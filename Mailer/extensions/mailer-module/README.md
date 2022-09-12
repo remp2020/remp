@@ -101,6 +101,18 @@ services:
             - allow("@@example2.com")
 ```
 
+### Allowed domain manager
+
+Mailer adds RTM parameters to links found in outgoing emails. To control to which links RTM parameters are added you have
+to specify allowed domains. RTM parameters are only added to links that match all domain levels with one of the allowed domains. 
+
+```neon
+services:
+    allowedDomainManager:
+        setup:
+            - addDomain('dennikn.sk')
+```
+
 ## Technical feature description
 
 ### Mailers setup
