@@ -4,6 +4,7 @@ namespace Remp\MailerModule\Models\ContentGenerator\Replace;
 
 use Nette\Http\Url;
 use Nette\InvalidArgumentException;
+use Remp\MailerModule\Models\ContentGenerator\AllowedDomainManager;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
 /**
@@ -14,11 +15,11 @@ class UrlRtmReplace implements IReplace
 {
     use RtmReplaceTrait;
 
-    private $hostWhitelist = [];
+    private AllowedDomainManager $allowedDomainManager;
 
-    public function addHost(string $host)
+    public function __construct(AllowedDomainManager $allowedDomainManager)
     {
-        $this->hostWhitelist[$host] = true;
+        $this->allowedDomainManager = $allowedDomainManager;
     }
 
     public function replace(string $content, GeneratorInput $generatorInput): string
@@ -36,7 +37,7 @@ class UrlRtmReplace implements IReplace
         }
 
         // check if the host is whitelisted
-        if (!isset($this->hostWhitelist[$url->getHost()])) {
+        if (!$this->allowedDomainManager->isAllowed($url->getHost())) {
             return $content;
         }
 

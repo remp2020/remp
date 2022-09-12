@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Changed allowed domains registration for content generator replacers. remp/remp#1176
+  - Removed `addHost` public methods from replacers implementations (e.g. `UrlRtmReplace::addHost`) which served as a whitelist for hosts where RTM parameters should be added. Instead, use `AllowedDomainManager::addDomain` so the configuration is shared among all replacers.  See [README](https://github.com/remp2020/remp/tree/master/Mailer/extensions/mailer-module#allowed-domain-manager) for more information.
+  - Added allowed domains check to `AnchorRtmReplace` content generator replacer to have allowed domains check in all replacers. 
+- Added `TextUrlRtmReplace` content generator replacer to add RTM parameters to links in the text version of the email. remp/remp#1176
 - Fixed crashing Newsfilter generator if `articlelink` tag pointed to the article that doesn't exist. remp/remp#1066
 
 ## [0.33.0] - 2022-08-08

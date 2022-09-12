@@ -7,7 +7,7 @@ use Nette\InvalidArgumentException;
 use Remp\MailerModule\Models\ContentGenerator\AllowedDomainManager;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
-class AnchorRtmReplace implements IReplace
+class TextUrlRtmReplace implements IReplace
 {
     use RtmReplaceTrait;
 
@@ -21,10 +21,10 @@ class AnchorRtmReplace implements IReplace
     public function replace(string $content, GeneratorInput $generatorInput): string
     {
         $matches = [];
-        preg_match_all('/<a(.*?)href="([^"]*?)"(.*?)>/i', $content, $matches);
+        preg_match_all('/(https?:\/\/.+?)(\s)/i', $content, $matches);
 
         if (count($matches) > 0) {
-            foreach ($matches[2] as $idx => $hrefUrl) {
+            foreach ($matches[1] as $idx => $hrefUrl) {
                 // parse URL
                 try {
                     $url = new Url($hrefUrl);
@@ -37,8 +37,8 @@ class AnchorRtmReplace implements IReplace
                     continue;
                 }
 
-                $href = sprintf('<a%shref="%s"%s>', $matches[1][$idx], $this->replaceUrl($hrefUrl, $generatorInput), $matches[3][$idx]);
-                $content = str_replace($matches[0][$idx], $href, $content);
+                $finalUrl = $this->replaceUrl($hrefUrl, $generatorInput) . $matches[2][$idx];
+                $content = str_replace($matches[0][$idx], $finalUrl, $content);
             }
         }
 

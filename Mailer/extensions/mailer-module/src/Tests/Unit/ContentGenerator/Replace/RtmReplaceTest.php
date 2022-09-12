@@ -21,7 +21,7 @@ class RtmReplaceTest extends TestCase
         /** @var Container $container */
         $container = $GLOBALS['container'];
 
-        $this->rtmReplace = new AnchorRtmReplace();
+        $this->rtmReplace = $container->getByType(AnchorRtmReplace::class);
 
         $mailType = new DataRow([
             'id' => 1,
