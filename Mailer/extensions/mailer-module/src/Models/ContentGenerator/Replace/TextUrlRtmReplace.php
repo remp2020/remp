@@ -20,8 +20,13 @@ class TextUrlRtmReplace implements IReplace
 
     public function replace(string $content, GeneratorInput $generatorInput): string
     {
+        if ($content !== strip_tags($content)) {
+            // This replacer is intended to be used only for text emails. HTML is handled by AnchorRtmReplace.
+            return $content;
+        }
+
         $matches = [];
-        preg_match_all('/(https?:\/\/.+?)(\s)/i', $content, $matches);
+        preg_match_all('/(https?:\/\/.+?)(\s|")/i', $content, $matches);
 
         if (count($matches) > 0) {
             foreach ($matches[1] as $idx => $hrefUrl) {
