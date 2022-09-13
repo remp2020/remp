@@ -26,7 +26,7 @@ class TextUrlRtmReplace implements IReplace
         }
 
         $matches = [];
-        preg_match_all('/(https?:\/\/.+?)(\s|")/i', $content, $matches);
+        preg_match_all('/(https?:\/\/.+?)(\s)/i', $content, $matches);
 
         if (count($matches) > 0) {
             foreach ($matches[1] as $idx => $hrefUrl) {
