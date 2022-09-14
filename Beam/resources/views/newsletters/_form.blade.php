@@ -148,9 +148,9 @@
             <h5>Start date and recurrence</h5>
             <div class="m-t-20">
                 {!! Form::hidden('starts_at', $newsletter->starts_at) !!}
-                {!! Form::hidden('recurrence_rule', $newsletter->recurrence_rule) !!}
+                {!! Form::hidden('recurrence_rule', $newsletter->recurrence_rule_inline) !!}
                 @php
-                    $recurrence = old('recurrence_rule', $newsletter->recurrence_rule);
+                    $recurrence = old('recurrence_rule', $newsletter->recurrence_rule_inline);
                     $recurrence = $recurrence !== null ? "'{$recurrence}'" : 'null';
                 @endphp
                 <recurrence-selector

@@ -19,6 +19,7 @@
             'colSettings' => [
                 'newsletter' => [
                     'priority' => 1,
+                    'render' => 'link'
                 ],
                 'segment' => [
                     'priority' => 2,

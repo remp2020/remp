@@ -78,7 +78,7 @@ class SendNewslettersCommand extends Command
             $newsletter->save();
         }
 
-        $this->line(' <info>Done!</info>');
+        $this->line('<info>Done!</info>');
         return 0;
     }
 
@@ -105,6 +105,11 @@ class SendNewslettersCommand extends Command
                 $newsletter->articles_count
             );
 
+        if ($articles->count() === 0) {
+            $this->line('  <comment>WARNING:</comment> No articles found for selected timespan, nothing is sent');
+            return;
+        }
+
         [$htmlContent, $textContent] = $this->generateEmail($newsletter, $articles);
 
         $templateId = $this->createTemplate($newsletter, $htmlContent, $textContent);
@@ -115,7 +120,7 @@ class SendNewslettersCommand extends Command
     private function createJob($newsletter, $templateId)
     {
         $jobId = $this->mailer->createJob($newsletter->segment_code, $newsletter->segment_provider, $templateId);
-        $this->line(sprintf('Mailer job successfully created (id: %s)', $jobId));
+        $this->line(sprintf('  Mailer job successfully created (id: %s)', $jobId));
     }
 
     private function createTemplate($newsletter, $htmlContent, $textContent): int

@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- Updated Docker Adminer to the latest version.
+
+### [Beam]
+
+- Fixed edge case error in Newsletter sending when there are no articles matching the condition. remp/remp#1182
+- Fixed broken newsletter form caused by unprocessable recurrent rules. remp/remp#1182
+
 ### [Campaign]
 
 - Fixed incorrect links for schedules edit. remp/remp#1181

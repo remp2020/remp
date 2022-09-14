@@ -30,7 +30,10 @@ class NewsletterController extends Controller
 
         return $datatables->of($newsletters)
             ->addColumn('newsletter', function (Newsletter $newsletter) {
-                return Html::linkRoute('newsletters.edit', $newsletter->name, $newsletter);
+                return [
+                    'url' => route('newsletters.edit', ['newsletter' => $newsletter]),
+                    'text' => $newsletter->name,
+                ];
             })
             ->addColumn('action_methods', [
                 'start' => 'POST',
