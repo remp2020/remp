@@ -50,13 +50,6 @@ trait RulesTrait
             '/\[caption.*?\].*?href="(.*?)".*?src="(.*?)".*?\/a>(.*?)\[\/caption\]/im' => $captionWithLinkTemplate,
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
-            // replace link shortcodes
-            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) {
-                $url = "https://dennikn.sk/{$matches[1]}";
-                $meta = $this->content->fetchUrlMeta($url);
-                return '<a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">' . $meta->getTitle() . '</a>';
-            },
-
             // replace hrefs
             '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">$2</a>',
 

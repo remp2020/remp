@@ -18,7 +18,7 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class MMSGenerator implements IGenerator
 {
-    use RulesTrait;
+    use RulesTrait, TemplatesTrait;
 
     public $onSubmit;
 
@@ -94,6 +94,10 @@ class MMSGenerator implements IGenerator
         // wrap text in paragraphs
         $post = $this->helpers->wpautop($post);
         $lockedPost = $this->helpers->wpautop($lockedPost);
+
+        // parse article links
+        $post = $this->helpers->wpParseArticleLinks($post, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction());
+        $lockedPost = $this->helpers->wpParseArticleLinks($lockedPost, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction());
 
         // fix pees
         [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;\">", [$post, $lockedPost]);

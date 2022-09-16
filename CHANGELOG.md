@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Added allowed domains check to `AnchorRtmReplace` content generator replacer to have allowed domains check in all replacers. 
 - Added `TextUrlRtmReplace` content generator replacer to add RTM parameters to links in the text version of the email. remp/remp#1176
 - Fixed crashing Newsfilter generator if `articlelink` tag pointed to the article that doesn't exist. remp/remp#1066
+- Refactored mail generators wordpress article links parsing. remp/remp#1166
 
 ## [0.33.0] - 2022-08-08
 

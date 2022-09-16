@@ -19,7 +19,7 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class NewsfilterGenerator implements IGenerator
 {
-    use RulesTrait;
+    use RulesTrait, TemplatesTrait;
 
     public $onSubmit;
 
@@ -81,16 +81,6 @@ class NewsfilterGenerator implements IGenerator
         $generatorRules = [
             '/<h2.*?>.*?\*.*?<\/h2>/im' => '<div style="color:#181818;padding:0;line-height:1.3;font-weight:bold;text-align:center;margin:0 0 30px 0;font-size:24px;">*</div>',
             "/https:\/\/dennikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
-            '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) use (&$errors) {
-                $url = "https://dennikn.sk/{$matches[1]}";
-                try {
-                    $meta = $this->content->fetchUrlMeta($url);
-                } catch (InvalidUrlException $e) {
-                    $errors[$matches[1]] = "Unable to fetch metadata for [articlelink id={$matches[1]}], the article doesn't exist";
-                    return null;
-                }
-                return 'Čítajte viac: <a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">' . $meta->getTitle() . '</a>';
-            },
         ];
         $rules = $this->getRules($generatorRules);
 
@@ -103,9 +93,14 @@ class NewsfilterGenerator implements IGenerator
                 $lockedPost = preg_replace($rule, $replace, $lockedPost);
             }
         }
+
         // wrap text in paragraphs
         $post = $this->helpers->wpautop($post);
         $lockedPost = $this->helpers->wpautop($lockedPost);
+
+        // parse article links
+        $post = $this->helpers->wpParseArticleLinks($post, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction(), $errors);
+        $lockedPost = $this->helpers->wpParseArticleLinks($lockedPost, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction(), $errors);
 
         $post = str_replace('<p>', '<p style="font-weight: normal;">', $post);
         $lockedPost = str_replace('<p>', '<p style="font-weight: normal;">', $lockedPost);

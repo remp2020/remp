@@ -3,8 +3,18 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Generators;
 
+use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
+use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
+
 class WordpressHelpers
 {
+    private $content;
+
+    public function __construct(ContentInterface $content)
+    {
+        $this->content = $content;
+    }
+
     public function wpautop(string $pee, bool $br = false): string
     {
         $pre_tags = array();
@@ -218,5 +228,21 @@ class WordpressHelpers
         }
 
         return $regex;
+    }
+
+    public function wpParseArticleLinks(string $post, string $host, callable $callback, ?array &$errors = null)
+    {
+        return preg_replace_callback('/\[articlelink.*?id="?(\d+)"?.*?\]/is', function ($matches) use ($host, $callback, &$errors) {
+            $url = $host . $matches[1];
+            try {
+                $meta = $this->content->fetchUrlMeta($url);
+            } catch (InvalidUrlException $e) {
+                if (isset($errors)) {
+                    $errors[$matches[1]] = "Unable to fetch metadata for [articlelink id={$matches[1]}], the article doesn't exist";
+                }
+                return null;
+            }
+            return $callback($meta->getTitle(), $url, $meta->getImage());
+        }, $post);
     }
 }
