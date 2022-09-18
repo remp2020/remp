@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed incorrect links for schedules edit. remp/remp#1181
+- Fixed banner custom css styles loading in preview. remp/remp#1183
 
 ### [Mailer]
 

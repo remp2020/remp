@@ -30,17 +30,17 @@ export default {
         iframe.contentWindow.document.open();
         iframe.contentWindow.document.close();
 
-        // copy styles to iframe
-        let styles = document.querySelectorAll("head style")
-        styles.forEach(li => {
-            iframe.contentWindow.document.head.append(li.cloneNode(true))
-        });
-
-        return new Vue({
+        new Vue({
             el: iframe.contentWindow.document.body,
             render: h => h(BannerPreview, {
                 props: this.$props,
             }),
+        });
+
+        // copy styles to iframe
+        let styles = document.querySelectorAll("head style, head link[rel='stylesheet']")
+        styles.forEach(li => {
+            iframe.contentWindow.document.head.append(li.cloneNode(true))
         });
     },
 };
