@@ -175,8 +175,18 @@ class MailWorkerCommand extends Command
                     break;
                 }
                 if (!$this->mailCache->isQueueTopPriority($batch->id)) {
-                    $output->writeln("Batch <info>{$batch->id}</info> no longer top priority, switching...");
-                    $this->logger->info("Batch <info>{$batch->id}</info> no longer top priority, switching...");
+                    $topPriorityQueueScore = $this->mailCache->getTopPriorityQueues();
+                    $topPriorityBatchId = array_key_first($topPriorityQueueScore);
+
+                    $output->writeln("Batch <info>{$batch->id}</info> no longer top priority, switching to <info>$topPriorityBatchId</info>...");
+                    $this->logger->info("Batch <info>{$batch->id}</info> no longer top priority, switching to <info>$topPriorityBatchId</info>...");
+
+                    if (!$this->mailJobBatchRepository->isSendingBatch($topPriorityBatchId)) {
+                        $this->mailCache->removeQueue($topPriorityBatchId);
+                        $output->writeln("Top priority batch <info>{$topPriorityBatchId}</info> is not being sent anymore, clearing cache and starting again...");
+                        $this->logger->info("Top priority batch <info>{$topPriorityBatchId}</info> is not being sent anymore, clearing cache and starting again...");
+                    }
+
                     break;
                 }
 

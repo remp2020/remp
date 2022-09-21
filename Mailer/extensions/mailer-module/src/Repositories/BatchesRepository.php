@@ -30,6 +30,10 @@ class BatchesRepository extends Repository
         BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND,
         BatchesRepository::STATUS_READY_TO_PROCESS,
     ];
+    const SENDING_STATUSES = [
+        self::STATUS_QUEUED, // waiting for the next worker to pick up
+        self::STATUS_SENDING, // actually sending
+    ];
 
     protected $tableName = 'mail_job_batch';
 
@@ -99,11 +103,22 @@ class BatchesRepository extends Repository
         return $this->getTable()
             ->select('mail_job_batch.*')
             ->where([
-                'mail_job_batch.status' => [ self::STATUS_QUEUED, self::STATUS_SENDING ]
+                'mail_job_batch.status' => self::SENDING_STATUSES,
             ])
             ->order(':mail_job_batch_templates.mail_template.mail_type.priority DESC')
             ->limit(1)
             ->fetch();
+    }
+
+    public function isSendingBatch(int $batchId): bool
+    {
+        return $this->getTable()
+            ->select('mail_job_batch.*')
+            ->where([
+                'mail_job_batch.id' => $batchId,
+                'mail_job_batch.status' => self::SENDING_STATUSES,
+            ])
+            ->count('*') > 0;
     }
 
     public function getBatchPriority(ActiveRow $batch): int
