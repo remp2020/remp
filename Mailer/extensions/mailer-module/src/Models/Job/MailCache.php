@@ -117,11 +117,12 @@ class MailCache
         return $this->redis()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId) > 0;
     }
 
-    public function isQueueTopPriority(int $queueId): bool
+    /**
+     * getTopPriorityQueues returns array of queue-score pairs order by queue priority (descending).
+     */
+    public function getTopPriorityQueues(int $count = 1)
     {
-        $selectedQueueScore = $this->redis()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
-
-        $topPriorityQueue = $this->redis()->zrevrangebyscore(
+        return $this->redis()->zrevrangebyscore(
             static::REDIS_PRIORITY_QUEUES_KEY,
             '+inf',
             1,
@@ -129,10 +130,16 @@ class MailCache
                 'withscores' => true,
                 'limit' => [
                     'offset' => 0,
-                    'count' => 1,
+                    'count' => $count,
                 ],
             ]
         );
+    }
+
+    public function isQueueTopPriority(int $queueId): bool
+    {
+        $topPriorityQueue = $this->getTopPriorityQueues();
+        $selectedQueueScore = $this->redis()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
 
         return isset($topPriorityQueue[$queueId]) || // topPriorityQueue is requested queue
             reset($topPriorityQueue) == $selectedQueueScore; // or requested queue has same priority as topPriorityQueue
