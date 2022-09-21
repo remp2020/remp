@@ -28,6 +28,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `TextUrlRtmReplace` content generator replacer to add RTM parameters to links in the text version of the email. remp/remp#1176
 - Fixed crashing Newsfilter generator if `articlelink` tag pointed to the article that doesn't exist. remp/remp#1066
 - Refactored mail generators wordpress article links parsing. remp/remp#1166
+- Added `context` to job create/detail pages. remp/remp#1185
+  - Context is a parameter, that maintains that user doesn't receive contextually similar emails multiple times. Each user can receive an email with a specific context only once.
 
 ## [0.33.0] - 2022-08-08
 

@@ -7,9 +7,9 @@ use Nette\Application\UI\Form;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\FormRenderer\MaterialRenderer;
+use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
-use Remp\MailerModule\Models\Segment\Aggregator;
 use Tracy\Debugger;
 
 class JobFormFactory
@@ -69,6 +69,10 @@ class JobFormFactory
             ->setHtmlAttribute('data-live-search-normalize', 'true')
             ->setDefaultValue($job->segment_provider . '::' . $job->segment_code);
 
+        $form->addText('context', 'Context')
+            ->setNullable()
+            ->setDefaultValue($job->context);
+
         $form->addSubmit('save')
             ->getControlPrototype()
             ->setName('button')
@@ -87,6 +91,7 @@ class JobFormFactory
         $jobNewData = [
             'segment_provider' => $segment[0],
             'segment_code' => $segment[1],
+            'context' => $values->context,
         ];
 
         try {

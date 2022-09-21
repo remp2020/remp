@@ -109,6 +109,11 @@ class NewBatchFormFactory
 
         $form->addText('start_at', 'Start date');
 
+        if ($jobId === null) {
+            $form->addText('context', 'Context')
+                ->setNullable();
+        }
+
         $form->addHidden('job_id', $jobId);
 
         $form->addSubmit('save')
@@ -131,7 +136,7 @@ class NewBatchFormFactory
     {
         if (!$values['job_id']) {
             $segment = explode('::', $values['segment_code']);
-            $values['job_id'] = $this->jobsRepository->add($segment[1], $segment[0])->id;
+            $values['job_id'] = $this->jobsRepository->add($segment[1], $segment[0], $values->context)->id;
         } else {
             $values['job_id'] = (int)$values['job_id'];
         }

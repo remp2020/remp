@@ -58,6 +58,14 @@
                 </div>
             </div>
 
+            <div class="row form-group" n:ifset="$control['newBatchForm']['context']">
+                <div class="col-sm-12">
+                    {label context/}
+                    <span data-toggle="tooltip" title="User can receive an email with specific context only once. Use same context in multiple context-related jobs to make sure user doesn't receive multiple similar emails."><i class="zmdi zmdi-info"></i></span>
+                    {input context, class => 'form-control fg-input'}
+                </div>
+            </div>
+
             <div class="row form-group">
                 <div class="col-sm-12">
                     {input save, class => 'btn btn-info waves-effect'}
