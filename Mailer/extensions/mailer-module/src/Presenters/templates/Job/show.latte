@@ -48,6 +48,7 @@
                 <div class="card-body">
                     <ul class="list-group">
                         <li class="list-group-item"><strong>Segment:</strong> {isset($segment) ? $segment['provider'] . ':' . $segment['name'] : 'Missing segment'}</li>
+                        <li class="list-group-item"><strong>Context:</strong> {$job->context}</li>
                         <li class="list-group-item"><strong>Created:</strong> {$job->created_at}</li>
                         <li class="list-group-item"><strong>Number of sent mails:</strong> {$total_sent}</li>
                     </ul>
