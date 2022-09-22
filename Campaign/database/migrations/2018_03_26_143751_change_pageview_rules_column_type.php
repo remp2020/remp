@@ -14,23 +14,26 @@ class ChangePageviewRulesColumnType extends Migration
      */
     public function up()
     {
-        DB::transaction(function () {
-            $pageviewRulesData = DB::table('campaigns')->select('id', 'pageview_rules')->get();
+        // DISABLING TRANSACTION in old migration
+        // since it is already applied in production and it breaks php test
+        // reason: https://github.com/laravel/framework/issues/35380
+        //DB::transaction(function () {
+        $pageviewRulesData = DB::table('campaigns')->select('id', 'pageview_rules')->get();
 
-            Schema::table('campaigns', function (Blueprint $table) {
-                $table->dropColumn("pageview_rules");
-            });
-
-            Schema::table('campaigns', function (Blueprint $table) {
-                $table->json("pageview_rules")->nullable(true);
-            });
-
-            foreach($pageviewRulesData as $row) {
-                DB::table('campaigns')->where('id', $row->id)->update([
-                    'pageview_rules' => $row->pageview_rules
-                ]);
-            }
+        Schema::table('campaigns', function (Blueprint $table) {
+            $table->dropColumn("pageview_rules");
         });
+
+        Schema::table('campaigns', function (Blueprint $table) {
+            $table->json("pageview_rules")->nullable(true);
+        });
+
+        foreach($pageviewRulesData as $row) {
+            DB::table('campaigns')->where('id', $row->id)->update([
+                'pageview_rules' => $row->pageview_rules
+            ]);
+        }
+        //});
     }
 
     /**

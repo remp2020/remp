@@ -1,4 +1,4 @@
-FROM php:7.4-fpm
+FROM php:8.0.20-fpm
 
 ENV BUILD_DEPS g++ build-essential libsasl2-dev libssl-dev
 
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUN_DEPS} \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && docker-php-ext-configure intl \
     && docker-php-ext-configure gd --with-jpeg=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring iconv zip intl sockets pcntl gd \
+    && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring zip intl sockets pcntl gd \
     && apt-get purge \
         -y --auto-remove \
         -o APT::AutoRemove::RecommendsImportant=false \

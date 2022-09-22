@@ -31,7 +31,7 @@ parameters:
 
 extensions:
 	local_configs: Remp\MailerModule\Models\Config\ConfigExtension
-	webpack: Oops\WebpackNetteAdapter\DI\WebpackExtension(true)
+	webpack: Contributte\Webpack\DI\WebpackExtension(true)
 	mailer: Remp\MailerModule\DI\MailerModuleExtension
 
 webpack:

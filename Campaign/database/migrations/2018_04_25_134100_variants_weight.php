@@ -13,7 +13,10 @@ class VariantsWeight extends Migration
      */
     public function up()
     {
-        DB::transaction(function () {
+        // DISABLING TRANSACTION in old migration
+        // since it is already applied in production and it breaks php test
+        // reason: https://github.com/laravel/framework/issues/35380
+        //DB::transaction(function () {
             Schema::table('campaign_banners', function (Blueprint $table) {
                 $table->integer('weight')->nullable();
             });
@@ -35,8 +38,7 @@ class VariantsWeight extends Migration
             Schema::table('campaign_banners', function (Blueprint $table) {
                 $table->integer('weight')->nullable(false)->change();
             });
-        });
-
+        //});
     }
 
     /**

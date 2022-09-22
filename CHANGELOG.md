@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- **IMPORTANT**: Updated required PHP version 8.0. remp/remp#1160
 - Added support for `group` in options for `ButtonSwitcher`. Groups allow to visually separate options. remp/remp#1110
 - Added `First day`, `First 7 days` and `First 14 days` options to `PageLoadsGraph`. remp/remp#1110
 - [Tracker]: Added support for SASL Kafka authentication in Tracker. remp/remp#971
@@ -52,6 +53,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
+- **IMPORTANT**: Updated required PHP version 8.0. remp/remp#1160
 - Added option to toggle between mobile and desktop banner preview on banner edit page. remp/remp#1071
 - Fixed bar banner close text display. remp/crm#1068
 - Fixed site layout on mobile.
@@ -59,6 +61,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **IMPORTANT**: Updated required PHP version 8.0. remp/remp#1160
 - **IMPORTANT**: Added soft delete for emails, layouts, newsletter lists and generator templates. remp/remp#1075
   - The database migration is blocking to maintain consistency and might take 5-10 minutes for bigger instances. Please schedule the release to the off-peak hours.
 - **IMPORTANT**: Fixed mail type priority can't be 0. remp/remp#1134
@@ -93,6 +96,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Sso]
 
+- **IMPORTANT**: Updated required PHP version 8.0. remp/remp#1160
 - Fixed site layout on mobile.
 
 ## [0.32.2] - 2022-05-11
