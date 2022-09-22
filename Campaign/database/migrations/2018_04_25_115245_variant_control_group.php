@@ -17,7 +17,10 @@ class VariantControlGroup extends Migration
             $table->dropForeign(['banner_id']);
         });
 
-        DB::transaction(function () {
+        // DISABLING TRANSACTION in old migration
+        // since it is already applied in production and it breaks php test
+        // reason: https://github.com/laravel/framework/issues/35380
+        //DB::transaction(function () {
             Schema::table('campaign_banners', function (Blueprint $table) {
                 $table->integer('control_group')->nullable()->default(0);
 
@@ -31,7 +34,7 @@ class VariantControlGroup extends Migration
 
                 DB::statement("INSERT INTO campaign_banners (`campaign_id`, `banner_id`, `variant`, `control_group`) VALUES({$id}, null, 'Control Group', 1)");
             }
-        });
+        //});
 
         Schema::table('campaign_banners', function (Blueprint $table) {
             $table->foreign('banner_id')->references('id')->on('banners');
@@ -45,7 +48,7 @@ class VariantControlGroup extends Migration
      */
     public function down()
     {
-        DB::transaction(function () {
+        //DB::transaction(function () {
             DB::statement("DELETE FROM campaign_banners WHERE control_group = 1");
 
             Schema::table('campaign_banners', function (Blueprint $table) {
@@ -54,6 +57,6 @@ class VariantControlGroup extends Migration
                 $table->integer('banner_id')->nullable(true);
             });
 
-        });
+        //});
     }
 }

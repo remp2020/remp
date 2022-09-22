@@ -3,7 +3,8 @@
 namespace App;
 
 use League\Uri\Components\Query;
-use League\Uri\Schemes\Http;
+use League\Uri\Http;
+use League\Uri\QueryString;
 
 class UrlHelper
 {
@@ -18,12 +19,10 @@ class UrlHelper
     public function appendQueryParams($originalUrl, array $params)
     {
         $url = Http::createFromString($originalUrl);
-        $queryPairs = Query::parse($url->getQuery());
-        $query = Query::createFromPairs($queryPairs)
-            ->append(
-                Query::build($params)
-            )
+        $query = Query::createFromParams(QueryString::parse($url->getQuery()))
+            ->append(Query::createFromParams($params))
             ->getContent();
+
         return $url->withQuery($query)->__toString();
     }
 }

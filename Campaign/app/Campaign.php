@@ -248,7 +248,7 @@ class Campaign extends Model implements Searchable
 
     public function cache()
     {
-        // dump active cache when we something important changed
+        // dump active cache when something important changed
         self::$activeCache = null;
 
         self::refreshActiveCampaignsCache();

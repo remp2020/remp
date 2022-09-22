@@ -14,9 +14,17 @@ syntax:7.4:
   script:
     - make syntax
 
+syntax:8.0:
+  stage: test
+  image: php:8.0-cli
+  tags:
+    - docker
+  script:
+    - make syntax
+
 sniffer:
   stage: test
-  image: remp/php-ci:7.4.29
+  image: remp/php-ci:8.0.20
   tags:
     - docker
   script:
@@ -25,7 +33,7 @@ sniffer:
 
 phpstan:
   stage: test
-  image: remp/php-ci:7.4.29
+  image: remp/php-ci:8.0.20
   tags:
     - docker
   script:
@@ -34,7 +42,7 @@ phpstan:
 
 latte_lint:
   stage: test
-  image: remp/php-ci:7.4.29
+  image: remp/php-ci:8.0.20
   tags:
     - docker
   script:
@@ -43,7 +51,7 @@ latte_lint:
 
 tests:
   stage: test
-  image: remp/php-ci:7.4.29
+  image: remp/php-ci:8.0.20
   tags:
     - docker
   script:
@@ -76,9 +84,27 @@ mailer/🇸🇰:
   tags:
     - remp2020
     - deploy
-    - php7
   only:
     - master
+
+"mailer/🇸🇰 (PHP8)":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "ref=php8"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=dennikn/mailer"
+      -F "variables[URL]=https://mailer.remp2020.com"
+      -F "variables[APP]=mailer"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
 
 campaign/🇸🇰:
   stage: deploy
@@ -96,9 +122,28 @@ campaign/🇸🇰:
   tags:
     - remp2020
     - deploy
-    - php7
   only:
     - master
+  dependencies: []
+
+"campaign/🇸🇰 (PHP8)":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "ref=php8"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=dennikn/campaign"
+      -F "variables[URL]=https://campaign.remp2020.com"
+      -F "variables[APP]=campaign"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
   dependencies: []
 
 beam/🇸🇰:
@@ -117,9 +162,27 @@ beam/🇸🇰:
   tags:
     - remp2020
     - deploy
-    - php7
   only:
     - master
+  dependencies: []
+
+"beam/🇸🇰 (PHP8)":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=php8"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=dennikn/beam"
+      -F "variables[URL]=https://beam.remp2020.com"
+      -F "variables[APP]=beam"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - php8
+    - deploy
   dependencies: []
 
 sso/🇸🇰:
@@ -138,9 +201,28 @@ sso/🇸🇰:
   tags:
     - remp2020
     - deploy
-    - php7
   only:
     - master
+  dependencies: []
+
+"sso/🇸🇰 (PHP8)":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "ref=php8"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=dennikn/sso"
+      -F "variables[URL]=https://sso.remp2020.com"
+      -F "variables[APP]=sso"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
   dependencies: []
 
 "mailer/🇨🇿":
@@ -159,9 +241,28 @@ sso/🇸🇰:
   tags:
     - remp2020
     - deploy
-    - php7
   only:
     - master
+  dependencies: []
+
+"mailer/🇨🇿 (PHP8)":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "ref=php8"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=denikncz/mailer"
+      -F "variables[URL]=https://mailer.denikn.cz"
+      -F "variables[APP]=mailer"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
   dependencies: []
 
 "campaign/🇨🇿":
@@ -180,9 +281,28 @@ sso/🇸🇰:
   tags:
     - remp2020
     - deploy
-    - php7
   only:
     - master
+  dependencies: []
+
+"campaign/🇨🇿 (PHP8)":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "ref=php8"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=denikncz/campaign"
+      -F "variables[URL]=https://campaign.denikn.cz"
+      -F "variables[APP]=campaign"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
   dependencies: []
 
 "beam/🇨🇿":
@@ -201,9 +321,28 @@ sso/🇸🇰:
   tags:
     - remp2020
     - deploy
-    - php7
   only:
     - master
+  dependencies: []
+
+"beam/🇨🇿 (PHP8)":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "ref=php8"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=denikncz/beam"
+      -F "variables[URL]=https://beam.denikn.cz"
+      -F "variables[APP]=beam"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
   dependencies: []
 
 "sso/🇨🇿":
@@ -222,7 +361,26 @@ sso/🇸🇰:
   tags:
     - remp2020
     - deploy
-    - php7
   only:
     - master
+  dependencies: []
+
+"sso/🇨🇿 (PHP8)":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "ref=php8"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=denikncz/sso"
+      -F "variables[URL]=https://sso.denikn.cz"
+      -F "variables[APP]=sso"
+      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
   dependencies: []

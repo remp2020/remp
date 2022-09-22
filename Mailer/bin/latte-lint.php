@@ -19,7 +19,7 @@ $engine = new Latte\Engine;
 Nette\Bridges\ApplicationLatte\UIMacros::install($engine->getCompiler());
 Nette\Bridges\FormsLatte\FormMacros::install($engine->getCompiler());
 \Remp\MailerModule\Latte\PermissionMacros::install($engine->getCompiler());
-\Oops\WebpackNetteAdapter\Latte\WebpackMacros::install($engine->getCompiler());
+\Contributte\Webpack\Latte\WebpackMacros::install($engine->getCompiler());
 
 $debug = in_array('--debug', $argv, true);
 $path = $argv[1];

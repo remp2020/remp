@@ -7,6 +7,7 @@ use App\SessionReferer;
 use App\Console\Command;
 use DeviceDetector\DeviceDetector;
 use Illuminate\Support\Carbon;
+use League\Uri\UriString;
 use Remp\Journal\JournalContract;
 use Remp\Journal\ListRequest;
 use Snowplow\RefererParser\Parser;
@@ -22,8 +23,7 @@ class ProcessPageviewSessions extends Command
     public function handle(
         JournalContract $journalContract,
         DeviceDetector $deviceDetector,
-        Parser $refererParser,
-        \League\Uri\Parser $uriParser
+        Parser $refererParser
     ) {
         $request = new ListRequest('pageviews');
 
@@ -100,7 +100,7 @@ class ProcessPageviewSessions extends Command
                 continue;
             }
             if ($refererData['medium'] === 'unknown') {
-                $uri = $uriParser($pageview->user->referer);
+                $uri = UriString::parse($pageview->user->referer);
                 $refererData['medium'] = 'external';
                 $refererData['source'] = $uri['host'];
             }

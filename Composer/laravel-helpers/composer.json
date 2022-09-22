@@ -10,10 +10,10 @@
     }
   ],
   "require": {
-    "php": "^7.4",
-    "illuminate/http": "7.0|^8.0",
-    "illuminate/support": "7.0|^8.0",
-    "illuminate/routing": "7.0|^8.0"
+    "php": "^8.0",
+    "illuminate/http": "^v8.76.2",
+    "illuminate/support": "^v8.76.2",
+    "illuminate/routing": "^v8.76.2"
   },
   "require-dev": {
   },
