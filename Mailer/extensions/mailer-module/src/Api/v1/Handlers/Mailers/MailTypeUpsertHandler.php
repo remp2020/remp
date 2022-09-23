@@ -125,6 +125,7 @@ class MailTypeUpsertHandler extends BaseHandler
                 $data['description'] ??= $list->description;
 
                 $this->listsRepository->update($list, $data);
+                $list = $this->listsRepository->find($list->id);
             } else {
                 $list = $this->addList($data);
             }

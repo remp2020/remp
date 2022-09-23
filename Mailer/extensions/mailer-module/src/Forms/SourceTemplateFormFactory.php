@@ -173,6 +173,7 @@ class SourceTemplateFormFactory implements IFormFactory
 
         if ($template) {
             $this->mailSourceTemplateRepository->update($template, (array) $values);
+            $template = $this->mailSourceTemplateRepository->find($template->id);
             $this->onUpdate->__invoke($form, $template, $buttonSubmitted);
         } else {
             $template = $this->mailSourceTemplateRepository->add(

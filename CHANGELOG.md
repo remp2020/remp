@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Fixed issue with Twig syntax failsave which shouldn't allow user to save template with invalid syntax. It wasn't working correctly and allowed such scenario. remp/remp#1190
+
 ## [0.34.0] - 2022-09-23
 
 ### Project

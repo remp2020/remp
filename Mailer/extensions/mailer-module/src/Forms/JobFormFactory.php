@@ -96,6 +96,7 @@ class JobFormFactory
 
         try {
             $this->jobsRepository->update($job, $jobNewData);
+            $job = $this->jobsRepository->find($job->id);
         } catch (\Exception $e) {
             ($this->onError)($job, $e->getMessage());
         }

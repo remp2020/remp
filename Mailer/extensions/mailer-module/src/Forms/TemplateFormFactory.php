@@ -193,6 +193,7 @@ class TemplateFormFactory implements IFormFactory
                 }
 
                 $this->templatesRepository->update($row, (array) $values);
+                $row = $this->templatesRepository->find($values['id']);
                 $callback = $this->onUpdate;
             } else {
                 $row = $this->templatesRepository->add(
