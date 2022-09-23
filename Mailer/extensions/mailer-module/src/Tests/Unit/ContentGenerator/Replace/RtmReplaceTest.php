@@ -64,18 +64,18 @@ class RtmReplaceTest extends TestCase
 
     public function testReplaceExistingRtmParametersWhenTheUrlAlreadyContainsTheseUtm()
     {
-        $content = $this->rtmReplace->replace('<a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=apple&amp;feira=terca&modelo=1?a=1&b=2" target="blank"/>', $this->generatorInput);
+        $content = $this->rtmReplace->replace('<a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=apple&feira=terca&modelo=1?a=1&b=2" target="blank"/>', $this->generatorInput);
         $this->assertEquals(
-            '<a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=&feira=terca&modelo=1%3Fa%3D1&b=2&rtm_source=demo-weekly-newsletter&rtm_medium=email&rtm_campaign=impresa_mail_20190903103350" target="blank"/>',
+            '<a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=&feira=terca&modelo=1?a=1&b=2&rtm_source=demo-weekly-newsletter&rtm_medium=email&rtm_campaign=impresa_mail_20190903103350" target="blank"/>',
             $content
         );
     }
 
     public function testFixHTMLEntitiesFromURL()
     {
-        $content = $this->rtmReplace->replace('<a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=apple&amp;feira=terca&modelo=1?a=1&b=2" target="blank"/>', $this->generatorInput);
+        $content = $this->rtmReplace->replace('<a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=apple&amp;feira=terca&modelo=1%3Fa%3D1&b=2" target="blank"/>', $this->generatorInput);
         $this->assertEquals(
-            '<a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=&feira=terca&modelo=1%3Fa%3D1&b=2&rtm_source=demo-weekly-newsletter&rtm_medium=email&rtm_campaign=impresa_mail_20190903103350" target="blank"/>',
+            '<a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=&amp;feira=terca&modelo=1%3Fa%3D1&b=2&rtm_source=demo-weekly-newsletter&rtm_medium=email&rtm_campaign=impresa_mail_20190903103350" target="blank"/>',
             $content
         );
     }
