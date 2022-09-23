@@ -124,6 +124,7 @@ class LayoutFormFactory implements IFormFactory
         if (!empty($values['id'])) {
             $row = $this->layoutsRepository->find($values['id']);
             $this->layoutsRepository->update($row, $values);
+            $row = $this->layoutsRepository->find($row->id);
             $this->storeLayoutTranslations($row, $translations);
             ($this->onUpdate)($row, $buttonSubmitted);
         } else {
