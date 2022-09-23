@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.34.0] - 2022-09-23
+
 ### Project
 
 - Updated Docker Adminer to the latest version.
@@ -1324,7 +1326,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.33.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.34.0...master
+[0.34.0]: https://github.com/remp2020/remp/compare/0.33.0...0.34.0
 [0.33.0]: https://github.com/remp2020/remp/compare/0.32.2...0.33.0
 [0.32.2]: https://github.com/remp2020/remp/compare/0.32.1...0.32.2
 [0.32.1]: https://github.com/remp2020/remp/compare/0.31.0...0.32.1
