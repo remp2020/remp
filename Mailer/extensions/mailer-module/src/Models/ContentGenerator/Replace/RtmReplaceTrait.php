@@ -23,11 +23,9 @@ trait RtmReplaceTrait
         $utmCampaign = $generatorInput->template()->code;
         $utmContent = $generatorInput->batchId();
 
-        $url = html_entity_decode($hrefUrl);
-
         $matches = [];
         // Split URL between path and params (before and after '?')
-        preg_match('/^([^\?]*)\??(.*)$/', $url, $matches);
+        preg_match('/^([^\?]*)\??(.*)$/', $hrefUrl, $matches);
 
         $path = $matches[1];
         $params = explode('&', $matches[2] ?? '');
@@ -60,7 +58,7 @@ trait RtmReplaceTrait
                     $finalParams[] = "$key={$utmContent}";
                     $rtmContentAdded = true;
                 } else {
-                    $finalParams[] = "$key=" . rawurlencode($value);
+                    $finalParams[] = "$key=" . $value;
                 }
             } else {
                 $finalParams[] = $param;
