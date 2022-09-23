@@ -144,6 +144,7 @@ class SnippetFormFactory implements IFormFactory
             $row = $this->snippetsRepository->find($values['id']);
 
             $this->snippetsRepository->update($row, $values);
+            $row = $this->snippetsRepository->find($row->id);
             $this->storeSnippetTranslations($row, $translations);
 
             ($this->onUpdate)($row, $buttonSubmitted);

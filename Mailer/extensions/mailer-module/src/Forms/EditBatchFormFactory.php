@@ -98,6 +98,7 @@ class EditBatchFormFactory implements IFormFactory
             'max_emails' => $values['max_emails'],
             'start_at' => new DateTime($values['start_at']),
         ]));
+        $batch = $this->batchesRepository->find($batch->id);
 
         // decide if user wants to save or save and leave
         $buttonSubmitted = self::FORM_ACTION_SAVE;
