@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `context` to job create/detail pages. remp/remp#1185
   - Context is a parameter, that maintains that user doesn't receive contextually similar emails multiple times. Each user can receive an email with a specific context only once.
 - Fixed bug where template parameters used in URLs would not be correctly replaced if Mailgun sender was used in batch mode. hiking.sk/web#92
+- Fixed issue with `worker:mail` getting stuck in an infinite "no longer top priority, switching" message. remp/remp#1189
 
 ## [0.33.0] - 2022-08-08
 
