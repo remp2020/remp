@@ -1332,7 +1332,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/0.34.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/0.34.1...master
+[0.34.1]: https://github.com/remp2020/remp/compare/0.34.0...0.34.1
 [0.34.0]: https://github.com/remp2020/remp/compare/0.33.0...0.34.0
 [0.33.0]: https://github.com/remp2020/remp/compare/0.32.2...0.33.0
 [0.32.2]: https://github.com/remp2020/remp/compare/0.32.1...0.32.2
