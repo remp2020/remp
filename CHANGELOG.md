@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Added `dimensions` of banner into required inputs during the creation of custom HTML banner. remp/remp#1165
+
 ## [1.0.0] - 2022-09-26
 
 ### [Beam]
