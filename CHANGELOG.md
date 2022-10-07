@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **IMPORTANT**: Fixed description of "priority" field in the newsletter list form. remp/remp#1195
+  - The newsletter form incorrectly stated the information about newsletter list priority. Mailer always prioritized newsletters with higher "priority" field, but the form stated otherwise.
 - Added `ServiceParamsProviderInterface` which implements adding custom parameters to mail templates. remp/remp#1175
 - Added `DefaultServiceParamsProvider` which adds `settings` and `unsubscribe` params to mail templates.
 - Refactored `Sender` class to use `ServiceParamsProviderInterface` instead of `generateServiceParams` method.
