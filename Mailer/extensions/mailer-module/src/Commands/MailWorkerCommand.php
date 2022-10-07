@@ -3,23 +3,23 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
-use League\Event\EventDispatcher;
 use Exception;
+use League\Event\EventDispatcher;
 use Nette\Mail\SmtpException;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
-use Remp\MailerModule\Models\HealthChecker;
-use Remp\MailerModule\Models\Mailer\EmailAllowList;
-use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Events\MailSentEvent;
+use Remp\MailerModule\Models\HealthChecker;
 use Remp\MailerModule\Models\Job\MailCache;
+use Remp\MailerModule\Models\Mailer\EmailAllowList;
+use Remp\MailerModule\Models\Sender;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
-use Remp\MailerModule\Models\Sender;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -294,7 +294,6 @@ class MailWorkerCommand extends Command
                         $this->cacheJobs($jobs, $batch->id);
 
                         if ($this->smtpErrors >= 10) {
-                            $this->mailCache->pauseQueue($batch->id);
                             $this->mailJobBatchRepository->updateStatus($batch, BatchesRepository::STATUS_WORKER_STOP);
                             break;
                         }

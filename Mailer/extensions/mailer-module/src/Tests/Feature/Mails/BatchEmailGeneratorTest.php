@@ -27,9 +27,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
     private function getGenerator($aggregator, $userProvider)
     {
         return new BatchEmailGeneratorWrapper(
-            $this->jobsRepository,
             $this->jobQueueRepository,
-            $this->batchesRepository,
             $aggregator,
             $userProvider,
             $this->mailCache,

@@ -8,6 +8,7 @@ use Nette\Database\Context;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Hermes\RedisDriver;
+use Remp\MailerModule\Models\Job\MailCache;
 use Tomaj\Hermes\Emitter;
 
 class BatchesRepository extends Repository
@@ -34,15 +35,19 @@ class BatchesRepository extends Repository
         self::STATUS_QUEUED, // waiting for the next worker to pick up
         self::STATUS_SENDING, // actually sending
     ];
-
+    const STOP_STATUSES = [
+        self::STATUS_USER_STOP,
+        self::STATUS_WORKER_STOP,
+    ];
     protected $tableName = 'mail_job_batch';
 
-    private Emitter $emitter;
-
-    public function __construct(Context $database, Emitter $emitter, Storage $cacheStorage = null)
-    {
+    public function __construct(
+        Context $database,
+        protected Emitter $emitter,
+        protected MailCache $mailCache,
+        Storage $cacheStorage = null
+    ) {
         parent::__construct($database, $cacheStorage);
-        $this->emitter = $emitter;
     }
 
     public function add(int $jobId, int $emailCount = null, string $startAt = null, string $method = 'random'): ActiveRow
@@ -69,6 +74,16 @@ class BatchesRepository extends Repository
             'status' => $status,
             'updated_at' => new DateTime()
         ]);
+
+        if (in_array($status, self::SENDING_STATUSES, true)) {
+            $priority = $this->getBatchPriority($batch);
+            $this->mailCache->restartQueue($batch->id, $priority);
+        } elseif (in_array($status, self::STOP_STATUSES, true)) {
+            $this->mailCache->pauseQueue($batch->id);
+        } elseif (in_array($status, self::EDITABLE_STATUSES, true)) {
+            $this->mailCache->removeQueue($batch->id);
+        }
+
         $this->emitter->emit(new HermesMessage('batch-status-change', [
             'mail_job_batch_id' => $batch->id,
             'time' => time(),
