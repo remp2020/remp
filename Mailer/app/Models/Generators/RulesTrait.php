@@ -77,6 +77,10 @@ trait RulesTrait
                 return $this->embedParser->parse($matches[0]);
             },
 
+            "/\[embed](.*)\[\/embed\]/is" => function ($matches) {
+                return $this->embedParser->parse($matches[1]);
+            },
+
             // remove br from inside of a
             '/<a.*?\/a>/is' => function ($matches) {
                 return str_replace('<br />', '', $matches[0]);
