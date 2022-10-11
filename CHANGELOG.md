@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added `dimensions` of banner into required inputs during the creation of custom HTML banner. remp/remp#1165
 
+### [Mailer]
+
+- Added `ServiceParamsProviderInterface` which implements adding custom parameters to mail templates. remp/remp#1175
+- Added `DefaultServiceParamsProvider` which adds `settings` and `unsubscribe` params to mail templates.
+- Refactored `Sender` class to use `ServiceParamsProviderInterface` instead of `generateServiceParams` method.
+
 ## [1.0.0] - 2022-09-26
 
 ### [Beam]

@@ -16,6 +16,7 @@ use Remp\MailerModule\Models\Mailer\Mailer;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
 use Remp\MailerModule\Models\Sender\MailerFactory;
 use Remp\MailerModule\Models\Sender\MailerNotExistsException;
+use Remp\MailerModule\Models\ServiceParams\ServiceParamsProviderInterface;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
@@ -45,36 +46,16 @@ class Sender
 
     private $locale;
 
-    private $mailerFactory;
-
-    private $autoLogin;
-
-    private $userSubscriptionsRepository;
-
-    private $logsRepository;
-
-    private $contentGenerator;
-
-    private $generatorInputFactory;
-
-    public $emailAllowList;
-
     public function __construct(
-        MailerFactory $mailerFactory,
-        AutoLogin $autoLogin,
-        UserSubscriptionsRepository $userSubscriptionsRepository,
-        LogsRepository $logsRepository,
-        ContentGenerator $contentGenerator,
-        GeneratorInputFactory $generatorInputFactory,
-        EmailAllowList $emailAllowList
+        private MailerFactory $mailerFactory,
+        private AutoLogin $autoLogin,
+        private UserSubscriptionsRepository $userSubscriptionsRepository,
+        private LogsRepository $logsRepository,
+        private ContentGenerator $contentGenerator,
+        private GeneratorInputFactory $generatorInputFactory,
+        private ServiceParamsProviderInterface $serviceParamsProvider,
+        private EmailAllowList $emailAllowList
     ) {
-        $this->mailerFactory = $mailerFactory;
-        $this->autoLogin = $autoLogin;
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
-        $this->logsRepository = $logsRepository;
-        $this->contentGenerator = $contentGenerator;
-        $this->generatorInputFactory = $generatorInputFactory;
-        $this->emailAllowList = $emailAllowList;
     }
 
     public function addRecipient(string $email, string $name = null, array $params = []): self
@@ -156,7 +137,15 @@ class Sender
         $this->params['email'] = $recipient['email'];
         $this->params['autologin'] = "?token={$tokens[$recipient['email']]}";
         $this->params = array_merge($this->params, $recipient['params'] ?? []);
-        $this->params = array_merge($this->params, $this->generateServiceParams($this->params['autologin']));
+
+        $serviceParams = $this->serviceParamsProvider->provide(
+            $this->template,
+            $recipient['email'],
+            $this->batchId,
+            $this->params['autologin'],
+        );
+
+        $this->params = array_merge($this->params, $serviceParams);
 
         $mailer = $this->getMailer();
 
@@ -269,7 +258,15 @@ class Sender
             $p['mail_sender_id'] = $this->getSenderId($recipient['email']);
             $p['autologin'] = "?token={$autologinTokens[$recipient['email']]}";
             $p['email'] = $recipient['email'];
-            $p = array_merge($p, $this->generateServiceParams($p['autologin']));
+
+            $serviceParams = $this->serviceParamsProvider->provide(
+                $this->template,
+                $recipient['email'],
+                $this->batchId,
+                $p['autologin'],
+            );
+
+            $p = array_merge($p, $serviceParams);
 
             [$transformedParams, $p] = $mailer->transformTemplateParams($p);
             $templateParams[$recipient['email']] = $p;
@@ -426,18 +423,6 @@ class Sender
     public function supportsBatch()
     {
         return $this->getMailer()->supportsBatch();
-    }
-
-    private function generateServiceParams(?string $autologin)
-    {
-        $params = [];
-        if (isset($_ENV['UNSUBSCRIBE_URL'])) {
-            $params['unsubscribe'] = str_replace('%type%', $this->template->mail_type->code, $_ENV['UNSUBSCRIBE_URL']) . $autologin;
-        }
-        if (isset($_ENV['SETTINGS_URL'])) {
-            $params['settings'] = $_ENV['SETTINGS_URL'] . $autologin;
-        }
-        return $params;
     }
 
     private function getSenderId(string $email): string
