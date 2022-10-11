@@ -96,18 +96,6 @@ class GrafdnaGenerator implements IGenerator
 
         $errors = [];
 
-        $articleId = $values['article_id'] ?? $this->getArticleId($values['url']);
-        if (!$articleId) {
-            $errors[] = $values['url'];
-            return [
-                'htmlContent' => null,
-                'textContent' => null,
-                'lockedHtmlContent' => null,
-                'lockedTextContent' => null,
-                'errors' => $errors,
-            ];
-        }
-
         $post = $values['grafdna_html'];
         $post = $this->parseOls($post);
 
@@ -143,14 +131,7 @@ class GrafdnaGenerator implements IGenerator
         $economyPostsResponse = $this->webClient->getEconomyPostsLast24Hours();
         $excerpt = $economyPostsResponse['meta']['excerpt'];
 
-        // remove article from posts
-        $economyPosts = array_filter(
-            $economyPostsResponse['posts'],
-            function ($value) use ($articleId) {
-                return $value['id'] !== $articleId;
-            },
-            ARRAY_FILTER_USE_BOTH
-        );
+        $economyPosts = $this->filterPosts($economyPostsResponse['posts']);
         $economyPosts = array_slice($economyPosts, 0, 5);
         foreach ($economyPosts as &$economyPost) {
             $economyPost['image_url'] = $this->getImageUrlForPost($economyPost);
@@ -363,6 +344,20 @@ HTML;
         }
 
         return null;
+    }
+
+    private function filterPosts($posts): array
+    {
+        $tagsToFilter = ['graf-dna', 'ekonomicky-newsfilter'];
+
+        return array_filter($posts, function ($post) use ($tagsToFilter) {
+            foreach ($post['tags'] as $tag) {
+                if (in_array($tag['slug'], $tagsToFilter, true)) {
+                    return false;
+                }
+            }
+            return true;
+        }, ARRAY_FILTER_USE_BOTH);
     }
 
     private function getImageUrlForPost($post)
