@@ -113,6 +113,20 @@ services:
             - addDomain('dennikn.sk')
 ```
 
+### Email template service parameters
+
+Mailer allows adding service parameters to mail templates, that are available to use in every email. To bind your own parameters, you have to register `ServiceParamsProviderInterface` implementation in which you can add your own parameters.
+
+Registration example:
+
+```neon
+services: 
+	serviceParamsProvider:
+	    factory: App\MyServiceParamsProvider
+```
+
+Mailer module is by default adding two parameters (`settings` and `unsubscribe`) in `DefaultServiceParamsProvider`. If u register your own service params provider, default one will not be used. You can extend `DefaultServiceParamsProvider` instead of implementing `ServiceParamsProviderInterface` to preserve binding default service parameters.
+
 ## Technical feature description
 
 ### Mailers setup

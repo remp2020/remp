@@ -143,6 +143,8 @@ services:
 	apiTokenRepository:
 		factory: Remp\MailerModule\Models\Auth\SsoTokenRepository
 
+	serviceParamsProvider:
+		factory: Remp\MailerModule\Models\ServiceParams\DefaultServiceParamsProvider
 
 	# Beam
 	- Remp\MailerModule\Models\Beam\Client(%remp.beam.web_addr%, %remp.beam.token%)
