@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Models\Beam;
 
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
+use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 
 class UnreadArticlesResolver
 {
@@ -83,7 +84,11 @@ class UnreadArticlesResolver
 
         foreach ($this->results[$templateCode][$userId] as $i => $url) {
             if (!array_key_exists($url, $this->articlesMeta)) {
-                $meta = $this->content->fetchUrlMeta($url);
+                try {
+                    $meta = $this->content->fetchUrlMeta($url);
+                } catch (InvalidUrlException $e) {
+                    $meta = null;
+                }
                 if (!$meta) {
                     throw new UserUnreadArticlesResolveException("Unable to fetch meta for url {$url} when resolving article parameters for userId: {$userId}, templateCode: {$templateCode}");
                 }

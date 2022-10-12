@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `ServiceParamsProviderInterface` which implements adding custom parameters to mail templates. remp/remp#1175
 - Added `DefaultServiceParamsProvider` which adds `settings` and `unsubscribe` params to mail templates.
 - Refactored `Sender` class to use `ServiceParamsProviderInterface` instead of `generateServiceParams` method.
+- Fixed `UnreadArticlesResolver` which crashed job processing in case of an uncaught (invalid URL) exception. remp/remp#1017
+  - This could happen if an article was unpublished, but remained in the stats and was selected for personalized newsletter. Mailer wouldn't be able to fetch meta for article.
 
 ## [1.0.0] - 2022-09-26
 
