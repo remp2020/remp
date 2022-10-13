@@ -20,13 +20,14 @@
                 <td class="operator-select-td">
                     <input type="hidden"
                            :name="'pageview_attributes[' + index + '][operator]'"
-                           value="=">
+                           :value="attribute.operator">
                     <select :name="'pageview_attributes[' + index + '][operator]'"
                             class="form-control text-center selectpicker"
                             data-attr-item="operator"
-                            @change="(e) => updatePageviewAttribute(e, attribute)"
-                            disabled>
+                            :value="attribute.operator"
+                            @change="(e) => updatePageviewAttribute(e, attribute)">
                         <option class="text-center" value="=" selected>is</option>
+                        <option class="text-center" value="!=">is not</option>
                     </select>
                 </td>
                 <td class="value-input-td">
@@ -55,7 +56,7 @@
 
 <style scoped>
     .operator-select-td {
-        min-width: 60px;
+        min-width: 75px;
     }
 </style>
 

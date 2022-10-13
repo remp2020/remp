@@ -143,14 +143,14 @@ class ShowtimeTest extends TestCase
         $this->campaign->update([
             'pageview_attributes' => [
                 [
-                    'name' => 'test_attr',
+                    'name' => 'author',
                     'operator' => '=',
-                    'value' => 'test_attr_value'
+                    'value' => 'author_value_1'
                 ],
                 [
-                    'name' => 'test_array_attr',
+                    'name' => 'category',
                     'operator' => '=',
-                    'value' => 'test_array_attr_value1',
+                    'value' => 'category_value_1',
                 ],
             ]
         ]);
@@ -160,10 +160,10 @@ class ShowtimeTest extends TestCase
         $this->assertNull($bannerVariant);
 
         $userData->pageviewAttributes = json_decode(json_encode([
-            'test_attr' => 'test_attr_value',
-            'test_array_attr' => [
-                'test_array_attr_value1',
-                'test_array_attr_value2'
+            'author' => 'author_value_1',
+            'category' => [
+                'category_value_1',
+                'category_value_2',
             ],
         ]), false);
 
@@ -171,6 +171,58 @@ class ShowtimeTest extends TestCase
         $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids);
         $this->assertNotNull($bannerVariant);
         $this->assertNotEmpty($activeCampaignUuids);
+
+        $this->campaign->update([
+            'pageview_attributes' => [
+                [
+                    'name' => 'author',
+                    'operator' => '!=',
+                    'value' => 'author_value_1'
+                ],
+                [
+                    'name' => 'category',
+                    'operator' => '!=',
+                    'value' => 'category_value_1',
+                ],
+            ]
+        ]);
+
+        $userData->pageviewAttributes = json_decode(json_encode([
+            'author' => 'author_value_2',
+            'category' => [
+                'category_value_2',
+                'category_value_3',
+            ],
+        ]), false);
+
+        $activeCampaignUuids = [];
+        $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids);
+        $this->assertNotNull($bannerVariant);
+        $this->assertNotEmpty($activeCampaignUuids);
+
+        $userData->pageviewAttributes = json_decode(json_encode([
+            'author' => 'author_value_1',
+            'category' => [
+                'category_value_2',
+                'category_value_3',
+            ],
+        ]), false);
+
+        $activeCampaignUuids = [];
+        $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids);
+        $this->assertNull($bannerVariant);
+
+        $userData->pageviewAttributes = json_decode(json_encode([
+            'author' => 'author_value_2',
+            'category' => [
+                'category_value_1',
+                'category_value_3',
+            ],
+        ]), false);
+
+        $activeCampaignUuids = [];
+        $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids);
+        $this->assertNull($bannerVariant);
     }
 
     public function testStoppedCampaign()
