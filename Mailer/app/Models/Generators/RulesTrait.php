@@ -90,6 +90,8 @@ trait RulesTrait
             "/\[greybox\](.*?)\[\/greybox\]/is" => '<div class="t_greybox" style="padding: 16px; background: #f6f6f6;">$1</div>',
             '/\[row\](.*?)\[\/row\]/is' => '<div class="t_row gutter_8" style="display: flex; flex-wrap: wrap; margin: 0 -8px">$1</div>',
             '/\[col\](.*?)\[\/col\]/is' => '<div class="t_col large_0 small_0" style="margin: 0 8px; flex: 1">$1</div>',
+
+            "/<blockquote.*?>(.*?)<\/blockquote>/is" => '<blockquote style="position: relative;padding: 16px;border-radius: 6px;font-style: normal; background: #f6f6f6; margin: 0 0 16px 0">$1</blockquote>'
         ];
 
         foreach ($generatorRules as $generatorRuleKey => $generatorRuleValue) {
