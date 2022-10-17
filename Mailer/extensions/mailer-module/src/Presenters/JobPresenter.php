@@ -351,7 +351,6 @@ final class JobPresenter extends BasePresenter
             $this->flashMessage("You can't send batch which mail type have priority set to 0.");
             $this->redirect('Show', $batch->mail_job_id);
         }
-        $this->mailCache->restartQueue($batch->id, $priority);
         $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_SENDING);
 
         $this->flashMessage('Status of batch was changed.');
@@ -367,7 +366,6 @@ final class JobPresenter extends BasePresenter
             );
         }
         $batch = $this->batchesRepository->find($id);
-        $this->mailCache->pauseQueue($batch->id);
         $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_USER_STOP);
 
         $this->flashMessage('Status of batch was changed.');

@@ -10,9 +10,7 @@ use Remp\MailerModule\Models\Beam\UserUnreadArticlesResolveException;
 use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Models\Users\IUser;
 use Remp\MailerModule\Repositories\ActiveRow;
-use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
-use Remp\MailerModule\Repositories\JobsRepository;
 
 class BatchEmailGenerator
 {
@@ -20,42 +18,16 @@ class BatchEmailGenerator
 
     private int $deleteLimit = 10000;
 
-    private $mailJobsRepository;
-
-    private $mailJobQueueRepository;
-
-    private $batchesRepository;
-
-    private $segmentAggregator;
-
-    private $userProvider;
-
-    private $mailCache;
-
     private $templates = [];
 
-    private $unreadArticlesResolver;
-
-    private $logger;
-
     public function __construct(
-        LoggerInterface $logger,
-        JobsRepository $mailJobsRepository,
-        JobQueueRepository $mailJobQueueRepository,
-        BatchesRepository $batchesRepository,
-        Aggregator $segmentAggregator,
-        IUser $userProvider,
-        MailCache $mailCache,
-        UnreadArticlesResolver $unreadArticlesResolver
+        private LoggerInterface $logger,
+        private JobQueueRepository $mailJobQueueRepository,
+        private Aggregator $segmentAggregator,
+        private IUser $userProvider,
+        private MailCache $mailCache,
+        private UnreadArticlesResolver $unreadArticlesResolver
     ) {
-        $this->mailJobsRepository = $mailJobsRepository;
-        $this->mailJobQueueRepository = $mailJobQueueRepository;
-        $this->batchesRepository = $batchesRepository;
-        $this->segmentAggregator = $segmentAggregator;
-        $this->userProvider = $userProvider;
-        $this->mailCache = $mailCache;
-        $this->unreadArticlesResolver = $unreadArticlesResolver;
-        $this->logger = $logger;
     }
 
     public function setDeleteLimit($limit): void
@@ -270,9 +242,6 @@ class BatchEmailGenerator
         }
 
         $this->logger->info('Jobs inserted into mail cache', ['jobsCount' => $jobsCount]);
-
-        $priority = $this->batchesRepository->getBatchPriority($batch);
-        $this->mailCache->restartQueue($batch->id, $priority);
     }
 
     private function getTemplate(ActiveRow $batch)

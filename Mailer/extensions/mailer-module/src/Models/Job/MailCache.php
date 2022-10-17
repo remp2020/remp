@@ -122,6 +122,7 @@ class MailCache
      */
     public function getTopPriorityQueues(int $count = 1)
     {
+        // TODO: change to zrange with "byscore" and "rev" options once we upgrade to Predis 2.0
         return $this->redis()->zrevrangebyscore(
             static::REDIS_PRIORITY_QUEUES_KEY,
             '+inf',
