@@ -19,6 +19,10 @@ class Showtime
 
     private const BANNER_ONETIME_BROWSER_KEY = 'banner_onetime_browser';
 
+    private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS = '=';
+
+    private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS_NOT = '!=';
+
     private $redis;
 
     private $segmentAggregator;
@@ -434,16 +438,33 @@ class Showtime
             foreach ($campaign->pageview_attributes as $attribute) {
                 $attrName = $attribute['name'];
                 $attrValue = $attribute['value'];
+                $attrOperator = $attribute['operator'];
 
-                if (!property_exists($userData->pageviewAttributes, $attrName)) {
-                    return null;
-                }
-                if (is_array($userData->pageviewAttributes->{$attrName})) {
-                    if (!in_array($attrValue, $userData->pageviewAttributes->{$attrName})) {
+                if ($attrOperator === self::PAGEVIEW_ATTRIBUTE_OPERATOR_IS) {
+                    if (!property_exists($userData->pageviewAttributes, $attrName)) {
                         return null;
                     }
-                } elseif ($userData->pageviewAttributes->{$attrName} !== $attrValue) {
-                    return null;
+                    if (is_array($userData->pageviewAttributes->{$attrName})) {
+                        if (!in_array($attrValue, $userData->pageviewAttributes->{$attrName})) {
+                            return null;
+                        }
+                    } elseif ($userData->pageviewAttributes->{$attrName} !== $attrValue) {
+                        return null;
+                    }
+                }
+
+                if ($attrOperator === self::PAGEVIEW_ATTRIBUTE_OPERATOR_IS_NOT) {
+                    if (property_exists($userData->pageviewAttributes, $attrName)) {
+                        if (is_array($userData->pageviewAttributes->{$attrName})) {
+                            if (in_array($attrValue, $userData->pageviewAttributes->{$attrName})) {
+                                return null;
+                            }
+                        } else {
+                            if ($userData->pageviewAttributes->{$attrName} === $attrValue) {
+                                return null;
+                            }
+                        }
+                    }
                 }
             }
         }
