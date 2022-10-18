@@ -11,8 +11,12 @@ class ListVariantsRepository extends Repository
 
     protected $dataTableSearchable = ['code', 'title'];
 
-    public function add(ActiveRow $mailType, string $title, string $code, int $sorting)
+    public function add(ActiveRow $mailType, string $title, string $code, int $sorting = null)
     {
+        if (!isset($sorting)) {
+            $sorting = $this->getNextSorting($mailType);
+        }
+
         return $this->insert([
             'mail_type_id' => $mailType->id,
             'title' => $title,
@@ -20,6 +24,15 @@ class ListVariantsRepository extends Repository
             'sorting' => $sorting,
             'created_at' => new DateTime()
         ]);
+    }
+
+    private function getNextSorting(ActiveRow $mailType): int
+    {
+        $row = $this->getTable()->where(['mail_type_id' => $mailType->id])->order('sorting DESC')->limit(1)->fetch();
+        if ($row) {
+            return $row->sorting + 100;
+        }
+        return 100;
     }
 
     public function findByIdAndMailTypeId(int $id, int $mailTypeId): ?ActiveRow
