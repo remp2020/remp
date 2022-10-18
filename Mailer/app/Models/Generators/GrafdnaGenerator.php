@@ -3,6 +3,7 @@
 namespace Remp\Mailer\Models\Generators;
 
 use Nette\Application\UI\Form;
+use Nette\Http\Url;
 use Nette\Utils\ArrayHash;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\GrafdnaWidget\GrafdnaWidget;
 use Remp\Mailer\Models\WebClient;
@@ -102,7 +103,8 @@ class GrafdnaGenerator implements IGenerator
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
         $generatorRules = [
-            "/\[embed](.*)\[\/embed\]/is" => '',
+            "/\[embed\](.*)\[\/embed\]/is" => '',
+            "/\[graf\]/is" => '<img src=' . $values['image_url'] . ' alt="" style="width: 100%"/>',
         ];
         $rules = $this->getRules($generatorRules);
         foreach ($rules as $rule => $replace) {
@@ -123,8 +125,7 @@ class GrafdnaGenerator implements IGenerator
         $post = $this->helpers->wpParseArticleLinks($post, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction(), $errors);
         $lockedPost = $this->helpers->wpParseArticleLinks($lockedPost, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction(), $errors);
 
-        $post = str_replace('<p>', '<p style="font-weight: normal;">', $post);
-        $lockedPost = str_replace('<p>', '<p style="font-weight: normal;">', $lockedPost);
+        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:160%;margin: 16px 0 16px 0\">", [$post, $lockedPost]);
 
         $lockedPost = $this->articleLocker->putLockedMessage($lockedPost);
 
@@ -237,7 +238,9 @@ class GrafdnaGenerator implements IGenerator
         $output->grafdna_html = $data->post_content;
 
         $meta = $this->content->fetchUrlMeta($data->post_url);
-        $output->image_url = $meta->getImage();
+        $imageUrl = new Url($meta->getImage());
+
+        $output->image_url = $imageUrl->setQuery([])->getAbsoluteUrl();
 
         $output->article_id = $data->ID;
 
