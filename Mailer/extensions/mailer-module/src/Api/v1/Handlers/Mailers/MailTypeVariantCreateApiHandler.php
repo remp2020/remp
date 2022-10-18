@@ -55,11 +55,13 @@ class MailTypeVariantCreateApiHandler extends BaseHandler
         if ($mailTypeVariant) {
             return new JsonApiResponse(Response::S400_BAD_REQUEST, [
                 'status' => 'error',
+                'code' => 'already_exists',
                 'message' => 'Mail type variant with code: ' . $payload['code'] . ' already exists.',
             ]);
         }
 
-        $mailTypeVariant = $this->listVariantsRepository->add($mailType, $payload['title'], $payload['code'], $payload['sorting']);
+        $sorting = $payload['sorting'] ?? null;
+        $mailTypeVariant = $this->listVariantsRepository->add($mailType, $payload['title'], $payload['code'], $sorting);
         return new JsonApiResponse(200, [
             'status' => 'ok',
             'id' => $mailTypeVariant->id,

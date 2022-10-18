@@ -7,8 +7,7 @@
   "required": [
     "mail_type_code",
     "title",
-    "code",
-    "sorting"
+    "code"
   ],
   "properties": {
     "mail_type_code": {
