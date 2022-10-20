@@ -14,6 +14,7 @@ use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
 use Remp\MailerModule\Models\Generators\WordpressHelpers;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
+use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
 use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\PostInputParam;
@@ -33,6 +34,7 @@ class GrafdnaGenerator implements IGenerator
         private EngineFactory $engineFactory,
         private WebClient $webClient,
         private SnippetsRepository $snippetsRepository,
+        private TransportInterface $transport,
     ) {
     }
 
@@ -237,10 +239,16 @@ class GrafdnaGenerator implements IGenerator
         }
         $output->grafdna_html = $data->post_content;
 
-        $meta = $this->content->fetchUrlMeta($data->post_url);
-        $imageUrl = new Url($meta->getImage());
+        // remp/remp#1174
+        // og:image is used as graph image instead of complex graph element in generated newsletter
+        // this image contains labels and logo
+        $imageUrl = $this->getSocialImageUrl($data->post_url);
+        if (!$imageUrl) {
+            $meta = $this->content->fetchUrlMeta($data->post_url);
+            $imageUrl = $meta->getImage();
+        }
 
-        $output->image_url = $imageUrl->setQuery([])->getAbsoluteUrl();
+        $output->image_url = (new Url($imageUrl))->setQuery([])->getAbsoluteUrl();
 
         $output->article_id = $data->ID;
 
@@ -338,17 +346,6 @@ HTML;
         return $post;
     }
 
-    private function getArticleId($articleUrl)
-    {
-        $matches = [];
-        preg_match("/https:\/\/.+\/(\d+)\//i", $articleUrl, $matches);
-        if (isset($matches[1])) {
-            return (int) $matches[1];
-        }
-
-        return null;
-    }
-
     private function filterPosts($posts): array
     {
         $tagsToFilter = ['graf-dna', 'ekonomicky-newsfilter'];
@@ -378,5 +375,17 @@ HTML;
         }
 
         return $currentUrl;
+    }
+
+    private function getSocialImageUrl($postUrl)
+    {
+        $content = $this->transport->getContent($postUrl);
+        $matches = [];
+        preg_match('/<meta property=\"og:image\" content=\"(.+)\">/U', $content, $matches);
+        if ($matches) {
+            return $matches[1];
+        }
+
+        return null;
     }
 }
