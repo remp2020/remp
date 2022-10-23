@@ -72,7 +72,7 @@ tests:
       -F "variables[STAGE]=dennikn/mailer"
       -F "variables[URL]=https://mailer.remp2020.com"
       -F "variables[APP]=mailer"
-      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+      $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
   tags:
     - remp2020
@@ -93,7 +93,7 @@ tests:
       -F "variables[STAGE]=dennikn/campaign"
       -F "variables[URL]=https://campaign.remp2020.com"
       -F "variables[APP]=campaign"
-      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+      $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
   tags:
     - remp2020
@@ -114,7 +114,7 @@ tests:
       -F "variables[STAGE]=dennikn/beam"
       -F "variables[URL]=https://beam.remp2020.com"
       -F "variables[APP]=beam"
-      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+      $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
   tags:
     - remp2020
@@ -136,7 +136,7 @@ tests:
       -F "variables[STAGE]=dennikn/sso"
       -F "variables[URL]=https://sso.remp2020.com"
       -F "variables[APP]=sso"
-      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+      $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
   tags:
     - remp2020
@@ -158,7 +158,7 @@ tests:
       -F "variables[STAGE]=denikncz/mailer"
       -F "variables[URL]=https://mailer.denikn.cz"
       -F "variables[APP]=mailer"
-      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+      $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
   tags:
     - remp2020
@@ -180,7 +180,7 @@ tests:
       -F "variables[STAGE]=denikncz/campaign"
       -F "variables[URL]=https://campaign.denikn.cz"
       -F "variables[APP]=campaign"
-      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+      $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
   tags:
     - remp2020
@@ -202,7 +202,7 @@ tests:
       -F "variables[STAGE]=denikncz/beam"
       -F "variables[URL]=https://beam.denikn.cz"
       -F "variables[APP]=beam"
-      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+      $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
   tags:
     - remp2020
@@ -224,7 +224,7 @@ tests:
       -F "variables[STAGE]=denikncz/sso"
       -F "variables[URL]=https://sso.denikn.cz"
       -F "variables[APP]=sso"
-      https://gitlab.com/api/v4/projects/7413363/trigger/pipeline
+      $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
   tags:
     - remp2020
