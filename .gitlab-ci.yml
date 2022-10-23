@@ -67,7 +67,6 @@ tests:
       curl -X POST
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
-      -F "ref=php8"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=dennikn/mailer"
       -F "variables[URL]=https://mailer.remp2020.com"
@@ -88,7 +87,6 @@ tests:
       curl -X POST
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
-      -F "ref=php8"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=dennikn/campaign"
       -F "variables[URL]=https://campaign.remp2020.com"
@@ -109,7 +107,7 @@ tests:
     - >
       curl -X POST
       -F "token=$CI_JOB_TOKEN"
-      -F "ref=php8"
+      -F "ref=master"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=dennikn/beam"
       -F "variables[URL]=https://beam.remp2020.com"
@@ -131,7 +129,6 @@ tests:
       curl -X POST
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
-      -F "ref=php8"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=dennikn/sso"
       -F "variables[URL]=https://sso.remp2020.com"
@@ -153,7 +150,6 @@ tests:
       curl -X POST
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
-      -F "ref=php8"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=denikncz/mailer"
       -F "variables[URL]=https://mailer.denikn.cz"
@@ -175,7 +171,6 @@ tests:
       curl -X POST
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
-      -F "ref=php8"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=denikncz/campaign"
       -F "variables[URL]=https://campaign.denikn.cz"
@@ -197,7 +192,6 @@ tests:
       curl -X POST
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
-      -F "ref=php8"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=denikncz/beam"
       -F "variables[URL]=https://beam.denikn.cz"
@@ -219,7 +213,6 @@ tests:
       curl -X POST
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
-      -F "ref=php8"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=denikncz/sso"
       -F "variables[URL]=https://sso.denikn.cz"
