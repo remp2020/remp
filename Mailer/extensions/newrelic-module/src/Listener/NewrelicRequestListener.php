@@ -7,15 +7,25 @@ namespace Remp\NewrelicModule\Listener;
 use Nette\Application\Application;
 use Nette\Application\Request;
 use Remp\Mailer\Bootstrap;
+use Remp\NewrelicModule\DI\Config;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
 final class NewrelicRequestListener
 {
+    private Config $config;
+
+    public function __construct(Config $config)
+    {
+        $this->config = $config;
+    }
+
     public function onRequest(Application $application, Request $request)
     {
         if (!extension_loaded('newrelic')) {
-            Debugger::log("You're using Newrelic module without 'newrelic' PHP extension. Either install the extension or disable the module in app's configuration.", ILogger::WARNING);
+            if ($this->config->getLogRequestListenerErrors()) {
+                Debugger::log("You're using Newrelic module without 'newrelic' PHP extension. Either install the extension or disable the module in app's configuration.", ILogger::WARNING);
+            }
             return;
         }
 

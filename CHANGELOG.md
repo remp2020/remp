@@ -22,6 +22,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - This could happen if an article was unpublished, but remained in the stats and was selected for personalized newsletter. Mailer wouldn't be able to fetch meta for article.
 - Replaced use of `zrevrangebyscore` Redis call (deprecated) with `zrange` with `BYSCORE` and `REV` options. remp/remp#1195
 - Changed required parameter `sorting` to optional in `/api/v1/mailers/mail-type-variants` API endpoint. remp/mnt#114
+- Added `logRequestListenerErrors` option to `NewRelicModuleExtension` configuration. remp/remp#1180
+- Added `getBool` method to MailerModule `EnvironmentConfig`, which provides support for getting boolean values from `.env` files. remp/remp#1180
 
 ## [1.0.0] - 2022-09-26
 
