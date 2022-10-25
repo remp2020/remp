@@ -59,6 +59,15 @@ class EnvironmentConfig
             ';port=' . $port;
     }
 
+    public function getBool(string $key): ?bool
+    {
+        $value = $this->get($key);
+        if ($value === null) {
+            return null;
+        }
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+    }
+
     public function setParam(string $key, ?string $value): void
     {
         $this->params[$key] = $value;
