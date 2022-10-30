@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added `dimensions` of banner into required inputs during the creation of custom HTML banner. remp/remp#1165
 - Added operator `is not` for the pageview attributes of campaign settings. remp/remp#1177
+- Added the configurable option to prioritize banners on same position. To enable set `env` variable `PRIORITIZE_BANNERS_ON_SAME_POSITION`. remp/remp#1167
 
 ### [Mailer]
 

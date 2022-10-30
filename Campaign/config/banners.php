@@ -90,5 +90,6 @@ return [
                 'justify-content' => 'flex-end',
             ],
         ],
-    ]
+    ],
+    'prioritize_banners_on_same_position' => env('PRIORITIZE_BANNERS_ON_SAME_POSITION', false)
 ];

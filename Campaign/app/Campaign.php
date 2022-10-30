@@ -71,6 +71,8 @@ class Campaign extends Model implements Searchable
 
     protected $appends = ['active'];
 
+    protected $dateFormat = 'Y-m-d H:i:s';
+
     public function getSearchResult(): SearchResult
     {
         return new SearchResult($this, $this->name);
