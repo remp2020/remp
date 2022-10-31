@@ -72,7 +72,43 @@
                         </ul>
                     </li>
 
-                    @if($campaign->pageview_rules !== null)
+                    <li class="list-group-item">
+                        <strong>Where to display: </strong>
+                        <ul>
+                            <li>
+                                URL:
+                                @if ($campaign->url_filter === 'everywhere') Everywhere
+                                @elseif($campaign->url_filter === 'only_at') Only at
+                                @elseif($campaign->url_filter === 'except_at') Except at
+                                @endif
+
+                                @if($campaign->url_filter !== 'everywhere')
+                                <ul>
+                                    @foreach($campaign->url_patterns as $urlPattern)
+                                    <li><code>{{ $urlPattern }}</code></li>
+                                    @endforeach
+                                </ul>
+                                @endif
+                            </li>
+                            <li>
+                                Referer:
+                                @if ($campaign->referer_filter === 'everywhere') Everywhere
+                                @elseif($campaign->referer_filter === 'only_at') Only at
+                                @elseif($campaign->referer_filter === 'except_at') Except at
+                                @endif
+
+                                @if($campaign->referer_filter !== 'everywhere')
+                                    <ul>
+                                        @foreach($campaign->referer_patterns as $refererPattern)
+                                            <li><code>{{ $refererPattern }}</code></li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </li>
+                        </ul>
+                    </li>
+
+                @if($campaign->pageview_rules !== null)
                     <li class="list-group-item">
                         <strong>Display banner:</strong>
                         <ul>
