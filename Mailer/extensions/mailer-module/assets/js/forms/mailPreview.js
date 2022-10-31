@@ -44,6 +44,9 @@ let beautify = require('js-beautify').html;
             });
         },
         trumbowyg: (element) => {
+            let el = $(element);
+            el.val(remplib.templateForm.screwTwig(el.val()));
+
             let buttons = $.trumbowyg.defaultOptions.btns;
             let plugins = {};
             const snippetsData = $(element).data('snippets');
@@ -101,7 +104,7 @@ let beautify = require('js-beautify').html;
 
             // load changed data from codemirror
             if (remplib.templateForm.codeMirrorChanged) {
-                trumbowyg.trumbowyg('html', codeMirror.doc.getValue());
+                trumbowyg.trumbowyg('html', remplib.templateForm.screwTwig(codeMirror.doc.getValue()));
                 remplib.templateForm.codeMirrorChanged = false;
             }
             $(codeMirror.display.wrapper).hide();
@@ -111,7 +114,9 @@ let beautify = require('js-beautify').html;
 
             // load changed and beautified data from trumbowyg
             if (remplib.templateForm.trumbowygChanged) {
-                codeMirror.doc.setValue(beautify(trumbowyg.trumbowyg('html')));
+                let twCode = remplib.templateForm.unscrewTwig(trumbowyg.trumbowyg('html'));
+
+                codeMirror.doc.setValue(beautify(twCode));
                 remplib.templateForm.trumbowygChanged = false;
             }
 
@@ -164,7 +169,7 @@ let beautify = require('js-beautify').html;
                 if (remplib.templateForm.editorChoice() !== 'editor') {
                     return;
                 }
-                vue.htmlContent = trumbowyg.trumbowyg('html');
+                vue.htmlContent = remplib.templateForm.unscrewTwig(trumbowyg.trumbowyg('html'));
                 $('body').trigger('preview:change');
                 remplib.templateForm.trumbowygChanged = true;
             });
@@ -209,7 +214,89 @@ let beautify = require('js-beautify').html;
                     '--trumbowyg-header-height': $('.fullscreen-edit .trumbowyg-button-pane').outerHeight(true) + 'px',
                 });
             }
+        },
+
+        // TWIG vars are not compatible with WYSIWYG editor Trumbowyg,
+        // they are stripped away and put back when switching to/from Trumbowyg.
+        twigVars: {},
+        unscrewTwig: (text) => {
+            for (const varName in remplib.templateForm.twigVars) {
+                // varName cannot contain character with regex meaning - it doesn't, only "TWGVAR__<NUMBER>__TWGVAR"
+                text = text.replace(new RegExp(varName, "ig"), remplib.templateForm.twigVars[varName]);
+            }
+
+            // do not reset twig vars. unscrew might be called multiple times
+            return text;
+        },
+        screwTwig: (text) => {
+            // First, replace all Twig variables with text replacements containing:
+            // "TGWVAR__<NUMBER>__TWGVAR"
+            // to protect them against WYSIWYG editor parser
+
+            const startTag = "TWGVAR__";
+            const endTag = "__TWGVAR";
+
+            let newText = text;
+            let it = 0;
+            let variableNum = 0;
+
+            let vars = {};
+            while (it < newText.length) {
+                let start = newText.indexOf("{{", it);
+                if (start === -1) {
+                    break;
+                }
+                let end = newText.indexOf("}}", start);
+                if (end === -1) {
+                    break;
+                }
+                end += 2; // end of parentheses
+                let varName = startTag + variableNum++ + endTag;
+                vars[varName] = newText.slice(start, end);
+
+                newText = newText.slice(0, start) + varName + newText.slice(end);
+                it = newText.indexOf(varName) + varName.length + 1; // find new start
+
+            }
+            remplib.templateForm.twigVars =vars;
+
+
+            // Second, revert replacements to Twig variables in text nodes,
+            // so user can edit them even in WYSIWYG editor.
+
+            // Very simple state automaton, detecting tag/non-tag context and replacing vars back.
+            let tagContext = false;
+            let textQueue = [];
+            let varStartIndex = null;
+
+            for (const c of newText) {
+                if (c === '<') {
+                    tagContext = true;
+                }
+                if (c === '>') {
+                    tagContext = false;
+                }
+                textQueue.push(c);
+
+                // if we are in an HTML tag, do not replace variables
+                if (tagContext) {
+                    continue;
+                }
+
+                // otherwise, replace them back
+                if (varStartIndex === null) {
+                    if (textQueue.slice(-startTag.length).join('') === startTag) {
+                        varStartIndex = textQueue.length - startTag.length;
+                    }
+                } else {
+                    if (textQueue.slice(-endTag.length).join('') === endTag) {
+                        let varName = textQueue.splice(varStartIndex).join('');
+                        textQueue.push(...(remplib.templateForm.twigVars[varName].split('')));
+                        varStartIndex = null;
+                    }
+                }
+            }
+            return textQueue.join('');
         }
     }
-
 })();

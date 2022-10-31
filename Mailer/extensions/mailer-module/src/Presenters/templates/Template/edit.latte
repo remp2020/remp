@@ -180,6 +180,16 @@
     <script>
         $(function() {
             remplib.templateForm.init();
+
+            form.submit(function(event) {
+                event.preventDefault();
+
+                // unscrew (= return back) twig variables before submit
+                var jsMailBodyInput = $(remplib.templateForm.textareaSelector);
+                jsMailBodyInput.val(remplib.templateForm.unscrewTwig(jsMailBodyInput.val()));
+
+                form[0].submit();
+            });
         });
     </script>
 {/define}
