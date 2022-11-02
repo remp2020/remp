@@ -62,10 +62,10 @@ docker-build:
 	@cd $(SUB_SEGMENTS) && make docker-build
 
 sniff:
-	../phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p
+	php vendor/bin/phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p
 
 sniff_fix:
-	../phpcbf --standard=PSR2 ${PHP_FOLDERS} -n
+	php vendor/bin/phpcbf --standard=PSR2 ${PHP_FOLDERS} -n
 
 fixcs:
 	php vendor/bin/php-cs-fixer fix --config=.php_cs -v

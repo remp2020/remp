@@ -22,10 +22,10 @@ js-watch:
 	yarn watch
 
 sniff:
-	../phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p
+	php vendor/bin/phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p
 
 sniff_fix:
-	../phpcbf --standard=PSR2 ${PHP_FOLDERS} -n
+	php vendor/bin/phpcbf --standard=PSR2 ${PHP_FOLDERS} -n
 
 test:
 	php -d memory_limit=256M vendor/bin/phpunit --configuration=phpunit.xml
