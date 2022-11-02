@@ -19,17 +19,25 @@ class Banner extends Model implements Searchable
     use Notifiable;
     use IdentificationTrait;
 
-    const BANNER_TAG = 'banner';
+    private const BANNER_TAG = 'banner';
 
-    const TEMPLATE_HTML = 'html';
-    const TEMPLATE_MEDIUM_RECTANGLE = 'medium_rectangle';
-    const TEMPLATE_OVERLAY_RECTANGLE = 'overlay_rectangle';
-    const TEMPLATE_HTML_OVERLAY = 'html_overlay';
-    const TEMPLATE_BAR = 'bar';
-    const TEMPLATE_COLLAPSIBLE_BAR = 'collapsible_bar';
-    const TEMPLATE_SHORT_MESSAGE = 'short_message';
-    const TEMPLATE_OVERLAY_TWO_BUTTONS_SIGNATURE = 'overlay_two_buttons_signature';
-    const TEMPLATE_NEWSLETTER_RECTANGLE = 'newsletter_rectangle';
+    public const POSITION_TOP_LEFT = 'top_left';
+    public const POSITION_TOP_RIGHT = 'top_right';
+    public const POSITION_BOTTOM_LEFT = 'bottom_left';
+    public const POSITION_BOTTOM_RIGHT = 'bottom_right';
+
+    public const DISPLAY_TYPE_INLINE = 'inline';
+    public const DISPLAY_TYPE_OVERLAY = 'overlay';
+
+    public const TEMPLATE_HTML = 'html';
+    public const TEMPLATE_MEDIUM_RECTANGLE = 'medium_rectangle';
+    public const TEMPLATE_OVERLAY_RECTANGLE = 'overlay_rectangle';
+    public const TEMPLATE_HTML_OVERLAY = 'html_overlay';
+    public const TEMPLATE_BAR = 'bar';
+    public const TEMPLATE_COLLAPSIBLE_BAR = 'collapsible_bar';
+    public const TEMPLATE_SHORT_MESSAGE = 'short_message';
+    public const TEMPLATE_OVERLAY_TWO_BUTTONS_SIGNATURE = 'overlay_two_buttons_signature';
+    public const TEMPLATE_NEWSLETTER_RECTANGLE = 'newsletter_rectangle';
 
     protected $fillable = [
         'name',

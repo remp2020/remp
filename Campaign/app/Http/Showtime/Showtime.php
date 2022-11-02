@@ -23,17 +23,7 @@ class Showtime
 
     private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS_NOT = '!=';
 
-    private $redis;
-
-    private $segmentAggregator;
-
-    private $logger;
-
-    private $geoReader;
-
     private $request;
-
-    private $deviceDetector;
 
     private $positionMap;
 
@@ -44,17 +34,13 @@ class Showtime
     private $variables;
 
     public function __construct(
-        ClientInterface $redis,
-        SegmentAggregator $segmentAggregator,
-        LazyGeoReader $geoReader,
-        LazyDeviceDetector $deviceDetector,
-        LoggerInterface $logger
+        private ClientInterface $redis,
+        private SegmentAggregator $segmentAggregator,
+        private LazyGeoReader $geoReader,
+        private LazyDeviceDetector $deviceDetector,
+        private LoggerInterface $logger,
+        private bool $prioritizeBannerOnSamePosition = false
     ) {
-        $this->redis = $redis;
-        $this->segmentAggregator = $segmentAggregator;
-        $this->logger = $logger;
-        $this->geoReader = $geoReader;
-        $this->deviceDetector = $deviceDetector;
     }
 
     public function setRequest(Request $request): void
@@ -175,18 +161,68 @@ class Showtime
         }
 
         $activeCampaigns = [];
+        $campaigns = [];
+        $campaignBanners = [];
         foreach ($campaignIds as $campaignId) {
             /** @var Campaign $campaign */
-            $campaign = unserialize($this->redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"));
-            $campaignBannerVariant = $this->shouldDisplay($campaign, $data, $activeCampaigns);
-            if ($campaignBannerVariant) {
-                $displayData[] = $showtimeResponse->renderCampaign($campaignBannerVariant, $campaign, $alignments, $dimensions, $positions, $variables);
-            }
+            $campaign = unserialize($this->redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"), ['allowed_class' => Campaign::class]);
+            $campaigns[$campaignId] = $campaign;
+            $campaignBanners[] = $this->shouldDisplay($campaign, $data, $activeCampaigns);
+        }
+
+        $campaignBanners = array_filter($campaignBanners);
+        if ($this->prioritizeBannerOnSamePosition) {
+            $campaignBanners = $this->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners);
+        }
+
+        foreach ($campaignBanners as $campaignBanner) {
+            $displayData[] = $showtimeResponse->renderCampaign($campaignBanner, $campaign, $alignments, $dimensions, $positions, $variables);
         }
 
         return $showtimeResponse->success($callback, $displayData, $activeCampaigns, $segmentAggregator->getProviderData());
     }
 
+    public function prioritizeCampaignBannerOnPosition(array $campaigns, array $campaignBanners): array
+    {
+        $bannersOnPosition = [];
+        foreach ($campaignBanners as $campaignBanner) {
+            $position = "{$campaignBanner->banner->display_type}_{$campaignBanner->banner->position}_{$campaignBanner->banner->target_selector}";
+
+            if (isset($bannersOnPosition[$position])) {
+                /** @var CampaignBanner $bannerOnPosition */
+                $bannerOnPosition = $bannersOnPosition[$position];
+                /** @var Campaign $campaignOfBannerOnPosition */
+                $actualCampaign = $campaigns[$bannerOnPosition->campaign_id];
+                /** @var Campaign $newCampaign */
+                $newCampaign = $campaigns[$campaignBanner->campaign_id];
+
+                if ($this->hasActualCampaignHigherPriorityOverTest($actualCampaign, $newCampaign)) {
+                    $bannersOnPosition[$position] = $campaignBanner;
+                }
+            } else {
+                $bannersOnPosition[$position] = $campaignBanner;
+            }
+        }
+
+        return array_values($bannersOnPosition);
+    }
+
+    private function hasActualCampaignHigherPriorityOverTest(Campaign $actualCampaign, Campaign $testCampaign): bool
+    {
+        // campaign with more banners has higher priority
+        if ($testCampaign->campaignBanners->count() > $actualCampaign->campaignBanners->count()) {
+            return true;
+        }
+
+        if ($testCampaign->campaignBanners->count() === $actualCampaign->campaignBanners->count()) {
+            // campaign with more recent updates has higher priority
+            if ($testCampaign->updated_at > $actualCampaign->updated_at) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Determines if campaign should be displayed for user/browser

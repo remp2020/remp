@@ -404,7 +404,13 @@ try {
     }
     $geoReader = new LazyGeoReader($maxmindDbPath);
 
-    $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $deviceDetector, $logger);
+    $prioritizeBannerOnSamePosition = filter_var(
+        env('PRIORITIZE_BANNERS_ON_SAME_POSITION', false),
+        FILTER_VALIDATE_BOOLEAN,
+        ['options' => ['default' => false]]
+    );
+
+    $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $deviceDetector, $logger, $prioritizeBannerOnSamePosition);
     $showtime->showtime($data, $callback, $showtimeResponse);
 } catch (\Exception $exception) {
     $logger->error($exception);

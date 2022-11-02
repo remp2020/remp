@@ -58,25 +58,12 @@ class ShowtimeTest extends TestCase
         $this->showtime = $showtime;
 
         // Prepare banner and campaign
-        $banner = Banner::factory()->create(['template' => 'short_message']);
-        ShortMessageTemplate::factory()->create(['banner_id' => $banner->id]);
+        $banner = $this->prepareBanner();
 
-        $campaign = Campaign::factory()->create([
-            'once_per_session' => false,
-            'signed_in' => null,
-            'using_adblock' => null,
-            'url_filter' => 'everywhere',
-            'referer_filter' => 'everywhere',
-            'devices' => [Campaign::DEVICE_DESKTOP, Campaign::DEVICE_MOBILE],
-            'pageview_rules' => null,
-        ]);
-        $this->campaignBanner = CampaignBanner::factory()->create([
-            'campaign_id' => $campaign->id,
-            'banner_id' => $banner->id,
-            'control_group' => 0,
-            'proportion' => 100,
-            'weight' => 1
-        ]);
+        $campaign = $this->prepareCampaign();
+
+        $this->campaignBanner = $this->prepareCampaignBanners($campaign,$banner);
+
         CampaignBanner::factory()->create([
             'campaign_id' => $campaign->id,
             'control_group' => 1,
@@ -501,5 +488,94 @@ class ShowtimeTest extends TestCase
         $activeCampaignUuids = [];
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
         $this->assertCount(1, $activeCampaignUuids);
+    }
+
+    public function testPrioritizeCampaignBannerOnDifferentPosition(): void
+    {
+        $campaign1 = $this->prepareCampaign();
+        $campaign2 = $this->prepareCampaign();
+
+        $campaigns = [$campaign1->id => $campaign1, $campaign2->id => $campaign2];
+
+        $campaignBanner1 = $this->prepareCampaignBanners($campaign1, $this->prepareBanner(Banner::POSITION_TOP_LEFT, Banner::DISPLAY_TYPE_INLINE, '#test-id'));
+        $campaignBanner2 = $this->prepareCampaignBanners($campaign2, $this->prepareBanner(Banner::POSITION_BOTTOM_LEFT, Banner::DISPLAY_TYPE_OVERLAY));
+
+        $campaignBanners = [$campaignBanner1, $campaignBanner2];
+
+        // banners on different position - both should be displayed
+        $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners);
+        $this->assertCount(2, $result);
+    }
+
+    public function testPrioritizeCampaignBannerOnSamePositionWithDifferentUpdateTime(): void
+    {
+        $campaign1 = $this->prepareCampaign();
+        $campaign2 = $this->prepareCampaign();
+
+        $campaign2->setAttribute('updated_at', $campaign1->updated_at->addMinutes(10));
+
+        $campaigns = [$campaign1->id => $campaign1, $campaign2->id => $campaign2];
+
+        $campaignBanner1 = $this->prepareCampaignBanners($campaign1, $this->prepareBanner(Banner::POSITION_BOTTOM_LEFT, Banner::DISPLAY_TYPE_INLINE, '#test-id'));
+        $campaignBanner2 = $this->prepareCampaignBanners($campaign2, $this->prepareBanner(Banner::POSITION_BOTTOM_LEFT, Banner::DISPLAY_TYPE_INLINE, '#test-id'));
+
+        $campaignBanners = [$campaignBanner1, $campaignBanner2];
+
+        // campaigns with the same amount of banners - banner with more recent campaign (campaign2) update time should be prioritized
+        $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners);
+        $this->assertCount(1, $result);
+        $this->assertEquals($campaignBanner2, $result[0]);
+
+        // campaign1 has more banners so banner from campaign1 should be prioritized
+        $campaignBanner3 = $this->prepareCampaignBanners($campaign1, $this->prepareBanner());
+        $campaign1->campaignBanners->push($campaignBanner3);
+
+        $campaigns = [$campaign1->id => $campaign1, $campaign2->id => $campaign2];
+
+        $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners);
+        $this->assertCount(1, $result);
+        $this->assertEquals($campaignBanner1, $result[0]);
+    }
+
+    private function prepareCampaign(): Campaign
+    {
+        return Campaign::factory()->create([
+            'once_per_session' => false,
+            'signed_in' => null,
+            'using_adblock' => null,
+            'url_filter' => 'everywhere',
+            'referer_filter' => 'everywhere',
+            'devices' => [Campaign::DEVICE_DESKTOP, Campaign::DEVICE_MOBILE],
+            'pageview_rules' => null,
+        ]);
+    }
+
+    private function prepareCampaignBanners(Campaign $campaign, Banner $banner): CampaignBanner
+    {
+        return CampaignBanner::factory()->create([
+            'campaign_id' => $campaign->id,
+            'banner_id' => $banner->id,
+            'control_group' => 0,
+            'proportion' => 100,
+            'weight' => 1
+        ]);
+    }
+
+    private function prepareBanner(
+        string $position = Banner::POSITION_BOTTOM_LEFT,
+        string $displayType = Banner::DISPLAY_TYPE_INLINE,
+        string $targetSelector = null
+    ): Banner
+    {
+        $banner = Banner::factory()->create([
+            'template' => Banner::TEMPLATE_SHORT_MESSAGE,
+            'position' => $position,
+            'display_type' => $displayType,
+            'target_selector' => $targetSelector,
+        ]);
+
+        ShortMessageTemplate::factory()->create(['banner_id' => $banner->id]);
+
+        return $banner;
     }
 }
