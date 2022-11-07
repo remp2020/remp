@@ -35,6 +35,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed removal of template (Twig) variables in HTML email template when switching from text to WYSIWYG editor and back. remp/remp#719
 - Fixed possibly slow view of job detail caused by missing index. remp/remp#1209
 - Fixed mail preview when WYSIWYG editor was used. WYSIWYG editor changes structure of inserted HTML (removes html, head and body tags). We need to preserve these tags to preview mail. remp/remp#1194
+- Added migration to change `mail_job_queue` `id` column type from `int` to `bigint`. remp/remp#1187
 
 ## [1.0.0] - 2022-09-26
 
