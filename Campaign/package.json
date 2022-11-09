@@ -41,6 +41,7 @@
         "jquery": "3.6.0",
         "jquery-placeholder": "^2.3.1",
         "jquery-typeahead": "^2.11",
+        "jshint": "^2.13.5",
         "laravel-mix-polyfill": "^3.0.0",
         "lodash": "^4.17.20",
         "material-design-iconic-font": "^2.2.0",
@@ -52,6 +53,7 @@
         "rison": "^0.1.1",
         "salvattore": "^1.0.9",
         "vue": "^2.6.10",
+        "vue-codemirror": "4.0.6",
         "vue-slide-up-down": "^1.7.2",
         "vue-template-compiler": "^2.6.10"
     },

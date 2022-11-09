@@ -10,3 +10,4 @@ require("@remp/js-commons/js/search.js");
 require("./banner.js");
 require("./forms/bannerForm.js");
 require("./forms/campaignForm.js");
+require("./javascript-twig-lint.js");

@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added operator `is not` for the pageview attributes of campaign settings. remp/remp#1177
 - Added the configurable option to prioritize banners on same position. To enable set `env` variable `PRIORITIZE_BANNERS_ON_SAME_POSITION`. remp/remp#1167
 - Added information about where to display to the detail page of campaign. remp/remp#1009
+- Changed the form of editing banner's custom JS - now JS code is displayed formatted and linted in separate window. remp/remp#1171
 
 ### [Mailer]
 
