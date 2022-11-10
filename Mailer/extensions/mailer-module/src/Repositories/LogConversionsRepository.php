@@ -8,6 +8,8 @@ use Nette\Utils\DateTime;
 
 class LogConversionsRepository extends Repository
 {
+    use NewTableDataMigrationTrait;
+
     protected $tableName = 'mail_log_conversions';
 
     public function upsert(NetteActiveRow $mailLog, DateTime $convertedAt): void
@@ -34,8 +36,16 @@ class LogConversionsRepository extends Repository
             return 0;
         }
 
-        return $this->getTable()->where([
+        $result = $this->getTable()->where([
             'mail_log_id IN (?)' => $mailLogIds
         ])->delete();
+
+        if ($this->newTableDataMigrationIsRunning()) {
+            $this->getNewTable()->where([
+                'mail_log_id IN (?)' => $mailLogIds
+            ])->delete();
+        }
+
+        return $result;
     }
 }

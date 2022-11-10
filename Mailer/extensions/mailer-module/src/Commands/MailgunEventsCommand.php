@@ -101,17 +101,18 @@ class MailgunEventsCommand extends Command
                     continue;
                 }
 
-                $updated = $this->logsRepository->getTable()->where([
-                    'mail_sender_id' => $userVariables['mail_sender_id'],
-                ])->update([
-                    $mappedEvent => $date,
-                    'updated_at' => new DateTime(),
-                ]);
+                $logs = $this->logsRepository->findAllBySenderId($userVariables['mail_sender_id']);
+                foreach ($logs as $log) {
+                    $updated = $this->logsRepository->update($log, [
+                        $mappedEvent => $date,
+                        'updated_at' => new DateTime(),
+                    ]);
 
-                if (!$updated) {
-                    $output->writeln(sprintf("%s: event ignored, missing mail_logs record: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
-                } else {
-                    $output->writeln(sprintf("%s: event processed: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
+                    if (!$updated) {
+                        $output->writeln(sprintf("%s: event ignored, missing mail_logs record: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
+                    } else {
+                        $output->writeln(sprintf("%s: event processed: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
+                    }
                 }
             }
 

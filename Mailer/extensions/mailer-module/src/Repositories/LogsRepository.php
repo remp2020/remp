@@ -7,6 +7,8 @@ use Nette\Utils\DateTime;
 
 class LogsRepository extends Repository
 {
+    use NewTableDataMigrationTrait;
+
     protected $tableName = 'mail_logs';
 
     protected $dataTableSearchable = ['email'];
@@ -90,6 +92,11 @@ class LogsRepository extends Repository
     public function findBySenderId(string $senderId): ?ActiveRow
     {
         return $this->getTable()->where('mail_sender_id', $senderId)->limit(1)->fetch();
+    }
+
+    public function findAllBySenderId(string $senderId): Selection
+    {
+        return $this->getTable()->where('mail_sender_id', $senderId);
     }
 
     public function getBatchTemplateStats(ActiveRow $batchTemplate): ?ActiveRow
@@ -231,5 +238,21 @@ class LogsRepository extends Repository
             return $this->bouncesMap[$reason];
         }
         return $this->eventMap[$externalEvent];
+    }
+
+    public function insert(array $data)
+    {
+        $userId = $data['user_id'] ?? null;
+        unset($data['user_id']);
+
+        $result = parent::insert($data);
+        if ($this->newTableDataMigrationIsRunning()) {
+            $newTableData = $result->toArray();
+            if ($userId !== null) {
+                $newTableData['user_id'] = $userId;
+            }
+            $this->getNewTable()->insert($newTableData);
+        }
+        return $result;
     }
 }
