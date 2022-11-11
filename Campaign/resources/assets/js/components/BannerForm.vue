@@ -185,15 +185,7 @@
                             <div class="input-group fg-float m-t-30">
                                 <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
                                 <div class="fg-line">
-                                    <label for="js" class="fg-label">Custom JS</label>
-                                    <textarea v-model="js" class="form-control fg-input" rows="6" name="js" cols="50" id="js"></textarea>
-                                    <small class="help-block">Custom JS is run as a function with single a function parameter <i>params</i>.
-                                        Object <i>params</i> contains several properties of the banner you can access.
-                                        <span data-toggle="tooltip"
-                                              data-original-title="properties: rtmSource, rtmMedium, rtmCampaign, rtmContent, rtmVariant"
-                                              class="glyphicon glyphicon-question-sign"></span><br>
-                                        <span v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</span>
-                                    </small>
+                                    <custom-js :js="js" />
                                 </div>
                             </div><!-- .input-group -->
 
@@ -456,6 +448,7 @@
     import HtmlOverlayTemplate from "./templates/HtmlOverlay";
     import OverlayTwoButtonsSignatureTemplate from "./templates/OverlayTwoButtonsSignature";
     import NewsletterRectangleTemplate from './templates/NewsletterRectangle';
+    import CustomJs from "./CustomJs";
 
 
     const props = {
@@ -514,7 +507,8 @@
             OverlayRectangleTemplate,
             OverlayTwoButtonsSignatureTemplate,
             NewsletterRectangleTemplate,
-            BannerPreviewFrame
+            BannerPreviewFrame,
+            CustomJs
         },
         name: 'banner-form',
         props: props,
