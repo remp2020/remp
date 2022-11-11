@@ -9,7 +9,7 @@
         <div id="custom-js">
             <textarea type="text" name="js" :value="js" hidden />
             <button v-on:click="textAreaClicked" type="button" class="btn btn-default waves-effect">
-                <template v-if="js.trim().length > 0"><i class="zmdi zmdi-edit" ></i> Edit custom JS ({{ js.split(/\r\n|\r|\n/).length }} lines)</template>
+                <template v-if="js && js.trim().length > 0"><i class="zmdi zmdi-edit" ></i> Edit custom JS ({{ js.split(/\r\n|\r|\n/).length }} lines)</template>
                 <template v-else><i class="zmdi zmdi-plus" ></i> Add custom JS</template>
             </button>
         </div>
