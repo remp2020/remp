@@ -46,6 +46,7 @@ if (process.env.REMP_TARGET === 'lib') {
         .js("resources/assets/js/banner.js", "js/banner.js")
         .sass("resources/assets/sass/vendor.scss", "css/vendor.css")
         .sass("resources/assets/sass/app.scss", "css/app.css")
+        .less("node_modules/bootstrap-sweetalert/lib/sweet-alert-combine.less", "css/app.css")
         .vue()
         .extract();
 }

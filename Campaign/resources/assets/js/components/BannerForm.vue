@@ -185,7 +185,7 @@
                             <div class="input-group fg-float m-t-30">
                                 <span class="input-group-addon"><i class="zmdi zmdi-format-subject"></i></span>
                                 <div class="fg-line">
-                                    <custom-js :js="js" />
+                                    <custom-js :js="js" :bannerName="name"/>
                                 </div>
                             </div><!-- .input-group -->
 
@@ -360,7 +360,7 @@
                 <div class="fg-line">
                     <input type="hidden" name="action" :value="submitAction">
 
-                    <button class="btn btn-info waves-effect" type="submit" name="action" value="save" @click="submitAction = 'save'">
+                    <button ref="saveButton" class="btn btn-info waves-effect" type="submit" name="action" value="save" @click="submitAction = 'save'">
                         <i class="zmdi zmdi-check"></i> Save
                     </button>
                     <button class="btn btn-info waves-effect" type="submit" name="action" value="save_close" @click="submitAction = 'save_close'">
