@@ -3,12 +3,18 @@ import icons from "trumbowyg/dist/ui/icons.svg";
 import "trumbowyg/dist/ui/trumbowyg.css";
 import "trumbowyg/dist/trumbowyg.js";
 import "./trumbowyg-snippets-plugin.js";
+import 'codemirror/mode/twig/twig.js';
+import 'codemirror/addon/mode/overlay.js';
 
 $.trumbowyg.svgPath = icons;
 
 window.remplib = typeof(remplib) === 'undefined' ? {} : window.remplib;
 
 let beautify = require('js-beautify').html;
+
+CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
+    return CodeMirror.overlayMode(CodeMirror.getMode(config, parserConfig.backdrop || "text/html"), CodeMirror.getMode(config, "twig"));
+});
 
 (function() {
     'use strict';
@@ -17,7 +23,7 @@ let beautify = require('js-beautify').html;
         codeMirror: (element) => {
             return CodeMirror( element, {
                 value: beautify($(remplib.templateForm.textareaSelector).val()),
-                mode: 'htmlmixed',
+                mode: 'htmltwig',
                 indentUnit: 4,
                 indentWithTabs: true,
                 lineNumbers: true,
