@@ -31,7 +31,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed required parameter `sorting` to optional in `/api/v1/mailers/mail-type-variants` API endpoint. remp/mnt#114
 - Added `logRequestListenerErrors` option to `NewRelicModuleExtension` configuration. remp/remp#1180
 - Added `getBool` method to MailerModule `EnvironmentConfig`, which provides support for getting boolean values from `.env` files. remp/remp#1180
-- Fixed removal of template (Twig) variables in HTML email template when switching from text to WYSIWYG editor and back. remp/remp#719  
+- Fixed removal of template (Twig) variables in HTML email template when switching from text to WYSIWYG editor and back. remp/remp#719
+- Fixed possibly slow view of job detail caused by missing index. remp/remp#1209
 
 ## [1.0.0] - 2022-09-26
 
