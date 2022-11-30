@@ -51,7 +51,10 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
         },
         trumbowyg: (element) => {
             let el = $(element);
-            el.val(remplib.templateForm.screwTwig(el.val()));
+
+            // trumbowyg removes head/body tags, so we need to edit only body content in WYSIWYG
+            const mailBody = remplib.templateForm.parseBodyFromMail(el.val());
+            el.val(remplib.templateForm.screwTwig(mailBody));
 
             let buttons = $.trumbowyg.defaultOptions.btns;
             let plugins = {};
@@ -110,7 +113,8 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
 
             // load changed data from codemirror
             if (remplib.templateForm.codeMirrorChanged) {
-                trumbowyg.trumbowyg('html', remplib.templateForm.screwTwig(codeMirror.doc.getValue()));
+                const mailBody = remplib.templateForm.parseBodyFromMail(codeMirror.doc.getValue());
+                trumbowyg.trumbowyg('html', remplib.templateForm.screwTwig(mailBody));
                 remplib.templateForm.codeMirrorChanged = false;
             }
             $(codeMirror.display.wrapper).hide();
@@ -120,7 +124,7 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
 
             // load changed and beautified data from trumbowyg
             if (remplib.templateForm.trumbowygChanged) {
-                let twCode = remplib.templateForm.unscrewTwig(trumbowyg.trumbowyg('html'));
+                let twCode = remplib.templateForm.buildMailFromTrumbowyg(trumbowyg.trumbowyg('html'));
 
                 codeMirror.doc.setValue(beautify(twCode));
                 remplib.templateForm.trumbowygChanged = false;
@@ -149,6 +153,8 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                 $('.js-mail-body-html-input').val(),
             );
 
+            remplib.templateForm.displayedMailContent = $(remplib.templateForm.textareaSelector).val();
+
             const codeMirror = remplib.templateForm.codeMirror($('.js-codemirror')[0]);
             const trumbowyg = remplib.templateForm.trumbowyg('.js-html-editor');
 
@@ -175,7 +181,7 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                 if (remplib.templateForm.editorChoice() !== 'editor') {
                     return;
                 }
-                vue.htmlContent = remplib.templateForm.unscrewTwig(trumbowyg.trumbowyg('html'));
+                vue.htmlContent = remplib.templateForm.buildMailFromTrumbowyg(trumbowyg.trumbowyg('html'));
                 $('body').trigger('preview:change');
                 remplib.templateForm.trumbowygChanged = true;
             });
@@ -190,7 +196,6 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                     return;
                 }
                 vue.htmlContent = editor.doc.getValue();
-                $(remplib.templateForm.textareaSelector).val(editor.doc.getValue());
                 $('body').trigger('preview:change');
                 remplib.templateForm.codeMirrorChanged = true;
             });
@@ -303,6 +308,22 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                 }
             }
             return textQueue.join('');
+        },
+        displayedMailContent: null,
+        // returns content inside body tag or whole mail if no body tag
+        parseBodyFromMail: (mailContent) => {
+            const matches = [...mailContent.matchAll(/<body>(.*)<\/body>/gsm)]
+            return matches?.[0]?.[1] ?? mailContent;
+        },
+        buildMailFromTrumbowyg: (mailContent) => {
+            mailContent = remplib.templateForm.unscrewTwig(mailContent);
+            if (/<body>.*<\/body>/gsm.test(remplib.templateForm.displayedMailContent)) {
+                remplib.templateForm.displayedMailContent = remplib.templateForm.displayedMailContent.replace(/<body>.*<\/body>/gsm, '<body>' + mailContent + '</body>');
+            } else {
+                remplib.templateForm.displayedMailContent = mailContent;
+            }
+
+            return remplib.templateForm.displayedMailContent;
         }
     }
 })();

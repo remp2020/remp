@@ -186,7 +186,7 @@
 
                 // unscrew (= return back) twig variables before submit
                 var jsMailBodyInput = $(remplib.templateForm.textareaSelector);
-                jsMailBodyInput.val(remplib.templateForm.unscrewTwig(jsMailBodyInput.val()));
+                jsMailBodyInput.val(remplib.templateForm.unscrewTwig(remplib.templateForm.displayedMailContent));
 
                 form[0].submit();
             });

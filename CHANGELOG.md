@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `getBool` method to MailerModule `EnvironmentConfig`, which provides support for getting boolean values from `.env` files. remp/remp#1180
 - Fixed removal of template (Twig) variables in HTML email template when switching from text to WYSIWYG editor and back. remp/remp#719
 - Fixed possibly slow view of job detail caused by missing index. remp/remp#1209
+- Fixed mail preview when WYSIWYG editor was used. WYSIWYG editor changes structure of inserted HTML (removes html, head and body tags). We need to preserve these tags to preview mail. remp/remp#1194
 
 ## [1.0.0] - 2022-09-26
 
