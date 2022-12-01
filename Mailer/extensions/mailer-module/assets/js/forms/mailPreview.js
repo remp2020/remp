@@ -196,6 +196,7 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                     return;
                 }
                 vue.htmlContent = editor.doc.getValue();
+                remplib.templateForm.displayedMailContent = editor.doc.getValue();
                 $('body').trigger('preview:change');
                 remplib.templateForm.codeMirrorChanged = true;
             });
