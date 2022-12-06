@@ -26,6 +26,7 @@ global.$.ajaxSetup({
 require('bootstrap');
 require('bootstrap-select');
 require('bootstrap-notify');
+require('bootstrap-sweetalert');
 
 require('datatables.net');
 require('datatables.net-rowgroup');
