@@ -321,6 +321,19 @@ Example:
 }
 ```
 
+##### Campaign position collision resolving (experimental)
+
+By default, Campaign displays all active and matched banners to the positions they're intended to be displayed at. If you want to ensure that there's always only one banner displayed at a single position, you can enable this feature with ENV variable:
+
+```
+PRIORITIZE_BANNERS_ON_SAME_POSITION=1
+```
+
+When this feature is enabled and the system resolves multiple banners at the same position, the rules are:
+
+- Display the banner which is part of the campaign with the most variants.
+- If there are more of them, display the banner with the most recently updated campaign.
+
 ### Admin integration with Beam Journal
 
 Beam Journal API (also known as Segments API) provides API for retrieving information about ongoing campaigns.
