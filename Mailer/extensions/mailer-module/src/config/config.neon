@@ -51,6 +51,7 @@ services:
 			- add(Remp\MailerModule\Commands\HeartbeatCommand())
 			- add(Remp\MailerModule\Commands\MailTypeStatsCommand())
 			- add(Remp\MailerModule\Commands\RemoveOldMailJobBatchesCommand())
+			- add(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand())
 			- add(@hermesWorker)
 			- setCatchExceptions(true)
 
@@ -221,8 +222,21 @@ services:
 	- Remp\MailerModule\Repositories\ConfigsRepository
 	- Remp\MailerModule\Repositories\UserSubscriptionsRepository
 	- Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository
-	- Remp\MailerModule\Repositories\LogsRepository
-	- Remp\MailerModule\Repositories\LogConversionsRepository
+
+	logsRepository:
+		factory: Remp\MailerModule\Repositories\LogsRepository
+		setup:
+			- setNewTableName('mail_logs_v2')
+			- setNewTableDataMigrationIsRunningFlag(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand::MAIL_LOGS_AND_CONVERSIONS_IS_RUNNING)
+			- setRedisClientFactory(@redisClientFactory)
+
+	logConversionsRepository:
+		factory: Remp\MailerModule\Repositories\LogConversionsRepository
+		setup:
+			- setNewTableName('mail_log_conversions_v2')
+			- setNewTableDataMigrationIsRunningFlag(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand::MAIL_LOGS_AND_CONVERSIONS_IS_RUNNING)
+			- setRedisClientFactory(@redisClientFactory)
+
 	- Remp\MailerModule\Repositories\LayoutsRepository
 	- Remp\MailerModule\Repositories\SnippetsRepository
 	- Remp\MailerModule\Repositories\ListsRepository
