@@ -10,6 +10,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Changed the way how PHP CodeSniffer scripts (`phpcbf`, `phpcs`) is executed. Now they run from `vendor/bin` and so will reflect actual version of PHP.
 
+### [Beam]
+
+- Added optional parameters for command `service:elastic-write-alias-rollover` to allow customization of search options for rollover. remp/remp#1208
+  - `max-age` - triggers rollover after the maximum elapsed time from index creation is reached (default value is `31d`).
+  - `max-size` -  triggers rollover when the index reaches a certain size (default value is `4gb`).
+  - `max-primary-shard-size` - triggers rollover when the largest primary shard in the index reaches a certain size. Option introduced from elasticsearch version 7.13.
+
 ### [Campaign]
 
 - Added `dimensions` of banner into required inputs during the creation of custom HTML banner. remp/remp#1165
