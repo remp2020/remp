@@ -39,6 +39,9 @@ final class CreateNewMailLogsAndMailConversionsTable extends AbstractMigration
                 ->changeColumn('id', 'biginteger', ['identity' => true])
                 ->addColumn('user_id', 'integer', ['null' => true, 'after' => 'email'])
                 ->addIndex('user_id')
+                ->addForeignKey('mail_template_id', 'mail_templates')
+                ->addForeignKey('mail_job_id', 'mail_jobs')
+                ->addForeignKey('mail_job_batch_id', 'mail_job_batch')
                 ->save();
 
             $this->table('mail_log_conversions_v2')
@@ -49,6 +52,16 @@ final class CreateNewMailLogsAndMailConversionsTable extends AbstractMigration
 
     public function down()
     {
-        $this->output->writeln('Down migration is not available.');
+        if ($this->hasTable('mail_log_conversions_v2')) {
+            $this->table('mail_log_conversions_v2')
+                ->drop()
+                ->update();
+        }
+
+        if ($this->hasTable('mail_logs_v2')) {
+            $this->table('mail_logs_v2')
+                ->drop()
+                ->update();
+        }
     }
 }
