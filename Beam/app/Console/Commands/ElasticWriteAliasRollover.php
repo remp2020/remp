@@ -11,7 +11,7 @@ class ElasticWriteAliasRollover extends Command
 {
     const COMMAND = 'service:elastic-write-alias-rollover';
 
-    protected $signature = self::COMMAND . ' {--host=} {--write-alias=} {--read-alias=} {--auth=}';
+    protected $signature = self::COMMAND . ' {--host=} {--write-alias=} {--read-alias=} {--auth=} {--max-age=} {--max-size=} {--max-primary-shard-size=}';
 
     protected $description = 'Rollover write index and assign newly created index to read index';
 
@@ -58,14 +58,20 @@ class ElasticWriteAliasRollover extends Command
             ];
         }
 
-        // execute rollover; https://www.elastic.co/guide/en/elasticsearch/reference/6.3/indices-rollover-index.html
+        $conditions = [
+            'max_age' => $this->input->getOption('max-age') ?? '31d',
+            'max_size' => $this->input->getOption('max-size') ?? '4gb',
+            //'max_docs' => 1, // condition for testing
+        ];
+
+        if ($this->input->getOption('max-primary-shard-size')) {
+            $conditions['max_primary_shard_size'] = $this->input->getOption('max-primary-shard-size');
+        }
+
+        // execute rollover; https://www.elastic.co/guide/en/elasticsearch/reference/7.17/indices-rollover-index.html
         $response = $client->post(sprintf("/%s/_rollover", $this->input->getOption('write-alias')), array_merge([
             'json' => [
-                'conditions' => [
-                    'max_age' => '31d',
-                    'max_size' => '4gb',
-                    //'max_docs' => 1, // condition for testing
-                ],
+                'conditions' => $conditions,
             ],
         ], $options));
 

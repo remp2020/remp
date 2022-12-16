@@ -2761,32 +2761,18 @@ and more about aliases at [Elastic aliases documentation](https://www.elastic.co
 * If you configured Telegraf to use `index_name = pageviews_write`, you should see new events being poured to this
 `pageviews-2019.05.17-000001` index and also you should be able to see all tracked events by reading `pageviews` alias.
 
-* Schedule the `_rollover` call to be run periodically against write alias (`pageviews_write`). Once the conditions
-are met, Elasticsearch will create new index.
+* Schedule the `service:elastic-write-alias-rollover` command to be run periodically against write alias (`pageviews_write`). Once the conditions
+are met, Elasticsearch will create new index. Options:
+  * `--host`: address to your Elastic instance
+  * `--write_alias`: name of the write alias you use
+  * `--read-alias`: name of the read alias you use
+  * `--max-size`: trigger condition - index reaches a certain size
+  * `--max-age`: trigger condition - maximum elapsed time from index creation is reached
+  * `--max-primary-shard-size`: trigger condition - largest primary shard in the index reaches a certain size
 
-    ```
-    curl -X POST \
-      http://localhost:9200/pageviews_write/_rollover \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "conditions" : {
-        "max_size": "5gb"
-      }
-    }'
-    ```
-    ```
-    {
-        "old_index": "pageviews-2019.05.17-000001",
-        "new_index": "pageviews-2019.05.17-000002",
-        "rolled_over": true,
-        "dry_run": false,
-        "acknowledged": true,
-        "shards_acknowledged": true,
-        "conditions": {
-            "[max_size: 5gb]": true
-        }
-    }
-    ```
+```
+php artisan service:elastic-write-alias-rollover --host=http://localhost:9200 --write-alias=pageviews_write --read-alias=pageviews --max-size=5gb
+```
 
 * Now check the existing aliases again.
 
