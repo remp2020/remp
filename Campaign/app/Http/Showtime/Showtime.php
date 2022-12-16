@@ -176,7 +176,14 @@ class Showtime
         }
 
         foreach ($campaignBanners as $campaignBanner) {
-            $displayData[] = $showtimeResponse->renderCampaign($campaignBanner, $campaign, $alignments, $dimensions, $positions, $variables);
+            $displayData[] = $showtimeResponse->renderCampaign(
+                variant: $campaignBanner,
+                campaign: $campaigns[$campaignBanner->campaign_id],
+                alignments: $alignments,
+                dimensions: $dimensions,
+                positions: $positions,
+                variables: $variables
+            );
         }
 
         return $showtimeResponse->success($callback, $displayData, $activeCampaigns, $segmentAggregator->getProviderData());
