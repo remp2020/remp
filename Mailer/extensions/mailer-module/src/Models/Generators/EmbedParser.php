@@ -7,7 +7,7 @@ use Embed\Embed;
 
 class EmbedParser
 {
-    private $videoLinkText;
+    protected ?string $videoLinkText;
 
     public function setVideoLinkText(?string $videoLinkText = null): void
     {
