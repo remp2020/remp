@@ -67,13 +67,15 @@ class MigrateMailLogsAndConversionsCommand extends Command
         // Paging LOOP
         $pageSize = 10000;
         while (true) {
-            $lastMigratedId = $this->database->query("
-                SELECT MAX(id) AS id FROM `{$mailLogsV2TableName}`
-            ")->fetch()?->id ?? 0;
+            $lastMigratedId = $this->database
+                ->query("SELECT MAX(id) AS id FROM `{$mailLogsV2TableName}` WHERE created_at <= ?", $migrationStartTime)
+                ->fetch()
+                ?->id ?? 0;
 
-            $maxId = $this->database->query("
-                SELECT MAX(id) AS id FROM `{$mailLogsTableName}`
-            ")->fetch()?->id ?? 0;
+            $maxId = $this->database
+                ->query("SELECT MAX(id) AS id FROM `{$mailLogsTableName}` WHERE created_at <= ?", $migrationStartTime)
+                ->fetch()
+                ?->id ?? 0;
 
             if ($maxId === 0 || $lastMigratedId === $maxId) {
                 break;
