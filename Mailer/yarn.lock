@@ -3813,7 +3813,7 @@ lz-string@^1.4.4:
     material-design-iconic-font "^2.2.0"
     moment "^2.24.0"
     moment-timezone "@^0.4.0 || ^0.5.0"
-    nette-forms "^2.4.9"
+    nette-forms "^3.1.8"
     nette.ajax.js "^2.3.0"
     node-waves "^0.7.6"
     rison "^0.1.1"
@@ -4043,10 +4043,10 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nette-forms@^2.4.9:
-  version "2.4.9"
-  resolved "https://registry.yarnpkg.com/nette-forms/-/nette-forms-2.4.9.tgz#a5f6fa4600eea03be2fa25472d8b55753b76f4dc"
-  integrity sha512-uezQ4b+yn9e91u7RVi2DTddzybbSotilkEF8ZoyefQ+KmmrZj9sCg/PkNu7BgUFrI3KsNEBEpDcwnmo7A/hxvA==
+nette-forms@^3.1.8:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/nette-forms/-/nette-forms-3.3.1.tgz#c8d0512d8a5d66a644ff9fcd700284acc4adf3c3"
+  integrity sha512-UOmA3rF+FjpSci5CGmMtsy79PMWCcl0yyfyCd8YXVS+c68FAnVq3ref5qSxYFcwFynTqcPsYKhsNh8eYW5nVhQ==
 
 nette.ajax.js@^2.3.0:
   version "2.3.0"

@@ -37,7 +37,7 @@
     "material-design-iconic-font": "^2.2.0",
     "moment": "^2.24.0",
     "moment-timezone": "@^0.4.0 || ^0.5.0",
-    "nette-forms": "^2.4.9",
+    "nette-forms": "^3.1.8",
     "nette.ajax.js": "^2.3.0",
     "node-waves": "^0.7.6",
     "rison": "^0.1.1",

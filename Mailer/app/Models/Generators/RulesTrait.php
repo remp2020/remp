@@ -77,7 +77,7 @@ trait RulesTrait
                 return $this->embedParser->parse($matches[0]);
             },
 
-            "/\[embed](.*)\[\/embed\]/is" => function ($matches) {
+            "/\[embed\](.*?)\[\/embed\]/is" => function ($matches) {
                 return $this->embedParser->parse($matches[1]);
             },
 
