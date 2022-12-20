@@ -5,6 +5,7 @@ namespace Remp\Mailer\Models\Generators;
 use Nette\Application\UI\Form;
 use Nette\Http\Url;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Strings;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\GrafdnaWidget\GrafdnaWidget;
 use Remp\Mailer\Models\WebClient;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
@@ -43,7 +44,7 @@ class GrafdnaGenerator implements IGenerator
         return [
             (new PostInputParam('grafdna_html'))->setRequired(),
             (new PostInputParam('url'))->setRequired(),
-            (new PostInputParam('image_url'))->setRequired(),
+            (new PostInputParam('image_url')),
             (new PostInputParam('title'))->setRequired(),
             (new PostInputParam('from'))->setRequired(),
         ];
@@ -62,8 +63,8 @@ class GrafdnaGenerator implements IGenerator
             ->setRequired("Field 'Newsfilter URL' is required.");
 
         $form->addText('image_url', 'Image URL')
-            ->addRule(Form::URL)
-            ->setRequired("Field 'Image URL' is required.");
+            ->setNullable()
+            ->addRule(Form::URL);
 
         $form->addText('from', 'Sender');
 
@@ -104,9 +105,38 @@ class GrafdnaGenerator implements IGenerator
 
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
+        if (!empty($values['image_url'])) {
+            // match first embed or graph URL in text and replace with provided image
+            $specialRule = [
+                "/(\[embed\](.*?)\[\/embed\]|^(http|https)\:\/\/[a-zA-Z0-9\-\.]*(flourish|datawrapper)+[a-zA-Z0-9\-\.]*\.[a-zA-Z]+(\/\S*)?\s*$)/im" => function ($matches) use ($values) {
+                    $link = null;
+                    foreach ($matches as $match) {
+                        if (Strings::startsWith($match, 'http')) {
+                            $link = $match;
+                            break;
+                        }
+                    }
+
+                    if (isset($link)) {
+                        return <<< HTML
+<img src={$values['image_url']} alt="" style="width: 100%"/>
+<p>Graf nájdete aj na <a href="$link">$link</a>.</p>
+HTML;
+                    }
+                    return '';
+                }
+            ];
+            $post = preg_replace_callback(key($specialRule), current($specialRule), $post, 1);
+            $lockedPost = preg_replace_callback(key($specialRule), current($specialRule), $lockedPost, 1);
+        }
+
         $generatorRules = [
-            "/\[embed\](.*)\[\/embed\]/is" => '',
-            "/\[graf\]/is" => '<img src=' . $values['image_url'] . ' alt="" style="width: 100%"/>',
+            "/\[embed\](.*?)\[\/embed\]/is" => function ($matches) {
+                return '<p>Graf nájdete aj na <a href="' . $matches[1] . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">' . $matches[1] . ' </a>.</p>';
+            },
+            "/^(http|https)\:\/\/[a-zA-Z0-9\-\.]*(flourish|datawrapper)+[a-zA-Z0-9\-\.]*\.[a-zA-Z]+(\/\S*)?\s*$/im" => function ($matches) {
+                return '<p>Graf nájdete aj na <a href="' . $matches[0] . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">' . $matches[0] . ' </a>.</p>';
+            },
         ];
         $rules = $this->getRules($generatorRules);
         foreach ($rules as $rule => $replace) {
