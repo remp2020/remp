@@ -140,6 +140,8 @@ class MigrateMailLogsAndConversionsCommand extends Command
 
         // Rename tables
         $this->database->query("
+            ANALYZE TABLE {$mailLogsV2TableName};
+            ANALYZE TABLE {$mailLogConversionsV2TableName};
             RENAME TABLE {$mailLogsTableName} TO {$mailLogsTableName}_old,
             {$mailLogsV2TableName} TO {$mailLogsTableName},
             {$mailLogConversionsTableName} TO {$mailLogConversionsTableName}_old,
@@ -222,5 +224,18 @@ class MigrateMailLogsAndConversionsCommand extends Command
             WHERE `mail_log_id` IN ?
         ", $missingIds);
         }
+
+        // make sure that any mail_sender_id in the old table is also in the new table
+        $this->database->query("
+            INSERT INTO `{$mailLogsToTable}` (`email`, `subject`, `mail_template_id`, `mail_job_id`, `mail_job_batch_id`, `mail_sender_id`, `context`, `delivered_at`, `dropped_at`, `spam_complained_at`, `hard_bounced_at`, `clicked_at`, `opened_at`, `attachment_size`, `created_at`, `updated_at`)
+            SELECT `email`, `subject`, `mail_template_id`, `mail_job_id`, `mail_job_batch_id`, `mail_sender_id`, `context`, `delivered_at`, `dropped_at`, `spam_complained_at`, `hard_bounced_at`, `clicked_at`, `opened_at`, `attachment_size`, `created_at`, `updated_at`
+            FROM {$mailLogsFromTable}
+            WHERE `{$mailLogsFromTable}`.created_at >= ?
+            AND mail_sender_id NOT IN (
+                SELECT `mail_sender_id`
+                FROM `{$mailLogsToTable}`
+                WHERE `{$mailLogsToTable}`.`created_at` >= ?
+            );
+        ", $updatedAfter, $updatedAfter);
     }
 }
