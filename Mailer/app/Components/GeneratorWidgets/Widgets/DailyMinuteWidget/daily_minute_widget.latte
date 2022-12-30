@@ -1,0 +1,133 @@
+{define previewCallback}
+    <script type="text/javascript">
+        $('[aria-controls="daily-minute-preview"]').on('shown.bs.tab', function () {
+            $.nette.ajax({
+                type: 'POST',
+                url: {link dailyMinutePreview!},
+                data: {
+                    'html_content': {$htmlContent},
+                    'text_content': {$textContent},
+                    'name': $('#' + {$control["dailyMinuteTemplateForm"]['name']->htmlId}).val(),
+                    'mail_layout_id': $('#' + {$control["dailyMinuteTemplateForm"]['mail_layout_id']->htmlId}).val(),
+                    'mail_type_id': $('#' + {$control["dailyMinuteTemplateForm"]['mail_type_id']->htmlId}).val(),
+                    'from': $('#' + {$control["dailyMinuteTemplateForm"]['from']->htmlId}).val(),
+                    'subject': $('#' + {$control["dailyMinuteTemplateForm"]['subject']->htmlId}).val()
+                },
+                success: function(data) {
+                    previewFrame('#daily-minute-preview-full-frame', data['generatedHtml']);
+                }
+            });
+        });
+
+        function previewFrame(id, html) {
+            var iframe = $(id);
+            var idoc = iframe[0].contentDocument;
+            idoc.open();
+            idoc.write(html);
+            idoc.close();
+        }
+    </script>
+{/define}
+
+<div class="card">
+    <div class="card-header">
+        <h2>Daily minute details<small></small></h2>
+    </div>
+
+    {if count($errors) > 0}
+        <div class="alert alert-danger" role="alert">
+            There are URLs Mailer couldn't process and were ignored:
+            <ul>
+                <li n:foreach="$errors as $error">
+                    {$error}
+                </li>
+            </ul>
+        </div>
+    {/if}
+
+    <div class="card-body card-padding">
+        <div role="tabpanel">
+            <ul class="tab-nav" role="tablist">
+                <li role="tab" class="active"><a href="#daily-minute-form" aria-controls="daily-minute-form" role="tab" data-toggle="tab">Email info</a></li>
+                <li role="tab"><a href="#daily-minute-preview" aria-controls="daily-minute-preview" role="tab" data-toggle="tab">Final previews</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="daily-minute-form">
+
+                    {form dailyMinuteTemplateForm, class => form-horizontal}
+
+                        <div class="col-sm-6">
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    {input name, class => 'form-control fg-input'}
+                                    {label name, class => 'fg-label' /}
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    {input code, class => 'form-control fg-input'}
+                                    {label code, class => 'fg-label' /}
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                {label mail_layout_id /}
+                                {input mail_layout_id, class => 'form-control selectpicker',  data-live-search => 'true'}
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                {label mail_type_id /}
+                                {input mail_type_id, class => 'form-control selectpicker',  data-live-search => 'true'}
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    {input from, class => 'form-control fg-input', value => $from}
+                                    {label from, class => 'fg-label' /}
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                <div class="fg-line">
+                                    {input subject, class => 'form-control fg-input', value => $subject}
+                                    {label subject, class => 'fg-label' /}
+                                </div>
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                {input generate_emails_jobs_created, class => 'btn palette-Cyan bg waves-effect'}
+
+                                {if isset($form['generate_emails_jobs'])}
+                                    {input generate_emails_jobs, class => 'btn palette-Cyan bg waves-effect'}
+                                {/if}
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            {input html_content, value => $htmlContent}
+                            {input text_content, value => $textContent}
+                        </div>
+                    {/form}
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="daily-minute-preview">
+                    {snippet dailyMinutePreviewWrapper}
+                        <div class="row">
+                            <div class="col-md-6 text-center">
+                                <h4>Mobile preview
+                                    <a target="_blank" style="font-size: 12px" href="{plink MailGenerator:preview false}"><i class="zmdi zmdi-arrow-right-top zmdi-hc-fw"></i> Full-screen preview</a>
+                                </h4>
+                                <iframe id="daily-minute-preview-full-frame" frameBorder="0" style="max-width: 576px; width:100%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
+                            </div>
+                        </div>
+                    {/snippet}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include previewCallback}

@@ -1,0 +1,8 @@
+<!-- core/column -->
+<td align="left"
+    valign="{% if verticalAlignment %}{{ verticalAlignment }}{% else %}top{% endif %}"
+    {% if width %}width="{{ width }}"{% endif %}
+>
+    {{ contents|raw }}
+</td>
+<!-- end core/group -->
