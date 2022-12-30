@@ -295,6 +295,15 @@ class NewsfilterTemplateFormFactory
                 'mail_type_id' => 28, // tyzden v nhl
                 'from' => 'Denník N <info@dennikn.sk>',
             ];
+        } elseif ($sourceTemplateId === 81) {
+            $defaults = [
+                'name' => 'Ráno s NHL ' . date('j.n.Y'),
+                'code' => 'nwsf_rano-nhl_' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 61, // rano s NHL
+                'from' => 'Denník N <info@dennikn.sk>',
+            ];
         } elseif ($sourceTemplateId == 40) {
             $defaults = [
                 'name' => 'Ofsajd ' . date('j.n.Y'),
