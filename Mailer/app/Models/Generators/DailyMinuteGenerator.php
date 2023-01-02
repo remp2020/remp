@@ -27,6 +27,9 @@ class DailyMinuteGenerator implements IGenerator
 
     public function generateForm(Form $form): void
     {
+        // disable CSRF protection as external sources could post the params here
+        $form->offsetUnset(Form::PROTECTOR_ID);
+
         $form->addText('subject', 'Subject')
             ->setHtmlAttribute('class', 'form-control')
             ->setRequired();
@@ -112,6 +115,8 @@ class DailyMinuteGenerator implements IGenerator
         if (!isset($data->subject)) {
             throw new PreprocessException("WP json object does not contain required attribute 'subject'");
         }
+
+        $output->from = "Denník N <info@dennikn.sk>";
 
         $output->blocks_json = $data->blocks;
         $output->subject = $data->subject;
