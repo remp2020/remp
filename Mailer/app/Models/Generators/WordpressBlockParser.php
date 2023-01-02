@@ -28,8 +28,10 @@ class WordpressBlockParser
 
     private bool $isFirstDNMinuteInGroup = true;
 
-    public function __construct(EngineFactory $engineFactory)
-    {
+    public function __construct(
+        EngineFactory $engineFactory,
+        private EmbedParser $embedParser
+    ) {
         $this->twig = $engineFactory->engine('twig');
     }
 
@@ -73,6 +75,10 @@ class WordpressBlockParser
             && str_contains($block->attributes->className, 'wp-block-dn-newsletter-group-ordered')
         ) {
             $data['group_ordered'] = true;
+        }
+
+        if ($block->name === self::BLOCK_CORE_EMBED) {
+            $data['embed_html'] = $this->embedParser->parse($block->attributes->url);
         }
 
         if ($block->name === self::BLOCK_DN_MINUTE) {
