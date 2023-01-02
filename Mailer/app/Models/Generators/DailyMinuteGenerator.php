@@ -116,7 +116,7 @@ class DailyMinuteGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'subject'");
         }
 
-        $output->from = "Denník N <info@dennikn.sk>";
+        $output->from = "Ranných 5 minút | Denník N <info@dennikn.sk>";
 
         $output->blocks_json = $data->blocks;
         $output->subject = $data->subject;
