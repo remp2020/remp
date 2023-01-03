@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Config;
 
-use Remp\MailerModule\Repositories\ConfigsRepository;
 use Nette\Caching\Cache;
-use Nette\Caching\IStorage;
+use Nette\Caching\Storage;
+use Remp\MailerModule\Repositories\ConfigsRepository;
 
 class Config
 {
@@ -17,24 +17,15 @@ class Config
     const TYPE_SELECT = 'select';
     const TYPE_BOOLEAN = 'boolean';
 
-    private $loaded = false;
+    private bool $loaded = false;
 
-    private $configsRepository;
-
-    private $localConfig;
-
-    private $cacheStorage;
-
-    private $items = null;
+    private ?array $items = null;
 
     public function __construct(
-        ConfigsRepository $configsRepository,
-        LocalConfig $localConfig,
-        IStorage $cacheStorage
+        private ConfigsRepository $configsRepository,
+        private LocalConfig $localConfig,
+        private Storage $cacheStorage
     ) {
-        $this->configsRepository = $configsRepository;
-        $this->localConfig = $localConfig;
-        $this->cacheStorage = $cacheStorage;
     }
 
     public function get(string $name)

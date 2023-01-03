@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
-use Nette\Caching\IStorage;
-use Nette\Database\Context;
+use Nette\Caching\Storage;
+use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Tomaj\Hermes\Emitter;
@@ -20,10 +20,10 @@ class UserSubscriptionsRepository extends Repository
     private $emitter;
 
     public function __construct(
-        Context $database,
+        Explorer $database,
         UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository,
         Emitter $emitter,
-        IStorage $cacheStorage = null
+        Storage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
         $this->userSubscriptionVariantsRepository = $userSubscriptionVariantsRepository;

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
-use Nette\Http\Response;
+use Nette\Http\IResponse;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Remp\MailerModule\Repositories\LayoutsRepository;
@@ -61,7 +61,7 @@ class MailCreateTemplateHandler extends BaseHandler
 
         $mailType = $this->listsRepository->findBy('code', $params['mail_type_code']);
         if (!$mailType) {
-            return new JsonApiResponse(Response::S400_BAD_REQUEST, [
+            return new JsonApiResponse(IResponse::S400_BadRequest, [
                 'status' => 'error',
                 'code' => 'mail_type_not_found',
                 'message' => 'mail_type_code not found: ' . $params['mail_type_code'],
@@ -80,7 +80,7 @@ class MailCreateTemplateHandler extends BaseHandler
         $extras = $params['extras'] ?? null;
 
         if ($extras !== null && !$this->isJson($extras)) {
-            return new JsonApiResponse(Response::S400_BAD_REQUEST, [
+            return new JsonApiResponse(IResponse::S400_BadRequest, [
                 'status' => 'error',
                 'code' => 'invalid_extras',
                 'message' => "'extras' parameter contains invalid JSON value",
@@ -94,7 +94,7 @@ class MailCreateTemplateHandler extends BaseHandler
             $mailLayout = $this->layoutsRepository->findBy('code', $params['mail_layout_code']);
         }
         if (!$mailLayout) {
-            return new JsonApiResponse(Response::S404_NOT_FOUND, [
+            return new JsonApiResponse(IResponse::S404_NotFound, [
                 'status' => 'error',
                 'code' => "mail_layout_not_found",
                 'message' => "mail layout not found",
@@ -115,7 +115,7 @@ class MailCreateTemplateHandler extends BaseHandler
             $extras
         );
 
-        return new JsonApiResponse(Response::S200_OK, [
+        return new JsonApiResponse(IResponse::S200_OK, [
             'status' => 'ok',
             'id' => $template->id,
             'code' => $template->code,

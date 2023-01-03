@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
-use Nette\Database\Context;
+use Nette\Database\Explorer;
 use Nette\Security\IUserStorage;
 
 class AuditLogRepository extends Repository
@@ -19,7 +19,7 @@ class AuditLogRepository extends Repository
     const OPERATION_UPDATE = 'update';
     const OPERATION_DELETE = 'delete';
 
-    public function __construct(Context $database, IUserStorage $userStorage)
+    public function __construct(Explorer $database, IUserStorage $userStorage)
     {
         parent::__construct($database);
         $this->database = $database;

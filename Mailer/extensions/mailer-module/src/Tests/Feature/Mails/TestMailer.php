@@ -17,11 +17,11 @@ class TestMailer extends Mailer
     public bool $supportsBatch = true;
 
     public function __construct(
-        ?string $code = null,
         Config $config,
-        ConfigsRepository $configsRepository
+        ConfigsRepository $configsRepository,
+        ?string $code = null,
     ) {
-        parent::__construct($code, $config, $configsRepository);
+        parent::__construct($config, $configsRepository, $code);
     }
 
     public function send(Message $mail): void

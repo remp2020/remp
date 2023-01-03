@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
-use Nette\Http\Response;
+use Nette\Http\IResponse;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Repositories\TemplatesRepository;
@@ -43,7 +43,7 @@ class RenderTemplateApiHandler extends BaseHandler
         $template = $this->templatesRepository->findBy('code', $code);
 
         if (!$template) {
-            return new JsonApiResponse(Response::S404_NOT_FOUND, [
+            return new JsonApiResponse(IResponse::S404_NotFound, [
                 'status' => 'error',
                 'message' => "no such mail template: {$code}"
             ]);
@@ -56,6 +56,6 @@ class RenderTemplateApiHandler extends BaseHandler
             'text' => $renderedTemplate->text()
         ];
 
-        return new JsonApiResponse(Response::S200_OK, $result);
+        return new JsonApiResponse(IResponse::S200_OK, $result);
     }
 }

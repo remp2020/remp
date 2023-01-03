@@ -2,38 +2,22 @@
 
 namespace Remp\MailerModule\Models\ContentGenerator;
 
-use Nette\Database\IRow;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Repositories\SnippetsRepository;
 
 class GeneratorInput
 {
-    private $snippetsRepository;
-
-    private $mailTemplate;
-
-    private $params;
-
-    private $batchId;
-
-    private $locale;
-
     public function __construct(
-        SnippetsRepository $snippetsRepository,
-        IRow $mailTemplate,
-        array $params = [],
-        ?int $batchId = null,
-        string $locale = null
+        private SnippetsRepository $snippetsRepository,
+        private ActiveRow $mailTemplate,
+        private array $params = [],
+        private ?int $batchId = null,
+        private ?string $locale = null
     ) {
-        $this->snippetsRepository = $snippetsRepository;
-        $this->mailTemplate = $mailTemplate;
-        $this->params = $params;
-        $this->batchId = $batchId;
-        $this->locale = $locale;
     }
 
-    public function template(): IRow
+    public function template(): ActiveRow
     {
         return $this->mailTemplate;
     }

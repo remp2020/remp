@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Mailer;
 
-use Nette\Mail\IMailer;
 use Nette\Utils\Strings;
 use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Config\ConfigNotExistsException;

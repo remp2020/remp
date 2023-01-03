@@ -4,27 +4,21 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Caching\Storage;
-use Nette\Database\Context;
+use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 
 class Repository
 {
     use DateFieldsProcessorTrait;
 
-    protected $database;
-
     protected $auditLogRepository;
 
     protected $tableName = 'undefined';
 
-    protected $cacheStorage;
-
     public function __construct(
-        Context $database,
-        Storage $cacheStorage = null
+        protected Explorer $database,
+        protected ?Storage $cacheStorage = null
     ) {
-        $this->database = $database;
-        $this->cacheStorage = $cacheStorage;
     }
 
     public function getTable(): Selection
@@ -47,7 +41,7 @@ class Repository
         return $this->getTable()->count('*');
     }
 
-    public function getDatabase(): Context
+    public function getDatabase(): Explorer
     {
         return $this->database;
     }

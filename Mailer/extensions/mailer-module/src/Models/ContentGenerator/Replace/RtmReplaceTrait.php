@@ -25,7 +25,7 @@ trait RtmReplaceTrait
 
         $matches = [];
         // Split URL between path and params (before and after '?')
-        preg_match('/^([^\?]*)\??(.*)$/', $hrefUrl, $matches);
+        preg_match('/^([^?]*)\??(.*)$/', $hrefUrl, $matches);
 
         $path = $matches[1];
         $params = explode('&', $matches[2] ?? '');
@@ -81,7 +81,7 @@ trait RtmReplaceTrait
         return $path . '?' . implode('&', $finalParams);
     }
 
-    public function replace(string $content): string
+    public function replace(string $content, GeneratorInput $generatorInput): string
     {
         $matches = [];
         preg_match_all('/<a(.*?)href="([^"]*?)"(.*?)>/i', $content, $matches);
@@ -92,7 +92,12 @@ trait RtmReplaceTrait
                     continue;
                 }
 
-                $href = sprintf('<a%shref="%s"%s>', $matches[1][$idx], $this->replaceUrl($hrefUrl), $matches[3][$idx]);
+                $href = sprintf(
+                    '<a%shref="%s"%s>',
+                    $matches[1][$idx],
+                    $this->replaceUrl($hrefUrl, $generatorInput),
+                    $matches[3][$idx],
+                );
                 $content = str_replace($matches[0][$idx], $href, $content);
             }
         }

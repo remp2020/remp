@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\UI\Presenter;
-use Nette\Http\Response;
+use Nette\Http\IResponse;
 use Nette\Utils\FileSystem;
 use Remp\MailerModule\Commands\HermesWorkerCommand;
 use Remp\MailerModule\Commands\MailWorkerCommand;
@@ -70,9 +70,9 @@ final class HealthPresenter extends Presenter
 
         // set correct response code and return results
         if ($result['status'] === self::STATUS_OK) {
-            $resultCode = Response::S200_OK;
+            $resultCode = IResponse::S200_OK;
         } else {
-            $resultCode = Response::S500_INTERNAL_SERVER_ERROR;
+            $resultCode = IResponse::S500_InternalServerError;
         }
 
         $this->sendResponse(new JsonApiResponse($resultCode, $result));

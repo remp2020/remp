@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v2\Handlers\Mailers;
 
-use Nette\Http\Response;
+use Nette\Http\IResponse;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
@@ -46,7 +46,7 @@ class MailTypesListingHandler extends BaseHandler
         if (isset($params['public_listing'])) {
             $publicListing = filter_var($params['public_listing'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             if ($publicListing === null) {
-                return new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'error', 'message' => 'Invalid value provided for param public_listing: ' . $params['public_listing']]);
+                return new JsonApiResponse(IResponse::S400_BadRequest, ['status' => 'error', 'message' => 'Invalid value provided for param public_listing: ' . $params['public_listing']]);
             }
             $results->where(['public_listing' => $publicListing]);
         }

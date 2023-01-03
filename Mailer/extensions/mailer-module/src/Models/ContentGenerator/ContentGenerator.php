@@ -3,30 +3,21 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\ContentGenerator;
 
-use Nette\Database\IRow;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\ContentGenerator\Replace\IReplace;
-use Remp\MailerModule\Models\MailTemplate;
 use Remp\MailerModule\Models\MailTranslator;
 
 class ContentGenerator
 {
-    private EngineFactory $engineFactory;
-
-    private MailTranslator $mailTranslator;
-
-    private $time;
+    private \DateTime $time;
 
     /** @var IReplace[] */
-    private $replaceList = [];
+    private array $replaceList = [];
 
     public function __construct(
-        EngineFactory $engineFactory,
-        MailTranslator $mailTranslator
+        private EngineFactory $engineFactory,
+        private MailTranslator $mailTranslator,
     ) {
-        $this->engineFactory = $engineFactory;
-        $this->mailTranslator = $mailTranslator;
-
         $this->time = new \DateTime();
     }
 

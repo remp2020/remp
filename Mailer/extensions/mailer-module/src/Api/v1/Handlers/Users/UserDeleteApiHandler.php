@@ -49,17 +49,17 @@ class UserDeleteApiHandler extends BaseHandler
             $result = $this->userManager->deleteUsers([$email]);
         } catch (\Exception $e) {
             $this->logger->error($e);
-            return new JsonApiResponse(IResponse::S500_INTERNAL_SERVER_ERROR, []);
+            return new JsonApiResponse(IResponse::S500_InternalServerError, []);
         }
 
         if ($result === false) {
-            return new JsonApiResponse(IResponse::S404_NOT_FOUND, [
+            return new JsonApiResponse(IResponse::S404_NotFound, [
                 'status' => 'error',
                 'code' => 'user_not_found',
                 'message' => "No user data found for email [{$email}].",
             ]);
         }
 
-        return new JsonApiResponse(IResponse::S204_NO_CONTENT, []);
+        return new JsonApiResponse(IResponse::S204_NoContent, []);
     }
 }

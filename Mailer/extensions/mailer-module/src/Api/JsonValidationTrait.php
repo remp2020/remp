@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api;
 
-use Nette\Http\Response;
+use JsonSchema\Validator;
+use Nette\Http\IResponse;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tracy\Debugger;
-use JsonSchema\Validator;
 
 trait JsonValidationTrait
 {
@@ -17,7 +17,7 @@ trait JsonValidationTrait
     protected function validateInput(string $request, string $schema)
     {
         if (empty($request)) {
-            $this->errorResponse = new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'error', 'message' => 'Empty request']);
+            $this->errorResponse = new JsonApiResponse(IResponse::S400_BadRequest, ['status' => 'error', 'message' => 'Empty request']);
             return false;
         }
 
@@ -25,7 +25,7 @@ trait JsonValidationTrait
             $payload = Json::decode($request, Json::FORCE_ARRAY);
         } catch (JsonException $e) {
             Debugger::log($e->getMessage());
-            $this->errorResponse = new JsonApiResponse(Response::S400_BAD_REQUEST, ['status' => 'error', 'message' => "Malformed JSON: " . $e->getMessage()]);
+            $this->errorResponse = new JsonApiResponse(IResponse::S400_BadRequest, ['status' => 'error', 'message' => "Malformed JSON: " . $e->getMessage()]);
             return false;
         }
 
@@ -39,7 +39,7 @@ trait JsonValidationTrait
             foreach ($validator->getErrors() as $error) {
                 $data['errors'][] = "{$error['property']}: {$error['message']}";
             }
-            $this->errorResponse = new JsonApiResponse(Response::S400_BAD_REQUEST, $data);
+            $this->errorResponse = new JsonApiResponse(IResponse::S400_BadRequest, $data);
 
             return false;
         }

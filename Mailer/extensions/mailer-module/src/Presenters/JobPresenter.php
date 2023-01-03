@@ -27,7 +27,6 @@ use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
-use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tracy\Debugger;
 
 final class JobPresenter extends BasePresenter
@@ -49,8 +48,6 @@ final class JobPresenter extends BasePresenter
     private $editBatchFormFactory;
 
     private $newTemplateFormFactory;
-
-    private $userSubscriptionsRepository;
 
     private $linkGenerator;
 
@@ -80,7 +77,6 @@ final class JobPresenter extends BasePresenter
         NewBatchFormFactory $newBatchFormFactory,
         EditBatchFormFactory $editBatchFormFactory,
         NewTemplateFormFactory $newTemplateFormFactory,
-        UserSubscriptionsRepository $userSubscriptionsRepository,
         Aggregator $segmentAggregator,
         MailCache $mailCache,
         JobQueueRepository $jobQueueRepository,
@@ -101,7 +97,6 @@ final class JobPresenter extends BasePresenter
         $this->newBatchFormFactory = $newBatchFormFactory;
         $this->editBatchFormFactory = $editBatchFormFactory;
         $this->newTemplateFormFactory = $newTemplateFormFactory;
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
         $this->segmentAggregator = $segmentAggregator;
         $this->mailCache = $mailCache;
         $this->jobQueueRepository = $jobQueueRepository;
@@ -318,7 +313,7 @@ final class JobPresenter extends BasePresenter
         if (!$this->permissionManager->isAllowed($this->getUser(), 'batch', 'start')) {
             throw new ForbiddenRequestException(
                 "You don't have permission to run this action. (batch/start)",
-                IResponse::S403_FORBIDDEN
+                IResponse::S403_Forbidden
             );
         }
         $batch = $this->batchesRepository->find($id);
@@ -342,7 +337,7 @@ final class JobPresenter extends BasePresenter
         if (!$this->permissionManager->isAllowed($this->getUser(), 'batch', 'start')) {
             throw new ForbiddenRequestException(
                 "You don't have permission to run this action. (batch/start)",
-                IResponse::S403_FORBIDDEN
+                IResponse::S403_Forbidden
             );
         }
         $batch = $this->batchesRepository->find($id);
@@ -362,7 +357,7 @@ final class JobPresenter extends BasePresenter
         if (!$this->permissionManager->isAllowed($this->getUser(), 'batch', 'stop')) {
             throw new ForbiddenRequestException(
                 "You don't have permission to run this action. (batch/stop)",
-                IResponse::S403_FORBIDDEN
+                IResponse::S403_Forbidden
             );
         }
         $batch = $this->batchesRepository->find($id);
@@ -407,7 +402,7 @@ final class JobPresenter extends BasePresenter
         if (!$this->permissionManager->isAllowed($this->getUser(), 'batch', 'process')) {
             throw new ForbiddenRequestException(
                 "You don't have permission to run this action. (batch/process)",
-                IResponse::S403_FORBIDDEN
+                IResponse::S403_Forbidden
             );
         }
         $batch = $this->batchesRepository->find($id);

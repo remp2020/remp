@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api\v1\Handlers\Users;
 
-use Nette\Http\Response;
+use Nette\Http\IResponse;
 use Nette\Utils\Json;
 use Remp\MailerModule\Api\v1\Handlers\Users\UnSubscribeHandler;
 use Remp\MailerModule\Api\v1\Handlers\Users\UserDeleteApiHandler;
@@ -42,7 +42,7 @@ class UnsubscribeHandlerTest extends BaseApiHandlerTestCase
         /** @var JsonApiResponse $response */
         $response = $this->handler->handle($params);
         $this->assertInstanceOf(JsonApiResponse::class, $response);
-        $this->assertEquals(Response::S200_OK, $response->getCode());
+        $this->assertEquals(IResponse::S200_OK, $response->getCode());
 
         /** @var UserSubscriptionsRepository $userSubscriptionsRepository */
         $userSubscriptionsRepository = $this->inject(UserSubscriptionsRepository::class);
@@ -75,7 +75,7 @@ class UnsubscribeHandlerTest extends BaseApiHandlerTestCase
         /** @var JsonApiResponse $response */
         $response = $this->handler->handle($params);
         $this->assertInstanceOf(JsonApiResponse::class, $response);
-        $this->assertEquals(Response::S200_OK, $response->getCode());
+        $this->assertEquals(IResponse::S200_OK, $response->getCode());
 
         /** @var UserSubscriptionsRepository $userSubscriptionsRepository */
         $userSubscriptionsRepository = $this->inject(UserSubscriptionsRepository::class);
@@ -110,7 +110,7 @@ class UnsubscribeHandlerTest extends BaseApiHandlerTestCase
         /** @var JsonApiResponse $response */
         $response = $this->handler->handle($params);
         $this->assertInstanceOf(JsonApiResponse::class, $response);
-        $this->assertEquals(Response::S200_OK, $response->getCode());
+        $this->assertEquals(IResponse::S200_OK, $response->getCode());
 
         /** @var UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository */
         $userSubscriptionVariantsRepository = $this->inject(UserSubscriptionVariantsRepository::class);
@@ -145,7 +145,7 @@ class UnsubscribeHandlerTest extends BaseApiHandlerTestCase
         /** @var JsonApiResponse $response */
         $response = $this->handler->handle($params);
         $this->assertInstanceOf(JsonApiResponse::class, $response);
-        $this->assertEquals(Response::S200_OK, $response->getCode());
+        $this->assertEquals(IResponse::S200_OK, $response->getCode());
 
         /** @var UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository */
         $userSubscriptionVariantsRepository = $this->inject(UserSubscriptionVariantsRepository::class);
@@ -180,7 +180,7 @@ class UnsubscribeHandlerTest extends BaseApiHandlerTestCase
         /** @var JsonApiResponse $response */
         $response = $this->handler->handle($params);
         $this->assertInstanceOf(JsonApiResponse::class, $response);
-        $this->assertEquals(Response::S404_NOT_FOUND, $response->getCode());
+        $this->assertEquals(IResponse::S404_NotFound, $response->getCode());
 
         /** @var UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository */
         $userSubscriptionVariantsRepository = $this->inject(UserSubscriptionVariantsRepository::class);

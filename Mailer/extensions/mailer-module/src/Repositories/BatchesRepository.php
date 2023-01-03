@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Caching\Storage;
-use Nette\Database\Context;
+use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Hermes\RedisDriver;
@@ -42,7 +42,7 @@ class BatchesRepository extends Repository
     protected $tableName = 'mail_job_batch';
 
     public function __construct(
-        Context $database,
+        Explorer $database,
         protected Emitter $emitter,
         protected MailCache $mailCache,
         Storage $cacheStorage = null

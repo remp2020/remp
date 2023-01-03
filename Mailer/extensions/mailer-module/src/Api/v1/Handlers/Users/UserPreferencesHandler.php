@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
-use Nette\Http\Response;
+use Nette\Http\IResponse;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
@@ -60,7 +59,7 @@ class UserPreferencesHandler extends BaseHandler
 
         $rows = $rows->fetchAll();
         if (!count($rows)) {
-            return new JsonApiResponse(Response::S404_NOT_FOUND, [
+            return new JsonApiResponse(IResponse::S404_NotFound, [
                 'status' => 'error',
                 'message' => 'User with given ID/email has no subscription.',
             ]);
@@ -94,6 +93,6 @@ class UserPreferencesHandler extends BaseHandler
             ];
         }
 
-        return new JsonApiResponse(Response::S200_OK, $output);
+        return new JsonApiResponse(IResponse::S200_OK, $output);
     }
 }

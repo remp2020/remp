@@ -2,7 +2,7 @@
 
 namespace Remp\MailerModule\Models\ContentGenerator;
 
-use Nette\Database\IRow;
+use Nette\Database\Table\ActiveRow;
 use Remp\MailerModule\Repositories\SnippetsRepository;
 
 class GeneratorInputFactory
@@ -15,7 +15,7 @@ class GeneratorInputFactory
     }
 
     public function create(
-        IRow $mailTemplate,
+        ActiveRow $mailTemplate,
         array $params = [],
         ?int $batchId = null,
         string $locale = null

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Users;
 
-use Nette\Database\Context;
+use Nette\Database\Explorer;
 use Remp\MailerModule\Repositories\AutoLoginTokensRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
 use Remp\MailerModule\Repositories\LogConversionsRepository;
@@ -25,7 +25,7 @@ class UserManager
     private $userSubscriptionsRepository;
 
     public function __construct(
-        Context $database,
+        Explorer $database,
         AutoLoginTokensRepository $autoLoginTokensRepository,
         JobQueueRepository $jobQueueRepository,
         LogConversionsRepository $logConversionsRepository,

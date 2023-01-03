@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
-use Nette\Http\Response;
+use Nette\Http\IResponse;
+use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
-use Remp\MailerModule\Models\Segment\Aggregator;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\PostInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -57,7 +57,7 @@ class MailJobCreateApiHandler extends BaseHandler
         $templateId = $params['template_id'];
         $template = $this->templatesRepository->find($templateId);
         if (!$template) {
-            return new JsonApiResponse(Response::S404_NOT_FOUND, [
+            return new JsonApiResponse(IResponse::S404_NotFound, [
                 'status' => 'error',
                 'message' => 'No such template with id:' . $params['template_id'],
             ]);
@@ -73,7 +73,7 @@ class MailJobCreateApiHandler extends BaseHandler
             }
         }
         if (!$segmentFound) {
-            return new JsonApiResponse(Response::S404_NOT_FOUND, [
+            return new JsonApiResponse(IResponse::S404_NotFound, [
                 'status' => 'error',
                 'message' => 'No such segment was found'
             ]);
@@ -83,7 +83,7 @@ class MailJobCreateApiHandler extends BaseHandler
         if (isset($params['mail_type_variant_code'])) {
             $mailTypeVariant = $this->listVariantsRepository->findBy('code', ($params['mail_type_variant_code']));
             if (!$mailTypeVariant) {
-                return new JsonApiResponse(Response::S404_NOT_FOUND, [
+                return new JsonApiResponse(IResponse::S404_NotFound, [
                     'status' => 'error',
                     'message' => 'No such mail type variant with code:' . $params['mail_type_variant_code'],
                 ]);

@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Nette\Database\Context;
+use Nette\Database\Explorer;
+use Nette\DI\Container;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
-use PDOException;
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Repositories\AutoLoginTokensRepository;
 use Remp\MailerModule\Repositories\BatchesRepository;
@@ -26,57 +26,27 @@ use Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository;
 
 class BaseFeatureTestCase extends TestCase
 {
-    private $container;
-
-    /** @var  Context */
-    protected $database;
-
-    /** @var AutoLoginTokensRepository */
-    protected $autoLoginTokensRepository;
-
-    /** @var  JobsRepository */
-    protected $jobsRepository;
-
-    /** @var JobQueueRepository */
-    protected $jobQueueRepository;
-
-    /** @var BatchesRepository */
-    protected $batchesRepository;
-
-    /** @var LayoutsRepository */
-    protected $layoutsRepository;
-
-    /** @var TemplatesRepository */
-    protected $templatesRepository;
-
-    /** @var BatchTemplatesRepository */
-    protected $batchTemplatesRepository;
-
-    /** @var ListsRepository */
-    protected $listsRepository;
-
-    /** @var ListVariantsRepository */
-    protected $listVariantsRepository;
-
-    /** @var ListCategoriesRepository */
-    protected $listCategoriesRepository;
-
-    /** @var UserSubscriptionsRepository */
-    protected $userSubscriptionsRepository;
-
-    /** @var UserSubscriptionVariantsRepository */
-    protected $userSubscriptionVariantsRepository;
-
-    /** @var LogsRepository */
-    protected $mailLogsRepository;
-
-    /** @var LogConversionsRepository */
-    protected $mailLogConversionsRepository;
+    private Container $container;
+    protected Explorer $database;
+    protected AutoLoginTokensRepository $autoLoginTokensRepository;
+    protected JobsRepository $jobsRepository;
+    protected JobQueueRepository $jobQueueRepository;
+    protected BatchesRepository $batchesRepository;
+    protected LayoutsRepository $layoutsRepository;
+    protected TemplatesRepository $templatesRepository;
+    protected BatchTemplatesRepository $batchTemplatesRepository;
+    protected ListsRepository $listsRepository;
+    protected ListVariantsRepository $listVariantsRepository;
+    protected ListCategoriesRepository $listCategoriesRepository;
+    protected UserSubscriptionsRepository $userSubscriptionsRepository;
+    protected UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository;
+    protected LogsRepository $mailLogsRepository;
+    protected LogConversionsRepository $mailLogConversionsRepository;
 
     protected function setUp(): void
     {
         $this->container = $GLOBALS['container'];
-        $this->database = $this->inject(Context::class);
+        $this->database = $this->inject(Explorer::class);
 
         $this->autoLoginTokensRepository = $this->inject(AutoLoginTokensRepository::class);
         $this->jobsRepository = $this->inject(JobsRepository::class);

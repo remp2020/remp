@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Hermes;
 
-use Nette\Database\Context;
+use Nette\Database\Explorer;
 use Tomaj\Hermes\Handler\HandlerInterface;
 use Tomaj\Hermes\MessageInterface;
 
@@ -11,7 +11,7 @@ class PingMysql implements HandlerInterface
 {
     private $database;
 
-    public function __construct(Context $database)
+    public function __construct(Explorer $database)
     {
         $this->database = $database;
     }

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
-use Nette\Caching\IStorage;
-use Nette\Database\Context;
+use Nette\Caching\Storage;
+use Nette\Database\Explorer;
 use Remp\Journal\ListRequest;
 use Remp\MailerModule\Models\Beam\JournalFactory;
 
@@ -13,9 +13,9 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
     private $journal;
 
     public function __construct(
-        Context $database,
+        Explorer $database,
         JournalFactory $journalFactory,
-        IStorage $cacheStorage = null
+        Storage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
         $this->journal = $journalFactory->getClient();

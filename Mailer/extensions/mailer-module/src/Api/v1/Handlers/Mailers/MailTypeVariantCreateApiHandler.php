@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
+use Nette\Http\IResponse;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\MailTypesRepository;
@@ -10,7 +11,6 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
-use Nette\Http\Response;
 
 class MailTypeVariantCreateApiHandler extends BaseHandler
 {
@@ -45,7 +45,7 @@ class MailTypeVariantCreateApiHandler extends BaseHandler
 
         $mailType = $this->mailTypesRepository->findBy('code', $payload['mail_type_code']);
         if (!$mailType) {
-            return new JsonApiResponse(Response::S404_NOT_FOUND, [
+            return new JsonApiResponse(IResponse::S404_NotFound, [
                 'status' => 'error',
                 'message' => 'No such mail type with code: ' . $payload['mail_type_code'],
             ]);
@@ -53,7 +53,7 @@ class MailTypeVariantCreateApiHandler extends BaseHandler
 
         $mailTypeVariant = $this->listVariantsRepository->findBy('code', $payload['code']);
         if ($mailTypeVariant) {
-            return new JsonApiResponse(Response::S400_BAD_REQUEST, [
+            return new JsonApiResponse(IResponse::S400_BadRequest, [
                 'status' => 'error',
                 'code' => 'already_exists',
                 'message' => 'Mail type variant with code: ' . $payload['code'] . ' already exists.',

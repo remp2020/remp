@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Api\v1\Handlers\Users;
 
 use Nette\Database\Table\ActiveRow;
-use Nette\Http\Response;
+use Nette\Http\IResponse;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Remp\MailerModule\Api\v1\Handlers\Users\UserDeleteApiHandler;
@@ -38,7 +38,7 @@ class UserDeleteApiHandlerTest extends BaseApiHandlerTestCase
         $payload = $response->getPayload();
 
         $this->assertInstanceOf(JsonApiResponse::class, $response);
-        $this->assertEquals(Response::S404_NOT_FOUND, $response->getCode());
+        $this->assertEquals(IResponse::S404_NotFound, $response->getCode());
         $this->assertEquals('error', $payload['status']);
         $this->assertStringStartsWith('No user data found for email', $payload['message']);
         $this->assertStringContainsString($email, $payload['message']);
@@ -84,7 +84,7 @@ class UserDeleteApiHandlerTest extends BaseApiHandlerTestCase
         $payload = $response->getPayload();
 
         $this->assertInstanceOf(JsonApiResponse::class, $response);
-        $this->assertEquals(Response::S204_NO_CONTENT, $response->getCode());
+        $this->assertEquals(IResponse::S204_NoContent, $response->getCode());
         $this->assertEmpty($payload);
 
         // check user data after removal; check if correct user was removed (has zero data); other two users should be untouched

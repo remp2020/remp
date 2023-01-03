@@ -14,7 +14,6 @@ use Nette\Forms\Controls\SelectBox;
 use Nette\Forms\Controls\TextBase;
 use Nette\Forms\Controls\TextInput;
 use Nette\Forms\Form;
-use Nette\Forms\IControl;
 use Nette\Forms\Rendering\DefaultFormRenderer;
 use Nette\Utils\Html;
 
@@ -111,11 +110,6 @@ class MaterialRenderer extends DefaultFormRenderer
         return parent::renderControl($control);
     }
 
-    /**
-     * Renders single visual row.
-     * @param IControl $control
-     * @return string
-     */
     public function renderPair(Control $control): string
     {
         if (!$control instanceof BaseControl) {

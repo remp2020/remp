@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Exception;
-use Nette\Caching\IStorage;
-use Nette\Database\Context;
+use Nette\Caching\Storage;
+use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 
 class JobsRepository extends Repository
@@ -18,16 +18,12 @@ class JobsRepository extends Repository
         ':mail_job_batch_templates.mail_template.name',
     ];
 
-    private $batchesRepository;
-
     public function __construct(
-        Context $database,
-        BatchesRepository $batchesRepository,
-        IStorage $cacheStorage = null
+        Explorer $database,
+        private BatchesRepository $batchesRepository,
+        Storage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
-
-        $this->batchesRepository = $batchesRepository;
     }
 
     public function all(): Selection

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
-use Nette\Http\Response;
+use Nette\Http\IResponse;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\GetInputParam;
@@ -49,7 +49,7 @@ class MailTemplatesListingHandler extends BaseHandler
             $limit = (int) ($params['limit'] ?? null);
 
             if ($page <= 0 || $limit <= 0) {
-                return new JsonApiResponse(Response::S400_BAD_REQUEST, [
+                return new JsonApiResponse(IResponse::S400_BadRequest, [
                     'status' => 'error',
                     'code' => 'invalid_pagination_params',
                     'message' => sprintf(
