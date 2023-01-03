@@ -87,7 +87,8 @@ class DennikeWidget extends BaseControl implements IGeneratorWidget
                 'mail_layout_id' => $mailLayout->id,
                 'mail_layout' => $mailLayout,
                 'mail_type_id' => $request->getPost('mail_type_id'),
-                'mail_type' => $mailType
+                'mail_type' => $mailType,
+                'params' => null,
             ]);
 
             return $this->contentGenerator->render($this->generatorInputFactory->create($mailTemplate));
