@@ -4,48 +4,31 @@ declare(strict_types=1);
 namespace Remp\Mailer\Components\GeneratorWidgets\Widgets\ArticleUrlParserWidget;
 
 use Nette\Application\Responses\JsonResponse;
+use Nette\Application\UI\Form;
 use Nette\Http\Session;
 use Remp\Mailer\Forms\ArticleUrlParserTemplateFormFactory;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\IGeneratorWidget;
-use Nette\Application\UI\Form;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
-use Remp\MailerModule\Models\DataRow;
 use Remp\MailerModule\Presenters\MailGeneratorPresenter;
+use Remp\MailerModule\Repositories\ActiveRowFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 
 class ArticleUrlParserWidget extends BaseControl implements IGeneratorWidget
 {
-    private $templateName = 'article_url_parser_widget.latte';
-
-    private $session;
-
-    private $templateFormFactory;
-
-    private $layoutsRepository;
-
-    private $listsRepository;
-
-    private $contentGenerator;
-
-    private $generatorInputFactory;
+    private string $templateName = 'article_url_parser_widget.latte';
 
     public function __construct(
-        Session $session,
-        ArticleUrlParserTemplateFormFactory $templateFormFactory,
-        LayoutsRepository $layoutsRepository,
-        ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator,
-        GeneratorInputFactory $generatorInputFactory
+        private Session $session,
+        private ArticleUrlParserTemplateFormFactory $templateFormFactory,
+        private LayoutsRepository $layoutsRepository,
+        private ListsRepository $listsRepository,
+        private ContentGenerator $contentGenerator,
+        private GeneratorInputFactory $generatorInputFactory,
+        private ActiveRowFactory $activeRowFactory
     ) {
-        $this->session = $session;
-        $this->templateFormFactory = $templateFormFactory;
-        $this->layoutsRepository = $layoutsRepository;
-        $this->listsRepository = $listsRepository;
-        $this->contentGenerator = $contentGenerator;
-        $this->generatorInputFactory = $generatorInputFactory;
     }
 
     public function identifier(): string
@@ -91,7 +74,7 @@ class ArticleUrlParserWidget extends BaseControl implements IGeneratorWidget
         $mailType = $this->listsRepository->find($_POST['mail_type_id']);
 
         $generate = function ($htmlContent, $textContent, $mailLayout, $mailType) use ($request) {
-            $mailTemplate = new DataRow([
+            $mailTemplate = $this->activeRowFactory->create([
                 'name' => $request->getPost('name'),
                 'code' => 'tmp_' . microtime(true),
                 'description' => '',

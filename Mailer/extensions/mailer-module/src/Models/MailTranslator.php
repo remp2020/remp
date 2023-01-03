@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models;
 
-use Nette\Database\IRow;
 use Nette\Database\Table\ActiveRow;
 use Remp\MailerModule\Models\Config\LocalizationConfig;
+use Remp\MailerModule\Repositories\ActiveRowFactory;
 use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
@@ -27,9 +27,9 @@ class MailTranslator
         $this->localizationConfig = $localizationConfig;
     }
 
-    public function translateTemplate(IRow $templateRow, string $locale = null): MailTemplate
+    public function translateTemplate(ActiveRow $templateRow, string $locale = null): MailTemplate
     {
-        if ($templateRow instanceof DataRow || !$this->localizationConfig->isTranslatable($locale)) {
+        if ($templateRow->getTable()->getName() === ActiveRowFactory::TABLE_NAME_DATAROW || !$this->localizationConfig->isTranslatable($locale)) {
             return new MailTemplate($templateRow->from, $templateRow->subject, $templateRow->mail_body_text, $templateRow->mail_body_html);
         }
 

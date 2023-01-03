@@ -6,46 +6,29 @@ namespace Remp\Mailer\Components\GeneratorWidgets\Widgets\DennikeWidget;
 use Nette\Application\Responses\JsonResponse;
 use Nette\Application\UI\Form;
 use Nette\Http\Session;
+use Remp\Mailer\Forms\DennikeTemplateFormFactory;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\IGeneratorWidget;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
-use Remp\Mailer\Forms\DennikeTemplateFormFactory;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
-use Remp\MailerModule\Models\DataRow;
 use Remp\MailerModule\Presenters\MailGeneratorPresenter;
+use Remp\MailerModule\Repositories\ActiveRowFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 
 class DennikeWidget extends BaseControl implements IGeneratorWidget
 {
-    private $templateName = 'dennike_widget.latte';
-
-    private $layoutsRepository;
-
-    private $session;
-
-    private $listsRepository;
-
-    private $contentGenerator;
-
-    private $dennikeTemplateFormFactory;
-
-    private $generatorInputFactory;
+    private string $templateName = 'dennike_widget.latte';
 
     public function __construct(
-        Session $session,
-        LayoutsRepository $layoutsRepository,
-        ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator,
-        DennikeTemplateFormFactory $dennikeTemplateFormFactory,
-        GeneratorInputFactory $generatorInputFactory
+        private Session $session,
+        private LayoutsRepository $layoutsRepository,
+        private ListsRepository $listsRepository,
+        private ContentGenerator $contentGenerator,
+        private DennikeTemplateFormFactory $dennikeTemplateFormFactory,
+        private GeneratorInputFactory $generatorInputFactory,
+        private ActiveRowFactory $activeRowFactory,
     ) {
-        $this->layoutsRepository = $layoutsRepository;
-        $this->session = $session;
-        $this->listsRepository = $listsRepository;
-        $this->contentGenerator = $contentGenerator;
-        $this->dennikeTemplateFormFactory = $dennikeTemplateFormFactory;
-        $this->generatorInputFactory = $generatorInputFactory;
     }
 
     public function identifier(): string
@@ -92,7 +75,7 @@ class DennikeWidget extends BaseControl implements IGeneratorWidget
         $mailType = $this->listsRepository->find($_POST['mail_type_id']);
 
         $generate = function ($htmlContent, $textContent, $mailLayout, $mailType) use ($request) {
-            $mailTemplate = new DataRow([
+            $mailTemplate = $this->activeRowFactory->create([
                 'name' => $request->getPost('name'),
                 'code' => 'tmp_' . microtime(true),
                 'description' => '',

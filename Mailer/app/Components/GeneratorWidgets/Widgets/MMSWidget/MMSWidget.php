@@ -6,46 +6,29 @@ namespace Remp\Mailer\Components\GeneratorWidgets\Widgets\MMSWidget;
 use Nette\Application\Responses\JsonResponse;
 use Nette\Application\UI\Form;
 use Nette\Http\Session;
+use Remp\Mailer\Forms\MMSTemplateFormFactory;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\IGeneratorWidget;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
-use Remp\Mailer\Forms\MMSTemplateFormFactory;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
-use Remp\MailerModule\Models\DataRow;
 use Remp\MailerModule\Presenters\MailGeneratorPresenter;
+use Remp\MailerModule\Repositories\ActiveRowFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 
 class MMSWidget extends BaseControl implements IGeneratorWidget
 {
-    private $templateName = 'mms_widget.latte';
-
-    private $layoutsRepository;
-
-    private $session;
-
-    private $listsRepository;
-
-    private $contentGenerator;
-
-    private $mmsTemplateFormFactory;
-
-    private $generatorInputFactory;
+    private string $templateName = 'mms_widget.latte';
 
     public function __construct(
-        Session $session,
-        LayoutsRepository $layoutsRepository,
-        ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator,
-        MMSTemplateFormFactory $mmsTemplateFormFactory,
-        GeneratorInputFactory $generatorInputFactory
+        private Session $session,
+        private LayoutsRepository $layoutsRepository,
+        private ListsRepository $listsRepository,
+        private ContentGenerator $contentGenerator,
+        private MMSTemplateFormFactory $mmsTemplateFormFactory,
+        private GeneratorInputFactory $generatorInputFactory,
+        private ActiveRowFactory $activeRowFactory,
     ) {
-        $this->layoutsRepository = $layoutsRepository;
-        $this->session = $session;
-        $this->listsRepository = $listsRepository;
-        $this->contentGenerator = $contentGenerator;
-        $this->mmsTemplateFormFactory = $mmsTemplateFormFactory;
-        $this->generatorInputFactory = $generatorInputFactory;
     }
 
     public function identifier(): string
@@ -92,7 +75,7 @@ class MMSWidget extends BaseControl implements IGeneratorWidget
         $mailType = $this->listsRepository->find($_POST['mail_type_id']);
 
         $generate = function ($htmlContent, $textContent, $mailLayout, $mailType) use ($request) {
-            $mailTemplate = new DataRow([
+            $mailTemplate = $this->activeRowFactory->create([
                 'name' => $request->getPost('name'),
                 'code' => 'tmp_' . microtime(true),
                 'description' => '',
