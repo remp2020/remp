@@ -237,6 +237,8 @@ services:
 			- setNewTableDataMigrationIsRunningFlag(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand::MAIL_LOGS_AND_CONVERSIONS_IS_RUNNING)
 			- setRedisClientFactory(@redisClientFactory)
 
+	- Remp\MailerModule\Repositories\ActiveRowFactory
+
 	- Remp\MailerModule\Repositories\LayoutsRepository
 	- Remp\MailerModule\Repositories\SnippetsRepository
 	- Remp\MailerModule\Repositories\ListsRepository

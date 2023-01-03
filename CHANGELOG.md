@@ -28,6 +28,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Changed `DataRow` (which extended deprecated `Nette\Database\Table\IRow`) to `ActiveRowFactory` (which returns `ActiveRow`). remp/remp#1224
+  - If you use `DataRow`, replace the use with `$this->activeRowFactory->create()`.
 - **IMPORTANT**: Fixed description of "priority" field in the newsletter list form. remp/remp#1195
   - The newsletter form incorrectly stated the information about newsletter list priority. Mailer always prioritized newsletters with higher "priority" field, but the form stated otherwise.
 - Added `ServiceParamsProviderInterface` which implements adding custom parameters to mail templates. remp/remp#1175

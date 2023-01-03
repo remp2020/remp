@@ -10,14 +10,14 @@ use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\IGeneratorWidget;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
-use Remp\MailerModule\Models\DataRow;
 use Remp\MailerModule\Presenters\MailGeneratorPresenter;
+use Remp\MailerModule\Repositories\ActiveRowFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 
 class GrafdnaWidget extends BaseControl implements IGeneratorWidget
 {
-    private $templateName = 'grafdna_widget.latte';
+    private string $templateName = 'grafdna_widget.latte';
 
     public function __construct(
         private Session $session,
@@ -25,7 +25,8 @@ class GrafdnaWidget extends BaseControl implements IGeneratorWidget
         private ListsRepository $listsRepository,
         private ContentGenerator $contentGenerator,
         private GrafdnaTemplateFormFactory $grafdnaTemplateFormFactory,
-        private GeneratorInputFactory $generatorInputFactory
+        private GeneratorInputFactory $generatorInputFactory,
+        private ActiveRowFactory $activeRowFactory,
     ) {
     }
 
@@ -73,7 +74,7 @@ class GrafdnaWidget extends BaseControl implements IGeneratorWidget
         $mailType = $this->listsRepository->find($_POST['mail_type_id']);
 
         $generate = function ($htmlContent, $textContent, $mailLayout, $mailType) use ($request) {
-            $mailTemplate = new DataRow([
+            $mailTemplate = $this->activeRowFactory->create([
                 'name' => $request->getPost('name'),
                 'code' => 'tmp_' . microtime(true),
                 'description' => '',

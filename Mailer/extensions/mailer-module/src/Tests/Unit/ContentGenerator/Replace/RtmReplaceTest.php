@@ -5,16 +5,16 @@ namespace Tests\Unit\ContentGenerator\Replace;
 
 use Nette\DI\Container;
 use PHPUnit\Framework\TestCase;
+use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace;
-use Remp\MailerModule\Models\DataRow;
+use Remp\MailerModule\Repositories\ActiveRowFactory;
 
 class RtmReplaceTest extends TestCase
 {
-    /** @var AnchorRtmReplace */
-    protected $rtmReplace;
-
-    protected $generatorInput;
+    protected AnchorRtmReplace $rtmReplace;
+    protected ActiveRowFactory $activeRowFactory;
+    protected GeneratorInput $generatorInput;
 
     public function setUp(): void
     {
@@ -22,19 +22,20 @@ class RtmReplaceTest extends TestCase
         $container = $GLOBALS['container'];
 
         $this->rtmReplace = $container->getByType(AnchorRtmReplace::class);
+        $this->activeRowFactory = $container->getByType(ActiveRowFactory::class);
 
-        $mailType = new DataRow([
+        $mailType = $this->activeRowFactory->create([
             'id' => 1,
             'name' => 'type',
             'code' => 'demo-weekly-newsletter'
         ]);
 
-        $mailLayout = new DataRow([
+        $mailLayout = $this->activeRowFactory->create([
             'id' => 1,
             'name' => "layout1",
         ]);
 
-        $mailTemplate = new DataRow([
+        $mailTemplate = $this->activeRowFactory->create([
             'name' => 'Tesst',
             'code' => 'impresa_mail_20190903103350',
             'description' => '',
