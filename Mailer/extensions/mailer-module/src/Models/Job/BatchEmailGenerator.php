@@ -73,7 +73,7 @@ class BatchEmailGenerator
                         'batch' => $batch,
                         'templateId' => $templateId,
                         'email' => $user['email'],
-                        'sorting' => mt_rand(),
+                        'sorting' => rand(), /** @phpstan-ignore-line */
                         'context' => $job->context,
                         'params' => json_encode($user) // forward all user attributes to template params
                     ];

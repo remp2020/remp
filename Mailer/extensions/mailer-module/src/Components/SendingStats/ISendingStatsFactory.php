@@ -5,6 +5,5 @@ namespace Remp\MailerModule\Components\SendingStats;
 
 interface ISendingStatsFactory
 {
-    /** @return SendingStats */
-    public function create();
+    public function create(): SendingStats;
 }

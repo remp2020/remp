@@ -205,7 +205,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
                 'batch' => $anotherBatch->id,
                 'templateId' => $template->id,
                 'email' => $user['email'],
-                'sorting' => mt_rand(),
+                'sorting' => rand(), /** @phpstan-ignore-line */
                 'context' => $anotherBatch->mail_job->context,
             ];
             unset($userList[$key]);
@@ -257,7 +257,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
                 'batch' => $anotherBatch->id,
                 'templateId' => $template->id,
                 'email' => $user['email'],
-                'sorting' => mt_rand(),
+                'sorting' => rand(), /** @phpstan-ignore-line */
                 'context' => null,
             ];
             unset($userList[$key]);
