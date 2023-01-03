@@ -18,11 +18,11 @@ class MailgunMailer extends Mailer
 {
     public const ALIAS = 'remp_mailgun';
 
-    private $mailer;
+    private Mailgun $mailer;
 
-    private $logger;
+    private ?LoggerInterface $logger = null;
 
-    protected $options = [
+    protected array $options = [
         'api_key' => [
             'required' => true,
             'label' => 'Mailgun API key',
@@ -45,10 +45,10 @@ class MailgunMailer extends Mailer
         $this->logger = $logger;
     }
 
-    private function initMailer()
+    private function initMailer(): void
     {
-        if ($this->mailer) {
-            return $this->mailer;
+        if (isset($this->mailer)) {
+            return;
         }
 
         $clientConfigurator = (new HttpClientConfigurator())

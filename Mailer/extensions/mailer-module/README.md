@@ -139,8 +139,8 @@ mailers of the same type. In the settings you have to provide necessary values f
     ```neon
     mailFactory:
         setup:
-            - addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer('us'))
-            - addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer('eu'))
+            - addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(code: us))
+            - addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(code: eu))
     ```
 
 

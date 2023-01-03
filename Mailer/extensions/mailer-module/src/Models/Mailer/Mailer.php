@@ -13,26 +13,16 @@ abstract class Mailer implements \Nette\Mail\Mailer
 {
     public const ALIAS = "";
 
-    /** @var ConfigsRepository */
-    protected $configsRepository;
+    protected array $options = [];
 
-    /** @var Config */
-    protected $config;
-
-    protected $options = [];
-
-    protected $code;
+    protected ?string $code = null;
 
     public function __construct(
+        private Config $config,
+        private ConfigsRepository $configsRepository,
         ?string $code = null,
-        Config $config,
-        ConfigsRepository $configsRepository
     ) {
         $this->code = $code;
-
-        $this->configsRepository = $configsRepository;
-        $this->config = $config;
-
         $this->buildConfig();
     }
 

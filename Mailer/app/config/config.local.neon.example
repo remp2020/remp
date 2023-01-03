@@ -83,8 +83,8 @@ services:
     # Setup of multiple mailers of the same type
 #	mailFactory:
 #		setup:
-#			- addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(), 'us')
-#			- addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(), 'eu')
+#			- addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(code: us))
+#			- addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(code: eu))
 
     # Setup of secondary locales
     localizationConfig:

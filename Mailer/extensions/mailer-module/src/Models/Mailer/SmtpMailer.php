@@ -12,9 +12,9 @@ class SmtpMailer extends Mailer
 {
     public const ALIAS = 'remp_smtp';
 
-    private $mailer;
+    private NetteSmtpMailer $mailer;
 
-    protected $options = [
+    protected array $options = [
         'host' => [
             'required' => true,
             'label' => 'SMTP host',
@@ -41,11 +41,11 @@ class SmtpMailer extends Mailer
     ];
 
     public function __construct(
-        ?string $code = null,
         Config $config,
-        ConfigsRepository $configsRepository
+        ConfigsRepository $configsRepository,
+        ?string $code = null,
     ) {
-        parent::__construct($code, $config, $configsRepository);
+        parent::__construct($config, $configsRepository, $code);
 
         // SMTP Mailer expects plain options
         $options = [];
