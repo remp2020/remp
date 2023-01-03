@@ -4469,7 +4469,7 @@
             "dist": {
                 "type": "path",
                 "url": "extensions/mailer-module",
-                "reference": "240caf32052655c7d80168a3f2061af13545e9b0"
+                "reference": "c732325e238b060075997f570d5eae165dc87a74"
             },
             "require": {
                 "contributte/webpack": "^2.2",
@@ -4500,7 +4500,7 @@
                 "predis/predis": "^1.1",
                 "remp/remp-commons": "@dev|^0.32",
                 "robmorgan/phinx": "^0.12",
-                "rootpd/nette-sentry": "^1.1",
+                "rootpd/nette-sentry": "^2.0",
                 "slim/psr7": "^1.3",
                 "symfony/console": "^5.2",
                 "symfony/http-client": "^5.1",
@@ -4697,24 +4697,24 @@
         },
         {
             "name": "rootpd/nette-sentry",
-            "version": "1.4.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rootpd/nette-sentry.git",
-                "reference": "242f54fdcdfafbcecbefb48f82f952244f075a2c"
+                "reference": "f748c4d759a5a793f4024d0bcda843edd70cd614"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rootpd/nette-sentry/zipball/242f54fdcdfafbcecbefb48f82f952244f075a2c",
-                "reference": "242f54fdcdfafbcecbefb48f82f952244f075a2c",
+                "url": "https://api.github.com/repos/rootpd/nette-sentry/zipball/f748c4d759a5a793f4024d0bcda843edd70cd614",
+                "reference": "f748c4d759a5a793f4024d0bcda843edd70cd614",
                 "shasum": ""
             },
             "require": {
-                "nette/di": "^2.4.7 || ^3.0",
-                "nette/http": "^2.4.7 || ^3.0",
-                "nette/security": "^2.4 || ^3.0",
-                "nette/utils": "^2.4.5 || ^3.0",
-                "php": "^7.2 || ^8.0",
+                "nette/di": "^3.0",
+                "nette/http": "^3.0",
+                "nette/security": "^3.0",
+                "nette/utils": "^3.0",
+                "php": "^8.0",
                 "sentry/sdk": "^3.0",
                 "tracy/tracy": "^2.4"
             },
@@ -4747,9 +4747,9 @@
             ],
             "support": {
                 "issues": "https://github.com/rootpd/nette-sentry/issues",
-                "source": "https://github.com/rootpd/nette-sentry/tree/1.4.0"
+                "source": "https://github.com/rootpd/nette-sentry/tree/2.0.0"
             },
-            "time": "2021-11-29T21:26:22+00:00"
+            "time": "2022-12-28T09:48:08+00:00"
         },
         {
             "name": "sentry/sdk",
