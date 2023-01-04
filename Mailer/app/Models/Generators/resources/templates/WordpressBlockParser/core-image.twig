@@ -1,9 +1,11 @@
 <!-- core/image -->
 <div style="margin-top: 16px; margin-bottom: 16px;">
-<img src="{{ url }}" border="0" style="width: 100%; display: block;"
-    {% if alt %}alt="{{ alt }}"{% endif %}
-    {% if caption %}title="{{ caption }}"{% endif %}
->
+    {% if href %}<a href="{{ href }}" target="_blank" style="display: block; border: none; margin: 0; padding: 0; text-decoration: none;">{% endif %}
+        <img src="{{ url }}" border="0" style="width: 100%; display: block;"
+            {% if alt %}alt="{{ alt }}"{% endif %}
+            {% if caption %}title="{{ caption }}"{% endif %}
+        >
+    {% if href %}</a>{% endif %}
 {% if caption %}<div style="color: #888;font-family: Arial,sans-serif;font-size: 14px;margin-top:5px;line-height: 1.3;">{{ caption|raw }}</div>{% endif %}
 </div>
 <!-- end core/image -->

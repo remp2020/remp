@@ -61,6 +61,7 @@ class WordpressBlockParser
             'url' => $block->attributes->url ?? null,
             'alt' => $block->attributes->alt ?? null,
             'caption' => $block->attributes->caption ?? null,
+            'href' => $block->attributes->href ?? null,
         ];
 
         if ($block->name === self::BLOCK_CORE_GROUP
