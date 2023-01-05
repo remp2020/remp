@@ -131,7 +131,7 @@ class ArticleController extends Controller
             ])
             ->join('articles', 'articles.id', '=', 'conversions.article_id')
             ->whereIn('article_id', (clone $articles)->pluck('id'))
-            ->groupBy(['conversions.article_id', 'conversions.currency']);
+            ->groupBy(['conversions.article_id', 'articles.external_id', 'conversions.currency']);
 
         $externalIdsToUniqueBrowsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
 
