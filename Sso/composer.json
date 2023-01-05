@@ -60,6 +60,7 @@
         "guzzlehttp/guzzle": "^7.0.1"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.7",
         "barryvdh/laravel-ide-helper": "^2.10",
         "beyondcode/laravel-dump-server": "^1.7",
         "facade/ignition": "^2.5",
@@ -69,7 +70,6 @@
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
         "phpunit/phpunit": "9.3.11",
-        "recca0120/laravel-tracy": "^1.13",
         "squizlabs/php_codesniffer": "^3.6"
     },
     "autoload": {
