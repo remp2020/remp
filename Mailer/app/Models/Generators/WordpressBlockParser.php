@@ -71,6 +71,10 @@ class WordpressBlockParser
             $data['group_grey'] = true;
         }
 
+        if ($block->name === self::BLOCK_CORE_LIST) {
+            $data['list_type'] = str_contains($data['originalContent'], 'ol') !== false ? 'ol' : 'ul';
+        }
+
         if ($block->name === self::BLOCK_CORE_GROUP
             && isset($block->attributes->className)
             && str_contains($block->attributes->className, 'wp-block-dn-newsletter-group-ordered')
