@@ -33,6 +33,7 @@ class WordpressBlockParser
         private EmbedParser $embedParser
     ) {
         $this->twig = $engineFactory->engine('twig');
+        $this->embedParser->setVideoLinkText('Video sa po kliknutí spustí v novom okne');
     }
 
     public function parseJson(string $json)
