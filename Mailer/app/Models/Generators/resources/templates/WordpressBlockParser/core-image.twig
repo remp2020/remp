@@ -1,5 +1,5 @@
 <!-- core/image -->
-<div style="margin-top: 16px; margin-bottom: 16px;">
+<div {% if isInMinute %}style="margin-top: 16px; margin-bottom: 16px;"{% endif %}>
     {% if href %}<a href="{{ href }}" target="_blank" style="display: block; border: none; margin: 0; padding: 0; text-decoration: none;">{% endif %}
         <img src="{{ url }}" border="0" style="width: 100%; display: block;"
             {% if alt %}alt="{{ alt }}"{% endif %}

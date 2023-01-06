@@ -51,7 +51,7 @@ class WordpressBlockParser
         return [$result, $textResult];
     }
 
-    public function getBlockTemplateData(object $block): array
+    public function getBlockTemplateData(object $block, array $innerBlockParams = []): array
     {
         $data = [
             'originalContent' => $block->originalContent ?? null,
@@ -63,6 +63,8 @@ class WordpressBlockParser
             'alt' => $block->attributes->alt ?? null,
             'caption' => $block->attributes->caption ?? null,
             'href' => $block->attributes->href ?? null,
+            'isInMinute' => $innerBlockParams['isInMinute'] ?? false,
+            'minuteListItem' => $innerBlockParams['minuteListItem'] ?? false,
         ];
 
         if ($block->name === self::BLOCK_CORE_GROUP
@@ -90,18 +92,23 @@ class WordpressBlockParser
         if ($block->name === self::BLOCK_DN_MINUTE) {
             $data['isFirstDNMinuteInGroup'] = $this->isFirstDNMinuteInGroup;
         }
+
+        if (isset($innerBlockParams['groupOrdered']) && $innerBlockParams['groupOrdered'] && $block->name === self::BLOCK_DN_MINUTE) {
+            if ($this->minuteOrderCounter < 6) {
+                $data['minuteOrderCounter'] = $this->minuteOrderCounter;
+            }
+            $this->minuteOrderCounter++;
+        }
         return $data;
     }
 
-    public function parseBlock(object $block, bool $isInMinute = false, bool $groupOrdered = false): string
+    public function parseBlock(object $block, array $innerBlockParams = []): string
     {
         $params = [
             'contents' => ''
         ];
 
-        $params += $this->getBlockTemplateData($block);
-
-        $params['isInMinute'] = $isInMinute;
+        $params += $this->getBlockTemplateData($block, $innerBlockParams);
 
         if ($block->name === self::BLOCK_CORE_GROUP) {
             $this->minuteOrderCounter = 1;
@@ -112,15 +119,14 @@ class WordpressBlockParser
             $this->isFirstDNMinuteInGroup = false;
         }
 
-        if ($groupOrdered && $block->name === self::BLOCK_DN_MINUTE && $this->minuteOrderCounter < 6) {
-            $params['minuteOrderCounter'] = $this->minuteOrderCounter;
-            $this->minuteOrderCounter++;
-        }
-
         $template = $this->getTemplate($block->name);
         if (isset($block->innerBlocks) && !empty($block->innerBlocks)) {
             foreach ($block->innerBlocks as $innerBlock) {
-                $params['contents'] .= $this->parseBlock($innerBlock, $block->name === self::BLOCK_DN_MINUTE, $params['group_ordered'] ?? false);
+                $params['contents'] .= $this->parseBlock($innerBlock, [
+                    'isInMinute' => $block->name === self::BLOCK_DN_MINUTE,
+                    'groupOrdered' => $params['group_ordered'] ?? false,
+                    'minuteListItem' => isset($innerBlockParams['groupOrdered']) && $innerBlockParams['groupOrdered'] && $block->name === self::BLOCK_DN_MINUTE && $this->minuteOrderCounter > 6
+                ]);
             }
         }
         return $this->twig->render($template, $params);
