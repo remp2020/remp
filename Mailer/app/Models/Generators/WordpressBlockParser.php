@@ -93,13 +93,15 @@ class WordpressBlockParser
         return $data;
     }
 
-    public function parseBlock(object $block, bool $groupOrdered = false): string
+    public function parseBlock(object $block, bool $isInMinute = false, bool $groupOrdered = false): string
     {
         $params = [
             'contents' => ''
         ];
 
         $params += $this->getBlockTemplateData($block);
+
+        $params['isInMinute'] = $isInMinute;
 
         if ($block->name === self::BLOCK_CORE_GROUP) {
             $this->minuteOrderCounter = 1;
@@ -118,7 +120,7 @@ class WordpressBlockParser
         $template = $this->getTemplate($block->name);
         if (isset($block->innerBlocks) && !empty($block->innerBlocks)) {
             foreach ($block->innerBlocks as $innerBlock) {
-                $params['contents'] .= $this->parseBlock($innerBlock, $params['group_ordered'] ?? false);
+                $params['contents'] .= $this->parseBlock($innerBlock, $block->name === self::BLOCK_DN_MINUTE, $params['group_ordered'] ?? false);
             }
         }
         return $this->twig->render($template, $params);
