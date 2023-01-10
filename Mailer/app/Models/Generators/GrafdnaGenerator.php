@@ -236,23 +236,7 @@ HTML;
     {
         $output = new ArrayHash();
 
-        if (isset($data->sender_email) && $data->sender_email) {
-            $output->from = $data->sender_email;
-        } else {
-            $output->from = "Denník N <info@dennikn.sk>";
-            foreach ($data->post_authors as $author) {
-                if ($author->user_email === "editori@dennikn.sk") {
-                    continue;
-                }
-
-                if ($author->user_email !== 'e@dennikn.sk') {
-                    $output->from = $author->display_name . ' Denník N <' . $author->user_email . '>';
-                } else {
-                    $output->from = $author->display_name . ' <' . $author->user_email . '>';
-                }
-                break;
-            }
-        }
+        $output->from = "Denník E <e@dennikn.sk>";
 
         if (!isset($data->post_title)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_title'");
