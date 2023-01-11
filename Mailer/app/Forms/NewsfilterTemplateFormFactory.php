@@ -295,7 +295,7 @@ class NewsfilterTemplateFormFactory
                 'mail_type_id' => 28, // tyzden v nhl
                 'from' => 'Denník N <info@dennikn.sk>',
             ];
-        } elseif ($sourceTemplateId === 81) {
+        } elseif ($sourceTemplateId == 81) {
             $defaults = [
                 'name' => 'Ráno s NHL ' . date('j.n.Y'),
                 'code' => 'nwsf_rano-nhl_' . date('dmY'),
