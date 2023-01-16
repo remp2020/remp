@@ -11,7 +11,7 @@
     "ext-pdo": "*",
     "embed/embed": "^4.3",
     "guzzlehttp/guzzle": "^7.0",
-    "halaxa/json-machine": "^0.3",
+    "halaxa/json-machine": "^1.1",
     "justinrainbow/json-schema": "^5.2",
     "latte/latte": "^2.5",
     "league/event": "^3.0",

@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Models\Segment;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
+use JsonMachine\Items;
 use Psr\Http\Message\StreamInterface;
 
 class Crm implements ISegment
@@ -37,12 +38,12 @@ class Crm implements ISegment
         $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
         try {
             $segments = [];
-            foreach (\JsonMachine\JsonMachine::fromStream($stream, "/segments") as $segment) {
+            foreach (Items::fromStream($stream, ['pointer' => '/segments']) as $segment) {
                 $segments[] = [
-                    'name' => $segment['name'],
+                    'name' => $segment->name,
                     'provider' => static::PROVIDER_ALIAS,
-                    'code' => $segment['code'],
-                    'group' => $segment['group'],
+                    'code' => $segment->code,
+                    'group' => $segment->group->name,
                 ];
             }
         } finally {
@@ -59,8 +60,8 @@ class Crm implements ISegment
         $stream = \GuzzleHttp\Psr7\StreamWrapper::getResource($response);
         try {
             $userIds = [];
-            foreach (\JsonMachine\JsonMachine::fromStream($stream, "/users") as $user) {
-                $userIds[] = $user['id'];
+            foreach (Items::fromStream($stream, ['pointer' => '/users']) as $user) {
+                $userIds[] = $user->id;
             }
         } finally {
             fclose($stream);

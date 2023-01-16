@@ -35,6 +35,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Changed order of constructor parameters of `Remp\MailerModule\Models\Mailer\Mailer`. remp/remp#1224
   - If you implement your own mailer, align your constructor with the parent class.
   - The registration of mailer in `config.neon` should use named parameter - e.g. change `addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(eu))` to `addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(code: eu))`.
+- **BREAKING**: Updated `JsonMachine` library for parsing JSON streams. remp/remp#1224
+  - If you extend Mailer and use `JsonMachine` to process the API response's JSON stream, please refer to the [current version of documentation](https://github.com/halaxa/json-machine/blob/fa261d25231c8bfe1ea0a29da9033f575d0860a8/README.md). 
 - **IMPORTANT**: Fixed description of "priority" field in the newsletter list form. remp/remp#1195
   - The newsletter form incorrectly stated the information about newsletter list priority. Mailer always prioritized newsletters with higher "priority" field, but the form stated otherwise.
 - Added `ServiceParamsProviderInterface` which implements adding custom parameters to mail templates. remp/remp#1175

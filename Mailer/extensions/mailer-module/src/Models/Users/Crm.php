@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\StreamWrapper;
-use JsonMachine\JsonMachine;
+use JsonMachine\Items;
 use Nette\Utils\Json;
 use Tracy\Debugger;
 
@@ -42,10 +42,10 @@ class Crm implements IUser
             $stream = StreamWrapper::getResource($response->getBody());
             try {
                 $users = [];
-                foreach (JsonMachine::fromStream($stream, "/users") as $user) {
-                    $users[$user['id']] = [
-                        'id' => $user['id'],
-                        'email' => $user['email'],
+                foreach (Items::fromStream($stream, ['pointer' => '/users']) as $user) {
+                    $users[$user->id] = [
+                        'id' => $user->id,
+                        'email' => $user->email,
                     ];
                 }
             } finally {
