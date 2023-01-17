@@ -75,7 +75,7 @@ class WordpressBlockParser
         }
 
         if ($block->name === self::BLOCK_CORE_LIST) {
-            $data['list_type'] = str_contains($data['originalContent'], 'ol') !== false ? 'ol' : 'ul';
+            $data['list_type'] = $block->attributes->ordered ? 'ol' : 'ul';
         }
 
         if ($block->name === self::BLOCK_CORE_GROUP
