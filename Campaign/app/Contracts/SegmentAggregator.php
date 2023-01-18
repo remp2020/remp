@@ -4,7 +4,7 @@ namespace App\Contracts;
 
 use App\CampaignSegment;
 use Illuminate\Support\Collection;
-use Illuminate\Queue\SerializableClosure;
+use Laravel\SerializableClosure\SerializableClosure;
 use Predis\Client;
 use Illuminate\Support\Facades\Redis;
 

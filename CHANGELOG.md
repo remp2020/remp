@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added information about where to display to the detail page of campaign. remp/remp#1009
 - Changed the form of editing banner's custom JS - now JS code is displayed formatted and linted in separate window. remp/remp#1171
 - Added support for the inline editing of variables in the custom JS of banner. remp/remp#1172
+- Replaced Laravel's internal `SerializableClosure` with the separate forked implementation to avoid deprecation. remp/remp#1160
 
 ### [Mailer]
 
