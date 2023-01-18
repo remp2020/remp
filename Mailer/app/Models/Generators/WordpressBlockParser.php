@@ -93,6 +93,12 @@ class WordpressBlockParser
             $data['isFirstDNMinuteInGroup'] = $this->isFirstDNMinuteInGroup;
         }
 
+        if ($block->name === self::BLOCK_CORE_HEADING) {
+            $data['level'] = $block->attributes->level;
+            // Override content - get the width of image from style and add as html attribute to fix Outlook
+            $data['content'] = preg_replace('/(\N*width:\\s?)(\d*)(px\N*")(\N*)/', '$1$2$3 width=$2 $4', $block->attributes->content);
+        }
+
         if (isset($innerBlockParams['groupOrdered']) && $innerBlockParams['groupOrdered'] && $block->name === self::BLOCK_DN_MINUTE) {
             if ($this->minuteOrderCounter < 6) {
                 $data['minuteOrderCounter'] = $this->minuteOrderCounter;

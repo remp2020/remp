@@ -1,8 +1,5 @@
 <!-- core/column -->
-<td align="left"
-    valign="{% if verticalAlignment %}{{ verticalAlignment }}{% else %}top{% endif %}"
-    {% if width %}width="{{ width }}"{% endif %}
->
+<div style="width: 100%; {% if width %}max-width: {{ width }};{% endif %}">
     {{ contents|raw }}
-</td>
+</div>
 <!-- end core/group -->
