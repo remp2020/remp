@@ -29,11 +29,6 @@ final class Bootstrap
             $configurator->setDebugMode(false);
         }
 
-        // terminal
-        if (self::isCli()) {
-            $configurator->setDebugMode(true);
-        }
-
         $configurator->enableTracy(__DIR__ . '/../log');
 
         $configurator->setTimeZone($_ENV['TIMEZONE']);

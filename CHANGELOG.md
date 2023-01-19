@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - If you extend Mailer and use `JsonMachine` to process the API response's JSON stream, please refer to the [current version of documentation](https://github.com/halaxa/json-machine/blob/fa261d25231c8bfe1ea0a29da9033f575d0860a8/README.md). 
 - **IMPORTANT**: Fixed description of "priority" field in the newsletter list form. remp/remp#1195
   - The newsletter form incorrectly stated the information about newsletter list priority. Mailer always prioritized newsletters with higher "priority" field, but the form stated otherwise.
+- Removed debugMode from CLI executions on non-production environments. remp/remp#1224
 - Added `ServiceParamsProviderInterface` which implements adding custom parameters to mail templates. remp/remp#1175
 - Added `DefaultServiceParamsProvider` which adds `settings` and `unsubscribe` params to mail templates.
 - Refactored `Sender` class to use `ServiceParamsProviderInterface` instead of `generateServiceParams` method.
