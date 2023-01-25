@@ -55,7 +55,7 @@
         "laravel-mix-polyfill": "^3.0.0",
         "lodash": "^4.17.20",
         "material-design-iconic-font": "^2.2.0",
-        "moment": "^2.29.0",
+        "moment": "^2.29.4",
         "moment-timezone": "@^0.4.0 || ^0.5.0",
         "node-waves": "^0.7.6",
         "pluralize": "^7.0.0",
