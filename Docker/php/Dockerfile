@@ -1,4 +1,4 @@
-FROM php:8.0.20-fpm
+FROM php:8.1.14-fpm
 
 ENV BUILD_DEPS g++ build-essential libsasl2-dev libssl-dev
 

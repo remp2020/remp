@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Project
 
 - Changed the way how PHP CodeSniffer scripts (`phpcbf`, `phpcs`) is executed. Now they run from `vendor/bin` and so will reflect actual version of PHP.
+- The resolved composer dependencies are now generated against PHP 8.1. 
 
 ### [Beam]
 
