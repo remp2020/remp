@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Added the soft delete of mail type variants. remp/crm#2721
+
 ## [1.1.0] - 2023-01-27
 
 ### Project

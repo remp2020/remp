@@ -81,7 +81,7 @@ class MailJobCreateApiHandler extends BaseHandler
 
         $mailTypeVariant = null;
         if (isset($params['mail_type_variant_code'])) {
-            $mailTypeVariant = $this->listVariantsRepository->findBy('code', ($params['mail_type_variant_code']));
+            $mailTypeVariant = $this->listVariantsRepository->findByCode($params['mail_type_variant_code']);
             if (!$mailTypeVariant) {
                 return new JsonApiResponse(IResponse::S404_NotFound, [
                     'status' => 'error',

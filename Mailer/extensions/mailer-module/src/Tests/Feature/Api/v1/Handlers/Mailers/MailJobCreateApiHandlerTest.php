@@ -106,6 +106,22 @@ class MailJobCreateApiHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals('error', $response->getPayload()['status']);
     }
 
+    public function testDeletedMailTypeVariant()
+    {
+        $params = $this->getDefaultParams();
+
+        $mailTypeVariantCode = $params['mail_type_variant_code'];
+        $mailTypeVariant = $this->listVariantsRepository->findByCode($mailTypeVariantCode);
+
+        $this->listVariantsRepository->softDelete($mailTypeVariant);
+
+        /** @var JsonApiResponse $response */
+        $response = $this->handler->handle($params);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertEquals(404, $response->getCode());
+        $this->assertEquals('error', $response->getPayload()['status']);
+    }
+
     private function getDefaultParams()
     {
         $mailType = $this->createMailTypeWithCategory(
