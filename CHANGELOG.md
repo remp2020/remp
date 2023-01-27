@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [1.1.0] - 2023-01-27
+
 ### Project
 
 - Changed the way how PHP CodeSniffer scripts (`phpcbf`, `phpcs`) is executed. Now they run from `vendor/bin` and so will reflect actual version of PHP.
-- The resolved composer dependencies are now generated against PHP 8.1. 
+- The resolved composer dependencies are now generated against PHP 8.1.
 
 ### [Beam]
 
@@ -22,7 +24,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added `dimensions` of banner into required inputs during the creation of custom HTML banner. remp/remp#1165
 - Added operator `is not` for the pageview attributes of campaign settings. remp/remp#1177
-- Added the configurable option to prioritize banners on same position. To enable set `env` variable `PRIORITIZE_BANNERS_ON_SAME_POSITION`. remp/remp#1167
+- Added the configurable option to prioritize banners on same position. To enable the feature set `env` variable `PRIORITIZE_BANNERS_ON_SAME_POSITION`. remp/remp#1167
 - Added information about where to display to the detail page of campaign. remp/remp#1009
 - Changed the form of editing banner's custom JS - now JS code is displayed formatted and linted in separate window. remp/remp#1171
 - Added support for the inline editing of variables in the custom JS of banner. remp/remp#1172
@@ -30,6 +32,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **IMPORTANT**: Changed primary keys of exposed tables from `int` to `bigint`. remp/remp#1187
+  - This migration is a two-step process that requires your manual action - running `mail:migrate-mail-logs-and-conversions` in the off-peak hours. Since some tables are very exposed and cannot be locked for more than a couple of seconds, we decided to migrate the data into the new table manually and keep the old and new table in sync. Based on the amount of your data, the migration can take hours. Our production data with 200M+ records in the `mail_logs` table took ~15 hours to migrate.
+  - The newly created `mail_logs` table also contains `user_id`, that will be used in the future release.
 - **BREAKING**: Changed `DataRow` (which extended deprecated `Nette\Database\Table\IRow`) to `ActiveRowFactory` (which returns `ActiveRow`). remp/remp#1224
   - If you use `DataRow`, replace the use with `$this->activeRowFactory->create()`.
 - **BREAKING**: Added types to the properties of `Remp\MailerModule\Models\Mailer\Mailer`. remp/remp#1224
@@ -1396,7 +1401,8 @@ _Note: Generated binaries were not changed since 0.7.0, there's no need to redep
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/1.0.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/1.1.0...master
+[1.1.0]: https://github.com/remp2020/remp/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/remp2020/remp/compare/0.34.1...1.0.0
 [0.34.1]: https://github.com/remp2020/remp/compare/0.34.0...0.34.1
 [0.34.0]: https://github.com/remp2020/remp/compare/0.33.0...0.34.0
