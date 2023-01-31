@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Api\v2\Handlers\Mailers;
 use Nette\Http\IResponse;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\GetInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -13,14 +14,12 @@ use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailTypesListingHandler extends BaseHandler
 {
-    private $listsRepository;
     use JsonValidationTrait;
 
     public function __construct(
-        ListsRepository $listsRepository
+        private ListsRepository $listsRepository,
+        private ListVariantsRepository $listVariantsRepository
     ) {
-        parent::__construct();
-        $this->listsRepository = $listsRepository;
     }
 
     public function params(): array
@@ -65,7 +64,7 @@ class MailTypesListingHandler extends BaseHandler
             $item->locked = (bool) $row->locked;
             $item->is_multi_variant = (bool) $row->is_multi_variant;
             $item->sorting = $row->sorting;
-            $item->variants = $row->related('mail_type_variants.mail_type_id')->order('sorting')->fetchPairs('id', 'title');
+            $item->variants = $this->listVariantsRepository->getVariantsForType($row)->order('sorting')->fetchPairs('id', 'title');
             $output[] = $item;
         }
 
