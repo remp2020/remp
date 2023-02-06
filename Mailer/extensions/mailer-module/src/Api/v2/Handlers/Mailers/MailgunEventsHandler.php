@@ -75,7 +75,8 @@ class MailgunEventsHandler extends BaseHandler
             'timestamp' => $params['event-data']['timestamp'],
             'event' => $params['event-data']['event'],
             'reason' => $params['event-data']['reason'] ?? null,
-            'severity' => $params['event-data']['severity'] ?? null
+            'severity' => $params['event-data']['severity'] ?? null,
+            'client' => $params['event-data']['client-info'] ?? null,
         ]), RedisDriver::PRIORITY_LOW);
 
         return new JsonApiResponse(200, ['status' => 'ok']);
