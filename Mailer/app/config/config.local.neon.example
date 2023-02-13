@@ -71,7 +71,7 @@ services:
 #            - register(Remp\MailerModule\Models\Segment\Beam(%remp.beam.segments_addr%))
 #            - register(Remp\MailerModule\Models\Segment\Pythia(%remp.pythia.segments_addr%))
 
-#    - Remp\MailerModule\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
+#    - Remp\MailerModule\Models\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
 #    eventDispatcher:
 #        factory: League\Event\EventDispatcher
 #        setup:

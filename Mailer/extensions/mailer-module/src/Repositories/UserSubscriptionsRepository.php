@@ -163,12 +163,9 @@ class UserSubscriptionsRepository extends Repository
                 ] + $rtmParams);
         } else {
             if ($actual->subscribed) {
-                $this->getTable()->where([
-                    'user_id' => $userId,
-                    'mail_type_id' => $mailType->id,
-                ])->update(['subscribed' => false, 'updated_at' => new DateTime()] + $rtmParams);
+                $this->update($actual, ['subscribed' => false,] + $rtmParams);
                 $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
-                $this->emitUserUnsubscribedEvent($userId, $email, $mailType->id, $sendGoodbyeEmail);
+                $this->emitUserUnsubscribedEvent($userId, $email, $mailType->id, $sendGoodbyeEmail, $rtmParams);
             }
         }
     }
@@ -259,23 +256,25 @@ class UserSubscriptionsRepository extends Repository
         return $selection;
     }
 
-    private function emitUserSubscribedEvent($userId, $email, $mailTypeId, $sendWelcomeEmail)
+    private function emitUserSubscribedEvent($userId, $email, $mailTypeId, $sendWelcomeEmail, $rtmParams = [])
     {
         $this->emitter->emit(new HermesMessage('user-subscribed', [
             'user_id' => $userId,
             'user_email' => $email,
             'mail_type_id' => $mailTypeId,
             'send_welcome_email' => $sendWelcomeEmail,
-        ]));
+            'time' => new DateTime(),
+        ] + $rtmParams));
     }
 
-    private function emitUserUnsubscribedEvent($userId, $email, $mailTypeId, $sendGoodbyeEmail)
+    private function emitUserUnsubscribedEvent($userId, $email, $mailTypeId, $sendGoodbyeEmail, $rtmParams = [])
     {
         $this->emitter->emit(new HermesMessage('user-unsubscribed', [
             'user_id' => $userId,
             'user_email' => $email,
             'mail_type_id' => $mailTypeId,
             'send_goodbye_email' => $sendGoodbyeEmail,
-        ]));
+            'time' => new DateTime(),
+        ] + $rtmParams));
     }
 }
