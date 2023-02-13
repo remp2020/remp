@@ -31,3 +31,5 @@ services:
 	allowedDomainManager:
 		setup:
 			- addDomain('expresso.pt')
+
+	- Tests\Unit\NullTracker
