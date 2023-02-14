@@ -4,12 +4,21 @@ declare(strict_types=1);
 namespace Remp\Mailer\Hermes;
 
 use Remp\MailerModule\Hermes\HermesException;
+use Remp\MailerModule\Models\RedisClientFactory;
+use Remp\MailerModule\Models\RedisClientTrait;
 use Tomaj\Hermes\Handler\HandlerInterface;
 use Tomaj\Hermes\MessageInterface;
-use Tracy\Debugger;
 
 class MailgunBotTrackerHandler implements HandlerInterface
 {
+    private const APPLE_BOT_EMAILS = 'apple_bot_emails';
+
+    use RedisClientTrait;
+
+    public function __construct(protected RedisClientFactory $redisClientFactory)
+    {
+    }
+
     public function handle(MessageInterface $message): bool
     {
         $payload = $message->getPayload();
@@ -26,12 +35,10 @@ class MailgunBotTrackerHandler implements HandlerInterface
             return true;
         }
 
-        if (isset($payload['client']['bot']) && $payload['client']['bot'] !== "") {
-            $bot = $payload['client']['bot'];
-        } else {
-            $bot = "no_bot";
+        if (isset($payload['client']['bot']) && $payload['client']['bot'] === "apple") {
+            $redis = $this->redisClientFactory->getClient();
+            $redis->sadd(self::APPLE_BOT_EMAILS, [$payload['email']]);
         }
-        Debugger::log($bot, 'mailgun-bots');
 
         return true;
     }

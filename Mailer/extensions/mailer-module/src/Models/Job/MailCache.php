@@ -13,17 +13,14 @@ class MailCache
     const REDIS_KEY = 'mail-queue-';
     const REDIS_PRIORITY_QUEUES_KEY = 'priority-mail-queues';
 
-    private $redis;
-
     private $host;
 
     private $port;
 
     private $db;
 
-    public function __construct(RedisClientFactory $redisClientFactory)
+    public function __construct(protected RedisClientFactory $redisClientFactory)
     {
-        $this->redisClientFactory = $redisClientFactory;
     }
 
     /**

@@ -7,15 +7,13 @@ use Predis\Client;
 
 trait RedisClientTrait
 {
-    /** @var RedisClientFactory */
-    protected $redisClientFactory;
+    protected RedisClientFactory $redisClientFactory;
 
-    /** @var Client */
-    private $redis;
+    private Client $redis;
 
-    private $redisDatabase;
+    private ?int $redisDatabase = 0;
 
-    private $redisUseKeysPrefix = false;
+    private bool $redisUseKeysPrefix = false;
 
     public function setRedisDatabase($redisDatabase): void
     {
@@ -29,11 +27,11 @@ trait RedisClientTrait
 
     protected function redis(): Client
     {
-        if (!$this->redisClientFactory || !($this->redisClientFactory instanceof RedisClientFactory)) {
+        if (!isset($this->redisClientFactory) || !($this->redisClientFactory instanceof RedisClientFactory)) {
             throw new RedisClientTraitException('In order to use `RedisClientTrait`, you need to initialize `RedisClientFactory $redisClientFactory` in your service');
         }
 
-        if ($this->redis === null) {
+        if (!isset($this->redis)) {
             $this->redis = $this->redisClientFactory->getClient($this->redisDatabase, $this->redisUseKeysPrefix);
         }
 

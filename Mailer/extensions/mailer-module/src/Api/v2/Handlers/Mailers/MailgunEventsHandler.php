@@ -74,6 +74,7 @@ class MailgunEventsHandler extends BaseHandler
             'mail_sender_id' => $params['event-data']['user-variables']['mail_sender_id'] ?? null,
             'timestamp' => $params['event-data']['timestamp'],
             'event' => $params['event-data']['event'],
+            'email' => $params['event-data']['recipient'],
             'reason' => $params['event-data']['reason'] ?? null,
             'severity' => $params['event-data']['severity'] ?? null,
             'client' => $params['event-data']['client-info'] ?? null,
