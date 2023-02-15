@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added the soft delete of mail type variants. remp/crm#2721
 - Add ability to log apple bots use in Mailgun "opened" events via standalone Hermes handler (disabled by default). remp/analytika#137
 - Added `TrackSubscribeUnsubscribeHandler` hermes handler, which sends event to Tracker after user subscribes/unsubscribes from mail type. remp/remp#1226
+- Added ability to track RTM parameters in the `/api/v1/users/subscribe` API. remp/remp#1237
 
 ## [1.1.0] - 2023-01-27
 

@@ -54,6 +54,25 @@
     },
     "send_accompanying_emails": {
       "type": "boolean"
+    },
+    "rtm_params": {
+      "title": "RTM params",
+      "type": "object",
+      "properties": {
+        "rtm_source": {
+          "type": "string"
+        },
+        "rtm_medium": {
+          "type": "string"
+        },
+        "rtm_campaign": {
+          "type": "string"
+        },
+        "rtm_content": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

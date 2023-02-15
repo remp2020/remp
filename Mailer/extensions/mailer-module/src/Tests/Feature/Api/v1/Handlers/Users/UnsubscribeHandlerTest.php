@@ -46,13 +46,13 @@ class UnsubscribeHandlerTest extends BaseApiHandlerTestCase
 
         /** @var UserSubscriptionsRepository $userSubscriptionsRepository */
         $userSubscriptionsRepository = $this->inject(UserSubscriptionsRepository::class);
-        $isSubscribed = (bool) $userSubscriptionsRepository->getTable()->where([
+        $isNotSubscribed = (bool) $userSubscriptionsRepository->getTable()->where([
             'user_id' => 123,
             'user_email' => 'example@example.com',
             'mail_type_id' => $mailType->id,
-            'subscribed' => 1,
+            'subscribed' => 0,
         ])->count('*');
-        $this->assertFalse($isSubscribed);
+        $this->assertTrue($isNotSubscribed);
     }
 
     public function testSuccessfulUnsubscribeWithCode()
@@ -79,13 +79,13 @@ class UnsubscribeHandlerTest extends BaseApiHandlerTestCase
 
         /** @var UserSubscriptionsRepository $userSubscriptionsRepository */
         $userSubscriptionsRepository = $this->inject(UserSubscriptionsRepository::class);
-        $isSubscribed = (bool) $userSubscriptionsRepository->getTable()->where([
+        $isNotSubscribed = (bool) $userSubscriptionsRepository->getTable()->where([
             'user_id' => 123,
             'user_email' => 'example@example.com',
             'mail_type_id' => $mailType->id,
-            'subscribed' => 1,
+            'subscribed' => 0,
         ])->count('*');
-        $this->assertFalse($isSubscribed);
+        $this->assertTrue($isNotSubscribed);
     }
 
     public function testSuccessfulUnsubscribeWithVariantId()
@@ -114,13 +114,12 @@ class UnsubscribeHandlerTest extends BaseApiHandlerTestCase
 
         /** @var UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository */
         $userSubscriptionVariantsRepository = $this->inject(UserSubscriptionVariantsRepository::class);
-        $isSubscribed = (bool) $userSubscriptionVariantsRepository->getTable()->where([
+        $variantSubscription = $userSubscriptionVariantsRepository->getTable()->where([
             'mail_user_subscription.user_id' => 123,
             'mail_user_subscription.user_email' => 'example@example.com',
-            'mail_user_subscription.subscribed' => 1,
             'mail_type_variant_id' => $variant->id,
-        ])->count('*');
-        $this->assertFalse($isSubscribed);
+        ])->fetch();
+        $this->assertNull($variantSubscription);
     }
 
     public function testSuccessfulUnsubscribeWithVariantCode()
@@ -149,13 +148,57 @@ class UnsubscribeHandlerTest extends BaseApiHandlerTestCase
 
         /** @var UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository */
         $userSubscriptionVariantsRepository = $this->inject(UserSubscriptionVariantsRepository::class);
-        $isSubscribed = (bool) $userSubscriptionVariantsRepository->getTable()->where([
+        $variantSubscription = $userSubscriptionVariantsRepository->getTable()->where([
             'mail_user_subscription.user_id' => 123,
             'mail_user_subscription.user_email' => 'example@example.com',
-            'mail_user_subscription.subscribed' => 1,
             'mail_type_variant_id' => $variant->id,
+        ])->fetch();
+        $this->assertNull($variantSubscription);
+    }
+
+    public function testSuccessfulUnsubscribeWithRtmParams()
+    {
+        $mailType = $this->createMailTypeWithCategory(
+            "category1",
+            "code1",
+            "name1"
+        );
+        $variant = $this->createMailTypeVariant($mailType, 'Foo', 'foo');
+        $this->createMailUserSubscription($mailType, 123, 'example@example.com', $variant->id);
+
+        $params = [
+            'raw' => Json::encode([
+                'user_id' => 123,
+                'email' => 'example@example.com',
+                'list_code' => $mailType->code,
+                'variant_code' => $variant->code,
+                'rtm_params' => [
+                    'rtm_source' => 'test',
+                    'rtm_medium' => 'engine',
+                    'rtm_campaign' => 'cmp',
+                    'rtm_content' => 'code',
+                ]
+            ])
+        ];
+
+        /** @var JsonApiResponse $response */
+        $response = $this->handler->handle($params);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertEquals(IResponse::S200_OK, $response->getCode());
+
+        /** @var UserSubscriptionsRepository $userSubscriptionsRepository */
+        $userSubscriptionsRepository = $this->inject(UserSubscriptionsRepository::class);
+        $isNotSubscribed = (bool) $userSubscriptionsRepository->getTable()->where([
+            'user_id' => 123,
+            'user_email' => 'example@example.com',
+            'mail_type_id' => $mailType->id,
+            'subscribed' => 0,
+            'rtm_source' => 'test',
+            'rtm_medium' => 'engine',
+            'rtm_campaign' => 'cmp',
+            'rtm_content' => 'code',
         ])->count('*');
-        $this->assertFalse($isSubscribed);
+        $this->assertTrue($isNotSubscribed);
     }
 
     public function testFailingSubscribeWithInvalidVariantCode()

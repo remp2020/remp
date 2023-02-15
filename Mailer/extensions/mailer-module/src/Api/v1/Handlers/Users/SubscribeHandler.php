@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
-use Remp\MailerModule\Repositories\ActiveRow;
+use Nette\Utils\Strings;
 use Remp\MailerModule\Api\InvalidApiInputParamException;
 use Remp\MailerModule\Api\JsonValidationTrait;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
@@ -62,18 +63,16 @@ class SubscribeHandler extends BaseHandler
 
     protected function processUserSubscription($payload)
     {
-        $email = $payload['email'];
-        $userID = $payload['user_id'];
         $list = $this->getList($payload);
         $variantID = $this->getVariantID($payload, $list);
-        $sendWelcomeEmail = $payload['send_accompanying_emails'] ?? true;
 
         $this->userSubscriptionsRepository->subscribeUser(
-            $list,
-            $userID,
-            $email,
-            $variantID,
-            $sendWelcomeEmail
+            mailType: $list,
+            userId: $payload['user_id'],
+            email: $payload['email'],
+            variantId: $variantID,
+            sendWelcomeEmail: $payload['send_accompanying_emails'] ?? true,
+            rtmParams: $this->getRtmParams($payload),
         );
     }
 
@@ -131,5 +130,19 @@ class SubscribeHandler extends BaseHandler
         }
 
         return $list->default_variant_id;
+    }
+
+    // function that primary loads rtm parameters but fallbacks to utm if rtm are not present
+    private function getRtmParams($payload)
+    {
+        $rtmParams = [];
+        foreach ($payload['rtm_params'] ?? $payload['utm_params'] ?? [] as $key => $value) {
+            if (Strings::startsWith($key, 'utm_')) {
+                $rtmParams['rtm_' . substr($key, 4)] = $value;
+            } else {
+                $rtmParams[$key] = $value;
+            }
+        }
+        return $rtmParams;
     }
 }
