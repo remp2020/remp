@@ -155,6 +155,50 @@ class SubscribeHandlerTest extends BaseApiHandlerTestCase
         $this->assertTrue($isSubscribed);
     }
 
+    public function testSuccessfulSubscribeWithRtmParams()
+    {
+        $mailType = $this->createMailTypeWithCategory(
+            "category1",
+            "code1",
+            "name1"
+        );
+        $variant = $this->createMailTypeVariant($mailType, 'Foo', 'foo');
+
+        $params = [
+            'raw' => Json::encode([
+                'user_id' => 123,
+                'email' => 'example@example.com',
+                'list_code' => $mailType->code,
+                'rtm_params' => [
+                    'rtm_source' => 'test',
+                    'rtm_medium' => 'engine',
+                    'rtm_campaign' => 'cmp',
+                    'rtm_content' => 'code',
+                ]
+            ])
+        ];
+
+        /** @var JsonApiResponse $response */
+        $response = $this->handler->handle($params);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertEquals(IResponse::S200_OK, $response->getCode());
+
+        /** @var UserSubscriptionsRepository $userSubscriptionsRepository */
+        $userSubscriptionsRepository = $this->inject(UserSubscriptionsRepository::class);
+        $isSubscribed = (bool) $userSubscriptionsRepository->getTable()->where([
+            'user_id' => 123,
+            'user_email' => 'example@example.com',
+            'mail_type_id' => $mailType->id,
+            'subscribed' => 1,
+            'rtm_source' => 'test',
+            'rtm_medium' => 'engine',
+            'rtm_campaign' => 'cmp',
+            'rtm_content' => 'code',
+        ])->count('*');
+
+        $this->assertTrue($isSubscribed);
+    }
+
     public function testFailingSubscribeWithInvalidVariantCode()
     {
         $mailType = $this->createMailTypeWithCategory(

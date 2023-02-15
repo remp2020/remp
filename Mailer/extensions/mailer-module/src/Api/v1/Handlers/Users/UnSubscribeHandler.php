@@ -11,7 +11,6 @@ use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
@@ -76,9 +75,20 @@ class UnSubscribeHandler extends BaseHandler
                 return new JsonApiResponse(200, ['status' => 'ok']);
             }
 
-            $this->userSubscriptionsRepository->unsubscribeUserVariant($userSubscription, $variant, $this->getRtmParams($payload), $sendGoodbyeEmail);
+            $this->userSubscriptionsRepository->unsubscribeUserVariant(
+                userSubscription: $userSubscription,
+                variant: $variant,
+                rtmParams: $this->getRtmParams($payload),
+                sendGoodbyeEmail: $sendGoodbyeEmail,
+            );
         } else {
-            $this->userSubscriptionsRepository->unsubscribeUser($list, $payload['user_id'], $payload['email'], $this->getRtmParams($payload), $sendGoodbyeEmail);
+            $this->userSubscriptionsRepository->unsubscribeUser(
+                mailType: $list,
+                userId: $payload['user_id'],
+                email: $payload['email'],
+                rtmParams: $this->getRtmParams($payload),
+                sendGoodbyeEmail: $sendGoodbyeEmail,
+            );
         }
 
         return new JsonApiResponse(200, ['status' => 'ok']);

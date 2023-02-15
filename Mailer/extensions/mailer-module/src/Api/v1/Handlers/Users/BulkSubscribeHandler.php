@@ -9,7 +9,6 @@ use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
@@ -70,11 +69,24 @@ class BulkSubscribeHandler extends SubscribeHandler
             $rtmParams = $item['rtm_params'] ?? [];
 
             if ($user['subscribe'] === true) {
-                $this->userSubscriptionsRepository->subscribeUser($user['list'], $user['user_id'], $user['email'], $user['variant_id'], $user['send_accompanying_emails']);
+                $this->userSubscriptionsRepository->subscribeUser(
+                    mailType: $user['list'],
+                    userId: $user['user_id'],
+                    email: $user['email'],
+                    variantId: $user['variant_id'],
+                    sendWelcomeEmail: $user['send_accompanying_emails'],
+                    rtmParams: $rtmParams,
+                );
             } else {
                 // if email doesn't exist, no need to unsubscribe
                 if (!empty($this->userSubscriptionsRepository->findByEmail($user['email']))) {
-                    $this->userSubscriptionsRepository->unsubscribeUser($user['list'], $user['user_id'], $user['email'], $rtmParams, $user['send_accompanying_emails']);
+                    $this->userSubscriptionsRepository->unsubscribeUser(
+                        mailType: $user['list'],
+                        userId: $user['user_id'],
+                        email: $user['email'],
+                        rtmParams: $rtmParams,
+                        sendGoodbyeEmail: $user['send_accompanying_emails'],
+                    );
                 }
             }
         }

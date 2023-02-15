@@ -96,13 +96,15 @@ class UserSubscriptionsRepository extends Repository
         int $userId,
         string $email,
         int $variantId = null,
-        bool $sendWelcomeEmail = true
+        bool $sendWelcomeEmail = true,
+        array $rtmParams = [],
     ): void {
         if ($variantId == null) {
             $variantId = $mailType->default_variant_id;
         }
 
         // TODO: handle user ID even when searching for actual subscription
+        /** @var ActiveRow $actual */
         $actual = $this->getTable()
             ->where(['user_email' => $email, 'mail_type_id' => $mailType->id])
             ->limit(1)
@@ -116,8 +118,12 @@ class UserSubscriptionsRepository extends Repository
                 'created_at' => new DateTime(),
                 'updated_at' => new DateTime(),
                 'subscribed' => true,
+                'rtm_source' => $rtmParams['rtm_source'] ?? null,
+                'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
+                'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
+                'rtm_content' => $rtmParams['rtm_content'] ?? null,
             ]);
-            $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail);
+            $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail, $rtmParams);
 
             if ($variantId) {
                 if (!$mailType->is_multi_variant) {
@@ -127,8 +133,14 @@ class UserSubscriptionsRepository extends Repository
             }
         } else {
             if (!$actual->subscribed) {
-                $this->update($actual, ['subscribed' => true]);
-                $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail);
+                $this->update($actual, [
+                    'subscribed' => true,
+                    'rtm_source' => $rtmParams['rtm_source'] ?? null,
+                    'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
+                    'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
+                    'rtm_content' => $rtmParams['rtm_content'] ?? null,
+                ]);
+                $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail, $rtmParams);
             }
 
             if ($variantId) {
@@ -151,7 +163,13 @@ class UserSubscriptionsRepository extends Repository
         bool $sendGoodbyeEmail = true
     ): void {
         // TODO: check for userId also when searching for actual subscription
-        $actual = $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $mailType->id])->limit(1)->fetch();
+
+        /** @var ActiveRow $actual */
+        $actual = $this->getTable()->where([
+            'user_email' => $email,
+            'mail_type_id' => $mailType->id,
+        ])->limit(1)->fetch();
+
         if (!$actual) {
             $this->getTable()->insert([
                     'user_id' => $userId,
@@ -160,10 +178,20 @@ class UserSubscriptionsRepository extends Repository
                     'created_at' => new DateTime(),
                     'updated_at' => new DateTime(),
                     'subscribed' => false,
-                ] + $rtmParams);
+                    'rtm_source' => $rtmParams['rtm_source'] ?? null,
+                    'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
+                    'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
+                    'rtm_content' => $rtmParams['rtm_content'] ?? null,
+                ]);
         } else {
             if ($actual->subscribed) {
-                $this->update($actual, ['subscribed' => false,] + $rtmParams);
+                $this->update($actual, [
+                    'subscribed' => false,
+                    'rtm_source' => $rtmParams['rtm_source'] ?? null,
+                    'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
+                    'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
+                    'rtm_content' => $rtmParams['rtm_content'] ?? null,
+                ]);
                 $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
                 $this->emitUserUnsubscribedEvent($userId, $email, $mailType->id, $sendGoodbyeEmail, $rtmParams);
             }
@@ -172,6 +200,7 @@ class UserSubscriptionsRepository extends Repository
 
     public function unsubscribeEmail(ActiveRow $mailType, string $email, array $rtmParams = []): void
     {
+        /** @var ActiveRow $actual */
         $actual = $this->getTable()->where([
             'user_email' => $email,
             'mail_type_id' => $mailType->id,
@@ -185,7 +214,11 @@ class UserSubscriptionsRepository extends Repository
         $this->update($actual, [
                 'subscribed' => false,
                 'updated_at' => new DateTime(),
-            ] + $rtmParams);
+                'rtm_source' => $rtmParams['rtm_source'] ?? null,
+                'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
+                'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
+                'rtm_content' => $rtmParams['rtm_content'] ?? null,
+            ]);
 
         $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
     }
@@ -200,7 +233,13 @@ class UserSubscriptionsRepository extends Repository
 
     public function getUserSubscription(ActiveRow $mailType, int $userId, string $email): ?ActiveRow
     {
-        return $this->getTable()->where(['user_id' => $userId, 'mail_type_id' => $mailType->id, 'user_email' => $email])->limit(1)->fetch();
+        /** @var ActiveRow $row */
+        $row = $this->getTable()->where([
+            'user_id' => $userId,
+            'mail_type_id' => $mailType->id,
+            'user_email' => $email,
+        ])->limit(1)->fetch();
+        return $row;
     }
 
     public function unsubscribeUserVariant(
@@ -264,7 +303,11 @@ class UserSubscriptionsRepository extends Repository
             'mail_type_id' => $mailTypeId,
             'send_welcome_email' => $sendWelcomeEmail,
             'time' => new DateTime(),
-        ] + $rtmParams));
+            'rtm_source' => $rtmParams['rtm_source'] ?? null,
+            'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
+            'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
+            'rtm_content' => $rtmParams['rtm_content'] ?? null,
+        ]));
     }
 
     private function emitUserUnsubscribedEvent($userId, $email, $mailTypeId, $sendGoodbyeEmail, $rtmParams = [])
@@ -275,6 +318,10 @@ class UserSubscriptionsRepository extends Repository
             'mail_type_id' => $mailTypeId,
             'send_goodbye_email' => $sendGoodbyeEmail,
             'time' => new DateTime(),
-        ] + $rtmParams));
+            'rtm_source' => $rtmParams['rtm_source'] ?? null,
+            'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
+            'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
+            'rtm_content' => $rtmParams['rtm_content'] ?? null,
+        ]));
     }
 }

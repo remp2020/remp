@@ -1292,7 +1292,15 @@ Please visit `/list/new` to create a newsletter via web admin.
   // optional
   "variant_id": 123, // Integer; ID of the newsletter variant to subscribe
   "variant_code": "author.123", // String; Code of the newsletter variant to subscribe
-  "send_accompanying_emails": true // Boolean; Whether to send welcome or goodbye email to the subscribed/unsubscribed user. Defaults to TRUE.
+  "send_accompanying_emails": true, // Boolean; Whether to send welcome or goodbye email to the subscribed/unsubscribed user. Defaults to TRUE.
+
+  // optional RTM parameters for tracking "what" made the user unsubscribe
+  "rtm_params": { // Object; optional RTM parameters for pairing which email caused the user to unsubscribe. RTM params are generated into the email links automatically.
+    "rtm_source": "newsletter_daily",
+    "rtm_medium": "email",
+    "rtm_campaign": "daily-newsletter-11.3.2019-personalized",
+    "rtm_content": "26026"
+  }
 }
 ```
 
@@ -1308,7 +1316,14 @@ curl -X POST \
 	"user_id": 123,
 	"list_id": 1,
 	"variant_id": 1,
-    "send_accompanying_emails": true
+    "send_accompanying_emails": true,
+    // optional RTM parameters for tracking "what" made the user subscribe
+    "rtm_params": {
+        "rtm_source": "newsletter_daily",
+        "rtm_medium": "email",
+        "rtm_campaign": "daily-newsletter-11.3.2019-personalized",
+        "rtm_content": "26026"
+    },
 }'
 ```
 
@@ -1366,13 +1381,6 @@ of emails won't be available.
         "rtm_medium": "email",
         "rtm_campaign": "daily-newsletter-11.3.2019-personalized",
         "rtm_content": "26026"
-    },
-
-    "utm_params": { // (Deprecated) Fallback if no RTM parameters are found
-        "utm_source": "newsletter_daily",
-        "utm_medium": "email",
-        "utm_campaign": "daily-newsletter-11.3.2019-personalized",
-        "utm_content": "26026"
     }
 }
 ```
@@ -1445,12 +1453,6 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
         "rtm_content": "26026"
       },
 
-      "utm_params": { // Fallback to UTM - deprecated option, will be removed
-        "utm_source": "newsletter_daily",
-        "utm_medium": "email",
-        "utm_campaign": "daily-newsletter-11.3.2019-personalized",
-        "utm_content": "26026"
-      },
       // optional
       "send_accompanying_emails": true // Boolean; Flag whether to send welcome or goodbye email to the user whom subscription is being changed. Defaults to TRUE.
     }
