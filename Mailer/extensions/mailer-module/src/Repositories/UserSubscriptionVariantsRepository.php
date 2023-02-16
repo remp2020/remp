@@ -7,6 +7,8 @@ use Nette\Utils\DateTime;
 
 class UserSubscriptionVariantsRepository extends Repository
 {
+    use NewTableDataMigrationTrait;
+
     protected $tableName = 'mail_user_subscription_variants';
 
     public function subscribedVariants(ActiveRow $userSubscription): Selection
@@ -31,6 +33,11 @@ class UserSubscriptionVariantsRepository extends Repository
 
     public function removeSubscribedVariants(ActiveRow $userSubscription): int
     {
+        if ($this->newTableDataMigrationIsRunning()) {
+            $this->getNewTable()
+                ->where(['mail_user_subscription_id' => $userSubscription->id])
+                ->delete();
+        }
         return $this->getTable()
             ->where(['mail_user_subscription_id' => $userSubscription->id])
             ->delete();
@@ -65,15 +72,20 @@ class UserSubscriptionVariantsRepository extends Repository
 
     public function removeSubscribedVariant(ActiveRow $userSubscription, int $variantId): int
     {
-        return $this->getTable()->where([
+        $where = [
             'mail_user_subscription_id' => $userSubscription->id,
             'mail_type_variant_id' => $variantId
-        ])->delete();
+        ];
+
+        if ($this->newTableDataMigrationIsRunning()) {
+            $this->getNewTable()->where($where)->delete();
+        }
+        return $this->getTable()->where($where)->delete();
     }
 
     public function addVariantSubscription(ActiveRow $userSubscription, int $variantId): ActiveRow
     {
-        return $this->getTable()->insert([
+        return $this->insert([
             'mail_user_subscription_id' => $userSubscription->id,
             'mail_type_variant_id' => $variantId,
             'created_at' => new DateTime(),
@@ -90,5 +102,13 @@ class UserSubscriptionVariantsRepository extends Repository
         ])->group('mail_type_variant_id')
             ->select('COUNT(*) AS count, mail_type_variant_id, MAX(mail_type_variant.title) AS title, MAX(mail_type_variant.code) AS code')
             ->order('count DESC');
+    }
+
+    public function delete(ActiveRow &$row): bool
+    {
+        if ($this->newTableDataMigrationIsRunning()) {
+            $this->getNewTable()->wherePrimary($row->getPrimary())->delete();
+        }
+        return parent::delete($row);
     }
 }

@@ -52,6 +52,7 @@ services:
 			- add(Remp\MailerModule\Commands\MailTypeStatsCommand())
 			- add(Remp\MailerModule\Commands\RemoveOldMailJobBatchesCommand())
 			- add(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand())
+			- add(Remp\MailerModule\Commands\MigrateUserSubscriptionsAndVariantsCommand())
 			- add(@hermesWorker)
 			- setCatchExceptions(true)
 
@@ -222,8 +223,20 @@ services:
 	# Repositories
 	- Remp\MailerModule\Repositories\AuditLogRepository
 	- Remp\MailerModule\Repositories\ConfigsRepository
-	- Remp\MailerModule\Repositories\UserSubscriptionsRepository
-	- Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository
+
+	userSubscriptionsRepository:
+		factory: Remp\MailerModule\Repositories\UserSubscriptionsRepository
+		setup:
+			- setNewTableName('mail_user_subscriptions_v2')
+			- setNewTableDataMigrationIsRunningFlag(Remp\MailerModule\Commands\MigrateUserSubscriptionsAndVariantsCommand::USER_SUBSCRIPTIONS_AND_VARIANTS_MIGRATION_IS_RUNNING)
+			- setRedisClientFactory(@redisClientFactory)
+
+	userSubscriptionVariantsRepository:
+		factory: Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository
+		setup:
+			- setNewTableName('mail_user_subscription_variants_v2')
+			- setNewTableDataMigrationIsRunningFlag(Remp\MailerModule\Commands\MigrateUserSubscriptionsAndVariantsCommand::USER_SUBSCRIPTIONS_AND_VARIANTS_MIGRATION_IS_RUNNING)
+			- setRedisClientFactory(@redisClientFactory)
 
 	logsRepository:
 		factory: Remp\MailerModule\Repositories\LogsRepository

@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Add ability to log apple bots use in Mailgun "opened" events via standalone Hermes handler (disabled by default). remp/analytika#137
 - Added `TrackSubscribeUnsubscribeHandler` hermes handler, which sends event to Tracker after user subscribes/unsubscribes from mail type. remp/remp#1226
 - Added ability to track RTM parameters in the `/api/v1/users/subscribe` API. remp/remp#1237
+- **IMPORTANT**: Changed primary key from `int` to `bigint` for `mail_user_subscriptions` table. remp/remp#1187
+  - This migration is a two-step process that requires your manual action - running `mail:migrate-user-subscriptions-and-variants` in the off-peak hours. Since some tables are very exposed and cannot be locked for more than a couple of seconds, we decided to migrate the data into the new table manually and keep the old and new table in sync. Based on the amount of your data, the migration can take hours.
 
 ## [1.1.0] - 2023-01-27
 
