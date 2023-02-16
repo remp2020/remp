@@ -37,7 +37,6 @@ final class CreateNewMailUserSubscriptionsAndMailUserSubscriptionVariantsTables 
 
             $this->table('mail_user_subscriptions_v2')
                 ->changeColumn('id', 'biginteger', ['identity' => true])
-                ->addForeignKey('user_id', 'users')
                 ->addForeignKey('mail_type_id', 'mail_types')
                 ->save();
 
