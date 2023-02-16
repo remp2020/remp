@@ -11,6 +11,8 @@ use Tomaj\Hermes\Emitter;
 
 class UserSubscriptionsRepository extends Repository
 {
+    use NewTableDataMigrationTrait;
+
     protected $tableName = 'mail_user_subscriptions';
 
     protected $dataTableSearchable = ['user_email'];
@@ -33,6 +35,9 @@ class UserSubscriptionsRepository extends Repository
     public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
     {
         $data['updated_at'] = new DateTime();
+        if ($this->newTableDataMigrationIsRunning()) {
+            $this->getNewTable()->where('id', $row->id)->update($data);
+        }
         return parent::update($row, $data);
     }
 
@@ -47,6 +52,11 @@ class UserSubscriptionsRepository extends Repository
 
         $this->userSubscriptionVariantsRepository->removeSubscribedVariantsForEmails($emails);
 
+        if ($this->newTableDataMigrationIsRunning()) {
+            $this->getNewTable()->where([
+                'user_email' => $emails
+            ])->delete();
+        }
         return $this->getTable()->where([
             'user_email' => $emails
         ])->delete();
@@ -111,7 +121,7 @@ class UserSubscriptionsRepository extends Repository
             ->fetch();
 
         if (!$actual) {
-            $actual = $this->getTable()->insert([
+            $actual = $this->insert([
                 'user_id' => $userId,
                 'user_email' => $email,
                 'mail_type_id' => $mailType->id,
@@ -171,7 +181,7 @@ class UserSubscriptionsRepository extends Repository
         ])->limit(1)->fetch();
 
         if (!$actual) {
-            $this->getTable()->insert([
+            $this->insert([
                     'user_id' => $userId,
                     'user_email' => $email,
                     'mail_type_id' => $mailType->id,
