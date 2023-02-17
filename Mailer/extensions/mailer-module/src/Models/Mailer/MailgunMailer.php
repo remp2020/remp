@@ -37,7 +37,12 @@ class MailgunMailer extends Mailer
             'required' => false,
             'label' => 'Mailgun endpoint',
             'description' => 'Mailgun server URL (e.g. https://api.mailgun.net)',
-        ]
+        ],
+        'http_webhook_signing_key' => [
+            'required' => false,
+            'label' => 'HTTP webhook signing key',
+            'description' => "This key is used by Mailgun to sign webhook requests. It can be obtained in Mailgun's dashboard (Sending - Webhooks).",
+        ],
     ];
 
     public function setLogger(LoggerInterface $logger): void

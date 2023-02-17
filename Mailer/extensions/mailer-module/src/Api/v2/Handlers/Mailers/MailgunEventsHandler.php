@@ -66,7 +66,12 @@ class MailgunEventsHandler extends BaseHandler
 
         $mailer = $this->sender->getMailer(MailgunMailer::ALIAS);
 
-        if (hash_hmac('sha256', $params['signature']['timestamp'] . $params['signature']['token'], $mailer->getConfig('api_key')) !== $params['signature']['signature']) {
+        $signKey = $mailer->getConfig('http_webhook_signing_key');
+        if (!$signKey) {
+            // Fallback to the API key that was used as a signing key in the past.
+            $signKey = $mailer->getConfig('api_key');
+        }
+        if (hash_hmac('sha256', $params['signature']['timestamp'] . $params['signature']['token'], $signKey) !== $params['signature']['signature']) {
             return new JsonApiResponse(403, ['status' => 'error', 'message' => 'Wrong signature.']);
         }
 
