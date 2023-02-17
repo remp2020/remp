@@ -94,7 +94,7 @@ class MigrateMailLogsAndConversionsCommand extends Command
                 INSERT IGNORE INTO `{$mailLogConversionsV2TableName}` (`id`, `mail_log_id`, `converted_at`)
                 SELECT `{$mailLogConversionsTableName}`.`id`, `mail_log_id`, `converted_at`
                 FROM `{$mailLogConversionsTableName}`
-                WHERE `mail_log_id` IN (SELECT * FROM (SELECT `id` FROM `{$mailLogsTableName}` WHERE id > {$lastMigratedId} LIMIT {$pageSize}) as t)
+                WHERE `mail_log_id` IN (SELECT * FROM (SELECT `id` FROM `{$mailLogsTableName}` WHERE id > {$lastMigratedId} ORDER BY id ASC LIMIT {$pageSize}) as t)
             ");
 
             $remaining = $maxId-$lastMigratedId;

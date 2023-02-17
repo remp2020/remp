@@ -94,7 +94,7 @@ class MigrateUserSubscriptionsAndVariantsCommand extends Command
                 INSERT IGNORE INTO `{$userSubscriptionVariantsV2TableName}` (`id`, `mail_user_subscription_id`, `mail_type_variant_id`, `created_at`)
                 SELECT `{$userSubscriptionVariantsTableName}`.`id`, `mail_user_subscription_id`, `mail_type_variant_id`, `created_at`
                 FROM `{$userSubscriptionVariantsTableName}`
-                WHERE `mail_user_subscription_id` IN (SELECT * FROM (SELECT `id` FROM `{$userSubscriptionsTableName}` WHERE id > {$lastMigratedId} LIMIT {$pageSize}) as t)
+                WHERE `mail_user_subscription_id` IN (SELECT * FROM (SELECT `id` FROM `{$userSubscriptionsTableName}` WHERE id > {$lastMigratedId} ORDER BY id ASC LIMIT {$pageSize}) as t)
             ");
 
             $remaining = $maxId-$lastMigratedId;
