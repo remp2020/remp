@@ -56,6 +56,11 @@ class VariableController extends Controller
         ]);
     }
 
+    public function validateForm(VariableRequest $request, Variable $variable = null)
+    {
+        return response()->json(false);
+    }
+
     public function store(VariableRequest $request)
     {
         $variable = new Variable();

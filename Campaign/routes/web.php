@@ -49,6 +49,7 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::post('campaigns/validate', [CampaignController::class, 'validateForm'])->name('campaigns.validateForm');
     Route::post('banners/validate', [BannerController::class, 'validateForm'])->name('banners.validateForm');
+    Route::post('variables/validate/{variable?}', [VariableController::class, 'validateForm'])->name('variables.validateForm');
 
     Route::get('campaigns/{campaign}/stats', [CampaignController::class, 'stats'])->name('campaigns.stats');
     Route::post('campaigns/{campaign}/stats/data', [StatsController::class, 'getStats'])->name('campaigns.stats.data');
