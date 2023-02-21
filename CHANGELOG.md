@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for standalone HTTP webhook signing key. remp/remp#1232
   - Mailgun used to use domains API key to sign the requests, however it currently is a separate signing key.
 
+### [Campaign]
+
+- Fixed increasing pageviews for campaigns which banners were not displayed due to the priority rules for banners on the same position. remp/remp#1213
+
 ## [1.1.0] - 2023-01-27
 
 ### Project

@@ -172,7 +172,7 @@ class Showtime
 
         $campaignBanners = array_filter($campaignBanners);
         if ($this->prioritizeBannerOnSamePosition) {
-            $campaignBanners = $this->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners);
+            $campaignBanners = $this->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns);
         }
 
         foreach ($campaignBanners as $campaignBanner) {
@@ -189,7 +189,7 @@ class Showtime
         return $showtimeResponse->success($callback, $displayData, $activeCampaigns, $segmentAggregator->getProviderData());
     }
 
-    public function prioritizeCampaignBannerOnPosition(array $campaigns, array $campaignBanners): array
+    public function prioritizeCampaignBannerOnPosition(array $campaigns, array $campaignBanners, array &$activeCampaigns): array
     {
         $bannersOnPosition = [];
         foreach ($campaignBanners as $campaignBanner) {
@@ -199,12 +199,15 @@ class Showtime
                 /** @var CampaignBanner $bannerOnPosition */
                 $bannerOnPosition = $bannersOnPosition[$position];
                 /** @var Campaign $campaignOfBannerOnPosition */
-                $actualCampaign = $campaigns[$bannerOnPosition->campaign_id];
+                $currentCampaign = $campaigns[$bannerOnPosition->campaign_id];
                 /** @var Campaign $newCampaign */
                 $newCampaign = $campaigns[$campaignBanner->campaign_id];
 
-                if ($this->hasActualCampaignHigherPriorityOverTest($actualCampaign, $newCampaign)) {
+                if ($this->hasNewCampaignHigherPriorityOverCurrentOnPosition($newCampaign, $currentCampaign)) {
                     $bannersOnPosition[$position] = $campaignBanner;
+                    $this->removeCampaignByUuid($activeCampaigns, $currentCampaign->uuid);
+                } else {
+                    $this->removeCampaignByUuid($activeCampaigns, $newCampaign->uuid);
                 }
             } else {
                 $bannersOnPosition[$position] = $campaignBanner;
@@ -214,21 +217,31 @@ class Showtime
         return array_values($bannersOnPosition);
     }
 
-    private function hasActualCampaignHigherPriorityOverTest(Campaign $actualCampaign, Campaign $testCampaign): bool
+    private function hasNewCampaignHigherPriorityOverCurrentOnPosition(Campaign $newCampaign, Campaign $currentOnPosition): bool
     {
         // campaign with more banners has higher priority
-        if ($testCampaign->campaignBanners->count() > $actualCampaign->campaignBanners->count()) {
+        if ($newCampaign->campaignBanners->count() > $currentOnPosition->campaignBanners->count()) {
             return true;
         }
 
-        if ($testCampaign->campaignBanners->count() === $actualCampaign->campaignBanners->count()) {
+        if ($currentOnPosition->campaignBanners->count() === $newCampaign->campaignBanners->count()) {
             // campaign with more recent updates has higher priority
-            if ($testCampaign->updated_at > $actualCampaign->updated_at) {
+            if ($newCampaign->updated_at > $currentOnPosition->updated_at) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function removeCampaignByUuid(array &$campaigns, string $uuid): void
+    {
+        foreach ($campaigns as $key => $campaign) {
+            if ($campaign['uuid'] === $uuid) {
+                unset($campaigns[$key]);
+                return;
+            }
+        }
     }
 
     /**

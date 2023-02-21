@@ -357,7 +357,7 @@
                         </div>
                         <div id="collapseBannerRules" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingBannerRules">
                             <div class="panel-body p-l-10 p-r-20">
-                                <pageview-rules :pageviewRules="pageviewRules" :oncePerSession="oncePerSession" @pageviewRulesModified="updatePageviewRules"></pageview-rules>
+                                <pageview-rules :pageviewRules="pageviewRules" :oncePerSession="oncePerSession" :prioritizeBannersSamePosition="prioritizeBannersSamePosition" @pageviewRulesModified="updatePageviewRules"></pageview-rules>
                             </div><!-- .panel-body -->
                         </div>
                     </div><!-- .panel (banner rules) -->
@@ -583,6 +583,7 @@
         "_statsLink",
         "_showLink",
         "_editLink",
+        "_prioritizeBannersSamePosition",
 
         "_banners",
         "_availableSegments",
@@ -670,6 +671,7 @@
                 "urlPatterns": null,
                 "refererFilter": null,
                 "refererPatterns": null,
+                "prioritizeBannersSamePosition": false,
 
                 "banners": null,
                 "availableSegments": null,

@@ -6,6 +6,7 @@
                 <div class="row">
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <label class="fg-label">Display banner</label>
+                        <button type="button" v-if="prioritizeBannersSamePosition" v-on:click="displayBannerInfoButtonClicked" class="btn btn-link waves-effect" style="color: black; padding: 5px; font-size: 16px"><i class="zmdi zmdi-info-outline"></i></button>
                     </div>
 
                     <div class="col-md-8 col-sm-8 col-xs-10 pageview-rules-wrapper">
@@ -106,7 +107,8 @@
     export default {
         props: [
             "pageviewRules",
-            "oncePerSession"
+            "oncePerSession",
+            "prioritizeBannersSamePosition"
         ],
         data() {
             return {
@@ -162,7 +164,22 @@
                     },
                     oncePerSession: this.oncePerSessionVal
                 });
+            },
+            displayBannerInfoButtonClicked: function () {
+                swal({
+                    'html': true,
+                    'title': '<i class="zmdi zmdi-format-list-bulleted"></i> Display banner rules',
+                    'text': 'Banners placed on the same position are prioritized by following rules:<br><br>'
+                            + '<ol>'
+                            + '<li>Campaign with more banners has higher priority.</li>'
+                            + '<li>Campaign with more recent updates has higher priority.</li>'
+                            + '</ol>'
+                            + 'Due to the rules above there may occur a configuration that banner <strong>should be displayed</strong> (e.g. every n-th pageview) '
+                            + 'but another banner from different campaign has higher priority and therefore <strong>the one with higher priority will be displayed</strong>.<br>'
+                            + 'In this case banner with <strong>lower priority</strong> will be displayed <strong>at the earliest possible pageview</strong> which may create mismatch '
+                            + 'between configuration and the display itself.'
+                });
             }
-        }
+        },
     }
 </script>
