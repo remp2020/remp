@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed increasing pageviews for campaigns which banners were not displayed due to the priority rules for banners on the same position. remp/remp#1213
+- Added syntax highlighting to Variables section. remp/remp#1214
 
 ## [1.1.0] - 2023-01-27
 
