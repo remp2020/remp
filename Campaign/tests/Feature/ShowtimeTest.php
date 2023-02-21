@@ -503,11 +503,12 @@ class ShowtimeTest extends TestCase
         $campaignBanners = [$campaignBanner1, $campaignBanner2];
 
         // banners on different position - both should be displayed
-        $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners);
+        $activeCampaigns = [];
+        $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns);
         $this->assertCount(2, $result);
     }
 
-    public function testPrioritizeCampaignBannerOnSamePositionWithDifferentUpdateTime(): void
+    public function testPrioritizeCampaignBannerOnSamePosition(): void
     {
         $campaign1 = $this->prepareCampaign();
         $campaign2 = $this->prepareCampaign();
@@ -520,11 +521,17 @@ class ShowtimeTest extends TestCase
         $campaignBanner2 = $this->prepareCampaignBanners($campaign2, $this->prepareBanner(Banner::POSITION_BOTTOM_LEFT, Banner::DISPLAY_TYPE_INLINE, '#test-id'));
 
         $campaignBanners = [$campaignBanner1, $campaignBanner2];
+        $activeCampaigns = [
+            ['uuid' => $campaign1->uuid, 'public_id' => $campaign1->public_id],
+            ['uuid' => $campaign2->uuid, 'public_id' => $campaign2->public_id],
+        ];
 
         // campaigns with the same amount of banners - banner with more recent campaign (campaign2) update time should be prioritized
-        $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners);
+        $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns);
         $this->assertCount(1, $result);
         $this->assertEquals($campaignBanner2, $result[0]);
+        $this->assertCount(1, $activeCampaigns);
+        $this->assertEquals($campaign2->uuid, array_pop($activeCampaigns)['uuid']);
 
         // campaign1 has more banners so banner from campaign1 should be prioritized
         $campaignBanner3 = $this->prepareCampaignBanners($campaign1, $this->prepareBanner());
@@ -532,9 +539,15 @@ class ShowtimeTest extends TestCase
 
         $campaigns = [$campaign1->id => $campaign1, $campaign2->id => $campaign2];
 
-        $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners);
+        $activeCampaigns = [
+            ['uuid' => $campaign1->uuid, 'public_id' => $campaign1->public_id],
+            ['uuid' => $campaign2->uuid, 'public_id' => $campaign2->public_id],
+        ];
+        $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns);
         $this->assertCount(1, $result);
         $this->assertEquals($campaignBanner1, $result[0]);
+        $this->assertCount(1, $activeCampaigns);
+        $this->assertEquals($campaign1->uuid, array_pop($activeCampaigns)['uuid']);
     }
 
     private function prepareCampaign(): Campaign
