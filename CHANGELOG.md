@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - This migration is a two-step process that requires your manual action - running `mail:migrate-user-subscriptions-and-variants` in the off-peak hours. Since some tables are very exposed and cannot be locked for more than a couple of seconds, we decided to migrate the data into the new table manually and keep the old and new table in sync. Based on the amount of your data, the migration can take hours.
 - Added support for standalone HTTP webhook signing key. remp/remp#1232
   - Mailgun used to use domains API key to sign the requests, however it currently is a separate signing key.
+- Added filter by `user_id` support to mailer `LogsHandler`. remp/remp#1188
 
 ### [Campaign]
 

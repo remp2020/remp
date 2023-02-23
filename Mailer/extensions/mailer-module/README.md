@@ -987,6 +987,28 @@ Returns:
     }
     ```
 
+## Database tables migration
+
+Because of need of changing primary keys (`int` -> `bigint`), in tables that contain lots of data (or have risk of overflowing primary key if its `int`), we had to create migration process. Since some tables are very exposed and cannot be locked for more than a couple of seconds, we decided to create new tables, migrate the data manually and keep the old and new table in sync while migrating.
+
+_This migration process is necessary only for installations after specific version for specific table, and is two steps process._
+
+### Mail logs migration (version < 1.1.0)
+
+Consists of `mail_logs` and `mail_log_conversions` table migration. Also contains adding `user_id` column to `mail_logs` table.
+
+Steps:
+1. running phinx migration `CreateNewMailLogsAndMailConversionsTable` - which creates new tables `mail_logs_v2` and `mail_log_conversions_v2` (in case there is no data in tables, migration just changes type of primary key and next steps are not needed)
+2. running command `mail:migrate-mail-logs-and-conversions` which copies data from old tables to new (e.g. `mail_logs` to `mail_logs_v2`) - command will after successful migration atomically rename tables (e.g. `mail_logs` -> `mail_logs_old` and `mail_logs_v2` -> `mail_logs`) so when the migration ends only new tables are used
+
+### User subscription migration (version < 1.2.0)
+
+Consists of `mail_user_subscriptions` and `mail_user_subscription_variants` table migration.
+
+Steps:
+1. running phinx migration `CreateNewMailUserSubscriptionsAndMailUserSubscriptionVariantsTables` - which creates new tables `mail_user_subscriptions_v2` and `mail_user_subscription_variants_v2` (in case there is no data in tables, migration just changes type of primary key and next steps are not needed)
+2. running command `mail:migrate-user-subscriptions-and-variants` which copies data from old tables to new (e.g. `mail_user_subscriptions` to `mail_user_subscriptions_v2`) - command will after successful migration atomically rename tables (e.g. `mail_user_subscriptions` -> `mail_user_subscriptions_old` and `mail_user_subscriptions_v2` -> `mail_user_subscriptions`) so when the migration ends only new tables are used
+
 ## API Documentation
 
 All examples use `http://mailer.remp.press` as a base domain. Please change the host to the one you use
@@ -1708,7 +1730,7 @@ Response:
 
 #### POST `/api/v1/users/logs`
 
-Returns mail logs based on given criteria
+Returns mail logs based on given criteria.
 
 ##### *Headers:*
 
@@ -1720,8 +1742,9 @@ Returns mail logs based on given criteria
 
 ```json5
 {
-  //required
+  // required only one of email/user_id
   "email": "test@test.com", // String; email
+  "user_id": 123, // Integer
 
   // optional
   "filter": { // Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
@@ -1766,6 +1789,7 @@ curl -X POST \
         }
     },
     "email": "test@test.com",
+    "user_id": 123,
     "mail_template_ids": [1,2,3],
     "page": 1,
     "limit": 2

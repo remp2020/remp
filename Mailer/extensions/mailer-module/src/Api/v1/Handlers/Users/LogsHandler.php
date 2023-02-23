@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
+use Nette\Http\IResponse;
 use Nette\Utils\DateTime;
-use Nette\Utils\Arrays;
-use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\Traits\ParseLogFilterConditionsTrait;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
-use Tomaj\NetteApi\Params\RawInputParam;
+use Tomaj\NetteApi\Params\JsonInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 class LogsHandler extends BaseHandler
 {
@@ -32,19 +32,20 @@ class LogsHandler extends BaseHandler
     public function params(): array
     {
         return [
-            new RawInputParam('raw'),
+            new JsonInputParam('json', file_get_contents(__DIR__ . '/logs.schema.json')),
         ];
     }
 
     public function handle(array $params): ResponseInterface
     {
-        $payload = $this->validateInput($params['raw'], __DIR__ . '/logs.schema.json');
-
-        if ($this->hasErrorResponse()) {
-            return $this->getErrorResponse();
+        $payload = $params['json'];
+        $logs = $this->logsRepository->getTable();
+        if (isset($payload['user_id'])) {
+            $logs->where('user_id', $payload['user_id']);
+        } else {
+            $logs->where('email', $payload['email']);
         }
 
-        $logs = $this->logsRepository->allForEmail($payload['email']);
         if (isset($payload['mail_template_ids'])) {
             $logs->where('mail_template_id', $payload['mail_template_ids']);
         }
@@ -63,10 +64,25 @@ class LogsHandler extends BaseHandler
 
         $output = [];
 
-        foreach ($logs->order('created_at DESC')->fetchAll() as $log) {
+        try {
+            $logs = $logs->order('created_at DESC')->fetchAll();
+        } catch (\Exception $exception) {
+            if ($exception->getCode() === '42S22' && str_contains($exception->getMessage(), 'user_id')) {
+                Debugger::log("Missing 'user_id' column in 'mail_logs' table", ILogger::WARNING);
+                return new JsonApiResponse(IResponse::S501_NotImplemented, [
+                    'status' => 'error',
+                    'message' => "Missing 'user_id' column in 'mail_logs' table",
+                    'detail' => "You probably don't have newest version of 'mail_logs' table. For more information about migration, check 'mail:migrate-mail-logs-and-conversions' command."
+                ]);
+            }
+            throw $exception;
+        }
+
+        foreach ($logs as $log) {
             $item = new \stdClass();
             $item->id = $log->id;
             $item->email = $log->email;
+            $item->user_id = $log->user_id ?? null;
             $item->subject = $log->subject;
             $item->mail_template = [
                 'id' => $log->mail_template_id,
