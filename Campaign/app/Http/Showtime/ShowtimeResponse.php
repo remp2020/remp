@@ -22,7 +22,9 @@ interface ShowtimeResponse
      * @param $alignments
      * @param $dimensions
      * @param $positions
+     * @param $variables
+     * @param $userData
      * @return string
      */
-    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $variables): string;
+    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $variables, mixed $userData): string;
 }

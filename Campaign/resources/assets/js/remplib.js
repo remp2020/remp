@@ -360,7 +360,7 @@ class Campaign {
         remplib.setToStorage(this.campaignsStorageKey, this.minifyStoredData(campaigns));
     }
 
-    incrementPageviewCountForCampaigns (activeCampaigns)  {
+    incrementPageviewCountForCampaigns(activeCampaigns)  {
         let campaigns = this.getCampaigns();
         const now = new Date();
 
@@ -391,6 +391,91 @@ class Campaign {
         }
 
         remplib.setToStorage(this.campaignsStorageKey, this.minifyStoredData(campaigns));
+    }
+
+    storeCampaignCollapsed(campaignPublicId, isCollapsed) {
+        let campaigns = this.getCampaigns();
+
+        const now = new Date();
+
+        if (!campaigns.hasOwnProperty(campaignPublicId)) {
+            campaigns[campaignPublicId] = {}
+        }
+
+        campaigns[campaignPublicId].updatedAt = now;
+        campaigns[campaignPublicId].collapsed = isCollapsed;
+
+        remplib.setToStorage(this.campaignsStorageKey, this.minifyStoredData(campaigns));
+    }
+
+    storeCampaignClosed(campaignPublicId) {
+        this.storePersistentCampaignClosed(campaignPublicId);
+        this.storeSessionCampaignClosed(campaignPublicId);
+    }
+
+    storePersistentCampaignClosed(campaignPublicId) {
+        let campaigns = this.getCampaigns();
+
+        const now = new Date();
+
+        if (!campaigns.hasOwnProperty(campaignPublicId)) {
+            campaigns[campaignPublicId] = {}
+        }
+
+        campaigns[campaignPublicId].updatedAt = now;
+        campaigns[campaignPublicId].closedAt = Math.floor(now.getTime() / 1000);
+
+        remplib.setToStorage(this.campaignsStorageKey, this.minifyStoredData(campaigns));
+    }
+
+    storeSessionCampaignClosed(campaignPublicId) {
+        let campaignsSession = this.getCampaignsSession();
+
+        const now = new Date();
+
+        if (!campaignsSession) {
+            campaignsSession = {};
+        }
+
+        campaignsSession[campaignPublicId].updatedAt = now;
+        campaignsSession[campaignPublicId].closedAt = Math.floor(now.getTime() / 1000);
+
+        remplib.setToStorage(this.campaignsSessionStorageKey, this.minifyStoredData(campaignsSession));
+    }
+
+    storeCampaignClicked(campaignPublicId) {
+        this.storePersistentCampaignClicked(campaignPublicId);
+        this.storeSessionCampaignClicked(campaignPublicId);
+    }
+
+    storePersistentCampaignClicked(campaignPublicId) {
+        let campaigns = this.getCampaigns();
+
+        const now = new Date();
+
+        if (!campaigns.hasOwnProperty(campaignPublicId)) {
+            campaigns[campaignPublicId] = {}
+        }
+
+        campaigns[campaignPublicId].updatedAt = now;
+        campaigns[campaignPublicId].clickedAt = Math.floor(now.getTime() / 1000);
+
+        remplib.setToStorage(this.campaignsStorageKey, this.minifyStoredData(campaigns));
+    }
+
+    storeSessionCampaignClicked(campaignPublicId) {
+        let campaignsSession = this.getCampaignsSession();
+
+        const now = new Date();
+
+        if (!campaignsSession) {
+            campaignsSession = {};
+        }
+
+        campaignsSession[campaignPublicId].updatedAt = now;
+        campaignsSession[campaignPublicId].clickedAt = Math.floor(now.getTime() / 1000);
+
+        remplib.setToStorage(this.campaignsSessionStorageKey, this.minifyStoredData(campaignsSession));
     }
 
     getCampaignsSession() {
@@ -431,13 +516,16 @@ class Campaign {
 
         remplib.setToStorage(this.campaignsSessionStorageKey, this.minifyStoredData(campaignsSession));
     }
-    minifyStoredData (data) {
+    minifyStoredData(data) {
         for (const id in data) {
             this.renameKey(data[id], 'seen', 'sn');
             this.renameKey(data[id], 'count', 'ct');
             this.renameKey(data[id], 'variantId', 'vi');
             this.renameKey(data[id], 'bannerId', 'bi');
             this.renameKey(data[id], 'updatedAt', 'ut');
+            this.renameKey(data[id], 'collapsed', 'cp');
+            this.renameKey(data[id], 'closedAt', 'cl');
+            this.renameKey(data[id], 'clickedAt', 'cc');
 
             if (data[id].hasOwnProperty('ut')) {
                 const unixTime = new Date(data[id].ut).getTime();
@@ -454,6 +542,9 @@ class Campaign {
             this.renameKey(data[id], 'ct', 'count');
             this.renameKey(data[id], 'vi', 'variantId');
             this.renameKey(data[id], 'bi', 'bannerId');
+            this.renameKey(data[id], 'cp', 'collapsed');
+            this.renameKey(data[id], 'cl', 'closedAt');
+            this.renameKey(data[id], 'cc', 'clickedAt');
 
             if (data[id].hasOwnProperty('ut')) {
                 const date = new Date();
@@ -465,7 +556,7 @@ class Campaign {
 
         return data;
     }
-    renameKey (data, oldKey, newKey) {
+    renameKey(data, oldKey, newKey) {
         if (data.hasOwnProperty(oldKey)) {
             data[newKey] = data[oldKey];
             delete data[oldKey];

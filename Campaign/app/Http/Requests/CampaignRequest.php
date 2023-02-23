@@ -37,6 +37,10 @@ class CampaignRequest extends FormRequest
             'pageview_rules.display_banner_every' => 'required|integer',
             'pageview_rules.display_times' => 'required',
             'pageview_rules.display_n_times' => 'required|integer',
+            'pageview_rules.after_banner_closed_display' => 'required|string',
+            'pageview_rules.after_closed_hours' => 'required|integer',
+            'pageview_rules.after_banner_clicked_display' => 'required|string',
+            'pageview_rules.after_clicked_hours' => 'required|integer',
             'pageview_attributes.*.name' => 'required|string',
             'pageview_attributes.*.operator' => 'required|string',
             'pageview_attributes.*.value' => 'required|string',
@@ -81,6 +85,16 @@ class CampaignRequest extends FormRequest
         );
         $data['pageview_rules']['display_n_times'] = filter_var(
             $data['pageview_rules']['display_n_times'],
+            FILTER_VALIDATE_INT,
+            ['options' => ['default' => 2]]
+        );
+        $data['pageview_rules']['after_closed_hours'] = filter_var(
+            $data['pageview_rules']['after_closed_hours'],
+            FILTER_VALIDATE_INT,
+            ['options' => ['default' => 2]]
+        );
+        $data['pageview_rules']['after_clicked_hours'] = filter_var(
+            $data['pageview_rules']['after_clicked_hours'],
             FILTER_VALIDATE_INT,
             ['options' => ['default' => 2]]
         );

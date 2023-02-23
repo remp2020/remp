@@ -104,7 +104,8 @@ window.remplib = window.remplib || {};
                     textColor: model['collapsible_bar_template']['text_color'] || null,
                     buttonBackgroundColor: model['collapsible_bar_template']['button_background_color'] || null,
                     buttonTextColor: model['collapsible_bar_template']['button_text_color'] || null,
-                    initialState: model['collapsible_bar_template']['initial_state'] || "expanded"
+                    initialState: model['collapsible_bar_template']['initial_state'] || "expanded",
+                    forceInitialState: model['collapsible_bar_template']['force_initial_state'] || false,
                 }
             }
 
@@ -165,6 +166,20 @@ window.remplib = window.remplib || {};
                     paramsTransposition: model['newsletter_rectangle_template']['params_transposition'] || null,
                     paramsExtra: model['newsletter_rectangle_template']['params_extra'] || null,
                     rempMailerAddr: model['newsletter_rectangle_template']['remp_mailer_addr'] || null,
+                }
+            }
+
+            return banner;
+        },
+
+        parseUserData: (banner, userData) => {
+            if (userData == null) {
+                return banner;
+            }
+
+            if (banner.template === 'collapsible_bar') {
+                if ('collapsed' in userData && !banner.collapsibleBarTemplate.forceInitialState) {
+                    banner.collapsibleBarTemplate.initialState = userData.collapsed ? 'collapsed' : 'expanded';
                 }
             }
 

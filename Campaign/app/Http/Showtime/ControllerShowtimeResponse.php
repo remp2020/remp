@@ -57,7 +57,8 @@ class ControllerShowtimeResponse implements ShowtimeResponse
         array $alignments,
         array $dimensions,
         array $positions,
-        array $variables
+        array $variables,
+        mixed $userData,
     ): string {
         return View::make('banners.preview', [
             'banner' => $variant->banner,
@@ -69,7 +70,8 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             'dimensions' => $dimensions,
             'alignments' => $alignments,
             'variables' => $variables,
-            'controlGroup' => $variant->control_group
+            'controlGroup' => $variant->control_group,
+            'userData' => $userData,
         ])->render();
     }
 }

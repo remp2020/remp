@@ -136,30 +136,50 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         ]);
     }
 
-    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $variables): string {
-        return $this->renderInternal($variant->banner, $variant->uuid, $campaign->uuid, (int) $variant->control_group, $alignments, $dimensions, $positions, $variables, $variant->public_id, $campaign->public_id);
+    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $variables, mixed $userData): string {
+        return $this->renderInternal(
+            banner: $variant->banner,
+            alignments: $alignments,
+            dimensions: $dimensions,
+            positions: $positions,
+            variables: $variables,
+            variantUuid: $variant->uuid,
+            campaignUuid: $campaign->uuid,
+            isControlGroup: (int) $variant->control_group,
+            variantPublicId: $variant->public_id,
+            campaignPublicId: $campaign->public_id,
+            userData: $userData
+        );
     }
 
     public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $variables): string {
-        return $this->renderInternal($banner, null, null, 0, $alignments, $dimensions, $positions, $variables, null, null);
+        return $this->renderInternal(
+            banner: $banner,
+            alignments: $alignments,
+            dimensions: $dimensions,
+            positions: $positions,
+            variables: $variables,
+        );
     }
 
     private function renderInternal(
         ?Banner $banner,
-        $variantUuid,
-        $campaignUuid,
-        $isControlGroup,
         $alignments,
         $dimensions,
         $positions,
         $variables,
-        $variantPublicId,
-        $campaignPublicId
+        $variantUuid = null,
+        $campaignUuid = null,
+        $isControlGroup = 0,
+        $variantPublicId = null,
+        $campaignPublicId = null,
+        $userData = null
     ) {
         $alignmentsJson = json_encode($alignments);
         $dimensionsJson = json_encode($dimensions);
         $positionsJson = json_encode($positions);
         $variablesJson = json_encode($variables);
+        $userDataJson = json_encode($userData);
 
         $bannerJs = asset(mix('/js/banner.js', '/assets/lib'));
 
@@ -210,9 +230,14 @@ var run = function() {
     var dimensions = JSON.parse('{$dimensionsJson}');
     var positions = JSON.parse('{$positionsJson}');
     var variables = {$variablesJson};
+    var userData = JSON.parse('{$userDataJson}');
 
     if (!isControlGroup) {
-        banner = remplib.banner.fromModel(bannerJsonData);
+        var campaignUserData = null;
+        if (userData && userData.campaigns && userData.campaigns[campaignPublicId]) {
+            campaignUserData = userData.campaigns[campaignPublicId];
+        }
+        banner = remplib.banner.parseUserData(remplib.banner.fromModel(bannerJsonData), campaignUserData);
     }
 
     banner.show = false;

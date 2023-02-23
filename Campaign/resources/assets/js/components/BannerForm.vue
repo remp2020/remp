@@ -101,6 +101,7 @@
                v-bind:_buttonBackgroundColor="collapsibleBarTemplate.buttonBackgroundColor"
                v-bind:_buttonTextColor="collapsibleBarTemplate.buttonTextColor"
                v-bind:_initialState="collapsibleBarTemplate.initialState"
+               v-bind:_forceInitialState="collapsibleBarTemplate.forceInitialState"
                v-bind:show="show"
             ></collapsible-bar-template>
 
