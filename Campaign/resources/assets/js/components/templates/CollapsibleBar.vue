@@ -58,6 +58,18 @@
                             </div>
                         </div>
 
+                        <div class="input-group fg-float checkbox">
+                            <label class="m-l-15">
+                                Always display banner in initial state
+                                <input v-model="forceInitialState" value="1" name="force_initial_state" type="checkbox">
+                                <i class="input-helper"></i>
+                                <small class="help-block">
+                                    Banner is displayed in the same state in which it was on the last display or
+                                    in initial state. Enable if you want to always display in initial state.
+                                </small>
+                            </label>
+                        </div><!-- .input-group -->
+
 
                         <input type="hidden" name="background_color" v-bind:value="_backgroundColor" />
                         <input type="hidden" name="text_color" v-bind:value="_textColor" />
@@ -135,6 +147,7 @@
         "_buttonBackgroundColor",
         "_buttonTextColor",
         "_initialState",
+        "_forceInitialState",
     ];
     export default {
         name: "collapsible-bar-template",

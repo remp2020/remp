@@ -110,12 +110,12 @@
             {{ headerText }}
 
             <div class="collapsible-bar-toggle">
-                <div v-if="collapsed" @click="collapsed = !collapsed" class="collapsible-bar-toggle-expand">
+                <div v-if="collapsed" @click="handleCollapse()" class="collapsible-bar-toggle-expand">
                     {{ expandText }}
                     <span>&#9650;</span>
                 </div>
 
-                <div v-if="!collapsed" @click="collapsed = !collapsed" class="collapsible-bar-toggle-collapse">
+                <div v-if="!collapsed" @click="handleCollapse()" class="collapsible-bar-toggle-collapse">
                     {{ collapseText }}
                     <span>&#9660;</span>
                 </div>
@@ -238,6 +238,12 @@ export default {
                 position: position,
                 zIndex: zIndex,
             }
+        }
+    },
+    methods: {
+        handleCollapse: function () {
+            this.collapsed = !this.collapsed;
+            this.$parent.collapsed(this.collapsed)
         }
     }
 }

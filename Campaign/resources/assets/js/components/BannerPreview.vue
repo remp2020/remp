@@ -292,6 +292,8 @@
         "positionOptions",
 
         "variantUuid",
+        "campaignPublicId",
+        "userData",
 
         "adminPreview",
 
@@ -469,6 +471,8 @@
                 return str;
             },
             closed: function() {
+                remplib.campaign.storeCampaignClosed(this.campaignPublicId);
+
                 this.visible = false;
                 this.$parent.$emit('values-changed', [
                     {key: "show", val: false}
@@ -486,6 +490,8 @@
                 this.closeTracked = true;
             },
             clicked: function(event, hideBanner = false) {
+                remplib.campaign.storeCampaignClicked(this.campaignPublicId);
+
                 if (this.manualEventsTracking || this.clickTracked) {
                     return true;
                 }
@@ -501,6 +507,13 @@
                     this.visible = false;
                 }
                 return true;
+            },
+            collapsed: function(isCollapsed) {
+                if (typeof remplib.campaign === 'undefined') {
+                    return;
+                }
+
+                remplib.campaign.storeCampaignCollapsed(this.campaignPublicId, isCollapsed);
             },
             trackEvent: function(category, action, tags, fields, source) {
                 if (typeof remplib.tracker === 'undefined') {

@@ -23,6 +23,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed increasing pageviews for campaigns which banners were not displayed due to the priority rules for banners on the same position. remp/remp#1213
 - Added syntax highlighting to Variables section. remp/remp#1214
+- Added support for new banner rules in campaign. Now you can determine if campaign should display after user clicked or closed the banner. remp/remp#960
+- Added storing of collapse state for collapsible banner. remp/remp#960
+  - If user collapses campaign banner then it displays collapsed on the next display. 
+  - In collapsible banner settings there is a new toggle to override this behaviour and display banner always in initial state.
 
 ## [1.1.0] - 2023-01-27
 

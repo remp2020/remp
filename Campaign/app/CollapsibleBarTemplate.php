@@ -15,6 +15,7 @@ class CollapsibleBarTemplate extends AbstractTemplate
         'button_background_color',
         'button_text_color',
         'initial_state',
+        'force_initial_state',
     ];
 
     /**

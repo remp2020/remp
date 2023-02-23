@@ -466,6 +466,192 @@ class ShowtimeTest extends TestCase
 
     }
 
+    public function testPageviewRulesAfterClickRule()
+    {
+        $this->scheduleCampaign();
+        $campaignsDataClicked = [
+            $this->campaign->uuid => [
+                'count' => 1,
+                'seen' => 0,
+                'clickedAt' => Carbon::now()->subHours(2)->getTimestamp(),
+            ],
+        ];
+        $campaignsSessionDataClicked = [
+            $this->campaign->uuid => [
+                'clickedAt' => Carbon::now()->subHours(2)->getTimestamp(),
+            ],
+        ];
+        $userDataClicked = $this->getUserData(campaigns: $campaignsDataClicked, campaignsSession: $campaignsSessionDataClicked);
+        $campaignsDataNoClick = [$this->campaign->uuid => ['count' => 1, 'seen' => 0]];
+        $userDataNoClick = $this->getUserData(campaigns: $campaignsDataNoClick);
+
+        // ALWAYS rule
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_clicked_display' => 'always',
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataClicked, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataNoClick, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        //  NEVER rule
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_clicked_display' => 'never',
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userDataClicked, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataNoClick, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        //  NOT IN SESSION rule
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_clicked_display' => 'never_in_session',
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userDataClicked, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataNoClick, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        //  CLOSE FOR HOURS rule - should display
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_clicked_display' => 'close_for_hours',
+                'after_clicked_hours' => 1
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataClicked, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataNoClick, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        //  CLOSE FOR HOURS rule - should not display
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_clicked_display' => 'close_for_hours',
+                'after_clicked_hours' => 3
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userDataClicked, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+    }
+
+    public function testPageviewRulesAfterCloseRule()
+    {
+        $this->scheduleCampaign();
+        $campaignsDataClosed = [
+            $this->campaign->uuid => [
+                'count' => 1,
+                'seen' => 0,
+                'closedAt' => Carbon::now()->subHours(2)->getTimestamp(),
+            ],
+        ];
+        $campaignsSessionDataClosed = [
+            $this->campaign->uuid => [
+                'closedAt' => Carbon::now()->subHours(2)->getTimestamp(),
+            ],
+        ];
+        $userDataClosed = $this->getUserData(campaigns: $campaignsDataClosed, campaignsSession: $campaignsSessionDataClosed);
+        $campaignsDataNoClose = [$this->campaign->uuid => ['count' => 1, 'seen' => 0]];
+        $userDataNoClose = $this->getUserData(campaigns: $campaignsDataNoClose);
+
+        // ALWAYS rule
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_closed_display' => 'always',
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataClosed, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataNoClose, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        //  NEVER rule
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_closed_display' => 'never',
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userDataClosed, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataNoClose, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        //  NOT IN SESSION rule
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_closed_display' => 'never_in_session',
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userDataClosed, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataNoClose, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        //  CLOSE FOR HOURS rule - should display
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_closed_display' => 'close_for_hours',
+                'after_closed_hours' => 1
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataClosed, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userDataNoClose, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+
+        //  CLOSE FOR HOURS rule - should not display
+        $this->campaign->update([
+            'pageview_rules' => [
+                'after_banner_closed_display' => 'close_for_hours',
+                'after_closed_hours' => 3
+            ]
+        ]);
+
+        $activeCampaignUuids = [];
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userDataClosed, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids);
+    }
+
     public function testSeenCountRules()
     {
         $this->scheduleCampaign();

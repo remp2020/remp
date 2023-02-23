@@ -122,6 +122,7 @@ class BannerRequest extends FormRequest
                         'main_text' => 'string|nullable',
                         'button_text' => 'string|nullable',
                         'initial_state' => 'string|required',
+                        'force_initial_state' => 'boolean',
                     ]);
                     break;
                 case Banner::TEMPLATE_SHORT_MESSAGE:
@@ -164,6 +165,10 @@ class BannerRequest extends FormRequest
         }
         if (!isset($result['closeable'])) {
             $result['closeable'] = false;
+        }
+
+        if (!isset($result['force_initial_state'])) {
+            $result['force_initial_state'] = false;
         }
         return $result;
     }

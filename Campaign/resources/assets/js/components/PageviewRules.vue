@@ -2,16 +2,14 @@
     <div>
         <div class="input-group m-t-20">
             <span class="input-group-addon pageview-rules-addon"><i class="zmdi zmdi-eye"></i></span>
-            <div>
-                <div class="row">
+            <div class="row">
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <label class="fg-label">Display banner</label>
                         <button type="button" v-if="prioritizeBannersSamePosition" v-on:click="displayBannerInfoButtonClicked" class="btn btn-link waves-effect" style="color: black; padding: 5px; font-size: 16px"><i class="zmdi zmdi-info-outline"></i></button>
                     </div>
 
-                    <div class="col-md-8 col-sm-8 col-xs-10 pageview-rules-wrapper">
+                    <div class="col-xs-12 pageview-rules-wrapper">
                         <div class="row">
-
                             <div class="input-group fg-float m-t-10 radio">
                                 <label class="m-l-15">
                                     Always
@@ -23,9 +21,9 @@
                                 </label>
                             </div>
 
-                            <div class="col-md-4 col-sm-4" style="margin-left: -15px;">
-                                <div class="input-group fg-float m-t-10 radio">
-                                    <label class="m-l-15">
+                            <div class="col-sm-12" style="margin-left: -15px;">
+                                <div class="input-group fg-float radio flex-input-group">
+                                    <label class="m-l-15 m-10">
                                         Every
                                         <input v-model="displayBanner"
                                                type="radio"
@@ -33,49 +31,34 @@
                                                value="every">
                                         <i class="input-helper"></i>
                                     </label>
+                                    <input v-model="displayBannerEvery"
+                                           type="text"
+                                           name="pageview_rules[display_banner_every]"
+                                           class="form-control fg-input every-input inline-flex-input"
+                                           id="num">
+                                    <span style="margin: 10px"> page views</span>
                                 </div>
-                            </div>
-
-                            <div class="col-md-2 col-sm-2 p-l-0">
-                                <input v-model="displayBannerEvery"
-                                       type="text"
-                                       name="pageview_rules[display_banner_every]"
-                                       class="form-control fg-input every-input"
-                                       id="num">
-                            </div>
-
-                            <div class="col-md-4 col-sm-4 p-l-0" style="height: 38px; line-height: 38px;">
-                                page views
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
 
-        <div class="input-group fg-float m-t-20">
-            <div class="col-md-5 col-sm-5 p-r-0" style="margin-left: -15px;">
-                <div class="input-group fg-float m-t-10 checkbox">
-                    <label class="m-l-15">
-                        Display to user
-                        <input v-model="displayTimes"
-                               type="checkbox"
-                               name="pageview_rules[display_times]">
-                        <i class="input-helper"></i>
-                    </label>
-                </div>
-            </div>
-
-            <div class="col-md-2 col-sm-2 p-l-0" style="margin-left: -10px;">
+        <div class="col-sm-12" style="margin-left: -15px;">
+            <div class="input-group fg-float m-t-10 checkbox" style="display: flex;">
+                <label class="m-l-15" style="margin: 10px">
+                    Display to user
+                    <input v-model="displayTimes"
+                           type="checkbox"
+                           name="pageview_rules[display_times]">
+                    <i class="input-helper"></i>
+                </label>
                 <input v-model="displayNTimes"
                        type="text"
                        name="pageview_rules[display_n_times]"
-                       class="form-control fg-input every-input"
+                       class="form-control fg-input every-input inline-flex-input"
                        id="times_num">
-            </div>
-
-            <div class="col-md-4 col-sm-4 p-l-0" style="height: 38px; line-height: 38px;">
-                times, then stop.
+                <span style="margin: 10px">times, then stop.</span>
             </div>
         </div>
 
@@ -85,6 +68,150 @@
                 <input v-model="oncePerSessionVal" value="1" name="once_per_session" type="checkbox">
                 <i class="input-helper"></i>
             </label>
+        </div>
+
+        <div class="input-group m-t-20">
+            <span class="input-group-addon pageview-rules-addon"><i class="zmdi zmdi-close-circle"></i></span>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <label class="fg-label">After banner is CLOSED by user:</label>
+                </div>
+
+                <div class="col-md-8 col-sm-8 col-xs-10">
+                    <div class="row">
+
+                        <div class="col-sm-12" style="margin-left: -15px;">
+                            <div class="input-group fg-float m-t-10 radio input-inline-block">
+                                <label class="m-l-15">
+                                    Always show
+                                    <input v-model="afterBannerClosedDisplay"
+                                           type="radio"
+                                           name="pageview_rules[after_banner_closed_display]"
+                                           value="always">
+                                    <i class="input-helper"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12" style="margin-left: -15px;">
+                            <div class="input-group fg-float m-t-10 radio input-inline-block">
+                                <label class="m-l-15">
+                                    Never show it again
+                                    <input v-model="afterBannerClosedDisplay"
+                                           type="radio"
+                                           name="pageview_rules[after_banner_closed_display]"
+                                           value="never">
+                                    <i class="input-helper"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12" style="margin-left: -15px;">
+                            <div class="input-group fg-float m-t-10 radio input-inline-block">
+                                <label class="m-l-15">
+                                    Don't show within current session
+                                    <input v-model="afterBannerClosedDisplay"
+                                           type="radio"
+                                           name="pageview_rules[after_banner_closed_display]"
+                                           value="never_in_session">
+                                    <i class="input-helper"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12" style="margin-left: -15px;">
+                            <div class="input-group fg-float radio flex-input-group">
+                                <label class="m-l-15" style="margin: 10px">
+                                    Don't show for the next
+                                    <input v-model="afterBannerClosedDisplay"
+                                           type="radio"
+                                           name="pageview_rules[after_banner_closed_display]"
+                                           value="close_for_hours">
+                                    <i class="input-helper"></i>
+                                </label>
+                                <input v-model="afterClosedHours"
+                                       type="text"
+                                       name="pageview_rules[after_closed_hours]"
+                                       class="form-control fg-input every-input inline-flex-input"
+                                       id="num">
+                                <span style="margin: 10px">hours</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group m-t-20">
+          <span class="input-group-addon pageview-rules-addon"><i class="zmdi zmdi-mouse"></i></span>
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <label class="fg-label">After banner is CLICKED by user:</label>
+            </div>
+
+            <div class="col-md-8 col-sm-8 col-xs-10">
+                <div class="row">
+
+                    <div class="col-sm-12" style="margin-left: -15px;">
+                        <div class="input-group fg-float m-t-10 radio input-inline-block">
+                            <label class="m-l-15">
+                                Always show
+                                <input v-model="afterBannerClickedDisplay"
+                                       type="radio"
+                                       name="pageview_rules[after_banner_clicked_display]"
+                                       value="always">
+                                <i class="input-helper"></i>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12" style="margin-left: -15px;">
+                        <div class="input-group fg-float m-t-10 radio input-inline-block">
+                            <label class="m-l-15">
+                                Never show it again
+                                <input v-model="afterBannerClickedDisplay"
+                                       type="radio"
+                                       name="pageview_rules[after_banner_clicked_display]"
+                                       value="never">
+                                <i class="input-helper"></i>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12" style="margin-left: -15px;">
+                        <div class="input-group fg-float m-t-10 radio input-inline-block">
+                            <label class="m-l-15">
+                                Don't show within current session
+                                <input v-model="afterBannerClickedDisplay"
+                                       type="radio"
+                                       name="pageview_rules[after_banner_clicked_display]"
+                                       value="never_in_session">
+                                <i class="input-helper"></i>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12" style="margin-left: -15px;">
+                        <div class="input-group fg-float radio flex-input-group">
+                            <label class="m-l-15 m-10">
+                                Don't show for the next
+                                <input v-model="afterBannerClickedDisplay"
+                                       type="radio"
+                                       name="pageview_rules[after_banner_clicked_display]"
+                                       value="close_for_hours">
+                                <i class="input-helper"></i>
+                            </label>
+                            <input v-model="afterClickedHours"
+                                   type="text"
+                                   name="pageview_rules[after_clicked_hours]"
+                                   class="form-control fg-input every-input inline-flex-input"
+                                   id="num">
+                            <span style="margin: 10px">hours</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 </template>
@@ -100,6 +227,20 @@
     .every-input {
         height: 38px;
         text-align: center;
+    }
+    .inline-flex-input {
+        opacity: 1;
+        max-width: 50px;
+        cursor:text
+    }
+    .flex-input-group {
+        display: flex;
+        margin-bottom: 0;
+        margin-top: 0;
+        align-items: center;
+    }
+    .input-inline-block {
+        display: inline-block;
     }
 </style>
 
@@ -117,6 +258,10 @@
                 displayTimes: false,
                 displayNTimes: 2,
                 oncePerSessionVal: false,
+                afterBannerClosedDisplay: 'always',
+                afterClosedHours: 2,
+                afterBannerClickedDisplay: 'always',
+                afterClickedHours: 2,
             };
         },
         created: function () {
@@ -131,6 +276,18 @@
             }
             if (this.pageviewRules.display_n_times !== undefined) {
                 this.displayNTimes = this.pageviewRules.display_n_times;
+            }
+            if (this.pageviewRules.after_banner_closed_display !== undefined) {
+                this.afterBannerClosedDisplay = this.pageviewRules.after_banner_closed_display;
+            }
+            if (this.pageviewRules.after_closed_hours !== undefined) {
+                this.afterClosedHours = this.pageviewRules.after_closed_hours;
+            }
+            if (this.pageviewRules.after_banner_clicked_display !== undefined) {
+                this.afterBannerClickedDisplay = this.pageviewRules.after_banner_clicked_display;
+            }
+            if (this.pageviewRules.after_clicked_hours !== undefined) {
+                this.afterClickedHours = this.pageviewRules.after_clicked_hours;
             }
 
             this.oncePerSessionVal = this.oncePerSession;
@@ -152,6 +309,18 @@
             oncePerSessionVal: function () {
                 this.updatePageviewRules();
             },
+            afterBannerClosedDisplay: function () {
+                this.updatePageviewRules();
+            },
+            afterClosedHours: function () {
+                this.updatePageviewRules();
+            },
+            afterBannerClickedDisplay: function () {
+                this.updatePageviewRules();
+            },
+            afterClickedHours: function () {
+                this.updatePageviewRules();
+            },
         },
         methods: {
             updatePageviewRules: function () {
@@ -160,7 +329,11 @@
                         display_banner: this.displayBanner,
                         display_banner_every: this.displayBannerEvery,
                         display_times: this.displayTimes,
-                        display_n_times: this.displayNTimes
+                        display_n_times: this.displayNTimes,
+                        after_banner_closed_display: this.afterBannerClosedDisplay,
+                        after_closed_hours: this.afterClosedHours,
+                        after_banner_clicked_display: this.afterBannerClickedDisplay,
+                        after_clicked_hours: this.afterClickedHours
                     },
                     oncePerSession: this.oncePerSessionVal
                 });

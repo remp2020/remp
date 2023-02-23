@@ -98,8 +98,14 @@ class Showtime
     private function getVariables()
     {
         if (!$this->variables) {
-            $this->variables = json_decode($this->redis->get(\App\Variable::REDIS_CACHE_KEY), true) ?? [];
+            $this->variables = [];
+
+            $redisCacheKey = $this->redis->get(\App\Variable::REDIS_CACHE_KEY);
+            if (!is_null($redisCacheKey)) {
+                $this->variables = json_decode($redisCacheKey, true) ?? [];
+            }
         }
+
         return $this->variables;
     }
 
@@ -155,7 +161,7 @@ class Showtime
             return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData());
         }
 
-        $campaignIds = json_decode($this->redis->get(Campaign::ACTIVE_CAMPAIGN_IDS)) ?? [];
+        $campaignIds = json_decode($this->redis->get(Campaign::ACTIVE_CAMPAIGN_IDS) ?? '[]') ?? [];
         if (count($campaignIds) === 0) {
             return $showtimeResponse->success($callback, [], [], $segmentAggregator->getProviderData());
         }
@@ -182,7 +188,8 @@ class Showtime
                 alignments: $alignments,
                 dimensions: $dimensions,
                 positions: $positions,
-                variables: $variables
+                variables: $variables,
+                userData: $data,
             );
         }
 
@@ -469,7 +476,7 @@ class Showtime
 
         // pageview rules - check display banner every n-th request
         if ($seenCampaign !== null && $campaign->pageview_rules !== null) {
-            $pageviewCount =  $seenCampaign->count ?? null;
+            $pageviewCount = $seenCampaign->count ?? null;
 
             if ($pageviewCount === null) {
                 // if campaign is recorder as seen but has no pageview count,
@@ -482,6 +489,45 @@ class Showtime
             $displayBannerEvery = $campaign->pageview_rules['display_banner_every'] ?? 1;
             if ($displayBanner === 'every' && $pageviewCount % $displayBannerEvery !== 0) {
                 return null;
+            }
+
+            $sessionCampaign = $campaignsSeenInSession->{$campaign->uuid} ?? $campaignsSeenInSession->{$campaign->public_id} ?? null;
+
+            if (property_exists($seenCampaign, 'closedAt')) {
+                $afterClosedRule = $campaign->pageview_rules['after_banner_closed_display'] ?? null;
+                $afterClosedHours = $campaign->pageview_rules['after_closed_hours'] ?? 0;
+                if ($afterClosedRule === 'never') {
+                    return null;
+                }
+
+                if ($afterClosedRule === 'never_in_session' && isset($sessionCampaign->closedAt)) {
+                    return null;
+                }
+
+                if ($afterClosedRule === 'close_for_hours' && $afterClosedHours) {
+                    $threshold = time() - $afterClosedHours * 60 * 60;
+                    if ($seenCampaign->closedAt > $threshold) {
+                        return null;
+                    }
+                }
+            }
+
+            if (property_exists($seenCampaign, 'clickedAt')) {
+                $afterClickedRule = $campaign->pageview_rules['after_banner_clicked_display'] ?? null;
+                $afterClickedHours = $campaign->pageview_rules['after_clicked_hours'] ?? 0;
+                if ($afterClickedRule === 'never') {
+                    return null;
+                }
+                if ($afterClickedRule === 'never_in_session' && isset($sessionCampaign->clickedAt)) {
+                    return null;
+                }
+
+                if ($afterClickedRule === 'close_for_hours' && $afterClickedHours) {
+                    $threshold = time() - $afterClickedHours * 60 * 60;
+                    if ($seenCampaign->clickedAt > $threshold) {
+                        return null;
+                    }
+                }
             }
         }
 
