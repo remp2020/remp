@@ -4,7 +4,10 @@
   "type": "object",
   "$id": "POST /api/v1/mailers/logs-for-email",
   "title": "Logs",
-  "required": ["email"],
+  "oneOf": [
+    { "required": ["email"] },
+    { "required": ["user_id"] }
+  ],
   "examples": [
     {
       "filter": {
@@ -76,6 +79,9 @@
     "email": {
       "type": "string",
       "format": "email"
+    },
+    "user_id": {
+      "type": "integer"
     },
     "mail_template_ids": {
       "type": "array",
