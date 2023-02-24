@@ -44,10 +44,10 @@ class CompressAggregations extends Command
         $this->aggregate(ArticleTimespent::class, $threshold, $debug);
 
         $this->line('Processing <info>SessionReferers</info> table');
-        $this->aggregate(SessionReferer::class, $threshold, $debug);
+//        $this->aggregate(SessionReferer::class, $threshold, $debug);
 
         $this->line('Processing <info>SessionDevices</info> table');
-        $this->aggregate(SessionDevice::class, $threshold, $debug);
+//        $this->aggregate(SessionDevice::class, $threshold, $debug);
 
         $this->line(' <info>OK!</info>');
         return 0;
