@@ -334,6 +334,13 @@ When this feature is enabled and the system resolves multiple banners at the sam
 - Display the banner which is part of the campaign with the most variants.
 - If there are more of them, display the banner with the most recently updated campaign.
 
+#### Collapsible banner state storing
+
+Collapsible banner stores its collapse state and displays in the same state on the next display (expanded, collapsed).
+If user collapses campaign banner then it displays collapsed on the next display and vice versa.
+
+In collapsible banner settings there is a toggle to override this behaviour and display banner always in initial state.
+
 ### Admin integration with Beam Journal
 
 Beam Journal API (also known as Segments API) provides API for retrieving information about ongoing campaigns.
