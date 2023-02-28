@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Removed `php-amqplib/php-amqplib` from the direct Mailer dependencies. remp/remp#1244
+
 ## [1.2.0] - 2023-02-23
 
 ### [Mailer]
