@@ -334,9 +334,14 @@ class MailWorkerCommand extends Command
 
     private function filterJobs(array $jobs, ActiveRow $batch): array
     {
+        $mailTemplates = [];
+
         $emailsByTemplateCodes = [];
         $jobsByEmails = [];
         foreach ($jobs as $i => $job) {
+            if (!isset($mailTemplates[$job->templateCode])) {
+                $mailTemplates[$job->templateCode] = $this->mailTemplateRepository->getByCode($job->templateCode);
+            }
             $emailsByTemplateCodes[$job->templateCode][] = $job->email;
             $jobsByEmails[$job->email] = $job;
         }
@@ -344,7 +349,12 @@ class MailWorkerCommand extends Command
         // get list of allowed emails
         $filteredEmails = [];
         foreach ($emailsByTemplateCodes as $templateCode => $emails) {
-            $filteredTemplateEmails = $this->mailLogRepository->filterAlreadySent($emails, $templateCode, $batch->mail_job_id);
+            $filteredTemplateEmails = $this->mailLogRepository->filterAlreadySentV2(
+                emails: $emails,
+                mailTemplate: $mailTemplates[$templateCode],
+                job: $batch->mail_job,
+                context: $job->context ?? null,
+            );
             $filteredEmails = array_merge($filteredEmails, $filteredTemplateEmails);
         }
 

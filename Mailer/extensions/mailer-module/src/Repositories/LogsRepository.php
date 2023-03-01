@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use Nette\Database\Table\ActiveRow as NetteActiveRow;
 use Nette\Utils\DateTime;
 
 class LogsRepository extends Repository
@@ -11,9 +12,9 @@ class LogsRepository extends Repository
 
     protected $tableName = 'mail_logs';
 
-    protected $dataTableSearchable = ['email'];
+    protected array $dataTableSearchable = ['email'];
 
-    private $eventMap = [
+    private array $eventMap = [
         'delivered' => 'delivered_at',
         'clicked' => 'clicked_at',
         'opened' => 'opened_at',
@@ -23,7 +24,7 @@ class LogsRepository extends Repository
         'dropped' => 'dropped_at',
     ];
 
-    private $bouncesMap = [
+    private array $bouncesMap = [
         'suppress-bounce' => 'hard_bounced_at',
         'suppress-complaint' => 'hard_bounced_at',
         'suppress-unsubscribe' => 'hard_bounced_at',
@@ -194,6 +195,9 @@ class LogsRepository extends Repository
         ])->count('*') > 0;
     }
 
+    /**
+     * @deprecated Method is not performant due to unnecessary joins. Use filterAlreadySentV2 instead.
+     */
     public function filterAlreadySent(array $emails, string $mailTemplateCode, int $jobId, ?string $context = null): array
     {
         $query = $this->getTable()->where([
@@ -212,6 +216,30 @@ class LogsRepository extends Repository
         }
 
         $alreadySentEmails = $query->select('email')->fetchPairs(null, 'email');
+
+        return array_diff($emails, $alreadySentEmails);
+    }
+
+    public function filterAlreadySentV2(
+        array $emails,
+        NetteActiveRow $mailTemplate,
+        NetteActiveRow $job,
+        ?string $context = null
+    ) {
+        $query = $this->getTable()->where(['email' => $emails]);
+
+        $orCondition = [
+            'mail_template_id' => $mailTemplate->id,
+            'mail_job_id' => $job->id,
+        ];
+        if ($context) {
+            $orCondition['context'] = $context;
+        }
+
+        $alreadySentEmails = $query
+            ->select('email')
+            ->whereOr($orCondition)
+            ->fetchPairs(null, 'email');
 
         return array_diff($emails, $alreadySentEmails);
     }
