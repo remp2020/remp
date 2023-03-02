@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed possible performance issues if bigger amount of aggregation data need to be compressed. remp/remp#1246
+
 ### [Mailer]
 
 - Removed `php-amqplib/php-amqplib` from the direct Mailer dependencies. remp/remp#1244

@@ -44,10 +44,10 @@ class CompressAggregations extends Command
         $this->aggregate(ArticleTimespent::class, $threshold, $debug);
 
         $this->line('Processing <info>SessionReferers</info> table');
-//        $this->aggregate(SessionReferer::class, $threshold, $debug);
+        $this->aggregate(SessionReferer::class, $threshold, $debug);
 
         $this->line('Processing <info>SessionDevices</info> table');
-//        $this->aggregate(SessionDevice::class, $threshold, $debug);
+        $this->aggregate(SessionDevice::class, $threshold, $debug);
 
         $this->line(' <info>OK!</info>');
         return 0;
@@ -61,67 +61,83 @@ class CompressAggregations extends Command
 
         /** @var Model|Aggregable $model */
         $model = new $modelClass();
-        $rows = $model::select(
-            array_merge(
-                [
-                    DB::raw('DATE(time_from) as day_from'),
-                    DB::raw('DATE_ADD(ANY_VALUE(DATE(time_from)), INTERVAL 1 DAY) as day_to'),
-                    DB::raw("GROUP_CONCAT(DISTINCT id ORDER BY id SEPARATOR',') as ids_to_delete"),
-                ],
-                $model->groupableFields(),
-                $this->getSumAgregablesSelection($model)
+
+        $this->getOutput()->write('Determining earliest date to compress: ');
+        $dateFromRaw = $modelClass::whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')->min('time_from');
+        if (!$dateFromRaw) {
+            $this->line('nothing to compress!');
+            return;
+        }
+        $dateFrom = (new Carbon($dateFromRaw))->setTime(0, 0, 0);
+        $this->line($dateFrom->format('Y-m-d'));
+
+        while ($dateFrom <= $threshold) {
+            $this->getOutput()->write("  * Processing {$dateFrom->format('Y-m-d')}: ");
+
+            $dateTo = (clone $dateFrom)->addDay();
+            $ids = DB::table($model->getTable())
+                ->select('id')
+                ->whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
+                ->where('time_from', '>=', $dateFrom)
+                ->where('time_from', '<', $dateTo);
+
+            $rows = $model::select(
+                array_merge(
+                    [
+                        DB::raw("GROUP_CONCAT(DISTINCT id ORDER BY id SEPARATOR',') as ids_to_delete"),
+                    ],
+                    $model->groupableFields(),
+                    $this->getSumAgregablesSelection($model)
+                )
             )
-        )
-            ->whereIn('id', function ($query) use ($threshold) {
-                $query->select('id')
-                    ->whereRaw('TIMESTAMPDIFF(HOUR, time_from, time_to) < 24')
-                    ->whereDate('time_from', '<=', $threshold->format('Y-m-d'));
-            })
-            ->groupBy('day_from', ...$model->groupableFields())
-            ->orderBy('day_from')
-            ->cursor();
+                ->whereIn('id', $ids)
+                ->groupBy(...$model->groupableFields())
+                ->cursor();
 
-        $limit = 1000;
-        $i = 0;
-        $compressedRecords = [];
-        $idsToDelete = [];
+            $limit = 256;
+            $i = 0;
+            $compressedRecords = [];
+            $idsToDelete = [];
 
-        foreach ($rows as $row) {
-            $data = $row->toArray();
-            $data['time_from'] = $data['day_from'];
-            $data['time_to'] = $data['day_to'];
+            foreach ($rows as $row) {
+                $data = $row->toArray();
+                $data['time_from'] = $dateFrom;
+                $data['time_to'] = $dateTo;
 
-            array_push($idsToDelete, ...explode(',', $data['ids_to_delete']));
-            unset($data['day_from'], $data['day_to'], $data['ids_to_delete']);
-
-            $compressedRecords[] = $data;
-
-            if ($i >= $limit) {
-                if ($debug) {
-                    $this->getOutput()->write('.');
+                foreach (explode(',', $data['ids_to_delete']) as $id) {
+                    $idsToDelete[] = (int) $id;
                 }
+                unset($data['ids_to_delete']);
 
+                $compressedRecords[] = $data;
+
+                if ($i >= $limit) {
+                    if ($debug) {
+                        $this->getOutput()->write('.');
+                    }
+
+                    DB::transaction(function () use ($modelClass, $compressedRecords, $idsToDelete) {
+                        $modelClass::insert($compressedRecords);
+                        $modelClass::whereIn('id', $idsToDelete)->delete();
+                    });
+
+                    $i = 0;
+                    $compressedRecords = [];
+                    $idsToDelete = [];
+                }
+                $i += 1;
+            }
+
+            if (count($compressedRecords)) {
                 DB::transaction(function () use ($modelClass, $compressedRecords, $idsToDelete) {
                     $modelClass::insert($compressedRecords);
-                    $modelClass::destroy($idsToDelete);
+                    $modelClass::whereIn('id', $idsToDelete)->delete();
                 });
-
-                $i = 0;
-                $compressedRecords = [];
-                $idsToDelete = [];
             }
-            $i += 1;
-        }
 
-        if (count($compressedRecords)) {
-            DB::transaction(function () use ($modelClass, $compressedRecords, $idsToDelete) {
-                $modelClass::insert($compressedRecords);
-                $modelClass::destroy($idsToDelete);
-            });
-        }
+            $this->line('OK!');
 
-        if ($debug) {
-            $this->line('');
+            $dateFrom = $dateFrom->addDay();
         }
     }
 
