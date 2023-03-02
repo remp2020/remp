@@ -1009,6 +1009,14 @@ Steps:
 1. running phinx migration `CreateNewMailUserSubscriptionsAndMailUserSubscriptionVariantsTables` - which creates new tables `mail_user_subscriptions_v2` and `mail_user_subscription_variants_v2` (in case there is no data in tables, migration just changes type of primary key and next steps are not needed)
 2. running command `mail:migrate-user-subscriptions-and-variants` which copies data from old tables to new (e.g. `mail_user_subscriptions` to `mail_user_subscriptions_v2`) - command will after successful migration atomically rename tables (e.g. `mail_user_subscriptions` -> `mail_user_subscriptions_old` and `mail_user_subscriptions_v2` -> `mail_user_subscriptions`) so when the migration ends only new tables are used
 
+### Autologin tokens migration (version < 1.3.0)
+
+Consists of `autologin_tokens` table migration.
+
+Steps:
+1. running phinx migration `CreateNewAutologinTokensTable` - which creates new table `autologin_tokens_v2` (in case there is no data in table, migration just changes type of primary key and next steps are not needed)
+2. running command `mail:migrate-autologin-tokens` which copies data from old tables to new (`autologin_tokens` to `autologin_tokens_v2`) - command will after successful migration atomically rename tables (`autologin_tokens` -> `autologin_tokens_old` and `autologin_tokens_v2` -> `autologin_tokens`) so when the migration ends only new tables are used
+
 ## API Documentation
 
 All examples use `http://mailer.remp.press` as a base domain. Please change the host to the one you use

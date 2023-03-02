@@ -53,6 +53,7 @@ services:
 			- add(Remp\MailerModule\Commands\RemoveOldMailJobBatchesCommand())
 			- add(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand())
 			- add(Remp\MailerModule\Commands\MigrateUserSubscriptionsAndVariantsCommand())
+			- add(Remp\MailerModule\Commands\MigrateAutologinTokensCommand())
 			- add(@hermesWorker)
 			- setCatchExceptions(true)
 
@@ -264,7 +265,14 @@ services:
 	- Remp\MailerModule\Repositories\JobQueueRepository
 	- Remp\MailerModule\Repositories\BatchesRepository
 	- Remp\MailerModule\Repositories\BatchTemplatesRepository
-	- Remp\MailerModule\Repositories\AutoLoginTokensRepository
+
+	autologinTokensRepository:
+		factory: Remp\MailerModule\Repositories\AutoLoginTokensRepository
+		setup:
+			- setNewTableName('autologin_tokens_v2')
+			- setNewTableDataMigrationIsRunningFlag(Remp\MailerModule\Commands\MigrateAutologinTokensCommand::AUTOLOGIN_TOKENS_MIGRATION_IS_RUNNING)
+			- setRedisClientFactory(@redisClientFactory)
+
 	- Remp\MailerModule\Repositories\SourceTemplatesRepository
 	- Remp\MailerModule\Repositories\MailTypesRepository
 	- Remp\MailerModule\Repositories\MailTemplateStatsRepository
