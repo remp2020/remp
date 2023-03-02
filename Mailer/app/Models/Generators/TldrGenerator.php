@@ -78,8 +78,10 @@ class TldrGenerator implements IGenerator
 
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
-        $rules = $this->getRules();
-
+        $generatorRules = [
+            '/<p.*?>(.*?)<\/p>/is' => "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0 0 26px 0;text-align:left;font-size:18px;line-height:160%;\">$1</p>",
+        ];
+        $rules = $this->getRules($generatorRules);
 
         foreach ($rules as $rule => $replace) {
             if (is_array($replace) || is_callable($replace)) {
@@ -100,7 +102,7 @@ class TldrGenerator implements IGenerator
         $lockedPost = $this->helpers->wpParseArticleLinks($lockedPost, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction());
 
         // fix pees
-        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"margin-bottom:26px;color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:1.6;\">", [$post, $lockedPost]);
+        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0 0 26px 0;text-align:left;font-size:18px;line-height:160%;\">", [$post, $lockedPost]);
 
         [$captionTemplate,,,,,$imageTemplate] = $this->getTemplates();
         $imageHtml = '';
