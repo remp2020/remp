@@ -35,8 +35,7 @@ trait RulesTrait
             // remove iframes
             "/<iframe.*?\/iframe>/is" => "",
 
-            // remove paragraphs
-            '/<p.*?>(.*?)<\/p>/is' => "$1",
+            '/<p.*?>(.*?)<\/p>/is' => "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:160%;margin: 16px 0 16px 0\">$1</p>",
 
             // replace em-s
             "/<em.*?>(.*?)<\/em>/is" => "<i style=\"margin:0 0 26px 0;color:#181818;padding:0;font-size:18px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;\">$1</i><br>",

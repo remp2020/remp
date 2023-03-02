@@ -78,7 +78,10 @@ class MediaBriefingGenerator implements IGenerator
         $post = $values['mediabriefing_html'];
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
-        $rules = $this->getRules();
+        $generatorRules = [
+            '/<p.*?>(.*?)<\/p>/is' => "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0 0 26px 0;text-align:left;font-size:18px;line-height:160%;\">$1</p>",
+        ];
+        $rules = $this->getRules($generatorRules);
 
         foreach ($rules as $rule => $replace) {
             if (is_array($replace) || is_callable($replace)) {
@@ -99,7 +102,7 @@ class MediaBriefingGenerator implements IGenerator
         $lockedPost = $this->helpers->wpParseArticleLinks($lockedPost, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction());
 
         // fix pees
-        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;\">", [$post, $lockedPost]);
+        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0 0 26px 0;text-align:left;font-size:18px;line-height:160%;\">", [$post, $lockedPost]);
 
         [$captionTemplate,,,,,$imageTemplate] = $this->getTemplates();
         $imageHtml = '';
