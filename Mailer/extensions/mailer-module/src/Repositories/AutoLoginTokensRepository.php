@@ -7,6 +7,8 @@ use Nette\Utils\DateTime;
 
 class AutoLoginTokensRepository extends Repository
 {
+    use NewTableDataMigrationTrait;
+
     protected $tableName = 'autologin_tokens';
 
     public function getInsertData(string $token, string $email, DateTime $validFrom, DateTime $validTo, int $maxCount = 1): array
@@ -29,6 +31,12 @@ class AutoLoginTokensRepository extends Repository
     {
         if (count($emails) === 0) {
             return 0;
+        }
+
+        if ($this->newTableDataMigrationIsRunning()) {
+            $this->getNewTable()->where([
+                'email' => $emails
+            ])->delete();
         }
 
         return $this->getTable()->where([

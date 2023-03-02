@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Removed `php-amqplib/php-amqplib` from the direct Mailer dependencies. remp/remp#1244
+- **IMPORTANT**: Changed primary key from `int` to `bigint` for `autologin_tokens` table. remp/remp#1187
+  - This migration is a two-step process that requires your manual action - running `mail:migrate-autologin-tokens` in the off-peak hours. Since some tables are very exposed and cannot be locked for more than a couple of seconds, we decided to migrate the data into the new table manually and keep the old and new table in sync. Based on the amount of your data, the migration can anywhere from couple of minutes to hours.
+  - Check `Database tables migration` section in `mailer-module` README file for more information.
 
 ## [1.2.0] - 2023-02-23
 
