@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **DEPRECATED**: Deprecated method `LogsRepository::filterAlreadySent` in favor of `LogsRepository::filterAlreadySentV2`. remp/remp#1242
 - Removed `php-amqplib/php-amqplib` from the direct Mailer dependencies. remp/remp#1244
 - **IMPORTANT**: Changed primary key from `int` to `bigint` for `autologin_tokens` table. remp/remp#1187
   - This migration is a two-step process that requires your manual action - running `mail:migrate-autologin-tokens` in the off-peak hours. Since some tables are very exposed and cannot be locked for more than a couple of seconds, we decided to migrate the data into the new table manually and keep the old and new table in sync. Based on the amount of your data, the migration can anywhere from couple of minutes to hours.
@@ -15,6 +16,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed `<p>` tag formatting in generators. remp#remp1215 
   - Generators used to remove `<p>` tags from input to then create new `<p>` tags and then add desired styling.
   - Now `<p>` tags are not removed but just changed to desired styling.
+- Fixed possible performance issue when sending emails. remp/remp#1242
+  - The check executed in the `mail:worker` command didn't perform well under certain DB settings and caused unnecessary hold-ups.
 
 ## [1.2.0] - 2023-02-23
 
