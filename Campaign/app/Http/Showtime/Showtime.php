@@ -193,7 +193,12 @@ class Showtime
             );
         }
 
-        return $showtimeResponse->success($callback, $displayData, $activeCampaigns, $segmentAggregator->getProviderData());
+        return $showtimeResponse->success(
+            $callback,
+            $displayData,
+            array_values($activeCampaigns), // make sure $activeCampaigns is always encoded as array in JSON
+            $segmentAggregator->getProviderData()
+        );
     }
 
     public function prioritizeCampaignBannerOnPosition(array $campaigns, array $campaignBanners, array &$activeCampaigns): array
