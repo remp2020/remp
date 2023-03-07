@@ -226,7 +226,7 @@ class LogsRepository extends Repository
         NetteActiveRow $job,
         ?string $context = null
     ) {
-        $query = $this->getTable()->where(['email' => $emails]);
+        $query = $this->getTable()->where('CONVERT(email USING UTF8)', $emails);
 
         $orCondition = [
             'mail_template_id' => $mailTemplate->id,
