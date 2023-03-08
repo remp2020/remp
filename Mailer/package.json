@@ -14,7 +14,8 @@
     "production": "cross-env MAILER_MODULE_PATH=extensions/mailer-module mix --production --mix-config=extensions/mailer-module/webpack.mix.js"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=16",
+    "npm": ">=8"
   },
   "dependencies": {
     "mailer-module": "file:extensions/mailer-module"

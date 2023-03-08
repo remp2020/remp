@@ -33,9 +33,10 @@ php artisan db:seed
 
 #### Dependencies
 
-- PHP 7.4
-- MySQL 5.7
-- Redis 3.2
+- PHP ^8.0
+- MySQL ^8.0
+- Redis ^6.2
+- Node.js >=16
 
 ##### Redis Sentinel
 

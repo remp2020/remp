@@ -42,11 +42,11 @@ ENV YARN_CACHE_FOLDER /yarn
 
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 
 RUN apt-get install -y nodejs
 
-RUN curl -sL https://yarnpkg.com/install.sh | bash -
+RUN npm install --global yarn
 
 # VOLUME
 
@@ -54,9 +54,9 @@ VOLUME /var/www/html
 
 RUN chmod 777 /var/www/html
 
-ADD remp.sh /root/remp.sh
+ADD remp.sh /usr/local/bin/remp.sh
 
-RUN chmod +x /root/remp.sh
+RUN chmod +x /usr/local/bin/remp.sh
 
 ENV DOCKERIZE_VERSION v0.6.1
 

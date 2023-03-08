@@ -10,7 +10,8 @@
         "production": "mix --production"
     },
     "engines": {
-        "node": ">=12"
+        "node": ">=16",
+        "npm": ">=8"
     },
     "dependencies": {
         "@remp/js-commons": "^1.3",
