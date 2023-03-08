@@ -12,7 +12,9 @@ services:
       XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
       PHP_IDE_CONFIG: "serverName=campaign.remp.press"
 
-    # add these volumes only after initial installation (containers would override each others cache otherwise)
+    # Add these volumes only after initial installation (containers would otherwise override each other's cache).
+    # Also make sure, the host machine folders already exist; otherwise Docker would create them with root owner,
+    # and you might encounter permission issues.
     #volumes:
     #  - "/home/user/.cache/composer:/composer:rw"
     #  - "/home/user/.cache/yarn:/yarn:rw"
@@ -22,7 +24,9 @@ services:
       XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
       PHP_IDE_CONFIG: "serverName=mailer.remp.press"
 
-    # add these volumes only after initial installation (containers would override each others cache otherwise)
+    # Add these volumes only after initial installation (containers would otherwise override each other's cache).
+    # Also make sure, the host machine folders already exist; otherwise Docker would create them with root owner,
+    # and you might encounter permission issues.
     #volumes:
     #  - "/home/user/.cache/composer:/composer:rw"
     #  - "/home/user/.cache/yarn:/yarn:rw"
@@ -32,7 +36,9 @@ services:
       XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
       PHP_IDE_CONFIG: "serverName=beam.remp.press"
 
-    # add these volumes only after initial installation (containers would override each others cache otherwise)
+    # Add these volumes only after initial installation (containers would otherwise override each other's cache).
+    # Also make sure, the host machine folders already exist; otherwise Docker would create them with root owner,
+    # and you might encounter permission issues.
     #volumes:
     #  - "/home/user/.cache/composer:/composer:rw"
     #  - "/home/user/.cache/yarn:/yarn:rw"
@@ -42,7 +48,9 @@ services:
       XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
       PHP_IDE_CONFIG: "serverName=sso.remp.press"
 
-    # add these volumes only after initial installation (containers would override each others cache otherwise)
+    # Add these volumes only after initial installation (containers would otherwise override each other's cache).
+    # Also make sure, the host machine folders already exist; otherwise Docker would create them with root owner,
+    # and you might encounter permission issues.
     #volumes:
     #  - "/home/user/.cache/composer:/composer:rw"
     #  - "/home/user/.cache/yarn:/yarn:rw"

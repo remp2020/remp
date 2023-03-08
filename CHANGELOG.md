@@ -6,6 +6,40 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- **BREAKING**: Raised minimal version of Node.js to v16. Older versions are already after its end-of-life and not supported anymore. remp/remp#2091
+- **IMPORTANT**: Updated configuration of Docker Compose to use non-root users. remp/remp#2091
+  - To make sure you use the same user/group within the docker images as in the host machine, follow these steps:
+    1. Add following snippet to your `.bashrc` / `.zshrc` files:
+       ```
+       export UID=${UID}
+       export GID=${GID}
+       export UNAME=`whoami`
+       ```
+    2. Remove cache files created by previous version of image (owned by `root` user):
+       ```
+       sudo rm -fr Mailer/tmp/cache/*
+       sudo rm -fr Beam/storage/framework/cache/*
+       sudo rm -fr Beam/storage/framework/sessions/*
+       sudo rm -fr Beam/storage/framework/testing/*
+       sudo rm -fr Beam/storage/framework/views/*
+       sudo rm -fr Campaign/storage/framework/cache/*
+       sudo rm -fr Campaign/storage/framework/sessions/*
+       sudo rm -fr Campaign/storage/framework/testing/*
+       sudo rm -fr Campaign/storage/framework/views/*
+       sudo rm -fr Sso/storage/framework/cache/*
+       sudo rm -fr Sso/storage/framework/sessions/*
+       sudo rm -fr Sso/storage/framework/testing/*
+       sudo rm -fr Sso/storage/framework/views/*
+       ```
+    3. Rebuild the docker images, clear caches, and start them again:
+       ```
+       docker compose stop
+       docker compose build beam sso campaign mailer
+       docker-compose up -d
+       ```
+
 ### [Beam]
 
 - Fixed possible performance issues if bigger amount of aggregation data need to be compressed. remp/remp#1246

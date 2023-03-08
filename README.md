@@ -9,7 +9,7 @@ Following is a brief description of REMP services included in this mono-reposito
 
 #### [SSO](Sso)
 
-SSO is the single point of authentication in the default REMP tools configuration. Currently it allows users of
+SSO is the single point of authentication in the default REMP tools configuration. Currently, it allows users of
 REMP tools (Beam, Campaign, Mailer) to log in via their Google accounts.
 
 It also serves as an authentication tool for API requests across the REMP tools - you can manage your API keys
@@ -44,7 +44,7 @@ Mailer provides a way to manage emails (layouts and templates) which can be sent
 APIs for managing user's newsletter subscriptions, handles batch sending of emails and A/B testing.
 
 To complement all users subscribed to newsletter, you're able to use user segment when sending a newsletter.
-Therefore only users belonging to the selected segment which are also subscribed to the newsletter will receive
+Therefore, only users belonging to the selected segment which are also subscribed to the newsletter will receive
 an email. In the default configuration, Beam segments are available. You can link your own segment provider
 (e.g. your own CRM) to provide other user segments.
 
@@ -66,23 +66,38 @@ to have set up, but you need Docker to build docker-ready tarballs properly.
 make docker-build
 ```
 
-#### 2. Docker-compose
+#### 2. Docker Compose
 
 We've prepared `docker-compose.yml` in a way it's ready for development.
+
 ```bash
-docker-compose up
+docker compose up
 ```
 
 After pulling new code, if changes where made to `Docker/php/Dockerfile` or any `composer.lock` files run:
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
-> The appliance was tested with Docker CE 20.10.11 and Docker Compose 1.26.2.
+> The appliance was tested with Docker Engine - Community 23.0 and Docker Compose 2.16.0.
+
+##### 2.1 User rights in the container
+
+Since REMP 1.3, Docker Compose appliance supports passing the currently logged user to the containers to make sure there are not any access rights issues within the containers.
+
+To correctly pass information about your user to Docker Compose, add following snippet to your `~/.bashrc` or `~/.zshrc` file and restart the shell (terminal):
+
+```
+export UID=${UID}
+export GID=${GID}
+export UNAME=`whoami`
+```
+
+If the Docker compose cannot find the information, it will default to the `docker` user with UID:GID of 1000:1000.
 
 #### 3. First run
 
-If some of the application doesn't have `.env` file, docker will assume it's not installed and it will automatically proceed with all required steps to install project. It will:
+If some application doesn't have `.env` file, docker will assume it's not installed and it will automatically proceed with all required steps to install project. It will:
 * create `.env` file,
 * install all the dependencies _(composer & yarn)_,
 * prepare the DB structure and insert demo data.
@@ -97,7 +112,7 @@ This is an excerpt of override we use. It handles proper connection of XDebug to
 running outside of this appliance (such as our internal CRM) and caching of yarn/composer packages.
 
 We highly recommend to place the yarn/composer cache volumes to all PHP-based services, but only after the first run.
-Otherwise the installation of project would be downloading the packages simultaneously and would be overriding stored
+Otherwise, the installation of project would be downloading the packages simultaneously and would be overriding stored
 packages in cache. This would cause an error.
 
 ```yml
@@ -166,15 +181,15 @@ configuration.
 
 ## Docker Compose
 
-If you're unfamiliar with `docker-compose`, try running `docker-compose --help` as a starter. Each of the subcommands 
+If you're unfamiliar with `docker-compose`, try running `docker compose --help` as a starter. Each of the subcommands 
 of Docker also supports its own `--help` switch. Feel free to explore it.
 
 Couple of neat commands:
-* `docker-compose down` to remove all containers, networks and volumes created by `docker-compose`
-* `docker-compose ps` to list all services with their status
-* `docker-compose logs` to read services logs
-* `docker-compose build` to force rebuild of images
-* `docker-compose exec campaign /bin/bash` to connect to `campaign` container
+* `docker compose down` to remove all containers, networks and volumes created by `docker-compose`
+* `docker compose ps` to list all services with their status
+* `docker compose logs` to read services logs
+* `docker compose build` to force rebuild of images
+* `docker compose exec campaign /bin/bash` to connect to `campaign` container
 * `docker images` to list all available docker images
 
 ## PHP Debugging
@@ -201,8 +216,8 @@ To enforce `https` generation, you can use `FORCE_HTTPS` environment variable ch
 ## Known issues
 
 - PHP images are coming with preinstalled and always-on XDebug. We made the always-on choise for easier debugging and
-availability to debug also console scripts. However if it can't connect to the host machine, it slows down the request
-because it waits for connection timeout. Therefore is very important to have proper `XDEBUG_CONFIG` variables
+availability to debug also console scripts. However, if it can't connect to the host machine, it slows down the request
+because it waits for connection timeout. Therefore, is very important to have proper `XDEBUG_CONFIG` variables
 configured in your `docker-compose.override.yml`. 
 
 - Windows is pushing scripts to Docker with CRLF new lines which is causing issues described 
