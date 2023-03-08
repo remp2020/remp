@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed possible performance issues if bigger amount of aggregation data need to be compressed. remp/remp#1246
+
 ### [Mailer]
 
 - **DEPRECATED**: Deprecated method `LogsRepository::filterAlreadySent` in favor of `LogsRepository::filterAlreadySentV2`. remp/remp#1242
