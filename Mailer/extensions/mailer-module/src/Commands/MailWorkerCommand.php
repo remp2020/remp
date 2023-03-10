@@ -169,6 +169,8 @@ class MailWorkerCommand extends Command
             $this->logger->info("Sending batch <info>{$batch->id}</info>...");
 
             while (true) {
+                $this->healthChecker->ping(self::COMMAND_NAME);
+
                 if (!$this->mailCache->isQueueActive($batch->id)) {
                     $output->writeln("Queue <info>{$batch->id}</info> not active anymore...");
                     $this->logger->info("Queue <info>{$batch->id}</info> not active anymore...");
