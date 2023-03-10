@@ -85,15 +85,7 @@ docker compose up --build
 
 Since REMP 1.3, Docker Compose appliance supports passing the currently logged user to the containers to make sure there are not any access rights issues within the containers.
 
-To correctly pass information about your user to Docker Compose, add following snippet to your `~/.bashrc` or `~/.zshrc` file and restart the shell (terminal):
-
-```
-export UID=${UID}
-export GID=${GID}
-export UNAME=`whoami`
-```
-
-If the Docker compose cannot find the information, it will default to the `docker` user with UID:GID of 1000:1000.
+To correctly pass information about your user to Docker Compose, create `.env` file in the root of the project (based on the `.env.example`). If the Docker compose cannot find the information, it will default to the `docker` user with UID:GID of 1000:1000.
 
 #### 3. First run
 

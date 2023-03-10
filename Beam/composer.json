@@ -36,7 +36,7 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-json": "*",
         "ext-pcntl": "*",
         "arrilot/laravel-widgets": "^3.13",

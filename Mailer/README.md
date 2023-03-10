@@ -37,7 +37,7 @@ You can override any default config from
 
 ### Dependencies
 
-- PHP ^8.0
+- PHP ^8.1
 - MySQL ^8.0
 - Redis ^6.2
 - Node.js >=16

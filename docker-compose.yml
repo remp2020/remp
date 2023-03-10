@@ -141,6 +141,7 @@ services:
   sso:
     domainname: "sso.remp.press"
     hostname: "sso"
+    user: "${UID:-1000}:${GID:-1000}"
     environment:
       APP_NAME: "Sso"
       PHP_IDE_CONFIG: "serverName=sso.remp.press"
@@ -168,6 +169,7 @@ services:
   beam:
     domainname: "beam.remp.press"
     hostname: "beam"
+    user: "${UID:-1000}:${GID:-1000}"
     environment:
       APP_NAME: "Beam"
       PHP_IDE_CONFIG: "serverName=beam.remp.press"
