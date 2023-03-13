@@ -25,3 +25,9 @@ services:
 
 	embedParser:
 		factory: Remp\Mailer\Models\Generators\EmbedParser
+
+	hermesWorker:
+		setup:
+#			- add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
+			- add('user-subscribed', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())
+			- add('user-unsubscribed', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())

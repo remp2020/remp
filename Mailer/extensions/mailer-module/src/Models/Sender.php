@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models;
 
+use Nette\Database\Table\ActiveRow;
 use Nette\Mail\Message;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Json;
@@ -17,34 +18,19 @@ use Remp\MailerModule\Models\Sender\MailerBatchException;
 use Remp\MailerModule\Models\Sender\MailerFactory;
 use Remp\MailerModule\Models\Sender\MailerNotExistsException;
 use Remp\MailerModule\Models\ServiceParams\ServiceParamsProviderInterface;
-use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 
 class Sender
 {
-    /** @var array */
-    private $recipients = [];
-
-    /** @var ActiveRow */
-    private $template;
-
-    /** @var int|null */
-    private $jobId = null;
-
-    /** @var int|null */
-    private $batchId = null;
-
-    /** @var  array */
-    private $params = [];
-
-    /** @var  array */
-    private $attachments = [];
-
-    /** @var string */
-    private $context;
-
-    private $locale;
+    private array $recipients = [];
+    private ActiveRow $template;
+    private ?int $jobId = null;
+    private ?int $batchId = null;
+    private array $params = [];
+    private array $attachments = [];
+    private ?string $context = null;
+    private ?string $locale = null;
 
     public function __construct(
         private MailerFactory $mailerFactory,
@@ -176,7 +162,7 @@ class Sender
         $senderId = $this->getSenderId($recipient['email']);
         $this->setMessageHeaders($message, $senderId, [$recipient['email'] => $this->params]);
 
-        if ($this->context) {
+        if (isset($this->context)) {
             $alreadySent = $this->logsRepository->alreadySentContext($recipient['email'], $this->context);
             if ($alreadySent) {
                 return 0;
@@ -409,7 +395,7 @@ class Sender
     public function reset(): self
     {
         $this->recipients = [];
-        $this->template = null;
+        unset($this->template);
         $this->jobId = null;
         $this->batchId = null;
         $this->params = [];
