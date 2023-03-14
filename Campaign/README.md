@@ -45,7 +45,7 @@ php artisan db:seed
 - PHP ^8.1
 - MySQL ^8.0
 - Redis ^6.2
-- Node.js >=16
+- Node.js >=18
 
 #### Redis Sentinel
 

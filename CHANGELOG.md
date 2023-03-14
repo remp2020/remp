@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Project
 
 - **BREAKING**: Raised minimal version of PHP to v8.1. remp/remp#2091
-- **BREAKING**: Raised minimal version of Node.js to v16. Older versions are already after its end-of-life and not supported anymore. remp/remp#2091
+- **BREAKING**: Raised minimal version of Node.js to v18. Older versions are already after its end-of-life and not supported anymore, `v16` ends its life in couple of months. remp/remp#2091
 - **IMPORTANT**: Updated configuration of Docker Compose to use non-root users. remp/remp#2091
   - To make sure you use the same user/group within the docker images as in the host machine, follow these steps:
     1. Find out what is the `UID` and `GID` of your user:

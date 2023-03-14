@@ -14,17 +14,17 @@
     "production": "cross-env MAILER_MODULE_PATH=extensions/mailer-module mix --production --mix-config=extensions/mailer-module/webpack.mix.js"
   },
   "engines": {
-    "node": ">=16",
-    "npm": ">=8"
+    "node": ">=18",
+    "npm": ">=9"
   },
   "dependencies": {
     "mailer-module": "file:extensions/mailer-module"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-0",
+    "@babel/core": "^7.0",
     "cross-env": "^7.0",
     "css-loader": "^5.2.6",
-    "laravel-mix": "<=6.0.43",
+    "laravel-mix": "^6.0",
     "postcss": "^8.2.8",
     "resolve-url-loader": "^3.1",
     "sass": "^1.17.4",

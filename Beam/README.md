@@ -43,7 +43,7 @@ php artisan db:seed
 - PHP ^8.1
 - MySQL ^8.0
 - Redis ^6.2
-- Node.js >=16
+- Node.js >=18
 - Segments API (see #segments-go)
 
 After clean installation Beam Admin and Segments API would throw errors because the underlying database wouldn't have inidices for tracked events created. Docker installation handles this for you, but if you use manual installation, please run the following set of commands against your Elasticsearch instance.

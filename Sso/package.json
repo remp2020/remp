@@ -10,12 +10,11 @@
         "production": "mix --production"
     },
     "engines": {
-        "node": ">=16",
-        "npm": ">=8"
+        "node": ">=18",
+        "npm": ">=9"
     },
     "dependencies": {
         "@remp/js-commons": "^1.3",
-        "acorn": "^7.4.0",
         "animate.css": "^3.7.2",
         "autosize": "^4.0.2",
         "bootstrap": "^3.4.1",
@@ -35,14 +34,14 @@
         "rison": "^0.1.1"
     },
     "devDependencies": {
-        "@babel/core": "^7.0.0-0",
-        "css-loader": "^5.2.6",
+        "@babel/core": "^7.0.0",
+        "css-loader": "^6.0",
         "laravel-mix": "^6.0.12",
         "npm-run-all": "^4.1.5",
         "postcss": "^8.2.8",
         "resolve-url-loader": "^3.1.1",
         "sass": "^1.26.11",
-        "sass-loader": "^10.0",
+        "sass-loader": "^13.0",
         "vue-template-compiler": "^2.6.10",
         "webpack": "^5.0.0"
     }

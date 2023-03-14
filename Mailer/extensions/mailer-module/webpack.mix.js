@@ -22,6 +22,6 @@ mix
     .vue()
     .sass(mailerModulePath + "/assets/sass/vendor.scss", "css/vendor.css")
     .sass(mailerModulePath + "/assets/sass/app.scss", "css/app.css")
-    .copyDirectory(mailerModulePath + "/assets/img", "www/assets/img")
+    .copyDirectory(mailerModulePath + "/assets/img", "www/assets/vendor")
     .extract()
     .version();
