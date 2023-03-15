@@ -6,6 +6,39 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- **BREAKING**: Raised minimal version of PHP to v8.1. remp/remp#2091
+- **BREAKING**: Raised minimal version of Node.js to v18. Older versions are already after its end-of-life and not supported anymore, `v16` ends its life in couple of months. remp/remp#2091
+- **IMPORTANT**: Updated configuration of Docker Compose to use non-root users. remp/remp#2091
+  - To make sure you use the same user/group within the docker images as in the host machine, follow these steps:
+    1. Find out what is the `UID` and `GID` of your user:
+       ```
+       id -u # UID
+       id -g # GID
+       whoami # UNAME
+       ```
+         
+    2. Create new `.env` file in the root of `remp` project (based on the `.env.example`):
+       ```
+       UID=1000
+       GID=1000
+       UNAME=docker
+       ```
+
+    3. Transfer owner of generated files created by previous version of image (owned by `root` user) to user who will use them from now on:
+       ```
+       sudo chown -R 1000:1000 Beam Campaign Mailer Package Sso
+       ```
+       If you changed the default `UID` / `GID` to something different, use that in the `chown` command.
+
+    4. Rebuild the docker images, clear caches, and start them again:
+       ```
+       docker compose stop
+       docker compose build beam sso campaign mailer
+       docker-compose up -d
+       ```
+
 ### [Beam]
 
 - Fixed possible performance issues if bigger amount of aggregation data need to be compressed. remp/remp#1246

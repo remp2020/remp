@@ -40,9 +40,10 @@ php artisan db:seed
 
 ### Dependencies
 
-- PHP ^7.1.3
-- MySQL ^5.7
-- Redis ^3.2
+- PHP ^8.1
+- MySQL ^8.0
+- Redis ^6.2
+- Node.js >=18
 - Segments API (see #segments-go)
 
 After clean installation Beam Admin and Segments API would throw errors because the underlying database wouldn't have inidices for tracked events created. Docker installation handles this for you, but if you use manual installation, please run the following set of commands against your Elasticsearch instance.
@@ -154,7 +155,7 @@ Then, visit `/entities` and define what's structure of your entities. In our exa
 `print_delivery` and the parent entity `user` (as we want to track it for each user). Each entity has to belong
 to some other entity - either to default `user` entity or to one of your entities.
 
-We could add couple of parameters for this entity:
+We could add a couple of parameters for this entity:
 
 * `delivery_date` (datetime) indicating when the delivery was attempted
 * `successful` (boolean) indicating if the delivery was successful or not

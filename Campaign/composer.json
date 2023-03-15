@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-json": "*",
         "cache/predis-adapter": "^1.0",
         "doctrine/dbal": "^3.1",

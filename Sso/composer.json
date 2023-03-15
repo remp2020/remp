@@ -33,7 +33,7 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-json": "*",
         "arrilot/laravel-widgets": "3.13.1",
         "fideloper/proxy": "^4.4",

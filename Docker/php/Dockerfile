@@ -1,5 +1,19 @@
 FROM php:8.1.14-fpm
 
+# ADD NON-ROOT USER; IF THE VARIABLES ARE NOT SET, DOCKER COMPOSE DEFAULTS TO 1000:1000 "docker"
+
+ARG UID
+ARG GID
+ARG UNAME
+
+RUN groupadd -g ${GID} -o ${UNAME}
+
+RUN usermod -a -G ${UNAME} www-data
+
+RUN useradd -m -u ${UID} -g ${GID} -o -s /bin/bash ${UNAME}
+
+# INSTALL DEPENDENCIES
+
 ENV BUILD_DEPS g++ build-essential libsasl2-dev libssl-dev
 
 ENV RUN_DEPS libzip-dev libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev libonig-dev
@@ -42,11 +56,13 @@ ENV YARN_CACHE_FOLDER /yarn
 
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 
 RUN apt-get install -y nodejs
 
-RUN curl -sL https://yarnpkg.com/install.sh | bash -
+RUN npm install --global yarn
+
+RUN mkdir -p ${YARN_CACHE_FOLDER} && chmod -R 777 ${YARN_CACHE_FOLDER}
 
 # VOLUME
 
@@ -54,14 +70,10 @@ VOLUME /var/www/html
 
 RUN chmod 777 /var/www/html
 
-ADD remp.sh /root/remp.sh
+ADD remp.sh /usr/local/bin/remp.sh
 
-RUN chmod +x /root/remp.sh
+RUN chmod +x /usr/local/bin/remp.sh
 
-ENV DOCKERIZE_VERSION v0.6.1
+# RUN
 
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-
-CMD ["dockerize", "-timeout", "1m", "-wait-retry-interval", "10s", "-wait", "tcp://mysql:3306", "-wait", "tcp://redis:6379", "/root/remp.sh"]
+CMD /usr/local/bin/remp.sh

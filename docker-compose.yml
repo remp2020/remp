@@ -10,6 +10,11 @@ services:
     volumes:
       - ".:/var/www/html:rw"
       - "./Docker/nginx/nginx.conf:/etc/nginx/conf.d/default.template:ro"
+    healthcheck:
+      test: [ "CMD-SHELL", "service nginx status || exit 1" ]
+      timeout: 2s
+      retries: 10
+      interval: 5s
     restart: "unless-stopped"
     networks:
       default:
@@ -37,12 +42,22 @@ services:
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "no"
       MYSQL_ROOT_PASSWORD: "secret"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" , "ping", "-h", "localhost" ]
+      timeout: 2s
+      retries: 10
+      interval: 5s
     restart: "unless-stopped"
 
   redis:
     image: "redis:6.2"
     volumes:
       - "redis-data:/data"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      timeout: 2s
+      retries: 10
+      interval: 5s
 
   mailhog:
     image: "mailhog/mailhog:v1.0.0"
@@ -51,7 +66,14 @@ services:
     restart: "unless-stopped"
 
   adminer:
-    build: "./Docker/php"
+    user: "${UID:-1000}:${GID:-1000}"
+    build:
+      context: "./Docker/php"
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        UNAME: ${UNAME:-docker}
+
     volumes:
       - ".:/var/www/html:rw"
     restart: "unless-stopped"
@@ -59,20 +81,29 @@ services:
   # campaign
 
   campaign:
-    build: "./Docker/php"
+    domainname: "campaign.remp.press"
+    hostname: "campaign"
+    user: "${UID:-1000}:${GID:-1000}"
     environment:
       APP_NAME: "Campaign"
       PHP_IDE_CONFIG: "serverName=campaign.remp.press"
-    domainname: "campaign.remp.press"
-    hostname: "campaign"
+    build:
+      context: "./Docker/php"
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        UNAME: ${UNAME:-docker}
     volumes:
       - "./Campaign:/var/www/html/Campaign:rw"
       - "./Composer:/var/www/html/Composer:rw"
       - "./Package:/var/www/html/Package:rw"
     depends_on:
-      - "nginx"
-      - "mysql"
-      - "redis"
+      nginx:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: "unless-stopped"
 
   # mailer
@@ -80,38 +111,57 @@ services:
   mailer:
     domainname: "mailer.remp.press"
     hostname: "mailer"
+    user: "${UID:-1000}:${GID:-1000}"
     environment:
       APP_NAME: "Mailer"
       PHP_IDE_CONFIG: "serverName=mailer.remp.press"
-    build: "./Docker/php"
+    build:
+      context: "./Docker/php"
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        UNAME: ${UNAME:-docker}
     volumes:
       - "./Mailer:/var/www/html/Mailer:rw"
       - "./Composer:/var/www/html/Composer:rw"
       - "./Package:/var/www/html/Package:rw"
     depends_on:
-      - "nginx"
-      - "mysql"
-      - "redis"
-      - "mailhog"
+      nginx:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
     restart: "unless-stopped"
 
   # sso
 
   sso:
-    build: "./Docker/php"
+    domainname: "sso.remp.press"
+    hostname: "sso"
+    user: "${UID:-1000}:${GID:-1000}"
     environment:
       APP_NAME: "Sso"
       PHP_IDE_CONFIG: "serverName=sso.remp.press"
-    domainname: "sso.remp.press"
-    hostname: "sso"
+    build:
+      context: "./Docker/php"
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        UNAME: ${UNAME:-docker}
     volumes:
       - "./Sso:/var/www/html/Sso:rw"
       - "./Composer:/var/www/html/Composer:rw"
       - "./Package:/var/www/html/Package:rw"
     depends_on:
-      - "nginx"
-      - "mysql"
-      - "redis"
+      nginx:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: "unless-stopped"
 
   # beam
@@ -119,18 +169,27 @@ services:
   beam:
     domainname: "beam.remp.press"
     hostname: "beam"
-    build: "./Docker/php"
+    user: "${UID:-1000}:${GID:-1000}"
     environment:
       APP_NAME: "Beam"
       PHP_IDE_CONFIG: "serverName=beam.remp.press"
+    build:
+      context: "./Docker/php"
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        UNAME: ${UNAME:-docker}
     volumes:
       - "./Beam:/var/www/html/Beam:rw"
       - "./Composer:/var/www/html/Composer:rw"
       - "./Package:/var/www/html/Package:rw"
     depends_on:
-      - "nginx"
-      - "mysql"
-      - "redis"
+      nginx:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: "unless-stopped"
 
   zookeeper:

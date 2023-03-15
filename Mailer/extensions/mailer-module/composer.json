@@ -5,7 +5,7 @@
   "homepage": "https://remp2030.com",
   "license": "MIT",
   "require": {
-    "php": "^8.0",
+    "php": "^8.1",
     "ext-intl": "*",
     "ext-json": "*",
     "ext-pdo": "*",

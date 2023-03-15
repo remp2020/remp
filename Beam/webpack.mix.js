@@ -6,8 +6,8 @@ mix.override((config) => {
     resolve: {
         symlinks: false,
     },
-    watchOptions: {
-        ignored: /node_modules([\\]+|\/)+(?!@remp)/
+    stats: {
+        children: true,
     }
 }).version();
 
