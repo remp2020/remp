@@ -31,20 +31,169 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             $aggregator,
             $userProvider,
             $this->mailCache,
-            $this->unreadArticlesGenerator
+            $this->unreadArticlesGenerator,
         );
     }
 
-    private function generateUsers(int $count): array
+    private function generateUsers(int $count, int $startFromId = 1): array
     {
         $userList = [];
-        for ($i=1; $i<=$count; $i++) {
+        for ($i=$startFromId; $i < $startFromId + $count; $i++) {
             $userList[$i] = [
                 'id' => $i,
                 'email' => "email{$i}@example.com"
             ];
         }
         return $userList;
+    }
+
+    public function testOnlyIncludeSegments()
+    {
+        // Prepare data
+        $mailType = $this->createMailTypeWithCategory();
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+        $job = $this->createJob(includeSegments: [['code' => 's1', 'provider' => 'p'], ['code' => 's2', 'provider' => 'p']]);
+        $batch = $this->createBatch($job, $template);
+
+        $userList1 = $this->generateUsers(100);
+        $userList2 = $this->generateUsers(50, 101);
+        $userList = array_merge($userList1, $userList2);
+
+        $userProvider = $this->createMock(IUser::class);
+        $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
+            if ($page === 1) {
+                return array_intersect_key($userList, $ids);
+            }
+
+            return [];
+        });
+
+        $aggregator = $this->createMock(Aggregator::class);
+        $map = [
+            [['provider' => 'p', 'code' => 's1'], array_map(static fn($i) => $i['id'], $userList1)],
+            [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $userList2)]
+        ];
+        $aggregator->method('users')->willReturnMap($map);
+
+        $this->subscribeUsers($mailType, $userList);
+
+        // Test generator
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        $userMap = [];
+
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        $this->assertEquals(150, $this->jobQueueCount($batch, $template));
+
+        $expectedUsers = $this->getUserEmailsByKeys($userList, array_keys($userList));
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing($expectedUsers, $actualUsers);
+    }
+
+    public function testIntersectingSegments()
+    {
+        // Prepare data
+        $mailType = $this->createMailTypeWithCategory();
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+        $job = $this->createJob(includeSegments: [['code' => 's1', 'provider' => 'p'], ['code' => 's2', 'provider' => 'p']]);
+        $batch = $this->createBatch($job, $template);
+
+        $userList1 = $this->generateUsers(100);
+        $userList2 = $this->generateUsers(50, 20);
+        $userList = array_merge($userList1, $userList2);
+
+        $userProvider = $this->createMock(IUser::class);
+        $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
+            if ($page === 1) {
+                return array_intersect_key($userList, $ids);
+            }
+
+            return [];
+        });
+
+        $map = [
+            [['provider' => 'p', 'code' => 's1'], array_map(static fn($i) => $i['id'], $userList1)],
+            [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $userList2)]
+        ];
+        $aggregator = $this->createMock(Aggregator::class);
+        $aggregator->method('users')->willReturnMap($map);
+
+        $this->subscribeUsers($mailType, $userList);
+
+        // Test generator
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        $userMap = [];
+
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        $this->assertEquals(100, $this->jobQueueCount($batch, $template));
+
+        $expectedUsers = $this->getUserEmailsByKeys($userList1, array_keys($userList1));
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing($expectedUsers, $actualUsers);
+    }
+
+    public function testIncludeExcludeSegments()
+    {
+        // Prepare data
+        $mailType = $this->createMailTypeWithCategory();
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+        $job = $this->createJob(
+            includeSegments: [['code' => 's1', 'provider' => 'p'], ['code' => 's2', 'provider' => 'p']],
+            excludeSegments: [['code' => 's3', 'provider' => 'p'], ['code' => 's4', 'provider' => 'p']]
+        );
+        $batch = $this->createBatch($job, $template);
+
+        $includeUserList1 = $this->generateUsers(10);
+        $includeUserList2 = $this->generateUsers(5, 11);
+        $excludeUserList3 = $this->generateUsers(5);
+        $excludeUserList4 = $this->generateUsers(4, 14);
+
+        $userList = array_merge($includeUserList1, $includeUserList2);
+
+        $userProvider = $this->createMock(IUser::class);
+        $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
+            if ($page === 1) {
+                return array_intersect_key($userList, $ids);
+            }
+
+            return [];
+        });
+
+        $map = [
+            [['provider' => 'p', 'code' => 's1'], array_map(static fn($i) => $i['id'], $includeUserList1)],
+            [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $includeUserList2)],
+            [['provider' => 'p', 'code' => 's3'], array_map(static fn($i) => $i['id'], $excludeUserList3)],
+            [['provider' => 'p', 'code' => 's4'], array_map(static fn($i) => $i['id'], $excludeUserList4)]
+        ];
+        $aggregator = $this->createMock(Aggregator::class);
+        $aggregator->method('users')->willReturnMap($map);
+
+        $this->subscribeUsers($mailType, array_merge($includeUserList1, $includeUserList2));
+
+        // Test generator
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        $userMap = [];
+
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        $this->assertEquals(8, $this->jobQueueCount($batch, $template));
+
+        $expectedUsers = $this->getUserEmailsByIds($userList, [6,7,8,9,10,11,12,13]);
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing($expectedUsers, $actualUsers);
     }
 
     public function testFilteringUnsubscribed()
@@ -496,5 +645,17 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         }
 
         return $result;
+    }
+
+    private function getUserEmailsByIds($users, $ids): array
+    {
+        return array_map(
+            static function ($user) {
+                return $user['email'];
+            },
+            array_filter($users, static function ($user) use ($ids) {
+                return in_array($user['id'], $ids, true);
+            })
+        );
     }
 }

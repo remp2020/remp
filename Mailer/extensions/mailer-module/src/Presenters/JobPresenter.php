@@ -17,6 +17,7 @@ use Remp\MailerModule\Forms\IFormFactory;
 use Remp\MailerModule\Forms\JobFormFactory;
 use Remp\MailerModule\Forms\NewBatchFormFactory;
 use Remp\MailerModule\Forms\NewTemplateFormFactory;
+use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Models\Job\MailCache;
 use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Repositories\ActiveRow;
@@ -120,9 +121,10 @@ final class JobPresenter extends BasePresenter
                 'render' => 'date',
                 'priority' => 1,
             ])
-            ->setColSetting('segment', [
+            ->setColSetting('segments', [
                 'orderable' => false,
                 'priority' => 1,
+                'render' => 'raw',
             ])
             ->setColSetting('batches', [
                 'orderable' => false,
@@ -197,7 +199,7 @@ final class JobPresenter extends BasePresenter
         $segments = [];
         $segmentList = $this->segmentAggregator->list();
         array_walk($segmentList, function ($segment) use (&$segments) {
-            $segments[$segment['code']] = $segment['name'];
+            $segments[$segment['provider']][$segment['code']] = $segment['name'];
         });
         if ($this->segmentAggregator->hasErrors()) {
             $result['error'] = 'Unable to fetch list of segments, please check the application configuration.';
@@ -218,12 +220,29 @@ final class JobPresenter extends BasePresenter
 
             $unsubscribedCount = $latte->renderToString(__DIR__  . '/templates/Job/_unsubscribed_count.latte', ['job' => $job]);
 
+            $jobSegmentsManager = new JobSegmentsManager($job);
+
+            $includeSegments = [];
+            foreach ($jobSegmentsManager->getIncludeSegments() as $segment) {
+                $includeSegments[] = $segments[$segment['provider']][$segment['code']] ?? 'Missing segment';
+            }
+
+            $excludeSegments = [];
+            foreach ($jobSegmentsManager->getExcludeSegments() as $segment) {
+                $excludeSegments[] = $segments[$segment['provider']][$segment['code']] ?? 'Missing segment';
+            }
+
+            $segmentsRaw = $latte->renderToString(
+                __DIR__  . '/templates/Job/_job_segments.latte',
+                ['includeSegments' => $includeSegments, 'excludeSegments' => $excludeSegments]
+            );
+
             $result['data'][] = [
                 'actions' => [
                     'show' => $this->link('Show', $job->id),
                 ],
                 $job->created_at,
-                ($segments[$job->segment_code] ?? 'Missing segment'),
+                $segmentsRaw,
                 $status,
                 $sentCount,
                 $openedCount,
@@ -237,13 +256,12 @@ final class JobPresenter extends BasePresenter
     public function renderShow($id)
     {
         $job = $this->jobsRepository->find($id);
-
         $segmentList = $this->segmentAggregator->list();
-        array_walk($segmentList, function ($segment) use (&$job) {
-            if ($segment['code'] == $job->segment_code) {
-                $this->template->segment = $segment;
-            }
-        });
+        $jobSegmentsManager = new JobSegmentsManager($job);
+
+        $this->template->includeSegments = $this->pairSegments($jobSegmentsManager->getIncludeSegments(), $segmentList);
+        $this->template->excludeSegments = $this->pairSegments($jobSegmentsManager->getExcludeSegments(), $segmentList);
+
         if ($this->segmentAggregator->hasErrors()) {
             $this->flashMessage('Unable to fetch list of segments, please check the application configuration.', 'danger');
             Debugger::log($this->segmentAggregator->getErrors(), Debugger::WARNING);
@@ -272,6 +290,23 @@ final class JobPresenter extends BasePresenter
         $this->template->jobIsEditable = $this->jobsRepository->isEditable($job->id);
         $this->template->batchUnsubscribeStats = $batchUnsubscribeStats;
         $this->template->batchPreparedEmailsStats = $batchPreparedEmailsStats;
+    }
+
+    private function pairSegments($jobSegments, $aggSegments): array
+    {
+        $result = [];
+        foreach ($jobSegments as $jobSegment) {
+            foreach ($aggSegments as $aggSegment) {
+                if ($aggSegment['provider'] === $jobSegment['provider']
+                    && $aggSegment['code'] === $jobSegment['code']) {
+                    $result[] =  $aggSegment['name'];
+                    continue 2;
+                }
+            }
+            $result[] = $jobSegment['provider'] . ':' . $jobSegment['code'] . ' - Missing segment';
+        }
+
+        return $result;
     }
 
     public function renderEditJob($id)

@@ -26,7 +26,7 @@ class BatchEmailGenerator
         private Aggregator $segmentAggregator,
         private IUser $userProvider,
         private MailCache $mailCache,
-        private UnreadArticlesResolver $unreadArticlesResolver
+        private UnreadArticlesResolver $unreadArticlesResolver,
     ) {
     }
 
@@ -48,19 +48,38 @@ class BatchEmailGenerator
 
         $job = $batch->job;
 
-        $this->logger->info('Fetching users from the segment', [
-            'batchId' => $batch->id,
-            'provider' => $batch->mail_job->segment_provider,
-            'code' => $batch->mail_job->segment_code,
-        ]);
-        $userIds = $this->segmentAggregator->users(['provider' => $batch->mail_job->segment_provider, 'code' => $batch->mail_job->segment_code]);
+        $usersSegments = [];
 
-        $this->logger->info('Processing users from the segment to mail_job_queue', [
-            'batchId' => $batch->id,
-            'provider' => $batch->mail_job->segment_provider,
-            'code' => $batch->mail_job->segment_code,
-        ]);
-        foreach (array_chunk($userIds, 1000, true) as $userIdsChunk) {
+        $jobSegmentsManager = new JobSegmentsManager($batch->mail_job);
+
+        $this->logger->info('Fetching users from include segments', ['batchId' => $batch->id]);
+        $includeSegments = $jobSegmentsManager->getIncludeSegments();
+        foreach ($includeSegments as $segment) {
+            $this->logger->info('Fetching users from the include segment', [
+                'batchId' => $batch->id,
+                'provider' => $segment['provider'],
+                'code' => $segment['code'],
+            ]);
+
+            $includeUserIds = $this->segmentAggregator->users(['provider' => $segment['provider'], 'code' => $segment['code']]);
+            $usersSegments = array_unique(array_merge($usersSegments, $includeUserIds), SORT_NUMERIC);
+        }
+
+        $this->logger->info('Fetching users from exclude segments', ['batchId' => $batch->id]);
+        $excludeSegments = $jobSegmentsManager->getExcludeSegments();
+        foreach ($excludeSegments as $segment) {
+            $this->logger->info('Fetching users from the exclude segment', [
+                'batchId' => $batch->id,
+                'provider' => $segment['provider'],
+                'code' => $segment['code'],
+            ]);
+
+            $excludeUserIds = $this->segmentAggregator->users(['provider' => $segment['provider'], 'code' => $segment['code']]);
+            $usersSegments = array_diff($usersSegments, $excludeUserIds);
+        }
+
+        $this->logger->info('Processing users from segments to mail_job_queue', ['batchId' => $batch->id]);
+        foreach (array_chunk($usersSegments, 1000, true) as $userIdsChunk) {
             $page = 1;
             while ($users = $this->userProvider->list($userIdsChunk, $page)) {
                 foreach ($users as $user) {

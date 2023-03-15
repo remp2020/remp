@@ -7,6 +7,7 @@ use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\Security\User;
 use Remp\MailerModule\Models\Auth\PermissionManager;
+use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Models\Segment\Crm;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
@@ -169,7 +170,7 @@ class ArticleUrlParserTemplateFormFactory
 
             $jobContext = null;
 
-            $mailJob = $this->jobsRepository->add($segmentCode, Crm::PROVIDER_ALIAS, $jobContext);
+            $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, Crm::PROVIDER_ALIAS), $jobContext);
             $batch = $this->batchesRepository->add(
                 $mailJob->id,
                 (int)$values['email_count'],

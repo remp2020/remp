@@ -8,6 +8,7 @@ use Nette\DI\Container;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
 use PHPUnit\Framework\TestCase;
+use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Repositories\AutoLoginTokensRepository;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
@@ -96,9 +97,17 @@ class BaseFeatureTestCase extends TestCase
         return $this->container->getByType($className);
     }
 
-    protected function createJob($context, $mailTypeVariant = null, $segmentCode = 'segment', $segmentProvider = 'provider')
+    protected function createJob($context = null, $mailTypeVariant = null, $includeSegments = [['code' => 'segment', 'provider' => 'provider']], $excludeSegments = [])
     {
-        return $this->jobsRepository->add($segmentCode, $segmentProvider, $context, $mailTypeVariant);
+        $jobSegmentsManager = new JobSegmentsManager();
+        foreach ($includeSegments as $includeSegment) {
+            $jobSegmentsManager->includeSegment($includeSegment['code'], $includeSegment['provider']);
+        }
+        foreach ($excludeSegments as $excludeSegment) {
+            $jobSegmentsManager->excludeSegment($excludeSegment['code'], $excludeSegment['provider']);
+        }
+
+        return $this->jobsRepository->add($jobSegmentsManager, $context, $mailTypeVariant);
     }
 
     protected function createBatch($mailJob, $template, $maxEmailsCount = null)

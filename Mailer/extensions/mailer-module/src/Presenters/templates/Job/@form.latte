@@ -5,10 +5,19 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <div class="row form-group" n:ifset="$control['newBatchForm']['segment_code']">
+            <div class="row form-group" n:ifset="$control['newBatchForm']['include_segment_codes']">
                 <div class="col-sm-12">
-                    {label segment_code /}
-                    {input segment_code, class => 'selectpicker', data-live-search => 'true', data-live-search-normalize => 'true'}
+                    {label include_segment_codes /}
+                    <i class="zmdi zmdi-help" style="cursor: help" data-toggle="tooltip" data-placement="top" title="Send email to users who are in one of the include segments."></i>
+                    {input include_segment_codes, class => 'selectpicker', data-live-search => 'true', data-live-search-normalize => 'true', multiple => 'true'}
+                </div>
+            </div>
+
+            <div class="row form-group" n:ifset="$control['newBatchForm']['exclude_segment_codes']">
+                <div class="col-sm-12">
+                    {label exclude_segment_codes /}
+                    <i class="zmdi zmdi-help" style="cursor: help" data-toggle="tooltip" data-placement="top" title="Do not send email to users in one of the exclude segments even if they are in one of the include segments."></i>
+                    {input exclude_segment_codes, class => 'selectpicker', data-live-search => 'true', data-live-search-normalize => 'true', multiple => 'true'}
                 </div>
             </div>
 
