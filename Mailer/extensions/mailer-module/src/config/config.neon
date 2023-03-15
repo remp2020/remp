@@ -157,6 +157,7 @@ services:
 	- Remp\MailerModule\Models\Sender
 	- Remp\MailerModule\Models\Job\BatchEmailGenerator(@mailProcessLogger)
 	- Remp\MailerModule\Models\Job\MailCache
+	- Remp\MailerModule\Models\Job\JobSegmentsManager
 	- Remp\MailerModule\Models\Auth\AutoLogin
 
 	- Remp\MailerModule\Models\HealthChecker
@@ -191,6 +192,7 @@ services:
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'generator-templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\GeneratorTemplatesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'templates'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailCreateTemplateHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 1, 'mailers', 'jobs'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailJobCreateApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
+			- addApi(\Tomaj\NetteApi\EndpointIdentifier('POST', 2, 'mailers', 'jobs'), \Remp\MailerModule\Api\v2\Handlers\Mailers\MailJobCreateApiHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-types'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 2, 'mailers', 'mail-types'), \Remp\MailerModule\Api\v2\Handlers\Mailers\MailTypesListingHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())
 			- addApi(\Tomaj\NetteApi\EndpointIdentifier('GET', 1, 'mailers', 'mail-type-categories'), \Remp\MailerModule\Api\v1\Handlers\Mailers\MailTypeCategoriesHandler(), \Tomaj\NetteApi\Authorization\BearerTokenAuthorization())

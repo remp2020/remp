@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api\v1\Handlers\Mailers;
 
 use Remp\MailerModule\Api\v1\Handlers\Mailers\MailJobCreateApiHandler;
+use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
@@ -32,8 +33,9 @@ class MailJobCreateApiHandlerTest extends BaseApiHandlerTestCase
         $this->assertIsNumeric($payload['id']);
 
         $mailJob = $this->jobsRepository->find($payload['id']);
-        $this->assertEquals($params['segment_code'], $mailJob->segment_code);
-        $this->assertEquals($params['segment_provider'], $mailJob->segment_provider);
+        $jobSegmentsManager = new JobSegmentsManager($mailJob);
+        $this->assertEquals($params['segment_code'], $jobSegmentsManager->getIncludeSegments()[0]['code']);
+        $this->assertEquals($params['segment_provider'], $jobSegmentsManager->getIncludeSegments()[0]['provider']);
         $this->assertNull($mailJob->context);
         $this->assertNull($mailJob->mail_type_variant_id);
     }
@@ -52,8 +54,9 @@ class MailJobCreateApiHandlerTest extends BaseApiHandlerTestCase
         $this->assertIsNumeric($payload['id']);
 
         $mailJob = $this->jobsRepository->find($payload['id']);
-        $this->assertEquals($params['segment_code'], $mailJob->segment_code);
-        $this->assertEquals($params['segment_provider'], $mailJob->segment_provider);
+        $jobSegmentsManager = new JobSegmentsManager($mailJob);
+        $this->assertEquals($params['segment_code'], $jobSegmentsManager->getIncludeSegments()[0]['code']);
+        $this->assertEquals($params['segment_provider'], $jobSegmentsManager->getIncludeSegments()[0]['provider']);
         $this->assertEquals($params['context'], $mailJob->context);
         $this->assertEquals($params['mail_type_variant_code'], $mailJob->mail_type_variant->code);
     }

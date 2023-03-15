@@ -9,6 +9,7 @@ use Nette\Security\User;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\Auth\PermissionManager;
+use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
@@ -77,9 +78,10 @@ class NewBatchFormFactory
                 Debugger::log($this->segmentAggregator->getErrors()[0], Debugger::WARNING);
             }
 
-            $form->addSelect('segment_code', 'Segment', $segments)
-                ->setPrompt('Select segment')
-                ->setRequired("Field 'Segment' is required.");
+            $form->addMultiSelect('include_segment_codes', 'Include segments', $segments)
+                ->setRequired("You have to include at least one segment.");
+
+            $form->addMultiSelect('exclude_segment_codes', 'Exclude segments', $segments);
         }
 
         $methods = [
@@ -135,8 +137,17 @@ class NewBatchFormFactory
     public function formSucceeded(Form $form, ArrayHash $values): void
     {
         if (!$values['job_id']) {
-            $segment = explode('::', $values['segment_code']);
-            $values['job_id'] = $this->jobsRepository->add($segment[1], $segment[0], $values->context)->id;
+            $jobSegmentsManager = new JobSegmentsManager();
+            foreach ($values['include_segment_codes'] as $includeSegment) {
+                [$provider, $code] = explode('::', $includeSegment);
+                $jobSegmentsManager->includeSegment($code, $provider);
+            }
+            foreach ($values['exclude_segment_codes'] as $excludeSegment) {
+                [$provider, $code] = explode('::', $excludeSegment);
+                $jobSegmentsManager->excludeSegment($code, $provider);
+            }
+
+            $values['job_id'] = $this->jobsRepository->add($jobSegmentsManager, $values->context)->id;
         } else {
             $values['job_id'] = (int)$values['job_id'];
         }

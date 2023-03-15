@@ -11,6 +11,7 @@ use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Models\Users\IUser;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\JobQueueRepository;
+use Remp\MailerModule\Repositories\JobsRepository;
 
 class BatchEmailGeneratorWrapper extends BatchEmailGenerator
 {
@@ -19,7 +20,7 @@ class BatchEmailGeneratorWrapper extends BatchEmailGenerator
         Aggregator $segmentAggregator,
         IUser $userProvider,
         MailCache $mailCache,
-        UnreadArticlesResolver $unreadArticlesGenerator
+        UnreadArticlesResolver $unreadArticlesGenerator,
     ) {
         parent::__construct(
             new NullLogger(),
@@ -27,7 +28,7 @@ class BatchEmailGeneratorWrapper extends BatchEmailGenerator
             $segmentAggregator,
             $userProvider,
             $mailCache,
-            $unreadArticlesGenerator
+            $unreadArticlesGenerator,
         );
     }
 

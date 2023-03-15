@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
 
 use Nette\Http\IResponse;
+use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
@@ -90,7 +91,7 @@ class MailJobCreateApiHandler extends BaseHandler
             }
         }
 
-        $mailJob = $this->jobsRepository->add($segmentCode, $segmentProvider, $params['context'] ?? null, $mailTypeVariant);
+        $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, $segmentProvider), $params['context'] ?? null, $mailTypeVariant);
         $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
         $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);

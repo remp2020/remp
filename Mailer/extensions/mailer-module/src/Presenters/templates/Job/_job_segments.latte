@@ -1,0 +1,15 @@
+{foreach $includeSegments as $includeSegment}
+  <div>
+    <i class="zmdi zmdi-mail-send"></i>
+    <span>{$includeSegment}</span>
+  </div>
+{/foreach}
+
+{foreach $excludeSegments as $excludeSegment}
+  {first}<br style="display:block; content: ''; margin-top: 8px">{/first}
+
+  <div>
+    <i class="zmdi zmdi-block"></i>
+    <span>{$excludeSegment}</span>
+  </div>
+{/foreach}

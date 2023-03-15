@@ -7,6 +7,7 @@ use Nette\Application\UI\Form;
 use Nette\Security\User;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\Auth\PermissionManager;
+use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
@@ -140,7 +141,7 @@ class TldrTemplateFormFactory
                 $jobContext = 'newsletter.' . $values['article_id'];
             }
 
-            $mailJob = $this->jobsRepository->add($segmentCode, Crm::PROVIDER_ALIAS, $jobContext);
+            $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, Crm::PROVIDER_ALIAS), $jobContext);
             $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
 

@@ -7,6 +7,7 @@ use Exception;
 use Nette\Caching\Storage;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Models\Job\JobSegmentsManager;
 
 class JobsRepository extends Repository
 {
@@ -31,11 +32,10 @@ class JobsRepository extends Repository
         return $this->getTable()->order('mail_jobs.created_at DESC');
     }
 
-    public function add(string $segmentCode, string $segmentProvider, ?string $context = null, ?ActiveRow $mailTypeVariant = null): ?ActiveRow
+    public function add(JobSegmentsManager $jobSegmentsManager, ?string $context = null, ?ActiveRow $mailTypeVariant = null): ?ActiveRow
     {
         $data = [
-            'segment_code' => $segmentCode,
-            'segment_provider' => $segmentProvider,
+            'segments' => $jobSegmentsManager->toJson(),
             'context' => $context,
             'status' => static::STATUS_NEW,
             'created_at' => new DateTime(),
