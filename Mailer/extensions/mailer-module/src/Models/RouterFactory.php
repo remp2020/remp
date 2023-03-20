@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Models;
 
 use Nette;
-use Nette\Application\Routers\RouteList;
 use Nette\Application\Routers\Route;
+use Nette\Application\Routers\RouteList;
 
 class RouterFactory
 {
@@ -14,6 +14,10 @@ class RouterFactory
     public static function createRouter(): RouteList
     {
         $router = new RouteList;
+        $router[] = new Route('<module>/<presenter>/<action>[/<id>]', [
+            'action' => 'default',
+            'id' => null,
+        ]);
         $router[] = new Route('<presenter>/<action>[/<id>]', [
             'module' => 'Mailer',
             'presenter' => 'Dashboard',
