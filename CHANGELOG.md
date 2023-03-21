@@ -45,6 +45,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Added support for external module routes (`/<module>/<presenter>/<action>`). remp/remp#1220
+  - This new route map changed the default routes and breaks anything linking to the Mailer directly; primarily bookmarks. APIs are not affected by this change. 
 - **DEPRECATED**: Deprecated method `LogsRepository::filterAlreadySent` in favor of `LogsRepository::filterAlreadySentV2`. remp/remp#1242
 - Removed `php-amqplib/php-amqplib` from the direct Mailer dependencies. remp/remp#1244
 - **IMPORTANT**: Changed primary key from `int` to `bigint` for `autologin_tokens` table. remp/remp#1187
@@ -57,7 +59,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - The check executed in the `mail:worker` command didn't perform well under certain DB settings and caused unnecessary hold-ups.
 - Fixed `worker:mail` healthcheck not correctly working if worker was occupied with big batch. remp/remp#1240
 - Added support for include and exclude segments in mail jobs. Now you can select multiple include and exclude segments for mail job. remp/remp#1216
-- Added support for external module routes (`/<module>/<presenter>/<action>`). remp/remp#1220
 
 ## [1.2.0] - 2023-02-23
 

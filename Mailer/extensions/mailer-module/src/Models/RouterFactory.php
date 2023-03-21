@@ -14,18 +14,15 @@ class RouterFactory
     public static function createRouter(): RouteList
     {
         $router = new RouteList;
+
+        $router[] = new Route('/api/v<version>/<package>[/<apiAction>][/<params>]', 'Api:Api:default');
         $router[] = new Route('<module>/<presenter>/<action>[/<id>]', [
-            'action' => 'default',
-            'id' => null,
-        ]);
-        $router[] = new Route('<presenter>/<action>[/<id>]', [
             'module' => 'Mailer',
             'presenter' => 'Dashboard',
             'action' => 'default',
             'id' => null,
         ]);
 
-        $router[] = new Route('/api/v<version>/<package>[/<apiAction>][/<params>]', 'Api:Api:default');
         return $router;
     }
 }
