@@ -59,6 +59,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - The check executed in the `mail:worker` command didn't perform well under certain DB settings and caused unnecessary hold-ups.
 - Fixed `worker:mail` healthcheck not correctly working if worker was occupied with big batch. remp/remp#1240
 - Added support for include and exclude segments in mail jobs. Now you can select multiple include and exclude segments for mail job. remp/remp#1216
+- Added log `user_id` to `mail_logs` in mail Sender. remp/remp#1188
+- Fixed `CreateNewMailLogsAndMailConversionsTable` migration to add `user_id` column and index if database table is empty. remp/remp#1188
 
 ## [1.2.0] - 2023-02-23
 

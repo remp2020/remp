@@ -111,7 +111,8 @@ class Sender
         }
         $recipient = reset($this->recipients);
 
-        if ($checkEmailSubscribed && !$this->userSubscriptionsRepository->isEmailSubscribed($recipient['email'], $this->template->mail_type->id)) {
+        $subscription = $this->userSubscriptionsRepository->getEmailSubscription($this->template->mail_type, $recipient['email']);
+        if ($checkEmailSubscribed && (!$subscription || !$subscription->subscribed)) {
             return 0;
         }
 
@@ -177,7 +178,8 @@ class Sender
             $this->batchId,
             $senderId,
             $attachmentSize,
-            $this->context
+            $this->context,
+            $subscription->user_id ?? null
         );
 
         $mailer->send($message);
@@ -208,7 +210,7 @@ class Sender
                 'recipients_count' => count($subscribedEmails)
             ]);
         }
-        $subscribedEmails = $this->userSubscriptionsRepository->filterSubscribedEmails($subscribedEmails, $this->template->mail_type_id);
+        $subscribedEmails = $this->userSubscriptionsRepository->filterSubscribedEmailsAndIds($subscribedEmails, $this->template->mail_type_id);
 
         if ($logger !== null) {
             $logger->info("Sender - subscribers filtering before sending {$this->batchId}", [
@@ -216,7 +218,7 @@ class Sender
             ]);
         }
 
-        $autologinTokens = $this->autoLogin->createTokens($subscribedEmails);
+        $autologinTokens = $this->autoLogin->createTokens(array_keys($subscribedEmails));
 
         $transformedParams = [];
         foreach ($this->recipients as $recipient) {
@@ -313,7 +315,8 @@ class Sender
                 $this->batchId,
                 $params['mail_sender_id'],
                 $attachmentSize,
-                $this->context
+                $this->context,
+                (int) $subscribedEmails[$email]
             );
         }
         $logsTableName = $this->logsRepository->getTable()->getName();

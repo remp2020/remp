@@ -101,6 +101,15 @@ class UserSubscriptionsRepository extends Repository
         ])->select('user_email')->fetchPairs('user_email', 'user_email');
     }
 
+    public function filterSubscribedEmailsAndIds(array $emails, int $typeId): array
+    {
+        return $this->getTable()->where([
+            'user_email' => $emails,
+            'mail_type_id' => $typeId,
+            'subscribed' => true,
+        ])->select('user_id, user_email')->fetchPairs('user_email', 'user_id');
+    }
+
     public function subscribeUser(
         ActiveRow $mailType,
         int $userId,
@@ -246,6 +255,16 @@ class UserSubscriptionsRepository extends Repository
         /** @var ActiveRow $row */
         $row = $this->getTable()->where([
             'user_id' => $userId,
+            'mail_type_id' => $mailType->id,
+            'user_email' => $email,
+        ])->limit(1)->fetch();
+        return $row;
+    }
+
+    public function getEmailSubscription(ActiveRow $mailType, string $email): ?ActiveRow
+    {
+        /** @var ActiveRow $row */
+        $row = $this->getTable()->where([
             'mail_type_id' => $mailType->id,
             'user_email' => $email,
         ])->limit(1)->fetch();

@@ -43,17 +43,18 @@ class LogsRepository extends Repository
         return $this->getTable()->where('email', $emails);
     }
 
-    public function add(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null): ActiveRow
+    public function add(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null, ?int $userId = null): ActiveRow
     {
         return $this->insert(
-            $this->getInsertData($email, $subject, $templateId, $jobId, $batchId, $mailSenderId, $attachmentSize, $context)
+            $this->getInsertData($email, $subject, $templateId, $jobId, $batchId, $mailSenderId, $attachmentSize, $context, $userId)
         );
     }
 
-    public function getInsertData(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null): array
+    public function getInsertData(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null, ?int $userId = null): array
     {
         return [
             'email' => $email,
+            'user_id' => $userId,
             'subject' => $subject,
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
@@ -270,16 +271,9 @@ class LogsRepository extends Repository
 
     public function insert(array $data)
     {
-        $userId = $data['user_id'] ?? null;
-        unset($data['user_id']);
-
         $result = parent::insert($data);
         if ($this->newTableDataMigrationIsRunning()) {
-            $newTableData = $result->toArray();
-            if ($userId !== null) {
-                $newTableData['user_id'] = $userId;
-            }
-            $this->getNewTable()->insert($newTableData);
+            $this->getNewTable()->insert($result->toArray());
         }
         return $result;
     }
