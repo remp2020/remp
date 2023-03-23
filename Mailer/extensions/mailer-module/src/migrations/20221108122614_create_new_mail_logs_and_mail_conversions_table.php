@@ -20,6 +20,8 @@ final class CreateNewMailLogsAndMailConversionsTable extends AbstractMigration
 
             $this->table('mail_logs')
                 ->changeColumn('id', 'biginteger', ['identity' => true])
+                ->addColumn('user_id', 'integer', ['null' => true, 'after' => 'email'])
+                ->addIndex('user_id')
                 ->save();
 
             $this->table('mail_log_conversions')
