@@ -31,7 +31,7 @@ class Showtime
 
     private $alignmentsMap;
 
-    private $variables;
+    private $snippets;
 
     public function __construct(
         private ClientInterface $redis,
@@ -95,18 +95,18 @@ class Showtime
         return $this->alignmentsMap;
     }
 
-    private function getVariables()
+    private function getSnippets()
     {
-        if (!$this->variables) {
-            $this->variables = [];
+        if (!$this->snippets) {
+            $this->snippets = [];
 
-            $redisCacheKey = $this->redis->get(\App\Variable::REDIS_CACHE_KEY);
+            $redisCacheKey = $this->redis->get(\App\Snippet::REDIS_CACHE_KEY);
             if (!is_null($redisCacheKey)) {
-                $this->variables = json_decode($redisCacheKey, true) ?? [];
+                $this->snippets = json_decode($redisCacheKey, true) ?? [];
             }
         }
 
-        return $this->variables;
+        return $this->snippets;
     }
 
     public function showtime(string $userData, string $callback, ShowtimeResponse $showtimeResponse)
@@ -144,7 +144,7 @@ class Showtime
         $positions = $this->getPositionMap();
         $dimensions = $this->getDimensionMap();
         $alignments = $this->getAlignmentsMap();
-        $variables = $this->getVariables();
+        $snippets = $this->getSnippets();
 
         $displayData = [];
 
@@ -157,7 +157,7 @@ class Showtime
             $banner = $this->loadOneTimeBrowserBanner($browserId);
         }
         if ($banner) {
-            $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $variables);
+            $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $snippets);
             return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData());
         }
 
@@ -188,7 +188,7 @@ class Showtime
                 alignments: $alignments,
                 dimensions: $dimensions,
                 positions: $positions,
-                variables: $variables,
+                snippets: $snippets,
                 userData: $data,
             );
         }

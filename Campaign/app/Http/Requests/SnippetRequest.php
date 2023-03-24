@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class VariableRequest extends FormRequest
+class SnippetRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class VariableRequest extends FormRequest
         return [
             'name' => [
                 "required",
-                Rule::unique("variables", "name")->ignore($this->variable->id ?? null)
+                Rule::unique("snippets", "name")->ignore($this->snippet->id ?? null)
             ],
             'value' => 'required',
         ];

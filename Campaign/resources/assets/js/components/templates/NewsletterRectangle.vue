@@ -37,7 +37,7 @@
                                 <input v-model="btnSubmit" class="form-control fg-input remp-banner-text-input"
                                        name="btn_submit" id="btn_submit">
                             </div>
-                            <small v-pre>You can use &lt;&nbsp;&gt; Variables in this field as {{&nbsp;variable_name&nbsp;}}.</small>
+                            <small v-pre>You can use &lt;&nbsp;&gt; Snippets in this field as {{&nbsp;snippet_name&nbsp;}}.</small>
                         </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">
@@ -47,7 +47,7 @@
                                 <input v-model="title" class="form-control fg-input remp-banner-text-input"
                                        name="title" id="title">
                             </div>
-                            <small v-pre>You can use &lt;&nbsp;&gt; Variables in this field as {{&nbsp;variable_name&nbsp;}}.</small>
+                            <small v-pre>You can use &lt;&nbsp;&gt; Snippets in this field as {{&nbsp;snippet_name&nbsp;}}.</small>
                         </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">
@@ -57,7 +57,7 @@
                                 <textarea v-model="text" class="form-control fg-input remp-banner-text-input"
                                           rows="4" name="text" cols="50" id="text"></textarea>
                             </div>
-                            <small v-pre>You can use &lt;&nbsp;&gt; Variables in this field as {{&nbsp;variable_name&nbsp;}}.</small>
+                            <small v-pre>You can use &lt;&nbsp;&gt; Snippets in this field as {{&nbsp;snippet_name&nbsp;}}.</small>
                         </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">

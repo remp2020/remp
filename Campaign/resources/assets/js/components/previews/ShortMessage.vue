@@ -73,7 +73,7 @@ a.short-message-preview-close::after {
                    v-bind:class="[{hidden: !closeable}]"
                    v-on:click.stop="$parent.closed"
                    v-bind:style="closeStyles"></a>
-                <div class="short-message-main" v-html="$parent.injectVars(text)"></div>
+                <div class="short-message-main" v-html="$parent.injectSnippets(text)"></div>
             </div>
         </transition>
     </a>

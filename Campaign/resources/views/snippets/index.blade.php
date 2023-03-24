@@ -1,22 +1,22 @@
 @extends('layouts.app')
 
-@section('title', 'Variables')
+@section('title', 'Snippets')
 
 @section('content')
 
     <div class="c-header">
-        <h2>Variables</h2>
+        <h2>Snippets</h2>
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>List of variables
+            <h2>List of snippets
                 <small v-pre>
-                    These variables are supported in your banner template contents, inline JS/CSS snippets and URLs of external JS/CSS files.<br>
-                    You can use created variables by adding <code>&#123;&#123;&nbsp;variable_name&nbsp;&#125;&#125;</code> to fields which are marked as supported.
+                    These snippets are supported in your banner template contents, inline JS/CSS snippets and URLs of external JS/CSS files.<br>
+                    You can use created snippets by adding <code>&#123;&#123;&nbsp;snippet_name&nbsp;&#125;&#125;</code> to fields which are marked as supported.
                 </small>
             </h2>
             <div class="actions">
-                <a href="{{ route('variables.create') }}" data-toggle="modal" class="btn palette-Cyan bg waves-effect">Add new variable</a>
+                <a href="{{ route('snippets.create') }}" data-toggle="modal" class="btn palette-Cyan bg waves-effect">Add new snippet</a>
             </div>
         </div>
 
@@ -37,9 +37,9 @@
                     'priority' => 4,
                 ],
             ],
-            'dataSource' => route('variables.json'),
+            'dataSource' => route('snippets.json'),
             'rowActions' => [
-                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit variable'],
+                ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit snippet'],
             ],
             'order' => [2, 'desc']
         ]) !!}

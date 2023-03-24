@@ -50,7 +50,7 @@
                             </div>
                             <div class="help-block">
                                 <small v-html="$parent.fieldParamsMessage"></small><br>
-                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                             </div>
                         </div>
 

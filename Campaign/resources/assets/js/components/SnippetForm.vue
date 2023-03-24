@@ -30,14 +30,13 @@
         <div class="row">
             <div class="col-md-12 col-lg-8">
                 <div class="input-group m-t-20 m-b-30">
-                    <span v-if="hasParseError" class="m-r-10">Parse error. Unable to save.</span>
                     <div class="fg-line">
                         <input type="hidden" name="action" :value="submitAction">
 
-                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save'" :disabled="hasParseError">
+                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save'">
                             <i class="zmdi zmdi-check"></i> Save
                         </button>
-                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save_close'" :disabled="hasParseError">
+                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save_close'">
                             <i class="zmdi zmdi-mail-send"></i> Save and close
                         </button>
                     </div>
@@ -81,7 +80,7 @@ CodeMirror.defineMode("jstwig", function(config, parserConfig) {
 });
 
 export default {
-    name: "variable-form",
+    name: "snippet-form",
     components: {
         codemirror,
         FormValidator,

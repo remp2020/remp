@@ -149,7 +149,7 @@ a.html-overlay-rectangle-preview-close::after {
                             <div class="html-overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
                                 <div class="html-overlay-rectangle-content" v-if="text">
                                     <div class="html-overlay-rectangle-main"
-                                         v-html="$parent.injectVars(text)"
+                                         v-html="$parent.injectSnippets(text)"
                                          v-bind:style="[_textAlign, textStyles]"></div>
                                 </div>
                             </div>
@@ -247,9 +247,9 @@ export default {
         style.type = 'text/css';
         if (style.styleSheet) {
             // This is required for IE8 and below.
-            style.styleSheet.cssText = this.$parent.injectVars(styles);
+            style.styleSheet.cssText = this.$parent.injectSnippets(styles);
         } else {
-            style.appendChild(document.createTextNode(this.$parent.injectVars(styles)));
+            style.appendChild(document.createTextNode(this.$parent.injectSnippets(styles)));
         }
     },
 }

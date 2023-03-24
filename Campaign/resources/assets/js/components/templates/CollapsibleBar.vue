@@ -82,7 +82,7 @@
                                 <label for="header_text" class="fg-label">Header text</label>
                                 <input v-model="headerText" class="form-control fg-input remp-banner-text-input" name="header_text" id="header_text" type="text">
                             </div>
-                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                         </div>
 
                         <div class="input-group fg-float m-t-30">
@@ -91,7 +91,7 @@
                                 <label for="collapse_text" class="fg-label">Collapse text</label>
                                 <input v-model="collapseText" class="form-control fg-input remp-banner-text-input" name="collapse_text" id="collapse_text" type="text">
                             </div>
-                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                         </div>
 
                         <div class="input-group fg-float m-t-30">
@@ -100,7 +100,7 @@
                                 <label for="expand_text" class="fg-label">Expand text</label>
                                 <input v-model="expandText" class="form-control fg-input remp-banner-text-input" name="expand_text" id="expand_text" type="text">
                             </div>
-                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                         </div>
 
                         <div class="input-group fg-float m-t-30">
@@ -111,7 +111,7 @@
                             </div>
                             <div>
                                 <small v-html="$parent.fieldParamsMessage"></small><br>
-                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                             </div>
                         </div>
 
@@ -121,7 +121,7 @@
                                 <label for="button_text" class="fg-label">Button text</label>
                                 <input v-model="buttonText" class="form-control fg-input remp-banner-text-input" name="button_text" id="button_text" type="text">
                             </div>
-                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                         </div>
                     </div>
                 </div>

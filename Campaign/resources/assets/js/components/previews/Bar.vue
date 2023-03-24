@@ -160,13 +160,13 @@
                    v-bind:style="closeStyles">
                     <span>{{ closeText }} <span style="font-size: 18px">&#215;</span></span>
                 </a>
-                <div class="bar-main" v-html="$parent.injectVars(mainText)"></div>
+                <div class="bar-main" v-html="$parent.injectSnippets(mainText)"></div>
                 <div class="bar-button-wrap">
                     <div class="bar-button"
                          v-if="buttonText.length > 0"
                          v-bind:class="{'bar-button-margin': closeable}"
                          v-on:click="$parent.clicked($event, !$parent.url)"
-                         v-html="$parent.injectVars(buttonText)"
+                         v-html="$parent.injectSnippets(buttonText)"
                          v-bind:style="[buttonStyles]"></div>
                 </div>
             </div>

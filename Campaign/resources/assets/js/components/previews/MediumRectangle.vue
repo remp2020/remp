@@ -80,10 +80,10 @@ a.medium-rectangle-preview-close::after {
                 <a class="medium-rectangle-preview-close" title="Close banner" href="javascript://"
                    v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed"
                    v-bind:style="[closeStyles]"><span>{{ closeText }}</span></a>
-                <div class="medium-rectangle-header" v-html="$parent.injectVars(headerText)"></div>
-                <div class="medium-rectangle-main" v-html="$parent.injectVars(mainText)"></div>
+                <div class="medium-rectangle-header" v-html="$parent.injectSnippets(headerText)"></div>
+                <div class="medium-rectangle-main" v-html="$parent.injectSnippets(mainText)"></div>
                 <div class="medium-rectangle-button" v-if="buttonText.length > 0"
-                     v-on:click="$parent.clicked($event, !$parent.url)" v-html="$parent.injectVars(buttonText)"
+                     v-on:click="$parent.clicked($event, !$parent.url)" v-html="$parent.injectSnippets(buttonText)"
                      v-bind:style="[buttonStyles]"></div>
             </div>
         </transition>

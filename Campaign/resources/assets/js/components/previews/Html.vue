@@ -72,7 +72,7 @@ a.html-preview-close::after {
                 <a class="html-preview-close" title="Close banner" href="javascript://"
                    v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed"
                    v-bind:style="closeStyles"><small>{{ closeText }}</small></a>
-                <div v-html="$parent.injectVars(text)" class="html-preview-text"
+                <div v-html="$parent.injectSnippets(text)" class="html-preview-text"
                      v-bind:style="[_textAlign, textStyles]"></div>
             </div>
         </transition>
@@ -125,9 +125,9 @@ export default {
         style.type = 'text/css';
         if (style.styleSheet) {
             // This is required for IE8 and below.
-            style.styleSheet.cssText = this.$parent.injectVars(styles);
+            style.styleSheet.cssText = this.$parent.injectSnippets(styles);
         } else {
-            style.appendChild(document.createTextNode(this.$parent.injectVars(styles)));
+            style.appendChild(document.createTextNode(this.$parent.injectSnippets(styles)));
         }
     },
     computed: {

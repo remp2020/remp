@@ -133,12 +133,12 @@
                         <div class="collapsible-bar-preview-box sans-serif" v-bind:style="[ boxStyles ]">
 
                             <div class="collapsible-bar-main"
-                                 v-html="$parent.injectVars(mainText)"></div>
+                                 v-html="$parent.injectSnippets(mainText)"></div>
 
                             <div class="collapsible-bar-button"
                                  v-if="buttonText.length > 0"
                                  v-on:click="$parent.clicked($event, !$parent.url)"
-                                 v-html="$parent.injectVars(buttonText)"
+                                 v-html="$parent.injectSnippets(buttonText)"
                                  v-bind:style="[buttonStyles]"></div>
 
                         </div>

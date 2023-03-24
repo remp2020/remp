@@ -16,7 +16,7 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\ScheduleController;
-use App\Http\Controllers\VariableController;
+use App\Http\Controllers\SnippetController;
 use App\Http\Controllers\CampaignsComparisonController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\SearchController;
@@ -30,7 +30,7 @@ Route::middleware('auth.jwt')->group(function () {
     Route::get('/', [DashboardController::class, 'index']);
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('banners/json', [BannerController::class, 'json'])->name('banners.json');
-    Route::get('variables/json', [VariableController::class, 'json'])->name('variables.json');
+    Route::get('snippets/json', [SnippetController::class, 'json'])->name('snippets.json');
     Route::get('banners/{sourceBanner}/copy', [BannerController::class, 'copy'])->name('banners.copy');
     Route::get('campaigns/json', [CampaignController::class, 'json'])->name('campaigns.json');
     Route::get('campaigns/{sourceCampaign}/copy', [CampaignController::class, 'copy'])->name('campaigns.copy');
@@ -49,7 +49,7 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::post('campaigns/validate', [CampaignController::class, 'validateForm'])->name('campaigns.validateForm');
     Route::post('banners/validate', [BannerController::class, 'validateForm'])->name('banners.validateForm');
-    Route::post('variables/validate/{variable?}', [VariableController::class, 'validateForm'])->name('variables.validateForm');
+    Route::post('snippets/validate/{snippet?}', [SnippetController::class, 'validateForm'])->name('snippets.validateForm');
 
     Route::get('campaigns/{campaign}/stats', [CampaignController::class, 'stats'])->name('campaigns.stats');
     Route::post('campaigns/{campaign}/stats/data', [StatsController::class, 'getStats'])->name('campaigns.stats.data');
@@ -58,7 +58,7 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::resource('banners', BannerController::class);
     Route::resource('campaigns', CampaignController::class);
-    Route::resource('variables', VariableController::class);
+    Route::resource('snippets', SnippetController::class);
     Route::resource('schedule', ScheduleController::class)->only(['index', 'create', 'edit', 'update', 'destroy']);
     Route::resource('campaigns.schedule', ScheduleController::class);
 

@@ -88,8 +88,8 @@
             <li {!! route_active(['campaigns']) !!}>
                 <a href="{{ route('campaigns.index') }}" ><i class="zmdi zmdi-ticket-star"></i> Campaigns</a>
             </li>
-            <li {!! route_active(['variables']) !!}>
-                <a href="{{ route('variables.index') }}" ><i class="zmdi zmdi-code"></i> Variables</a>
+            <li {!! route_active(['snippets']) !!}>
+                <a href="{{ route('snippets.index') }}" ><i class="zmdi zmdi-code"></i> Snippets</a>
             </li>
         </ul>
     </aside>

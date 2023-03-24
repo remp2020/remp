@@ -19,7 +19,7 @@
                             </div>
                             <div class="help-block">
                                 <small>Single new lines are converted to <code>&lt;br&gt;</code>, double new lines to <code>&lt;p&gt;</code></small>
-                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                             </div>
 
                         </div><!-- .input-group -->
@@ -32,7 +32,7 @@
                             </div>
                             <div class="help-block">
                                 <small>Single new lines are converted to <code>&lt;br&gt;</code>, double new lines to <code>&lt;p&gt;</code></small>
-                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                             </div>
 
                         </div><!-- .input-group -->
@@ -43,7 +43,7 @@
                                 <label for="text_btn_primary" class="fg-label">Primary button text</label>
                                 <input v-model="textBtnPrimary" class="form-control fg-input remp-banner-text-input" name="text_btn_primary" id="text_btn_primary">
                             </div>
-                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                         </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">
@@ -52,7 +52,7 @@
                                 <label for="text_btn_primary" class="fg-label">Primary button minor text</label>
                                 <input v-model="textBtnPrimaryMinor" class="form-control fg-input remp-banner-text-input" name="text_btn_primary_minor" id="text_btn_primary_minor">
                             </div>
-                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                         </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">
@@ -64,7 +64,7 @@
                             <div class="help-block">
                                 <small>If not set, secondary button disappears</small>
                                 <br>
-                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                             </div>
                         </div><!-- .input-group -->
 
@@ -74,7 +74,7 @@
                                 <label for="text_btn_secondary" class="fg-label">Secondary button minor text</label>
                                 <input v-model="textBtnSecondaryMinor" class="form-control fg-input remp-banner-text-input" name="text_btn_secondary_minor" id="text_btn_secondary_minor">
                             </div>
-                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                            <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                         </div><!-- .input-group -->
 
                         <div class="input-group fg-float m-t-30">
@@ -102,7 +102,7 @@
                             </div>
                             <div class="help-block">
                                 <small>Single new lines are converted to <code>&lt;br&gt;</code>, double new lines to <code>&lt;p&gt;</code></small><br>
-                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                                <small v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
                             </div>
                         </div><!-- .input-group -->
 

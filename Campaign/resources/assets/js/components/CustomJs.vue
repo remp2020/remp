@@ -178,7 +178,7 @@
                     'html': true,
                     'title': '<i class="zmdi zmdi-code"></i> Syntax',
                     'text': 'Custom JS is run as a function with single a function parameter params. Object <code>params</code> contains several properties of the banner you can access (<code>rtmSource, rtmMedium, rtmCampaign, rtmContent, rtmVariant</code>). <br><br>'
-                        + 'You can use <a href="/variables" target="_blank">defined variables</a> in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>. <br><br>'
+                        + 'You can use <a href="/snippets" target="_blank">defined snippets</a> in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>. <br><br>'
                         + 'You can also use inline variables defined as <code>$$variableName$$</code> to use them on another place of JS code.'
                 });
             }
