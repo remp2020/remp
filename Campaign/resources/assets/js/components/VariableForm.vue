@@ -30,7 +30,6 @@
         <div class="row">
             <div class="col-md-12 col-lg-8">
                 <div class="input-group m-t-20 m-b-30">
-                    <span v-if="hasParseError" class="m-r-10">Parse error. Unable to save.</span>
                     <div class="fg-line">
                         <input type="hidden" name="action" :value="submitAction">
 
