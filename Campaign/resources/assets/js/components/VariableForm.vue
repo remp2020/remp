@@ -34,10 +34,10 @@
                     <div class="fg-line">
                         <input type="hidden" name="action" :value="submitAction">
 
-                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save'" :disabled="hasParseError">
+                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save'">
                             <i class="zmdi zmdi-check"></i> Save
                         </button>
-                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save_close'" :disabled="hasParseError">
+                        <button class="btn btn-info waves-effect" type="submit" @click="submitAction = 'save_close'">
                             <i class="zmdi zmdi-mail-send"></i> Save and close
                         </button>
                     </div>

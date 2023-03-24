@@ -43,6 +43,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed possible performance issues if bigger amount of aggregation data need to be compressed. remp/remp#1246
 
+### [Campaign]
+
+- Fixed issue with enforced Javascript in Variable form. remp/remp#1256
+  - We unintentionally started to enforce JS in Variables without realizing that _any_ value can be stored there. We keep the syntax highlighting for now, but it's not enforced.
+
 ### [Mailer]
 
 - **BREAKING**: Added support for external module routes (`/<module>/<presenter>/<action>`). remp/remp#1220
