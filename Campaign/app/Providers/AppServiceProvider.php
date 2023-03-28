@@ -73,6 +73,6 @@ class AppServiceProvider extends ServiceProvider
         \App\CampaignBanner::observe(\App\Observers\CampaignBanner::class);
         \App\CampaignSegment::observe(\App\Observers\CampaignSegment::class);
         \App\Schedule::observe(\App\Observers\Schedule::class);
-        \App\Variable::observe(\App\Observers\Variable::class);
+        \App\Snippet::observe(\App\Observers\Snippet::class);
     }
 }

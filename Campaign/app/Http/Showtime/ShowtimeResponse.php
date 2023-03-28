@@ -12,7 +12,7 @@ interface ShowtimeResponse
 
     public function success(string $callback, $data, $activeCampaigns, $providerData);
 
-    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $variables): string;
+    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $snippets): string;
 
     /**
      * render is responsible for rendering JS to be executed on client.
@@ -22,9 +22,9 @@ interface ShowtimeResponse
      * @param $alignments
      * @param $dimensions
      * @param $positions
-     * @param $variables
+     * @param $snippets
      * @param $userData
      * @return string
      */
-    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $variables, mixed $userData): string;
+    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $snippets, mixed $userData): string;
 }

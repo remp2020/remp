@@ -162,22 +162,22 @@
 
                     <div class="overlay-with-two-btn-signature serif">
 
-                        <div class="text-before-buttons" v-html="$parent.injectVars(textBeforeMultiLine)"></div>
+                        <div class="text-before-buttons" v-html="$parent.injectSnippets(textBeforeMultiLine)"></div>
 
                         <div class="buttons sans-serif">
                             <a class="btn btn-primary"
-                               v-bind:href="$parent.injectVars(targetUrl)"
+                               v-bind:href="$parent.injectSnippets(targetUrl)"
                                v-on:click="$parent.clicked($event, !$parent.url)"
                                data-param-rtm_keyword="btn-primary">
-                                <span class="item title" v-html="$parent.injectVars(textBtnPrimary)"></span>
-                                <span class="item desc" v-if="hasTextBtnPrimaryMinor" v-html="$parent.injectVars(textBtnPrimaryMinor)"></span>
+                                <span class="item title" v-html="$parent.injectSnippets(textBtnPrimary)"></span>
+                                <span class="item desc" v-if="hasTextBtnPrimaryMinor" v-html="$parent.injectSnippets(textBtnPrimaryMinor)"></span>
                             </a>
 
                             <div class="spacer" v-if="hasSecondaryButton">&nbsp;</div>
 
-                            <a class="btn btn-secondary" v-if="hasSecondaryButton" v-bind:href="$parent.injectVars(targetUrlSecondary)" data-param-rtm_keyword="btn-secondary">
-                                <span class="item title" v-html="$parent.injectVars(textBtnSecondary)"></span>
-                                <span class="item desc" v-if="hasTextBtnSecondaryMinor" v-html="$parent.injectVars(textBtnSecondaryMinor)"></span>
+                            <a class="btn btn-secondary" v-if="hasSecondaryButton" v-bind:href="$parent.injectSnippets(targetUrlSecondary)" data-param-rtm_keyword="btn-secondary">
+                                <span class="item title" v-html="$parent.injectSnippets(textBtnSecondary)"></span>
+                                <span class="item desc" v-if="hasTextBtnSecondaryMinor" v-html="$parent.injectSnippets(textBtnSecondaryMinor)"></span>
                             </a>
                         </div>
 
@@ -185,11 +185,11 @@
                             <a href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed"><span>{{ closeText }}</span></a>
                         </p>
 
-                        <div class="text-after-buttons" v-html="$parent.injectVars(textAfterMultiLine)"></div>
+                        <div class="text-after-buttons" v-html="$parent.injectSnippets(textAfterMultiLine)"></div>
 
                         <div class="signature">
-                            <img v-bind:src="$parent.injectVars(signatureImageUrl)" alt="" />
-                            <p v-html="$parent.injectVars(textSignatureMultiLine)"></p>
+                            <img v-bind:src="$parent.injectSnippets(signatureImageUrl)" alt="" />
+                            <p v-html="$parent.injectSnippets(textSignatureMultiLine)"></p>
                         </div>
 
                     </div>

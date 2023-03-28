@@ -17,8 +17,8 @@
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
 
-    var variables = {!! json_encode($variables) !!};
-    variables = variables.length === 0 ? {} : variables;
+    var snippets = {!! json_encode($snippets) !!};
+    snippets = snippets.length === 0 ? {} : snippets;
 
     var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
     banner.show = true;
@@ -26,7 +26,7 @@
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
     banner.forcedPosition = 'absolute';
-    banner.variables = variables;
+    banner.snippets = snippets;
     banner.validateUrl = {!! @json(route('banners.validateForm')) !!};
     banner.clientSiteUrl = '{{ Config::get('app.client_site_url') }}';
 

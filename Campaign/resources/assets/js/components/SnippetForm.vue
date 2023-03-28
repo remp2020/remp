@@ -80,7 +80,7 @@ CodeMirror.defineMode("jstwig", function(config, parserConfig) {
 });
 
 export default {
-    name: "variable-form",
+    name: "snippet-form",
     components: {
         codemirror,
         FormValidator,

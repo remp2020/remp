@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Banner;
 use App\Contracts\SegmentAggregator;
-use App\Variable;
+use App\Snippet;
 use Illuminate\Console\Command;
 use App\Campaign;
 
@@ -62,7 +62,7 @@ class CampaignsRefreshCache extends Command
             $banner->cache();
         }
 
-        Variable::refreshVariableCache();
+        Snippet::refreshSnippetsCache();
 
         $this->line('Campaigns cache refreshed.');
         return 0;

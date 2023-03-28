@@ -10,7 +10,7 @@ use App\Http\Showtime\Showtime;
 use App\Models\Dimension\Map as DimensionMap;
 use App\Models\Position\Map as PositionMap;
 use App\Models\Alignment\Map as AlignmentMap;
-use App\Variable;
+use App\Snippet;
 use Carbon\Carbon;
 use HTML;
 use Illuminate\Database\Eloquent\Builder;
@@ -110,7 +110,7 @@ class BannerController extends Controller
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
-            'variables' => Variable::all()->pluck('value', 'name'),
+            'snippets' => Snippet::all()->pluck('value', 'name'),
         ]);
     }
 
@@ -136,7 +136,7 @@ class BannerController extends Controller
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
-            'variables' => Variable::all()->pluck('value', 'name'),
+            'snippets' => Snippet::all()->pluck('value', 'name'),
         ]);
     }
 
@@ -195,7 +195,7 @@ class BannerController extends Controller
                 'positions' => $this->positionMap->positions(),
                 'dimensions' => $this->dimensionMap->dimensions(),
                 'alignments' => $this->alignmentMap->alignments(),
-                'variables' => Variable::all()->pluck('value', 'name'),
+                'snippets' => Snippet::all()->pluck('value', 'name'),
             ]),
             'json' => new BannerResource($banner),
         ]);
@@ -218,7 +218,7 @@ class BannerController extends Controller
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
-            'variables' => Variable::all()->pluck('value', 'name'),
+            'snippets' => Snippet::all()->pluck('value', 'name'),
         ]);
     }
 

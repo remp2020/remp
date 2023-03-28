@@ -180,16 +180,16 @@ a.overlay-rectangle-preview-close::after {
 
                                 <div class="overlay-rectangle-content" v-if="headerText || buttonText || mainText">
                                     <div v-if="headerText"
-                                         v-html="$parent.injectVars(headerText)"
+                                         v-html="$parent.injectSnippets(headerText)"
                                          class="overlay-rectangle-header"></div>
 
                                     <div class="overlay-rectangle-main"
-                                         v-html="$parent.injectVars(mainText)"></div>
+                                         v-html="$parent.injectSnippets(mainText)"></div>
 
                                     <div class="overlay-rectangle-button"
                                          v-if="buttonText.length > 0"
                                          v-on:click="$parent.clicked($event, !$parent.url)"
-                                         v-html="$parent.injectVars(buttonText)"
+                                         v-html="$parent.injectSnippets(buttonText)"
                                          v-bind:style="[buttonStyles]"></div>
                                 </div>
                             </div>

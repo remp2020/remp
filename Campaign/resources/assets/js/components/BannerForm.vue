@@ -197,7 +197,7 @@
                                     <textarea v-model="jsIncludesStr" class="form-control fg-input" rows="6" name="jsIncludesStr" cols="50" id="jsIncludesStr"></textarea>
                                 </div>
                                 <div style="margin-top: 5px;">Enter include script urls separated by new line. <br></div>
-                                <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                                <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
 
                                 <div v-if="jsIncludes">
                                     <input v-for="jsInclude in jsIncludes" type="hidden" name="js_includes[]" :value="jsInclude">
@@ -212,7 +212,7 @@
                                     <textarea v-model="cssIncludesStr" class="form-control fg-input" rows="6" name="cssIncludesStr" cols="50" id="cssIncludesStr"></textarea>
                                 </div>
                                 <div style="margin-top: 5px;">Enter include stylesheets urls separated by new line.</div>
-                                <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Variables in this field as <code>{{&nbsp;variable_name&nbsp;}}</code>.</small>
+                                <small class="help-block" v-pre>You can use <i class="zmdi zmdi-code"></i> Snippets in this field as <code>{{&nbsp;snippet_name&nbsp;}}</code>.</small>
 
                                 <div v-if="cssIncludes">
                                     <input v-for="cssInclude in cssIncludes" type="hidden" name="css_includes[]" :value="cssInclude">
@@ -394,7 +394,7 @@
                                         :positionOptions="positionOptions"
                                         :show="show"
                                         :template="template"
-                                        :variables="variables"
+                                        :snippets="snippets"
 
                                         :mediumRectangleTemplate="mediumRectangleTemplate"
                                         :overlayRectangleTemplate="overlayRectangleTemplate"
@@ -483,7 +483,7 @@
         "_alignmentOptions": Object,
         "_dimensionOptions": Object,
         "_positionOptions": Object,
-        "_variables": Object,
+        "_snippets": Object,
 
         "_validateUrl": String,
         "_clientSiteUrl": String,
@@ -553,7 +553,7 @@
             alignmentOptions: [],
             dimensionOptions: [],
             positionOptions: [],
-            variables: {},
+            snippets: {},
             show: true,
             mobile: true,
 

@@ -2,10 +2,10 @@
 
 namespace App\Observers;
 
-class Variable
+class Snippet
 {
     public function saved()
     {
-        \App\Variable::refreshVariableCache();
+        \App\Snippet::refreshSnippetsCache();
     }
 }

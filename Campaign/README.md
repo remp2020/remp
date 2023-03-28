@@ -360,11 +360,11 @@ Laravel's queue currently includes
 
 If the data are still valid, job doesn't refresh them.
 
-### Variables
+### Snippets
 
-Campaign supports use of variables in your banner template contents, custom javascript and custom css. You can create variables using `Add new variable` in `Variables` main menu section.
+Campaign supports use of snippets in your banner template contents, custom javascript and custom css. You can create snippets using `Add new snippet` in the `Snippets` main menu section.
 
-You can use created variables by adding `{{ variable_name }}` to one of the fields used in banner content or in custom javascript & css.
+You can use created snippets by adding `{{ snippet_name }}` to one of the fields used in banner content or in custom javascript & css.
 
 ### API Documentation
 

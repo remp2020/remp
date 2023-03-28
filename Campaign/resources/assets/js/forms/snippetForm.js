@@ -1,5 +1,5 @@
 import Transformer from '../components/_transformer.js';
-import VariableForm from '../components/VariableForm.vue';
+import SnippetForm from '../components/SnippetForm.vue';
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
@@ -7,13 +7,13 @@ remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
     'use strict';
 
-    remplib.variableForm = {
+    remplib.snippetForm = {
 
-        bind: (el, variable) => {
+        bind: (el, snippet) => {
             return new Vue({
                 el: el,
-                render: h => h(VariableForm, {
-                    props: Transformer.transformKeys(variable)
+                render: h => h(SnippetForm, {
+                    props: Transformer.transformKeys(snippet)
                 }),
             });
         }

@@ -274,7 +274,7 @@
         "forcedPosition",
         "show",
 
-        "variables",
+        "snippets",
         "urlParams",
 
         "mediumRectangleTemplate",
@@ -336,7 +336,7 @@
             let cssIncludes = (this.cssIncludes) ? this.cssIncludes.filter(cssInclude => cssInclude) : [];
             if (cssIncludes && cssIncludes.length > 0) {
                 for (let ii = 0; ii < cssIncludes.length; ii++) {
-                    lib.loadStyle(this.injectVars(cssIncludes[ii]));
+                    lib.loadStyle(this.injectSnippets(cssIncludes[ii]));
                 }
             }
 
@@ -344,7 +344,7 @@
             if (jsIncludes && jsIncludes.length > 0) {
                 let loadedScriptsCount = 0;
                 jsIncludes.forEach((jsInclude) => {
-                    lib.loadScript(this.injectVars(jsInclude), () => {
+                    lib.loadScript(this.injectSnippets(jsInclude), () => {
                         loadedScriptsCount += 1;
                         if (loadedScriptsCount === jsIncludes.length) {
                             this.runCustomJavascript(this.js);
@@ -352,7 +352,7 @@
                     });
                 });
             } else {
-                this.runCustomJavascript(this.injectVars(this.js));
+                this.runCustomJavascript(this.injectSnippets(this.js));
             }
         },
         data: () => ({
@@ -447,7 +447,7 @@
 
                 return url;
             },
-            injectVars: function(str) {
+            injectSnippets: function(str) {
                 let re = /\{\{\s?(.*?)\s?\}\}/g;
                 let match;
 
@@ -457,14 +457,14 @@
                     let replVal = '';
                     if (remplib &&
                         remplib.campaign &&
-                        remplib.campaign.variables &&
-                        remplib.campaign.variables.hasOwnProperty(match[1])
+                        remplib.campaign.snippets &&
+                        remplib.campaign.snippets.hasOwnProperty(match[1])
                     ) {
-                        replVal = remplib.campaign.variables[match[1]].value()
-                    } else if (this.variables && this.variables.hasOwnProperty(match[1])) {
-                        replVal = this.variables[match[1]];
+                        replVal = remplib.campaign.snippets[match[1]].value()
+                    } else if (this.snippets && this.snippets.hasOwnProperty(match[1])) {
+                        replVal = this.snippets[match[1]];
                     } else {
-                        throw EvalError("cannot render banner, variable [" + match[1] + "] is missing");
+                        throw EvalError("cannot render banner, snippet [" + match[1] + "] is missing");
                     }
                     str = str.replace(replRegex, replVal);
                 }
@@ -539,7 +539,7 @@
                       try {
                           // Evaluating JS code using Function with passed params object
                           // https://stackoverflow.com/questions/49125059/how-to-pass-parameters-to-an-eval-based-function-injavascript
-                          let body = 'function(params) { ' + that.injectVars(js) + ' }';
+                          let body = 'function(params) { ' + that.injectSnippets(js) + ' }';
                           let wrap = s => "{ return " + body + " };";
                           let func = new Function(wrap(body));
                           func.call(null).call(null, that.paramsForCustomJavascript());

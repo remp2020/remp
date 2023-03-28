@@ -1,23 +1,23 @@
 @extends('layouts.app')
 
-@section('title', 'Add variable')
+@section('title', 'Edit snippet')
 
 @section('content')
 
     <div class="c-header">
-        <h2>Variables</h2>
+        <h2>Snippets</h2>
     </div>
-
     <div class="card">
         <div class="card-header">
-            <h2>Create variable</h2>
+            <h2>Edit snippet</h2>
         </div>
         <div class="card-body card-padding">
             @include('flash::message')
 
-            {!! Form::model($variable, ['route' => 'variables.store']) !!}
-                @include('variables._form')
+            {!! Form::model($snippet, ['route' => ['snippets.update', 'snippet' => $snippet], 'method' => 'PATCH']) !!}
+                @include('snippets._form')
             {!! Form::close() !!}
         </div>
     </div>
+
 @endsection

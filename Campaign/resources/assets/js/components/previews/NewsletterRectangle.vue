@@ -150,8 +150,8 @@ a.newsletter-rectangle-preview-close::after {
                    v-bind:style="[linkStyles]">{{ closeText }}</a>
 
                 <div class="newsletter-rectangle-title"
-                     v-html="$parent.injectVars(title)"></div>
-                <div class="newsletter-rectangle-text" v-html="$parent.injectVars(text)"></div>
+                     v-html="$parent.injectSnippets(title)"></div>
+                <div class="newsletter-rectangle-text" v-html="$parent.injectSnippets(text)"></div>
 
                 <fieldset class="newsletter-rectangle-form-inputs">
                     <label class="newsletter-rectangle-form-label" for="newsletter-rectangle-form-email">Email</label>

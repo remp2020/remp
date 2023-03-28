@@ -15,7 +15,6 @@ export default {
 
         $(this.$el).closest('form').on('submit', function () {
             var form = this;
-            console.log('submitujem tadialto');
 
             if ($(form).attr('data-valid')) {
                 return true;

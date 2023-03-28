@@ -136,13 +136,13 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         ]);
     }
 
-    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $variables, mixed $userData): string {
+    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $snippets, mixed $userData): string {
         return $this->renderInternal(
             banner: $variant->banner,
             alignments: $alignments,
             dimensions: $dimensions,
             positions: $positions,
-            variables: $variables,
+            snippets: $snippets,
             variantUuid: $variant->uuid,
             campaignUuid: $campaign->uuid,
             isControlGroup: (int) $variant->control_group,
@@ -152,13 +152,13 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         );
     }
 
-    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $variables): string {
+    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $snippets): string {
         return $this->renderInternal(
             banner: $banner,
             alignments: $alignments,
             dimensions: $dimensions,
             positions: $positions,
-            variables: $variables,
+            snippets: $snippets,
         );
     }
 
@@ -167,7 +167,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         $alignments,
         $dimensions,
         $positions,
-        $variables,
+        $snippets,
         $variantUuid = null,
         $campaignUuid = null,
         $isControlGroup = 0,
@@ -178,7 +178,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         $alignmentsJson = json_encode($alignments);
         $dimensionsJson = json_encode($dimensions);
         $positionsJson = json_encode($positions);
-        $variablesJson = json_encode($variables);
+        $snippetsJson = json_encode($snippets);
         $userDataJson = json_encode($userData);
 
         $bannerJs = asset(mix('/js/banner.js', '/assets/lib'));
@@ -229,7 +229,7 @@ var run = function() {
     var alignments = JSON.parse('{$alignmentsJson}');
     var dimensions = JSON.parse('{$dimensionsJson}');
     var positions = JSON.parse('{$positionsJson}');
-    var variables = {$variablesJson};
+    var snippets = {$snippetsJson};
     var userData = JSON.parse('{$userDataJson}');
 
     if (!isControlGroup) {
@@ -244,7 +244,7 @@ var run = function() {
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
-    banner.variables = variables;
+    banner.snippets = snippets;
 
     banner.campaignUuid = campaignUuid;
     banner.campaignPublicId = campaignPublicId;
