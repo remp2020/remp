@@ -44,9 +44,9 @@ ENV COMPOSER_HOME /composer
 
 ENV PATH /composer/vendor/bin:$PATH
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
-
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN mkdir -p /composer/cache && chown -R ${UID}:${GID} /composer/cache
 
 # NODEJS + YARN
 
