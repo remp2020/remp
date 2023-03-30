@@ -98,7 +98,16 @@ class NovydenikNewsfilterTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 26) {
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 27) {
+            $defaults = [
+                'name' => 'Děcka, práce ' . date('j.n.Y'),
+                'code' => 'nwsf_detska_prace_' . date('dmY'),
+                'mail_layout_id' => 2, // empty layout
+                'locked_mail_layout_id' => 2, // empty layout
+                'mail_type_id' => 21, // live!
+                'from' => 'Deník N <info@denikn.cz>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 26) {
             $defaults = [
                 'name' => 'live! ' . date('j.n.Y'),
                 'code' => 'nwsf_live_' . date('dmY'),
