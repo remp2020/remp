@@ -3,6 +3,7 @@ namespace App\Model\Snapshots;
 
 use App\Helpers\Journal\JournalInterval;
 use App\Model\ArticleViewsSnapshot;
+use Cache;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
@@ -62,7 +63,6 @@ class SnapshotHelpers
     /**
      * Load concurrents histogram for given interval
      * Concurrents counts are grouped by time, referer_medium
-     * TODO: add caching
      *
      * @param JournalInterval $interval
      * @param array           $externalArticleIds
@@ -73,21 +73,32 @@ class SnapshotHelpers
         JournalInterval $interval,
         array $externalArticleIds
     ) {
-        /** @var Carbon $from */
-        $from = $interval->timeAfter;
-        /** @var Carbon $to */
-        $to = $interval->timeBefore;
+        sort($externalArticleIds);
+        $cacheKey = "concurrentArticlesHistograms." . hash('md5', implode('.', $externalArticleIds));
 
-        $q = DB::table(ArticleViewsSnapshot::getTableName())
-            ->select('time', 'external_article_id', DB::raw('sum(count) as count'), DB::raw('UNIX_TIMESTAMP(time) as timestamp'))
-            ->where('time', '>=', $from)
-            ->where('time', '<=', $to)
-            ->whereIn('external_article_id', $externalArticleIds)
-            ->groupBy(['time', 'external_article_id'])
-            ->orderBy('external_article_id')
-            ->orderBy('time');
+        $result = Cache::get($cacheKey);
+        if (!$result) {
+            /** @var Carbon $from */
+            $from = $interval->timeAfter;
+            /** @var Carbon $to */
+            $to = $interval->timeBefore;
 
-        return $q->get();
+            $q = DB::table(ArticleViewsSnapshot::getTableName())
+                ->select('time', 'external_article_id', DB::raw('sum(count) as count'), DB::raw('UNIX_TIMESTAMP(time) as timestamp'))
+                ->where('time', '>=', $from)
+                ->where('time', '<=', $to)
+                ->whereIn('external_article_id', $externalArticleIds)
+                ->groupBy(['time', 'external_article_id'])
+                ->orderBy('external_article_id')
+                ->orderBy('time');
+
+            $result = $q->get();
+
+            // Set 10 minute cache
+            Cache::put($cacheKey, $result, 600);
+        }
+
+        return $result;
     }
 
     /**

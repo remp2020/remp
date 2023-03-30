@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added an optimizations to speed up the statistics of articles on dashboard. remp/remp#1250
+
 
 ## Archive
 

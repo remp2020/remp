@@ -4,6 +4,7 @@ namespace App\Helpers\Journal;
 
 use App\Article;
 use App\Model\RefererMediumLabel;
+use Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Remp\Journal\AggregateRequest;
@@ -133,16 +134,24 @@ class JournalHelpers
      */
     public function abTestFlagsForArticles(Collection $articles, Carbon $since): Collection
     {
-        $externalArticleIds = $articles->pluck('external_id')->toArray();
+        $externalArticleIds = $articles->pluck('external_id')->sortDesc(SORT_NUMERIC)->toArray();
 
-        $request = new AggregateRequest('pageviews', 'load');
-        $request->setTimeAfter($since);
-        $request->setTimeBefore(Carbon::now());
-        $request->addGroup('article_id', 'title_variant', 'image_variant');
+        $cacheKey = "abTestFlagsForArticles." . hash('md5', implode('', $externalArticleIds));
+        $result = Cache::get($cacheKey);
+        if (!$result) {
+            $request = new AggregateRequest('pageviews', 'load');
+            $request->setTimeAfter($since);
+            $request->setTimeBefore(Carbon::now());
+            $request->addGroup('article_id', 'title_variant', 'image_variant');
 
-        $request->addFilter('article_id', ...$externalArticleIds);
+            $request->addFilter('article_id', ...$externalArticleIds);
 
-        $result = collect($this->journal->count($request));
+            $result = collect($this->journal->count($request));
+
+            // Set 10 minutes cache
+            Cache::put($cacheKey, $result, 600);
+        }
+
         $articles = collect();
 
         foreach ($result as $item) {
