@@ -9,10 +9,7 @@
             <div class="col-md-6">
                 <options :classes="['pull-right', 'm-l-15', 'm-b-5']"></options>
 
-                <button-switcher :options="[
-        {text: 'Today', value: 'today'},
-        {text: '7 days', value: '7days'},
-        {text: '30 days', value: '30days'}]"
+                <button-switcher :options="options"
                                  :classes="['pull-right']"
                                  v-model="interval">
                 </button-switcher>
@@ -226,6 +223,14 @@
         externalEvents: {
             type: Array,
             default: () => [],
+        },
+        showInterval7Days: {
+            type: Boolean,
+            default: true,
+        },
+        showInterval30Days: {
+            type: Boolean,
+            default: true,
         }
     };
 
@@ -263,6 +268,15 @@
             }
         },
         data() {
+            let options = [
+                {text: 'Today', value: 'today'}
+            ];
+            if (this.showInterval7Days) {
+                options.push({text: '7 days', value: '7days'});
+            }
+            if (this.showInterval30Days) {
+                options.push({text: '30 days', value: '30days'});
+            }
             return {
                 data: null,
                 error: null,
@@ -277,6 +291,7 @@
                     style: {}
                 },
                 selectedExternalEvents: [],
+                options: options
             };
         },
         computed: {

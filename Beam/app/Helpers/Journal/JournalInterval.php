@@ -31,10 +31,16 @@ class JournalInterval
     public $intervalText;
     public $intervalMinutes;
     public $tz;
+    public $cacheTTL;
 
 
-    public function __construct(\DateTimeZone $tz, string $interval, Article $article = null, array $allowedIntervals = null)
-    {
+    public function __construct(
+        \DateTimeZone $tz,
+        string $interval,
+        Article $article = null,
+        array $allowedIntervals = null,
+        int $cacheTTL = null
+    ) {
         if ($allowedIntervals && !in_array($interval, $allowedIntervals)) {
             throw new InvalidArgumentException("Parameter 'interval' must be one of the [" . implode(',', $allowedIntervals) . "] values, instead '$interval' provided");
         }
@@ -105,6 +111,10 @@ class JournalInterval
                 break;
             default:
                 throw new InvalidArgumentException("Parameter 'interval' must be one of the [today,1day,7days,30days,all] values, instead '$interval' provided");
+        }
+
+        if (!$cacheTTL) {
+            $this->cacheTTL = $this->intervalMinutes * 60;
         }
     }
 

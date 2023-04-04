@@ -39,5 +39,13 @@ return [
     'article_traffic_graph_data_source' => env('ARTICLE_TRAFFIC_GRAPH_DATA_SOURCE', 'pageviews'),
 
     // Temporarily disable property token filtering for debugging
-    'disable_token_filtering' => env('DISABLE_TOKEN_FILTERING', false)
+    'disable_token_filtering' => env('DISABLE_TOKEN_FILTERING', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Article traffic graph additional intervals
+    |--------------------------------------------------------------------------
+     */
+    'article_traffic_graph_show_interval_7d' => env('ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_7D', true),
+    'article_traffic_graph_show_interval_30d' => env('ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_30D', true),
 ];
