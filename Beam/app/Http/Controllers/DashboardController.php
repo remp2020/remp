@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DashboardArticle;
 use Illuminate\Support\Arr;
 use App\Article;
 use App\Helpers\Journal\JournalHelpers;
@@ -530,22 +531,21 @@ class DashboardController extends Controller
             }
         }, $timeBefore);
 
-        $topPages = [];
-        $articleCounter = 0;
-        $totalConcurrents = 0;
-        $tz = new \DateTimeZone('UTC');
-        $journalInterval = new JournalInterval($tz, '1day');
-
+        $articlesIds = array_filter($records->pluck('tags.article_id')->toArray());
         $articleQuery = Article::with(['dashboardArticle', 'conversions'])
             ->whereIn(
                 'external_id',
-                array_filter($records->pluck('tags.article_id')->toArray())
+                array_map('strval', $articlesIds)
             );
 
         $articles = [];
         foreach ($articleQuery->get() as $article) {
             $articles[$article->external_id] = $article;
         }
+
+        $topPages = [];
+        $articleCounter = 0;
+        $totalConcurrents = 0;
         foreach ($records as $record) {
             $totalConcurrents += $record->count;
 
@@ -598,17 +598,16 @@ class DashboardController extends Controller
         $topPages = array_slice($topPages, 0, 30);
 
         // Add chart data into top articles
+        $tz = new \DateTimeZone('UTC');
+        $journalInterval = new JournalInterval($tz, '1day');
+
         $topPages = $this->addOverviewChartData($topPages, $journalInterval);
+
         $topArticles = collect($topPages)->filter(function ($item) {
             return !empty($item->external_article_id);
         })->pluck('article');
 
-        /** @var Article $article */
-        foreach ($topArticles as $article) {
-            $article->dashboardArticle()->updateOrCreate([], [
-                'last_dashboard_time' => Carbon::now(),
-            ]);
-        }
+        $this->updateDasboardArticle($topArticles);
 
         $externalIdsToUniqueUsersCount = $this->getUniqueBrowserCountData($topArticles);
 
@@ -645,6 +644,32 @@ class DashboardController extends Controller
             'articles' => $topPages,
             'totalConcurrents' => $totalConcurrents,
         ]);
+    }
+
+    private function updateDasboardArticle(Collection $articles)
+    {
+        $articleIds = $articles->pluck('id')->toArray();
+        $dashboardArticles = DashboardArticle::whereIn('article_id', $articleIds)->get();
+
+        $storedDashboardArticles = array_intersect($articleIds, $dashboardArticles->pluck('article_id')->toArray());
+        if ($storedDashboardArticles) {
+            DashboardArticle::whereIn('article_id', $storedDashboardArticles)
+                ->update(['last_dashboard_time' => Carbon::now()]);
+        }
+
+        $unstoredDashboardArticles = array_diff($articleIds, $storedDashboardArticles);
+        if ($unstoredDashboardArticles) {
+            $data = [];
+            $now = Carbon::now();
+            foreach ($unstoredDashboardArticles as $articleId) {
+                $data[] = [
+                    'article_id' => $articleId,
+                    'last_dashboard_time' => $now,
+                    'created_at' => $now,
+                ];
+            }
+            DashboardArticle::insert($data);
+        }
     }
 
     /**
