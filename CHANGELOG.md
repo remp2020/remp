@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added an optimizations to speed up the statistics of articles on dashboard. remp/remp#1250
 - Optimized `/api/articles` API call to eager load necessary relationships. remp/remp#1254
+- Optimized `/articles/conversions` view to use article pageviews to calculate conversion rate instead of unique browsers from Journal API which can be slow. This may change the resulting values in conversion rate column. remp/remp#1253
 
 ## Archive
 
@@ -29,3 +30,4 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
 [Unreleased]: https://github.com/remp2020/remp/compare/2.0.0...master
+

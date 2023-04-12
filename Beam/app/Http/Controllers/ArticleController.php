@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
-use App\Helpers\Journal\JournalHelpers;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Requests\ArticlesListRequest;
 use App\Http\Resources\ArticleResource;
@@ -16,23 +15,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Remp\Journal\JournalContract;
 use Yajra\Datatables\Datatables;
 use Yajra\DataTables\EloquentDataTable;
 
 class ArticleController extends Controller
 {
-    private $journal;
-
-    private $journalHelper;
-
-    private $conversionRateConfig;
-
-    public function __construct(JournalContract $journal, ConversionRateConfig $conversionRateConfig)
-    {
-        $this->journal = $journal;
-        $this->journalHelper = new JournalHelpers($journal);
-        $this->conversionRateConfig = $conversionRateConfig;
+    public function __construct(
+        private ConversionRateConfig $conversionRateConfig
+    ) {
     }
 
     /**
@@ -71,10 +61,10 @@ class ArticleController extends Controller
     {
         return response()->format([
             'html' => view('articles.conversions', [
-                'authors' => Author::all()->pluck('name', 'id'),
+                'authors' => Author::all(['name', 'id'])->pluck('name', 'id'),
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
-                'sections' => Section::all()->pluck('name', 'id'),
-                'tags' => Tag::all()->pluck('name', 'id'),
+                'sections' => Section::all(['name', 'id'])->pluck('name', 'id'),
+                'tags' => Tag::all(['name', 'id'])->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
@@ -93,9 +83,11 @@ class ArticleController extends Controller
                 "articles.content_type",
                 "articles.url",
                 "articles.published_at",
+                "articles.pageviews_all",
                 "count(conversions.id) as conversions_count",
                 "coalesce(sum(conversions.amount), 0) as conversions_sum",
-                "avg(conversions.amount) as conversions_avg"
+                "avg(conversions.amount) as conversions_avg",
+                "coalesce(cast(count(conversions.id) AS DECIMAL(15, 10)) / articles.pageviews_all, 0) as conversions_rate",
             ]))
             ->with(['authors', 'sections', 'tags'])
             ->leftJoin('conversions', 'articles.id', '=', 'conversions.article_id')
@@ -119,7 +111,25 @@ class ArticleController extends Controller
             $articlesQuery->where('paid_at', '<=', $conversionTo);
         }
 
-        $articles = $articlesQuery->get();
+        $columns = $request->input('columns');
+        $authorsIndex = array_search('authors', array_column($columns, 'name'), true);
+        if (isset($columns[$authorsIndex]['search']['value'])) {
+            $values = explode(',', $columns[$authorsIndex]['search']['value']);
+            $articlesQuery->join('article_author', 'articles.id', '=', 'article_author.article_id')
+                ->whereIn('article_author.author_id', $values);
+        }
+        $sectionsIndex = array_search('sections[, ].name', array_column($columns, 'name'), true);
+        if (isset($columns[$sectionsIndex]['search']['value'])) {
+            $values = explode(',', $columns[$sectionsIndex]['search']['value']);
+            $articlesQuery->join('article_section', 'articles.id', '=', 'article_section.article_id')
+                ->whereIn('article_section.section_id', $values);
+        }
+        $tagsIndex = array_search('tags[, ].name', array_column($columns, 'name'), true);
+        if (isset($columns[$tagsIndex]['search']['value'])) {
+            $values = explode(',', $columns[$tagsIndex]['search']['value']);
+            $articlesQuery->join('article_tag', 'articles.id', '=', 'article_tag.article_id')
+                ->whereIn('article_tag.tag_id', $values);
+        }
 
         $conversionsQuery = \DB::table('conversions')
             ->select([
@@ -131,31 +141,23 @@ class ArticleController extends Controller
                 'articles.external_id',
             ])
             ->join('articles', 'articles.id', '=', 'conversions.article_id')
-            ->whereIn('article_id', (clone $articles)->pluck('id'))
+            ->whereIntegerInRaw('article_id', $articlesQuery->pluck('id'))
             ->groupBy(['conversions.article_id', 'articles.external_id', 'conversions.currency']);
-
-        $externalIdsToUniqueBrowsersCount = $this->journalHelper->uniqueBrowsersCountForArticles($articles);
 
         $conversionSums = [];
         $conversionAverages = [];
-        $conversionRates = collect();
 
         foreach ($conversionsQuery->get() as $record) {
             $conversionSums[$record->article_id][$record->currency] = $record->sum;
             $conversionAverages[$record->article_id][$record->currency] = $record->avg;
-            if ($externalIdsToUniqueBrowsersCount->get($record->external_id, 0) === 0) {
-                $conversionRates[$record->external_id] = 0;
-            } else {
-                $conversionRates[$record->external_id] = $record->count / $externalIdsToUniqueBrowsersCount->get($record->external_id);
-            }
         }
 
         /** @var EloquentDataTable $dt */
         $dt =  $datatables->of($articlesQuery);
 
         return $dt
-            ->addColumn('id', function (Article $author) {
-                return $author->id;
+            ->addColumn('id', function (Article $article) {
+                return $article->id;
             })
             ->addColumn('title', function (Article $article) {
                 return [
@@ -163,16 +165,8 @@ class ArticleController extends Controller
                     'text' => $article->title,
                 ];
             })
-            ->addColumn('conversions_rate', function (Article $article) use ($externalIdsToUniqueBrowsersCount) {
-                $uniqueCount = $externalIdsToUniqueBrowsersCount->get($article->external_id, 0);
-                $threeMonthsAgo = Carbon::now()->subMonths(3);
-
-                if ($uniqueCount === 0 || $article->published_at->lt($threeMonthsAgo)) {
-                    return '';
-                }
-
-                $conversionCount = $article->conversions_count;
-                return Article::computeConversionRate($conversionCount, $uniqueCount, $this->conversionRateConfig);
+            ->addColumn('conversions_rate', function (Article $article) {
+                return Article::computeConversionRate($article->conversions_count, $article->pageviews_all, $this->conversionRateConfig);
             })
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
                 if (!isset($conversionSums[$article->id])) {
@@ -204,7 +198,7 @@ class ArticleController extends Controller
             })
             ->orderColumn('amount', 'conversions_sum $1')
             ->orderColumn('average', 'conversions_avg $1')
-            ->orderColumn('conversions_rate', DB::raw("FIELD(articles.external_id,". $conversionRates->sort()->keys()->implode(",") .") $1, conversions_count $1"))
+            ->orderColumn('conversions_rate', 'conversions_rate $1')
             ->orderColumn('id', 'articles.id $1')
             ->filterColumn('title', function (Builder $query, $value) {
                 $query->where('articles.title', 'like', '%' . $value . '%');
