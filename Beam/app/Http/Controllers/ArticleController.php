@@ -43,21 +43,22 @@ class ArticleController extends Controller
     public function index(ArticlesListRequest $request)
     {
         $articles = null;
+        $articlesBuilder = Article::with(['authors:id,external_id', 'sections:id,external_id', 'tags:id,external_id']);
 
         $externalIds = $request->input('external_ids', []);
         if (count($externalIds)) {
-            $articles = Article::whereIn('external_id', $externalIds)->get();
+            $articles = $articlesBuilder->whereIn('external_id', array_map('strval', $externalIds))->get();
         }
 
         if (!$articles) {
             $ids = $request->input('ids', []);
             if (count($request->ids)) {
-                $articles = Article::whereIn('id', $ids)->get();
+                $articles = $articlesBuilder->whereIntegerInRaw('id', $ids)->get();
             }
         }
 
         if (!$articles) {
-            $articles = Article::paginate($request->get('per_page', 15));
+            $articles = $articlesBuilder->paginate($request->get('per_page', 15));
         }
 
         return response()->format([
