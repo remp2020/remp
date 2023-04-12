@@ -24,8 +24,11 @@ class ArticlesListRequest extends FormRequest
     {
         // TODO: add prohibited_if rule for each field after update to Laravel 8
         return [
-            'external_ids' => "array",
-            'ids' => "array",
+            'external_ids' => 'array',
+            'external_ids.*' => 'string',
+            'ids' => 'array',
+            'ids.*' => 'integer',
+            'per_page' => 'integer'
         ];
     }
 }

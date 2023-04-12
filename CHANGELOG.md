@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Added an optimizations to speed up the statistics of articles on dashboard. remp/remp#1250
-
+- Optimized `/api/articles` API call to eager load necessary relationships. remp/remp#1254
 
 ## Archive
 
