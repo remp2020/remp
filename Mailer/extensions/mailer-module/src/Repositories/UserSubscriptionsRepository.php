@@ -87,9 +87,14 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $typeId, 'subscribed' => false])->count('*') > 0;
     }
 
-    public function isUserUnsubscribed($userId, $mailTypeId)
+    public function isUserUnsubscribed($userId, $mailTypeId): bool
     {
         return $this->getTable()->where(['user_id' => $userId, 'mail_type_id' => $mailTypeId, 'subscribed' => false])->count('*') > 0;
+    }
+
+    public function isUserSubscribed($userId, $mailTypeId): bool
+    {
+        return $this->getTable()->where(['user_id' => $userId, 'mail_type_id' => $mailTypeId, 'subscribed' => true])->count('*') > 0;
     }
 
     public function filterSubscribedEmails(array $emails, int $typeId): array
@@ -275,10 +280,12 @@ class UserSubscriptionsRepository extends Repository
         ActiveRow $userSubscription,
         ActiveRow $variant,
         array $rtmParams = [],
-        bool $sendGoodbyeEmail = true
+        bool $sendGoodbyeEmail = true,
+        bool $keepMailTypeSubscription = false
     ): void {
         $this->userSubscriptionVariantsRepository->removeSubscribedVariant($userSubscription, $variant->id);
-        if ($this->userSubscriptionVariantsRepository->subscribedVariants($userSubscription)->count('*') == 0) {
+        if (!$keepMailTypeSubscription &&
+            $this->userSubscriptionVariantsRepository->subscribedVariants($userSubscription)->count('*') == 0) {
             $this->unSubscribeUser($userSubscription->mail_type, $userSubscription->user_id, $userSubscription->user_email, $rtmParams, $sendGoodbyeEmail);
         }
     }

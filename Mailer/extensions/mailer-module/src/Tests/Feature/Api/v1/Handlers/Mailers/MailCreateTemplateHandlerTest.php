@@ -26,7 +26,7 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
 
         /** @var JsonApiResponse $response */
         $response =  $this->handler->handle($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertEquals(200, $response->getCode());
         $this->assertEquals('foo', $response->getPayload()['code']);
     }
@@ -40,7 +40,7 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
 
         /** @var JsonApiResponse $response */
         $response =  $this->handler->handle($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertEquals(200, $response->getCode());
 
         $template = $this->templatesRepository->findBy('code', $response->getPayload()['code']);
@@ -56,7 +56,7 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
 
         /** @var JsonApiResponse $response */
         $response =  $this->handler->handle($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertEquals(404, $response->getCode());
         $this->assertEquals('mail_layout_not_found', $response->getPayload()['code']);
     }
@@ -69,7 +69,7 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
 
         /** @var JsonApiResponse $response */
         $response =  $this->handler->handle($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertEquals(200, $response->getCode());
 
         $template = $this->templatesRepository->findBy('code', $response->getPayload()['code']);
@@ -84,7 +84,7 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
 
         /** @var JsonApiResponse $response */
         $response =  $this->handler->handle($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertEquals(200, $response->getCode());
 
         $template = $this->templatesRepository->findBy('code', $response->getPayload()['code']);
@@ -99,7 +99,7 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
 
         /** @var JsonApiResponse $response */
         $response =  $this->handler->handle($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertEquals(200, $response->getCode());
 
         $template = $this->templatesRepository->findBy('code', $response->getPayload()['code']);

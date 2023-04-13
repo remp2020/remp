@@ -9,7 +9,8 @@
     "email": "test@test.com",
     "list_id": 1,
     "variant_id": 1,
-    "send_accompanying_emails": true
+    "send_accompanying_emails": true,
+    "keep_list_subscription": true
   },
   {
     "user_id": 1,
@@ -54,6 +55,9 @@
       ]
     },
     "send_accompanying_emails": {
+      "type": "boolean"
+    },
+    "keep_list_subscription": {
       "type": "boolean"
     },
     "utm_params": {

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Feature\Api\v2\Mailers;
+namespace Tests\Feature\Api\v3\Mailers;
 
-use Remp\MailerModule\Api\v2\Handlers\Mailers\MailTypesListingHandler;
+use Remp\MailerModule\Api\v3\Handlers\Mailers\MailTypesListingHandler;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
@@ -95,10 +95,10 @@ class MailTypesListingHandlerTest extends BaseApiHandlerTestCase
         $response =  $this->handler->handle($params);
 
         $data = $response->getPayload()['data'];
-
         $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertCount(1, $data[0]->variants);
-        $this->assertEquals([$mailTypeVariant2->id => $mailTypeVariant2->title], $data[0]->variants);
+        $this->assertEquals($mailTypeVariant2->title, $data[0]->variants[$mailTypeVariant2->id]->title);
+        $this->assertEquals($mailTypeVariant2->code, $data[0]->variants[$mailTypeVariant2->id]->code);
     }
 
     private function createMailTypes()

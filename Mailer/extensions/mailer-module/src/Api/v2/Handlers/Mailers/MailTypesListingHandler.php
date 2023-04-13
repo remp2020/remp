@@ -20,6 +20,7 @@ class MailTypesListingHandler extends BaseHandler
         private ListsRepository $listsRepository,
         private ListVariantsRepository $listVariantsRepository
     ) {
+        parent::__construct();
     }
 
     public function params(): array
@@ -61,6 +62,7 @@ class MailTypesListingHandler extends BaseHandler
             $item->title = $row->title;
             $item->description = $row->description;
             $item->mail_type_category_id = $row->mail_type_category_id;
+            $item->default_variant_id = $row->default_variant_id;
             $item->locked = (bool) $row->locked;
             $item->is_multi_variant = (bool) $row->is_multi_variant;
             $item->sorting = $row->sorting;

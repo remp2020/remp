@@ -17,23 +17,14 @@ use Tomaj\NetteApi\Response\ResponseInterface;
 
 class UnSubscribeHandler extends BaseHandler
 {
-    private $userSubscriptionsRepository;
-
-    private $listsRepository;
-
-    private $listVariantsRepository;
-
     use JsonValidationTrait;
 
     public function __construct(
-        UserSubscriptionsRepository $userSubscriptionsRepository,
-        ListsRepository $listsRepository,
-        ListVariantsRepository $listVariantsRepository
+        private UserSubscriptionsRepository $userSubscriptionsRepository,
+        private ListsRepository $listsRepository,
+        private ListVariantsRepository $listVariantsRepository
     ) {
         parent::__construct();
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
-        $this->listsRepository = $listsRepository;
-        $this->listVariantsRepository = $listVariantsRepository;
     }
 
     public function params(): array
@@ -68,6 +59,7 @@ class UnSubscribeHandler extends BaseHandler
         }
 
         $sendGoodbyeEmail = $payload['send_accompanying_emails'] ?? true;
+        $keepListSubscription = $payload['keep_list_subscription'] ?? false;
 
         if ($variant) {
             $userSubscription = $this->userSubscriptionsRepository->getUserSubscription($list, $payload['user_id'], $payload['email']);
@@ -80,6 +72,7 @@ class UnSubscribeHandler extends BaseHandler
                 variant: $variant,
                 rtmParams: $this->getRtmParams($payload),
                 sendGoodbyeEmail: $sendGoodbyeEmail,
+                keepMailTypeSubscription: $keepListSubscription
             );
         } else {
             $this->userSubscriptionsRepository->unsubscribeUser(

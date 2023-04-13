@@ -5,6 +5,7 @@ namespace Tests\Feature\Api\v1\Handlers\Mailers;
 
 use Remp\MailerModule\Api\v1\Handlers\Mailers\MailTemplatesListingHandler;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
+use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class MailTemplatesListingHandlerTest extends BaseApiHandlerTestCase
 {
@@ -24,7 +25,7 @@ class MailTemplatesListingHandlerTest extends BaseApiHandlerTestCase
         $params = ['limit' => 2, 'page' => 1];
         $response =  $handler->handle($params);
 
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertCount(2, $response->getPayload());
         $this->assertEquals('template_10', $response->getPayload()[0]['code']);
         $this->assertEquals('template_9', $response->getPayload()[1]['code']);
@@ -32,7 +33,7 @@ class MailTemplatesListingHandlerTest extends BaseApiHandlerTestCase
         $params = ['limit' => 2, 'page' => 3];
         $response =  $handler->handle($params);
 
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertCount(2, $response->getPayload());
         $this->assertEquals('template_6', $response->getPayload()[0]['code']);
         $this->assertEquals('template_5', $response->getPayload()[1]['code']);
@@ -45,7 +46,7 @@ class MailTemplatesListingHandlerTest extends BaseApiHandlerTestCase
     {
         $handler = $this->getHandler(MailTemplatesListingHandler::class);
         $response = $handler->handle($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertEquals($error, $response->getPayload()['code']);
     }
 

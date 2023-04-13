@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Remp\MailerModule\Api\v1\Handlers\Mailers;
+namespace Remp\MailerModule\Api\v3\Handlers\Mailers;
 
 use Nette\Http\IResponse;
 use Remp\MailerModule\Api\JsonValidationTrait;
@@ -26,7 +26,8 @@ class MailTypesListingHandler extends BaseHandler
     public function params(): array
     {
         return [
-            new GetInputParam('code'),
+            (new GetInputParam('code'))->setMulti(),
+            (new GetInputParam('mail_type_category_code'))->setMulti(),
             new GetInputParam('public_listing'),
         ];
     }
@@ -34,9 +35,11 @@ class MailTypesListingHandler extends BaseHandler
     public function handle(array $params): ResponseInterface
     {
         $results = $this->listsRepository->all();
-
         if (isset($params['code'])) {
             $results->where(['code' => $params['code']]);
+        }
+        if (isset($params['mail_type_category_code'])) {
+            $results->where(['mail_type_category.code' => $params['mail_type_category_code']]);
         }
 
         if (isset($params['public_listing'])) {
@@ -62,7 +65,10 @@ class MailTypesListingHandler extends BaseHandler
             $item->locked = (bool) $row->locked;
             $item->is_multi_variant = (bool) $row->is_multi_variant;
             $item->sorting = $row->sorting;
-            $item->variants = $this->listVariantsRepository->getVariantsForType($row)->order('sorting')->fetchPairs('id', 'title');
+            $item->variants = $this->listVariantsRepository->getVariantsForType($row)
+                ->order('sorting')
+                ->select('code,title,id,sorting')
+                ->fetchAssoc('id->'); // maps id to object containing selected columns
             $output[] = $item;
         }
 

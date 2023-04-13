@@ -96,9 +96,7 @@ class SendEmailHandlerTest extends BaseApiHandlerTestCase
             ->getMock();
         $this->dispatcher->registerHandler('send-email', $mockListener);
 
-        /** @var JsonApiResponse $response */
         $response = $this->request($params);
-        $this->assertInstanceOf(\Tomaj\NetteApi\Response\JsonApiResponse::class, $response);
         $this->assertEquals($httpCode, $response->getCode());
 
         $this->dispatcher->handle();
