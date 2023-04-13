@@ -13,15 +13,12 @@ use Tomaj\NetteApi\Response\ResponseInterface;
 
 class IsUnsubscribedHandler extends BaseHandler
 {
-    private $userSubscriptionsRepository;
-
     use JsonValidationTrait;
 
     public function __construct(
-        UserSubscriptionsRepository $userSubscriptionsRepository
+        private UserSubscriptionsRepository $userSubscriptionsRepository
     ) {
         parent::__construct();
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
     public function params(): array
@@ -30,7 +27,6 @@ class IsUnsubscribedHandler extends BaseHandler
             new RawInputParam('raw'),
         ];
     }
-
 
     public function handle(array $params): ResponseInterface
     {

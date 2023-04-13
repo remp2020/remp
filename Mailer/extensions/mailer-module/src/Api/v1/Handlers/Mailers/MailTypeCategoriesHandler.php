@@ -10,13 +10,10 @@ use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailTypeCategoriesHandler extends BaseHandler
 {
-    private $categoriesRepository;
-
     public function __construct(
-        ListCategoriesRepository $categoriesRepository
+        private ListCategoriesRepository $categoriesRepository
     ) {
         parent::__construct();
-        $this->categoriesRepository = $categoriesRepository;
     }
 
     public function handle(array $params): ResponseInterface
@@ -30,6 +27,7 @@ class MailTypeCategoriesHandler extends BaseHandler
             $item->title = $category->title;
             $item->sorting = $category->sorting;
             $item->show_title = (bool) $category->show_title;
+            $item->code = $category->code;
             $output[] = $item;
         }
 

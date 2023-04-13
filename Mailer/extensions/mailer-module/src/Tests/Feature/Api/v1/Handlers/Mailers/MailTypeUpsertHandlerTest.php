@@ -10,7 +10,8 @@ use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class MailTypeUpsertHandlerTest extends BaseApiHandlerTestCase
 {
-    protected $handler;
+    /** @var MailTypeUpsertHandler */
+    private $handler;
 
     public function setUp(): void
     {

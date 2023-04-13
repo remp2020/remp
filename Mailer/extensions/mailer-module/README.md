@@ -1229,6 +1229,54 @@ Response:
 
 ---
 
+#### POST `/api/v1/users/is-subscribed`
+
+API call that checks if user is subscribed from given newsletter list (and optionally its variant).
+
+##### *Headers:*
+
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
+
+##### *Body:*
+
+```json5
+{
+  // required
+  "user_id": 1, // Integer; ID of user
+  "email": "test@test.sk", // String; Email of user,
+  "list_id": 1 // Integer; ID of newsletter
+  "variant_id": 1 // Integer; ID of variant
+}
+```
+
+##### *Example:*
+
+```shell
+curl -X POST \
+  http://mailer.remp.press/api/v1/users/is-subscribed \
+  -H 'Authorization: Bearer XXX' \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"user_id": 123,
+    "email": "test@test.sk",
+	"list_id": 1,
+	"variant_id": 99,
+	
+}'
+```
+
+Response:
+
+```json5
+{
+  "is_subscribed": true
+}
+```
+
+---
+
 #### POST `/api/v1/users/user-preferences`
 
 API call to get subscribed newsletter lists and their variants.
@@ -1369,7 +1417,10 @@ Response:
 
 #### POST `/api/v1/users/un-subscribe`
 
-API call unsubscribes email address from the given newsletter.
+API call unsubscribes email address from the given newsletter. Optionally, one can specify newsletter variant to unsubscribe.
+By default, if list type has multiple variants and user unsubscribes from all of them, system also unsubscribes from the main newsletter list. 
+To change the default behaviour, one can specify `keep_list_subscription` parameter - if `true`, this endpoint call retains main list subscription 
+even if no variant is subscribed.
 
 Endpoint accepts an optional array of RTM (REMP's UTM) parameters. Every link in email send by Mailer contain RTM parameters
 referencing to the specific instance of sent email. If user unsubscribes via specific email, your frontend will also
@@ -1404,6 +1455,9 @@ of emails won't be available.
     // optional
     "variant_id": 1, // Integer;  ID of newsletter variant to unsubscribe
     "variant_code": "author.123", // String; Code of the newsletter variant to subscribe
+
+    // optional, useful only when variant_id or variant_code is specified
+    "keep_list_subscription": false, // Boolean; specifies if list subscription should be kept when no list variant remains subscribed   
 
     // optional RTM parameters for tracking "what" made the user unsubscribe
     "rtm_params": { // Object; optional RTM parameters for pairing which email caused the user to unsubscribe. RTM params are generated into the email links automatically.
@@ -2003,6 +2057,60 @@ Response:
 
 ---
 
+#### GET `/api/v3/mailers/mail-types`
+
+Lists all available *newsletter lists* (mail types). *Code* of the newsletter is required when creating
+new *email* template via API. Compared to v2, v3 returns all important variant attributes (`id`, `code`, `sorting`, `title`).
+
+##### *Headers:*
+
+| Name          | Value           | Required | Description |
+|---------------|-----------------|----------|-------------|
+| Authorization | Bearer *String* | yes      | API token.  |
+
+##### *Params:*
+
+| Name                    | Value      | Required | Description                                                                                                            |
+|-------------------------|------------|----------|------------------------------------------------------------------------------------------------------------------------|
+| code                    | *String[]* | no       | Filter only newsletters (mail types) with specific code. Multiple codes can be requested.                              |
+| mail_type_category_code | *String*   | no       | Filter only newsletters (mail types) of specific category. Multiple categories can be requested.                       |
+| public_listing          | *Boolean*  | no       | Flag whether only newsletters (mail types) hat should/shouldn't be available to be listed publicly should be returned. |
+
+##### *Example:*
+
+```shell
+curl -X GET \
+  http://mailer.remp.press/api/v1/mailers/mail-types?public_listing=1&code[]=demo-weekly-newsletter \
+  -H 'Authorization: Bearer XXX'
+```
+
+Response:
+
+```json5
+{
+  "status": "ok",
+  "data": [
+    {
+      "id": 1,
+      "code": "demo-weekly-newsletter",
+      "image_url": null,
+      "preview_url": null,
+      "page_url": null,
+      "title": "DEMO Weekly newsletter",
+      "description": "Example mail list",
+      "locked": false,
+      "is_multi_variant": true,
+      "variants": {
+        "2": {id: 2, code: "test", title: "test", sorting:  1},
+        "3": {id: 3, code: "test2", title: "test 2", sorting: 2}
+      }
+    }
+  ]
+}
+```
+
+---
+
 #### GET `/api/v1/mailers/mail-type-categories`
 
 Get available categories of newsletters.
@@ -2029,13 +2137,15 @@ Response:
     "id": 1,
     "title": "Newsletters",
     "sorting": 100,
-    "show_title": true
+    "show_title": true,
+    "code": "newsletters"
   },
   {
     "id": 2,
     "title": "System",
     "sorting": 999,
-    "show_title": false
+    "show_title": false,
+    "code": "system"
   }
 ]
 ```

@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "Check if user is unsubscribed",
-  "$id": "POST /api/v1/users/is-unsubscribed",
-  "title": "Is user unsubscribed",
+  "description": "Check if user is subscribed",
+  "$id": "POST /api/v1/users/is-subscribed",
+  "title": "Is user subscribed",
   "examples": [{
     "user_id": 1,
     "email": "example@example.com",
@@ -24,6 +24,9 @@
       "format": "email"
     },
     "list_id": {
+      "type": "integer"
+    },
+    "variant_id": {
       "type": "integer"
     }
   }
