@@ -14,7 +14,6 @@ class SnapshotHelpers
     /**
      * Load concurrents histogram for given interval
      * Concurrents counts are grouped by time and referer_medium
-     * TODO: add caching
      *
      * @param JournalInterval $interval
      * @param null            $externalArticleId if specified, show histogram only for this article
@@ -22,8 +21,11 @@ class SnapshotHelpers
      *
      * @return Collection     collection of concurrent time objects (properties: time, count, referer_medium)
      */
-    public function concurrentsHistogram(JournalInterval $interval, $externalArticleId = null, bool $addLastMinute = false)
-    {
+    public function concurrentsHistogram(
+        JournalInterval $interval,
+        $externalArticleId = null,
+        bool $addLastMinute = false
+    ) {
         /** @var Carbon $from */
         $from = $interval->timeAfter;
         /** @var Carbon $to */
@@ -45,16 +47,26 @@ class SnapshotHelpers
 
         $timePointsMapping = $timePoints->getIncludedPointsMapping();
 
-        $concurrents = collect();
-        foreach ($q->get() as $item) {
-            $concurrents->push((object) [
-                // concurrent snapshots may not be stored in DB precisely for each time interval start (e.g. snapshotting took too long).
-                // therefore we use provided mapping to display them nicely in graph
-                'time' => $timePointsMapping[$item->time->toIso8601ZuluString()],
-                'real_time' => $item->time->toIso8601ZuluString(),
-                'count' => $item->count,
-                'referer_medium' => $item->referer_medium,
-            ]);
+        // get cache key from binded parameters - parameters from scope may occur (e.g. `property_token`)
+        $bindings = implode('', $q->getBindings());
+        $cacheKey = "concurrentHistogram.". hash('md5', $bindings);
+
+        $concurrents = Cache::get($cacheKey);
+        if (!$concurrents) {
+            $concurrents = collect();
+            foreach ($q->get() as $item) {
+                $concurrents->push((object) [
+                    // concurrent snapshots may not be stored in DB precisely for each time interval start (e.g. snapshotting took too long).
+                    // therefore we use provided mapping to display them nicely in graph
+                    'time' => $timePointsMapping[$item->time->toIso8601ZuluString()],
+                    'real_time' => $item->time->toIso8601ZuluString(),
+                    'count' => $item->count,
+                    'referer_medium' => $item->referer_medium,
+                ]);
+            }
+            if ($interval->cacheTTL > 0) {
+                Cache::put($cacheKey, $concurrents, $interval->cacheTTL);
+            }
         }
 
         return $concurrents;

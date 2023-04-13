@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added an optimizations to speed up the statistics of articles on dashboard. remp/remp#1250
 - Optimized `/api/articles` API call to eager load necessary relationships. remp/remp#1254
 - Optimized `/articles/conversions` view to use article pageviews to calculate conversion rate instead of unique browsers from Journal API which can be slow. This may change the resulting values in conversion rate column. remp/remp#1253
+- Added an optimizations for dashboard view to reduce obsolete database calls and speed up the filtering by property. remp/remp#1251
+  - Added optional `env` configurations `ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_7D` and `ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_30D` to disable possibility of choosing longer time intervals in the article histogram.
 
 ## Archive
 

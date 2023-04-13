@@ -101,6 +101,8 @@ class DashboardController extends Controller
 
         // Additional options
         $options['dashboard_frontpage_referer_of_properties'] = array_values(Config::loadAllPropertyConfigs(ConfigNames::DASHBOARD_FRONTPAGE_REFERER));
+        $options['article_traffic_graph_show_interval_7d'] = config('beam.article_traffic_graph_show_interval_7d');
+        $options['article_traffic_graph_show_interval_30d'] = config('beam.article_traffic_graph_show_interval_30d');
 
         return $options;
     }
@@ -119,6 +121,17 @@ class DashboardController extends Controller
         }
     }
 
+    /**
+     * Return the time histogram for articles.
+     *
+     * Note: This action is cached. To improve response time especially for
+     * longer time intervals and first request, consider to preheat cache
+     * by calling this action from CLI command.
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function timeHistogramNew(Request $request)
     {
         $request->validate([
@@ -135,6 +148,11 @@ class DashboardController extends Controller
 
         $from = $journalInterval->timeAfter;
         $to = $journalInterval->timeBefore;
+
+        // for today histogram we need data not older than 1 minute
+        if ($interval === 'today') {
+            $journalInterval->cacheTTL = 60;
+        }
 
         $toNextDayStart = (clone $to)->tz($tz)->addDay()->startOfDay();
         $intervalMinutes = $journalInterval->intervalMinutes;
@@ -162,6 +180,9 @@ class DashboardController extends Controller
                 $shadowInterval = clone $journalInterval;
                 $shadowInterval->timeAfter = $shadowFrom;
                 $shadowInterval->timeBefore = $shadowTo;
+
+                // shadow values could be cached for 24 hours
+                $shadowInterval->cacheTTL = 86400;
 
                 foreach ($this->snapshotHelpers->concurrentsHistogram($shadowInterval) as $item) {
                     // we want to plot previous results on same points as current ones,

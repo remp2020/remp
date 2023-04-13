@@ -5,7 +5,10 @@
                             :url="timeHistogramUrl"
                             :url-new="timeHistogramUrlNew"
                             :concurrents="totalConcurrents"
-                            :external-events="externalEvents">
+                            :external-events="externalEvents"
+                            :show-interval7-days="options.article_traffic_graph_show_interval_7d"
+                            :show-interval30-days="options.article_traffic_graph_show_interval_30d"
+            >
 
                 <!-- Selector for property tokens, required only in public dashboard -->
                 <template v-if="accountPropertyTokens" v-slot:additional-settings>
