@@ -44,9 +44,9 @@ class AuthorController extends Controller
             'html' => view('authors.show', [
                 'author' => $author,
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
-                'sections' => Section::all()->pluck('name', 'id'),
-                'tags' => Tag::all()->pluck('name', 'id'),
-                'authors' => Author::all()->pluck('name', 'id'),
+                'sections' => Section::all(['name', 'id'])->pluck('name', 'id'),
+                'tags' => Tag::all(['name', 'id'])->pluck('name', 'id'),
+                'authors' => Author::all(['name', 'id'])->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
@@ -75,14 +75,6 @@ class AuthorController extends Controller
             'COALESCE(timespent_subscribers / pageviews_subscribers, 0) AS avg_timespent_subscribers',
         ];
 
-        $authorArticlesQuery = ArticleAuthor::selectRaw(implode(',', [
-            'author_id',
-            'COUNT(*) as articles_count'
-        ]))
-            ->leftJoin('articles', 'article_author.article_id', '=', 'articles.id')
-            ->ofSelectedProperty()
-            ->groupBy('author_id');
-
         $conversionsQuery = Conversion::selectRaw(implode(',', [
             'author_id',
             'count(distinct conversions.id) as conversions_count',
@@ -101,6 +93,7 @@ class AuthorController extends Controller
             'COALESCE(SUM(timespent_all), 0) AS timespent_all',
             'COALESCE(SUM(timespent_signed_in), 0) AS timespent_signed_in',
             'COALESCE(SUM(timespent_subscribers), 0) AS timespent_subscribers',
+            'COUNT(*) as articles_count'
         ]))
             ->leftJoin('article_author', 'articles.id', '=', 'article_author.article_id')
             ->ofSelectedProperty()
@@ -108,14 +101,12 @@ class AuthorController extends Controller
 
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'));
-            $authorArticlesQuery->where('published_at', '>=', $publishedFrom);
             $conversionsQuery->where('published_at', '>=', $publishedFrom);
             $pageviewsQuery->where('published_at', '>=', $publishedFrom);
         }
 
         if ($request->input('published_to')) {
             $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'));
-            $authorArticlesQuery->where('published_at', '<=', $publishedTo);
             $conversionsQuery->where('published_at', '<=', $publishedTo);
             $pageviewsQuery->where('published_at', '<=', $publishedTo);
         }
@@ -129,13 +120,11 @@ class AuthorController extends Controller
         }
 
         if ($request->input('content_type') && $request->input('content_type') !== 'all') {
-            $authorArticlesQuery->where('content_type', '=', $request->input('content_type'));
             $conversionsQuery->where('content_type', '=', $request->input('content_type'));
             $pageviewsQuery->where('content_type', '=', $request->input('content_type'));
         }
 
         $authors = Author::selectRaw(implode(",", $cols))
-            ->leftJoin(DB::raw("({$authorArticlesQuery->toSql()}) as aa"), 'authors.id', '=', 'aa.author_id')->addBinding($authorArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'authors.id', '=', 'c.author_id')->addBinding($conversionsQuery->getBindings())
             ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'authors.id', '=', 'pv.author_id')->addBinding($pageviewsQuery->getBindings())
             // has to be below manually added bindings
@@ -216,6 +205,8 @@ class AuthorController extends Controller
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')
             ->orderColumn('id', 'authors.id $1')
+            ->setTotalRecords(PHP_INT_MAX)
+            ->setFilteredRecords(PHP_INT_MAX)
             ->make(true);
     }
 

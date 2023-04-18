@@ -39,10 +39,10 @@ class TagController extends Controller
         return response()->format([
             'html' => view('tags.show', [
                 'tag' => $tag,
-                'tags' => Tag::all()->pluck('name', 'id'),
+                'tags' => Tag::all(['name', 'id'])->pluck('name', 'id'),
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
-                'sections' => Section::all()->pluck('name', 'id'),
-                'authors' => Author::all()->pluck('name', 'id'),
+                'sections' => Section::all(['name', 'id'])->pluck('name', 'id'),
+                'authors' => Author::all(['name', 'id'])->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),

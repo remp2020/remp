@@ -66,7 +66,6 @@ class TagsDataTableTest extends TestCase
     {
         $json = $this->requestTags();
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->tags[2]->id);
         $json->assertJsonPath('data.0.articles_count', 3);
         $json->assertJsonPath('data.0.conversions_count', 9);
@@ -83,7 +82,6 @@ class TagsDataTableTest extends TestCase
 
         $json = $this->requestTags();
         $json->assertSuccessful();
-        $json->assertJson(['recordsTotal' => 2]);
         $json->assertJsonPath('data.0.id', $this->tags[1]->id);
         $json->assertJsonPath('data.0.articles_count', 1);
         $json->assertJsonPath('data.0.conversions_count', 2);
@@ -97,7 +95,6 @@ class TagsDataTableTest extends TestCase
 
         $json = $this->requestTags();
         $json->assertSuccessful();
-        $json->assertJson(['recordsTotal' => 2]);
         $json->assertJsonPath('data.0.id', $this->tags[2]->id);
         $json->assertJsonPath('data.0.articles_count', 2);
         $json->assertJsonPath('data.0.conversions_count', 7);

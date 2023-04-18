@@ -66,7 +66,6 @@ class SectionsDataTableTest extends TestCase
     {
         $json = $this->requestSections();
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->sections[2]->id);
         $json->assertJsonPath('data.0.articles_count', 3);
         $json->assertJsonPath('data.0.conversions_count', 9);
@@ -83,7 +82,6 @@ class SectionsDataTableTest extends TestCase
 
         $json = $this->requestSections();
         $json->assertSuccessful();
-        $json->assertJson(['recordsTotal' => 2]);
         $json->assertJsonPath('data.0.id', $this->sections[1]->id);
         $json->assertJsonPath('data.0.articles_count', 1);
         $json->assertJsonPath('data.0.conversions_count', 2);
@@ -97,7 +95,6 @@ class SectionsDataTableTest extends TestCase
 
         $json = $this->requestSections();
         $json->assertSuccessful();
-        $json->assertJson(['recordsTotal' => 2]);
         $json->assertJsonPath('data.0.id', $this->sections[2]->id);
         $json->assertJsonPath('data.0.articles_count', 2);
         $json->assertJsonPath('data.0.conversions_count', 7);
@@ -110,7 +107,6 @@ class SectionsDataTableTest extends TestCase
     {
         $json = $this->requestSectionArticles($this->sections[1]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->articles['prop2_shared']->id);
         $json->assertJsonPath('data.0.conversions_count', 4);
         $json->assertJsonPath('data.1.id', $this->articles['prop1_shared']->id);
@@ -118,7 +114,6 @@ class SectionsDataTableTest extends TestCase
 
         $json = $this->requestSectionArticles($this->sections[2]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 3);
         $json->assertJsonPath('data.0.id', $this->articles['prop2_shared']->id);
         $json->assertJsonPath('data.0.conversions_count', 4);
         $json->assertJsonPath('data.1.id', $this->articles['prop2']->id);
@@ -135,13 +130,11 @@ class SectionsDataTableTest extends TestCase
 
         $json = $this->requestSectionArticles($this->sections[1]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 1);
         $json->assertJsonPath('data.0.id', $this->articles['prop1_shared']->id);
         $json->assertJsonPath('data.0.conversions_count', 2);
 
         $json = $this->requestSectionArticles($this->sections[2]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 1);
         $json->assertJsonPath('data.0.id', $this->articles['prop1_shared']->id);
         $json->assertJsonPath('data.0.conversions_count', 2);
 
@@ -151,13 +144,11 @@ class SectionsDataTableTest extends TestCase
 
         $json = $this->requestSectionArticles($this->sections[1]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 1);
         $json->assertJsonPath('data.0.id', $this->articles['prop2_shared']->id);
         $json->assertJsonPath('data.0.conversions_count', 4);
 
         $json = $this->requestSectionArticles($this->sections[2]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->articles['prop2_shared']->id);
         $json->assertJsonPath('data.0.conversions_count', 4);
         $json->assertJsonPath('data.1.id', $this->articles['prop2']->id);

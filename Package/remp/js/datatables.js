@@ -109,7 +109,7 @@ $.fn.dataTables = {
     pagination: function (settings, navId) {
         let start = settings._iDisplayStart;
         let length = settings._iDisplayLength;
-        let count = settings._iRecordsDisplay;
+        let count = settings.json.data.length;
         let nav = '#' + navId;
 
         $(nav + ' .ah-pagination button').removeAttr('disabled');
@@ -118,7 +118,7 @@ $.fn.dataTables = {
             $(nav + ' .ah-prev button').attr('disabled', 'disabled');
         }
 
-        if (start + length >= count) {
+        if (length > count) {
             $(nav + ' .ah-next button').attr('disabled', 'disabled');
         }
     },

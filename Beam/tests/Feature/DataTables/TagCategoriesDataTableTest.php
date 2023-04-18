@@ -215,14 +215,12 @@ class TagCategoriesDataTableTest extends TestCase
     {
         $json = $this->requestTagCategoryTags($this->tagCategories[1]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 1);
         $json->assertJsonPath('data.0.id', $this->tags[1]->id);
         $json->assertJsonPath('data.0.articles_count', 3);
         $json->assertJsonPath('data.0.conversions_count', 7);
 
         $json = $this->requestTagCategoryTags($this->tagCategories[2]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->tags[2]->id);
         $json->assertJsonPath('data.0.articles_count', 3);
         $json->assertJsonPath('data.0.conversions_count', 9);
@@ -236,7 +234,6 @@ class TagCategoriesDataTableTest extends TestCase
         $this->setProperty('prop_1');
         $json = $this->requestTagCategoryTags($this->tagCategories[1]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 1);
         $json->assertJsonPath('data.0.id', $this->tags[1]->id);
         $json->assertJsonPath('data.0.articles_count', 2);
         $json->assertJsonPath('data.0.conversions_count', 3);
@@ -244,7 +241,6 @@ class TagCategoriesDataTableTest extends TestCase
         $this->setProperty('prop_2');
         $json = $this->requestTagCategoryTags($this->tagCategories[1]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 1);
         $json->assertJsonPath('data.0.id', $this->tags[1]->id);
         $json->assertJsonPath('data.0.articles_count', 1);
         $json->assertJsonPath('data.0.conversions_count', 4);
@@ -252,7 +248,6 @@ class TagCategoriesDataTableTest extends TestCase
         $this->setProperty('prop_1');
         $json = $this->requestTagCategoryTags($this->tagCategories[2]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->tags[1]->id);
         $json->assertJsonPath('data.0.articles_count', 2);
         $json->assertJsonPath('data.0.conversions_count', 3);
@@ -263,7 +258,6 @@ class TagCategoriesDataTableTest extends TestCase
         $this->setProperty('prop_2');
         $json = $this->requestTagCategoryTags($this->tagCategories[2]);
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->tags[2]->id);
         $json->assertJsonPath('data.0.articles_count', 2);
         $json->assertJsonPath('data.0.conversions_count', 7);
