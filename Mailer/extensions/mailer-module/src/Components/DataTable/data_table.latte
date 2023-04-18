@@ -37,6 +37,7 @@
         <tr>
             <th n:foreach="$colSettings as $colName => $colSetting">
                 {isset($colSetting['header']) ? $colSetting['header'] : $colName}
+                <i n:ifset="$colSetting['tooltip']" class="zmdi zmdi-info" data-toggle="tooltip" data-placement="top" title="{$colSetting['tooltip']}"></i>
             </th>
             <th n:if="!empty($rowActions)">actions</th>
         </tr>

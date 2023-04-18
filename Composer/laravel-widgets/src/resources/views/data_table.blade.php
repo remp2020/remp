@@ -38,6 +38,10 @@
                     @else
                         {{ $col['name'] }}
                     @endif
+
+                    @if (isset($col['tooltip']))
+                        <i class="zmdi zmdi-info" data-toggle="tooltip" data-placement="top" title="{{ $col['tooltip'] }}"></i>
+                    @endif
                 </th>
             @endforeach
             @if (!empty($rowActions))

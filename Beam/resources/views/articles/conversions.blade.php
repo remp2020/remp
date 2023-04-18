@@ -53,6 +53,7 @@
                     'orderSequence' => ['desc', 'asc'],
                     'priority' => 2,
                     'className' => 'text-right',
+                    'tooltip' => 'The rate between conversions count and all article pageviews.'
                 ],
                 'amount' => [
                     'header' => 'amount',
