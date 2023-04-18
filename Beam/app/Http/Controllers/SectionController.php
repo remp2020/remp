@@ -44,9 +44,9 @@ class SectionController extends Controller
             'html' => view('sections.show', [
                 'section' => $section,
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
-                'authors' => Author::all()->pluck('name', 'id'),
-                'tags' => Tag::all()->pluck('name', 'id'),
-                'sections' => Section::all()->pluck('name', 'id'),
+                'authors' => Author::all(['name', 'id'])->pluck('name', 'id'),
+                'tags' => Tag::all(['name', 'id'])->pluck('name', 'id'),
+                'sections' => Section::all(['name', 'id'])->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
@@ -75,18 +75,6 @@ class SectionController extends Controller
             'COALESCE(timespent_subscribers / pageviews_subscribers, 0) AS avg_timespent_subscribers',
         ];
 
-        $sectionArticlesQuery = ArticleSection::selectRaw(implode(',', [
-            'section_id',
-            'COUNT(*) as articles_count'
-        ]))
-            ->ofSelectedProperty()
-            ->leftJoin('articles', 'article_section.article_id', '=', 'articles.id')
-            ->groupBy('section_id');
-
-        if ($request->input('content_type') && $request->input('content_type') !== 'all') {
-            $sectionArticlesQuery->where('content_type', '=', $request->input('content_type'));
-        }
-
         $conversionsQuery = Conversion::selectRaw(implode(',', [
             'section_id',
             'count(distinct conversions.id) as conversions_count',
@@ -105,6 +93,7 @@ class SectionController extends Controller
             'COALESCE(SUM(timespent_all), 0) AS timespent_all',
             'COALESCE(SUM(timespent_all) - SUM(timespent_subscribers), 0) AS timespent_not_subscribed',
             'COALESCE(SUM(timespent_subscribers), 0) AS timespent_subscribers',
+            'COUNT(*) as articles_count'
         ]))
             ->ofSelectedProperty()
             ->leftJoin('article_section', 'articles.id', '=', 'article_section.article_id')
@@ -117,14 +106,12 @@ class SectionController extends Controller
 
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'));
-            $sectionArticlesQuery->where('published_at', '>=', $publishedFrom);
             $conversionsQuery->where('published_at', '>=', $publishedFrom);
             $pageviewsQuery->where('published_at', '>=', $publishedFrom);
         }
 
         if ($request->input('published_to')) {
             $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'));
-            $sectionArticlesQuery->where('published_at', '<=', $publishedTo);
             $conversionsQuery->where('published_at', '<=', $publishedTo);
             $pageviewsQuery->where('published_at', '<=', $publishedTo);
         }
@@ -139,7 +126,6 @@ class SectionController extends Controller
         }
 
         $sections = Section::selectRaw(implode(",", $cols))
-            ->leftJoin(DB::raw("({$sectionArticlesQuery->toSql()}) as aa"), 'sections.id', '=', 'aa.section_id')->addBinding($sectionArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'sections.id', '=', 'c.section_id')->addBinding($conversionsQuery->getBindings())
             ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'sections.id', '=', 'pv.section_id')->addBinding($pageviewsQuery->getBindings())
             ->ofSelectedProperty()
@@ -220,6 +206,8 @@ class SectionController extends Controller
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')
             ->orderColumn('id', 'sections.id $1')
+            ->setTotalRecords(PHP_INT_MAX)
+            ->setFilteredRecords(PHP_INT_MAX)
             ->make(true);
     }
 

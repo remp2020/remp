@@ -63,7 +63,6 @@ class AuthorsDataTableTest extends TestCase
     {
         $json = $this->request();
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->authors[2]->id);
         $json->assertJsonPath('data.0.articles_count', 3);
         $json->assertJsonPath('data.0.conversions_count', 9);
@@ -80,7 +79,6 @@ class AuthorsDataTableTest extends TestCase
 
         $json = $this->request();
         $json->assertSuccessful();
-        $json->assertJson(['recordsTotal' => 2]);
         $json->assertJsonPath('data.0.id', $this->authors[1]->id);
         $json->assertJsonPath('data.0.articles_count', 1);
         $json->assertJsonPath('data.0.conversions_count', 2);
@@ -94,7 +92,6 @@ class AuthorsDataTableTest extends TestCase
 
         $json = $this->request();
         $json->assertSuccessful();
-        $json->assertJson(['recordsTotal' => 2]);
         $json->assertJsonPath('data.0.id', $this->authors[2]->id);
         $json->assertJsonPath('data.0.articles_count', 2);
         $json->assertJsonPath('data.0.conversions_count', 7);
@@ -107,7 +104,6 @@ class AuthorsDataTableTest extends TestCase
     {
         $json = $this->request('article');
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->authors[2]->id);
         $json->assertJsonPath('data.0.articles_count', 2);
         $json->assertJsonPath('data.0.conversions_count', 5);
@@ -117,7 +113,6 @@ class AuthorsDataTableTest extends TestCase
 
         $json = $this->request('blog');
         $json->assertSuccessful();
-        $json->assertJsonPath('recordsTotal', 2);
         $json->assertJsonPath('data.0.id', $this->authors[1]->id);
         $json->assertJsonPath('data.0.articles_count', 1);
         $json->assertJsonPath('data.0.conversions_count', 4);

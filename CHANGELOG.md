@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Optimized `/articles/conversions` view to use article pageviews to calculate conversion rate instead of unique browsers from Journal API which can be slow. This may change the resulting values in conversion rate column. remp/remp#1253
 - Added an optimizations for dashboard view to reduce obsolete database calls and speed up the filtering by property. remp/remp#1251
   - Added optional `env` configurations `ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_7D` and `ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_30D` to disable possibility of choosing longer time intervals in the article histogram.
+- Optimized `/authors`, `/sections` and `/tags` views by removing redundant join from datatable query and removing datatable count queries. remp/remp#1255
+  - Changed pagination in datatable to use displayed data length instead of executing count query.
 
 ### [Mailer]
 

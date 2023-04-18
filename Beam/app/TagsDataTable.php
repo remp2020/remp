@@ -37,18 +37,6 @@ class TagsDataTable
             'COALESCE(timespent_subscribers / pageviews_subscribers, 0) AS avg_timespent_subscribers',
         ];
 
-        $tagArticlesQuery = ArticleTag::selectRaw(implode(',', [
-            'tag_id',
-            'COUNT(*) as articles_count'
-        ]))
-            ->leftJoin('articles', 'article_tag.article_id', '=', 'articles.id')
-            ->ofSelectedProperty()
-            ->groupBy('tag_id');
-
-        if ($request->input('content_type') && $request->input('content_type') !== 'all') {
-            $tagArticlesQuery->where('content_type', '=', $request->input('content_type'));
-        }
-
         $conversionsQuery = Conversion::selectRaw(implode(',', [
             'tag_id',
             'count(distinct conversions.id) as conversions_count',
@@ -67,6 +55,7 @@ class TagsDataTable
             'COALESCE(SUM(timespent_all), 0) AS timespent_all',
             'COALESCE(SUM(timespent_all) - SUM(timespent_subscribers), 0) AS timespent_not_subscribed',
             'COALESCE(SUM(timespent_subscribers), 0) AS timespent_subscribers',
+            'COUNT(*) as articles_count',
         ]))
             ->leftJoin('article_tag', 'articles.id', '=', 'article_tag.article_id')
             ->ofSelectedProperty()
@@ -79,14 +68,12 @@ class TagsDataTable
 
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'));
-            $tagArticlesQuery->where('published_at', '>=', $publishedFrom);
             $conversionsQuery->where('published_at', '>=', $publishedFrom);
             $pageviewsQuery->where('published_at', '>=', $publishedFrom);
         }
 
         if ($request->input('published_to')) {
             $publishedTo = Carbon::parse($request->input('published_to'), $request->input('tz'));
-            $tagArticlesQuery->where('published_at', '<=', $publishedTo);
             $conversionsQuery->where('published_at', '<=', $publishedTo);
             $pageviewsQuery->where('published_at', '<=', $publishedTo);
         }
@@ -100,7 +87,6 @@ class TagsDataTable
         }
 
         $tags = Tag::selectRaw(implode(",", $cols))
-            ->leftJoin(DB::raw("({$tagArticlesQuery->toSql()}) as aa"), 'tags.id', '=', 'aa.tag_id')->addBinding($tagArticlesQuery->getBindings())
             ->leftJoin(DB::raw("({$conversionsQuery->toSql()}) as c"), 'tags.id', '=', 'c.tag_id')->addBinding($conversionsQuery->getBindings())
             ->leftJoin(DB::raw("({$pageviewsQuery->toSql()}) as pv"), 'tags.id', '=', 'pv.tag_id')->addBinding($pageviewsQuery->getBindings())
             ->ofSelectedProperty()
@@ -185,6 +171,8 @@ class TagsDataTable
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')
             ->orderColumn('id', 'tags.id $1')
+            ->setTotalRecords(PHP_INT_MAX)
+            ->setFilteredRecords(PHP_INT_MAX)
             ->make(true);
     }
 
