@@ -5,53 +5,88 @@ namespace App\Model\Pageviews\Api\v2;
 use App\Http\Requests\Api\v2\TopArticlesSearchRequest;
 use App\Http\Requests\Api\v2\TopAuthorsSearchRequest;
 use App\Http\Requests\Api\v2\TopTagsSearchRequest;
+use Cache;
 use DB;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Carbon;
 
 class TopSearch
 {
+    private const THRESHOLD_DIFF_DAYS = 7;
+
     public function topArticles(TopArticlesSearchRequest $request)
     {
         $limit = $request->json('limit');
         $timeFrom = Carbon::parse($request->json('from'));
+        $publishedFrom = $request->json('published_from');
 
-        $pageviewsQuery = DB::table('article_pageviews')
-            ->where('article_pageviews.time_from', '>=', $timeFrom)
-            ->groupBy('article_pageviews.article_id')
-            ->select(
-                'article_pageviews.article_id',
-                DB::raw('CAST(SUM(article_pageviews.sum) AS UNSIGNED) as pageviews')
-            )
-            ->orderBy('pageviews', 'DESC')
-            ->limit($limit);
+        $useArticlesTableAsDataSource = $this->shouldUseArticlesTableAsDataSource($timeFrom, $publishedFrom);
+
+        if ($useArticlesTableAsDataSource) {
+            $baseQuery = DB::table('articles')
+                ->orderBy('pageviews_all', 'DESC')
+                ->limit($limit);
+        } else {
+            $baseQuery = DB::table('article_pageviews')
+                ->groupBy('article_pageviews.article_id')
+                ->select(
+                    'article_pageviews.article_id',
+                    DB::raw('CAST(SUM(article_pageviews.sum) AS UNSIGNED) as pageviews')
+                )
+                ->orderBy('pageviews', 'DESC')
+                ->limit($limit);
+        }
 
         $sectionFilters = $this->getFilters($request, 'sections');
-        $this->addSectionsCondition($pageviewsQuery, $sectionFilters);
+        $this->addSectionsCondition($baseQuery, $sectionFilters, $useArticlesTableAsDataSource);
 
         $authorFilters = $this->getFilters($request, 'authors');
-        $this->addAuthorsCondition($pageviewsQuery, $authorFilters);
+        $this->addAuthorsCondition($baseQuery, $authorFilters, $useArticlesTableAsDataSource);
 
         $tagFilters = $this->getFilters($request, 'tags');
-        $this->addTagsCondition($pageviewsQuery, $tagFilters);
+        $this->addTagsCondition($baseQuery, $tagFilters, $useArticlesTableAsDataSource);
 
         $tagCategoryFilters = $this->getFilters($request, 'tag_categories');
-        $this->addTagCategoriesCondition($pageviewsQuery, $tagCategoryFilters);
+        $this->addTagCategoriesCondition($baseQuery, $tagCategoryFilters, $useArticlesTableAsDataSource);
 
         $contentType = $request->json('content_type');
         if ($contentType) {
-            $this->addContentTypeCondition($pageviewsQuery, $contentType);
+            $this->addContentTypeCondition($baseQuery, $contentType, $useArticlesTableAsDataSource);
         }
 
-        $data = DB::table('articles')
-            ->joinSub($pageviewsQuery, 'top_articles_by_pageviews', function ($join) {
-                $join->on('articles.id', '=', 'top_articles_by_pageviews.article_id');
-            })
-            ->select('articles.id', 'articles.external_id', 'top_articles_by_pageviews.pageviews');
+        if ($publishedFrom) {
+            $this->addPublishedFromCondition($baseQuery, Carbon::parse($publishedFrom), $useArticlesTableAsDataSource);
+        }
+
+        if (!$useArticlesTableAsDataSource) {
+            $now = Carbon::now();
+            $diffInDays = $timeFrom->diffInDays($now);
+
+            // for longer time periods irrelevant low pageviews data will be cut off
+            if ($diffInDays > self::THRESHOLD_DIFF_DAYS) {
+                $thresholdPageviews = $this->getPageviewsThreshold(clone $baseQuery, $limit);
+
+                if (!$this->hasAlreadyJoinedArticlesTable($baseQuery)) {
+                    $baseQuery->join('articles', 'article_pageviews.article_id', '=', 'articles.id');
+                }
+
+                $baseQuery->where('articles.pageviews_all', '>=', $thresholdPageviews);
+            }
+
+            $baseQuery->where('article_pageviews.time_from', '>=', $timeFrom);
+
+            $data = DB::table('articles')
+                ->joinSub($baseQuery, 'top_articles_by_pageviews', function ($join) {
+                    $join->on('articles.id', '=', 'top_articles_by_pageviews.article_id');
+                })
+                ->select('articles.id', 'articles.external_id', 'top_articles_by_pageviews.pageviews');
+        } else {
+            $data = $baseQuery->select('articles.id', 'articles.external_id', 'articles.pageviews_all as pageviews');
+        }
 
         return $data->get();
     }
-
 
     public function topAuthors(TopAuthorsSearchRequest $request)
     {
@@ -152,11 +187,13 @@ class TopSearch
         }
     }
 
-    private function addSectionsCondition(Builder $articlePageviewsQuery, array $sectionFilters): void
+    private function addSectionsCondition(Builder $baseQuery, array $sectionFilters, bool $isArticlesTable = false): void
     {
+        $column = $isArticlesTable ? 'articles.id' : 'article_pageviews.article_id';
+
         foreach ($sectionFilters as [$type, $values]) {
             $this->checkQueryType($type);
-            $articlePageviewsQuery->whereIn('article_pageviews.article_id', function ($query) use ($type, $values) {
+            $baseQuery->whereIn($column, function ($query) use ($type, $values) {
                 $query->select('article_id')
                     ->from('article_section')
                     ->join('sections', 'article_section.section_id', '=', 'sections.id')
@@ -165,11 +202,13 @@ class TopSearch
         }
     }
 
-    private function addAuthorsCondition(Builder $articlePageviewsQuery, array $authorsFilter): void
+    private function addAuthorsCondition(Builder $articlePageviewsQuery, array $authorsFilter, bool $isArticlesTable = false): void
     {
+        $column = $isArticlesTable ? 'articles.id' : 'article_pageviews.article_id';
+
         foreach ($authorsFilter as [$type, $values]) {
             $this->checkQueryType($type);
-            $articlePageviewsQuery->whereIn('article_pageviews.article_id', function ($query) use ($type, $values) {
+            $articlePageviewsQuery->whereIn($column, function ($query) use ($type, $values) {
                 $query->select('article_id')
                     ->from('article_author')
                     ->join('authors', 'article_author.author_id', '=', 'authors.id')
@@ -178,17 +217,21 @@ class TopSearch
         }
     }
 
-    private function addContentTypeCondition(Builder $articlePageviewsQuery, string $contentType): void
+    private function addContentTypeCondition(Builder $baseQuery, string $contentType, bool $isArticlesTable = false): void
     {
-        $articlePageviewsQuery->join('articles', 'article_pageviews.article_id', '=', 'articles.id')
-            ->where('articles.content_type', '=', $contentType);
+        if (!$isArticlesTable && !$this->hasAlreadyJoinedArticlesTable($baseQuery)) {
+            $baseQuery->join('articles', 'article_pageviews.article_id', '=', 'articles.id');
+        }
+        $baseQuery->where('articles.content_type', '=', $contentType);
     }
 
-    private function addTagsCondition(Builder $articlePageviewsQuery, array $tagFilters): void
+    private function addTagsCondition(Builder $articlePageviewsQuery, array $tagFilters, bool $isArticlesTable = false): void
     {
+        $column = $isArticlesTable ? 'articles.id' : 'article_pageviews.article_id';
+
         foreach ($tagFilters as [$type, $values]) {
             $this->checkQueryType($type);
-            $articlePageviewsQuery->whereIn('article_pageviews.article_id', function ($query) use ($type, $values) {
+            $articlePageviewsQuery->whereIn($column, function ($query) use ($type, $values) {
                 $query->select('article_id')
                     ->from('article_tag')
                     ->join('tags', 'article_tag.tag_id', '=', 'tags.id')
@@ -197,11 +240,13 @@ class TopSearch
         }
     }
 
-    private function addTagCategoriesCondition(Builder $articlePageviewsQuery, array $tagCategoryFilters): void
+    private function addTagCategoriesCondition(Builder $articlePageviewsQuery, array $tagCategoryFilters, bool $isArticlesTable = false): void
     {
+        $column = $isArticlesTable ? 'articles.id' : 'article_pageviews.article_id';
+
         foreach ($tagCategoryFilters as [$type, $values]) {
             $this->checkQueryType($type);
-            $articlePageviewsQuery->whereIn('article_pageviews.article_id', function ($query) use ($type, $values) {
+            $articlePageviewsQuery->whereIn($column, function ($query) use ($type, $values) {
                 $query->select('article_id')
                     ->from('article_tag as at')
                     ->join('tag_tag_category', 'tag_tag_category.tag_id', '=', 'at.tag_id')
@@ -209,5 +254,73 @@ class TopSearch
                     ->whereIn('tag_categories.' . $type, $values);
             });
         }
+    }
+
+    private function addPublishedFromCondition(Builder $articlePageviewsQuery, Carbon $publishedFrom, bool $isArticlesTable): void
+    {
+        if (!$isArticlesTable && !$this->hasAlreadyJoinedArticlesTable($articlePageviewsQuery)) {
+            $articlePageviewsQuery->join('articles', 'article_pageviews.article_id', '=', 'articles.id');
+        }
+
+        $articlePageviewsQuery->where('articles.published_at', '>=', $publishedFrom);
+    }
+
+    private function shouldUseArticlesTableAsDataSource(Carbon $timeFrom, ?string $publishedFrom = null): bool
+    {
+        if ($publishedFrom) {
+            $publishedFrom = Carbon::parse($publishedFrom);
+            if ($publishedFrom >= $timeFrom) {
+                return true;
+            }
+        }
+
+        $cacheKey = "articlePageviewsFirstItemTime";
+        $result = Cache::get($cacheKey);
+        if (!$result) {
+            $data = DB::table('article_pageviews')
+                ->orderBy('time_from')
+                ->limit(1)
+                ->get()
+                ->first();
+
+            if (!$data) {
+                return true;
+            }
+
+            $result = $data->time_from;
+
+            // Cache data for one day
+            Cache::put($cacheKey, $result, 86400);
+        }
+
+        $timeFromThresholdObject = Carbon::parse($result);
+
+        return $timeFromThresholdObject > $timeFrom;
+    }
+
+    private function hasAlreadyJoinedArticlesTable(Builder $builder): bool
+    {
+        if (!is_array($builder->joins)) {
+            return false;
+        }
+
+        return in_array('articles', array_map(function ($item) {
+            /** @var JoinClause $item */
+            return $item->table;
+        }, $builder->joins), true);
+    }
+
+
+    private function getPageviewsThreshold(Builder $query, int $limit): int
+    {
+        $timeFrom = Carbon::now()->subDays(3);
+
+        $data = $query->where('article_pageviews.time_from', '>=', $timeFrom)
+            ->limit(1)
+            ->offset($limit - 1)
+            ->get()
+            ->first();
+
+        return $data ? $data->pageviews : 0;
     }
 }
