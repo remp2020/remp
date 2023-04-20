@@ -126,7 +126,13 @@
                         <ul class="list-group">
                             <li class="list-group-item"><strong>Status:</strong> {$batch->status}</li>
                             <li class="list-group-item"><strong>Method:</strong> {$batch->method}</li>
-                            <li class="list-group-item"><strong>Newsletter list:</strong> {$batch->related('mail_job_batch_templates')->fetch()->mail_template->mail_type->title}</li>
+                            <li class="list-group-item">
+                                <strong>Newsletter list:</strong>
+                                {var $jobTemplate = $batch->related('mail_job_batch_templates')->fetch()}
+                                {if $jobTemplate}
+                                    {$jobTemplate->mail_template->mail_type->title}{if $job->mail_type_variant} / {$job->mail_type_variant->title}{/if}
+                                {/if}
+                            </li>
                             <li n:if="!empty($batch->max_emails)" class="list-group-item"><strong>Max number of sent emails:</strong> {$batch->max_emails}</li>
                             <li class="list-group-item"><strong>Start at:</strong> {$batch->start_at}</li>
                             <li class="list-group-item"><strong>Number of sent mails:</strong> {$batch->sent_emails}</li>

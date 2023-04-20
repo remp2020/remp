@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use Latte\Macros\CoreMacros;
 use Nette\Application\ForbiddenRequestException;
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
+use Nette\Bridges\ApplicationLatte\UIMacros;
 use Nette\Http\IResponse;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory;
@@ -26,87 +28,35 @@ use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tracy\Debugger;
 
 final class JobPresenter extends BasePresenter
 {
-    private $jobsRepository;
-
-    private $jobFormFactory;
-
-    private $batchesRepository;
-
-    private $batchTemplatesRepository;
-
-    private $templatesRepository;
-
-    private $logsRepository;
-
-    private $newBatchFormFactory;
-
-    private $editBatchFormFactory;
-
-    private $newTemplateFormFactory;
-
-    private $linkGenerator;
-
-    private $segmentAggregator;
-
-    private $jobQueueRepository;
-
-    private $mailCache;
-
-    private $latteFactory;
-
-    private $listsRepository;
-
-    private $dataTableFactory;
-
-    private $sendingStatsFactory;
-
-    private $batchExperimentEvaluationFactory;
-
     public function __construct(
-        JobsRepository $jobsRepository,
-        JobFormFactory $jobFormFactory,
-        BatchesRepository $batchesRepository,
-        BatchTemplatesRepository $batchTemplatesRepository,
-        TemplatesRepository $templatesRepository,
-        LogsRepository $logsRepository,
-        NewBatchFormFactory $newBatchFormFactory,
-        EditBatchFormFactory $editBatchFormFactory,
-        NewTemplateFormFactory $newTemplateFormFactory,
-        Aggregator $segmentAggregator,
-        MailCache $mailCache,
-        JobQueueRepository $jobQueueRepository,
-        LatteFactory $latteFactory,
-        LinkGenerator $linkGenerator,
-        ListsRepository $listsRepository,
-        DataTableFactory $dataTableFactory,
-        ISendingStatsFactory $sendingStatsFactory,
-        IBatchExperimentEvaluationFactory $batchExperimentEvaluationFactory
+        private JobsRepository $jobsRepository,
+        private JobFormFactory $jobFormFactory,
+        private BatchesRepository $batchesRepository,
+        private BatchTemplatesRepository $batchTemplatesRepository,
+        private TemplatesRepository $templatesRepository,
+        private LogsRepository $logsRepository,
+        private NewBatchFormFactory $newBatchFormFactory,
+        private EditBatchFormFactory $editBatchFormFactory,
+        private NewTemplateFormFactory $newTemplateFormFactory,
+        private Aggregator $segmentAggregator,
+        private MailCache $mailCache,
+        private JobQueueRepository $jobQueueRepository,
+        private LatteFactory $latteFactory,
+        private LinkGenerator $linkGenerator,
+        private ListsRepository $listsRepository,
+        private DataTableFactory $dataTableFactory,
+        private ISendingStatsFactory $sendingStatsFactory,
+        private IBatchExperimentEvaluationFactory $batchExperimentEvaluationFactory,
+        private ListVariantsRepository $listVariantsRepository,
     ) {
         parent::__construct();
-        $this->jobsRepository = $jobsRepository;
-        $this->jobFormFactory = $jobFormFactory;
-        $this->batchesRepository = $batchesRepository;
-        $this->batchTemplatesRepository = $batchTemplatesRepository;
-        $this->templatesRepository = $templatesRepository;
-        $this->logsRepository = $logsRepository;
-        $this->newBatchFormFactory = $newBatchFormFactory;
-        $this->editBatchFormFactory = $editBatchFormFactory;
-        $this->newTemplateFormFactory = $newTemplateFormFactory;
-        $this->segmentAggregator = $segmentAggregator;
-        $this->mailCache = $mailCache;
-        $this->jobQueueRepository = $jobQueueRepository;
-        $this->latteFactory = $latteFactory;
-        $this->linkGenerator = $linkGenerator;
-        $this->listsRepository = $listsRepository;
-        $this->dataTableFactory = $dataTableFactory;
-        $this->sendingStatsFactory = $sendingStatsFactory;
-        $this->batchExperimentEvaluationFactory = $batchExperimentEvaluationFactory;
     }
 
     public function createComponentDataTableDefault()
@@ -207,8 +157,8 @@ final class JobPresenter extends BasePresenter
         }
 
         $latte = $this->latteFactory->create();
-        \Latte\Macros\CoreMacros::install($latte->getCompiler());
-        \Nette\Bridges\ApplicationLatte\UIMacros::install($latte->getCompiler());
+        CoreMacros::install($latte->getCompiler());
+        UIMacros::install($latte->getCompiler());
         $latte->addProvider('uiControl', $this->linkGenerator);
 
         /** @var ActiveRow $job */
@@ -447,33 +397,22 @@ final class JobPresenter extends BasePresenter
         $this->redirect('Show', $batch->mail_job_id);
     }
 
-    public function handleTemplatesByListId($listId, $sourceForm, $sourceField, array $targetFields, array $snippets = null)
+    public function actionMailTypeTemplates($id): void
     {
-        $emptyValue = empty($listId);
-        if (!empty($listId)) {
-            $this[$sourceForm][$sourceField]
-                ->setDefaultValue($listId);
-            foreach ($targetFields as $targetField) {
-                $this[$sourceForm][$targetField]
-                    ->setItems($this->templatesRepository->pairs((int) $listId));
-            }
-        } else {
-            $this[$sourceForm][$sourceField]
-                ->setDefaultValue(null);
-            foreach ($targetFields as $targetField) {
-                $this[$sourceForm][$targetField]
-                    ->setItems([]);
-            }
-        }
+        $templates = $this->templatesRepository->pairs((int) $id);
+        $this->sendJson($templates);
+    }
 
-        if ($snippets) {
-            foreach ($snippets as $snippet) {
-                $this->redrawControl($snippet);
-            }
+    public function actionMailTypeVariants($id): void
+    {
+        $mailType = $this->listsRepository->find($id);
+        $variants = [];
+        if ($mailType) {
+            $variants = $this->listVariantsRepository->getVariantsForType($mailType)
+                ->order('sorting')
+                ->fetchPairs('id', 'title');
         }
-        $this->redrawControl('wrapper');
-        $this->redrawControl('batchesWrapper');
-        $this->redrawControl('batches');
+        $this->sendJson($variants);
     }
 
     public function createComponentNewBatchForm()

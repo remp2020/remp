@@ -1,4 +1,10 @@
 {form newBatchForm}
+    <style>
+        .selectpicker ~ .dropdown-menu {
+            max-width: 640px;
+        }
+    </style>
+
     <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
         {$error}<br>
     </div>
@@ -35,21 +41,25 @@
                 </div>
             </div>
 
+
+            <div class="row form-group" n:ifset="$control['newBatchForm']['mail_type_variant_id']">
+                <div class="col-sm-12">
+                    {label mail_type_variant_id /}
+                    {input mail_type_variant_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+                </div>
+            </div>
+
             <div class="row form-group">
                 <div class="col-sm-12">
                     {label template_id /}
-                    {snippet template_id}
                     {input template_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
-                    {/snippet}
                 </div>
             </div>
 
             <div class="row form-group">
                 <div class="col-sm-12">
                     {label b_template_id /}
-                    {snippet b_template_id}
                     {input b_template_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
-                    {/snippet}
                 </div>
             </div>
 
@@ -87,7 +97,6 @@
     </div>
 
     {include jsCallback, form => $form}
-    {include onChangeCallback, input => mail_type_id, targets => [template_id, b_template_id]}
     {include onChangeStartTimeCallback, form => $form, input => start_at, button => save_start}
 {/form}
 
@@ -109,32 +118,6 @@
         {/foreach}
     });
 </script>
-{/define}
-
-{define onChangeCallback}
-    <script>
-        $('#' + {$control['newBatchForm'][$input]->htmlId}).off('change').on('change', function () {
-            $.nette.ajax({
-                type: 'GET',
-                url: {link templatesByListId!},
-                data: {
-                    'sourceForm': 'newBatchForm',
-                    'listId': $(this).val(),
-                    'sourceField': {$input},
-                    'targetFields': {$targets},
-                    'snippets': {$targets}
-                },
-                before: function() {
-                    {foreach $targets as $target}
-                    $('#' + {$control['newBatchForm'][$target]->htmlId}).empty();
-                    {/foreach}
-                },
-                complete: function() {
-                    $('#' + {$control['newBatchForm']->getElementPrototype()->id} + ' .selectpicker').selectpicker('refresh');
-                }
-            });
-        });
-    </script>
 {/define}
 
 {define onChangeStartTimeCallback}
