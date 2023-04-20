@@ -8,3 +8,5 @@ require("@remp/js-commons/js/search.js");
 
 require("./forms/mailPreview.js");
 
+require("./forms/dependantSelectbox.js");
+

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Forms;
 
+use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\Security\User;
@@ -15,6 +16,7 @@ use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tracy\Debugger;
 
@@ -24,42 +26,20 @@ class NewBatchFormFactory
 
     private const FORM_ACTION_SAVE_START = 'save_start';
 
-    private $jobsRepository;
-
-    private $batchesRepository;
-
-    private $templatesRepository;
-
-    private $batchTemplatesRepository;
-
-    private $listsRepository;
-
-    private $segmentAggregator;
-
-    private $permissionManager;
-
-    private $user;
-
     public $onSuccess;
 
     public function __construct(
-        JobsRepository $jobsRepository,
-        BatchesRepository $batchesRepository,
-        TemplatesRepository $templatesRepository,
-        BatchTemplatesRepository $batchTemplatesRepository,
-        ListsRepository $listsRepository,
-        Aggregator $segmentAggregator,
-        PermissionManager $permissionManager,
-        User $user
+        private JobsRepository $jobsRepository,
+        private BatchesRepository $batchesRepository,
+        private TemplatesRepository $templatesRepository,
+        private BatchTemplatesRepository $batchTemplatesRepository,
+        private ListsRepository $listsRepository,
+        private Aggregator $segmentAggregator,
+        private PermissionManager $permissionManager,
+        private User $user,
+        private LinkGenerator $linkGenerator,
+        private ListVariantsRepository $listVariantsRepository,
     ) {
-        $this->jobsRepository = $jobsRepository;
-        $this->batchesRepository = $batchesRepository;
-        $this->templatesRepository = $templatesRepository;
-        $this->batchTemplatesRepository = $batchTemplatesRepository;
-        $this->listsRepository = $listsRepository;
-        $this->segmentAggregator = $segmentAggregator;
-        $this->permissionManager = $permissionManager;
-        $this->user = $user;
     }
 
     public function create(?int $jobId)
@@ -92,20 +72,37 @@ class NewBatchFormFactory
 
         $listPairs = $this->listsRepository->all()->fetchPairs('id', 'title');
 
-        $form->addSelect('mail_type_id', 'Newsletter list', $listPairs)
+        $mailTypeField = $form->addSelect('mail_type_id', 'Newsletter list', $listPairs)
             ->setPrompt('Select newsletter list');
 
         if (isset($_POST['mail_type_id'])) {
+            $variantsList = $this->getMailTypeVariants((int) $_POST['mail_type_id']);
             $templateList = $this->templatesRepository->pairs((int) $_POST['mail_type_id']);
         } else {
-            $templateList = null;
+            $variantsList = $templateList = null;
         }
-        $form->addSelect('template_id', 'Email A alternative', $templateList)
-            ->setPrompt('Select email')
-            ->setRequired('Email for A alternative is required');
 
-        $form->addSelect('b_template_id', 'Email B alternative', $templateList)
+        if ($jobId === null) {
+            $form->addSelect('mail_type_variant_id', 'List variant', $variantsList)
+                ->setPrompt('Select variant')
+                ->setDisabled(!$variantsList || count($variantsList) === 0)
+                ->setHtmlAttribute('data-depends', $mailTypeField->getHtmlName())
+                // %value% will be replaced by selected ID from 'data-depends' input
+                ->setHtmlAttribute('data-url', $this->linkGenerator->link('Mailer:Job:MailTypeVariants', ['id'=>'%value%']));
+        }
+
+        $templateFieldA = $form->addSelect('template_id', 'Email A alternative', $templateList)
+            ->setPrompt('Select email')
+            ->setRequired('Email for A alternative is required')
+            ->setHtmlAttribute('data-depends', $mailTypeField->getHtmlName())
+            // %value% will be replaced by selected ID from 'data-depends' input
+            ->setHtmlAttribute('data-url', $this->linkGenerator->link('Mailer:Job:MailTypeTemplates', ['id'=>'%value%']));
+
+        $templateFieldB = $form->addSelect('b_template_id', 'Email B alternative', $templateList)
             ->setPrompt('Select alternative email');
+
+        // Mirror dependent data (mail_templates) to template_b, to avoid duplicate ajax call
+        $templateFieldA->setHtmlAttribute('data-mirror-to', $templateFieldB->getHtmlName());
 
         $form->addText('email_count', 'Number of emails');
 
@@ -134,6 +131,18 @@ class NewBatchFormFactory
         return $form;
     }
 
+    private function getMailTypeVariants($mailTypeId): array
+    {
+        $mailType = $this->listsRepository->find($mailTypeId);
+        if (!$mailType) {
+            return [];
+        }
+
+        return $this->listVariantsRepository->getVariantsForType($mailType)
+            ->order('sorting')
+            ->fetchPairs('id', 'title');
+    }
+
     public function formSucceeded(Form $form, ArrayHash $values): void
     {
         if (!$values['job_id']) {
@@ -147,7 +156,11 @@ class NewBatchFormFactory
                 $jobSegmentsManager->excludeSegment($code, $provider);
             }
 
-            $values['job_id'] = $this->jobsRepository->add($jobSegmentsManager, $values->context)->id;
+            $variant = null;
+            if (isset($values['mail_type_variant_id'])) {
+                $variant = $this->listVariantsRepository->find($values['mail_type_variant_id']);
+            }
+            $values['job_id'] = $this->jobsRepository->add($jobSegmentsManager, $values->context, $variant)->id;
         } else {
             $values['job_id'] = (int)$values['job_id'];
         }
