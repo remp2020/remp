@@ -961,6 +961,7 @@ You can filter articles by content type, sections, authors, tags or tag categori
 	"from": "2020-08-10T08:09:18+00:00", // RFC3339-based start time from which to take pageviews to this today
 	"limit": 3, // limit how many top articles this endpoint returns
 	"content_type": "article", // String; OPTIONAL; filters articles by content_type
+  "published_from": "2020-08-10T08:09:18+00:00", // RFC3339-based time; OPTIONAL; filter articles according theirs publishing date
 	"sections": { // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both)
 		"external_id": ["Section external id"], // String; section external IDs
 		"name": ["Section title"] // String; section names

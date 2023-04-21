@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Added optional `env` configurations `ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_7D` and `ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_30D` to disable possibility of choosing longer time intervals in the article histogram.
 - Optimized `/authors`, `/sections` and `/tags` views by removing redundant join from datatable query and removing datatable count queries. remp/remp#1255
   - Changed pagination in datatable to use displayed data length instead of executing count query.
+- Added an optimization for API call `/api/v2/articles/top`. remp/remp#1252
+- Added new optional parameter `published_from` to filter out older articles from the counted data. Recommended to use for longer time periods, significantly speed up calls. remp/remp#1252
 
 ### [Mailer]
 

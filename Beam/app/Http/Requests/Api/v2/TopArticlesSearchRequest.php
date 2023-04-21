@@ -76,6 +76,7 @@ class TopArticlesSearchRequest extends FormRequest
             'tag_categories.*.external_ids.*' => 'string',
             'tag_categories.*.names' => 'array',
             'tag_categories.*.names.*' => 'string',
+            'published_from' => 'date',
         ];
     }
 }
