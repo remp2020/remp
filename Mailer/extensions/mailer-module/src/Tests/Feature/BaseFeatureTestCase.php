@@ -152,23 +152,22 @@ class BaseFeatureTestCase extends TestCase
         string $categoryName = 'category',
         string $typeCode = 'code',
         string $typeName = 'name',
-        bool $publicListing = true
+        bool $publicListing = true,
+        bool $isMultiVariant = false
     ) {
         $listCategory = $this->createMailTypeCategory($categoryName);
 
         return $this->listsRepository->add(
-            $listCategory->id,
-            1,
-            $typeCode,
-            $typeName,
-            1,
-            true,
-            false,
-            'XXX',
-            null,
-            null,
-            null,
-            $publicListing
+            categoryId: $listCategory->id,
+            priority: 1,
+            code: $typeCode,
+            name: $typeName,
+            sorting: 1,
+            isAutoSubscribe: true,
+            isLocked: false,
+            description: 'XXX',
+            publicListing: $publicListing,
+            isMultiVariant: $isMultiVariant,
         );
     }
 
@@ -195,9 +194,13 @@ SET FOREIGN_KEY_CHECKS=1;
         }
     }
 
-    protected function createMailTypeVariant($mailType, string $title = 'variant', string $code = 'variant', int $sorting = 100)
+    protected function createMailTypeVariant($mailType, string $title = 'variant', string $code = 'variant', int $sorting = 100, bool $isDefaultVariant = false)
     {
-        return $this->listVariantsRepository->add($mailType, $title, $code, $sorting);
+        $variant = $this->listVariantsRepository->add($mailType, $title, $code, $sorting);
+        if ($isDefaultVariant) {
+            $this->listsRepository->update($mailType, ['default_variant_id' => $variant->id]);
+        }
+        return $variant;
     }
 
     protected function createMailUserSubscription($mailType, int $userID = 123, string $email = 'example@example.com', int $variantID = null)

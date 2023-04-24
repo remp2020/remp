@@ -6,9 +6,6 @@ namespace Remp\MailerModule\Api\v1\Handlers\Users;
 use Nette\Utils\Strings;
 use Remp\MailerModule\Api\InvalidApiInputParamException;
 use Remp\MailerModule\Api\JsonValidationTrait;
-use Remp\MailerModule\Repositories\ListsRepository;
-use Remp\MailerModule\Repositories\ListVariantsRepository;
-use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
@@ -16,14 +13,6 @@ use Tomaj\NetteApi\Response\ResponseInterface;
 class BulkSubscribeHandler extends SubscribeHandler
 {
     use JsonValidationTrait;
-
-    public function __construct(
-        UserSubscriptionsRepository $userSubscriptionsRepository,
-        ListsRepository $listsRepository,
-        ListVariantsRepository $listVariantsRepository
-    ) {
-        parent::__construct($userSubscriptionsRepository, $listsRepository, $listVariantsRepository);
-    }
 
     public function params(): array
     {

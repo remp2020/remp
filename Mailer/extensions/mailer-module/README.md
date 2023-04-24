@@ -1346,7 +1346,7 @@ Response:
 
 #### POST `/api/v1/users/subscribe`
 
-API call subscribes email address to the given newsletter. Newsletter has tp be already created.
+API call subscribes email address to the given newsletter. Newsletter has to be already created.
 Currently, there's no API endpoint for that and the newsletter needs to be created manually.
 Please visit `/list/new` to create a newsletter via web admin.
 
@@ -1409,7 +1409,11 @@ Response:
 
 ```json5
 {
-    "status": "ok"
+    "status": "ok",
+    "subscribed_variants": [ // in case mail_type has variants, list of subscribed variants is listed here
+        {id: 2, code: "test", title: "test", sorting:  1},
+        {id: 3, code: "test2", title: "test 2", sorting: 2}
+    ]
 }
 ```
 
