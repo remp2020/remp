@@ -35,7 +35,8 @@ class ListsRepository extends Repository
         bool $publicListing = true,
         ?string $mailFrom = null,
         int $subscribeEmailTemplateId = null,
-        int $unSubscribeEmailTemplateId = null
+        int $unSubscribeEmailTemplateId = null,
+        bool $isMultiVariant = false,
     ): ActiveRow {
         $result = $this->insert([
             'mail_type_category_id' => $categoryId,
@@ -54,7 +55,8 @@ class ListsRepository extends Repository
             'subscribe_mail_template_id' => $subscribeEmailTemplateId,
             'unsubscribe_mail_template_id' => $unSubscribeEmailTemplateId,
             'created_at' => new DateTime(),
-            'updated_at' => new DateTime()
+            'updated_at' => new DateTime(),
+            'is_multi_variant' => $isMultiVariant,
         ]);
 
         if (is_numeric($result)) {

@@ -10,6 +10,7 @@ use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
+use Remp\MailerModule\Repositories\UserSubscriptionVariantsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -17,24 +18,15 @@ use Tomaj\NetteApi\Response\ResponseInterface;
 
 class SubscribeHandler extends BaseHandler
 {
-    protected $userSubscriptionsRepository;
-
-    private $listsRepository;
-
-    private $listVariantsRepository;
-
     use JsonValidationTrait;
 
     public function __construct(
-        UserSubscriptionsRepository $userSubscriptionsRepository,
-        ListsRepository $listsRepository,
-        ListVariantsRepository $listVariantsRepository
+        protected UserSubscriptionsRepository $userSubscriptionsRepository,
+        private ListsRepository $listsRepository,
+        private ListVariantsRepository $listVariantsRepository,
+        private UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository,
     ) {
         parent::__construct();
-
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
-        $this->listsRepository = $listsRepository;
-        $this->listVariantsRepository = $listVariantsRepository;
     }
 
     public function params(): array
@@ -53,20 +45,23 @@ class SubscribeHandler extends BaseHandler
         }
 
         try {
-            $this->processUserSubscription($payload);
+            $subscribedVariants = $this->processUserSubscription($payload);
         } catch (InvalidApiInputParamException $e) {
             return new JsonApiResponse($e->getCode(), ['status' => 'error', 'message' => $e->getMessage()]);
         }
 
-        return new JsonApiResponse(200, ['status' => 'ok']);
+        return new JsonApiResponse(200, [
+            'status' => 'ok',
+            'subscribed_variants' => $subscribedVariants,
+        ]);
     }
 
-    protected function processUserSubscription($payload)
+    protected function processUserSubscription($payload): array
     {
         $list = $this->getList($payload);
         $variantID = $this->getVariantID($payload, $list);
 
-        $this->userSubscriptionsRepository->subscribeUser(
+        $userListSubscription = $this->userSubscriptionsRepository->subscribeUser(
             mailType: $list,
             userId: $payload['user_id'],
             email: $payload['email'],
@@ -74,6 +69,23 @@ class SubscribeHandler extends BaseHandler
             sendWelcomeEmail: $payload['send_accompanying_emails'] ?? true,
             rtmParams: $this->getRtmParams($payload),
         );
+
+        $subscribedVariantsData = [];
+
+        $subscribedVariants = $this->userSubscriptionVariantsRepository->subscribedVariants($userListSubscription)
+            ->order('mail_type_variant.sorting')
+            ->fetchAll();
+
+        foreach ($subscribedVariants as $subscribedVariant) {
+            $variant = $subscribedVariant->mail_type_variant;
+            $subscribedVariantsData[] = (object) [
+                'id' => $variant->id,
+                'title' => $variant->title,
+                'code' => $variant->code,
+                'sorting' => $variant->sorting,
+            ];
+        }
+        return $subscribedVariantsData;
     }
 
     /**

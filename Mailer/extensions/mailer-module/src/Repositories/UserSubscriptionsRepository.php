@@ -17,19 +17,14 @@ class UserSubscriptionsRepository extends Repository
 
     protected $dataTableSearchable = ['user_email'];
 
-    private $userSubscriptionVariantsRepository;
-
-    private $emitter;
-
     public function __construct(
         Explorer $database,
-        UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository,
-        Emitter $emitter,
+        private UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository,
+        private ListVariantsRepository $listVariantsRepository,
+        private Emitter $emitter,
         Storage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
-        $this->userSubscriptionVariantsRepository = $userSubscriptionVariantsRepository;
-        $this->emitter = $emitter;
     }
 
     public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
@@ -122,8 +117,8 @@ class UserSubscriptionsRepository extends Repository
         int $variantId = null,
         bool $sendWelcomeEmail = true,
         array $rtmParams = [],
-    ): void {
-        if ($variantId == null) {
+    ): ActiveRow {
+        if ($variantId === null) {
             $variantId = $mailType->default_variant_id;
         }
 
@@ -148,35 +143,33 @@ class UserSubscriptionsRepository extends Repository
                 'rtm_content' => $rtmParams['rtm_content'] ?? null,
             ]);
             $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail, $rtmParams);
+        } elseif (!$actual->subscribed) {
+            $this->update($actual, [
+                'subscribed' => true,
+                'rtm_source' => $rtmParams['rtm_source'] ?? null,
+                'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
+                'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
+                'rtm_content' => $rtmParams['rtm_content'] ?? null,
+            ]);
+            $actual = $this->find($actual->id);
+            $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail, $rtmParams);
+        }
 
-            if ($variantId) {
+        if ($variantId) {
+            $variantSubscribed = $this->userSubscriptionVariantsRepository->variantSubscribed($actual, $variantId);
+            if (!$variantSubscribed) {
                 if (!$mailType->is_multi_variant) {
                     $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
                 }
                 $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variantId);
             }
-        } else {
-            if (!$actual->subscribed) {
-                $this->update($actual, [
-                    'subscribed' => true,
-                    'rtm_source' => $rtmParams['rtm_source'] ?? null,
-                    'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
-                    'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
-                    'rtm_content' => $rtmParams['rtm_content'] ?? null,
-                ]);
-                $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail, $rtmParams);
-            }
-
-            if ($variantId) {
-                $variantExists = $this->userSubscriptionVariantsRepository->variantSubscribed($actual, $variantId);
-                if (!$variantExists) {
-                    if (!$mailType->is_multi_variant) {
-                        $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
-                    }
-                    $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variantId);
-                }
+        } elseif (!$variantId && $mailType->is_multi_variant) {
+            // subscribe all mail variants for multi_variant type without default variant
+            foreach ($this->listVariantsRepository->getVariantsForType($mailType)->fetchAll() as $variant) {
+                $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variant->id);
             }
         }
+        return $actual;
     }
 
     public function unsubscribeUser(

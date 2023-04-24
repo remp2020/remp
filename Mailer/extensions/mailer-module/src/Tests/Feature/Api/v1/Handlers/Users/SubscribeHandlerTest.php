@@ -80,14 +80,72 @@ class SubscribeHandlerTest extends BaseApiHandlerTestCase
         $this->assertTrue($isSubscribed);
     }
 
+    public function testSuccessfulSubscribeHavingMultipleVariants()
+    {
+        $mailType = $this->createMailTypeWithCategory(isMultiVariant: true);
+        $variant1 = $this->createMailTypeVariant($mailType, 'Foo', 'foo');
+        $variant2 = $this->createMailTypeVariant($mailType, 'Foo', 'foo');
+
+        /** @var JsonApiResponse $response */
+        $response = $this->handler->handle([
+            'raw' => Json::encode([
+                    'user_id' => 123,
+                    'email' => 'example@example.com',
+                    'list_code' => $mailType->code,
+                ])
+        ]);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertEquals(IResponse::S200_OK, $response->getCode());
+        $payload = $response->getPayload();
+        $this->assertEquals('ok', $payload['status']);
+        $this->assertEqualsCanonicalizing([
+            (object) [
+                'id' => $variant1->id,
+                'title' => $variant1->title,
+                'code' => $variant1->code,
+                'sorting' => $variant1->sorting,
+            ], (object) [
+                'id' => $variant2->id,
+                'title' => $variant2->title,
+                'code' => $variant2->code,
+                'sorting' => $variant2->sorting,
+            ]
+        ], $payload['subscribed_variants']);
+    }
+
+    public function testSuccessfulSubscribeHavingMultipleVariantsWithDefaultVariant()
+    {
+        $mailType = $this->createMailTypeWithCategory(isMultiVariant: true);
+        $variant1 = $this->createMailTypeVariant($mailType, 'Foo', 'foo', isDefaultVariant: true);
+        $variant2 = $this->createMailTypeVariant($mailType, 'Foo', 'foo');
+
+        /** @var JsonApiResponse $response */
+        $response = $this->handler->handle([
+            'raw' => Json::encode([
+                'user_id' => 123,
+                'email' => 'example@example.com',
+                'list_code' => $mailType->code,
+            ])
+        ]);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertEquals(IResponse::S200_OK, $response->getCode());
+        $payload = $response->getPayload();
+        $this->assertEquals('ok', $payload['status']);
+        $this->assertEqualsCanonicalizing([
+            (object) [
+                'id' => $variant1->id,
+                'title' => $variant1->title,
+                'code' => $variant1->code,
+                'sorting' => $variant1->sorting,
+            ]
+        ], $payload['subscribed_variants']);
+    }
+
     public function testSuccessfulSubscribeWithVariantId()
     {
-        $mailType = $this->createMailTypeWithCategory(
-            "category1",
-            "code1",
-            "name1"
-        );
+        $mailType = $this->createMailTypeWithCategory(isMultiVariant: true);
         $variant = $this->createMailTypeVariant($mailType, 'Foo', 'foo');
+        $variantNotSubscribed = $this->createMailTypeVariant($mailType, 'Foo2', 'foo2');
 
         $params = [
             'raw' => Json::encode([
@@ -110,6 +168,17 @@ class SubscribeHandlerTest extends BaseApiHandlerTestCase
             'mail_type_variant_id' => $variant->id,
         ])->count('*');
         $this->assertTrue($isSubscribed);
+
+        $payload = $response->getPayload();
+        $this->assertEquals('ok', $payload['status']);
+        $this->assertEqualsCanonicalizing([
+            (object) [
+                'id' => $variant->id,
+                'title' => $variant->title,
+                'code' => $variant->code,
+                'sorting' => $variant->sorting,
+            ]
+        ], $payload['subscribed_variants']);
     }
 
     public function testSuccessfulSubscribeWithVariantCode()

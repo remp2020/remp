@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- **BREAKING**: Changed behavior when subscribing mail_type with variants (and not specifying variant), having `is_multi_variant` set to true - all variants are automatically subscribed together with the mail type. remp/crm#2723
+  - Previously, only if `default_variant_id` was set, such variant would be subscribed. 
+- Added list of subscribed variants to `/api/v1/users/subscribe` API response (parameter `subscribed_variants`). remp/crm#2723
+
 ## Archive
 
 - [v2.1](./changelogs/CHANGELOG-v2.1.md)
