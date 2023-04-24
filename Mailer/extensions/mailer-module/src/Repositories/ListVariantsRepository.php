@@ -58,6 +58,11 @@ class ListVariantsRepository extends Repository
         return $this->getTable()->where('mail_type_id', $mailType->id)->where('deleted_at', null);
     }
 
+    public function getVariantsForTypeId(int $mailTypeId): Selection
+    {
+        return $this->getTable()->where('mail_type_id', $mailTypeId)->where('deleted_at', null);
+    }
+
     public function tableFilter(string $query, string $order, string $orderDirection, ?array $listIds = null, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()

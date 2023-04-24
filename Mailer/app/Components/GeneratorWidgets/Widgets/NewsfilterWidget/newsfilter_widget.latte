@@ -10,9 +10,10 @@
                     'locked_html_content': {$lockedHtmlContent},
                     'locked_text_content': {$lockedTextContent},
                     'name': $('#' + {$control["newsfilterTemplateForm"]['name']->htmlId}).val(),
-                    'mail_layout_id': $('#' + {$control["newsfilterTemplateForm"]['mail_layout_id']->htmlId}).val(),
-                    'locked_mail_layout_id': $('#' + {$control["newsfilterTemplateForm"]['locked_mail_layout_id']->htmlId}).val(),
-                    'mail_type_id': $('#' + {$control["newsfilterTemplateForm"]['mail_type_id']->htmlId}).val(),
+                    'mail_layout_code': $('#' + {$control["newsfilterTemplateForm"]['mail_layout_code']->htmlId}).val(),
+                    'locked_mail_layout_code': $('#' + {$control["newsfilterTemplateForm"]['locked_mail_layout_code']->htmlId}).val(),
+                    'mail_type_code': $('#' + {$control["newsfilterTemplateForm"]['mail_type_code']->htmlId}).val(),
+                    'mail_type_variant_code': $('#' + {$control["newsfilterTemplateForm"]['mail_type_variant_code']->htmlId}).val(),
                     'from': $('#' + {$control["newsfilterTemplateForm"]['from']->htmlId}).val(),
                     'subject': $('#' + {$control["newsfilterTemplateForm"]['subject']->htmlId}).val(),
                     'article_id': $('#' + {$control["newsfilterTemplateForm"]['article_id']->htmlId}).val()
@@ -78,18 +79,23 @@
                             </div>
 
                             <div class="form-group fg-float m-b-30">
-                                {label mail_layout_id /}
-                                {input mail_layout_id, class => 'form-control selectpicker',  data-live-search => 'true'}
+                                {label mail_layout_code /}
+                                {input mail_layout_code, class => 'form-control selectpicker',  data-live-search => 'true'}
                             </div>
 
                             <div class="form-group fg-float m-b-30">
-                                {label locked_mail_layout_id /}
-                                {input locked_mail_layout_id, class => 'form-control selectpicker',  data-live-search => 'true'}
+                                {label locked_mail_layout_code /}
+                                {input locked_mail_layout_code, class => 'form-control selectpicker',  data-live-search => 'true'}
                             </div>
 
                             <div class="form-group fg-float m-b-30">
-                                {label mail_type_id /}
-                                {input mail_type_id, class => 'form-control selectpicker',  data-live-search => 'true'}
+                                {label mail_type_code /}
+                                {input mail_type_code, class => 'form-control selectpicker',  data-live-search => 'true'}
+                            </div>
+
+                            <div class="form-group fg-float m-b-30">
+                                {label mail_type_variant_code /}
+                                {input mail_type_variant_code, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
                             </div>
 
                             <div class="form-group fg-float m-b-30">
