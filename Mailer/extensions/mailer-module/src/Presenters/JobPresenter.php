@@ -415,6 +415,18 @@ final class JobPresenter extends BasePresenter
         $this->sendJson($variants);
     }
 
+    public function actionMailTypeCodeVariants($id): void
+    {
+        $mailType = $this->listsRepository->findByCode($id)->fetch();
+        $variants = [];
+        if ($mailType) {
+            $variants = $this->listVariantsRepository->getVariantsForType($mailType)
+                ->order('sorting')
+                ->fetchPairs('id', 'title');
+        }
+        $this->sendJson($variants);
+    }
+
     public function createComponentNewBatchForm()
     {
         $form = $this->newBatchFormFactory->create(isset($this->params['id']) ? (int)$this->params['id'] : null);
