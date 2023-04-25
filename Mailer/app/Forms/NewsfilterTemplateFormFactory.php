@@ -288,6 +288,12 @@ class NewsfilterTemplateFormFactory
                 'mail_type_code' => 'high_five',
                 'from' => 'Kultúra Denník N <kultura@dennikn.sk>',
             ],
+            'newsfilter-v3' => [
+                'name' => 'Newsfilter ' . date('j.n.Y'),
+                'code' => 'nwsf_' . date('dmY'),
+                'mail_type_code' => 'newsfilter',
+                'from' => 'Denník N <info@dennikn.sk>',
+            ],
             default => throw new \Exception("No default values found for source template code='{$sourceTemplate->code}'"),
         };
 
