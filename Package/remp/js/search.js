@@ -1,5 +1,15 @@
 require('jquery-typeahead');
 
+let config = {
+    url: "/search",
+}
+
+module.exports = {
+    setUrl: function(url) {
+        config.url = url;
+    }
+}
+
 $(document).ready(function() {
     $('.js-typeahead').typeahead({
         dynamic: true,
@@ -11,7 +21,7 @@ $(document).ready(function() {
         emptyTemplate: "No results found for <strong>{{query}}</strong>",
         source: {
             ajax: {
-                url: '/search',
+                url: config.url,
                 data: {
                     term: '{{query}}'
                 },
