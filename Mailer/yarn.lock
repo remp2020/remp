@@ -1022,10 +1022,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@remp/js-commons@^1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@remp/js-commons/-/js-commons-1.3.1.tgz#50ae98ad9fd8668299104ee36d4e38f64ff6cbe6"
-  integrity sha512-lDrBDpbD/V2NhD9ZRViOMAlny7ONwLSBribL5oMQn1nzl7RcfXI3+AzthhNnmmFVduTYeXjhynLipC/83EV1IA==
+"@remp/js-commons@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@remp/js-commons/-/js-commons-2.1.0.tgz#095a9d46b50bd2e3c5b9d9c717b690d32319fbdd"
+  integrity sha512-xezd/IQpKeQSyuwwKtAOQDhZv4O1DHea+VS9C7D8w4Q5c+MkxOlFnXmxDZY/DaFmnP8Gd3+U3VRz1dhScoXbeg==
   dependencies:
     chart.js "^2.9.3"
     datatables.net "^1.10.25"
@@ -3780,9 +3780,9 @@ lz-string@^1.4.4:
   integrity sha512-0ckx7ZHRPqb0oUm8zNr+90mtf9DQB60H1wMCjBtfi62Kl3a7JbHob6gA2bC+xRvZoOL+1hzUK8jeuEIQE8svEQ==
 
 "mailer-module@file:extensions/mailer-module":
-  version "0.2.0"
+  version "2.0.0"
   dependencies:
-    "@remp/js-commons" "^1.3.1"
+    "@remp/js-commons" "^2.1.0"
     animate.css "^3.7.0"
     autosize "^4.0.2"
     bootstrap "^3.4.1"
