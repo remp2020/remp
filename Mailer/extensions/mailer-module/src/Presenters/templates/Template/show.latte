@@ -61,6 +61,15 @@
             </div>
         </div>
 
+        <div class="card" n:if="$isClickTrackerEnabled">
+            <div class="card-header">
+                <h2><i class="zmdi zmdi-equalizer"></i> Links summary</h2>
+            </div>
+            <div class="card-body">
+                {control mailLinkStats, $mailTemplate->id}
+            </div>
+        </div>
+
         <ul n:if="$langs" class="tab-nav m-t-30" role="tablist" data-tab-color="teal">
             <li class="active">
                 <a href="#tab-{$locale}" role="tab" data-toggle="tab" aria-expanded="true">Default content ({$locale})</a>

@@ -33,3 +33,10 @@ services:
 			- addDomain('expresso.pt')
 
 	- Tests\Unit\NullTracker
+
+	config:
+		setup:
+			- allowLocalConfigFallback(true)
+
+local_configs:
+	mail_click_tracker: true

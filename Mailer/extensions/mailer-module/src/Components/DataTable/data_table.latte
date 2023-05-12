@@ -91,6 +91,9 @@
                     {ifset $colSetting['visible']}
                     'visible': {$colSetting['visible']},
                     {/ifset}
+                    {ifset $colSetting['width']}
+                    'width': {$colSetting['width']},
+                    {/ifset}
                     'render': function () {
                         {ifset $colSetting['render']}
                         if (typeof $.fn.dataTables.render.{$colSetting['render']|noescape} === 'function') {

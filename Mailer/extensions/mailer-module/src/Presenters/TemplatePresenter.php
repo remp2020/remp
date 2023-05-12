@@ -7,8 +7,11 @@ use Http\Discovery\Exception\NotFoundException;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Remp\MailerModule\Components\MailLinkStats\MailLinkStats;
 use Remp\MailerModule\Forms\IFormFactory;
+use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
+use Remp\MailerModule\Models\ContentGenerator\Replace\RtmClickReplace;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
@@ -27,61 +30,24 @@ use Remp\MailerModule\Repositories\TemplateTranslationsRepository;
 
 final class TemplatePresenter extends BasePresenter
 {
-    private $templatesRepository;
-
-    private $logsRepository;
-
-    private $templateFormFactory;
-
-    private $templateTestFormFactory;
-
-    private $layoutsRepository;
-
-    private $snippetsRepository;
-
-    private $listsRepository;
-
-    private $contentGenerator;
-
-    private $dataTableFactory;
-
-    private $sendingStatsFactory;
-
-    private $generatorInputFactory;
-
-    private LayoutTranslationsRepository $layoutTranslationsRepository;
-
-    private TemplateTranslationsRepository $templateTranslationsRepository;
-
     public function __construct(
-        TemplatesRepository $templatesRepository,
-        LogsRepository $logsRepository,
-        TemplateFormFactory $templateFormFactory,
-        TemplateTestFormFactory $templateTestFormFactory,
-        LayoutsRepository $layoutsRepository,
-        SnippetsRepository $snippetsRepository,
-        ListsRepository $listsRepository,
-        ContentGenerator $contentGenerator,
-        DataTableFactory $dataTableFactory,
-        ISendingStatsFactory $sendingStatsFactory,
-        GeneratorInputFactory $generatorInputFactory,
-        LayoutTranslationsRepository $layoutTranslationsRepository,
-        TemplateTranslationsRepository $templateTranslationsRepository
+        private TemplatesRepository $templatesRepository,
+        private LogsRepository $logsRepository,
+        private TemplateFormFactory $templateFormFactory,
+        private TemplateTestFormFactory $templateTestFormFactory,
+        private LayoutsRepository $layoutsRepository,
+        private SnippetsRepository $snippetsRepository,
+        private ListsRepository $listsRepository,
+        private ContentGenerator $contentGenerator,
+        private DataTableFactory $dataTableFactory,
+        private ISendingStatsFactory $sendingStatsFactory,
+        private GeneratorInputFactory $generatorInputFactory,
+        private LayoutTranslationsRepository $layoutTranslationsRepository,
+        private TemplateTranslationsRepository $templateTranslationsRepository,
+        private MailLinkStats $mailLinkStats,
+        private Config $config,
     ) {
         parent::__construct();
-        $this->templatesRepository = $templatesRepository;
-        $this->logsRepository = $logsRepository;
-        $this->templateFormFactory = $templateFormFactory;
-        $this->templateTestFormFactory = $templateTestFormFactory;
-        $this->layoutsRepository = $layoutsRepository;
-        $this->snippetsRepository = $snippetsRepository;
-        $this->listsRepository = $listsRepository;
-        $this->contentGenerator = $contentGenerator;
-        $this->dataTableFactory = $dataTableFactory;
-        $this->sendingStatsFactory = $sendingStatsFactory;
-        $this->generatorInputFactory = $generatorInputFactory;
-        $this->layoutTranslationsRepository = $layoutTranslationsRepository;
-        $this->templateTranslationsRepository = $templateTranslationsRepository;
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -209,6 +175,7 @@ final class TemplatePresenter extends BasePresenter
         }
 
         $this->template->mailTemplate = $template;
+        $this->template->isClickTrackerEnabled = $this->config->get(RtmClickReplace::CONFIG_NAME);
     }
 
     public function actionShowByCode($id): void
@@ -397,6 +364,12 @@ final class TemplatePresenter extends BasePresenter
         }
 
         return $templateStats;
+    }
+
+    protected function createComponentMailLinkStats(): Control
+    {
+        $template = $this->templatesRepository->find($this->params['id']);
+        return $this->mailLinkStats->create($template);
     }
 
     protected function redirectBasedOnButtonSubmitted(string $buttonSubmitted, int $itemID = null): void

@@ -9,9 +9,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - **BREAKING**: Changed behavior when subscribing mail_type with variants (and not specifying variant), having `is_multi_variant` set to true - all variants are automatically subscribed together with the mail type. remp/crm#2723
-  - Previously, only if `default_variant_id` was set, such variant would be subscribed. 
+  - Previously, only if `default_variant_id` was set, such variant would be subscribed.
+- **BREAKING**: Added `context` parameter to `IReplace::replace()` interface method. remp/remp#1102
+    - Use context to pass additional information to replacers.
+    - If you have own implementation of `IReplace` interface, you should add new `context` parameter to `replace` method.
 - Added list of subscribed variants to `/api/v1/users/subscribe` API response (parameter `subscribed_variants`). remp/crm#2723
 - Fixed broken master search, which was hitting deprecated search URL. remp/remp#1265
+- Added clicked links tracking in sent emails. remp/remp#1102
+    - Added `RtmClickReplace` to add `rtm_click` query parameter with computed link hash to email links. Hash is then used to identify clicked link in email.
+    - Added table with link clicks count to `/template/show` page.
+    - You can enable/disable email link clicks tracking in Settings with Mail click tracker toggle.
+    - Do not forget to seed your database with new config (Run `make install` after every update).
+- Added `url` parameter with clicked URL to `mailgun-event` Hermes event in `v2/MailgunEventsHandler`. remp/remp#1102
 
 ## Archive
 
