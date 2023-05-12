@@ -1,0 +1,20 @@
+<style>
+    .table-image-tooltip + .tooltip img {
+        max-width: 300px;
+    }
+
+    .tooltip-inner {
+        padding: 0;
+    }
+</style>
+
+{control dataTableMailLinkStats}
+
+<script>
+    $('table').on( 'draw.dt', function () {
+        $('.table-image-tooltip').tooltip({
+            html: true,
+            placement: 'top'
+        });
+    })
+</script>

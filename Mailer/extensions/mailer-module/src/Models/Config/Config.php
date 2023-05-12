@@ -19,6 +19,8 @@ class Config
 
     private bool $loaded = false;
 
+    private bool $allowLocalConfigFallback = false;
+
     private ?array $items = null;
 
     public function __construct(
@@ -26,6 +28,11 @@ class Config
         private LocalConfig $localConfig,
         private Storage $cacheStorage
     ) {
+    }
+
+    public function allowLocalConfigFallback(bool $allow = true): void
+    {
+        $this->allowLocalConfigFallback = $allow;
     }
 
     public function get(string $name)
@@ -52,6 +59,10 @@ class Config
             return $this->formatValue($value, $item->type);
         }
 
+        if ($this->allowLocalConfigFallback && $this->localConfig->exists($name)) {
+            return $this->localConfig->value($name);
+        }
+
         throw new ConfigNotExistsException("Setting {$name} does not exists.");
     }
 
@@ -65,7 +76,7 @@ class Config
             foreach ($items as $item) {
                 $this->items[$item->name] = (object)$item->toArray();
             }
-            $this->cacheStorage->write('application_autoload_cache', $this->items, [Cache::EXPIRE => 60]);
+            $this->cacheStorage->write('application_autoload_cache', $this->items, [Cache::Expire => 60]);
         }
         $this->loaded = true;
     }

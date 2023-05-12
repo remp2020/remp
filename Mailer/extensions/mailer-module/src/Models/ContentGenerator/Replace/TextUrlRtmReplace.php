@@ -18,7 +18,7 @@ class TextUrlRtmReplace implements IReplace
         $this->allowedDomainManager = $allowedDomainManager;
     }
 
-    public function replace(string $content, GeneratorInput $generatorInput): string
+    public function replace(string $content, GeneratorInput $generatorInput, array $context = null): string
     {
         if ($content !== strip_tags($content)) {
             // This replacer is intended to be used only for text emails. HTML is handled by AnchorRtmReplace.

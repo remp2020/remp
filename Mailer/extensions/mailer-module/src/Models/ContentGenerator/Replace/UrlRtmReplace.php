@@ -22,7 +22,7 @@ class UrlRtmReplace implements IReplace
         $this->allowedDomainManager = $allowedDomainManager;
     }
 
-    public function replace(string $content, GeneratorInput $generatorInput): string
+    public function replace(string $content, GeneratorInput $generatorInput, array $context = null): string
     {
         // fast check to avoid unnecessary parsing
         if (strpos($content, 'http') !== 0) {

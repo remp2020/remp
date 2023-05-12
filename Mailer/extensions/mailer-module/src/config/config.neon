@@ -98,6 +98,7 @@ services:
 		setup:
 			- add('list-created', Remp\MailerModule\Hermes\ListCreatedHandler())
 			- add('mailgun-event', Remp\MailerModule\Hermes\MailgunEventHandler())
+			- add('mailgun-event', Remp\MailerModule\Hermes\MailgunEventClickHandler())
 			- add('heartbeat', Remp\MailerModule\Hermes\PingMysql())
 			- add('send-email', Remp\MailerModule\Hermes\SendEmailHandler())
 			- add('user-subscribed', Remp\MailerModule\Hermes\SubscribeHandler())
@@ -116,10 +117,14 @@ services:
 	anchorRtmReplace: Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmReplace
 	urlRtmReplace: Remp\MailerModule\Models\ContentGenerator\Replace\UrlRtmReplace
 	textUrlRtmReplace: Remp\MailerModule\Models\ContentGenerator\Replace\TextUrlRtmReplace
+	anchorRtmClickReplace: Remp\MailerModule\Models\ContentGenerator\Replace\AnchorRtmClickReplace
+	urlRtmClickReplace: Remp\MailerModule\Models\ContentGenerator\Replace\UrlRtmClickReplace
 
 	contentGenerator:
 		factory: Remp\MailerModule\Models\ContentGenerator\ContentGenerator
 		setup:
+			- register(@anchorRtmClickReplace)
+			- register(@urlRtmClickReplace)
 			- register(@anchorRtmReplace)
 			- register(@urlRtmReplace)
 			- register(@textUrlRtmReplace)
@@ -153,7 +158,7 @@ services:
 	- Remp\MailerModule\Models\Beam\UnreadArticlesResolver
 	- Remp\MailerModule\Models\Beam\JournalFactory(%remp.beam.segments_addr%)
 
-	- Remp\MailerModule\Models\Config\Config
+	config: Remp\MailerModule\Models\Config\Config
 	- Remp\MailerModule\Models\Sender
 	- Remp\MailerModule\Models\Job\BatchEmailGenerator(@mailProcessLogger)
 	- Remp\MailerModule\Models\Job\MailCache
@@ -225,6 +230,8 @@ services:
 	# Repositories
 	- Remp\MailerModule\Repositories\AuditLogRepository
 	- Remp\MailerModule\Repositories\ConfigsRepository
+	- Remp\MailerModule\Repositories\MailTemplateLinksRepository
+	- Remp\MailerModule\Repositories\MailTemplateLinkClicksRepository
 
 	userSubscriptionsRepository:
 		factory: Remp\MailerModule\Repositories\UserSubscriptionsRepository
@@ -316,3 +323,5 @@ services:
 
 	# healtCheck - inject temp for storage check
 	- Remp\MailerModule\Presenters\HealthPresenter(%tempDir%)
+
+	- Remp\MailerModule\Components\MailLinkStats\MailLinkStats

@@ -26,7 +26,7 @@ class ContentGenerator
         $this->replaceList[] = $replace;
     }
 
-    public function render(GeneratorInput $generatorInput): MailContent
+    public function render(GeneratorInput $generatorInput, array $context = null): MailContent
     {
         $params = $generatorInput->params();
 
@@ -51,14 +51,14 @@ class ContentGenerator
         $subject = $this->generate($template->getSubject(), $params);
 
         foreach ($this->replaceList as $replace) {
-            $html = $replace->replace($html, $generatorInput);
-            $text = $replace->replace($text, $generatorInput);
+            $html = $replace->replace($html, $generatorInput, $context);
+            $text = $replace->replace($text, $generatorInput, $context);
         }
 
         return new MailContent($html, $text, $subject, $template->getFrom());
     }
 
-    public function getEmailParams(GeneratorInput $generatorInput, array $emailParams): array
+    public function getEmailParams(GeneratorInput $generatorInput, array $emailParams, array $context = null): array
     {
         $outputParams = [];
 
@@ -69,7 +69,7 @@ class ContentGenerator
             }
 
             foreach ($this->replaceList as $replace) {
-                $value = $replace->replace($value, $generatorInput);
+                $value = $replace->replace($value, $generatorInput, $context);
             }
             $outputParams[$name] = $value;
         }

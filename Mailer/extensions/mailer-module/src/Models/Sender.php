@@ -146,7 +146,8 @@ class Sender
             $this->locale
         );
 
-        $mailContent = $this->contentGenerator->render($generatorInput);
+        $contentGeneratorContext = ['status' => 'sending'];
+        $mailContent = $this->contentGenerator->render($generatorInput, $contentGeneratorContext);
 
         $message->setSubject($mailContent->subject());
         $message->setFrom($mailContent->from());
@@ -271,16 +272,21 @@ class Sender
             $transformedParams,
             $this->batchId
         );
+        $contentGeneratorContext = ['status' => 'sending'];
 
         foreach ($templateParams as $email => $params) {
-            $templateParams[$email] = $this->contentGenerator->getEmailParams($generatorInput, $params);
+            $templateParams[$email] = $this->contentGenerator->getEmailParams(
+                $generatorInput,
+                $params,
+                array_merge($contentGeneratorContext, ['contentType' => 'params'])
+            );
         }
 
         if ($logger !== null) {
             $logger->info("Sender - email params generated for {$this->batchId}");
         }
 
-        $mailContent = $this->contentGenerator->render($generatorInput);
+        $mailContent = $this->contentGenerator->render($generatorInput, $contentGeneratorContext);
 
         $message->setFrom($mailContent->from());
         $message->setSubject($mailContent->subject());

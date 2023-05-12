@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
+use Remp\MailerModule\Models\ContentGenerator\Replace\RtmClickReplace;
 use Remp\MailerModule\Models\Mailer\SmtpMailer;
 use Remp\MailerModule\Repositories\ConfigsRepository;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
@@ -45,6 +46,7 @@ class DatabaseSeedCommand extends Command
         $output->writeln('Required configuration: ');
         $configValues = [
             ['default_mailer', 'Default Mailer', SmtpMailer::ALIAS, '', 'string'],
+            [RtmClickReplace::CONFIG_NAME, 'Mail click tracker', true, '', 'boolean'],
         ];
         foreach ($configValues as $configValue) {
             $config = $this->configsRepository->findBy('name', $configValue['0']);

@@ -81,7 +81,7 @@ trait RtmReplaceTrait
         return $path . '?' . implode('&', $finalParams);
     }
 
-    public function replace(string $content, GeneratorInput $generatorInput): string
+    public function replace(string $content, GeneratorInput $generatorInput, array $context = null): string
     {
         $matches = [];
         preg_match_all('/<a(.*?)href="([^"]*?)"(.*?)>/i', $content, $matches);
