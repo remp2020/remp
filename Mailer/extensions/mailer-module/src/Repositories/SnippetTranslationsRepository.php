@@ -28,6 +28,14 @@ class SnippetTranslationsRepository extends Repository
         return $this->insert($data);
     }
 
+    public function deleteBySnippetLocale(ActiveRow $snippet, string $locale): void
+    {
+        $this->getTable()
+            ->where('mail_snippet_id', $snippet->id)
+            ->where('locale', $locale)
+            ->delete();
+    }
+
     public function getTranslationsForSnippet(ActiveRow $snippet): Selection
     {
         return $this->getTable()->where('mail_snippet_id', $snippet->id);

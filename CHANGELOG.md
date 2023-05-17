@@ -21,6 +21,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - You can enable/disable email link clicks tracking in Settings with Mail click tracker toggle.
     - Do not forget to seed your database with new config (Run `make install` after every update).
 - Added `url` parameter with clicked URL to `mailgun-event` Hermes event in `v2/MailgunEventsHandler`. remp/remp#1102
+- **IMPORTANT**: Fixed inconsistent behavior of missing translations for layouts and snippets which didn't default to the primary locale variant. remp/remp#1260
+  - This fix might affect you if you are using multiple locales in Mailer, and if you rely on the behavior that empty snippet/layout is included for locales which were not filled.
+  - Our intention (also communicated by the UI) was always the same: Use the translation if it's present, or **fallback to the default language if it is not**. Unfortunately layouts and snippets always created empty translations and used them instead. That was a bug. If you want to preserve this behavior, you need to explictly save _something_ into the translation (e.g. space or HTML comment).
 
 ## Archive
 

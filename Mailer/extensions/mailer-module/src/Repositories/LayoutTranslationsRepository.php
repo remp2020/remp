@@ -28,6 +28,14 @@ class LayoutTranslationsRepository extends Repository
         return $this->insert($data);
     }
 
+    public function deleteByLayoutLocale(ActiveRow $layout, string $locale): void
+    {
+        $this->getTable()
+            ->where('mail_layout_id', $layout->id)
+            ->where('locale', $locale)
+            ->delete();
+    }
+
     public function getTranslationsForLocale(string $locale): Selection
     {
         return $this->getTable()->where('locale', $locale);

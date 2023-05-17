@@ -79,11 +79,13 @@ class SnippetFormFactory implements IFormFactory
         foreach ($this->locales as $locale) {
             $translationFields[$locale] = $form->addContainer($locale);
             $translationFields[$locale]->addTextArea('text', 'Text version')
-                ->setHtmlAttribute('rows', 3);
-            $translationFields[$locale]->addTextArea('html', 'HTML version');
+                ->setHtmlAttribute('rows', 3)
+                ->setNullable();
+            $translationFields[$locale]->addTextArea('html', 'HTML version')
+                ->setNullable();
 
-            $defaults[$locale]['text'] = $snippetTranslations[$locale]['text'] ?? '';
-            $defaults[$locale]['html'] = $snippetTranslations[$locale]['html'] ?? '';
+            $defaults[$locale]['text'] = $snippetTranslations[$locale]['text'] ?? null;
+            $defaults[$locale]['html'] = $snippetTranslations[$locale]['html'] ?? null;
         }
 
         $form->setDefaults($defaults);
@@ -159,11 +161,16 @@ class SnippetFormFactory implements IFormFactory
     private function storeSnippetTranslations(ActiveRow $snippet, $values)
     {
         foreach ($this->locales as $locale) {
+            if ($values[$locale]['html'] === null && $values[$locale]['text'] === null) {
+                $this->snippetTranslationsRepository->deleteBySnippetLocale($snippet, $locale);
+                continue;
+            }
+
             $this->snippetTranslationsRepository->upsert(
                 $snippet,
                 $locale,
-                $values[$locale]['text'],
-                $values[$locale]['html']
+                $values[$locale]['text'] ?? '',
+                $values[$locale]['html'] ?? ''
             );
         }
     }

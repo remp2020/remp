@@ -78,8 +78,10 @@ class LayoutFormFactory implements IFormFactory
         foreach ($this->locales as $locale) {
             $translationFields[$locale] = $form->addContainer($locale);
             $translationFields[$locale]->addTextArea('layout_text', 'Text version')
-                ->setHtmlAttribute('rows', 3);
-            $translationFields[$locale]->addTextArea('layout_html', 'HTML version');
+                ->setHtmlAttribute('rows', 3)
+                ->setNullable();
+            $translationFields[$locale]->addTextArea('layout_html', 'HTML version')
+                ->setNullable();
 
             $defaults[$locale]['layout_text'] = $layoutTranslations[$locale]['layout_text'] ?? '';
             $defaults[$locale]['layout_html'] = $layoutTranslations[$locale]['layout_html'] ?? '';
@@ -142,11 +144,16 @@ class LayoutFormFactory implements IFormFactory
     private function storeLayoutTranslations(ActiveRow $layout, array $values)
     {
         foreach ($this->locales as $locale) {
+            if ($values[$locale]['layout_html'] === null && $values[$locale]['layout_text'] === null) {
+                $this->layoutTranslationsRepository->deleteByLayoutLocale($layout, $locale);
+                continue;
+            }
+
             $this->layoutTranslationsRepository->upsert(
                 $layout,
                 $locale,
-                $values[$locale]['layout_text'],
-                $values[$locale]['layout_html']
+                $values[$locale]['layout_text'] ?? '',
+                $values[$locale]['layout_html'] ?? '',
             );
         }
     }
