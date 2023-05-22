@@ -15,17 +15,18 @@ class AnchorRtmClickReplace extends RtmClickReplace
             return $content;
         }
 
-        if (isset($context['contentType']) && $context['contentType'] === 'params') {
-            return $content;
-        }
-
         // check if HTML
         if ($content === strip_tags($content)) {
             return $content;
         }
 
         $template = $generatorInput->template();
-        [$mailContent, $urls] = $this->process($content, $template);
+
+        if (isset($context['sendingMode']) && $context['sendingMode'] === 'batch') {
+            [$mailContent, $urls] = $this->hashLinkWithCache($content, $template);
+        } else {
+            [$mailContent, $urls] = $this->hashLinks($content, $template);
+        }
 
         if (isset($context['status']) && $context['status'] === 'sending') {
             foreach ($urls as $hash => $url) {
@@ -36,7 +37,7 @@ class AnchorRtmClickReplace extends RtmClickReplace
         return $mailContent;
     }
 
-    private function process($mailContent, $template): array
+    private function hashLinkWithCache($mailContent, $template): array
     {
         $cacheKey = 'rtmclick_anchor_' . $template->code . '_' . (isset($template->updated_at) ? $template->updated_at->format('U') : time());
         [$hashedContent, $urls] = $this->storage->read($cacheKey);
@@ -54,7 +55,7 @@ class AnchorRtmClickReplace extends RtmClickReplace
     {
         $matches = [];
         $links = [];
-        preg_match_all('/<a(\s[^>]*)href\s*=\s*([\"\']??)(http[^\" >]*?)\2([^>]*)>/iU', $mailContent, $matches);
+        preg_match_all('/<a(\s[^>]*)href\s*=\s*([\"\']??)(http[^\"\'>]*?)\2([^>]*)>/iU', $mailContent, $matches);
 
         if (empty($matches)) {
             return [$mailContent, $links];
@@ -67,10 +68,12 @@ class AnchorRtmClickReplace extends RtmClickReplace
                 continue;
             }
 
-            $hash = $this->computeUrlHash($url, $idx . $templateCode);
+            $urlEmptyParams = (clone $url)->setQuery([]);
+
+            $hash = $this->computeUrlHash($urlEmptyParams, $idx . $templateCode);
             $url->setQueryParameter(self::HASH_PARAM, $hash);
 
-            $links[$hash] = (clone $url)->setQuery([]);
+            $links[$hash] = $urlEmptyParams;
 
             $href = sprintf('<a%shref="%s"%s>', $matches[1][$idx], $url->getAbsoluteUrl(), $matches[4][$idx]);
             $mailContent = preg_replace('/' . preg_quote($matches[0][$idx], '/') . '/i', $href, $mailContent, 1);

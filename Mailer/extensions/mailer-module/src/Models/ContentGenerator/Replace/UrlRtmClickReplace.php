@@ -26,11 +26,12 @@ class UrlRtmClickReplace extends RtmClickReplace
         }
 
         $template = $generatorInput->template();
-        $hash = $this->computeUrlHash($url, $template->code);
+        $urlEmptyParams = (clone $url)->setQuery([]);
+        $hash = $this->computeUrlHash($urlEmptyParams, $template->code);
         $url->setQueryParameter(self::HASH_PARAM, $hash);
 
         if (isset($context['status']) && $context['status'] === 'sending') {
-            $this->mailTemplateLinksRepository->upsert($template->id, (clone $url)->setQuery([])->getAbsoluteUrl(), $hash);
+            $this->mailTemplateLinksRepository->upsert($template->id, $urlEmptyParams->getAbsoluteUrl(), $hash);
         }
 
         return $url->getAbsoluteUrl();

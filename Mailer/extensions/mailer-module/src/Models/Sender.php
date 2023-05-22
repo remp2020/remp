@@ -272,13 +272,13 @@ class Sender
             $transformedParams,
             $this->batchId
         );
-        $contentGeneratorContext = ['status' => 'sending'];
+        $contentGeneratorContext = ['status' => 'sending', 'sendingMode' => 'batch'];
 
         foreach ($templateParams as $email => $params) {
             $templateParams[$email] = $this->contentGenerator->getEmailParams(
                 $generatorInput,
                 $params,
-                array_merge($contentGeneratorContext, ['contentType' => 'params'])
+                $contentGeneratorContext
             );
         }
 
