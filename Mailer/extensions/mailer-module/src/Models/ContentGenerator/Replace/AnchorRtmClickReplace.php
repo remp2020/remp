@@ -25,7 +25,7 @@ class AnchorRtmClickReplace extends RtmClickReplace
         if (isset($context['sendingMode']) && $context['sendingMode'] === 'batch') {
             [$mailContent, $urls] = $this->hashLinkWithCache($content, $template);
         } else {
-            [$mailContent, $urls] = $this->hashLinks($content, $template);
+            [$mailContent, $urls] = $this->hashLinks($content, $template->code);
         }
 
         if (isset($context['status']) && $context['status'] === 'sending') {
