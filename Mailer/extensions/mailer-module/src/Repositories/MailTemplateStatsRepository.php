@@ -73,6 +73,7 @@ class MailTemplateStatsRepository extends Repository
                 date
             ')
             ->where('mail_template.mail_type_id IS NOT NULL')
+            ->where('mail_template.mail_type.deleted_at', null)
             ->where('mail_template_stats.date >= DATE(?)', $from)
             ->where('mail_template_stats.date <= DATE(?)', $to)
             ->group('
