@@ -3,11 +3,21 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use Nette\Caching\Storage;
+use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 
 class MailTemplateStatsRepository extends Repository
 {
     protected $tableName = 'mail_template_stats';
+
+    public function __construct(
+        Explorer $database,
+        private ListsRepository $listsRepository,
+        ?Storage $cacheStorage = null
+    ) {
+        parent::__construct($database, $cacheStorage);
+    }
 
     public function byDateAndMailTemplateId(DateTime $date, int $id): ?ActiveRow
     {
@@ -72,8 +82,7 @@ class MailTemplateStatsRepository extends Repository
                 mail_template.mail_type_id,
                 date
             ')
-            ->where('mail_template.mail_type_id IS NOT NULL')
-            ->where('mail_template.mail_type.deleted_at', null)
+            ->where('mail_template.mail_type_id', $this->listsRepository->all())
             ->where('mail_template_stats.date >= DATE(?)', $from)
             ->where('mail_template_stats.date <= DATE(?)', $to)
             ->group('

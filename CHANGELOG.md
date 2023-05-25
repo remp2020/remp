@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## [Unreleased]
 
 
+### [Mailer]
+
+- Removed deleted mail types from dashboard stats. remp/remp#1269
+
 ## Archive
 
 - [v2.2](./changelogs/CHANGELOG-v2.2.md)
