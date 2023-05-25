@@ -3,11 +3,21 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use Nette\Caching\Storage;
+use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 
 class MailTypeStatsRepository extends Repository
 {
     protected $tableName = 'mail_type_stats';
+
+    public function __construct(
+        Explorer $database,
+        private ListsRepository $listsRepository,
+        ?Storage $cacheStorage = null
+    ) {
+        parent::__construct($database, $cacheStorage);
+    }
 
     public function add(
         int $mailTypeId,
@@ -26,6 +36,7 @@ class MailTypeStatsRepository extends Repository
             ->select('mail_type_id, DATE(created_at) AS created_date, MAX(subscribers_count) AS count')
             ->where('created_at >= ?', $from)
             ->where('created_at <= ?', $to)
+            ->where('mail_type_id', $this->listsRepository->all())
             ->group('mail_type_id, created_date')
             ->order('created_date ASC')
             ->fetchAll();
