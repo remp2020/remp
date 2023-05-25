@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Added copy banner link to banner detail and banner edit form. remp/remp#1259
 
 ## Archive
 

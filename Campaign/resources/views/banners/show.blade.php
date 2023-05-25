@@ -56,6 +56,9 @@
                     <a href="{{ route('banners.edit', $banner) }}" class="btn palette-Cyan bg waves-effect">
                         <i class="zmdi zmdi-palette-Cyan zmdi-edit"></i> Edit
                     </a>
+                    <a href="{{ route('banners.copy', $banner) }}" class="btn palette-Cyan bg waves-effect">
+                        <i class="zmdi zmdi-palette-Cyan zmdi-copy"></i> Copy
+                    </a>
                 </div>
             </div>
         </div>
