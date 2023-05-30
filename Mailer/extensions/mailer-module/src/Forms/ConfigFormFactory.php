@@ -7,6 +7,7 @@ use Exception;
 use Nette\Application\UI\Form;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Json;
 use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Config\LocalConfig;
 use Remp\MailerModule\Repositories\ConfigsRepository;
@@ -129,6 +130,10 @@ class ConfigFormFactory
                             ->setDefaultValue($config['value'])
                             ->addCondition(Form::FILLED)
                             ->addRule(Form::INTEGER);
+                        break;
+                    case Config::TYPE_SELECT:
+                        $selectOptions = $config['options'] ? Json::decode($config['options'], Json::FORCE_ARRAY) : [];
+                        $othersContainer->addSelect($config['name'], $config['display_name'] ?? $config['name'], $selectOptions);
                         break;
                     default:
                         throw new Exception('unhandled config type: ' . $config['type']);

@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Removed deleted mail types from dashboard stats. remp/remp#1269
+- Added support for select boxes to `ConfigFormFactory`. remp/remp#1271
 
 ## Archive
 
