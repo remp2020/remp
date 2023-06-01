@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Removed deleted mail types from dashboard stats. remp/remp#1269
 - Added support for select boxes to `ConfigFormFactory`. remp/remp#1271
+- Added support for horizontal scroll in DataTable (parameter `scrollX` in table settings). remp/remp#1270
+- Fixed mail click tracker to not modify URL in any way other than adding required query parameter. remp/remp#1270
+- Changed `url` column type in `mail_template_links` table from `string` to `text` to support longer URLs. remp/remp#1270
 
 ## Archive
 

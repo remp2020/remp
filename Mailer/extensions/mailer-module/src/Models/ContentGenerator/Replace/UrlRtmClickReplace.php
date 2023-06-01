@@ -2,8 +2,6 @@
 
 namespace Remp\MailerModule\Models\ContentGenerator\Replace;
 
-use Nette\Http\Url;
-use Nette\InvalidArgumentException;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
 class UrlRtmClickReplace extends RtmClickReplace
@@ -19,21 +17,15 @@ class UrlRtmClickReplace extends RtmClickReplace
             return $content;
         }
 
-        try {
-            $url = new Url($content);
-        } catch (InvalidArgumentException $e) {
-            return $content;
-        }
-
         $template = $generatorInput->template();
-        $urlEmptyParams = (clone $url)->setQuery([]);
+        $urlEmptyParams = $this->removeQueryParams($content);
         $hash = $this->computeUrlHash($urlEmptyParams, $template->code);
-        $url->setQueryParameter(self::HASH_PARAM, $hash);
+        $finalUrl = $this->setRtmClickHashInUrl($content, $hash);
 
         if (isset($context['status']) && $context['status'] === 'sending') {
-            $this->mailTemplateLinksRepository->upsert($template->id, $urlEmptyParams->getAbsoluteUrl(), $hash);
+            $this->mailTemplateLinksRepository->upsert($template->id, $urlEmptyParams, $hash);
         }
 
-        return $url->getAbsoluteUrl();
+        return $finalUrl;
     }
 }

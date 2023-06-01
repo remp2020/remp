@@ -2,9 +2,7 @@
 
 namespace Remp\MailerModule\Models\ContentGenerator\Replace;
 
-use InvalidArgumentException;
 use Nette\Caching\Cache;
-use Nette\Http\Url;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
 class AnchorRtmClickReplace extends RtmClickReplace
@@ -30,7 +28,7 @@ class AnchorRtmClickReplace extends RtmClickReplace
 
         if (isset($context['status']) && $context['status'] === 'sending') {
             foreach ($urls as $hash => $url) {
-                $this->mailTemplateLinksRepository->upsert($template->id, $url->getAbsoluteUrl(), $hash);
+                $this->mailTemplateLinksRepository->upsert($template->id, $url, $hash);
             }
         }
 
@@ -62,20 +60,14 @@ class AnchorRtmClickReplace extends RtmClickReplace
         }
 
         foreach ($matches[3] as $idx => $hrefUrl) {
-            try {
-                $url = new Url($hrefUrl);
-            } catch (InvalidArgumentException $e) {
-                continue;
-            }
-
-            $urlEmptyParams = (clone $url)->setQuery([]);
+            $urlEmptyParams = $this->removeQueryParams($hrefUrl);
 
             $hash = $this->computeUrlHash($urlEmptyParams, $idx . $templateCode);
-            $url->setQueryParameter(self::HASH_PARAM, $hash);
+            $finalUrl = $this->setRtmClickHashInUrl($hrefUrl, $hash);
 
             $links[$hash] = $urlEmptyParams;
 
-            $href = sprintf('<a%shref="%s"%s>', $matches[1][$idx], $url->getAbsoluteUrl(), $matches[4][$idx]);
+            $href = sprintf('<a%shref="%s"%s>', $matches[1][$idx], $finalUrl, $matches[4][$idx]);
             $mailContent = preg_replace('/' . preg_quote($matches[0][$idx], '/') . '/i', $href, $mailContent, 1);
         }
 
