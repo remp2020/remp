@@ -3,7 +3,6 @@
 namespace Remp\MailerModule\Components\MailLinkStats;
 
 use Nette\Application\UI\Control;
-use Nette\Http\Url;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
@@ -44,22 +43,25 @@ class MailLinkStats extends Control
                 'priority' => 1,
                 'orderable' => false,
                 'width' => '50%',
+                'class' => 'all',
             ])
             ->setColSetting('text', [
                 'header' => 'content',
                 'render' => 'raw',
                 'priority' => 1,
                 'orderable' => false,
+                'class' => 'all',
             ])
             ->setColSetting('click_count', [
                 'header' => 'clicked',
-                'priority' => 2,
+                'priority' => 1,
                 'render' => 'number',
-                'class' => 'text-right',
-                'orderable' => false
+                'class' => 'text-right all',
+                'orderable' => false,
             ])
             ->setTableSetting('order', Json::encode([])) // removes sorting arrow from first column
-            ->setTableSetting('allowSearch', false);
+            ->setTableSetting('allowSearch', false)
+            ->setTableSetting('scrollX', true);
 
         return $dataTable;
     }
@@ -123,12 +125,11 @@ class MailLinkStats extends Control
 
         $result = [];
         foreach ($matches[3] as $index => $url) {
-            $url = new Url($url);
-            $hash = $url->getQueryParameter(RtmClickReplace::HASH_PARAM);
+            $hash = RtmClickReplace::getRtmClickHashFromUrl($url);
 
             $result[$hash] = [
                 'content' => $matches[4][$index],
-                'url'=> $url->setQueryParameter(RtmClickReplace::HASH_PARAM, null)->getAbsoluteUrl()
+                'url'=> RtmClickReplace::removeRtmClickHash($url),
             ];
         }
 
