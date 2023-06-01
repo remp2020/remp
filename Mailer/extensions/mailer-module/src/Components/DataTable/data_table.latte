@@ -165,6 +165,9 @@
             {ifset $tableSettings['length']}
             'pageLength': {$tableSettings['length']|noescape},
             {/ifset}
+            {ifset $tableSettings['scrollX']}
+            'scrollX': {$tableSettings['scrollX']},
+            {/ifset}
             'drawCallback': function(settings) {
                 $.fn.dataTables.pagination(settings, 'dt-nav-{$tableId|noescape}');
             },
