@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed `url` column type in `mail_template_links` table from `string` to `text` to support longer URLs. remp/remp#1270
 - Added Makefile target `make install` to run all commands required after new code is pulled.
 - Fixed "Mail click tracker" config. The default setting is now "disabled". remp/remp#1102
+- Updated version of `@remp/js-commons` to 2.2 (contains fix for master search issue). remp/remp#1265
 
 ## Archive
 
