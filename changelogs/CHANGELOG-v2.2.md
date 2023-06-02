@@ -1,3 +1,15 @@
+## [2.2.1] - 2023-06-02
+
+### [Mailer]
+
+- Removed deleted mail types from dashboard stats. remp/remp#1269
+- Added support for horizontal scroll in DataTable (parameter `scrollX` in table settings). remp/remp#1270
+- Fixed mail click tracker to not modify URL in any way other than adding required query parameter. remp/remp#1270
+- Changed `url` column type in `mail_template_links` table from `string` to `text` to support longer URLs. remp/remp#1270
+- Added Makefile target `make install` to run all commands required after new code is pulled.
+- Fixed "Mail click tracker" config. The default setting is now "disabled". remp/remp#1102
+- Updated version of `@remp/js-commons` to 2.2 (contains fix for master search issue). remp/remp#1265
+
 ## [2.2] - 2023-05-25
 
 ### [Mailer]
@@ -22,6 +34,7 @@
 
 ---
 
+[2.2.1]: https://github.com/remp2020/remp/compare/2.2.0...2.2.1
 [2.2]: https://github.com/remp2020/remp/compare/2.1.0...2.2.0
 
 [Beam]: https://github.com/remp2020/remp/tree/master/Beam
