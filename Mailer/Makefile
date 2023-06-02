@@ -2,6 +2,12 @@
 
 PHP_FOLDERS=app bin extensions tests
 
+install:
+	composer install
+	make js
+	php bin/command.php migrate:migrate
+	php bin/command.php db:seed
+
 js-link-remp:
 	cd ../Package/remp && yarn link
 	yarn link "@remp/js-commons"
