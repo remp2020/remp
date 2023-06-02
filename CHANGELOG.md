@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed mail click tracker to not modify URL in any way other than adding required query parameter. remp/remp#1270
 - Changed `url` column type in `mail_template_links` table from `string` to `text` to support longer URLs. remp/remp#1270
 - Added Makefile target `make install` to run all commands required after new code is pulled.
+- Fixed "Mail click tracker" config. The default setting is now "disabled". remp/remp#1102
 
 ## Archive
 
