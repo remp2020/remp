@@ -46,7 +46,7 @@ class DatabaseSeedCommand extends Command
         $output->writeln('Required configuration: ');
         $configValues = [
             ['default_mailer', 'Default Mailer', SmtpMailer::ALIAS, '', 'string'],
-            [RtmClickReplace::CONFIG_NAME, 'Mail click tracker', true, '', 'boolean'],
+            [RtmClickReplace::CONFIG_NAME, 'Mail click tracker', false, '', 'boolean'],
         ];
         foreach ($configValues as $configValue) {
             $config = $this->configsRepository->findBy('name', $configValue['0']);
