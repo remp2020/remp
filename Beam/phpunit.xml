@@ -12,21 +12,13 @@
         processIsolation="false"
         stopOnFailure="false">
 
-  <coverage processUncoveredFiles="true">
-    <include>
-      <directory suffix=".php">./app</directory>
-    </include>
-  </coverage>
-
   <testsuites>
-    <testsuite name="Feature Tests">
-      <directory suffix="Test.php">./tests/Feature</directory>
-    </testsuite>
-    <testsuite name="Unit Tests">
-      <directory suffix="Test.php">./tests/Unit</directory>
-    </testsuite>
+      <testsuite name="All">
+          <directory suffix="Test.php">tests/</directory>
+          <directory suffix="Test.php">vendor/remp/beam-module/tests/</directory>
+      </testsuite>
   </testsuites>
-    
+
   <php>
     <env name="APP_KEY" value="base64:9jq4gfZZ/gJXsp2h2q325ZJwHf58QPrnaJo+6YnsCzY="/>
     <env name="APP_ENV" value="testing"/>

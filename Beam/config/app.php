@@ -157,11 +157,6 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\RempJournalServiceProvider::class,
-        App\Providers\RempMailerServiceProvider::class,
-        App\Providers\GoogleAnalyticsReportingServiceProvider::class,
-        App\Providers\RefererParserServiceProvider::class,
-        App\Providers\DeviceDetectorServiceProvider::class,
     ],
 
     /*

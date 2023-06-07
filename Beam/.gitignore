@@ -5,6 +5,8 @@
 /public/assets/lib
 /public/assets/iota
 /public/mix-manifest.json
+/public/vendor/
+/public/lib/
 /storage/*.key
 /vendor
 /.idea
@@ -16,3 +18,4 @@ _ide_helper.php
 _ide_helper_models.php
 adminer*
 google_service_account_key.json
+.phpunit.result.cache

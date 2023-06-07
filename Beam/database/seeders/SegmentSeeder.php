@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\SegmentGroup;
+use Remp\BeamModule\Model\Segment;
+use Remp\BeamModule\Model\SegmentGroup;
 use Illuminate\Database\Seeder;
 
 class SegmentSeeder extends Seeder
@@ -24,11 +25,11 @@ class SegmentSeeder extends Seeder
         $rempGroup->save();
 
         foreach ($this->industrySegments() as $blueprint) {
-            if (!\App\Segment::where(['code' => $blueprint['code']])->exists()) {
+            if (!Segment::where(['code' => $blueprint['code']])->exists()) {
                 $rules = $blueprint['rulesDef'];
                 $blueprint['segment_group_id'] = $rempGroup->id;
                 unset($blueprint['rulesDef']);
-                $segment = \App\Segment::create($blueprint);
+                $segment = Segment::create($blueprint);
                 foreach ($rules as $rule) {
                     $segment->rules()->create($rule);
                 }

@@ -2,7 +2,15 @@
 
 namespace Database\Seeders;
 
+use Faker\Generator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Seeder;
+use Remp\BeamModule\Model\Article;
+use Remp\BeamModule\Model\Author;
+use Remp\BeamModule\Model\Conversion;
+use Remp\BeamModule\Model\Property;
+use Remp\BeamModule\Model\Section;
+use Remp\BeamModule\Model\Tag;
 
 class ArticleSeeder extends Seeder
 {
@@ -11,30 +19,30 @@ class ArticleSeeder extends Seeder
      *
      * @return void
      */
-    public function run(\Faker\Generator $faker)
+    public function run(Generator $faker)
     {
-        /** @var \App\Property $property */
-        $properties = \App\Property::all();
+        /** @var Property $property */
+        $properties = Property::all();
 
-        $sections = \App\Section::factory()->count(3)->create();
-        $tags = \App\Model\Tag::factory()->count(10)->create();
+        $sections = Section::factory()->count(3)->create();
+        $tags = Tag::factory()->count(10)->create();
 
-        /** @var \Illuminate\Database\Eloquent\Collection $articles */
-        $articles = \App\Article::factory()->count(50)->create([
+        /** @var Collection $articles */
+        $articles = Article::factory()->count(50)->create([
             'property_uuid' => $properties->random()->uuid,
-        ])->each(function (\App\Article $article) use ($sections, $tags) {
+        ])->each(function (Article $article) use ($sections, $tags) {
             $article->sections()->save($sections[rand(0, count($sections)-1)]);
             $article->tags()->save($tags[rand(0, count($tags)-1)]);
         });
 
-        $authors = \App\Author::factory()->count(5)->create();
-        $articles->each(function (\App\Article $article) use ($authors) {
+        $authors = Author::factory()->count(5)->create();
+        $articles->each(function (Article $article) use ($authors) {
             $article->authors()->attach($authors->random());
         });
 
-        $articles->each(function (\App\Article $article) use ($faker) {
+        $articles->each(function (Article $article) use ($faker) {
             $article->conversions()->saveMany(
-                \App\Conversion::factory()->count($faker->numberBetween(5,20))->make([
+                Conversion::factory()->count($faker->numberBetween(5,20))->make([
                     'article_id' => $article->id,
                 ])
             );

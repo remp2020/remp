@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added missing `funnelId` parameter to remplib functions for tracking `payment` and `purchase` events. remp/crm#2860
 - Fixed build issues of Go applications due to rename of transitive dependency of Goa v1. remp/remp#1275
+- **IMPORTANT** - Moved Beam core functionality into extensions folder as the Laravel package. remp/remp#565
 
 ### [Campaign]
 
