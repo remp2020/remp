@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added missing `funnelId` parameter to remplib functions for tracking `payment` and `purchase` events. remp/crm#2860 
+
 ### [Campaign]
 
 - Added copy banner link to banner detail and banner edit form. remp/remp#1259

@@ -469,7 +469,7 @@ class Tracker {
         this.dispatchEvent("commerce", "checkout", params);
     }
 
-    trackPayment(transactionId, amount, currency, productIds) {
+    trackPayment(transactionId, amount, currency, productIds, funnelId) {
         var params = {
             "step": "payment",
             "article": this.article,
@@ -484,12 +484,17 @@ class Tracker {
             "remp_commerce_id": remplib.uuidv4(),
             "commerce_session_id": remplib.getCommerceSessionID(),
         };
+
+        if (funnelId) {
+            params.payment.funnel_id = funnelId;
+        }
+
         params = this.addSystemUserParams(params);
         this.post(this.url + "/track/commerce", params);
         this.dispatchEvent("commerce", "payment", params);
     }
 
-    trackPaymentWithSource(transactionId, amount, currency, productIds, article, source) {
+    trackPaymentWithSource(transactionId, amount, currency, productIds, article, source, funnelId) {
         let params = {
             "step": "payment",
             "article": article,
@@ -507,6 +512,10 @@ class Tracker {
             "remp_commerce_id": remplib.uuidv4(),
             "commerce_session_id": remplib.getCommerceSessionID(),
         };
+
+        if (funnelId) {
+            params.payment.funnel_id = funnelId;
+        }
 
         params = this.addSystemUserParams(params);
         params["user"]["source"] = source;
@@ -514,7 +523,7 @@ class Tracker {
         this.dispatchEvent("commerce", "payment", params);
     }
 
-    trackPurchase(transactionId, amount, currency, productIds) {
+    trackPurchase(transactionId, amount, currency, productIds, funnelId) {
         var params = {
             "step": "purchase",
             "article": this.article,
@@ -529,12 +538,17 @@ class Tracker {
             "remp_commerce_id": remplib.uuidv4(),
             "commerce_session_id": remplib.getCommerceSessionID(),
         };
+
+        if (funnelId) {
+            params.purchase.funnel_id = funnelId;
+        }
+
         params = this.addSystemUserParams(params);
         this.post(this.url + "/track/commerce", params);
         this.dispatchEvent("commerce", "purchase", params);
     }
 
-    trackPurchaseWithSource(transactionId, amount, currency, productIds, article, source) {
+    trackPurchaseWithSource(transactionId, amount, currency, productIds, article, source, funnelId) {
         let params = {
             "step": "purchase",
             "article": article,
@@ -552,6 +566,10 @@ class Tracker {
             "remp_commerce_id": remplib.uuidv4(),
             "commerce_session_id": remplib.getCommerceSessionID(),
         };
+
+        if (funnelId) {
+            params.purchase.funnel_id = funnelId;
+        }
 
         params = this.addSystemUserParams(params);
         params["user"]["source"] = source;
