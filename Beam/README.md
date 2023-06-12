@@ -2506,21 +2506,23 @@ Here's the list of supported tracking methods:
 
     * `source`: Object with utm parameters (e.g. `{ utm_campaign: "foo" }`).
 
-* `remplib.tracker.trackPayment(transactionId, amount, currency, productIds)`: tracks commerce payment event - indicating
+* `remplib.tracker.trackPayment(transactionId, amount, currency, productIds, funnelId)`: tracks commerce payment event - indicating
 that the payment has started (user was redirected to payment gateway)
     * `transactionId`: Reference to transaction (should be unique for every payment; e.g. `"778453213"`)
     * `amount`: Numeric amount (e.g. `18.99`)
     * `currency`: String currency (e.g. `EUR`)
     * `productIds`: List of purchased products (e.g. `["product_1"]`)
+    * `funnelId`: Optional reference to funnel. You can use IDs if your system contains
+      referencable funnels or string keys otherwise. 
 
-* `remplib.tracker.trackPaymentWithSource: function(transactionId, amount, currency, productIds, article, source)`:
+* `remplib.tracker.trackPaymentWithSource: function(transactionId, amount, currency, productIds, article, source, funnelId)`:
 tracks commerce payment event with custom article and source - indicating that the payment has started
 (user was redirected to payment gateway)
 
-* `remplib.tracker.trackPurchase(transactionId, amount, currency, productIds)`: tracks commerce purchase event -
+* `remplib.tracker.trackPurchase(transactionId, amount, currency, productIds, funnelId)`: tracks commerce purchase event -
 indicating that the payment was successful
 
-* `remplib.tracker.trackPurchaseWithSource: function(transactionId, amount, currency, productIds, article, source)`:
+* `remplib.tracker.trackPurchaseWithSource: function(transactionId, amount, currency, productIds, article, source, funnelId)`:
 tracks commerce purchase event with custom article and source - indicating that the payment was successful
 
 * `remplib.tracker.trackRefund(transactionId, amount, currency, productIds)`: tracks commerce refund event -
