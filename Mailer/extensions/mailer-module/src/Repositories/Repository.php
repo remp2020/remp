@@ -38,6 +38,10 @@ class Repository
 
     public function totalCount(): int
     {
+        $primary = $this->getTable()->getPrimary();
+        if (is_string($primary)) {
+            return $this->getTable()->count("DISTINCT({$primary})");
+        }
         return $this->getTable()->count('*');
     }
 
