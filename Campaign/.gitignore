@@ -16,3 +16,10 @@ _ide_helper_models.php
 adminer*
 yarn-error.log
 npm-error.log
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

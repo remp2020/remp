@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- **BREAKING**: Bumped yarn minimal version to 2. Update your yarn installation by command `yarn set version 2.x`. remp/remp#565
+
 ### [Beam]
 
 - Added missing `funnelId` parameter to remplib functions for tracking `payment` and `purchase` events. remp/crm#2860

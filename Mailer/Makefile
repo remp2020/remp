@@ -9,8 +9,7 @@ install:
 	php bin/command.php db:seed
 
 js-link-remp:
-	cd ../Package/remp && yarn link
-	yarn link "@remp/js-commons"
+	yarn link "../Package/remp" --relative
 
 js:
 	make js-link-remp

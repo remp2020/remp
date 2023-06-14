@@ -1,5 +1,5 @@
 {
-    "name": "remp-beam",
+    "name": "beam-module",
     "version": "1.0.0",
     "private": true,
     "licenses": [
@@ -61,6 +61,7 @@
         "jquery-placeholder": "^2.3.1",
         "jquery-typeahead": "^2.11",
         "laravel-mix-polyfill": "^3.0.0",
+        "laravel-mix": "^6.0.49",
         "lodash": "^4.17.20",
         "material-design-iconic-font": "^2.2.0",
         "moment": "^2.29.0",
@@ -74,19 +75,5 @@
         "vue2-filters": "^0.6.0",
         "vuex": "^3.1.0",
         "vuex-persistedstate": "^2.5.4"
-    },
-    "devDependencies": {
-        "cross-env": "^7.0",
-        "css-loader": "^6.0",
-        "laravel-mix": "^6.0.12",
-        "npm-run-all": "^4.1.5",
-        "postcss": "^8.2.8",
-        "resolve-url-loader": "^3.1",
-        "sass": "^1.32",
-        "sass-loader": "^13.0",
-        "vue-loader": "^15.9.5",
-        "vue-template-compiler": "^2.6.10",
-        "webpack": "^5.0.0",
-        "webpack-cli": "^5.0.1"
     }
 }

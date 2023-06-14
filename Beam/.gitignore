@@ -19,3 +19,11 @@ _ide_helper_models.php
 adminer*
 google_service_account_key.json
 .phpunit.result.cache
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+yarn-error.log

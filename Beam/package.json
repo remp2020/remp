@@ -7,21 +7,21 @@
     ],
     "private": true,
     "scripts": {
-        "dev": "mix",
-        "watch": "mix watch",
-        "watch-poll": "mix watch -- --watch-options-poll=1000",
-        "hot": "mix watch --hot",
-        "web-production": "mix --production",
-        "iota-dev": "cross-env REMP_TARGET=iota mix",
-        "iota-watch": "cross-env REMP_TARGET=iota mix watch",
-        "iota-watch-poll": "cross-env REMP_TARGET=iota mix watch -- --watch-options-poll=1000",
-        "iota-hot": "cross-env REMP_TARGET=iota mix watch --hot",
-        "iota-production": "cross-env REMP_TARGET=iota mix --production",
-        "lib-dev": "cross-env REMP_TARGET=lib mix",
-        "lib-watch": "cross-env REMP_TARGET=lib mix watch",
-        "lib-watch-poll": "cross-env REMP_TARGET=lib mix watch -- --watch-options-poll=1000",
-        "lib-hot": "cross-env REMP_TARGET=lib mix watch --hot",
-        "lib-production": "cross-env REMP_TARGET=lib mix --production",
+        "dev": "npx mix",
+        "watch": "npx mix watch",
+        "watch-poll": "npx mix watch -- --watch-options-poll=1000",
+        "hot": "npx mix watch --hot",
+        "web-production": "npx mix --production",
+        "iota-dev": "npx cross-env REMP_TARGET=iota mix",
+        "iota-watch": "npx cross-env REMP_TARGET=iota mix watch",
+        "iota-watch-poll": "npx cross-env REMP_TARGET=iota mix watch -- --watch-options-poll=1000",
+        "iota-hot": "npx cross-env REMP_TARGET=iota mix watch --hot",
+        "iota-production": "npx cross-env REMP_TARGET=iota mix --production",
+        "lib-dev": "npx cross-env REMP_TARGET=lib mix",
+        "lib-watch": "npx cross-env REMP_TARGET=lib mix watch",
+        "lib-watch-poll": "npx cross-env REMP_TARGET=lib mix watch -- --watch-options-poll=1000",
+        "lib-hot": "npx cross-env REMP_TARGET=lib mix watch --hot",
+        "lib-production": "npx cross-env REMP_TARGET=lib mix --production",
         "production": "node_modules/npm-run-all/bin/npm-run-all/index.js web-production lib-production iota-production",
         "all-dev": "node_modules/npm-run-all/bin/npm-run-all/index.js dev lib-dev iota-dev",
         "all-watch": "node_modules/npm-run-all/bin/npm-run-all/index.js --parallel watch lib-watch iota-watch",
@@ -31,15 +31,15 @@
     },
     "engines": {
         "node": ">=18",
-        "npm": ">=9"
+        "npm": ">=9",
+        "yarn": ">2"
     },
     "dependencies": {
-        "remp-beam": "file:extensions/remp-beam"
+        "remp-beam": "file:extensions/beam-module"
     },
     "devDependencies": {
         "cross-env": "^7.0",
         "css-loader": "^6.0",
-        "laravel-mix": "^6.0.12",
         "npm-run-all": "^4.1.5",
         "postcss": "^8.2.8",
         "resolve-url-loader": "^3.1",
@@ -49,5 +49,9 @@
         "vue-template-compiler": "^2.6.10",
         "webpack": "^5.0.0",
         "webpack-cli": "^5.0.1"
+    },
+    "version": "2.2.4",
+    "resolutions": {
+        "@remp/js-commons": "portal:../Package/remp"
     }
 }
