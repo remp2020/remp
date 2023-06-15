@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed "Mail click tracker" config. The default setting is now "disabled". remp/remp#1102
 - Updated version of `@remp/js-commons` to 2.2 (contains fix for master search issue). remp/remp#1265
 - Fixed missing index for `mail_templates.created_at` (column is used by background queries in `TemplatePresenter->renderDefaultJsonData()`). remp/remp#1272
+- Fixed duplicate entry error of `hash` in `MailTemplateLinksRepository::add()` function by using `INSERT IGNORE` SQL statement. The error occurred when inserting the same data in a short time. remp/remp#1273
 
 ## Archive
 

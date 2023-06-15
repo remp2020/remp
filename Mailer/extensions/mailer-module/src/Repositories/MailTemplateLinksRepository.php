@@ -8,18 +8,11 @@ class MailTemplateLinksRepository extends Repository
 
     public function add(string $mailTemplateId, string $url, string $hash)
     {
-        $result = $this->insert([
-            'mail_template_id' => $mailTemplateId,
-            'url' => $url,
-            'hash' => $hash,
-            'created_at' => new \DateTime(),
-        ]);
-
-        if (is_numeric($result)) {
-            return $this->getTable()->where('id', $result)->fetch();
-        }
-
-        return $result;
+        $sql = <<<SQL
+INSERT IGNORE INTO `mail_template_links`(mail_template_id, url, hash, created_at)
+VALUES (?, ?, ?, ?)
+SQL;
+        $this->database->query($sql, $mailTemplateId, $url, $hash, new \DateTime());
     }
 
     public function upsert(int $mailTemplateId, string $url, string $hash)
