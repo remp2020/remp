@@ -23,10 +23,11 @@ clean:
 
 gen:
 	set -e
-	go install github.com/goadesign/goa/...@v1
+	# revert following back to go install github.com/goadesign/goa/...@v3 once we use the latest goa
+	command -v goagen || (git clone https://github.com/rootpd/goa.git && cd goa && git checkout v1 && make goagen)
 	goagen app -d=$(DESIGN_PKG)
 	goagen swagger -d=$(DESIGN_PKG)
-	go install github.com/go-bindata/go-bindata/...
+	go install github.com/go-bindata/go-bindata/go-bindata
 	go-bindata -pkg=data -o=./data/bindata.go -ignore=bindata.go data/
 
 build: gen
