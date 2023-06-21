@@ -208,7 +208,7 @@ export default {
         buttonTextColor: null,
         width: null,
         height: null,
-        terms: null,
+        terms: '',
         endpoint: null,
         useXhr: null,
         requestBody: null,
@@ -331,7 +331,6 @@ export default {
         termsHasLink: function () {
             const re = /<\s*a[^>]*>(.*?)<\s*\/\s*a>/g;
             const found = this.terms.match(re);
-            console.log(found);
             return (found && found.length > 0);
         },
         emitValuesChanged: function() {
