@@ -81,6 +81,7 @@ class BeamServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/../public/' => public_path('vendor/beam'),
+            __DIR__ .'/../config/beam.php' => config_path('beam.php'),
         ], ['beam-assets', 'laravel-assets']
         );
 
