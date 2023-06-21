@@ -14,7 +14,7 @@
             "type": "path",
             "url": "../Composer/*",
             "options": {
-                "symlink": true
+                "symlink": false
             }
         },
         {
