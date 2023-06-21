@@ -1,4 +1,4 @@
-<script src="{{ asset('/vendor/beam/iframeresizer/iframeResizer.contentWindow.min.js') }}"></script>
+<script src="{{ asset('/vendor/beam/iframeResizer/iframeResizer.contentWindow.min.js') }}"></script>
 
 <script type="text/javascript">
     window.Segments = {
