@@ -2,13 +2,15 @@
 
 namespace App\Providers;
 
-use App\Http\Resources\SearchResource;
-use App\Model\Property\SelectedProperty;
-use App\Model\Config\ConversionRateConfig;
+use App\Console\MigrateMakeCommand;
 use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Remp\BeamModule\Http\Resources\SearchResource;
+use Remp\BeamModule\Model\Config\ConversionRateConfig;
+use Remp\BeamModule\Model\Property\SelectedProperty;
 use Remp\LaravelHelpers\Database\MySqlConnection;
 
 class AppServiceProvider extends ServiceProvider
@@ -48,6 +50,13 @@ class AppServiceProvider extends ServiceProvider
         Connection::resolverFor('mysql', function ($connection, $database, $prefix, $config) {
             // Use local resolver to control DateTimeInterface bindings.
             return new MySqlConnection($connection, $database, $prefix, $config);
+        });
+
+        $this->app->extend('command.migrate.make', function ($app) {
+            return new MigrateMakeCommand(
+                $this->app->get('migration.creator'),
+                $this->app->get(Composer::class)
+            );
         });
     }
 }

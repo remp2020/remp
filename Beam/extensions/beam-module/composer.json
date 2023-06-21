@@ -1,0 +1,95 @@
+{
+    "name": "remp/beam-module",
+    "description": "REMP Beam Laravel package",
+    "type": "library",
+    "homepage": "https://remp2030.com",
+    "license": "MIT",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "snowplow/referer-parser-php",
+                "version": "0.0.1",
+                "source": {
+                    "url": "https://github.com/snowplow-referer-parser/php-referer-parser",
+                    "type": "git",
+                    "reference": "master"
+                },
+                "autoload": {
+                    "psr-4": {
+                        "Snowplow\\": "src/Snowplow"
+                    }
+                }
+            }
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "ext-pcntl": "*",
+        "arrilot/laravel-widgets": "^3.13",
+        "doctrine/dbal": "^3.1",
+        "fideloper/proxy": "^4.4",
+        "fruitcake/laravel-cors": "^v3.0.0",
+        "google/apiclient": "^2.9",
+        "guzzlehttp/guzzle": "^7.0.1",
+        "kouz/laravel-airbrake": "^0.7.0",
+        "laminas/laminas-diactoros": "^2.5",
+        "laracasts/flash": "^3.2",
+        "laravel/framework": "^8.44",
+        "laravelcollective/html": "^6.2",
+        "league/uri": "^6.7",
+        "marc-mabe/php-enum": "^3.0",
+        "matomo/device-detector": "^4.2",
+        "matomo/searchengine-and-social-list": "^3.11",
+        "php-amqplib/php-amqplib": "^v2.12",
+        "predis/predis": "^1.1",
+        "remp/laravel-helpers": "*",
+        "remp/laravel-sso": "*",
+        "remp/laravel-widgets": "*",
+        "remp/remp-commons": "*",
+        "sentry/sentry-laravel": "^2.6",
+        "simshaun/recurr": "^5.0",
+        "spatie/laravel-searchable": "^1.9",
+        "snowplow/referer-parser": "dev-master",
+        "snowplow/referer-parser-php": "0.0.1",
+        "symfony/cache": "^5.2",
+        "symfony/psr-http-message-bridge": "^v2.1.2",
+        "symfony/yaml": "^6.0",
+        "tightenco/ziggy": "^1.2",
+        "ukfast/laravel-health-check": "^1.5",
+        "yadakhov/insert-on-duplicate-key": "^1.2",
+        "yajra/laravel-datatables-oracle": "^9.18"
+    },
+    "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.7",
+        "barryvdh/laravel-ide-helper": "^2.10",
+        "facade/ignition": "^2.5",
+        "fakerphp/faker": "^v1.20.0",
+        "laravel/tinker": "^2.5",
+        "mockery/mockery": "^1.4.2",
+        "nunomaduro/collision": "^5.0",
+        "phpunit/phpunit": "^9.3.3"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Remp\\BeamModule\\": "src/",
+            "Remp\\BeamModule\\Database\\Factories\\": "database/factories/",
+            "Remp\\BeamModule\\Database\\Seeders\\": "database/seeders/",
+            "Remp\\BeamModule\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Remp\\BeamModule\\BeamServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
+}

@@ -2,18 +2,18 @@
 
 namespace App\Console;
 
-use App\Console\Commands\AggregateArticlesViews;
-use App\Console\Commands\AggregateConversionEvents;
-use App\Console\Commands\AggregatePageviews;
-use App\Console\Commands\CompressSnapshots;
-use App\Console\Commands\ComputeAuthorsSegments;
-use App\Console\Commands\ComputeSectionSegments;
-use App\Console\Commands\DashboardRefresh;
-use App\Console\Commands\DeleteOldAggregations;
-use App\Console\Commands\ProcessPageviewSessions;
-use App\Console\Commands\SendNewslettersCommand;
-use App\Console\Commands\CompressAggregations;
-use App\Console\Commands\SnapshotArticlesViews;
+use Remp\BeamModule\Console\Commands\AggregateArticlesViews;
+use Remp\BeamModule\Console\Commands\AggregateConversionEvents;
+use Remp\BeamModule\Console\Commands\AggregatePageviews;
+use Remp\BeamModule\Console\Commands\CompressSnapshots;
+use Remp\BeamModule\Console\Commands\ComputeAuthorsSegments;
+use Remp\BeamModule\Console\Commands\ComputeSectionSegments;
+use Remp\BeamModule\Console\Commands\DashboardRefresh;
+use Remp\BeamModule\Console\Commands\DeleteOldAggregations;
+use Remp\BeamModule\Console\Commands\ProcessPageviewSessions;
+use Remp\BeamModule\Console\Commands\SendNewslettersCommand;
+use Remp\BeamModule\Console\Commands\CompressAggregations;
+use Remp\BeamModule\Console\Commands\SnapshotArticlesViews;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 

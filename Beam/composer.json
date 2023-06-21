@@ -14,7 +14,14 @@
             "type": "path",
             "url": "../Composer/*",
             "options": {
-                "symlink": false
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "extensions/*",
+            "options": {
+                "symlink": true
             }
         },
         {
@@ -36,42 +43,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "ext-json": "*",
-        "ext-pcntl": "*",
-        "arrilot/laravel-widgets": "^3.13",
-        "doctrine/dbal": "^3.1",
-        "fideloper/proxy": "^4.4",
-        "fruitcake/laravel-cors": "^v3.0.0",
-        "google/apiclient": "^2.9",
-        "guzzlehttp/guzzle": "^7.0.1",
-        "kouz/laravel-airbrake": "^0.7.0",
-        "laminas/laminas-diactoros": "^2.5",
-        "laracasts/flash": "^3.2",
-        "laravel/framework": "^8.44",
-        "laravelcollective/html": "^6.2",
-        "league/uri": "^6.7",
-        "marc-mabe/php-enum": "^3.0",
-        "matomo/device-detector": "^4.2",
-        "matomo/searchengine-and-social-list": "^3.11",
-        "php-amqplib/php-amqplib": "^v2.12",
-        "predis/predis": "^1.1",
-        "remp/laravel-helpers": "*",
-        "remp/laravel-sso": "*",
-        "remp/laravel-widgets": "*",
-        "remp/remp-commons": "*",
-        "sentry/sentry-laravel": "^2.6",
-        "simshaun/recurr": "^5.0",
-        "snowplow/referer-parser": "dev-master",
-        "snowplow/referer-parser-php": "0.0.1",
-        "spatie/laravel-searchable": "^1.9",
-        "symfony/cache": "^5.2",
-        "symfony/psr-http-message-bridge": "^v2.1.2",
-        "symfony/yaml": "^6.0",
-        "tightenco/ziggy": "^1.2",
-        "ukfast/laravel-health-check": "^1.5",
-        "yadakhov/insert-on-duplicate-key": "^1.2",
-        "yajra/laravel-datatables-oracle": "^9.18"
+        "remp/beam-module": "@dev"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
@@ -86,9 +58,6 @@
         "squizlabs/php_codesniffer": "^3.6"
     },
     "autoload": {
-        "classmap": [
-            "database"
-        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
@@ -109,11 +78,15 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover"
+            "@php artisan package:discover",
+            "@php artisan vendor:publish --tag=beam-assets"
         ]
     },
     "config": {
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     }
 }

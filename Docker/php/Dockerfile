@@ -60,7 +60,7 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 
 RUN apt-get install -y nodejs
 
-RUN npm install --global yarn
+RUN npm install --global yarn@v2
 
 RUN mkdir -p ${YARN_CACHE_FOLDER} && chmod -R 777 ${YARN_CACHE_FOLDER}
 

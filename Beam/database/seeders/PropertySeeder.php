@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Remp\BeamModule\Model\Account;
+use Remp\BeamModule\Model\Property;
 
 class PropertySeeder extends Seeder
 {
@@ -13,11 +15,11 @@ class PropertySeeder extends Seeder
      */
     public function run()
     {
-        /** @var \App\Account $account */
-        $account = \App\Account::factory()->create();
+        /** @var Account $account */
+        $account = Account::factory()->create();
 
-        /** @var \App\Property $property */
-        $property = \App\Property::factory()->make();
+        /** @var Property $property */
+        $property = Property::factory()->make();
         $account->properties()->save($property);
     }
 }

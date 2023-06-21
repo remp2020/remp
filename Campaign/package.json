@@ -20,7 +20,8 @@
     },
     "engines": {
         "node": ">=18",
-        "npm": ">=9"
+        "npm": ">=9",
+        "yarn": ">=2"
     },
     "dependencies": {
         "@babel/core": "^7.0",
@@ -73,5 +74,8 @@
         "vue-loader": "^15.9.8",
         "webpack": "^5.0.0",
         "webpack-cli": "^5.0.1"
+    },
+    "resolutions": {
+        "@remp/js-commons": "portal:../Package/remp"
     }
 }

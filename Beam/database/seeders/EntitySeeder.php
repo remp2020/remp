@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Remp\BeamModule\Model\Entity;
+use Remp\BeamModule\Model\EntityParam;
 
 class EntitySeeder extends Seeder
 {
@@ -13,18 +15,18 @@ class EntitySeeder extends Seeder
      */
     public function run()
     {
-        $userEntity = new \App\Entity();
+        $userEntity = new Entity();
 
         $userEntity->name = "user";
         $userEntity->save();
 
-        $userIdParam = new \App\EntityParam();
+        $userIdParam = new EntityParam();
         $userIdParam->name = "id";
-        $userIdParam->type = \App\EntityParam::TYPE_STRING;
+        $userIdParam->type = EntityParam::TYPE_STRING;
 
-        $userEmailParam = new \App\EntityParam();
+        $userEmailParam = new EntityParam();
         $userEmailParam->name = "email";
-        $userEmailParam->type = \App\EntityParam::TYPE_STRING;
+        $userEmailParam->type = EntityParam::TYPE_STRING;
 
 
         $userEntity->params()->saveMany([
