@@ -22,6 +22,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **IMPORTANT**: Removed hardcoded "memory_limit" configuration (to "256M") in the `mail:process-job` command.
+  - If you encounter memory limit issues with the command, configure the memory limit yourself either for the whole instance, or for this single command by using `php -d memory_limit=256M bin/command.php` option. 
 - Removed deleted mail types from dashboard stats. remp/remp#1269
 - Added support for select boxes to `ConfigFormFactory`. remp/remp#1271
 - Added support for horizontal scroll in DataTable (parameter `scrollX` in table settings). remp/remp#1270
