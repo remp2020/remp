@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "990e70599599a3261446ed46299655a5",
+    "content-hash": "88f4d93eca398a606330182f95c35fd4",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -5332,7 +5332,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-helpers",
-                "reference": "b4a44b9b97e75e0e5d3bc4d17ddd7324334ec73b"
+                "reference": "f4f92636feb15a89ac146798190c76ec4a8fd2f7"
             },
             "require": {
                 "illuminate/http": "^v8.76.2",
@@ -5372,7 +5372,7 @@
                 "remp"
             ],
             "transport-options": {
-                "symlink": true,
+                "symlink": false,
                 "relative": true
             }
         },
@@ -5382,7 +5382,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-sso",
-                "reference": "fddea5cea4daecd9d36b9c9f8364f4f47ff79023"
+                "reference": "b02cbfb7bac239730c32d5654e5f0fb1a300929f"
             },
             "require": {
                 "guzzlehttp/guzzle": "^7.0",
@@ -5426,7 +5426,7 @@
                 "sso"
             ],
             "transport-options": {
-                "symlink": true,
+                "symlink": false,
                 "relative": true
             }
         },
@@ -5436,7 +5436,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Composer/laravel-widgets",
-                "reference": "4b3dcb6683972274fd8f1978014e5624ac61d10c"
+                "reference": "8fe192ca505ad2eb880d9222b8d097f28b3ac901"
             },
             "require": {
                 "arrilot/laravel-widgets": "^3.9",
@@ -5476,7 +5476,7 @@
                 "widgets"
             ],
             "transport-options": {
-                "symlink": true,
+                "symlink": false,
                 "relative": true
             }
         },
@@ -5486,7 +5486,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Composer/remp-commons",
-                "reference": "bc6d126fa6f65ced57e6d123cca43f6109b2454c"
+                "reference": "0e5949a59b213a0177d15a2996a191e8e3ed79ca"
             },
             "require": {
                 "gburtini/distributions": "^0.0.2",
@@ -5522,7 +5522,7 @@
                 "segments"
             ],
             "transport-options": {
-                "symlink": true,
+                "symlink": false,
                 "relative": true
             }
         },
