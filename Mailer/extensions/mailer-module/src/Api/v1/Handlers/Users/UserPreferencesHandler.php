@@ -50,6 +50,7 @@ class UserPreferencesHandler extends BaseHandler
             ->where([
                 'user_id' => $payload['user_id'],
                 'user_email' => $payload['email'],
+                'mail_type.deleted_at IS NULL',
             ]);
 
 

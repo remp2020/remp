@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed missing index for `mail_templates.created_at` (column is used by background queries in `TemplatePresenter->renderDefaultJsonData()`). remp/remp#1272
 - Fixed duplicate entry error of `hash` in `MailTemplateLinksRepository::add()` function by using `INSERT IGNORE` SQL statement. The error occurred when inserting the same data in a short time. remp/remp#1273
 - Fixed speed of listing pages. We changed how we get total row count (`Repository::totalCount()`) from `COUNT(*)` to `COUNT(DISTINCT({$primary}))`. Using DISTINCT with indexed column forces MySQL to use index. remp/remp#1272
+- Fixed issue in `/api/v1/users/user-preferences` API which could include deleted mail types in the response. remp/crm#2883  
 
 ## Archive
 
