@@ -27,3 +27,5 @@ google_service_account_key.json
 !.yarn/sdks
 !.yarn/versions
 yarn-error.log
+/config/beam.php
+/config/services.remp.php
