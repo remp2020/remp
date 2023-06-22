@@ -28,6 +28,7 @@ modules_paths=(
   [js-commons]="Package/remp/"
   [mailer-module]="Mailer/extensions/mailer-module"
   [newrelic-module]="Mailer/extensions/newrelic-module"
+  [beam-module]="Beam/extensions/beam-module"
 )
 
 if [ -z $MODULE ]; then
@@ -36,6 +37,7 @@ if [ -z $MODULE ]; then
     js-commons
     mailer-module
     newrelic-module
+    beam-module
   )
 else
   if ! [[ -v "modules_paths[${MODULE}]" ]]; then
