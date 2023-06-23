@@ -25,6 +25,9 @@ fi
 declare -A modules_paths
 modules_paths=(
   [remp-commons]="Composer/remp-commons"
+  [laravel-helpers]="Composer/laravel-helpers"
+  [laravel-sso]="Composer/laravel-sso"
+  [laravel-widgets]="Composer/laravel-widgets"
   [js-commons]="Package/remp/"
   [mailer-module]="Mailer/extensions/mailer-module"
   [newrelic-module]="Mailer/extensions/newrelic-module"
@@ -34,6 +37,9 @@ modules_paths=(
 if [ -z $MODULE ]; then
   modules=(
     remp-commons
+    laravel-helpers
+    laravel-sso
+    laravel-widgets
     js-commons
     mailer-module
     newrelic-module
