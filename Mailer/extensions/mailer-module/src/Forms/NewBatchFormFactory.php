@@ -145,6 +145,11 @@ class NewBatchFormFactory
 
     public function formSucceeded(Form $form, ArrayHash $values): void
     {
+        if ($values['template_id'] === $values['b_template_id']) {
+            $form->addError("Email A alternative and Email B Alternative cannot be the same.");
+            return;
+        }
+
         if (!$values['job_id']) {
             $jobSegmentsManager = new JobSegmentsManager();
             foreach ($values['include_segment_codes'] as $includeSegment) {
