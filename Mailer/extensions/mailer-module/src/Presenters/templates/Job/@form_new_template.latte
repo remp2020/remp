@@ -11,4 +11,25 @@
     {input batch_id}
 
     {input save, class => 'btn btn-info waves-effect'}
+
+    {include jsCallback, form => $form}
 {/form}
+
+{define jsCallback}
+    <script n:if="$form->getErrors()" type="application/javascript">
+        $(function() {
+            var index = 0;
+            {foreach $form->getErrors() as $error}
+            index += 250;
+            window.setTimeout(function() {
+                $.notify({
+                    message: {$error}
+                }, {
+                    allow_dismiss: false,
+                    type: 'danger'
+                });
+            }, index);
+            {/foreach}
+        });
+    </script>
+{/define}
