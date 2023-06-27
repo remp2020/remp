@@ -24,6 +24,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **IMPORTANT**: Removed hardcoded "memory_limit" configuration (to "256M") in the `mail:process-job` command.
   - If you encounter memory limit issues with the command, configure the memory limit yourself either for the whole instance, or for this single command by using `php -d memory_limit=256M bin/command.php` option. 
+- **IMPORTANT**: Added `mail:bigint_migration_cleanup` command, which drops left-over tables, after migration to bigint for `mail_user_subscriptions`, `mail_user_subscription_variants`, `autologin_tokens`, `mail_log_conversions`, `mail_logs` tables. remp/crm#2591
+  - It's recommended to run this command at least 2 weeks after migrating (to preserve backup data, if some issue emerges) after successful migration to drop left-over tables.
 - Removed deleted mail types from dashboard stats. remp/remp#1269
 - Added support for select boxes to `ConfigFormFactory`. remp/remp#1271
 - Added support for horizontal scroll in DataTable (parameter `scrollX` in table settings). remp/remp#1270

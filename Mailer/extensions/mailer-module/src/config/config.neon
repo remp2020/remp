@@ -54,6 +54,7 @@ services:
 			- add(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand())
 			- add(Remp\MailerModule\Commands\MigrateUserSubscriptionsAndVariantsCommand())
 			- add(Remp\MailerModule\Commands\MigrateAutologinTokensCommand())
+			- add(Remp\MailerModule\Commands\BigintMigrationCleanupCommand())
 			- add(@hermesWorker)
 			- setCatchExceptions(true)
 
