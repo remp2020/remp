@@ -44,7 +44,6 @@ class ProcessJobCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        ini_set('memory_limit', '256M');
         $output->writeln(sprintf('%s <info>Mail process job</info>', DateTime::from('now')));
 
         $pid = getmypid();
