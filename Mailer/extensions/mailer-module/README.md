@@ -1001,6 +1001,12 @@ Steps:
 1. running phinx migration `CreateNewMailLogsAndMailConversionsTable` - which creates new tables `mail_logs_v2` and `mail_log_conversions_v2` (in case there is no data in tables, migration just changes type of primary key and next steps are not needed)
 2. running command `mail:migrate-mail-logs-and-conversions` which copies data from old tables to new (e.g. `mail_logs` to `mail_logs_v2`) - command will after successful migration atomically rename tables (e.g. `mail_logs` -> `mail_logs_old` and `mail_logs_v2` -> `mail_logs`) so when the migration ends only new tables are used
 
+It's recommended to run (in order):
+1. `mail:bigint_migration_cleanup mail_log_conversions`
+2. `mail:bigint_migration_cleanup mail_logs`
+
+commands, at least 2 weeks (to preserve backup data, if some issue emerges) after successful migration to drop left-over tables.
+
 ### User subscription migration (version < 1.2.0)
 
 Consists of `mail_user_subscriptions` and `mail_user_subscription_variants` table migration.
@@ -1009,6 +1015,12 @@ Steps:
 1. running phinx migration `CreateNewMailUserSubscriptionsAndMailUserSubscriptionVariantsTables` - which creates new tables `mail_user_subscriptions_v2` and `mail_user_subscription_variants_v2` (in case there is no data in tables, migration just changes type of primary key and next steps are not needed)
 2. running command `mail:migrate-user-subscriptions-and-variants` which copies data from old tables to new (e.g. `mail_user_subscriptions` to `mail_user_subscriptions_v2`) - command will after successful migration atomically rename tables (e.g. `mail_user_subscriptions` -> `mail_user_subscriptions_old` and `mail_user_subscriptions_v2` -> `mail_user_subscriptions`) so when the migration ends only new tables are used
 
+It's recommended to run (in order):
+1. `mail:bigint_migration_cleanup mail_user_subscription_variants`
+2. `mail:bigint_migration_cleanup mail_user_subscriptions`
+
+commands, at least 2 weeks (to preserve backup data, if some issue emerges) after successful migration to drop left-over tables.
+
 ### Autologin tokens migration (version < 1.3.0)
 
 Consists of `autologin_tokens` table migration.
@@ -1016,6 +1028,8 @@ Consists of `autologin_tokens` table migration.
 Steps:
 1. running phinx migration `CreateNewAutologinTokensTable` - which creates new table `autologin_tokens_v2` (in case there is no data in table, migration just changes type of primary key and next steps are not needed)
 2. running command `mail:migrate-autologin-tokens` which copies data from old tables to new (`autologin_tokens` to `autologin_tokens_v2`) - command will after successful migration atomically rename tables (`autologin_tokens` -> `autologin_tokens_old` and `autologin_tokens_v2` -> `autologin_tokens`) so when the migration ends only new tables are used
+
+It's recommended to run `mail:bigint_migration_cleanup autologin_tokens` command, at least 2 weeks (to preserve backup data, if some issue emerges) after successful migration to drop left-over tables.
 
 ## API Documentation
 
