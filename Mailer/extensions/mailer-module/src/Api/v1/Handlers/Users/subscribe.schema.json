@@ -55,6 +55,9 @@
     "send_accompanying_emails": {
       "type": "boolean"
     },
+    "force_no_variant_subscription": {
+      "type": "boolean"
+    },
     "rtm_params": {
       "title": "RTM params",
       "type": "object",

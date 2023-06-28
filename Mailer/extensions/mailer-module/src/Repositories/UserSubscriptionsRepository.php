@@ -117,6 +117,7 @@ class UserSubscriptionsRepository extends Repository
         int $variantId = null,
         bool $sendWelcomeEmail = true,
         array $rtmParams = [],
+        bool $forceNoVariantSubscription = false,
     ): ActiveRow {
         if ($variantId === null) {
             $variantId = $mailType->default_variant_id;
@@ -155,20 +156,23 @@ class UserSubscriptionsRepository extends Repository
             $this->emitUserSubscribedEvent($userId, $email, $mailType->id, $sendWelcomeEmail, $rtmParams);
         }
 
-        if ($variantId) {
-            $variantSubscribed = $this->userSubscriptionVariantsRepository->variantSubscribed($actual, $variantId);
-            if (!$variantSubscribed) {
-                if (!$mailType->is_multi_variant) {
-                    $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
+        if (!$forceNoVariantSubscription) {
+            if ($variantId) {
+                $variantSubscribed = $this->userSubscriptionVariantsRepository->variantSubscribed($actual, $variantId);
+                if (!$variantSubscribed) {
+                    if (!$mailType->is_multi_variant) {
+                        $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
+                    }
+                    $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variantId);
                 }
-                $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variantId);
-            }
-        } elseif (!$variantId && $mailType->is_multi_variant) {
-            // subscribe all mail variants for multi_variant type without default variant
-            foreach ($this->listVariantsRepository->getVariantsForType($mailType)->fetchAll() as $variant) {
-                $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variant->id);
+            } elseif (!$variantId && $mailType->is_multi_variant) {
+                // subscribe all mail variants for multi_variant type without default variant
+                foreach ($this->listVariantsRepository->getVariantsForType($mailType)->fetchAll() as $variant) {
+                    $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variant->id);
+                }
             }
         }
+
         return $actual;
     }
 

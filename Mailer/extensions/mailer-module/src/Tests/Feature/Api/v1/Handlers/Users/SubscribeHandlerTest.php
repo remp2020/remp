@@ -286,4 +286,77 @@ class SubscribeHandlerTest extends BaseApiHandlerTestCase
         ])->count('*');
         $this->assertFalse($isSubscribed);
     }
+
+    /**
+     * @dataProvider forceNoVariantSubscriptionDataProvider
+     */
+    public function testUseOfForceNoVariantSubscriptionFlag(bool $multi, bool $default)
+    {
+        $mailType = $this->createMailTypeWithCategory(
+            categoryName: "category1",
+            typeCode: "code1",
+            typeName: "name1",
+            isMultiVariant: $multi,
+        );
+        $variant = $this->createMailTypeVariant($mailType, 'Foo', 'foo');
+
+        if ($default) {
+            $defaultVariant = $this->createMailTypeVariant($mailType, 'Bar', 'bar');
+            $this->listsRepository->update($mailType, [
+                'default_variant_id' => $defaultVariant->id,
+            ]);
+        }
+
+        $payload = [
+            'user_id' => 123,
+            'email' => 'example@example.com',
+            'list_code' => $mailType->code,
+            'variant_code' => $variant->code,
+            'force_no_variant_subscription' => true,
+        ];
+
+        $params = [
+            'raw' => Json::encode($payload)
+        ];
+
+        /** @var JsonApiResponse $response */
+        $response = $this->handler->handle($params);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertEquals(IResponse::S200_OK, $response->getCode());
+
+        $userSubscription = $this->userSubscriptionsRepository->getUserSubscription(
+            mailType: $mailType,
+            userId: $payload['user_id'],
+            email: $payload['email']
+        );
+        $this->assertTrue((bool) $userSubscription->subscribed);
+
+        $isVariantSubscribed = (bool) $this->userSubscriptionVariantsRepository->getTable()->where([
+            'mail_user_subscription.user_id' => $payload['user_id'],
+            'mail_user_subscription.user_email' => $payload['email'],
+        ])->count('*');
+        $this->assertFalse($isVariantSubscribed);
+    }
+
+    public function forceNoVariantSubscriptionDataProvider()
+    {
+        return [
+            'NoMultiVariant_NoDefaultVariant' => [
+                'multi' => false,
+                'default' => false,
+            ],
+            'WithMultiVariant_NoDefaultVariant' => [
+                'multi' => true,
+                'default' => false,
+            ],
+            'NoMultiVariant_WithDefaultVariant' => [
+                'multi' => false,
+                'default' => true,
+            ],
+            'WithMultiVariant_WithDefaultVariant' => [
+                'multi' => true,
+                'default' => true,
+            ],
+        ];
+    }
 }
