@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed issue in `/api/v1/users/user-preferences` API which could include deleted mail types in the response. remp/crm#2883
 - Added validation for restricting the use of the same email variant in `NewBatchFromFactory` and `NewTemplateFormFactory`. remp/remp#1230
 - Added configurable batch size to the `worker:mail` command; use `--batch-size=NUMBER` to set your own batch size. remp/remp#1238 
+- Fixed display issues of link stats table to display url in max. 3 lines and forbid horizontal scroll in table. remp/remp#1278
 
 ## Archive
 
