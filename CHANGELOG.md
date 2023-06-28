@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed speed of listing pages. We changed how we get total row count (`Repository::totalCount()`) from `COUNT(*)` to `COUNT(DISTINCT({$primary}))`. Using DISTINCT with indexed column forces MySQL to use index. remp/remp#1272
 - Fixed issue in `/api/v1/users/user-preferences` API which could include deleted mail types in the response. remp/crm#2883
 - Added validation for restricting the use of the same email variant in `NewBatchFromFactory` and `NewTemplateFormFactory`. remp/remp#1230
+- Added configurable batch size to the `worker:mail` command; use `--batch-size=NUMBER` to set your own batch size. remp/remp#1238 
 
 ## Archive
 

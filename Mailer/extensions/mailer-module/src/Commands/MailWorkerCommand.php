@@ -21,6 +21,7 @@ use Remp\MailerModule\Repositories\JobQueueRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,8 +34,6 @@ class MailWorkerCommand extends Command
 {
     public const COMMAND_NAME = "worker:mail";
     
-    const MESSAGES_PER_BATCH = 200;
-
     private $applicationMailer;
 
     private $mailJobBatchRepository;
@@ -114,6 +113,14 @@ class MailWorkerCommand extends Command
                 InputOption::VALUE_NONE,
                 'Flag whether batch sending should be attempted (will fallback to non-batch if selected mailer doesn\'t support batch sending)'
             )
+            ->addOption(
+                'batch-size',
+                's',
+                InputOption::VALUE_REQUIRED,
+                'Size of the batch to be used for sending. Applies only when --batch is used.',
+                200
+            )
+
         ;
     }
 
@@ -123,6 +130,11 @@ class MailWorkerCommand extends Command
         $this->startTime = new DateTime();
 
         $sendAsBatch = $input->getOption('batch');
+
+        $messagesPerBatch = (int) $input->getOption('batch-size');
+        if ($messagesPerBatch <= 0) {
+            throw new RuntimeException("The --batch-size option only allows positive integers.");
+        }
 
         $output->writeln('');
         $output->writeln('<info>***** EMAIL WORKER *****</info>');
@@ -200,7 +212,7 @@ class MailWorkerCommand extends Command
                 }
 
                 if ($sendAsBatch && $this->applicationMailer->getMailerByTemplate($mailJobBatchTemplate->mail_template)->supportsBatch()) {
-                    $rawJobs = $this->mailCache->getJobs($batch->id, self::MESSAGES_PER_BATCH);
+                    $rawJobs = $this->mailCache->getJobs($batch->id, $messagesPerBatch);
                     if (empty($rawJobs)) {
                         break;
                     }
