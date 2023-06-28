@@ -42,8 +42,8 @@ class MailLinkStats extends Control
                 'render' => 'link',
                 'priority' => 1,
                 'orderable' => false,
-                'width' => '50%',
-                'class' => 'all',
+                'width' => '70%',
+                'class' => 'all table-url',
             ])
             ->setColSetting('text', [
                 'header' => 'content',
@@ -61,7 +61,7 @@ class MailLinkStats extends Control
             ])
             ->setTableSetting('order', Json::encode([])) // removes sorting arrow from first column
             ->setTableSetting('allowSearch', false)
-            ->setTableSetting('scrollX', true);
+            ->setTableSetting('scrollX', false);
 
         return $dataTable;
     }
