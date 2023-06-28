@@ -1364,6 +1364,15 @@ API call subscribes email address to the given newsletter. Newsletter has to be 
 Currently, there's no API endpoint for that and the newsletter needs to be created manually.
 Please visit `/list/new` to create a newsletter via web admin.
 
+If newsletter list has variants, following behavior applies:
+
+- For `is_multi_variant=true` newsletter **without** the default variant, all variants are subscribed when user subscribes to the newsletter.
+- For `is_multi_variant=true` newsletter **with** the default variant, only the default variant is subscribed when user subscribes to the newsletter.
+- For `is_multi_variant=false` newsletter **without** the default variant, no variant is subscribed automatically when user subscribes to the newsletter. Variant should be provided explicitly for this scenario.
+- For `is_multi_Variant=false` newsletter **with** the default variant, the default variant is subscribed automatically unless the variant was provided explicitly.
+
+Please be aware, that the described variant subscription behavior can be suppressed by sending `force_no_variant_subscription=true`. If sent, no variant is subscribed, even if it was provided explicitly.
+
 ##### *Headers:*
 
 | Name          | Value           | Required | Description |
@@ -1385,6 +1394,7 @@ Please visit `/list/new` to create a newsletter via web admin.
   "variant_id": 123, // Integer; ID of the newsletter variant to subscribe
   "variant_code": "author.123", // String; Code of the newsletter variant to subscribe
   "send_accompanying_emails": true, // Boolean; Whether to send welcome or goodbye email to the subscribed/unsubscribed user. Defaults to TRUE.
+  "force_no_variant_subscription": true, // Boolean; If list_id has variants, flag indicates whether the default behavior should be suppressed and no variant subscribed. Defaults to FALSE.
 
   // optional RTM parameters for tracking "what" made the user unsubscribe
   "rtm_params": { // Object; optional RTM parameters for pairing which email caused the user to unsubscribe. RTM params are generated into the email links automatically.
@@ -1544,7 +1554,6 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
 
       "variant_id": 3, // Integer; ID of the variant of newsletter list you're subscribing user to. Must belong to provided list.
       "variant_code": "author.123", // String; Code of the newsletter variant to subscribe
-
       "subscribe": false, // Boolean; indicates if you want to subscribe or unsubscribe user
 
       // optional RTM parameters used only if `subscribe:false` for tracking "what" made the user unsubscribe
@@ -1556,7 +1565,8 @@ Bulk subscribe allows subscribing and unsubscribing multiple users in one batch.
       },
 
       // optional
-      "send_accompanying_emails": true // Boolean; Flag whether to send welcome or goodbye email to the user whom subscription is being changed. Defaults to TRUE.
+      "send_accompanying_emails": true, // Boolean; Flag whether to send welcome or goodbye email to the user whom subscription is being changed. Defaults to TRUE.
+      "force_no_variant_subscription": true // Boolean; If list_id has variants, flag indicates whether the default behavior should be suppressed and no variant subscribed. Defaults to FALSE.
     }
   //...
   ]

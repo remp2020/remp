@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added validation for restricting the use of the same email variant in `NewBatchFromFactory` and `NewTemplateFormFactory`. remp/remp#1230
 - Added configurable batch size to the `worker:mail` command; use `--batch-size=NUMBER` to set your own batch size. remp/remp#1238 
 - Fixed display issues of link stats table to display url in max. 3 lines and forbid horizontal scroll in table. remp/remp#1278
+- Added flag `force_no_variant_subscription` to `/api/v1/users/subscribe` and `/api/v1/users/bulk-subscribe` APIs enabling client to prevent _default variant_ subscribe behavior (changed in the v2.2). remp/remp#1279 
 
 ## Archive
 

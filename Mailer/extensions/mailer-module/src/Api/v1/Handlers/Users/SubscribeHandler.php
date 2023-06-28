@@ -68,6 +68,7 @@ class SubscribeHandler extends BaseHandler
             variantId: $variantID,
             sendWelcomeEmail: $payload['send_accompanying_emails'] ?? true,
             rtmParams: $this->getRtmParams($payload),
+            forceNoVariantSubscription: $payload['force_no_variant_subscription'] ?? false,
         );
 
         $subscribedVariantsData = [];

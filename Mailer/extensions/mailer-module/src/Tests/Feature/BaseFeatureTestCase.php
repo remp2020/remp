@@ -153,7 +153,8 @@ class BaseFeatureTestCase extends TestCase
         string $typeCode = 'code',
         string $typeName = 'name',
         bool $publicListing = true,
-        bool $isMultiVariant = false
+        bool $isMultiVariant = false,
+        int $defaultVariantId = null,
     ) {
         $listCategory = $this->createMailTypeCategory($categoryName);
 
@@ -168,6 +169,7 @@ class BaseFeatureTestCase extends TestCase
             description: 'XXX',
             publicListing: $publicListing,
             isMultiVariant: $isMultiVariant,
+            defaultVariantId: $defaultVariantId,
         );
     }
 

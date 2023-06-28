@@ -51,6 +51,7 @@ class BulkSubscribeHandler extends SubscribeHandler
                 'subscribe' => $item['subscribe'],
                 'rtm_params' => $this->getRtmParams($item),
                 'send_accompanying_emails' => $item['send_accompanying_emails'] ?? true,
+                'force_no_variant_subscription' => $item['force_no_variant_subscription'] ?? false,
             ];
         }
 
@@ -65,6 +66,7 @@ class BulkSubscribeHandler extends SubscribeHandler
                     variantId: $user['variant_id'],
                     sendWelcomeEmail: $user['send_accompanying_emails'],
                     rtmParams: $rtmParams,
+                    forceNoVariantSubscription: $user['force_no_variant_subscription'],
                 );
             } else {
                 // if email doesn't exist, no need to unsubscribe
