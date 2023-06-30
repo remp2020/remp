@@ -457,7 +457,7 @@ final class ListPresenter extends BasePresenter
         $this->template->mailTypeTitle = $mailType->title;
 
         if (!$this->isAjax()) {
-            $from = $this->getParameter('published_from', 'now - 30 days');
+            $from = $this->getParameter('published_from', 'today - 30 days');
             $to = $this->getParameter('published_to', 'now');
             $tz = $this->getParameter('tz');
             $groupBy = $this->getParameter('group_by', 'day');
