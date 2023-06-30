@@ -1,13 +1,14 @@
 {layout '../@layout.latte'}
 
+{block #title}
+    Layouts
+{/block}
+
 {block #content}
 
-<div class="c-header">
-    <h2 n:block="title">Layouts</h2>
-</div>
 <div class="card">
     <div class="card-header">
-        <h2>List of layouts <small></small></h2>
+        <h2>Layouts</h2>
         <div class="actions">
             <a n:href="Layout:new" class="btn palette-Cyan bg waves-effect">Add new layout</a>
         </div>

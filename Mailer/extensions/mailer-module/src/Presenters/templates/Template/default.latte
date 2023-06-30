@@ -1,13 +1,14 @@
 {layout '../@layout.latte'}
 
+{block #title}
+    Emails
+{/block}
+
 {block #content}
 
-<div class="c-header">
-    <h2 n:block="title">Emails</h2>
-</div>
 <div class="card">
     <div class="card-header">
-        <h2>List of templates<small></small></h2>
+        <h2>Email templates</h2>
         <div class="actions">
             <a n:href="Template:new" class="btn palette-Cyan bg waves-effect">Add new email</a>
         </div>
