@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Fixed date filtering on the newsletter stats page. remp/remp#1231
+
 ## Archive
 
 - [v3.0](./changelogs/CHANGELOG-v3.0.md)
