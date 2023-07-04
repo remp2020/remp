@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Changed CSS for collapsible bar banner to fix collisions with iPhone system button. remp/remp#1280
+
 ### [Mailer]
 
 - Fixed date filtering on the newsletter stats page. remp/remp#1231

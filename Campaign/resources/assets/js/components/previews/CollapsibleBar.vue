@@ -33,7 +33,12 @@
     display: flex;
     overflow: hidden;
     position: relative;
-    padding: 10px 18px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-bottom: calc(10px + constant(safe-area-inset-bottom));
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    padding-left: 18px;
+    padding-right: 18px;
     width: 100%;
     min-height: 68px;
     justify-content: space-between;
@@ -89,7 +94,8 @@
 @media (max-width: 640px) {
     .collapsible-bar-preview-box {
         flex-direction: column;
-        padding: 9px;
+        padding-left: 9px;
+        padding-right: 9px;
     }
 
     .collapsible-bar-main {
