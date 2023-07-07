@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed date filtering on the newsletter stats page. remp/remp#1231
 - Added make commands `update-dev` and `update-prod` to update development and production environments respectively after new code is pulled. remp/remp#1281
+- Added hermes handler to notify CRM about refreshing user's data. You can enable the feature in `config.local.neon` (see example file for reference). remp/web#2061
 
 ### [Sso]
 
