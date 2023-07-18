@@ -41,3 +41,19 @@ phpstan:
 latte-lint:
 	php bin/latte-lint.php app
 	php bin/latte-lint.php extensions
+
+composer-install-dev:
+	composer install
+
+composer-install:
+	composer install --optimize-autoloader --no-dev
+
+update-dev: composer-install-dev js-dev
+	php bin/command.php migrate:migrate
+	php bin/command.php db:seed
+	rm -rf temp/cache
+
+update-prod: composer-install js
+	php bin/command.php migrate:migrate
+	php bin/command.php db:seed
+	rm -rf temp/cache
