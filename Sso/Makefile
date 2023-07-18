@@ -31,3 +31,17 @@ fixcs:
 
 syntax:
 	find ${PHP_FOLDERS} -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
+
+composer-install-dev:
+	composer install
+
+composer-install:
+	composer install --optimize-autoloader --no-dev
+
+update-dev: composer-install-dev js-dev
+	php artisan migrate
+
+update-prod: composer-install js
+	php artisan migrate
+	php artisan config:cache
+	php artisan route:cache

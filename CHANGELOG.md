@@ -6,13 +6,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added make commands `update-dev` and `update-prod` to update development and production environments respectively after new code is pulled. remp/remp#1281
+
 ### [Campaign]
 
 - Changed CSS for collapsible bar banner to fix collisions with iPhone system button. remp/remp#1280
+- Added make commands `update-dev` and `update-prod` to update development and production environments respectively after new code is pulled. remp/remp#1281
 
 ### [Mailer]
 
 - Fixed date filtering on the newsletter stats page. remp/remp#1231
+- Added make commands `update-dev` and `update-prod` to update development and production environments respectively after new code is pulled. remp/remp#1281
+
+### [Sso]
+
+- Added make commands `update-dev` and `update-prod` to update development and production environments respectively after new code is pulled. remp/remp#1281
 
 ## Archive
 
