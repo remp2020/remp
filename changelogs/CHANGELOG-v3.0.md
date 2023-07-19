@@ -1,5 +1,7 @@
 ## [3.0] - 2023-06-28
 
+- [3.0.1] [Mailer]: Fixed typo in the `package.json` definition for `moment-timezone` causing Yarn3 installation issues. [remp2020/mailer-module#2](https://github.com/remp2020/mailer-module/pull/2)
+
 ### Project
 
 - **BREAKING**: Bumped yarn minimal version to 2. Update your yarn installation by command `yarn set version 2.x`. remp/remp#565
@@ -39,6 +41,7 @@
 
 ---
 
+[3.0.1]: https://github.com/remp2020/remp/compare/3.0.0...3.0.1
 [3.0]: https://github.com/remp2020/remp/compare/2.2.0...3.0.0
 
 [Beam]: https://github.com/remp2020/remp/tree/master/Beam

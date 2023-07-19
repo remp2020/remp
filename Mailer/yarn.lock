@@ -5478,9 +5478,9 @@ fsevents@~2.3.2:
 
 "mailer-module@file:extensions/mailer-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 2.0.0
-  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=ef1f64&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=3d3b03&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
-    "@remp/js-commons": ^2.1.0
+    "@remp/js-commons": ^2.2.0
     animate.css: ^3.7.0
     autosize: ^4.0.2
     bootstrap: ^3.4.1
@@ -5503,7 +5503,7 @@ fsevents@~2.3.2:
     lodash: ^4.17.20
     material-design-iconic-font: ^2.2.0
     moment: ^2.24.0
-    moment-timezone: "@^0.4.0 || ^0.5.0"
+    moment-timezone: ^0.4.0 || ^0.5.0
     nette-forms: ^3.1.8
     nette.ajax.js: ^2.3.0
     node-waves: ^0.7.6
@@ -5511,7 +5511,7 @@ fsevents@~2.3.2:
     salvattore: ^1.0.9
     trumbowyg: ^2.25.1
     vue: ^2.6.14
-  checksum: 9d0341f376585e66e72458100af63df4fc5169c22453f71bbcd69cacf70110a4b050beb727a1da804fea10dd9d390edd90e9fd164955b1ff01af53b5fd20d183
+  checksum: d32c8e0057afa509f0e2332f9ca76dbd06621d6fa4ba98adbceaf2c5f959014fddce5d76f949ddbe7e8424e3c09f809f87ae403b7e8a0f4929ccba69dbed0def
   languageName: node
   linkType: hard
 
@@ -5863,15 +5863,6 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-moment-timezone@@^0.4.0 || ^0.5.0:
-  version: 0.5.37
-  resolution: "moment-timezone@npm:0.5.37"
-  dependencies:
-    moment: ">= 2.9.0"
-  checksum: 2c8d98397f8512f2b3f8f8079914b22f7ef7ac8a0bd466bf00b2316d2f424c96198f2dc422b3eb4c07cf0f73172ca9d8919b8ff689eb7c88718de7bd2834be55
-  languageName: node
-  linkType: hard
-
 "moment-timezone@npm:^0.4.0":
   version: 0.4.1
   resolution: "moment-timezone@npm:0.4.1"
@@ -5881,7 +5872,16 @@ moment-timezone@@^0.4.0 || ^0.5.0:
   languageName: node
   linkType: hard
 
-"moment@npm:>= 2.6.0, moment@npm:>= 2.9.0, moment@npm:^2.10, moment@npm:^2.10.2, moment@npm:^2.24.0":
+"moment-timezone@npm:^0.4.0 || ^0.5.0":
+  version: 0.5.43
+  resolution: "moment-timezone@npm:0.5.43"
+  dependencies:
+    moment: ^2.29.4
+  checksum: e8719625feea5312f051c56d6735afe95d95f31b89fefc6b448485b6c4cde353fea1c5a0b1be01bc07daf5c4db981607839f702bf6b2c0ff2c2fd6fe315a3b33
+  languageName: node
+  linkType: hard
+
+"moment@npm:>= 2.6.0, moment@npm:^2.10, moment@npm:^2.10.2, moment@npm:^2.24.0, moment@npm:^2.29.4":
   version: 2.29.4
   resolution: "moment@npm:2.29.4"
   checksum: 5aa949ddcfc8dee4984123410cc0cd504caa6ef691bd191a527a1de67529895dcc8a8342cd67fb1953ae87172ea701bb957cea6d30abf0677ca9c62e834a5b5a
