@@ -3,13 +3,25 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use Nette\Caching\Storage;
+use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Hermes\HermesMessage;
+use Tomaj\Hermes\Emitter;
 
 class UserSubscriptionVariantsRepository extends Repository
 {
     use NewTableDataMigrationTrait;
 
     protected $tableName = 'mail_user_subscription_variants';
+
+    public function __construct(
+        Explorer $database,
+        private Emitter $emitter,
+        ?Storage $cacheStorage = null
+    ) {
+        parent::__construct($database, $cacheStorage);
+    }
 
     public function subscribedVariants(ActiveRow $userSubscription): Selection
     {
@@ -80,11 +92,27 @@ class UserSubscriptionVariantsRepository extends Repository
         if ($this->newTableDataMigrationIsRunning()) {
             $this->getNewTable()->where($where)->delete();
         }
+
+        $this->emitter->emit(new HermesMessage('user-unsubscribed-variant', [
+            'user_id' => $userSubscription->user_id,
+            'user_email' => $userSubscription->user_email,
+            'mail_type_id' => $userSubscription->mail_type->id,
+            'mail_type_variant_id' => $variantId,
+            'time' => new DateTime(),
+        ]));
         return $this->getTable()->where($where)->delete();
     }
 
     public function addVariantSubscription(ActiveRow $userSubscription, int $variantId): ActiveRow
     {
+        $this->emitter->emit(new HermesMessage('user-subscribed-variant', [
+            'user_id' => $userSubscription->user_id,
+            'user_email' => $userSubscription->user_email,
+            'mail_type_id' => $userSubscription->mail_type->id,
+            'mail_type_variant_id' => $variantId,
+            'time' => new DateTime(),
+        ]));
+
         return $this->insert([
             'mail_user_subscription_id' => $userSubscription->id,
             'mail_type_variant_id' => $variantId,

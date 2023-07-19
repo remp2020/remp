@@ -33,3 +33,5 @@ services:
 			- add('user-subscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
 			- add('user-unsubscribed', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())
 			- add('user-unsubscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+			- add('user-subscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+			- add('user-unsubscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
