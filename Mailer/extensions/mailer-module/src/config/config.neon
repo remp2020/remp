@@ -159,9 +159,6 @@ services:
 	- Remp\MailerModule\Models\Beam\UnreadArticlesResolver
 	- Remp\MailerModule\Models\Beam\JournalFactory(%remp.beam.segments_addr%)
 
-	# CRM
-	- Remp\MailerModule\Models\Crm\Client(%crm.addr%, %crm.api_token%)
-
 	config: Remp\MailerModule\Models\Config\Config
 	- Remp\MailerModule\Models\Sender
 	- Remp\MailerModule\Models\Job\BatchEmailGenerator(@mailProcessLogger)

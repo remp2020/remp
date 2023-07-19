@@ -6,7 +6,7 @@ extensions:
 
 #parameters:
 #	crm:
-#		addr: @environmentConfig::get('CRM_ADDR')
+#		addr: @environmentConfig::get('CRM_API_ADDR')
 #		api_token: @environmentConfig::get('CRM_API_TOKEN')
 
 services:

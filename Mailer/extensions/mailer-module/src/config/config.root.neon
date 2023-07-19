@@ -21,9 +21,6 @@ parameters:
 			segments_addr: @environmentConfig::get('REMP_PYTHIA_SEGMENTS_ADDR')
 		campaign:
 			web_addr: @environmentConfig::get('REMP_CAMPAIGN_ADDR')
-	crm:
-		addr: @environmentConfig::get('CRM_ADDR')
-		api_token: @environmentConfig::get(CRM_API_TOKEN)
 	preflight:
 		headers:
 			Access-Control-Allow-Headers:
