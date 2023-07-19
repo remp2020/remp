@@ -651,6 +651,9 @@ The changes Mailer is interested in are:
 In case you're not able to call these APIs, you can create console command and synchronize the data
 against your APIs with your update logic.
 
+If the changes of subscriptions isn't triggered from CRM you may notify it about changes in user's setting. You can use
+Hermes worker `\Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler` which notify CRM about the change and refresh user's data.
+
 ### Mailers
 
 By default application includes implementation of:

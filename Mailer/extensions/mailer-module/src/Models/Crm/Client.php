@@ -46,4 +46,21 @@ class Client
             throw new Exception("unable to confirm CRM user: {$serverException->getMessage()}");
         }
     }
+
+    public function userTouch(int $userId): bool
+    {
+        try {
+            $response = $this->client->get('api/v1/users/touch', [
+                'query' => [
+                    'id' => $userId,
+                ]
+            ]);
+
+            return $response->getStatusCode() === 200;
+        } catch (ClientException|ServerException $exception) {
+            throw new Exception("Unable to touch user: {$exception->getMessage()}");
+        } catch (ConnectException $exception) {
+            throw new Exception("Could not connect to CRM: {$exception->getMessage()}");
+        }
+    }
 }
