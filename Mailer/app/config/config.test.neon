@@ -28,6 +28,9 @@ services:
 		setup:
 			- addMailer(Tests\Feature\Mails\TestMailer())
 
+	crmClient:
+		factory: Remp\MailerModule\Models\Crm\Client(%crm.addr%, %crm.api_token%)
+
 	allowedDomainManager:
 		setup:
 			- addDomain('expresso.pt')
