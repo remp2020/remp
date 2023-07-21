@@ -28,15 +28,15 @@
                 <div class="tab-content p-20">
                     @foreach($configsByCategories as $category => $configs)
                         <div role="tabpanel" class="tab-pane animated fadeIn {{$loop->index === 0 ? 'active' : ''}}" id="{{$configs[0]->configCategory->code}}">
-                            <form method="post" action="{{ route('settings.update', ['configCategory' => $configs[0]->configCategory, 'redirect_url' => App\Model\Config\ConfigCategory::getSettingsTabUrl($configs[0]->configCategory->code)]) }}">
+                            <form method="post" action="{{ route('settings.update', ['configCategory' => $configs[0]->configCategory, 'redirect_url' => Remp\BeamModule\Model\Config\ConfigCategory::getSettingsTabUrl($configs[0]->configCategory->code)]) }}">
                                 {{ csrf_field() }}
 
-                                @if($configs[0]->configCategory->code === App\Model\Config\ConfigCategory::CODE_AUTHOR_SEGMENTS)
+                                @if($configs[0]->configCategory->code === Remp\BeamModule\Model\Config\ConfigCategory::CODE_AUTHOR_SEGMENTS)
                                     <div class="well col">
                                         <p><i class="zmdi zmdi-info"></i> Before you configure author segments, you can test the parameters at the configuration testing page. When you are satisfied with the resulting segments, you can get back here and configure the final parameters for calculation.</p>
                                         <a href="{{ route('authorSegments.testingConfiguration') }}" id="author-testing-link" class="btn btn-info waves-effect">Test Configuration</a>
                                     </div>
-                                @elseif($configs[0]->configCategory->code === App\Model\Config\ConfigCategory::CODE_SECTION_SEGMENTS)
+                                @elseif($configs[0]->configCategory->code === Remp\BeamModule\Model\Config\ConfigCategory::CODE_SECTION_SEGMENTS)
                                     <div class="well col">
                                         <p><i class="zmdi zmdi-info"></i> Before you configure section segments, you can test the parameters at the configuration testing page. When you are satisfied with the resulting segments, you can get back here and configure the final parameters for calculation.</p>
                                         <a href="{{ route('sectionSegments.testingConfiguration') }}" id="section-testing-link" class="btn btn-info waves-effect">Test Configuration</a>
