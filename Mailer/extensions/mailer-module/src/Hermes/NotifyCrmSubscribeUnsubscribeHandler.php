@@ -13,6 +13,13 @@ class NotifyCrmSubscribeUnsubscribeHandler implements HandlerInterface
 {
     use RedisClientTrait;
 
+    private array $allowedMessageTypes = [
+        'user-subscribed',
+        'user-unsubscribed',
+        'user-subscribed-variant',
+        'user-unsubscribed-variant',
+    ];
+
     public function __construct(
         private Client $client,
         protected RedisClientFactory $redisClientFactory
@@ -23,9 +30,9 @@ class NotifyCrmSubscribeUnsubscribeHandler implements HandlerInterface
     {
         $payload = $message->getPayload();
 
-        if (!in_array($message->getType(), ['user-subscribed', 'user-unsubscribed'], true)) {
+        if (!in_array($message->getType(), $this->allowedMessageTypes, true)) {
             throw new HermesException(
-                "unable to handle event: wrong type '{$message->getType()}', only 'user-subscribed' and 'user-unsubscribed' types are allowed"
+                "unable to handle event: wrong type '{$message->getType()}', only " . implode(',', $this->allowedMessageTypes) . " types are allowed"
             );
         }
 
