@@ -35,7 +35,10 @@ services:
 		setup:
 			- addDomain('expresso.pt')
 
+	- Remp\MailerModule\Commands\UnsubscribeInactiveUsersCommand
+
 	- Tests\Unit\NullTracker
+	- Tests\Feature\TestSegmentProvider
 
 	config:
 		setup:
