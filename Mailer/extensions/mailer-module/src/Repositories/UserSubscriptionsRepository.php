@@ -219,6 +219,25 @@ class UserSubscriptionsRepository extends Repository
         }
     }
 
+    public function unsubscribeUserFromAll(
+        int $userId,
+        string $email,
+        array $filterOutMailTypeCodes = []
+    ) {
+        $subscriptions = $this->getTable()
+            ->where('user_email', $email)
+            ->where('user_id', $userId)
+            ->where('mail_type.code NOT IN', $filterOutMailTypeCodes)
+            ->where('subscribed', 1);
+
+        foreach ($subscriptions as $subscription) {
+            $this->update($subscription, [
+                'subscribed' => false,
+            ]);
+            $this->userSubscriptionVariantsRepository->removeSubscribedVariants($subscription);
+        }
+    }
+
     public function unsubscribeEmail(ActiveRow $mailType, string $email, array $rtmParams = []): void
     {
         /** @var ActiveRow $actual */
