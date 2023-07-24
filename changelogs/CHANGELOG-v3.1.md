@@ -1,5 +1,7 @@
 ## [3.1] - 2023-07-24
 
+- [3.1.1] [Campaign]: Changed `asset()` function in `showtime.php` to return absolute URL. remp/remp#1282
+
 ### [Beam]
 
 - Added make commands `update-dev` and `update-prod` to update development and production environments respectively after new code is pulled. remp/remp#1281
@@ -25,7 +27,7 @@
 
 ---
 
-[3.1]: https://github.com/remp2020/remp/compare/3.0.0...3.1.0
+[3.1.1]: https://github.com/remp2020/remp/compare/3.1.0...3.1.1
 
 [Beam]: https://github.com/remp2020/remp/tree/master/Beam
 [Campaign]: https://github.com/remp2020/remp/tree/master/Campaign
