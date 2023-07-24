@@ -23,8 +23,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * @return string
  */
 function asset($path, $secure = null) {
-
-    return isSecure() ? 'https' : 'http' . '://' . $_SERVER['HTTP_HOST'] . '/' . trim($path, '/');
+    return ((isSecure() ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . trim($path, '/'));
 }
 
 function isSecure(): bool
