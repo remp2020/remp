@@ -23,7 +23,23 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * @return string
  */
 function asset($path, $secure = null) {
-    return (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/' . trim($path, '/');
+
+    return isSecure() ? 'https' : 'http' . '://' . $_SERVER['HTTP_HOST'] . '/' . trim($path, '/');
+}
+
+function isSecure(): bool
+{
+    if ((isset($_SERVER['HTTPS']) && (($_SERVER['HTTPS'] === 'on') || ($_SERVER['HTTPS'] === '1')))
+    || (isset($_SERVER['HTTPS']) && $_SERVER['SERVER_PORT'] === 443)) {
+        return true;
+    }
+
+    if ((!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
