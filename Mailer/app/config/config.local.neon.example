@@ -45,6 +45,12 @@ services:
         setup:
             - add('email-dropped', @unsubscribeDroppedHandler)
 
+            # Notifications to CRM that users' newsletter subscription was updated.
+            - add('user-subscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            - add('user-unsubscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            - add('user-subscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            - add('user-unsubscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+
     # Setup loggers output
     commandsLogger:
         setup:
