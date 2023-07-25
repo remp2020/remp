@@ -651,12 +651,21 @@ The changes Mailer is interested in are:
 In case you're not able to call these APIs, you can create console command and synchronize the data
 against your APIs with your update logic.
 
-If the changes of subscriptions isn't triggered from CRM you may notify it about changes in user's setting. You can use
-Hermes worker `\Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler` which notify CRM about the change and refresh user's data.
+If the subscription changes aren't triggered from CRM, it is recommended to notify CRM about changes in user's setting. You can use Hermes worker `\Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler` which notifies CRM about the change and refreshes user's cached data. To enable the feature, register the handler in your `config.local.neon`:
+
+```neon
+services:
+	hermesWorker:
+		setup:
+			- add('user-subscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+			- add('user-unsubscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+			- add('user-subscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+			- add('user-unsubscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+```
 
 ### Mailers
 
-By default application includes implementation of:
+By default, the application includes implementation of:
 
 - [SmtpMailer](./src/Models/Mailer/SmtpMailer.php)
 - [MailgunMailer](./src/Models/Mailer/MailgunMailer.php)

@@ -2,7 +2,7 @@
 
 ### Project
 
-- **BREAKING**: Bumped yarn minimal version to 2. Update your yarn installation by command `yarn set version 2.x`. remp/remp#565
+- **BREAKING**: Bumped yarn minimal version to 2. Update your yarn installation by command `yarn policies set-version 2.4.3` (replace the version with the latest v2 version). remp/remp#565
 
 ### [Beam]
 
