@@ -1,5 +1,14 @@
 <!-- core/paragraph -->
-<p style="font-family: Georgia, Times New Roman, serif; margin: 0; line-height: 1.5; font-size: {% if fontSize %}{{ fontSize }}{% else %}18px{% endif %}">
+<p style="
+        font-family: Georgia, Times New Roman, serif;
+        margin: 0;
+        line-height: 1.5;
+        font-size: {% if fontSize %}{{ fontSize }}{% else %}18px{% endif %};
+        {% if paragraph_hr %}
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        {% endif %}
+        ">
     {% if minuteListItem %}<span style="color: #BF2134;">&#8226;&nbsp;</span>{% endif %}{{ content|raw }}
 </p>
 <!-- end core/paragraph -->
