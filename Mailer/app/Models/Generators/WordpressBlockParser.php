@@ -105,6 +105,14 @@ class WordpressBlockParser
             }
             $this->minuteOrderCounter++;
         }
+
+        if ($block->name === self::BLOCK_CORE_PARAGRAPH
+            && isset($block->attributes->className)
+            && str_contains($block->attributes->className, 'wp-block-dn-newsletter-paragraph-hr')
+        ) {
+            $data['paragraph_hr'] = true;
+        }
+
         return $data;
     }
 
