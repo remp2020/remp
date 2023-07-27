@@ -45,11 +45,19 @@ services:
         setup:
             - add('email-dropped', @unsubscribeDroppedHandler)
 
+            # Tracking of sent emails into REMP Beam.
+            # Requires enabled Tracker\Remp (search this config).
+            #- add('mail-sent', Remp\MailerModule\Hermes\MailSentHandler())
+
             # Notifications to CRM that users' newsletter subscription was updated.
-            - add('user-subscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
-            - add('user-unsubscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
-            - add('user-subscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
-            - add('user-unsubscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            # Note: Requires crmClient (search this config).
+            #- add('user-subscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            #- add('user-unsubscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            #- add('user-subscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            #- add('user-unsubscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+
+    #crmClient:
+    #    factory: Remp\MailerModule\Models\Crm\Client(%crm.addr%, %crm.api_token%)
 
     # Setup loggers output
     commandsLogger:
@@ -74,10 +82,13 @@ services:
     segmentAgreggator:
         setup:
             - register(Remp\MailerModule\Models\Segment\Dummy())
+#            - register(Remp\MailerModule\Models\Segment\Crm(%crm.addr%, %crm.api_token%))
 #            - register(Remp\MailerModule\Models\Segment\Beam(%remp.beam.segments_addr%))
 #            - register(Remp\MailerModule\Models\Segment\Pythia(%remp.pythia.segments_addr%))
 
+    # If you are using REMP Beam, enable Tracker (parameters are loaded from .env)
 #    - Remp\MailerModule\Models\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
+
 #    eventDispatcher:
 #        factory: League\Event\EventDispatcher
 #        setup:
