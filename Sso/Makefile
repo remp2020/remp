@@ -2,6 +2,9 @@
 
 PHP_FOLDERS=app config
 
+install: composer-install js
+	php artisan migrate
+
 js-link-remp:
 	yarn link "../Package/remp" --relative
 
