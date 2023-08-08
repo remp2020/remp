@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- Removed `dockerize` from Dockerfiles across the project. It's been replaced by native Docker Compose healthcheck feature.
+- Added Elasticsearch and Telegraf configs directly to their respective Docker images, so there's a default config if one is not provided via volume. 
+
 ### [Campaign]
 
 - Changed `asset()` function in `showtime.php` to return absolute URL. remp/remp#1282

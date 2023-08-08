@@ -197,6 +197,11 @@ services:
     hostname: "zookeeper"
     ports:
       - "2181:2181"
+    healthcheck:
+      test: [ "CMD", 'nc', '-z', 'localhost', '2181' ]
+      timeout: 2s
+      retries: 10
+      interval: 5s
     restart: "unless-stopped"
 
   kafka:
@@ -214,6 +219,11 @@ services:
       KAFKA_RESERVED_BROKER_MAX_ID: "1001"
     volumes:
       - "kafka-data:/data"
+    healthcheck:
+      test: "nc -z localhost 9092"
+      timeout: 2s
+      retries: 10
+      interval: 5s
     restart: "unless-stopped"
 
   telegraf:
@@ -221,8 +231,10 @@ services:
     volumes:
       - "./Docker/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro"
     depends_on:
-      - "kafka"
-      - "elasticsearch"
+      elasticsearch:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     restart: "unless-stopped"
 
   elasticsearch:
@@ -230,6 +242,11 @@ services:
     volumes:
       - "./Docker/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
       - "elastic-data:/usr/share/elasticsearch/data"
+    healthcheck:
+      test: "curl -s http://localhost:9200 >/dev/null || exit 1"
+      timeout: 2s
+      retries: 10
+      interval: 5s
     restart: "unless-stopped"
 
   kibana:
