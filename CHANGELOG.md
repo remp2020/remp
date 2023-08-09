@@ -15,6 +15,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Changed `asset()` function in `showtime.php` to return absolute URL. remp/remp#1282
 
+### [Mailer]
+
+- Removed `HermesException` for missing `mail_sender_id` from `ValidateCrmEmailHandler`. remp/remp#1291
+  - This is valid state. It was introduced as fix by commit https://github.com/remp2020/remp/commit/c2d55b5d7d56f7ba29e3977f33785d77b3ca145a
+
 ## Archive
 
 - [v3.1](./changelogs/CHANGELOG-v3.1.md)

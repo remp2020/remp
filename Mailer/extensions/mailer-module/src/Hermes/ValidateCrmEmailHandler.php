@@ -27,7 +27,7 @@ class ValidateCrmEmailHandler implements HandlerInterface
     {
         $payload = $message->getPayload();
         if (!isset($payload['mail_sender_id'])) {
-            throw new HermesException('unable to handle event: mail_sender_id is missing');
+            return false;
         }
         if (!isset($payload['timestamp'])) {
             throw new HermesException('unable to handle event: timestamp is missing');
