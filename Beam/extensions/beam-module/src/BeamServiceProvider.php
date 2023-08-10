@@ -11,6 +11,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
@@ -93,6 +94,13 @@ class BeamServiceProvider extends ServiceProvider
 
         $router->aliasMiddleware('auth.jwt', VerifyJwtToken::class);
         $router->aliasMiddleware('auth.basic.dashboard', DashboardBasicAuth::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->app->booted(function () {
+                $schedule = $this->app->make(Schedule::class);
+                (new Scheduler())->schedule($schedule);
+            });
+        }
     }
 
     /**
