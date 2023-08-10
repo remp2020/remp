@@ -9,7 +9,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Project
 
 - Removed `dockerize` from Dockerfiles across the project. It's been replaced by native Docker Compose healthcheck feature.
-- Added Elasticsearch and Telegraf configs directly to their respective Docker images, so there's a default config if one is not provided via volume. 
+- Added Elasticsearch and Telegraf configs directly to their respective Docker images, so there's a default config if one is not provided via volume.
+
+### [Beam]
+
+- Fixed schedules not being registered for Skeleton application. remp/remp#1292
 
 ### [Campaign]
 
