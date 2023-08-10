@@ -209,28 +209,26 @@ class BeamServiceProvider extends ServiceProvider
 
     protected function registerCommands(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                Console\Commands\AggregateArticlesViews::class,
-                Console\Commands\AggregateConversionEvents::class,
-                Console\Commands\AggregatePageviewLoadJob::class,
-                Console\Commands\AggregatePageviews::class,
-                Console\Commands\AggregatePageviewTimespentJob::class,
-                Console\Commands\CompressAggregations::class,
-                Console\Commands\CompressSnapshots::class,
-                Console\Commands\ComputeAuthorsSegments::class,
-                Console\Commands\ComputeSectionSegments::class,
-                Console\Commands\DashboardRefresh::class,
-                Console\Commands\DeleteDuplicatePageviews::class,
-                Console\Commands\DeleteOldAggregations::class,
-                Console\Commands\ElasticDataRetention::class,
-                Console\Commands\ElasticWriteAliasRollover::class,
-                Console\Commands\ProcessConversionSources::class,
-                Console\Commands\ProcessPageviewLoyalVisitors::class,
-                Console\Commands\ProcessPageviewSessions::class,
-                Console\Commands\SendNewslettersCommand::class,
-                Console\Commands\SnapshotArticlesViews::class,
-            ]);
-        }
+        $this->commands([
+            Console\Commands\AggregateArticlesViews::class,
+            Console\Commands\AggregateConversionEvents::class,
+            Console\Commands\AggregatePageviewLoadJob::class,
+            Console\Commands\AggregatePageviews::class,
+            Console\Commands\AggregatePageviewTimespentJob::class,
+            Console\Commands\CompressAggregations::class,
+            Console\Commands\CompressSnapshots::class,
+            Console\Commands\ComputeAuthorsSegments::class,
+            Console\Commands\ComputeSectionSegments::class,
+            Console\Commands\DashboardRefresh::class,
+            Console\Commands\DeleteDuplicatePageviews::class,
+            Console\Commands\DeleteOldAggregations::class,
+            Console\Commands\ElasticDataRetention::class,
+            Console\Commands\ElasticWriteAliasRollover::class,
+            Console\Commands\ProcessConversionSources::class,
+            Console\Commands\ProcessPageviewLoyalVisitors::class,
+            Console\Commands\ProcessPageviewSessions::class,
+            Console\Commands\SendNewslettersCommand::class,
+            Console\Commands\SnapshotArticlesViews::class,
+        ]);
     }
 }

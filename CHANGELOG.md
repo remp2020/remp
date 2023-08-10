@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed schedules not being registered for Skeleton application. remp/remp#1292
+- Fixed commands not being available to execute for synchronous web event handlers. remp/remp#1292
 
 ### [Campaign]
 
