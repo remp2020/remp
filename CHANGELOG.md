@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed schedules not being registered for Skeleton application. remp/remp#1292
 - Fixed commands not being available to execute for synchronous web event handlers. remp/remp#1292
+- Refactored system settings configuration so they're available within Beam module and for Skeleton apps. remp/remp#1292
 
 ### [Campaign]
 
