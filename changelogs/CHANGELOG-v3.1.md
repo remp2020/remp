@@ -1,6 +1,9 @@
 ## [3.1] - 2023-07-24
 
 - [3.1.1] [Campaign]: Changed `asset()` function in `showtime.php` to return absolute URL. remp/remp#1282
+- [3.1.2] [Beam]: Fixed schedules not being registered for Skeleton application. remp/remp#1292
+- [3.1.2] [Beam]: Fixed commands not being available to execute for synchronous web event handlers. remp/remp#1292
+- [3.1.2] [Beam]: Refactored system settings configuration so they're available within Beam module and for Skeleton apps. remp/remp#1292
 
 ### [Beam]
 
@@ -28,6 +31,7 @@
 ---
 
 [3.1.1]: https://github.com/remp2020/remp/compare/3.1.0...3.1.1
+[3.1.2]: https://github.com/remp2020/remp/compare/3.1.1...3.1.2
 
 [Beam]: https://github.com/remp2020/remp/tree/master/Beam
 [Campaign]: https://github.com/remp2020/remp/tree/master/Campaign
