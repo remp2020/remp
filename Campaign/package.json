@@ -23,6 +23,7 @@
         "npm": ">=9",
         "yarn": ">=2"
     },
+    "packageManager": "yarn@2.4.3",
     "dependencies": {
         "@babel/core": "^7.0",
         "@remp/js-commons": "^1.3",

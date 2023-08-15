@@ -4,6 +4,8 @@
 - [3.1.2] [Beam]: Fixed schedules not being registered for Skeleton application. remp/remp#1292
 - [3.1.2] [Beam]: Fixed commands not being available to execute for synchronous web event handlers. remp/remp#1292
 - [3.1.2] [Beam]: Refactored system settings configuration so they're available within Beam module and for Skeleton apps. remp/remp#1292
+- [3.1.3]: Fixed issue with `yarn link` not being able to link JS packages due to version conflict. remp/remp#1293
+- [3.1.3]: Added explicit `packageManager` definition into `package.json` files so Yarn v3 doesn't complain about outdated lockfile. remp/remp#1294
 
 ### [Beam]
 
@@ -32,6 +34,7 @@
 
 [3.1.1]: https://github.com/remp2020/remp/compare/3.1.0...3.1.1
 [3.1.2]: https://github.com/remp2020/remp/compare/3.1.1...3.1.2
+[3.1.3]: https://github.com/remp2020/remp/compare/3.1.2...3.1.3
 
 [Beam]: https://github.com/remp2020/remp/tree/master/Beam
 [Campaign]: https://github.com/remp2020/remp/tree/master/Campaign
