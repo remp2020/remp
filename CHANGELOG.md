@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Removed `dockerize` from Dockerfiles across the project. It's been replaced by native Docker Compose healthcheck feature.
 - Added Elasticsearch and Telegraf configs directly to their respective Docker images, so there's a default config if one is not provided via volume.
 - Fixed issue with `yarn link` not being able to link JS packages due to version conflict. remp/remp#1293
+- Added explicit `packageManager` definition into `package.json` files so Yarn v3 doesn't complain about outdated lockfile. remp/remp#1294
 
 ### [Beam]
 

@@ -18,6 +18,7 @@
     "npm": ">=9",
     "yarn": ">=2"
   },
+  "packageManager": "yarn@2.4.3",
   "dependencies": {
     "mailer-module": "file:extensions/mailer-module"
   },

@@ -9,8 +9,11 @@
   ],
   "private": true,
   "engines": {
-    "node": ">=18"
+    "node": ">=18",
+    "npm": ">=9",
+    "yarn": ">=2"
   },
+  "packageManager": "yarn@2.4.3",
   "dependencies": {
     "@remp/js-commons": "^2.2.0",
     "animate.css": "^3.7.0",
