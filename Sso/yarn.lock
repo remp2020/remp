@@ -364,6 +364,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/parser@npm:^7.18.4":
+  version: 7.22.10
+  resolution: "@babel/parser@npm:7.22.10"
+  bin:
+    parser: ./bin/babel-parser.js
+  checksum: a4dcca80954f055d0be392276cd9673f24b3a0a70445005c3c33ca68f931497419374f3eed478ff53cd47c6f068832fc399e8bc0028df9d12e3e453b0e397bb9
+  languageName: node
+  linkType: hard
+
 "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@npm:^7.18.6":
   version: 7.18.6
   resolution: "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@npm:7.18.6"
@@ -1454,7 +1463,7 @@ __metadata:
     datatables.net-rowgroup: ^1.1.3
     jquery: 3.6.0
     rison: ^0.1.1
-    vue: ^2.6.14
+    vue: ^2.7.14
   languageName: node
   linkType: soft
 
@@ -1780,6 +1789,17 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: 2986cee524e758ca49a2a4df64516d81ee7d888eba93fb1405fe380242e4d3880f96c6e85e2dc59859fb282e50da4b9b0239cfc8ccc933344ae13d0db0fed514
+  languageName: node
+  linkType: hard
+
+"@vue/compiler-sfc@npm:2.7.14":
+  version: 2.7.14
+  resolution: "@vue/compiler-sfc@npm:2.7.14"
+  dependencies:
+    "@babel/parser": ^7.18.4
+    postcss: ^8.4.14
+    source-map: ^0.6.1
+  checksum: e99c478edb2f66dd6082fb583302cef7198924f40916a6356368e6789b1675f6f5785aeeb249468d13d75ec83f75309e52dc5a5c4a9c37ca5ffdd1d051671379
   languageName: node
   linkType: hard
 
@@ -3354,6 +3374,13 @@ __metadata:
   dependencies:
     css-tree: ^1.1.2
   checksum: 757304b1c78052e74d2235b775b9a5fee287c66a189944732165021a0bb45b65ba8e1b9cfa478884d5721967f98c9c6d998240c5c78b2a003e4ab76a5a5b7b10
+  languageName: node
+  linkType: hard
+
+"csstype@npm:^3.1.0":
+  version: 3.1.2
+  resolution: "csstype@npm:3.1.2"
+  checksum: cd3039367765327867c0c61384a629d3237f8c25198f6f766dda19be494b31bbd642dbedfc5e421c4a5c842585b43a617cfc25b36cb8fb1c6fcb2be34943e5d1
   languageName: node
   linkType: hard
 
@@ -5814,6 +5841,15 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
+"nanoid@npm:^3.3.6":
+  version: 3.3.6
+  resolution: "nanoid@npm:3.3.6"
+  bin:
+    nanoid: bin/nanoid.cjs
+  checksum: f849c83f0e0ba09542602804eb3d0ab00a758586764411ea17e55462777cbe88d24eaeeef4dfbfe436af62b88f20fc3d504c639f0c14fa0b1434b1de36fe19af
+  languageName: node
+  linkType: hard
+
 "negotiator@npm:0.6.3, negotiator@npm:^0.6.3":
   version: 0.6.3
   resolution: "negotiator@npm:0.6.3"
@@ -6809,6 +6845,17 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
+"postcss@npm:^8.4.14":
+  version: 8.4.27
+  resolution: "postcss@npm:8.4.27"
+  dependencies:
+    nanoid: ^3.3.6
+    picocolors: ^1.0.0
+    source-map-js: ^1.0.2
+  checksum: 65c489d6ff6123a8d73a038c0f0e2a0749382a29f6af1df87efccad2a0df402019353eeb5be6fdf7b48b2ad109724c787fda883d845df71a484b6b6d65852c65
+  languageName: node
+  linkType: hard
+
 "pretty-time@npm:^1.1.0":
   version: 1.1.0
   resolution: "pretty-time@npm:1.1.0"
@@ -7297,7 +7344,7 @@ resolve@^1.10.0:
     rison: ^0.1.1
     sass: ^1.26.11
     sass-loader: ^13.0
-    vue-template-compiler: ^2.6.10
+    vue-template-compiler: ^2.7
     webpack: ^5.0.0
   languageName: unknown
   linkType: soft
@@ -8382,7 +8429,7 @@ resolve@^1.10.0:
   languageName: node
   linkType: hard
 
-"vue-template-compiler@npm:^2.6.10":
+"vue-template-compiler@npm:^2.7":
   version: 2.7.14
   resolution: "vue-template-compiler@npm:2.7.14"
   dependencies:
@@ -8392,10 +8439,13 @@ resolve@^1.10.0:
   languageName: node
   linkType: hard
 
-"vue@npm:^2.6.14":
-  version: 2.6.14
-  resolution: "vue@npm:2.6.14"
-  checksum: 542787dc830efc5cb8285a8046bba5a81e6f952e70e4e1a308cc8d51c68f152fd02da5edbd47b6a14908437d76fdee048aa3f64341d4777fb37ce231e2d845df
+"vue@npm:^2.7.14":
+  version: 2.7.14
+  resolution: "vue@npm:2.7.14"
+  dependencies:
+    "@vue/compiler-sfc": 2.7.14
+    csstype: ^3.1.0
+  checksum: 7aafbb1e438c16bb7ec7b6bce3a59fe0494ed26ac80579627c0be0f88a37328af7a7e3996e4574df23f26a5a6a33041f55f93d332d5724004316530e4dfaf25e
   languageName: node
   linkType: hard
 
