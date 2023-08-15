@@ -1761,7 +1761,7 @@ __metadata:
     datatables.net-rowgroup: ^1.1.3
     jquery: 3.6.0
     rison: ^0.1.1
-    vue: ^2.6.14
+    vue: ^2.7.14
   languageName: node
   linkType: soft
 
@@ -8365,7 +8365,7 @@ fsevents@~2.3.2:
 
 "remp-beam@file:extensions/beam-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 1.0.0
-  resolution: "remp-beam@file:extensions/beam-module#extensions/beam-module::hash=579591&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "remp-beam@file:extensions/beam-module#extensions/beam-module::hash=a0be56&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/core": ^7.0
     "@remp/js-commons": ^1.3
@@ -8405,7 +8405,7 @@ fsevents@~2.3.2:
     vue2-filters: ^0.6.0
     vuex: ^3.1.0
     vuex-persistedstate: ^2.5.4
-  checksum: f4fbc908f3cb0d15e754f91b5df442c9956b2be6fb0a8a630ea6c8474e1901275efc274ba88e7f4a1e93df8ed92728f14ba3824fc1b8f32cc07832ffa3cc9da3
+  checksum: 21e38ceb2970a59ddf24f543d7358797d8ef50d8d19b1002644302b066be6761fc39b1b5ab436b2c5134610edd13f0d0162c7597974f5d044f52f4373eae2dfe
   languageName: node
   linkType: hard
 
@@ -9833,14 +9833,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"vue@npm:^2.6.14":
-  version: 2.6.14
-  resolution: "vue@npm:2.6.14"
-  checksum: 542787dc830efc5cb8285a8046bba5a81e6f952e70e4e1a308cc8d51c68f152fd02da5edbd47b6a14908437d76fdee048aa3f64341d4777fb37ce231e2d845df
-  languageName: node
-  linkType: hard
-
-"vue@npm:^2.7":
+"vue@npm:^2.7, vue@npm:^2.7.14":
   version: 2.7.14
   resolution: "vue@npm:2.7.14"
   dependencies:
