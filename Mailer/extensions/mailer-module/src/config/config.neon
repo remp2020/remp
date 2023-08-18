@@ -113,6 +113,8 @@ services:
 
 	segmentAgreggator:
 		factory: Remp\MailerModule\Models\Segment\Aggregator
+		setup:
+			- register(Remp\MailerModule\Models\Segment\Mailer())
 
 	allowedDomainManager: Remp\MailerModule\Models\ContentGenerator\AllowedDomainManager
 

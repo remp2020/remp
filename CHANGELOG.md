@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Removed `HermesException` for missing `mail_sender_id` from `ValidateCrmEmailHandler`. remp/remp#1291
   - This is valid state. It was introduced as fix by commit https://github.com/remp2020/remp/commit/c2d55b5d7d56f7ba29e3977f33785d77b3ca145a
+- Added new `Mailer` segment provider which provides segments of users subscribed to mail types. remp/mnt#114
 
 ## Archive
 

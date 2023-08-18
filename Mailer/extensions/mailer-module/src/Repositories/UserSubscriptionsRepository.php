@@ -72,6 +72,20 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $listId])->fetch();
     }
 
+    public function findSubscribedUserIdsByMailTypeCode(string $mailTypeCode): array
+    {
+        $query = $this->getTable()->where([
+            'mail_type.code' => $mailTypeCode,
+            'subscribed' => true,
+        ]);
+
+        $userIds = [];
+        foreach ($query as $row) {
+            $userIds[] = $row->user_id;
+        }
+        return $userIds;
+    }
+
     public function isEmailSubscribed(string $email, int $typeId): bool
     {
         return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $typeId, 'subscribed' => true])->count('*') > 0;
