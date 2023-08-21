@@ -26,7 +26,7 @@ class UnsubscribeInactiveUsersCommand extends Command
 
     public const COMMAND_NAME = 'mail:unsubscribe-inactive-users';
     private const CRM_SEGMENT_NAME = 'unsubscribe_inactive_users_from_newsletters_list';
-    private const APPLE_BOT_EMAILS = 'apple_bot_emails';
+    public const APPLE_BOT_EMAILS = 'apple_bot_emails';
 
     private array $omitMailTypeCodes = ['system', 'system_optional'];
 
@@ -93,13 +93,15 @@ class UnsubscribeInactiveUsersCommand extends Command
 
                 $logCount = count($logs);
                 if (count($logs) >= 5) {
-                    $columnToCheck = 'opened_at';
-                    if ($this->redis()->sismember(self::APPLE_BOT_EMAILS, $userEmail)) {
-                        $columnToCheck = 'clicked_at';
-                    }
+                    $isAppleBotOpenedEmail = $this->redis()->sismember(self::APPLE_BOT_EMAILS, $userEmail);
 
                     foreach ($logs as $log) {
-                        if ($log->{$columnToCheck}) {
+                        if ($isAppleBotOpenedEmail && $log->clicked_at) {
+                            $output->writeln("Skipping, user is active.");
+                            continue 2;
+                        }
+
+                        if (!$isAppleBotOpenedEmail && ($log->opened_at || $log->clicked_at)) {
                             $output->writeln("Skipping, user is active.");
                             continue 2;
                         }
