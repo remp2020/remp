@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Added string error code to the Subscribe APIs to differentiate between different 404 scenarios. remp/web#2263 
+
 ## Archive
 
 - [v3.2](./changelogs/CHANGELOG-v3.2.md)

@@ -47,7 +47,11 @@ class SubscribeHandler extends BaseHandler
         try {
             $subscribedVariants = $this->processUserSubscription($payload);
         } catch (InvalidApiInputParamException $e) {
-            return new JsonApiResponse($e->getCode(), ['status' => 'error', 'message' => $e->getMessage()]);
+            return new JsonApiResponse($e->getCode(), [
+                'status' => 'error',
+                'code' => $e->getErrorCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
 
         return new JsonApiResponse(200, [
@@ -105,7 +109,11 @@ class SubscribeHandler extends BaseHandler
         }
 
         if (!$list) {
-            throw new InvalidApiInputParamException('List not found.', 404);
+            throw new InvalidApiInputParamException(
+                'List with identifier ' . ($payload['list_code'] ?? $payload['list_id']) . ' not found.',
+                404,
+                'list_not_found',
+            );
         }
 
         return $list;
@@ -126,7 +134,8 @@ class SubscribeHandler extends BaseHandler
             if (!$variant) {
                 throw new InvalidApiInputParamException(
                     "Variant with ID [{$payload['variant_id']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
-                    404
+                    404,
+                    'variant_not_found',
                 );
             }
             return $variant->id;
@@ -136,7 +145,8 @@ class SubscribeHandler extends BaseHandler
             if (!$variant) {
                 throw new InvalidApiInputParamException(
                     "Variant with code [{$payload['variant_code']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
-                    404
+                    404,
+                    'variant_not_found',
                 );
             }
             return $variant->id;

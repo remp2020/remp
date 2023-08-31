@@ -49,13 +49,21 @@ class UnSubscribeHandler extends BaseHandler
         }
 
         if (!$list) {
-            return new JsonApiResponse(404, ['status' => 'error', 'message' => 'list not found']);
+            return new JsonApiResponse(404, [
+                'status' => 'error',
+                'code' => 'list_not_found',
+                'message' => 'List with identifier ' . ($payload['list_code'] ?? $payload['list_id']) . ' not found.',
+            ]);
         }
 
         try {
             $variant = $this->getVariant($payload, $list);
         } catch (InvalidApiInputParamException $e) {
-            return new JsonApiResponse($e->getCode(), ['status' => 'error', 'message' => $e->getMessage()]);
+            return new JsonApiResponse($e->getCode(), [
+                'status' => 'error',
+                'code' => $e->getErrorCode(),
+                'message' => $e->getMessage(),
+            ]);
         }
 
         $sendGoodbyeEmail = $payload['send_accompanying_emails'] ?? true;
@@ -108,7 +116,8 @@ class UnSubscribeHandler extends BaseHandler
             if (!$variant) {
                 throw new InvalidApiInputParamException(
                     "Variant with ID [{$payload['variant_id']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
-                    404
+                    404,
+                    'variant_not_found',
                 );
             }
             return $variant;
@@ -118,7 +127,8 @@ class UnSubscribeHandler extends BaseHandler
             if (!$variant) {
                 throw new InvalidApiInputParamException(
                     "Variant with code [{$payload['variant_code']}] for list [ID: {$list->id}, code: {$list->code}] was not found.",
-                    404
+                    404,
+                    'variant_not_found',
                 );
             }
             return $variant;

@@ -10,7 +10,6 @@ use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
@@ -132,7 +131,7 @@ class MailTypeUpsertHandler extends BaseHandler
         } catch (InvalidApiInputParamException $e) {
             return new JsonApiResponse($e->getCode(), [
                 'status' => 'error',
-                'code' => 'invalid_input',
+                'code' => $e->getErrorCode(),
                 'message' => $e->getMessage(),
             ]);
         }
