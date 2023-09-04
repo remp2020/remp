@@ -37,6 +37,7 @@ class Mailer implements ISegment
 
     public function users(array $segment): array
     {
-        return $this->userSubscriptionsRepository->findSubscribedUserIdsByMailTypeCode($segment['code']);
+        $code = preg_replace('/^subscribers-/', '', $segment['code']);
+        return $this->userSubscriptionsRepository->findSubscribedUserIdsByMailTypeCode($code);
     }
 }

@@ -1,5 +1,7 @@
 ## [3.2] - 2023-08-24
 
+- [3.2.1] [Mailer]: Fixed Mailer segment provider users acquiring. Provided segment code needs to be processed before fetching users from database. remp/mnt#114
+
 ### Project
 
 - Removed `dockerize` from Dockerfiles across the project. It's been replaced by native Docker Compose healthcheck feature.
@@ -27,6 +29,7 @@
 ---
 
 [3.2]: https://github.com/remp2020/remp/compare/3.1.0...3.2.0
+[3.2.1]: https://github.com/remp2020/remp/compare/3.2.0...3.2.1
 
 [Beam]: https://github.com/remp2020/remp/tree/master/Beam
 [Campaign]: https://github.com/remp2020/remp/tree/master/Campaign
