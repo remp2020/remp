@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added string error code to the Subscribe APIs to differentiate between different 404 scenarios. remp/web#2263 
+- Fix Mailer segment provider users acquiring. Provided segment code needs to be processed before fetching users from database. remp/mnt#114
 
 ## Archive
 
