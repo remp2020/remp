@@ -9,7 +9,7 @@
         "parent_id": '{!! $entity->parent_id !!}' || null,
         "name": '{!! $entity->name !!}',
         "params": {!! @json($entity->params) !!},
-        "types": {!! @json(\App\EntityParam::getAllTypes()) !!},
+        "types": {!! @json(\Remp\BeamModule\Model\EntityParam::getAllTypes()) !!},
         "rootEntities": {!! @json($rootEntities) !!} || null,
         "validateUrl": {!! @json(route('entities.validateForm', ['entity' => $entity])) !!}
     };

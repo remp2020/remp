@@ -88,7 +88,7 @@ class NewsletterController extends Controller
 
         return response()->format([
             'html' => view(
-                'newsletters.create',
+                'beam::newsletters.create',
                 compact(['newsletter', 'segments', 'generators', 'criteria', 'mailTypes'])
             ),
             'json' => [],
@@ -105,7 +105,7 @@ class NewsletterController extends Controller
 
         return response()->format([
             'html' => view(
-                'newsletters.edit',
+                'beam::newsletters.edit',
                 compact(['newsletter', 'segments', 'generators', 'criteria', 'mailTypes'])
             ),
             'json' => [],
