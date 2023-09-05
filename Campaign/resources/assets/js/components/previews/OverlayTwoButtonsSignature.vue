@@ -169,14 +169,14 @@
                                v-bind:href="$parent.injectSnippets(targetUrl)"
                                v-on:click="$parent.clicked($event, !$parent.url)"
                                data-param-rtm_keyword="btn-primary">
-                                <span class="item title" v-html="$parent.injectSnippets(textBtnPrimary)"></span>
+                                <span class="item title" v-html="$parent.injectSnippets(textBtnPrimary)"></span><br>
                                 <span class="item desc" v-if="hasTextBtnPrimaryMinor" v-html="$parent.injectSnippets(textBtnPrimaryMinor)"></span>
                             </a>
 
                             <div class="spacer" v-if="hasSecondaryButton">&nbsp;</div>
 
                             <a class="btn btn-secondary" v-if="hasSecondaryButton" v-bind:href="$parent.injectSnippets(targetUrlSecondary)" data-param-rtm_keyword="btn-secondary">
-                                <span class="item title" v-html="$parent.injectSnippets(textBtnSecondary)"></span>
+                                <span class="item title" v-html="$parent.injectSnippets(textBtnSecondary)"></span><br>
                                 <span class="item desc" v-if="hasTextBtnSecondaryMinor" v-html="$parent.injectSnippets(textBtnSecondaryMinor)"></span>
                             </a>
                         </div>

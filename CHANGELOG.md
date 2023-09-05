@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Added visual changes for the overlay two buttons banner - minor button texts are now on separate line.
+
 ### [Mailer]
 
 - Added string error code to the Subscribe APIs to differentiate between different 404 scenarios. remp/web#2263 
