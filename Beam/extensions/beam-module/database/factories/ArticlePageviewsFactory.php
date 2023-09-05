@@ -31,7 +31,7 @@ class ArticlePageviewsFactory extends Factory
 
         return [
             'article_id' => function () {
-                return \App\Article::factory()->create()->id;
+                return \Remp\BeamModule\Model\Article::factory()->create()->id;
             },
             'time_from' => $timeFrom,
             'time_to' => $timeTo,

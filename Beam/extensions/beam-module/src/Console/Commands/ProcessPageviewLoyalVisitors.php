@@ -91,7 +91,7 @@ class ProcessPageviewLoyalVisitors extends Command
         }
 
         $segmentCode = "{$treshold}-plus-article-views-in-{$days}-days";
-        if (\App\Segment::where(['code' => $segmentCode])->exists()) {
+        if (Segment::where(['code' => $segmentCode])->exists()) {
             $this->line("Segment <info>{$segmentCode}</info> already exists, no new segment was created");
             return 2;
         }

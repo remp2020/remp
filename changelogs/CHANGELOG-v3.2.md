@@ -1,6 +1,7 @@
 ## [3.2] - 2023-08-24
 
 - [3.2.1] [Mailer]: Fixed Mailer segment provider users acquiring. Provided segment code needs to be processed before fetching users from database. remp/mnt#114
+- [3.2.2] [Mailer]: Fixed Beam's invalid namespaces and routes.
 
 ### Project
 

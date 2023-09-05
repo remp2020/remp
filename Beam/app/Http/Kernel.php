@@ -2,9 +2,7 @@
 
 namespace App\Http;
 
-use App\Http\Middleware\DashboardBasicAuth;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
 class Kernel extends HttpKernel
 {

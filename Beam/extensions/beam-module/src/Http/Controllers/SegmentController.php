@@ -195,7 +195,7 @@ class SegmentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Segment  $segment
+     * @param \Remp\BeamModule\Model\Segment $segment
      * @return \Illuminate\Http\Response
      */
     public function destroy(Segment $segment)
