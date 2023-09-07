@@ -14,21 +14,12 @@ use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
 final class GeneratorPresenter extends BasePresenter
 {
-    private $sourceTemplatesRepository;
-
-    private $sourceTemplateFormFactory;
-
-    private $dataTableFactory;
-
     public function __construct(
-        SourceTemplatesRepository $sourceTemplatesRepository,
-        SourceTemplateFormFactory $sourceTemplateFormFactory,
-        DataTableFactory $dataTableFactory
+        private SourceTemplatesRepository $sourceTemplatesRepository,
+        private SourceTemplateFormFactory $sourceTemplateFormFactory,
+        private DataTableFactory $dataTableFactory
     ) {
         parent::__construct();
-        $this->sourceTemplatesRepository = $sourceTemplatesRepository;
-        $this->sourceTemplateFormFactory = $sourceTemplateFormFactory;
-        $this->dataTableFactory = $dataTableFactory;
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -139,11 +130,11 @@ final class GeneratorPresenter extends BasePresenter
         return $form;
     }
 
-    public function handleRenderSorting($sortingValue): void
+    public function handleRenderSorting($sorting): void
     {
-        /** @var BaseControl $sorting */
-        $sorting = $this['mailSourceTemplateForm']['sorting'];
-        $sorting->setValue($sortingValue);
+        /** @var BaseControl $sortingInput */
+        $sortingInput = $this['mailSourceTemplateForm']['sorting'];
+        $sortingInput->setValue($sorting);
 
         $this->redrawControl('wrapper');
         $this->redrawControl('sortingAfterSnippet');
