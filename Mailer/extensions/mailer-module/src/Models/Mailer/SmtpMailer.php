@@ -60,6 +60,11 @@ class SmtpMailer extends Mailer
 
     public function send(Message $message): void
     {
+        // Removing this header prevents leaking template parameters that may contain sensitive information.
+        // This header is historically used in MailgunMailer for passing template parameters to Mailgun.
+        // We rather not pass this to SMTP mailer.
+        $message->clearHeader('X-Mailer-Template-Params');
+
         $this->mailer->send($message);
     }
 }

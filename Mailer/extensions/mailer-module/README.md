@@ -737,6 +737,8 @@ abstract class.
     * `$message->getHeader('X-Mailer-Template-Params')`: Values for template variables to be injected by 3rd party
     * `$message->getHeader('X-Mailer-Variables')`: E-mail related metadata to be used in the implementation
 
+**Note:** SmtpMailer implementation automatically removes `X-Mailer-Template-Params` header before sending to prevent leaking of sensitive information.  
+
 #### Event-receiving webhooks
 
 If you're able to configure your 3rd party service to send stats about emails via webhooks, you can create

@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING** Changed that `X-Mailer-Template-Params` mail header is no longer sent to `SmtpMailer`, as it may contain sensitive information. remp/remp#1296
+  - If this header is still required by your implementation, you need to implement a custom SmtpMailer. 
 - Added string error code to the Subscribe APIs to differentiate between different 404 scenarios. remp/web#2263 
 - Fix Mailer segment provider users acquiring. Provided segment code needs to be processed before fetching users from database. remp/mnt#114
 
