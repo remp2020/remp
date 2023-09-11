@@ -67,6 +67,8 @@ tests:
     MYSQL_ROOT_PASSWORD: secret
     REDIS_PORT: 6379
 
+# DENNIKN.SK
+
 "mailer/🇸🇰":
   stage: deploy
   script:
@@ -150,6 +152,8 @@ tests:
     - master
   dependencies: []
 
+# DENIKN.CZ
+
 "mailer/🇨🇿":
   stage: deploy
   script:
@@ -223,6 +227,88 @@ tests:
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=denikncz/sso"
       -F "variables[URL]=https://sso.denikn.cz"
+      -F "variables[APP]=sso"
+      $DEPLOY_TRIGGER_PIPELINE_URL
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
+  only:
+    - master
+  dependencies: []
+
+# PREVIEW
+
+"mailer/🗞️":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=preview/mailer"
+      -F "variables[APP]=mailer"
+      $DEPLOY_TRIGGER_PIPELINE_URL
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
+  only:
+    - master
+  dependencies: []
+
+"campaign/🗞️":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=preview/campaign"
+      -F "variables[APP]=campaign"
+      $DEPLOY_TRIGGER_PIPELINE_URL
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
+  only:
+    - master
+  dependencies: []
+
+"beam/🗞️":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=preview/beam"
+      -F "variables[APP]=beam"
+      $DEPLOY_TRIGGER_PIPELINE_URL
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
+  only:
+    - master
+  dependencies: []
+
+"sso/🗞️":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=preview/sso"
       -F "variables[APP]=sso"
       $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
