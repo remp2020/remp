@@ -1,6 +1,6 @@
 <div class="pmb-block">
     <div class="pmbb-header">
-        <h2><i class="zmdi zmdi-male-female m-r-5"></i> Gender balance</h2>
+        <h2><i class="zmdi zmdi-male-female m-r-5"></i> Gender balance - first photo</h2>
     </div>
     @if (is_null($menCount) || is_null($womenCount))
         No data available.
