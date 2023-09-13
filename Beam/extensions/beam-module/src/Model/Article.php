@@ -398,29 +398,6 @@ SQL;
         return $query;
     }
 
-    /**
-     * Update or create record in case it doesn't exist.
-     *
-     * @param array $values
-     *
-     * @return Article
-     */
-    public static function upsert(array $values): Article
-    {
-        $attributes = (new static($values))->attributesToArray();
-        $updateKeys = array_keys($attributes);
-        $updateKeys[] = 'updated_at';
-        // Timestamp values are not inserted automatically
-        $attributes['updated_at'] = $attributes['created_at'] = Carbon::now()->toDateTimeString();
-        if (isset($attributes['published_at'])) {
-            $attributes['published_at'] = Misc::dateToSql($attributes['published_at']);
-        }
-
-        static::insertOnDuplicateKey($attributes, $updateKeys);
-
-        return static::where('external_id', $values['external_id'])->first();
-    }
-
     public static function computeConversionRate(
         $conversionsCount,
         $uniqueBrowsersCount,

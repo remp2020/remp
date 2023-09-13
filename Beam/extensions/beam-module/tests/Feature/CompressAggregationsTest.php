@@ -23,6 +23,7 @@ class CompressAggregationsTest extends TestCase
     {
         parent::setUp();
         $this->thresholdPeriod = config('beam.aggregated_data_retention_period');
+        Article::unsetEventDispatcher();
     }
 
     public function testPageviewsAggregations()

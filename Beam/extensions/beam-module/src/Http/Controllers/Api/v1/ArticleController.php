@@ -37,7 +37,10 @@ class ArticleController
             // therefore convert to UTC
             $a['published_at'] = Carbon::parse($a['published_at']);
             $a['content_type'] = $a['content_type'] ?? Article::DEFAULT_CONTENT_TYPE;
-            $article = Article::upsert($a);
+            $article = Article::updateOrCreate(
+                ['external_id' => $a['external_id']],
+                $a
+            );
 
             $article->sections()->detach();
             foreach ($a['sections'] ?? [] as $sectionName) {

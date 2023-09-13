@@ -29,4 +29,9 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+
+    'azure_computer_vision' => [
+        'endpoint' => env('AZURE_COMPUTER_VISION_ENDPOINT'),
+        'api_key' => env('AZURE_COMPUTER_VISION_API_KEY'),
+    ],
 ];

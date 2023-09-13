@@ -21,6 +21,8 @@ class ComputeAuthorsSegmentsTest extends TestCase
 
     public function testJob()
     {
+        Article::unsetEventDispatcher();
+
         $account = Account::factory()->create();
         $property = Property::factory()->create(['account_id' => $account->id]);
         $article = Article::factory()->create([

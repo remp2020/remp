@@ -20,6 +20,8 @@ class ArticlePageviewsDataTableTest extends TestCase
     {
         parent::setUp();
 
+        Article::unsetEventDispatcher();
+
         $this->withoutMiddleware([
             VerifyJwtToken::class,
         ]);

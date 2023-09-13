@@ -162,6 +162,9 @@
                         </div>
                     </div>
                 </div>
+
+                @widgetGroup('article.show.info')
+
             </div>
         </div>
 

@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Added gender identification in article title image and added gender balance info to article detail. remp/remp#1274
+
+### [BeamModule]
+
+- Added `article.show.info` widget group placeholder. Implement your own widget using `arrilot/laravel-widgets` package and display it at provided placeholder in the view. remp/remp#1274
+
 ### [Campaign]
 
 - Added visual changes for the overlay two buttons banner - minor button texts are now on separate line.

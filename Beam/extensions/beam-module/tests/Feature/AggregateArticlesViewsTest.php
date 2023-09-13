@@ -19,6 +19,8 @@ class AggregateArticlesViewsTest extends TestCase
 
     public function testJob()
     {
+        Article::unsetEventDispatcher();
+
         $pageviews1 = <<<JSON
 [
     {

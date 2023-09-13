@@ -31,6 +31,8 @@ class ProcessConversionSourcesTest extends TestCase
     {
         parent::setUp();
 
+        Article::unsetEventDispatcher();
+
         $account = Account::factory()->create();
         $this->property = Property::factory()->create(['account_id' => $account->id]);
 
