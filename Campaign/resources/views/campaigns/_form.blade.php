@@ -40,6 +40,7 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         "pageviewRules": {!! @json($campaign->pageview_rules) !!} || [],
         "pageviewAttributes": {!! @json($campaign->pageview_attributes) !!} || [],
         "countries": {!! @json($selectedCountries) !!},
+        "languages": {!! @json($selectedLanguages) !!},
         "countriesBlacklist": {!! @json($countriesBlacklist ?? 0) !!},
         "allDevices": {!! @json($campaign->getAllDevices()) !!},
         "selectedDevices": {!! @json($campaign->devices) !!} || [],
@@ -74,6 +75,7 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
             }
         ],
         "availableCountries": {!! $availableCountries->toJson(JSON_UNESCAPED_UNICODE) !!},
+        "availableLanguages": {!! $availableLanguages !!},
         "countriesBlacklistOptions": [
             {
                 "value": 0,

@@ -431,6 +431,30 @@
                                     </div>
                                 </div>
 
+                              <div class="input-group m-t-30">
+                                <span class="input-group-addon"><i class="zmdi zmdi-wallpaper"></i></span>
+                                <div>
+                                  <div class="row">
+                                    <div class="col-md-8 col-sm-12">
+                                      <label for="countries_blacklist" class="fg-label">Languages</label>
+                                    </div>
+                                    <div class="col-md-8 col-sm-12">
+                                      <v-select v-model="languages"
+                                                id="languages"
+                                                :name="'languages[]'"
+                                                :options.sync="availableLanguages"
+                                                :multiple="true"
+                                      ></v-select>
+                                    </div>
+
+                                    <div class="col-md-8 col-sm-12">
+                                      <small class="help-block">Allows campaign for all languages, if no language is selected.</small>
+                                    </div>
+                                  </div><!-- .row -->
+
+                                </div>
+                              </div>
+
                             </div><!-- .panel-body -->
                         </div>
                     </div><!-- .panel (geo targeting) -->
@@ -571,6 +595,7 @@
         "_oncePerSession",
         "_active",
         "_countries",
+        "_languages",
         "_countriesBlacklist",
         "_allDevices",
         "_selectedDevices",
@@ -593,6 +618,7 @@
         "_segmentMap",
         "_eventTypes",
         "_availableCountries",
+        "_availableLanguages",
         "_countriesBlacklistOptions",
         "_pageviewAttributes",
 
@@ -681,6 +707,7 @@
                 "eventTypes": null,
                 "pageviewRules": {},
                 "availableCountries": null,
+                "languages": null,
                 "countriesBlacklistOptions": null,
                 "pageviewAttributes": [],
 

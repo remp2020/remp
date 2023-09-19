@@ -37,9 +37,9 @@ class Showtime
         private ClientInterface $redis,
         private SegmentAggregator $segmentAggregator,
         private LazyGeoReader $geoReader,
+        private ShowtimeConfig $showtimeConfig,
         private LazyDeviceDetector $deviceDetector,
-        private LoggerInterface $logger,
-        private bool $prioritizeBannerOnSamePosition = false
+        private LoggerInterface $logger
     ) {
     }
 
@@ -67,6 +67,11 @@ class Showtime
             $this->positionMap = json_decode($this->redis->get(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY), true) ?? [];
         }
         return $this->positionMap;
+    }
+
+    public function getShowtimeConfig(): ShowtimeConfig
+    {
+        return $this->showtimeConfig;
     }
 
     public function setDimensionMap(\App\Models\Dimension\Map $dimensions)
@@ -136,6 +141,11 @@ class Showtime
             return $showtimeResponse->error($callback, 400, ['browserId is required and missing']);
         }
 
+        // language
+        if ($this->showtimeConfig->getAcceptLanguage()) {
+            $data->language = $this->showtimeConfig->getAcceptLanguage();
+        }
+
         $segmentAggregator = $this->segmentAggregator;
         if (isset($data->cache)) {
             $segmentAggregator->setProviderData($data->cache);
@@ -177,7 +187,7 @@ class Showtime
         }
 
         $campaignBanners = array_filter($campaignBanners);
-        if ($this->prioritizeBannerOnSamePosition) {
+        if ($this->showtimeConfig->isPrioritizeBannerOnSamePosition()) {
             $campaignBanners = $this->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns);
         }
 
@@ -462,6 +472,16 @@ class Showtime
                 return null;
             }
             if (!$campaign->countriesWhitelist->isEmpty() && !$campaign->countriesWhitelist->contains('iso_code', $countryCode)) {
+                return null;
+            }
+        }
+
+        // languages rules
+        if (!empty($userData->language)) {
+            $userData->primaryLanguage = \Locale::getPrimaryLanguage($userData->language);
+        }
+        if (!empty($campaign->languages)) {
+            if (empty($userData->primaryLanguage) || !in_array($userData->primaryLanguage, $campaign->languages, true)) {
                 return null;
             }
         }

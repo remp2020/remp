@@ -67,6 +67,9 @@ class CampaignRequest extends FormRequest
         if (!isset($data['pageview_rules']['display_times'])) {
             $data['pageview_rules']['display_times'] = false;
         }
+        if (!isset($data['languages'])) {
+            $data['languages'] = null;
+        }
         if (is_array($data['url_patterns'])) {
             $data['url_patterns'] = array_values(array_filter($data['url_patterns']));
         }

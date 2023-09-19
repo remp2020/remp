@@ -9,6 +9,7 @@ use App\Http\Showtime\LazyDeviceDetector;
 use App\Http\Showtime\LazyGeoReader;
 use App\Http\Showtime\Showtime;
 use App\Http\Showtime\ShowtimeResponse;
+use App\Http\Showtime\ShowtimeConfig;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Monolog\Logger;
@@ -410,6 +411,11 @@ $showtimeResponse = new PlainPhpShowtimeResponse();
 $data = filter_input(INPUT_GET, 'data');
 $callback = filter_input(INPUT_GET, 'callback');
 
+$showtimeConfig = new ShowtimeConfig();
+if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+    $showtimeConfig->setAcceptLanguage($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+}
+
 if ($data === null || $callback === null) {
     $showtimeResponse->jsonResponse(['errors' => ['invalid request, data or callback params missing']]);
     return;
@@ -449,8 +455,9 @@ try {
         FILTER_VALIDATE_BOOLEAN,
         ['options' => ['default' => false]]
     );
+    $showtimeConfig->setPrioritizeBannerOnSamePosition($prioritizeBannerOnSamePosition);
 
-    $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $deviceDetector, $logger, $prioritizeBannerOnSamePosition);
+    $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $showtimeConfig, $deviceDetector, $logger);
     $showtime->showtime($data, $callback, $showtimeResponse);
 } catch (\Exception $exception) {
     $logger->error($exception);

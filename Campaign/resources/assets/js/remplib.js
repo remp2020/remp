@@ -39,6 +39,7 @@ class Campaign {
                 "version": 1,
                 "userId": remplib.getUserId(),
                 "browserId": remplib.getBrowserId(),
+                "language": navigator.language,
                 "url": window.location.href,
                 "referer": document.referrer || null,
                 "campaigns": remplib.campaign.getCampaignsForShowtime(),

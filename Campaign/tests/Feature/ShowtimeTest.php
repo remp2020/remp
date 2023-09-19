@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Showtime\ShowtimeConfig;
 use Database\Seeders\CountrySeeder;
 use App\Banner;
 use App\Campaign;
@@ -51,7 +52,8 @@ class ShowtimeTest extends TestCase
         $geoReader->shouldReceive('countryCode')->andReturn('SK');
         $logger = Mockery::mock(Logger::class);
 
-        $showtime = new Showtime($redis, $this->segmentAggregator, $geoReader, resolve(LazyDeviceDetector::class), $logger);
+        $showtimeConfig = new ShowtimeConfig();
+        $showtime = new Showtime($redis, $this->segmentAggregator, $geoReader, $showtimeConfig, resolve(LazyDeviceDetector::class), $logger);
         $showtime->setDimensionMap(resolve(\App\Models\Dimension\Map::class));
         $showtime->setAlignmentsMap(resolve(\App\Models\Alignment\Map::class));
         $showtime->setPositionMap(resolve(\App\Models\Position\Map::class));
@@ -89,6 +91,7 @@ class ShowtimeTest extends TestCase
         $browserId = null,
         $isDesktop = true,
         $campaigns = null,
+        $language = null,
         $campaignsSession = null
     ) {
         if (!$url) {
@@ -110,6 +113,7 @@ class ShowtimeTest extends TestCase
             'userId' => $userId,
             'browserId' => $browserId,
             'campaigns' => $campaigns,
+            'language' => $language,
             'campaignsSession' => $campaignsSession,
             'userAgent' => $isDesktop ? $desktopUa : $mobileUa
         ];
@@ -247,7 +251,7 @@ class ShowtimeTest extends TestCase
 
         $activeCampaignUuids = [];
         $campaignsSession = [$this->campaign->uuid => ['seen' => 1]];
-        $userData = $this->getUserData(null, null, null, true, null, $campaignsSession);
+        $userData = $this->getUserData(null, null, null, true, null, null, $campaignsSession);
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
         $this->assertEmpty($activeCampaignUuids);
     }
@@ -392,6 +396,20 @@ class ShowtimeTest extends TestCase
             'SK' => ['blacklisted' => 1]
         ]);
         $this->campaign->load(['countries', 'countriesBlacklist', 'countriesWhitelist']);
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+    }
+
+    public function testLanguageRules()
+    {
+        $this->scheduleCampaign();
+        $activeCampaignUuids = [];
+
+        $this->campaign->update(['languages' => ["cs", "sk"]]);
+
+        $userData = $this->getUserData(language: 'sk-SK');
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+
+        $userData = $this->getUserData(language: 'en-US');
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
     }
 

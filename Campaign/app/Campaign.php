@@ -40,6 +40,7 @@ class Campaign extends Model implements Searchable
         'pageview_rules',
         'pageview_attributes',
         'devices',
+        'languages',
         'using_adblock',
         'url_filter',
         'url_patterns',
@@ -54,6 +55,7 @@ class Campaign extends Model implements Searchable
         'pageview_rules' => 'json',
         'pageview_attributes' => 'json',
         'devices' => 'json',
+        'languages' => 'json',
         'using_adblock' => 'boolean',
         'url_patterns' => 'json',
         'referer_patterns' => 'json',
@@ -298,5 +300,22 @@ class Campaign extends Model implements Searchable
     public function signedInLabel()
     {
         return $this->signedInOptions()[$this->signed_in];
+    }
+
+    public static function getAvailableLanguages()
+    {
+        $locales = \ResourceBundle::getLocales(null);
+        $availableLanguages = [];
+        foreach ($locales as $locale) {
+            $primaryLanguage = \Locale::getPrimaryLanguage($locale);
+            if (!isset($availableLanguages[$primaryLanguage])) {
+                $availableLanguages[$primaryLanguage] = [
+                    'value' => $primaryLanguage,
+                    'label' => \Locale::getDisplayLanguage($locale),
+                ];
+            }
+        }
+
+        return array_values($availableLanguages);
     }
 }

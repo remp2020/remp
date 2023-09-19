@@ -13,6 +13,7 @@ use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use App\Http\Showtime\ControllerShowtimeResponse;
 use App\Http\Showtime\Showtime;
+use App\Http\Showtime\ShowtimeConfig;
 use App\Schedule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -193,6 +194,7 @@ class CampaignController extends Controller
             $bannerId,
             $variants,
             $selectedCountries,
+            $selectedLanguages,
             $countriesBlacklist
         ] = $this->processOldCampaign($campaign, old());
 
@@ -201,6 +203,7 @@ class CampaignController extends Controller
             'bannerId' => $bannerId,
             'variants' => $variants,
             'selectedCountries' => $selectedCountries,
+            'selectedLanguages' => $selectedLanguages,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
@@ -220,6 +223,7 @@ class CampaignController extends Controller
             $bannerId,
             $variants,
             $selectedCountries,
+            $selectedLanguages,
             $countriesBlacklist
         ] = $this->processOldCampaign($campaign, old());
 
@@ -228,6 +232,7 @@ class CampaignController extends Controller
             'bannerId' => $bannerId,
             'variants' => $variants,
             'selectedCountries' => $selectedCountries,
+            'selectedLanguages' => $selectedLanguages,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
@@ -312,6 +317,7 @@ class CampaignController extends Controller
             $bannerId,
             $variants,
             $selectedCountries,
+            $selectedLanguages,
             $countriesBlacklist
         ] = $this->processOldCampaign($campaign, old());
 
@@ -320,9 +326,11 @@ class CampaignController extends Controller
             'bannerId' => $bannerId,
             'variants' => $variants,
             'selectedCountries' => $selectedCountries,
+            'selectedLanguages' => $selectedLanguages,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all()->keyBy("iso_code"),
+            'availableLanguages' => json_encode(Campaign::getAvailableLanguages()),
             'segments' => $this->getAllSegments($segmentAggregator)
         ]);
     }
@@ -534,6 +542,10 @@ class CampaignController extends Controller
             return response()->json(['errors' => ['invalid request, data or callback params missing']], 400);
         }
 
+        if (!empty($request->getPreferredLanguage())) {
+            $showtime->getShowtimeConfig()->setAcceptLanguage($request->getPreferredLanguage());
+        }
+
         return $showtime->showtime($data, $callback, $controllerShowtimeResponse);
     }
 
@@ -625,6 +637,7 @@ class CampaignController extends Controller
             $bannerId,
             $variants,
             $selectedCountries,
+            $campaign->languages,
             isset($data['countries_blacklist'])
                 ? $data['countries_blacklist']
                 : $blacklisted
