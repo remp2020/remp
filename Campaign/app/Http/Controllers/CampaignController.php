@@ -207,6 +207,7 @@ class CampaignController extends Controller
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
+            'availableLanguages' => json_encode(Campaign::getAvailableLanguages()),
             'segments' => $this->getAllSegments($segmentAggregator)
         ]);
     }
@@ -236,6 +237,7 @@ class CampaignController extends Controller
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
+            'availableLanguages' => json_encode(Campaign::getAvailableLanguages()),
             'segments' => $this->getAllSegments($segmentAggregator)
         ]);
     }
