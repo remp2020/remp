@@ -52,6 +52,10 @@ class Tracker {
 
     maxPageProgressAchieved = 0;
 
+    canonicalUrl = null;
+
+    referer = null;
+
     init(config) {
         Tracker.configure(config)
     }
@@ -159,6 +163,24 @@ class Tracker {
                 window.addEventListener("beforeunload", function() {
                     remplib.tracker.sendTrackedProgress(true)
                 });
+            }
+        }
+
+        if (config.tracker.canonicalUrl) {
+            try {
+                new URL(config.tracker.canonicalUrl);
+                this.canonicalUrl = config.tracker.canonicalUrl;
+            } catch (error) {
+                console.warn("Tracker - invalid value of 'canonicalUrl' attribute. Make sure the value is valid URL, including schema.");
+            }
+        }
+
+        if (config.tracker.referer) {
+            try {
+                new URL(config.tracker.referer);
+                this.referer = config.tracker.referer;
+            } catch (error) {
+                console.warn("Tracker - invalid value of 'referer' attribute. Make sure the value is valid URL, including schema.");
             }
         }
 
@@ -681,9 +703,13 @@ class Tracker {
         }
 
         let canonicalUrl = null;
-        let canonicalSelector = document.querySelector("link[rel='canonical']");
-        if (canonicalSelector) {
-            canonicalUrl = canonicalSelector.href;
+        if (this.canonicalUrl) {
+            canonicalUrl = this.canonicalUrl;
+        } else {
+            let canonicalSelector = document.querySelector("link[rel='canonical']");
+            if (canonicalSelector) {
+                canonicalUrl = canonicalSelector.href;
+            }
         }
 
         params["user"] = {
@@ -691,9 +717,9 @@ class Tracker {
             "browser_id": remplib.getBrowserId(),
             "subscriber": remplib.isUserSubscriber(),
             "subscription_ids": remplib.getSubscriptionIds(),
-            "url": window.location.href,
+            "url": this.canonicalUrl || window.location.href,
             "canonical_url": canonicalUrl,
-            "referer": document.referrer,
+            "referer": this.referer || document.referrer,
             "user_agent": window.navigator.userAgent,
             "adblock": remplib.usingAdblock,
             "window_height": window.outerHeight || document.documentElement.clientHeight,

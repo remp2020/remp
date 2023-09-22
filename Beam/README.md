@@ -292,7 +292,15 @@ var rempConfig = {
 
         // optional, allows to specify custom referer medium
         // this value overrides implicit referer medium computed from Referer header by tracker
-        refererMedium: "push_notification"
+        refererMedium: "push_notification",
+      
+        // optional, allows forcing URL that is being tracked 
+        // this value overrides both tracked URL (from window.location.href) 
+        // and tracked canonical URL (from <link> tag)
+        canonicalUrl: "https://something.example/article",
+      
+        // optional, overrides referer loaded from document.referrer
+        referer: "https://google.com"
     }
 };
 remplib.tracker.init(rempConfig);

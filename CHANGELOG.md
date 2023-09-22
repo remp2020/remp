@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [BeamModule]
 
 - Added `article.show.info` widget group placeholder. Implement your own widget using `arrilot/laravel-widgets` package and display it at provided placeholder in the view. remp/remp#1274
+- Added JS tracker parameters `canonicalUrl` and `referer`, allowing overriding URL and referer that are being tracked. remp/remp#1297 
 
 ### [Campaign]
 
