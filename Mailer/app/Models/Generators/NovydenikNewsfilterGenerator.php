@@ -165,7 +165,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
 
         $form->addTextArea('summary', 'Summary')
             ->setHtmlAttribute('rows', 3)
-            ->setRequired("Field 'Summary' is required.");
+            ->setRequired(false);
 
         $form->addTextArea('newsfilter_html', 'HTML')
             ->setHtmlAttribute('rows', 20)
