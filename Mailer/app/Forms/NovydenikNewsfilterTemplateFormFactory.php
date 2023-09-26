@@ -188,6 +188,15 @@ class NovydenikNewsfilterTemplateFormFactory
                 'mail_type_id' => 11, // nemecko,
                 'from' => 'Deník N <info@denikn.cz>',
             ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 28) {
+            $defaults = [
+                'name' => 'Vývoj bojů ' . date('j.n.Y'),
+                'code' => 'vyvoj_boju_' . date('dmY'),
+                'mail_layout_id' => 2, // empty layout
+                'locked_mail_layout_id' => 2, // empty layout
+                'mail_type_id' => 22, // Vývoj bojů,
+                'from' => 'Deník N <info@denikn.cz>',
+            ];
         } else {
             $defaults = [
                 'name' => 'Newsfilter ' . date('j.n.Y'),
