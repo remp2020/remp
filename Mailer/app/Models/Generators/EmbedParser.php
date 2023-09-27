@@ -5,6 +5,13 @@ namespace Remp\Mailer\Models\Generators;
 
 class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
 {
+    protected string $twitterLinkText = "Click to display on X (Twitter)";
+
+    public function setTwitterLinkText(string $twitterLinkText = null): void
+    {
+        $this->twitterLinkText = $twitterLinkText;
+    }
+
     public function createEmbedMarkup(string $link, string $title, ?string $image = null, bool $isVideo = false): string
     {
         $html = "<br>";
@@ -14,7 +21,7 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
         if (!is_null($image)) {
             $html .= "<img src='{$image}' alt='{$title}' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;max-width:100%;clear:both;display:inline;width:100%;height:auto;'>";
         } elseif (preg_match('/twitt/', $link)) {
-            return "<br><a style=\"display: block;margin: 0 0 20px;padding: 7px 10px;text-decoration: none;text-align: center;font-weight: bold;font-family:'Helvetica Neue', Helvetica, Arial;color: #249fdc; background: #ffffff; border: 3px solid #249fdc;margin: 16px 0 16px 0\" href=\"{$link}\" target=\"_blank\">Zobraziť na Twitteri</a>";
+            return "<br><a style=\"display: block;margin: 0 0 20px;padding: 7px 10px;text-decoration: none;text-align: center;font-weight: bold;font-family:'Helvetica Neue', Helvetica, Arial;color: #249fdc; background: #ffffff; border: 3px solid #249fdc;margin: 16px 0 16px 0\" href=\"{$link}\" target=\"_blank\">{$this->twitterLinkText}</a>";
         } else {
             $html .= "<span style='text-decoration: underline; color: #1F3F83;'>" . $link . "</span>";
         }

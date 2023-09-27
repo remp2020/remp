@@ -29,6 +29,7 @@ services:
     embedParser:
         setup:
             - setVideoLinkText("Click to play video")
+            - setTwitterLinkText("Click to display on X (Twitter)")
     articleLocker:
         setup:
             - setLockText("Exclusive content")
