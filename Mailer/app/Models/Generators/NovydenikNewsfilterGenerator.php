@@ -56,7 +56,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             (new PostInputParam('newsfilter_html'))->setRequired(),
             (new PostInputParam('title'))->setRequired(),
             (new PostInputParam('editor'))->setRequired(),
-            (new PostInputParam('summary'))->setRequired(),
+            (new PostInputParam('summary')),
             (new PostInputParam('from'))->setRequired(),
         ];
     }
