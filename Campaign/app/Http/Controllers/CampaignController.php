@@ -88,6 +88,9 @@ class CampaignController extends Controller
             ->filterColumn('name', function (Builder $query, $value) {
                 $query->where('campaigns.name', 'like', "%{$value}%");
             })
+            ->filterColumn('public_id', function (Builder $query, $value) {
+                $query->where('campaigns.public_id', $value);
+            })
             ->addColumn('variants', function (Campaign $campaign) {
                 $data = $campaign->campaignBanners->all();
                 $variants = [];

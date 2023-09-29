@@ -38,6 +38,10 @@
                         'render' => 'date',
                         'priority' => 2,
                     ],
+                    'campaign_public_id' => [
+                        'priority' => 3,
+                        'visible' => false,
+                    ],
                 ],
                 'dataSource' => route('schedule.json', ['active' => true, 'limit' => 5]),
                 'rowActions' => [
@@ -76,6 +80,10 @@
                         'name' => [
                             'priority' => 1,
                             'render' => 'link',
+                        ],
+                        'public_id' => [
+                            'header' => 'Public ID',
+                            'priority' => 1,
                         ],
                         'variants' => [
                             'header' => 'Variants',

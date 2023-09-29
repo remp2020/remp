@@ -12,6 +12,7 @@ class BannerSearchAspect extends SearchAspect
     {
         return Banner::query()
             ->where('name', 'LIKE', "%{$term}%")
+            ->orWhere('public_id', $term)
             ->orderBy('updated_at', 'DESC')
             ->take(config('search.maxResultCount'))
             ->get();

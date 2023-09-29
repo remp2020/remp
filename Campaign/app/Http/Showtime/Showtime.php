@@ -179,6 +179,7 @@ class Showtime
         $activeCampaigns = [];
         $campaigns = [];
         $campaignBanners = [];
+        $suppressedBanners = [];
         foreach ($campaignIds as $campaignId) {
             /** @var Campaign $campaign */
             $campaign = unserialize($this->redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"), ['allowed_class' => Campaign::class]);
@@ -188,7 +189,7 @@ class Showtime
 
         $campaignBanners = array_filter($campaignBanners);
         if ($this->showtimeConfig->isPrioritizeBannerOnSamePosition()) {
-            $campaignBanners = $this->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns);
+            $campaignBanners = $this->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns, $suppressedBanners);
         }
 
         foreach ($campaignBanners as $campaignBanner) {
@@ -207,11 +208,12 @@ class Showtime
             $callback,
             $displayData,
             array_values($activeCampaigns), // make sure $activeCampaigns is always encoded as array in JSON
-            $segmentAggregator->getProviderData()
+            $segmentAggregator->getProviderData(),
+            $suppressedBanners,
         );
     }
 
-    public function prioritizeCampaignBannerOnPosition(array $campaigns, array $campaignBanners, array &$activeCampaigns): array
+    public function prioritizeCampaignBannerOnPosition(array $campaigns, array $campaignBanners, array &$activeCampaigns, array &$suppressedBanners): array
     {
         $bannersOnPosition = [];
         foreach ($campaignBanners as $campaignBanner) {
@@ -226,9 +228,11 @@ class Showtime
                 $newCampaign = $campaigns[$campaignBanner->campaign_id];
 
                 if ($this->hasNewCampaignHigherPriorityOverCurrentOnPosition($newCampaign, $currentCampaign)) {
+                    $this->addSuppressedBanner($suppressedBanners, $bannerOnPosition, $currentCampaign->public_id);
                     $bannersOnPosition[$position] = $campaignBanner;
                     $this->removeCampaignByUuid($activeCampaigns, $currentCampaign->uuid);
                 } else {
+                    $this->addSuppressedBanner($suppressedBanners, $campaignBanner, $newCampaign->public_id);
                     $this->removeCampaignByUuid($activeCampaigns, $newCampaign->uuid);
                 }
             } else {
@@ -264,6 +268,15 @@ class Showtime
                 return;
             }
         }
+    }
+
+    private function addSuppressedBanner(array &$suppressedBanners, $campaignBanner, $campaignPublicId): void
+    {
+        $suppressedBanners[] = [
+            'campaign_banner_public_id' => $campaignBanner->public_id,
+            'banner_public_id' => $campaignBanner->banner->public_id,
+            'campaign_public_id' => $campaignPublicId
+        ];
     }
 
     /**

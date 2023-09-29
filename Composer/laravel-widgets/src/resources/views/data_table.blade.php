@@ -84,6 +84,9 @@
                     @isset($col['priority'])
                     responsivePriority: {!! @json($col['priority']) !!},
                     @endisset
+                    @isset($col['visible'])
+                    visible: {!! @json($col['visible']) !!},
+                    @endisset
                     @isset($col['orderSequence'])
                     orderSequence: {!! @json($col['orderSequence']) !!},
                     @endisset

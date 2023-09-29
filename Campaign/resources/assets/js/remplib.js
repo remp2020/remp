@@ -89,6 +89,7 @@ class Campaign {
             });
 
             remplib.campaign.incrementPageviewCountForCampaigns(result.activeCampaigns);
+            remplib.campaign.printSuppressedBanners(result);
         },
     };
 
@@ -561,6 +562,15 @@ class Campaign {
         if (data.hasOwnProperty(oldKey)) {
             data[newKey] = data[oldKey];
             delete data[oldKey];
+        }
+    }
+    printSuppressedBanners(data) {
+        if ('suppressedBanners' in data && data.suppressedBanners.length) {
+            console.groupCollapsed("remplib: suppressed banners (prioritization)");
+            for (let suppressed of data.suppressedBanners) {
+                console.info(suppressed)
+            }
+            console.groupEnd();
         }
     }
 }

@@ -21,6 +21,10 @@
                     'priority' => 1,
                     'render' => 'link',
                 ],
+                'public_id' => [
+                    'header' => 'Public ID',
+                    'priority' => 1,
+                ],
                 'template' => [
                     'priority' => 2,
                 ],

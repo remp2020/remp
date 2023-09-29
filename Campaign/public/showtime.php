@@ -140,7 +140,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         ], $statusCode);
     }
 
-    public function success(string $callback, $data, $activeCampaigns, $providerData)
+    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners)
     {
         $this->jsonpResponse($callback, [
             'success' => true,
@@ -149,6 +149,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
             'activeCampaignIds' => array_column($activeCampaigns, 'uuid'),
             'activeCampaigns' => $activeCampaigns,
             'providerData' => $providerData,
+            'suppressedBanners' => $suppressedBanners,
         ]);
     }
 

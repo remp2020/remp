@@ -48,7 +48,7 @@ class ScheduleController extends Controller
      */
     public function json(Request $request, Datatables $dataTables, Campaign $campaign = null)
     {
-        $scheduleSelect = Schedule::select('schedules.*')
+        $scheduleSelect = Schedule::select('schedules.*', 'campaigns.public_id as campaign_public_id')
             ->join('campaigns', 'schedules.campaign_id', '=', 'campaigns.id');
 
         if (!is_null($campaign)) {
@@ -87,6 +87,11 @@ class ScheduleController extends Controller
             ->filterColumn('campaign', function (Builder $query, $value) {
                 $query->whereHas('campaign', function (Builder $query) use ($value) {
                     $query->where('campaigns.name', 'like', "%{$value}%");
+                });
+            })
+            ->filterColumn('campaign_public_id', function (Builder $query, $value) {
+                $query->whereHas('campaign', function (Builder $query) use ($value) {
+                    $query->where('campaigns.public_id', $value);
                 });
             })
             ->orderColumn('campaign', function (Builder $query, $order) {

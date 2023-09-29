@@ -70,6 +70,9 @@ class BannerController extends Controller
             ->filterColumn('name', function (Builder $query, $value) {
                 $query->where('banners.name', 'like', "%{$value}%");
             })
+            ->filterColumn('public_id', function (Builder $query, $value) {
+                $query->where('banners.public_id', $value);
+            })
             ->addColumn('active', function (Banner $banner) {
                 foreach ($banner->campaigns as $campaign) {
                     if ($campaign->active) {

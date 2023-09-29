@@ -33,7 +33,7 @@ return [
             'height' => 'auto',
         ],
         'hidden' => [
-            'name' => 'Hidden (for tracking purposes)',
+            'name' => 'Hidden (tracking) / JS-based',
             'width' => '0px',
             'height' => '0px',
         ]

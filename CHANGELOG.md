@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added visual changes for the overlay two buttons banner - minor button texts are now on separate line.
 - Added ability to target campaign by user system language. remp/remp#1283
+- Added suppressed banners due to prioritization to showtime response for easier debugging. remp/remp#1295
 
 ### [Mailer]
 

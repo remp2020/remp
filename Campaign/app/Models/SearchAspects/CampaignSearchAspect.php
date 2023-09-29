@@ -12,6 +12,7 @@ class CampaignSearchAspect extends SearchAspect
     {
         return Campaign::query()
             ->where('name', 'LIKE', "%{$term}%")
+            ->orWhere('public_id', $term)
             ->orWhereHas('banners', function ($query) use ($term) {
                 $query->where('name', 'LIKE', "%{$term}%");
             })

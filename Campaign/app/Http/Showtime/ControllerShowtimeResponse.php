@@ -18,7 +18,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             ]);
     }
 
-    public function success(string $callback, $data, $activeCampaigns, $providerData)
+    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners)
     {
         return response()
             ->jsonp($callback, [
@@ -28,6 +28,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
                 'activeCampaignIds' => array_column($activeCampaigns, 'uuid'),
                 'activeCampaigns' => $activeCampaigns,
                 'providerData' => $providerData,
+                'suppressedBanners' => $suppressedBanners,
             ]);
     }
 
