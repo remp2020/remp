@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Models\Crm;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\RequestOptions;
 use Nette\Utils\Json;
 use GuzzleHttp\Exception\ClientException;
 
@@ -27,7 +28,7 @@ class Client
     {
         try {
             $response = $this->client->post('api/v1/users/set-email-validated', [
-                'form_params' => [
+                RequestOptions::FORM_PARAMS => [
                     'email' => $email,
                 ],
             ]);
@@ -40,7 +41,31 @@ class Client
             if (isset($body['code']) && $body['code'] === 'email_not_found') {
                 throw new UserNotFoundException("Unable to find email: {$clientException->getMessage()}");
             }
+            throw new Exception("unable to confirm CRM user: {$clientException->getMessage()}");
+        } catch (ServerException $serverException) {
+            throw new Exception("unable to confirm CRM user: {$serverException->getMessage()}");
+        }
+    }
 
+    /**
+     * @param string[] $emails
+     **/
+    public function validateMultipleEmails(array $emails): mixed
+    {
+        // An empty post request would just waste cpu cycles
+        if (count($emails) === 0) {
+            return [];
+        }
+        
+        try {
+            $response = $this->client->post('api/v2/users/set-email-validated', [
+                RequestOptions::JSON => ['emails' => $emails]
+            ]);
+
+            return Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
+        } catch (ConnectException $connectException) {
+            throw new Exception("could not connect to CRM: {$connectException->getMessage()}");
+        } catch (ClientException $clientException) {
             throw new Exception("unable to confirm CRM user: {$clientException->getMessage()}");
         } catch (ServerException $serverException) {
             throw new Exception("unable to confirm CRM user: {$serverException->getMessage()}");
@@ -51,7 +76,7 @@ class Client
     {
         try {
             $response = $this->client->get('api/v1/users/touch', [
-                'query' => [
+                RequestOptions::QUERY => [
                     'id' => $userId,
                 ]
             ]);

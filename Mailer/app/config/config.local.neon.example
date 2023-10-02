@@ -20,6 +20,9 @@ services:
             # If you're using Beam, you can enable this command to pull conversions from there
             # - add(Remp\MailerModule\Commands\ProcessConversionStatsCommand())
 
+            # Enable only if "crmClient" service is available
+            - add Remp\MailerModule\Commands\ValidateCrmEmailsCommand()
+
 #	# Internal CRM system. For more details contact Tomas Bella.
 #	authenticator:
 #		factory: Remp\MailerModule\Models\Auth\Authenticator
@@ -60,6 +63,7 @@ services:
 
     #crmClient:
     #    factory: Remp\MailerModule\Models\Crm\Client(%crm.addr%, %crm.api_token%)
+
 
     # Setup loggers output
     commandsLogger:

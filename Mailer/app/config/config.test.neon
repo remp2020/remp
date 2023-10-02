@@ -27,7 +27,6 @@ services:
 	mailFactory:
 		setup:
 			- addMailer(Tests\Feature\Mails\TestMailer())
-
 	crmClient:
 		factory: Remp\MailerModule\Models\Crm\Client(%crm.addr%, %crm.api_token%)
 
