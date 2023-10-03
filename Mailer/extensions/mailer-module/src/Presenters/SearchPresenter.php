@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
-use Remp\MailerModule\Repositories\BatchTemplatesRepository;
+use Remp\MailerModule\Models\Config\SearchConfig;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
@@ -11,31 +11,19 @@ use Remp\MailerModule\Repositories\TemplatesRepository;
 
 final class SearchPresenter extends BasePresenter
 {
-    private $templatesRepository;
-
-    private $layoutsRepository;
-
-    private $listsRepository;
-
-    private $jobsRepository;
-
     public function __construct(
-        TemplatesRepository $templatesRepository,
-        LayoutsRepository $layoutsRepository,
-        ListsRepository $listsRepository,
-        JobsRepository $jobsRepository
+        private TemplatesRepository $templatesRepository,
+        private LayoutsRepository $layoutsRepository,
+        private ListsRepository $listsRepository,
+        private JobsRepository $jobsRepository,
+        private SearchConfig $searchConfig,
     ) {
         parent::__construct();
-
-        $this->templatesRepository = $templatesRepository;
-        $this->layoutsRepository = $layoutsRepository;
-        $this->listsRepository = $listsRepository;
-        $this->jobsRepository = $jobsRepository;
     }
 
     public function actionDefault($term): void
     {
-        $limit =  (int) $this->environmentConfig->getParam('max_result_count', '5');
+        $limit = $this->searchConfig->getMaxResultCount();
         $layouts = array_values($this->layoutsRepository->search($term, $limit));
         $lists = array_values($this->listsRepository->search($term, $limit));
 

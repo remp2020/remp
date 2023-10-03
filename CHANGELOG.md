@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- **BREAKING**: Removed `EnvironmentConfig::setParam()` and `EnvironmentConfig::getParam()` methods. remp/remp#1299
+  - Use of these could lead to circular dependency issues if values were read by environment config itself.
+  - We recommend the extraction of these values to their separate config classes.
+- Fixed circular dependency issue with configs using environment variables. remp/remp#1299
+
 ## Archive
 
 - [v3.3](./changelogs/CHANGELOG-v3.3.md)
