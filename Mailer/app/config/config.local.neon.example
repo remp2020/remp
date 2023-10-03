@@ -21,7 +21,7 @@ services:
             # - add(Remp\MailerModule\Commands\ProcessConversionStatsCommand())
 
             # Enable only if "crmClient" service is available
-            - add Remp\MailerModule\Commands\ValidateCrmEmailsCommand()
+            - add(Remp\MailerModule\Commands\ValidateCrmEmailsCommand())
 
 #	# Internal CRM system. For more details contact Tomas Bella.
 #	authenticator:
@@ -59,7 +59,6 @@ services:
             #- add('user-unsubscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
             #- add('user-subscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
             #- add('user-unsubscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
-            #- add('mailgun-event', Remp\MailerModule\Hermes\ValidateCrmEmailHandler(@crmClient()))
 
     #crmClient:
     #    factory: Remp\MailerModule\Models\Crm\Client(%crm.addr%, %crm.api_token%)
