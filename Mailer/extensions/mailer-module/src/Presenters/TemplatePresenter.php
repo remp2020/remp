@@ -10,6 +10,7 @@ use Nette\Application\UI\Form;
 use Remp\MailerModule\Components\MailLinkStats\MailLinkStats;
 use Remp\MailerModule\Forms\IFormFactory;
 use Remp\MailerModule\Models\Config\Config;
+use Remp\MailerModule\Models\Config\EditorConfig;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Models\ContentGenerator\Replace\RtmClickReplace;
 use Remp\MailerModule\Repositories\ActiveRow;
@@ -46,6 +47,7 @@ final class TemplatePresenter extends BasePresenter
         private TemplateTranslationsRepository $templateTranslationsRepository,
         private MailLinkStats $mailLinkStats,
         private Config $config,
+        private EditorConfig $editorConfig,
     ) {
         parent::__construct();
     }
@@ -263,7 +265,7 @@ final class TemplatePresenter extends BasePresenter
         $this->template->layouts = $layouts;
         $this->template->snippets = $snippets;
         $this->template->lists = $lists;
-        $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
+        $this->template->templateEditor = $this->editorConfig->getTemplateEditor();
         $this->template->editedLocale = null;
     }
 
@@ -291,7 +293,7 @@ final class TemplatePresenter extends BasePresenter
         $this->template->layouts = $layouts;
         $this->template->snippets = $snippets;
         $this->template->lists = $lists;
-        $this->template->templateEditor = $this->environmentConfig->getParam('template_editor', 'codemirror');
+        $this->template->templateEditor = $this->editorConfig->getTemplateEditor();
         $this->template->editedLocale = $editedLocale;
     }
 

@@ -1,4 +1,13 @@
-## [3.3] - 2023-10-03
+## [3.3.1] - 2023-10-03
+
+### [Mailer]
+
+- **BREAKING**: Removed `EnvironmentConfig::setParam()` and `EnvironmentConfig::getParam()` methods. remp/remp#1299
+  - Use of these could lead to circular dependency issues if values were read by environment config itself.
+  - We recommend the extraction of these values to their separate config classes.
+- Fixed circular dependency issue with configs using environment variables. remp/remp#1299
+
+## [3.3.0] - 2023-10-03
 
 ### [Beam]
 
@@ -35,7 +44,8 @@
   This command directly replaces `Remp\MailerModule\Hermes\ValidateCrmEmailHandler` handled, which is not necessary if the command is used.
 ---
 
-[3.3]: https://github.com/remp2020/remp/compare/3.2.0...3.3.0
+[3.3.1]: https://github.com/remp2020/remp/compare/3.3.0...3.3.1
+[3.3.0]: https://github.com/remp2020/remp/compare/3.2.0...3.3.0
 
 [Beam]: https://github.com/remp2020/remp/tree/master/Beam
 [Campaign]: https://github.com/remp2020/remp/tree/master/Campaign

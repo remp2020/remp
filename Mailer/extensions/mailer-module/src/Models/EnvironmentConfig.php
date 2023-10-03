@@ -5,26 +5,6 @@ namespace Remp\MailerModule\Models;
 
 class EnvironmentConfig
 {
-    private $linkedServices = [];
-
-    private $params = [];
-
-    public function linkService(string $code, ?string $url, ?string $icon): void
-    {
-        if (empty($url)) {
-            return;
-        }
-        $this->linkedServices[$code] = [
-            'url' => $url,
-            'icon' => $icon,
-        ];
-    }
-
-    public function getLinkedServices(): array
-    {
-        return $this->linkedServices;
-    }
-
     public function get(string $key): ?string
     {
         if (!isset($_ENV[$key])) {
@@ -66,15 +46,5 @@ class EnvironmentConfig
             return null;
         }
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
-    }
-
-    public function setParam(string $key, ?string $value): void
-    {
-        $this->params[$key] = $value;
-    }
-
-    public function getParam(string $key, $default = null): ?string
-    {
-        return $this->params[$key] ?? $default;
     }
 }

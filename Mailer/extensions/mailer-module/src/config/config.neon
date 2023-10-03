@@ -1,14 +1,23 @@
 services:
 	router: Remp\MailerModule\Models\RouterFactory::createRouter
-	environmentConfig:
-		factory: Remp\MailerModule\Models\EnvironmentConfig
+	environmentConfig: Remp\MailerModule\Models\EnvironmentConfig
+
+	linkedServices:
+		factory: Remp\MailerModule\Models\Config\LinkedServices
 		setup:
 			- linkService(beam, %remp.beam.web_addr%, album)
 			- linkService(campaign, %remp.campaign.web_addr%, trending-up)
 			- linkService(mailer, /, email)
-			- setParam(locale, %locale%)
-			- setParam(max_result_count, %max_result_count%)
-			- setParam(template_editor, %template_editor%)
+
+	searchConfig:
+		factory: Remp\MailerModule\Models\Config\SearchConfig
+		setup:
+			- setMaxResultCount(%max_result_count%)
+
+	editorConfig:
+		factory: Remp\MailerModule\Models\Config\EditorConfig
+		setup:
+			- setTemplateEditor(%template_editor%)
 
 	localizationConfig:
 		factory: Remp\MailerModule\Models\Config\LocalizationConfig(@environmentConfig::get('LOCALE'))
