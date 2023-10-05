@@ -38,6 +38,7 @@ if (!function_exists('configure_redis')) {
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
             'database' => $database,
+            'persistent' => env('REDIS_PERSISTENT', false),
         ];
     }
 }

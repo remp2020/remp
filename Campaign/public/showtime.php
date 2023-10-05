@@ -432,6 +432,7 @@ try {
         'port'   => env('REDIS_PORT') ?: 6379,
         'password' => env('REDIS_PASSWORD') ?: null,
         'database' => env('REDIS_DEFAULT_DATABASE') ?: 0,
+        'persistent' => env('REDIS_PERSISTENT', false),
     ], [
         'prefix' => env('REDIS_PREFIX') ?: '',
     ]);
@@ -457,6 +458,7 @@ try {
         ['options' => ['default' => false]]
     );
     $showtimeConfig->setPrioritizeBannerOnSamePosition($prioritizeBannerOnSamePosition);
+    $showtimeConfig->setOneTimeBannerEnabled(env('ONE_TIME_BANNER_ENABLED', true));
 
     $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $showtimeConfig, $deviceDetector, $logger);
     $showtime->showtime($data, $callback, $showtimeResponse);

@@ -158,17 +158,19 @@ class Showtime
 
         $displayData = [];
 
-        // Try to load one-time banners (having precedence over campaigns)
-        $banner = null;
-        if ($userId) {
-            $banner = $this->loadOneTimeUserBanner($userId);
-        }
-        if (!$banner) {
-            $banner = $this->loadOneTimeBrowserBanner($browserId);
-        }
-        if ($banner) {
-            $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $snippets);
-            return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData());
+        if ($this->showtimeConfig->isOneTimeBannerEnabled()) {
+            // Try to load one-time banners (having precedence over campaigns)
+            $banner = null;
+            if ($userId) {
+                $banner = $this->loadOneTimeUserBanner($userId);
+            }
+            if (!$banner) {
+                $banner = $this->loadOneTimeBrowserBanner($browserId);
+            }
+            if ($banner) {
+                $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $snippets);
+                return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData());
+            }
         }
 
         $campaignIds = json_decode($this->redis->get(Campaign::ACTIVE_CAMPAIGN_IDS) ?? '[]') ?? [];

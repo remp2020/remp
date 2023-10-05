@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Contracts\SegmentAggregator;
 use App\Http\Resources\SearchResource;
 use App\Http\Showtime\LazyGeoReader;
+use App\Http\Showtime\ShowtimeConfig;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
@@ -45,6 +46,10 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->bind(LazyGeoReader::class, function () {
             return new LazyGeoReader(config("services.maxmind.database"));
+        });
+
+        $this->app->bind(ShowtimeConfig::class, function () {
+            return (new ShowtimeConfig())->setOneTimeBannerEnabled(config("banners.one_time_banner_enabled"));
         });
 
         $this->app->bind(SegmentAggregator::class, function (Application $app) {
