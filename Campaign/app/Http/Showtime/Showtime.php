@@ -429,12 +429,17 @@ class Showtime
         // device rules
         if (!isset($userData->userAgent)) {
             $this->logger->error("Unable to load user agent for userId [{$userId}]");
-        } else {
-            if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $this->deviceDetector->get($userData->userAgent)->isMobile()) {
+        } else if (in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)
+            || in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)
+        ) {
+            // parse user agent
+            $deviceDetector = $this->deviceDetector->get($userData->userAgent);
+
+            if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true) && $deviceDetector->isMobile()) {
                 return null;
             }
 
-            if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $this->deviceDetector->get($userData->userAgent)->isDesktop()) {
+            if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true) && $deviceDetector->isDesktop()) {
                 return null;
             }
         }
