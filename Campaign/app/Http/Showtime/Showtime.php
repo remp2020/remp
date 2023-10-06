@@ -61,14 +61,6 @@ class Showtime
         $this->positionMap = $positions->positions();
     }
 
-    private function getPositionMap()
-    {
-        if (!$this->positionMap) {
-            $this->positionMap = json_decode($this->redis->get(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY), true) ?? [];
-        }
-        return $this->positionMap;
-    }
-
     public function getShowtimeConfig(): ShowtimeConfig
     {
         return $this->showtimeConfig;
@@ -79,39 +71,9 @@ class Showtime
         $this->dimensionMap = $dimensions->dimensions();
     }
 
-    private function getDimensionMap()
-    {
-        if (!$this->dimensionMap) {
-            $this->dimensionMap = json_decode($this->redis->get(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY), true) ?? [];
-        }
-        return $this->dimensionMap;
-    }
-
     public function setAlignmentsMap(\App\Models\Alignment\Map $alignments)
     {
         $this->alignmentsMap = $alignments->alignments();
-    }
-
-    private function getAlignmentsMap()
-    {
-        if (!$this->alignmentsMap) {
-            $this->alignmentsMap = json_decode($this->redis->get(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY), true) ?? [];
-        }
-        return $this->alignmentsMap;
-    }
-
-    private function getSnippets()
-    {
-        if (!$this->snippets) {
-            $this->snippets = [];
-
-            $redisCacheKey = $this->redis->get(\App\Snippet::REDIS_CACHE_KEY);
-            if (!is_null($redisCacheKey)) {
-                $this->snippets = json_decode($redisCacheKey, true) ?? [];
-            }
-        }
-
-        return $this->snippets;
     }
 
     public function showtime(string $userData, string $callback, ShowtimeResponse $showtimeResponse)
@@ -151,10 +113,12 @@ class Showtime
             $segmentAggregator->setProviderData($data->cache);
         }
 
-        $positions = $this->getPositionMap();
-        $dimensions = $this->getDimensionMap();
-        $alignments = $this->getAlignmentsMap();
-        $snippets = $this->getSnippets();
+        $this->loadMaps();
+
+        $positions = $this->positionMap;
+        $dimensions = $this->dimensionMap;
+        $alignments = $this->alignmentsMap;
+        $snippets = $this->snippets;
 
         $displayData = [];
 
@@ -660,6 +624,47 @@ class Showtime
         $this->redis->expire($key, $expiresInSeconds);
     }
 
+    private function loadMaps(): void
+    {
+        $keys = [];
+        if (!$this->positionMap) {
+            $keys[] = \App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY;
+        }
+
+        if (!$this->dimensionMap) {
+            $keys[] = \App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY;
+        }
+
+        if (!$this->alignmentsMap) {
+            $keys[] = \App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY;
+        }
+
+        if (!$this->snippets) {
+            $keys[] = \App\Snippet::REDIS_CACHE_KEY;
+        }
+
+        $maps = $this->redis->mget($keys);
+        reset($keys);
+        foreach ($maps as $map) {
+            $key = current($keys);
+
+            switch ($key) {
+                case \App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY:
+                    $this->positionMap = json_decode($map, true) ?? [];
+                    break;
+                case \App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY:
+                    $this->dimensionMap = json_decode($map, true) ?? [];
+                    break;
+                case \App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY:
+                    $this->alignmentsMap = json_decode($map, true) ?? [];
+                    break;
+                case \App\Snippet::REDIS_CACHE_KEY:
+                    $this->snippets = json_decode($map, true) ?? [];
+                    break;
+            }
+            next($keys);
+        }
+    }
 
     private function loadOneTimeUserBanner($userId): ?Banner
     {
