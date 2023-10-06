@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- Fixed possible redirect issue after login causing HTTP 404 after successful login. remp/remp#1235
+
 ### [Mailer]
 
 - **BREAKING**: Removed `EnvironmentConfig::setParam()` and `EnvironmentConfig::getParam()` methods. remp/remp#1299
