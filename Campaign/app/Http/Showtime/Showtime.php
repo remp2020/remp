@@ -33,6 +33,8 @@ class Showtime
 
     private $snippets;
 
+    private array $segmentCheckCache = [];
+
     public function __construct(
         private ClientInterface $redis,
         private SegmentAggregator $segmentAggregator,
@@ -155,6 +157,7 @@ class Showtime
         $campaigns = [];
         $campaignBanners = [];
         $suppressedBanners = [];
+        $this->segmentCheckCache = [];
         reset($campaignIds);
         foreach ($fetchedCampaigns as $fetchedCampaign) {
             /** @var Campaign $campaign */
@@ -731,8 +734,15 @@ class Showtime
             return true;
         }
 
-        $cacheKeyTimeStamp = $this->redis->get(SegmentAggregator::cacheKey($campaignSegment) . '|timestamp');
+        $cacheKey = SegmentAggregator::cacheKey($campaignSegment);
+        if (isset($this->segmentCheckCache[$cacheKey])) {
+            return true;
+        }
+
+
+        $cacheKeyTimeStamp = $this->redis->get($cacheKey . '|timestamp');
         if ($cacheKeyTimeStamp) {
+            $this->segmentCheckCache[$cacheKey] = true;
             return true;
         }
 
