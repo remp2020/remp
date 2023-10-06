@@ -710,9 +710,9 @@ class Showtime
                     return false;
                 }
 
-                $belongsToSegment = $this->segmentAggregator->checkUser($campaignSegment, (string)$userId);
+                $belongsToSegment = $this->checkUserInSegment($campaignSegment, $userId);
             } else {
-                $belongsToSegment = $this->segmentAggregator->checkBrowser($campaignSegment, (string)$browserId);
+                $belongsToSegment = $this->checkBrowserInSegment($campaignSegment, $browserId);
             }
 
             // user is member of segment, that's excluded from campaign; halt execution
@@ -734,13 +734,12 @@ class Showtime
             return true;
         }
 
-        $cacheKey = SegmentAggregator::cacheKey($campaignSegment);
+        $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|timestamp';
         if (isset($this->segmentCheckCache[$cacheKey])) {
             return true;
         }
 
-
-        $cacheKeyTimeStamp = $this->redis->get($cacheKey . '|timestamp');
+        $cacheKeyTimeStamp = $this->redis->get($cacheKey );
         if ($cacheKeyTimeStamp) {
             $this->segmentCheckCache[$cacheKey] = true;
             return true;
@@ -766,5 +765,31 @@ class Showtime
             }
         }
         return null;
+    }
+
+    private function checkUserInSegment(CampaignSegment $campaignSegment, $userId): bool
+    {
+        $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|user|'.$userId;
+        if (isset($this->segmentCheckCache[$cacheKey])) {
+            return $this->segmentCheckCache[$cacheKey];
+        }
+
+        $belongsToSegment = $this->segmentAggregator->checkUser($campaignSegment, (string) $userId);
+        $this->segmentCheckCache[$cacheKey] = $belongsToSegment;
+
+        return $belongsToSegment;
+    }
+
+    private function checkBrowserInSegment(CampaignSegment $campaignSegment, $browserId): bool
+    {
+        $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|browser|'.$browserId;
+        if (isset($this->segmentCheckCache[$cacheKey])) {
+            return $this->segmentCheckCache[$cacheKey];
+        }
+
+        $belongsToSegment = $this->segmentAggregator->checkBrowser($campaignSegment, (string)$browserId);
+        $this->segmentCheckCache[$cacheKey] = $belongsToSegment;
+
+        return $belongsToSegment;
     }
 }
