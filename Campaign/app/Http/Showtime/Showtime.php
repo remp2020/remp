@@ -178,15 +178,26 @@ class Showtime
             return $showtimeResponse->success($callback, [], [], $segmentAggregator->getProviderData());
         }
 
+        // prepare campaign IDs to fetch
+        $dbCampaignIds = [];
+        foreach ($campaignIds as $campaignId) {
+            $dbCampaignIds[] = Campaign::CAMPAIGN_TAG . ":{$campaignId}";
+        }
+
+        // fetch all running campaigns at once
+        $fetchedCampaigns = $this->redis->mget($dbCampaignIds);
+
         $activeCampaigns = [];
         $campaigns = [];
         $campaignBanners = [];
         $suppressedBanners = [];
-        foreach ($campaignIds as $campaignId) {
+        reset($campaignIds);
+        foreach ($fetchedCampaigns as $fetchedCampaign) {
             /** @var Campaign $campaign */
-            $campaign = unserialize($this->redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"), ['allowed_class' => Campaign::class]);
-            $campaigns[$campaignId] = $campaign;
+            $campaign = unserialize($fetchedCampaign, ['allowed_class' => Campaign::class]);
+            $campaigns[current($campaignIds)] = $campaign;
             $campaignBanners[] = $this->shouldDisplay($campaign, $data, $activeCampaigns);
+            next($campaignIds);
         }
 
         $campaignBanners = array_filter($campaignBanners);
