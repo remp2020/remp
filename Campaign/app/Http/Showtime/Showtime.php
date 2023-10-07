@@ -19,6 +19,10 @@ class Showtime
 
     private const BANNER_ONETIME_BROWSER_KEY = 'banner_onetime_browser';
 
+    private const DEVICE_DETECTION_KEY = 'device_detection';
+
+    private const DEVICE_DETECTION_TTL = 86400;
+
     private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS = '=';
 
     private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS_NOT = '!=';
@@ -430,21 +434,8 @@ class Showtime
         }
 
         // device rules
-        if (!isset($userData->userAgent)) {
-            $this->logger->error("Unable to load user agent for userId [{$userId}]");
-        } else if (in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)
-            || in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)
-        ) {
-            // parse user agent
-            $deviceDetector = $this->deviceDetector->get($userData->userAgent);
-
-            if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true) && $deviceDetector->isMobile()) {
-                return null;
-            }
-
-            if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true) && $deviceDetector->isDesktop()) {
-                return null;
-            }
+        if (false === $this->isAcceptedByDeviceRules($userData, $campaign, $userId)) {
+            return null;
         }
 
         // country rules
@@ -791,5 +782,58 @@ class Showtime
         $this->segmentCheckCache[$cacheKey] = $belongsToSegment;
 
         return $belongsToSegment;
+    }
+
+    private function isAcceptedByDeviceRules($userData, Campaign $campaign, $userId): bool
+    {
+        if (!isset($userData->userAgent)) {
+            $this->logger->error("Unable to load user agent for userId [{$userId}]");
+
+            return true;
+        }
+
+        if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)
+            && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)
+        ) {
+            return true;
+        }
+
+        // check result of device detection in redis
+        $deviceKey = self::DEVICE_DETECTION_KEY.':'.md5($userData->userAgent);
+        $deviceDetection = $this->redis->get($deviceKey);
+        if ($deviceDetection) {
+            if ($deviceDetection === Campaign::DEVICE_MOBILE && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices,true)) {
+                return false;
+            }
+            if ($deviceDetection === Campaign::DEVICE_DESKTOP && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices,true)) {
+                return false;
+            }
+        }
+
+        // parse user agent
+        $deviceDetector = $this->deviceDetector->get($userData->userAgent);
+        $isMobile = $deviceDetector->isMobile();
+        $isDesktop = $deviceDetector->isDesktop();
+
+        if ($isMobile) {
+            $deviceDetectionValue = Campaign::DEVICE_MOBILE;
+        } else if ($isDesktop) {
+            $deviceDetectionValue = Campaign::DEVICE_DESKTOP;
+        } else {
+            $deviceDetectionValue = 'other';
+        }
+
+        // store result to redis to faster resolution on the next attempt
+        $this->redis->setex($deviceKey, self::DEVICE_DETECTION_TTL, $deviceDetectionValue);
+
+        if ($isMobile && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)) {
+            return false;
+        }
+
+        if ($isDesktop && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)) {
+            return false;
+        }
+
+        return true;
     }
 }
