@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../vendor/autoload.php';
+ini_set('display_errors', 1);
 
 /**
  * asset overrides Laravel's helper function to prevent usage of Laravel's app()
@@ -431,10 +432,10 @@ try {
         if (env('REDIS_PERSISTENT', false)) {
             $redis->pconnect(env('REDIS_HOST'), (int) env('REDIS_PORT', 6379), 5, 'showtime-'.env('REDIS_DEFAULT_DATABASE'));
         } else {
-            $redis->connect(env('REDIS_HOST'));
+            $redis->connect(env('REDIS_HOST'), (int) env('REDIS_PORT', 6379), 5);
         }
-        if (env('REDIS_PASSWORD')) {
-            $redis->auth(env('REDIS_PASSWORD'));
+        if ($pwd = env('REDIS_PASSWORD')) {
+            $redis->auth($pwd);
         }
         $redis->setOption(\Redis::OPT_PREFIX, env('REDIS_PREFIX', ''));
         //$redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);

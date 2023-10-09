@@ -128,7 +128,10 @@ class Segment implements SegmentContract
 
     public function addUserToCache(CampaignSegment $campaignSegment, string $userId): bool
     {
-        return $this->redis->sadd(SegmentAggregator::cacheKey($campaignSegment), [$userId]) ?: false;
+        return $this->redis->sadd(
+            SegmentAggregator::cacheKey($campaignSegment),
+            $this->redis instanceof \Redis ? $userId : [$userId]
+        ) ?: false;
     }
 
     public function removeUserFromCache(CampaignSegment $campaignSegment, string $userId): bool
