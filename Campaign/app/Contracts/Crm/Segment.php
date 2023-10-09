@@ -6,7 +6,6 @@ use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
-use App\Jobs\CacheSegmentJob;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
@@ -32,6 +31,13 @@ class Segment implements SegmentContract
         $this->client = $client;
         $this->providerData = new \stdClass;
         $this->redis = $redis;
+    }
+
+    public function setRedisClient(\Predis\Client|\Redis $redis): self
+    {
+        $this->redis = $redis;
+
+        return $this;
     }
 
     public function provider(): string

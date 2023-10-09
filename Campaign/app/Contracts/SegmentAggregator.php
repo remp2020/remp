@@ -148,6 +148,15 @@ class SegmentAggregator implements SegmentContract
         return $this->errors;
     }
 
+    public function refreshRedisClient(Client|\Redis $redisClient): void
+    {
+        foreach ($this->contracts as $contract) {
+            if (method_exists($contract, 'setRedisClient')) {
+                $contract->setRedisClient($redisClient);
+            }
+        }
+    }
+
     /**
      * SegmentAggregator contains Guzzle clients which have properties defined as closures.
      * It's not possible to serialize closures in plain PHP, but Laravel provides a workaround.
@@ -173,6 +182,13 @@ class SegmentAggregator implements SegmentContract
     public static function unserializeFromRedis(Client|\Redis $redisClient): ?SegmentAggregator
     {
         $serializedClosure = $redisClient->get(self::SEGMENT_AGGREGATOR_REDIS_KEY);
-        return $serializedClosure ? unserialize($serializedClosure)() : null;
+
+        /* @var SegmentAggregator $segmentAggregator */
+        $segmentAggregator =  $serializedClosure ? unserialize($serializedClosure)() : null;
+
+        // set the redis to avoid duplicated connection
+        $segmentAggregator->refreshRedisClient($redisClient);
+
+        return $segmentAggregator;
     }
 }

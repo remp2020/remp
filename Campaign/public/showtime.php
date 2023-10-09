@@ -15,7 +15,6 @@ use Illuminate\Support\Str;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-ini_set('display_errors', 1);
 
 /**
  * asset overrides Laravel's helper function to prevent usage of Laravel's app()
