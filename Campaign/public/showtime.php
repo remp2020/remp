@@ -426,16 +426,36 @@ header('Content-Type: application/javascript');
 
 try {
     // dependencies initialization
-    $redis = new \Predis\Client([
-        'scheme' => 'tcp',
-        'host'   => env('REDIS_HOST'),
-        'port'   => env('REDIS_PORT') ?: 6379,
-        'password' => env('REDIS_PASSWORD') ?: null,
-        'database' => env('REDIS_DEFAULT_DATABASE') ?: 0,
-        'persistent' => env('REDIS_PERSISTENT', false),
-    ], [
-        'prefix' => env('REDIS_PREFIX') ?: '',
-    ]);
+    if (env('REDIS_CLIENT', 'predis') === 'phpredis') {
+        $redis = new \Redis();
+        if (env('REDIS_PERSISTENT', false)) {
+            $redis->pconnect(env('REDIS_HOST'), (int) env('REDIS_PORT', 6379), 5, 'showtime-'.env('REDIS_DEFAULT_DATABASE'));
+        } else {
+            $redis->connect(env('REDIS_HOST'));
+        }
+        if (env('REDIS_PASSWORD')) {
+            $redis->auth(env('REDIS_PASSWORD'));
+        }
+        $redis->setOption(\Redis::OPT_PREFIX, env('REDIS_PREFIX', ''));
+        //$redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
+        $redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_NONE);
+        $redis->select((int) env('REDIS_DEFAULT_DATABASE', 0));
+
+        $cachePool =  new \Cache\Adapter\Redis\RedisCachePool($redis);
+
+    } else {
+        $redis = new \Predis\Client([
+            'scheme' => 'tcp',
+            'host'   => env('REDIS_HOST'),
+            'port'   => env('REDIS_PORT') ?: 6379,
+            'password' => env('REDIS_PASSWORD') ?: null,
+            'database' => env('REDIS_DEFAULT_DATABASE') ?: 0,
+            'persistent' => env('REDIS_PERSISTENT', false),
+        ], [
+            'prefix' => env('REDIS_PREFIX') ?: '',
+        ]);
+        $cachePool =  new \Cache\Adapter\Predis\PredisCachePool($redis);
+    }
 
     $segmentAggregator = SegmentAggregator::unserializeFromRedis($redis);
     if (!$segmentAggregator) {
@@ -443,7 +463,7 @@ try {
         $showtimeResponse->error($callback, 500, ['Internal error, application might not have been correctly initialized.']);
     }
 
-    $deviceDetector = new LazyDeviceDetector($redis);
+    $deviceDetector = new LazyDeviceDetector($cachePool);
 
     if (file_exists(env('MAXMIND_DATABASE'))) {
         $maxmindDbPath = env('MAXMIND_DATABASE');

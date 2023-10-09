@@ -48,12 +48,20 @@ class SegmentAggregator implements SegmentContract
 
     public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
+        if (!isset($this->contracts[$campaignSegment->provider])) {
+            return false;
+        }
+
         return $this->contracts[$campaignSegment->provider]
             ->checkUser($campaignSegment, $userId);
     }
 
     public function checkBrowser(CampaignSegment $campaignSegment, string $browserId): bool
     {
+        if (!isset($this->contracts[$campaignSegment->provider])) {
+            return false;
+        }
+
         return $this->contracts[$campaignSegment->provider]
             ->checkBrowser($campaignSegment, $browserId);
     }
@@ -66,6 +74,10 @@ class SegmentAggregator implements SegmentContract
 
     public function cacheEnabled(CampaignSegment $campaignSegment): bool
     {
+        if (!isset($this->contracts[$campaignSegment->provider])) {
+            return false;
+        }
+
         return $this->contracts[$campaignSegment->provider]
             ->cacheEnabled($campaignSegment);
     }
@@ -158,7 +170,7 @@ class SegmentAggregator implements SegmentContract
         Redis::set(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY, $alignmentsMap->alignments()->toJson());
     }
 
-    public static function unserializeFromRedis(Client $redisClient): ?SegmentAggregator
+    public static function unserializeFromRedis(Client|\Redis $redisClient): ?SegmentAggregator
     {
         $serializedClosure = $redisClient->get(self::SEGMENT_AGGREGATOR_REDIS_KEY);
         return $serializedClosure ? unserialize($serializedClosure)() : null;

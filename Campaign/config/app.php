@@ -159,6 +159,7 @@ return [
         App\Providers\BeamSegmentsServiceProvider::class,
         App\Providers\PythiaSegmentsServiceProvider::class,
         App\Providers\StatsServiceProvider::class,
+        App\Providers\ShowtimeServiceProvider::class,
     ],
 
     /*
@@ -227,6 +228,6 @@ return [
     | Url of the site, where remplib.js is implemented
     |
     */
-    
+
     'client_site_url' => env('CLIENT_SITE_URL'),
 ];

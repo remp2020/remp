@@ -27,7 +27,7 @@ class Segment implements SegmentContract
 
     private $redis;
 
-    public function __construct(Client $client, \Predis\Client $redis)
+    public function __construct(Client $client, \Predis\Client|\Redis $redis)
     {
         $this->client = $client;
         $this->providerData = new \stdClass;

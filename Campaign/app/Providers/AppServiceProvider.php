@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Contracts\SegmentAggregator;
 use App\Http\Resources\SearchResource;
+use App\Http\Showtime\LazyDeviceDetector;
 use App\Http\Showtime\LazyGeoReader;
 use App\Http\Showtime\ShowtimeConfig;
 use Illuminate\Database\Connection;
@@ -54,6 +55,16 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(SegmentAggregator::class, function (Application $app) {
             return new SegmentAggregator($app->tagged(SegmentAggregator::TAG));
+        });
+
+        $this->app->bind(LazyDeviceDetector::class, function () {
+            if (env('REDIS_CLIENT', 'phpredis') === 'phpredis') {
+                $cachePool =  new \Cache\Adapter\Redis\RedisCachePool(Redis::connection()->client());
+            } else {
+                $cachePool =  new \Cache\Adapter\Predis\PredisCachePool(Redis::connection()->client());
+            }
+
+            return (new LazyDeviceDetector($cachePool));
         });
     }
 

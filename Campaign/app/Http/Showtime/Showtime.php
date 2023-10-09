@@ -40,7 +40,7 @@ class Showtime
     private array $segmentCheckCache = [];
 
     public function __construct(
-        private ClientInterface $redis,
+        private ClientInterface|\Redis $redis,
         private SegmentAggregator $segmentAggregator,
         private LazyGeoReader $geoReader,
         private ShowtimeConfig $showtimeConfig,
