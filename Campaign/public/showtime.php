@@ -437,7 +437,6 @@ try {
             $redis->auth($pwd);
         }
         $redis->setOption(\Redis::OPT_PREFIX, env('REDIS_PREFIX', ''));
-        //$redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
         $redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_NONE);
         $redis->select((int) env('REDIS_DEFAULT_DATABASE', 0));
 

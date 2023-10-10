@@ -228,6 +228,5 @@ return [
     | Url of the site, where remplib.js is implemented
     |
     */
-
     'client_site_url' => env('CLIENT_SITE_URL'),
 ];
