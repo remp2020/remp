@@ -183,11 +183,11 @@ class SegmentAggregator implements SegmentContract
     {
         $serializedClosure = $redisClient->get(self::SEGMENT_AGGREGATOR_REDIS_KEY);
 
-        /* @var SegmentAggregator $segmentAggregator */
-        $segmentAggregator =  $serializedClosure ? unserialize($serializedClosure)() : null;
+        /* @var ?SegmentAggregator $segmentAggregator */
+        $segmentAggregator = $serializedClosure ? unserialize($serializedClosure)() : null;
 
         // set the redis to avoid duplicated connection
-        $segmentAggregator->refreshRedisClient($redisClient);
+        $segmentAggregator?->refreshRedisClient($redisClient);
 
         return $segmentAggregator;
     }
