@@ -34,6 +34,13 @@ class Segment implements SegmentContract
         $this->redis = $redis;
     }
 
+    public function setRedisClient(\Predis\Client $redis): self
+    {
+        $this->redis = $redis;
+
+        return $this;
+    }
+
     public function provider(): string
     {
         return static::PROVIDER_ALIAS;
