@@ -37,7 +37,7 @@ class Showtime
 
     private $snippets;
 
-    private array $segmentCheckCache = [];
+    private array $localCache = [];
 
     public function __construct(
         private ClientInterface $redis,
@@ -161,7 +161,7 @@ class Showtime
         $campaigns = [];
         $campaignBanners = [];
         $suppressedBanners = [];
-        $this->segmentCheckCache = [];
+        $this->localCache = [];
         reset($campaignIds);
         foreach ($fetchedCampaigns as $fetchedCampaign) {
             /** @var Campaign $campaign */
@@ -726,13 +726,13 @@ class Showtime
         }
 
         $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|timestamp';
-        if (isset($this->segmentCheckCache[$cacheKey])) {
+        if (isset($this->localCache[$cacheKey])) {
             return true;
         }
 
         $cacheKeyTimeStamp = $this->redis->get($cacheKey );
         if ($cacheKeyTimeStamp) {
-            $this->segmentCheckCache[$cacheKey] = true;
+            $this->localCache[$cacheKey] = true;
             return true;
         }
 
@@ -761,12 +761,12 @@ class Showtime
     private function checkUserInSegment(CampaignSegment $campaignSegment, $userId): bool
     {
         $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|user|'.$userId;
-        if (isset($this->segmentCheckCache[$cacheKey])) {
-            return $this->segmentCheckCache[$cacheKey];
+        if (isset($this->localCache[$cacheKey])) {
+            return $this->localCache[$cacheKey];
         }
 
         $belongsToSegment = $this->segmentAggregator->checkUser($campaignSegment, (string) $userId);
-        $this->segmentCheckCache[$cacheKey] = $belongsToSegment;
+        $this->localCache[$cacheKey] = $belongsToSegment;
 
         return $belongsToSegment;
     }
@@ -774,12 +774,12 @@ class Showtime
     private function checkBrowserInSegment(CampaignSegment $campaignSegment, $browserId): bool
     {
         $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|browser|'.$browserId;
-        if (isset($this->segmentCheckCache[$cacheKey])) {
-            return $this->segmentCheckCache[$cacheKey];
+        if (isset($this->localCache[$cacheKey])) {
+            return $this->localCache[$cacheKey];
         }
 
         $belongsToSegment = $this->segmentAggregator->checkBrowser($campaignSegment, (string)$browserId);
-        $this->segmentCheckCache[$cacheKey] = $belongsToSegment;
+        $this->localCache[$cacheKey] = $belongsToSegment;
 
         return $belongsToSegment;
     }
@@ -800,7 +800,8 @@ class Showtime
 
         // check result of device detection in redis
         $deviceKey = self::DEVICE_DETECTION_KEY.':'.md5($userData->userAgent);
-        $deviceDetection = $this->redis->get($deviceKey);
+        $deviceDetection = $this->localCache[$deviceKey] ?? $this->redis->get($deviceKey);
+
         if ($deviceDetection) {
             if ($deviceDetection === Campaign::DEVICE_MOBILE && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices,true)) {
                 return false;
@@ -808,6 +809,8 @@ class Showtime
             if ($deviceDetection === Campaign::DEVICE_DESKTOP && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices,true)) {
                 return false;
             }
+
+            return true;
         }
 
         // parse user agent
@@ -824,6 +827,7 @@ class Showtime
         }
 
         // store result to redis to faster resolution on the next attempt
+        $this->localCache[$deviceKey] = $deviceDetectionValue;
         $this->redis->setex($deviceKey, self::DEVICE_DETECTION_TTL, $deviceDetectionValue);
 
         if ($isMobile && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)) {
