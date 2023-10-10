@@ -82,6 +82,13 @@ class Showtime
         $this->alignmentsMap = $alignments->alignments();
     }
 
+    public function flushLocalCache(): self
+    {
+        $this->localCache = [];
+
+        return $this;
+    }
+
     public function showtime(string $userData, string $callback, ShowtimeResponse $showtimeResponse)
     {
         try {
@@ -161,7 +168,7 @@ class Showtime
         $campaigns = [];
         $campaignBanners = [];
         $suppressedBanners = [];
-        $this->localCache = [];
+        $this->flushLocalCache();
         reset($campaignIds);
         foreach ($fetchedCampaigns as $fetchedCampaign) {
             /** @var Campaign $campaign */
