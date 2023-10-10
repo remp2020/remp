@@ -800,7 +800,14 @@ class Showtime
 
         // check result of device detection in redis
         $deviceKey = self::DEVICE_DETECTION_KEY.':'.md5($userData->userAgent);
-        $deviceDetection = $this->localCache[$deviceKey] ?? $this->redis->get($deviceKey);
+        if (isset($this->localCache[$deviceKey])) {
+            $deviceDetection = $this->localCache[$deviceKey];
+        } else {
+            $deviceDetection = $this->redis->get($deviceKey);
+            if ($deviceDetection) {
+                $this->localCache[$deviceKey] = $deviceDetection;
+            }
+        }
 
         if ($deviceDetection) {
             if ($deviceDetection === Campaign::DEVICE_MOBILE && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices,true)) {
