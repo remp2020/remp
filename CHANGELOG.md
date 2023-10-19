@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Use of these could lead to circular dependency issues if values were read by environment config itself.
   - We recommend the extraction of these values to their separate config classes.
 - Fixed circular dependency issue with configs using environment variables. remp/remp#1299
+- Added new parameter `start_at` into `v1/mailer/jobs` and `v2/mailer/jobs` to allow schedule the start of sending. remp/respekt#19
 
 ## Archive
 

@@ -96,8 +96,10 @@ class MailJobCreateApiHandler extends BaseHandler
             }
         }
 
+        $startAt = $payload['start_at'] ?? null;
+
         $mailJob = $this->jobsRepository->add($jobSegmentsManager, $payload['context'] ?? null, $mailTypeVariant);
-        $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
+        $batch = $this->batchesRepository->add($mailJob->id, null, $startAt, BatchesRepository::METHOD_RANDOM);
         $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);
 

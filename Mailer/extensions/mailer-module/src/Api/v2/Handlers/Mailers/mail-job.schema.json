@@ -53,6 +53,10 @@
     },
     "mail_type_variant_code": {
       "type": "string"
+    },
+    "start_at": {
+      "type": "string",
+      "format": "date-time"
     }
   }
 }
