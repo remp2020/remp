@@ -5,7 +5,6 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Redis;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;

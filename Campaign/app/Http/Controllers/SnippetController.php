@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SnippetRequest;
 use App\Http\Resources\SnippetResource;
 use App\Snippet;
+use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\DataTables;
 
 class SnippetController extends Controller
@@ -24,7 +25,7 @@ class SnippetController extends Controller
 
     public function json(DataTables $dataTables)
     {
-        $snippets = Snippet::select()->get();
+        $snippets = Snippet::select();
 
         return $dataTables->of($snippets)
             ->addColumn('actions', function (Snippet $snippet) {
@@ -37,6 +38,9 @@ class SnippetController extends Controller
                     'url' => route('snippets.edit', ['snippet' => $snippet]),
                     'text' => $snippet->name,
                 ];
+            })
+            ->filterColumn('name', function (Builder $query, $value) {
+                $query->where('snippets.name', 'like', "%{$value}%");
             })
             ->setRowId('id')
             ->make(true);

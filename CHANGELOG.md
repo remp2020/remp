@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed possible redirect issue after login causing HTTP 404 after successful login. remp/remp#1235
 
+### [Campaign]
+
+- Fixed search by name on snippets listing. remp/remp#1303
+- Added snippet search to the universal search bar. remp/remp#1303
+
 ### [Mailer]
 
 - **BREAKING**: Removed `EnvironmentConfig::setParam()` and `EnvironmentConfig::getParam()` methods. remp/remp#1299
