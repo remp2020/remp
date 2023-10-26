@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - We recommend the extraction of these values to their separate config classes.
 - Fixed circular dependency issue with configs using environment variables. remp/remp#1299
 - Added new parameter `start_at` into `v1/mailer/jobs` and `v2/mailer/jobs` to allow schedule the start of sending. remp/respekt#19
+- Added `BeforeUsersDeleteEvent` and `UsersDeletedEvent` events to emit before and after users are deleted. remp/remp#1301
 
 ## Archive
 
