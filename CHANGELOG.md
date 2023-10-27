@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed search by name on snippets listing. remp/remp#1303
 - Added snippet search to the universal search bar. remp/remp#1303
 - Fixed Campaign's `showtime.php` crashing if there are no active campaigns.
+- Added campaign collections. remp/remp#1286
 
 ### [Mailer]
 

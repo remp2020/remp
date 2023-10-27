@@ -22,7 +22,7 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            {!! Form::model($schedule, ['route' => ['schedule.update', 'schedule' => $schedule], 'method' => 'PATCH']) !!}
+            {!! Form::model($schedule, ['route' => ['schedule.update', ['schedule' => $schedule, 'collection' => $collection]], 'method' => 'PATCH']) !!}
             @include('schedule._form')
             {!! Form::close() !!}
         </div>

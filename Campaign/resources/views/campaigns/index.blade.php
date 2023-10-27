@@ -5,14 +5,14 @@
 @section('content')
 
     <div class="c-header">
-        <h2>CAMPAIGNS</h2>
+        <h2>@if($collection) CAMPAIGNS FROM COLLECTION '{{ $collection->name }}' @else CAMPAIGNS @endif</h2>
     </div>
 
     <div class="card">
         <div class="card-header">
             <h2>Scheduled campaigns<small></small></h2>
             <div class="actions">
-                <a href="{{ route('schedule.index') }}" class="btn palette-Cyan bg waves-effect">View all schedules</a>
+                <a href="{{ route('schedule.index', ['collection' => $collection]) }}" class="btn palette-Cyan bg waves-effect">View all schedules</a>
             </div>
         </div>
         <div class="card-body">
@@ -43,7 +43,7 @@
                         'visible' => false,
                     ],
                 ],
-                'dataSource' => route('schedule.json', ['active' => true, 'limit' => 5]),
+                'dataSource' => route('schedule.json', ['collection' => $collection, 'active' => true, 'limit' => 5]),
                 'rowActions' => [
                     ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit schedule'],
                     ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play', 'title' => 'Start schedule'],
@@ -70,7 +70,7 @@
                     <h2>Campaign list <small></small></h2>
                     <div class="actions">
                         <a href="{{ route('comparison.index') }}" class="btn palette-Cyan bg waves-effect">Compare campaigns</a>
-                        <a href="{{ route('campaigns.create') }}" class="btn palette-Cyan bg waves-effect">Add new campaign</a>
+                        <a href="{{ route('campaigns.create', ['collection' => $collection]) }}" class="btn palette-Cyan bg waves-effect">Add new campaign</a>
                     </div>
                 </div>
 
@@ -131,7 +131,7 @@
                     'rowHighlights' => [
                         'is_running' => true
                     ],
-                    'dataSource' => route('campaigns.json'),
+                    'dataSource' => route('campaigns.json', ['collection' => $collection]),
                     'rowActions' => [
                         ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit campaign'],
                         ['name' => 'copy', 'class' => 'zmdi-palette-Cyan zmdi-copy', 'title' => 'Copy campaign'],

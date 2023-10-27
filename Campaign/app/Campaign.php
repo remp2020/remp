@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Redis;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
@@ -190,6 +191,16 @@ class Campaign extends Model implements Searchable
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
+    }
+
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            CampaignCollection::class,
+            'campaign_collections',
+            'campaign_id',
+            'collection_id',
+        );
     }
 
     public function getAllDevices()

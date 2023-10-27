@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Campaign;
 use App\CampaignBanner;
+use App\CampaignCollection;
 use App\Http\Requests\ScheduleRequest;
 use App\Http\Resources\ScheduleResource;
 use App\Schedule;
@@ -16,7 +17,7 @@ use Yajra\Datatables\Datatables;
 
 class ScheduleController extends Controller
 {
-    public function index()
+    public function index(CampaignCollection $collection = null)
     {
         $variants = CampaignBanner::with('banner')
             ->whereNotNull('banner_id')
@@ -25,7 +26,8 @@ class ScheduleController extends Controller
 
         return response()->format([
             'html' => view('schedule.index', [
-                'variants' => $variants
+                'variants' => $variants,
+                'collection' => $collection,
             ]),
             'json' => ScheduleResource::collection(Schedule::paginate()),
         ]);
@@ -46,13 +48,19 @@ class ScheduleController extends Controller
      * @return mixed
      * @throws \Exception
      */
-    public function json(Request $request, Datatables $dataTables, Campaign $campaign = null)
+    public function json(Request $request, Datatables $dataTables, Campaign $campaign = null, CampaignCollection $collection = null)
     {
-        $scheduleSelect = Schedule::select('schedules.*', 'campaigns.public_id as campaign_public_id')
-            ->join('campaigns', 'schedules.campaign_id', '=', 'campaigns.id');
+        $scheduleSelect = Schedule::select('schedules.*')
+            ->join('campaigns', 'schedules.campaign_id', '=', 'campaigns.id')
+            ->leftJoin('campaign_collections', 'campaigns.id', '=', 'campaign_collections.campaign_id')
+            ->groupBy('schedules.id');
 
         if (!is_null($campaign)) {
-            $scheduleSelect->where('campaign_id', '=', $campaign->id);
+            $scheduleSelect->where('schedules.campaign_id', '=', $campaign->id);
+        }
+
+        if ($collection) {
+            $scheduleSelect->where('campaign_collections.collection_id', '=', $collection->id);
         }
 
         if ($request->active) {
@@ -69,18 +77,18 @@ class ScheduleController extends Controller
         }
 
         return $dataTables->of($scheduleSelect)
-            ->addColumn('actions', function (Schedule $s) {
+            ->addColumn('actions', function (Schedule $s) use ($collection) {
                 return [
-                    'edit' => !$s->isStopped() ? route('schedule.edit', $s) : null,
+                    'edit' => !$s->isStopped() ? route('schedule.edit', ['schedule' => $s, 'collection' => $collection]) : null,
                     'start' => $s->isRunnable() ? route('schedule.start', $s) : null,
                     'pause' => $s->isRunning() ? route('schedule.pause', $s) : null,
                     'stop' => $s->isRunning() || $s->isPaused() ? route('schedule.stop', $s) : null,
                     'destroy' => $s->isEditable() ? route('schedule.destroy', $s) : null,
                 ];
             })
-            ->addColumn('campaign', function (Schedule $schedule) {
+            ->addColumn('campaign', function (Schedule $schedule) use ($collection) {
                 return [
-                    'url' => route('campaigns.edit', ['campaign' => $schedule->campaign]),
+                    'url' => route('campaigns.edit', ['campaign' => $schedule->campaign, 'collection' => $collection]),
                     'text' => $schedule->campaign->name,
                 ];
             })
@@ -88,6 +96,9 @@ class ScheduleController extends Controller
                 $query->whereHas('campaign', function (Builder $query) use ($value) {
                     $query->where('campaigns.name', 'like', "%{$value}%");
                 });
+            })
+            ->addColumn('campaign_public_id', function ($schedule) {
+                return $schedule->campaign->public_id;
             })
             ->filterColumn('campaign_public_id', function (Builder $query, $value) {
                 $query->whereHas('campaign', function (Builder $query) use ($value) {
@@ -193,22 +204,23 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function edit(Schedule $schedule)
+    public function edit(Schedule $schedule, CampaignCollection $collection = null)
     {
         $schedule->fill(old());
 
         return view('schedule.edit', [
             'schedule' => $schedule,
+            'collection' => $collection,
         ]);
     }
 
-    public function update(ScheduleRequest $request, Schedule $schedule)
+    public function update(ScheduleRequest $request, Schedule $schedule, CampaignCollection $collection = null)
     {
         $schedule->fill($request->all());
         $schedule->save();
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
+            'html' => redirect(route('campaigns.index', ['collection' => $collection]))->with('success', sprintf(
                 "Campaign %s rescheduled starting on %s and ending on %s",
                 $schedule->campaign->name,
                 Carbon::parse($schedule->start_time)->toDayDateTimeString(),
@@ -218,12 +230,12 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function destroy(Schedule $schedule)
+    public function destroy(Schedule $schedule, CampaignCollection $collection = null)
     {
         $schedule->delete();
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
+            'html' => redirect(route('campaigns.index', ['collection' => $collection]))->with('success', sprintf(
                 "Schedule for campaign %s from %s to %s was removed",
                 $schedule->campaign->name,
                 Carbon::parse($schedule->start_time)->toDayDateTimeString(),
@@ -241,7 +253,7 @@ class ScheduleController extends Controller
     {
         if (!$schedule->isRunning()) {
             return response()->format([
-                'html' => redirect(route('campaigns.index'))->with('success', sprintf(
+                'html' => redirect(url()->previous())->with('success', sprintf(
                     "Schedule for campaign %s was not running, pause request ignored",
                     $schedule->campaign->name
                 )),
@@ -253,7 +265,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
+            'html' => redirect(url()->previous())->with('success', sprintf(
                 "Schedule for campaign %s is now paused",
                 $schedule->campaign->name
             )),
@@ -269,7 +281,7 @@ class ScheduleController extends Controller
     {
         if (!$schedule->isRunnable()) {
             return response()->format([
-                'html' => redirect(route('campaigns.index'))->with('success', sprintf(
+                'html' => redirect(url()->previous())->with('success', sprintf(
                     "Schedule for campaign %s was not runnable, start request ignored",
                     $schedule->campaign->name
                 )),
@@ -284,7 +296,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
+            'html' => redirect(url()->previous())->with('success', sprintf(
                 "Schedule for campaign %s was started manually",
                 $schedule->campaign->name
             )),
@@ -300,7 +312,7 @@ class ScheduleController extends Controller
     {
         if (!$schedule->isRunning() && !$schedule->isPaused()) {
             return response()->format([
-                'html' => redirect(route('campaigns.index'))->with('success', sprintf(
+                'html' => redirect(url()->previous())->with('success', sprintf(
                     "Schedule for campaign %s was not running, stop request ignored",
                     $schedule->campaign->name
                 )),
@@ -312,7 +324,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return response()->format([
-            'html' => redirect(route('campaigns.index'))->with('success', sprintf(
+            'html' => redirect(url()->previous())->with('success', sprintf(
                 "Schedule for campaign %s was stopped",
                 $schedule->campaign->name
             )),

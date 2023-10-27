@@ -120,7 +120,7 @@
             'serverSide': true,
             'order': {!! @json($order) !!},
             'ajax': {
-                'url': '{{ $dataSource }}',
+                'url': '{!! $dataSource !!}',
                 'data': function (data) {
                     var url = window.location.href
                     var param = null;

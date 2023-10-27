@@ -88,6 +88,9 @@
             <li {!! route_active(['campaigns']) !!}>
                 <a href="{{ route('campaigns.index') }}" ><i class="zmdi zmdi-ticket-star"></i> Campaigns</a>
             </li>
+            <li {!! route_active(['collections']) !!}>
+                <a href="{{ route('collections.index') }}" ><i class="zmdi zmdi-collection-text"></i> Collections</a>
+            </li>
             <li {!! route_active(['snippets']) !!}>
                 <a href="{{ route('snippets.index') }}" ><i class="zmdi zmdi-code"></i> Snippets</a>
             </li>

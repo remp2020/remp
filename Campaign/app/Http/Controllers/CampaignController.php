@@ -6,6 +6,7 @@ use App\Banner;
 use App\Campaign;
 use App\CampaignBanner;
 use App\CampaignSegment;
+use App\CampaignCollection;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentException;
 use App\Country;
@@ -13,13 +14,10 @@ use App\Http\Requests\CampaignRequest;
 use App\Http\Resources\CampaignResource;
 use App\Http\Showtime\ControllerShowtimeResponse;
 use App\Http\Showtime\Showtime;
-use App\Http\Showtime\ShowtimeConfig;
 use App\Schedule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use View;
-use HTML;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -42,7 +40,7 @@ class CampaignController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(SegmentAggregator $segmentAggregator)
+    public function index(SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         $availableSegments = $this->getAllSegments($segmentAggregator)->pluck('name', 'code');
         $segments = CampaignSegment::get()->mapWithKeys(function ($item) use ($availableSegments) {
@@ -58,30 +56,37 @@ class CampaignController extends Controller
                 'beamJournalConfigured' => $this->beamJournalConfigured,
                 'segments' => $segments,
                 'variants' => $variants,
+                'collection' => $collection,
             ]),
             'json' => CampaignResource::collection(Campaign::paginate()),
         ]);
     }
 
-    public function json(Datatables $dataTables, SegmentAggregator $segmentAggregator)
+    public function json(Datatables $dataTables, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         $campaigns = Campaign::select('campaigns.*')
-            ->with(['segments', 'countries', 'campaignBanners', 'campaignBanners.banner', 'schedules']);
+            ->with(['segments', 'countries', 'collections', 'campaignBanners', 'campaignBanners.banner', 'schedules']);
+
+        if ($collection) {
+            $campaigns->whereHas('collections', function ($query) use ($collection) {
+                $query->where('collection_id', $collection->id);
+            });
+        }
 
         $segments = $this->getAllSegments($segmentAggregator)->pluck('name', 'code');
 
         return $dataTables->of($campaigns)
-            ->addColumn('actions', function (Campaign $campaign) {
+            ->addColumn('actions', function (Campaign $campaign) use ($collection) {
                 return [
-                    'edit' => route('campaigns.edit', $campaign),
-                    'copy' => route('campaigns.copy', $campaign),
-                    'stats' => route('campaigns.stats', $campaign),
-                    'compare' => route('comparison.add', $campaign),
+                    'edit' => route('campaigns.edit', ['campaign' => $campaign, 'collection' => $collection]),
+                    'copy' => route('campaigns.copy', ['sourceCampaign' => $campaign, 'collection' => $collection]),
+                    'stats' => route('campaigns.stats', ['campaign' => $campaign, 'collection' => $collection]),
+                    'compare' => route('comparison.add', ['campaign' => $campaign, 'collection' => $collection]),
                 ];
             })
-            ->addColumn('name', function (Campaign $campaign) {
+            ->addColumn('name', function (Campaign $campaign) use ($collection) {
                 return [
-                    'url' => route('campaigns.edit', ['campaign' => $campaign]),
+                    'url' => route('campaigns.edit', ['campaign' => $campaign, 'collection' => $collection]),
                     'text' => $campaign->name,
                 ];
             })
@@ -188,7 +193,7 @@ class CampaignController extends Controller
      * @param SegmentAggregator $segmentAggregator
      * @return \Illuminate\Http\Response
      */
-    public function create(SegmentAggregator $segmentAggregator)
+    public function create(SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         $campaign = new Campaign();
 
@@ -211,11 +216,12 @@ class CampaignController extends Controller
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
             'availableLanguages' => json_encode(Campaign::getAvailableLanguages()),
-            'segments' => $this->getAllSegments($segmentAggregator)
+            'segments' => $this->getAllSegments($segmentAggregator),
+            'collection' => $collection,
         ]);
     }
 
-    public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator)
+    public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         $sourceCampaign->load('banners', 'campaignBanners', 'segments', 'countries');
         $campaign = $sourceCampaign->replicate();
@@ -241,7 +247,8 @@ class CampaignController extends Controller
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
             'availableLanguages' => json_encode(Campaign::getAvailableLanguages()),
-            'segments' => $this->getAllSegments($segmentAggregator)
+            'segments' => $this->getAllSegments($segmentAggregator),
+            'collection' => $collection,
         ]);
     }
 
@@ -262,11 +269,11 @@ class CampaignController extends Controller
      * @param CampaignRequest|Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CampaignRequest $request)
+    public function store(CampaignRequest $request, CampaignCollection $collection = null)
     {
         $campaign = new Campaign();
 
-        $this->saveCampaign($campaign, $request->all());
+        $this->saveCampaign($campaign, $request->all(), $collection);
 
         $message = ['success' => sprintf('Campaign [%s] was created', $campaign->name)];
 
@@ -286,7 +293,7 @@ class CampaignController extends Controller
                     self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
                     self::FORM_ACTION_SAVE => 'campaigns.edit',
                 ],
-                $campaign
+                ['campaign' => $campaign, 'collection' => $collection]
             )->with($message),
             'json' => new CampaignResource($campaign),
         ]);
@@ -315,7 +322,7 @@ class CampaignController extends Controller
      * @param SegmentAggregator $segmentAggregator
      * @return \Illuminate\Http\Response
      */
-    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator)
+    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         [
             $campaign,
@@ -336,7 +343,8 @@ class CampaignController extends Controller
             'banners' => Banner::all(),
             'availableCountries' => Country::all()->keyBy("iso_code"),
             'availableLanguages' => json_encode(Campaign::getAvailableLanguages()),
-            'segments' => $this->getAllSegments($segmentAggregator)
+            'segments' => $this->getAllSegments($segmentAggregator),
+            'collection' => $collection,
         ]);
     }
 
@@ -347,9 +355,9 @@ class CampaignController extends Controller
      * @param  \App\Campaign $campaign
      * @return \Illuminate\Http\Response
      */
-    public function update(CampaignRequest $request, Campaign $campaign)
+    public function update(CampaignRequest $request, Campaign $campaign, CampaignCollection $collection = null)
     {
-        $this->saveCampaign($campaign, $request->all());
+        $this->saveCampaign($campaign, $request->all(), $collection);
 
         $message = ['success' => sprintf('Campaign [%s] was updated.', $campaign->name)];
 
@@ -369,7 +377,7 @@ class CampaignController extends Controller
                         self::FORM_ACTION_SAVE_CLOSE => 'campaigns.index',
                         self::FORM_ACTION_SAVE => 'campaigns.edit',
                     ],
-                $campaign
+                ['campaign' => $campaign, 'collection' => $collection]
             )->with($message),
             'json' => new CampaignResource($campaign),
         ]);
@@ -554,7 +562,7 @@ class CampaignController extends Controller
         return $showtime->showtime($data, $callback, $controllerShowtimeResponse);
     }
 
-    public function saveCampaign(Campaign $campaign, array $data)
+    public function saveCampaign(Campaign $campaign, array $data, CampaignCollection $collection = null)
     {
         $campaign->fill($data);
         $campaign->save();
@@ -586,6 +594,10 @@ class CampaignController extends Controller
 
         if (isset($data['removedSegments'])) {
             CampaignSegment::destroy($data['removedSegments']);
+        }
+
+        if ($collection !== null && !$campaign->collections->contains($collection)) {
+            $campaign->collections()->attach($collection);
         }
     }
 
@@ -654,7 +666,7 @@ class CampaignController extends Controller
         try {
             $segments = $segmentAggregator->list();
         } catch (SegmentException $e) {
-            $segments = new Collection();
+            $segments = new CampaignCollection();
             flash('Unable to fetch list of segments, please check the application configuration.')->error();
             Log::error($e->getMessage());
         }

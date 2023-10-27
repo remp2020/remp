@@ -13,6 +13,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\ScheduleController;
@@ -26,7 +27,7 @@ Route::get('/error', [AuthController::class, 'error'])->name('sso.error');
 Route::get('banners/preview/{uuid}', [BannerController::class, 'preview'])->name('banners.preview');
 Route::get('campaigns/showtime', [CampaignController::class, 'showtime'])->name('campaigns.showtime');
 
-Route::middleware('auth.jwt')->group(function () {
+Route::middleware(['auth.jwt', 'collectionQueryString'])->group(function () {
     Route::get('/', [DashboardController::class, 'index']);
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('banners/json', [BannerController::class, 'json'])->name('banners.json');
@@ -58,9 +59,14 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::resource('banners', BannerController::class);
     Route::resource('campaigns', CampaignController::class);
+    Route::resource('collections', CollectionController::class)->only(['index', 'create', 'edit', 'update', 'store']);
     Route::resource('snippets', SnippetController::class);
     Route::resource('schedule', ScheduleController::class)->only(['index', 'create', 'edit', 'update', 'destroy']);
     Route::resource('campaigns.schedule', ScheduleController::class);
+
+
+    Route::get('collections/json', [CollectionController::class, 'json'])->name('collections.json');
+    Route::get('collections/{collection}/destroy', [CollectionController::class, 'destroy'])->name('collections.destroy');
 
     Route::get('search', [SearchController::class, 'search'])->name('search');
 });
