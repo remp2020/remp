@@ -19,7 +19,7 @@ class UrlHelper
     public function appendQueryParams($originalUrl, array $params)
     {
         $url = Http::createFromString($originalUrl);
-        $query = Query::createFromParams(QueryString::parse($url->getQuery()))
+        $query = Query::createFromPairs(QueryString::parse($url->getQuery()))
             ->append(Query::createFromParams($params))
             ->getContent();
 

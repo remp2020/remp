@@ -10,7 +10,7 @@ interface ShowtimeResponse
 {
     public function error($callback, int $statusCode, array $errors);
 
-    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners = []);
+    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners);
 
     public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $snippets): string;
 

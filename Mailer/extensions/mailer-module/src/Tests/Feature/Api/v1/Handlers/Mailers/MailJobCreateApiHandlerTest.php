@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api\v1\Handlers\Mailers;
 
+use Nette\Database\Table\ActiveRow;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\MailJobCreateApiHandler;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
@@ -44,6 +45,9 @@ class MailJobCreateApiHandlerTest extends BaseApiHandlerTestCase
     {
         $params = $this->getDefaultParams();
 
+        $tomorrow = new \DateTime('tomorrow 15:00');
+        $params['start_at'] = $tomorrow->format(DATE_RFC3339);
+
         /** @var JsonApiResponse $response */
         $response = $this->handler->handle($params);
         $payload = $response->getPayload();
@@ -53,12 +57,16 @@ class MailJobCreateApiHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals('ok', $payload['status']);
         $this->assertIsNumeric($payload['id']);
 
+        /** @var ActiveRow $mailJob */
         $mailJob = $this->jobsRepository->find($payload['id']);
         $jobSegmentsManager = new JobSegmentsManager($mailJob);
         $this->assertEquals($params['segment_code'], $jobSegmentsManager->getIncludeSegments()[0]['code']);
         $this->assertEquals($params['segment_provider'], $jobSegmentsManager->getIncludeSegments()[0]['provider']);
         $this->assertEquals($params['context'], $mailJob->context);
         $this->assertEquals($params['mail_type_variant_code'], $mailJob->mail_type_variant->code);
+
+        $mailJobBatch = $mailJob->related('mail_job_batch')->fetch();
+        $this->assertEquals($tomorrow, $mailJobBatch->start_at);
     }
 
     public function testInvalidTemplate()

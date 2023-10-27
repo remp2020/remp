@@ -2586,13 +2586,14 @@ Endpoint complements manual job creation via web interface.
 
 ##### *Params:*
 
-| Name                   | Value    | Required | Description                                |
-|------------------------|----------|----------|--------------------------------------------|
-| segment_code           | *String* | yes      | Code of the segment to be used.            |
-| segment_provider       | *String* | yes      | Segment provider owning the segment.       |
-| template_id            | *String* | yes      | ID of *email*.                             |
-| context                | *String* | no       | Context to be used.                        |
-| mail_type_variant_code | *String* | no       | Specify mail type variant code to be used. |
+| Name                   | Value    | Required | Description                                         |
+|------------------------|----------|----------|-----------------------------------------------------|
+| segment_code           | *String* | yes      | Code of the segment to be used.                     |
+| segment_provider       | *String* | yes      | Segment provider owning the segment.                |
+| template_id            | *String* | yes      | ID of *email*.                                      |
+| context                | *String* | no       | Context to be used.                                 |
+| mail_type_variant_code | *String* | no       | Specify mail type variant code to be used.          |
+| start_at               | *String* | no       | RFC 3339 date format; Specify the start of sending. |
 
 ##### *Example:*
 
@@ -2601,7 +2602,7 @@ curl -X POST \
   http://mailer.remp.press/api/v1/mailers/jobs \
   -H 'Authorization: Bearer XXX' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'template_id=24832&segment_code=users_with_print_in_past&segment_provider=crm-segment&context=123&mail_type_variant_code=variant-1'
+  -d 'template_id=24832&segment_code=users_with_print_in_past&segment_provider=crm-segment&context=123&mail_type_variant_code=variant-1&start_at=2023-12-29T10:05:00Z'
 ```
 
 Response:

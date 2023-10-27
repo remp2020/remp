@@ -18,7 +18,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             ]);
     }
 
-    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners = [])
+    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners)
     {
         return response()
             ->jsonp($callback, [
