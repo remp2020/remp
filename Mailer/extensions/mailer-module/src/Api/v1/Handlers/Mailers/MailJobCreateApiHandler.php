@@ -50,6 +50,7 @@ class MailJobCreateApiHandler extends BaseHandler
             (new PostInputParam('template_id'))->setRequired(),
             (new PostInputParam('context')),
             (new PostInputParam('mail_type_variant_code')),
+            (new PostInputParam('start_at')),
         ];
     }
 
@@ -91,8 +92,21 @@ class MailJobCreateApiHandler extends BaseHandler
             }
         }
 
+        $startAt = null;
+        if (isset($params['start_at'])) {
+            $dateTime = \DateTime::createFromFormat(DATE_RFC3339, $params['start_at']);
+            if ($dateTime === false) {
+                return new JsonApiResponse(IResponse::S400_BadRequest, [
+                    'status' => 'error',
+                    'message' => 'Wrong datetime format used (RFC 3339 required)',
+                ]);
+            }
+
+            $startAt = $params['start_at'];
+        }
+
         $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, $segmentProvider), $params['context'] ?? null, $mailTypeVariant);
-        $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
+        $batch = $this->batchesRepository->add($mailJob->id, null, $startAt, BatchesRepository::METHOD_RANDOM);
         $this->batchesRepository->addTemplate($batch, $template);
         $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);
 

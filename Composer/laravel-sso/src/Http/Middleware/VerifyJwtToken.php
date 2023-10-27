@@ -102,8 +102,7 @@ class VerifyJwtToken
         $url = Http::createFromString($request->url());
 
         $queryPairs = QueryString::parse($fullUrl->getQuery());
-        unset($queryPairs['token']);
-        $query = Query::createFromParams($queryPairs)->getContent() ?: '';
+        $query = Query::createFromPairs($queryPairs)->withoutPair('token')->getContent() ?: '';
 
         return redirect($url->withQuery($query)->__toString());
     }

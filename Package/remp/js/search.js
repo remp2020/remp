@@ -47,6 +47,9 @@ $(document).ready(function() {
                         case 'banner':
                             searchResult['name'] = '<i class="zmdi zmdi-collection-folder-image"></i> ' + searchResult['name'];
                             break;
+                        case 'snippet':
+                            searchResult['name'] = '<i class="zmdi zmdi-code"></i> ' + searchResult['name'];
+                            break;
 
                         // Mailer
                         case 'email':

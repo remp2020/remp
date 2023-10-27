@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Users;
 
+use League\Event\EventDispatcher;
 use Nette\Database\Explorer;
+use Remp\MailerModule\Events\BeforeUsersDeleteEvent;
+use Remp\MailerModule\Events\UsersDeletedEvent;
 use Remp\MailerModule\Repositories\AutoLoginTokensRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
 use Remp\MailerModule\Repositories\LogConversionsRepository;
@@ -12,32 +15,15 @@ use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 
 class UserManager
 {
-    private $database;
-
-    private $autoLoginTokensRepository;
-
-    private $jobQueueRepository;
-
-    private $logConversionsRepository;
-
-    private $logsRepository;
-
-    private $userSubscriptionsRepository;
-
     public function __construct(
-        Explorer $database,
-        AutoLoginTokensRepository $autoLoginTokensRepository,
-        JobQueueRepository $jobQueueRepository,
-        LogConversionsRepository $logConversionsRepository,
-        LogsRepository $logsRepository,
-        UserSubscriptionsRepository $userSubscriptionsRepository
+        private Explorer $database,
+        private AutoLoginTokensRepository $autoLoginTokensRepository,
+        private JobQueueRepository $jobQueueRepository,
+        private LogConversionsRepository $logConversionsRepository,
+        private LogsRepository $logsRepository,
+        private UserSubscriptionsRepository $userSubscriptionsRepository,
+        private EventDispatcher $eventDispatcher,
     ) {
-        $this->database = $database;
-        $this->autoLoginTokensRepository = $autoLoginTokensRepository;
-        $this->jobQueueRepository = $jobQueueRepository;
-        $this->logConversionsRepository = $logConversionsRepository;
-        $this->logsRepository = $logsRepository;
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
     }
 
     /**
@@ -52,8 +38,9 @@ class UserManager
         }
 
         $this->database->beginTransaction();
-
         try {
+            $this->eventDispatcher->dispatch(new BeforeUsersDeleteEvent($emails));
+
             $deletedAutologinTokens = $this->autoLoginTokensRepository->deleteAllForEmails($emails);
             $deletedJobQueues = $this->jobQueueRepository->deleteAllByEmails($emails);
 
@@ -69,6 +56,8 @@ class UserManager
             $this->database->rollBack();
             throw $e;
         }
+
+        $this->eventDispatcher->dispatch(new UsersDeletedEvent($emails));
 
         // nothing was removed
         if ($deletedAutologinTokens === 0 && $deletedJobQueues === 0 && $deletedMailLogs === 0 && $deletedUserSubscriptions === 0) {

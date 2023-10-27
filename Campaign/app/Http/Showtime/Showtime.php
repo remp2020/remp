@@ -146,13 +146,13 @@ class Showtime
             }
             if ($banner) {
                 $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $snippets);
-                return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData());
+                return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData(), []);
             }
         }
 
         $campaignIds = json_decode($this->redis->get(Campaign::ACTIVE_CAMPAIGN_IDS) ?? '[]') ?? [];
         if (count($campaignIds) === 0) {
-            return $showtimeResponse->success($callback, [], [], $segmentAggregator->getProviderData());
+            return $showtimeResponse->success($callback, [], [], $segmentAggregator->getProviderData(), []);
         }
 
         // prepare campaign IDs to fetch
