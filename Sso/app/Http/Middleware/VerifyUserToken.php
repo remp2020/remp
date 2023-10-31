@@ -53,7 +53,9 @@ class VerifyUserToken
 
         $lastLogout = Redis::hget(User::USER_LAST_LOGOUT_KEY, $payload->get('id'));
         if ($lastLogout && $lastLogout > $this->auth->getClaim('iat')) {
-            $this->auth->invalidate();
+            if (config('jwt.blacklist_enabled')) {
+                $this->auth->invalidate();
+            }
             return $this->respond('token_expired', 'provided token was invalidated', 401);
         }
 

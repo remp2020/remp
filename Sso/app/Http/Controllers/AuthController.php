@@ -104,7 +104,14 @@ class AuthController extends Controller
     public function refresh(\Tymon\JWTAuth\JWTAuth $auth, Request $request)
     {
         try {
-            $refreshedToken = $auth->setRequest($request)->parseToken()->refresh();
+            $token = $auth->setRequest($request)->parseToken();
+
+            $lastLogout = Redis::hget(User::USER_LAST_LOGOUT_KEY, $token->payload()->get('id'));
+            if ($lastLogout && $lastLogout > $token->getClaim('iat')) {
+                throw new TokenExpiredException();
+            }
+
+            $refreshedToken = $token->refresh();
             return response()->json([
                 'token' => $refreshedToken,
             ]);

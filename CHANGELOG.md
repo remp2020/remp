@@ -26,6 +26,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added new parameter `start_at` into `v1/mailer/jobs` and `v2/mailer/jobs` to allow schedule the start of sending. remp/respekt#19
 - Added `BeforeUsersDeleteEvent` and `UsersDeletedEvent` events to emit before and after users are deleted. remp/remp#1301
 
+### [Sso]
+
+- Fixed scenario when invalidated token was allowed to be refreshed just to be evaluated as invalid again.
+- Fixed blacklist-related exception if token was blacklisted but the blacklist was not enabled.
+
 ## Archive
 
 - [v3.3](./changelogs/CHANGELOG-v3.3.md)
