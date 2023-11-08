@@ -432,6 +432,7 @@ class ShowtimeTest extends TestCase
 
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
         $this->assertCount(0, $activeCampaignUuids);
+        $this->showtime->flushLocalCache();
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
         $this->assertCount(1, $activeCampaignUuids);
 
@@ -442,6 +443,7 @@ class ShowtimeTest extends TestCase
         $this->segmentAggregator->shouldReceive('checkBrowser')->andReturn(false, true);
 
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+        $this->showtime->flushLocalCache();
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
     }
 

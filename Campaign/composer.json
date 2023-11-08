@@ -23,6 +23,7 @@
         "ext-intl": "*",
         "ext-json": "*",
         "cache/predis-adapter": "^1.0",
+        "cache/redis-adapter": "^1.2",
         "doctrine/dbal": "^3.1",
         "fico7489/laravel-pivot": "^3.0",
         "fideloper/proxy": "^4.4",
@@ -61,6 +62,9 @@
         "nunomaduro/collision": "^5.0",
         "phpunit/phpunit": "^9.3.3",
         "squizlabs/php_codesniffer": "^3.6"
+    },
+    "suggest": {
+        "ext-redis": "The extension required for better performance."
     },
     "autoload": {
         "classmap": [

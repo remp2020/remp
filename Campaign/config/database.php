@@ -38,6 +38,7 @@ if (!function_exists('configure_redis')) {
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
             'database' => $database,
+            'persistent' => env('REDIS_PERSISTENT', false),
         ];
     }
 }
@@ -163,6 +164,7 @@ return [
         'client' => env('REDIS_CLIENT', 'predis'),
 
         'options' => [
+            'serializer' => \Redis::SERIALIZER_NONE,
             'cluster' => env('REDIS_CLUSTER', 'predis'),
             'prefix' => env('REDIS_PREFIX', ''),
         ],
