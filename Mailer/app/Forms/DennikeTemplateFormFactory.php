@@ -97,7 +97,16 @@ class DennikeTemplateFormFactory
         $form->addHidden('locked_text_content');
         $form->addHidden('article_id');
 
-        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 63) {
+        if (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 84) {
+            $defaults = [
+                'name' => 'Týždeň v európskej ekonomike ' . date('j.n.Y'),
+                'code' => 'nwsf_eu_economy' . date('dmY'),
+                'mail_layout_id' => 33, // layout for subscribers
+                'locked_mail_layout_id' => 33, // layout for non-subscribers
+                'mail_type_id' => 65, // Týždeň v európskej ekonomike
+                'from' => 'Denník E <e@dennikn.sk>',
+            ];
+        } elseif (isset($_POST['source_template_id']) && $_POST['source_template_id'] == 63) {
             $defaults = [
                 'name' => 'Firemný newsfilter ' . date('j.n.Y'),
                 'code' => 'nwsf_firemny' . date('dmY'),
