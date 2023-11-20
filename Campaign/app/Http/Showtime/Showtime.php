@@ -19,6 +19,10 @@ class Showtime
 
     private const BANNER_ONETIME_BROWSER_KEY = 'banner_onetime_browser';
 
+    private const DEVICE_DETECTION_KEY = 'device_detection';
+
+    private const DEVICE_DETECTION_TTL = 86400;
+
     private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS = '=';
 
     private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS_NOT = '!=';
@@ -32,6 +36,8 @@ class Showtime
     private $alignmentsMap;
 
     private $snippets;
+
+    private array $localCache = [];
 
     public function __construct(
         private ClientInterface $redis,
@@ -61,14 +67,6 @@ class Showtime
         $this->positionMap = $positions->positions();
     }
 
-    private function getPositionMap()
-    {
-        if (!$this->positionMap) {
-            $this->positionMap = json_decode($this->redis->get(\App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY), true) ?? [];
-        }
-        return $this->positionMap;
-    }
-
     public function getShowtimeConfig(): ShowtimeConfig
     {
         return $this->showtimeConfig;
@@ -79,39 +77,16 @@ class Showtime
         $this->dimensionMap = $dimensions->dimensions();
     }
 
-    private function getDimensionMap()
-    {
-        if (!$this->dimensionMap) {
-            $this->dimensionMap = json_decode($this->redis->get(\App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY), true) ?? [];
-        }
-        return $this->dimensionMap;
-    }
-
     public function setAlignmentsMap(\App\Models\Alignment\Map $alignments)
     {
         $this->alignmentsMap = $alignments->alignments();
     }
 
-    private function getAlignmentsMap()
+    public function flushLocalCache(): self
     {
-        if (!$this->alignmentsMap) {
-            $this->alignmentsMap = json_decode($this->redis->get(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY), true) ?? [];
-        }
-        return $this->alignmentsMap;
-    }
+        $this->localCache = [];
 
-    private function getSnippets()
-    {
-        if (!$this->snippets) {
-            $this->snippets = [];
-
-            $redisCacheKey = $this->redis->get(\App\Snippet::REDIS_CACHE_KEY);
-            if (!is_null($redisCacheKey)) {
-                $this->snippets = json_decode($redisCacheKey, true) ?? [];
-            }
-        }
-
-        return $this->snippets;
+        return $this;
     }
 
     public function showtime(string $userData, string $callback, ShowtimeResponse $showtimeResponse)
@@ -151,24 +126,28 @@ class Showtime
             $segmentAggregator->setProviderData($data->cache);
         }
 
-        $positions = $this->getPositionMap();
-        $dimensions = $this->getDimensionMap();
-        $alignments = $this->getAlignmentsMap();
-        $snippets = $this->getSnippets();
+        $this->loadMaps();
+
+        $positions = $this->positionMap;
+        $dimensions = $this->dimensionMap;
+        $alignments = $this->alignmentsMap;
+        $snippets = $this->snippets;
 
         $displayData = [];
 
-        // Try to load one-time banners (having precedence over campaigns)
-        $banner = null;
-        if ($userId) {
-            $banner = $this->loadOneTimeUserBanner($userId);
-        }
-        if (!$banner) {
-            $banner = $this->loadOneTimeBrowserBanner($browserId);
-        }
-        if ($banner) {
-            $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $snippets);
-            return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData(), []);
+        if ($this->showtimeConfig->isOneTimeBannerEnabled()) {
+            // Try to load one-time banners (having precedence over campaigns)
+            $banner = null;
+            if ($userId) {
+                $banner = $this->loadOneTimeUserBanner($userId);
+            }
+            if (!$banner) {
+                $banner = $this->loadOneTimeBrowserBanner($browserId);
+            }
+            if ($banner) {
+                $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $snippets);
+                return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData());
+            }
         }
 
         $campaignIds = json_decode($this->redis->get(Campaign::ACTIVE_CAMPAIGN_IDS) ?? '[]') ?? [];
@@ -176,14 +155,24 @@ class Showtime
             return $showtimeResponse->success($callback, [], [], $segmentAggregator->getProviderData(), []);
         }
 
+        // prepare campaign IDs to fetch
+        $dbCampaignIds = [];
+        foreach ($campaignIds as $campaignId) {
+            $dbCampaignIds[] = Campaign::CAMPAIGN_TAG . ":{$campaignId}";
+        }
+
+        // fetch all running campaigns at once
+        $fetchedCampaigns = $this->redis->mget($dbCampaignIds);
+
         $activeCampaigns = [];
         $campaigns = [];
         $campaignBanners = [];
         $suppressedBanners = [];
-        foreach ($campaignIds as $campaignId) {
+        $this->flushLocalCache();
+        foreach ($fetchedCampaigns as $fetchedCampaign) {
             /** @var Campaign $campaign */
-            $campaign = unserialize($this->redis->get(Campaign::CAMPAIGN_TAG . ":{$campaignId}"), ['allowed_class' => Campaign::class]);
-            $campaigns[$campaignId] = $campaign;
+            $campaign = unserialize($fetchedCampaign, ['allowed_class' => Campaign::class]);
+            $campaigns[$campaign->id] = $campaign;
             $campaignBanners[] = $this->shouldDisplay($campaign, $data, $activeCampaigns);
         }
 
@@ -450,16 +439,8 @@ class Showtime
         }
 
         // device rules
-        if (!isset($userData->userAgent)) {
-            $this->logger->error("Unable to load user agent for userId [{$userId}]");
-        } else {
-            if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices) && $this->deviceDetector->get($userData->userAgent)->isMobile()) {
-                return null;
-            }
-
-            if (!in_array(Campaign::DEVICE_DESKTOP, $campaign->devices) && $this->deviceDetector->get($userData->userAgent)->isDesktop()) {
-                return null;
-            }
+        if ($this->isAcceptedByDeviceRules($userData, $campaign, $userId) === false) {
+            return null;
         }
 
         // country rules
@@ -647,6 +628,47 @@ class Showtime
         $this->redis->expire($key, $expiresInSeconds);
     }
 
+    private function loadMaps(): void
+    {
+        $keys = [];
+        if (!$this->positionMap) {
+            $keys[] = \App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY;
+        }
+
+        if (!$this->dimensionMap) {
+            $keys[] = \App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY;
+        }
+
+        if (!$this->alignmentsMap) {
+            $keys[] = \App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY;
+        }
+
+        if (!$this->snippets) {
+            $keys[] = \App\Snippet::REDIS_CACHE_KEY;
+        }
+
+        $maps = $this->redis->mget($keys);
+        reset($keys);
+        foreach ($maps as $map) {
+            $key = current($keys);
+
+            switch ($key) {
+                case \App\Models\Position\Map::POSITIONS_MAP_REDIS_KEY:
+                    $this->positionMap = json_decode($map, true) ?? [];
+                    break;
+                case \App\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY:
+                    $this->dimensionMap = json_decode($map, true) ?? [];
+                    break;
+                case \App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY:
+                    $this->alignmentsMap = json_decode($map, true) ?? [];
+                    break;
+                case \App\Snippet::REDIS_CACHE_KEY:
+                    $this->snippets = json_decode($map, true) ?? [];
+                    break;
+            }
+            next($keys);
+        }
+    }
 
     private function loadOneTimeUserBanner($userId): ?Banner
     {
@@ -684,9 +706,9 @@ class Showtime
                     return false;
                 }
 
-                $belongsToSegment = $this->segmentAggregator->checkUser($campaignSegment, (string)$userId);
+                $belongsToSegment = $this->checkUserInSegment($campaignSegment, $userId);
             } else {
-                $belongsToSegment = $this->segmentAggregator->checkBrowser($campaignSegment, (string)$browserId);
+                $belongsToSegment = $this->checkBrowserInSegment($campaignSegment, $browserId);
             }
 
             // user is member of segment, that's excluded from campaign; halt execution
@@ -708,8 +730,14 @@ class Showtime
             return true;
         }
 
-        $cacheKeyTimeStamp = $this->redis->get(SegmentAggregator::cacheKey($campaignSegment) . '|timestamp');
+        $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|timestamp';
+        if (isset($this->localCache[$cacheKey])) {
+            return true;
+        }
+
+        $cacheKeyTimeStamp = $this->redis->get($cacheKey);
         if ($cacheKeyTimeStamp) {
+            $this->localCache[$cacheKey] = true;
             return true;
         }
 
@@ -733,5 +761,95 @@ class Showtime
             }
         }
         return null;
+    }
+
+    private function checkUserInSegment(CampaignSegment $campaignSegment, $userId): bool
+    {
+        $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|user|'.$userId;
+        if (isset($this->localCache[$cacheKey])) {
+            return $this->localCache[$cacheKey];
+        }
+
+        $belongsToSegment = $this->segmentAggregator->checkUser($campaignSegment, (string) $userId);
+        $this->localCache[$cacheKey] = $belongsToSegment;
+
+        return $belongsToSegment;
+    }
+
+    private function checkBrowserInSegment(CampaignSegment $campaignSegment, $browserId): bool
+    {
+        $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|browser|'.$browserId;
+        if (isset($this->localCache[$cacheKey])) {
+            return $this->localCache[$cacheKey];
+        }
+
+        $belongsToSegment = $this->segmentAggregator->checkBrowser($campaignSegment, (string)$browserId);
+        $this->localCache[$cacheKey] = $belongsToSegment;
+
+        return $belongsToSegment;
+    }
+
+    private function isAcceptedByDeviceRules($userData, Campaign $campaign, $userId): bool
+    {
+        if (!isset($userData->userAgent)) {
+            $this->logger->error("Unable to load user agent for userId [{$userId}]");
+
+            return true;
+        }
+
+        if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)
+            && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)
+        ) {
+            return true;
+        }
+
+        // check result of device detection in redis
+        $deviceKey = self::DEVICE_DETECTION_KEY.':'.md5($userData->userAgent);
+        if (isset($this->localCache[$deviceKey])) {
+            $deviceDetection = $this->localCache[$deviceKey];
+        } else {
+            $deviceDetection = $this->redis->get($deviceKey);
+            if ($deviceDetection) {
+                $this->localCache[$deviceKey] = $deviceDetection;
+            }
+        }
+
+        if ($deviceDetection) {
+            if ($deviceDetection === Campaign::DEVICE_MOBILE && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)) {
+                return false;
+            }
+            if ($deviceDetection === Campaign::DEVICE_DESKTOP && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // parse user agent
+        $deviceDetector = $this->deviceDetector->get($userData->userAgent);
+        $isMobile = $deviceDetector->isMobile();
+        $isDesktop = $deviceDetector->isDesktop();
+
+        if ($isMobile) {
+            $deviceDetectionValue = Campaign::DEVICE_MOBILE;
+        } else if ($isDesktop) {
+            $deviceDetectionValue = Campaign::DEVICE_DESKTOP;
+        } else {
+            $deviceDetectionValue = 'other';
+        }
+
+        // store result to redis to faster resolution on the next attempt
+        $this->localCache[$deviceKey] = $deviceDetectionValue;
+        $this->redis->setex($deviceKey, self::DEVICE_DETECTION_TTL, $deviceDetectionValue);
+
+        if ($isMobile && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)) {
+            return false;
+        }
+
+        if ($isDesktop && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)) {
+            return false;
+        }
+
+        return true;
     }
 }

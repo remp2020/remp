@@ -8,6 +8,8 @@ class ShowtimeConfig
 
     private bool $prioritizeBannerOnSamePosition = false;
 
+    private bool $oneTimeBannerEnabled = true;
+
     public function setAcceptLanguage(string $language): void
     {
         $this->acceptLanguage = $language;
@@ -23,8 +25,22 @@ class ShowtimeConfig
         return $this->prioritizeBannerOnSamePosition;
     }
 
-    public function setPrioritizeBannerOnSamePosition(bool $prioritizeBannerOnSamePosition): void
+    public function setPrioritizeBannerOnSamePosition(bool $prioritizeBannerOnSamePosition): self
     {
         $this->prioritizeBannerOnSamePosition = $prioritizeBannerOnSamePosition;
+
+        return $this;
+    }
+
+    public function isOneTimeBannerEnabled(): bool
+    {
+        return $this->oneTimeBannerEnabled;
+    }
+
+    public function setOneTimeBannerEnabled(bool $oneTimeBannerEnabled): self
+    {
+        $this->oneTimeBannerEnabled = $oneTimeBannerEnabled;
+
+        return $this;
     }
 }
