@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `ONE_TIME_BANNER_ENABLED` env variable to disable fetching data for one time banners.
 - Added `REDIS_PERSISTENT` env variable to enable presistent redis connection.
 - Added showtime optimizations to better performance.
+- Fixed routes same name conflict.
 
 ### [Mailer]
 
