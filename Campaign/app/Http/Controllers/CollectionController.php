@@ -37,7 +37,7 @@ class CollectionController extends Controller
         return view('collections.edit', [
             'collection' => $collection->load('campaigns'),
             'selectedCampaigns' => $collection->campaigns()->get()->pluck('id'),
-            'campaigns' => Campaign::all(),
+            'campaigns' => Campaign::orderBy('created_at', 'DESC')->get(),
         ]);
     }
 
@@ -140,6 +140,7 @@ class CollectionController extends Controller
             ->filterColumn('campaigns', function (Builder $query, $value) {
                 $query->where('campaigns.name', 'like', "%{$value}%");
             })
+            ->rawColumns(['name.text'])
             ->setRowId('id')
             ->make(true);
     }

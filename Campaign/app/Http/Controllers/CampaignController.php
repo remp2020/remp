@@ -150,6 +150,18 @@ class CampaignController extends Controller
 
                 return $segmentNames;
             })
+            ->addColumn('collections', function (Campaign $campaign) {
+                $collections = [];
+                foreach ($campaign->collections as $collection) {
+                    $collections[] = link_to(
+                        route('campaigns.index', ['collection' => $collection->id]),
+                        $collection->name,
+                        ['target' => '_blank']
+                    );
+                }
+
+                return $collections;
+            })
             ->filterColumn('segments', function (Builder $query, $value) {
                 $values = explode(',', $value);
                 $filterQuery = \DB::table('campaign_segments')

@@ -8,7 +8,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="name">Name</label>
-                                <input type="text" class="form-control" v-model="name" id="name" name="name" placeholder="Name">
+                                <input type="text" class="form-control" v-model="name" id="name" name="name" placeholder="Name" required>
                             </div>
                         </div>
                     </div>
@@ -29,6 +29,7 @@
                                       :name="'campaigns[]'"
                                       :options.sync="availableCampaigns"
                                       :multiple="true"
+                                      ref="campaignsSelect"
                             ></v-select>
                         </div>
                     </div><!-- .row -->
@@ -42,7 +43,7 @@
                     <div class="col-md-12 text-left">
                         {{ getCampaignName(id) }}
                         <div class="pull-left m-r-20">
-                            <span v-on:click="removeCampaign(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-campaign">&times;</span>
+                            <span v-on:click="removeCampaign(i, id)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-campaign">&times;</span>
                         </div>
                     </div>
                 </div>
@@ -111,8 +112,9 @@
             },
         },
         methods: {
-            removeCampaign: function(index) {
+            removeCampaign: function(index, id) {
                 this.selectedCampaigns.splice(index, 1);
+                this.$refs.campaignsSelect.unselectValue(id);
             },
             getCampaignName: function(id) {
                 let campaign = this.availableCampaigns.find((campaign) => {

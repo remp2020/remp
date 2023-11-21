@@ -85,6 +85,10 @@
                             'header' => 'Public ID',
                             'priority' => 1,
                         ],
+                        'collections' => [
+                            'header' => 'Collections',
+                            'priority' => 2,
+                        ],
                         'variants' => [
                             'header' => 'Variants',
                             'orderable' => false,

@@ -151,7 +151,6 @@
             value: function () {
                 let $select = $(this.$el).find('select');
                 $select.val(this.value);
-                $select.selectpicker('refresh');
             }
         },
         methods: {
@@ -216,6 +215,11 @@
                 }
                 return String(this.value);
             },
+            unselectValue: function (value) {
+                let $select = $(this.$el).find('.selectpicker');
+                $select.find('[value='+value+']').prop('selected', false);
+                $select.selectpicker('refresh');
+            }
         }
     }
 </script>
