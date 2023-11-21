@@ -145,7 +145,7 @@
                         ),
                         ['name' => 'compare', 'onclick' => 'addCampaignToComparison(event, this)', 'class' => 'zmdi-palette-Cyan zmdi-swap ', 'title' => 'Add campaign to comparison']
                     ],
-                    'order' => [8, 'desc'],
+                    'order' => [9, 'desc'],
                 ]) !!}
                 </div>
             </div>
