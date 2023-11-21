@@ -7,7 +7,6 @@ use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use GuzzleHttp\Client;
 use Illuminate\Foundation\Application;
-use Illuminate\Redis\RedisManager;
 use Illuminate\Support\ServiceProvider;
 
 class CrmSegmentServiceProvider extends ServiceProvider
@@ -36,7 +35,7 @@ class CrmSegmentServiceProvider extends ServiceProvider
                     'Authorization' => 'Bearer ' . $app['config']->get('services.crm_segment.token'),
                 ],
             ]);
-            /** @var RedisManager $redis */
+            /** @var \Predis\Client|\Redis $redis */
             $redis = $app->make('redis')->connection()->client();
             return new Segment($client, $redis);
         });

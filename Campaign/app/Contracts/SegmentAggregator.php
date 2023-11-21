@@ -148,7 +148,7 @@ class SegmentAggregator implements SegmentContract
         return $this->errors;
     }
 
-    public function refreshRedisClient(Client $redisClient): void
+    public function refreshRedisClient(Client|\Redis $redisClient): void
     {
         foreach ($this->contracts as $contract) {
             if ($contract instanceof RedisAwareInterface) {
@@ -179,7 +179,7 @@ class SegmentAggregator implements SegmentContract
         Redis::set(\App\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY, $alignmentsMap->alignments()->toJson());
     }
 
-    public static function unserializeFromRedis(Client $redisClient): ?SegmentAggregator
+    public static function unserializeFromRedis(Client|\Redis $redisClient): ?SegmentAggregator
     {
         $serializedClosure = $redisClient->get(self::SEGMENT_AGGREGATOR_REDIS_KEY);
 

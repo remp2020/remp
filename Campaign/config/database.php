@@ -164,6 +164,7 @@ return [
         'client' => env('REDIS_CLIENT', 'predis'),
 
         'options' => [
+            'serializer' => 0, // \Redis::SERIALIZER_NONE
             'cluster' => env('REDIS_CLUSTER', 'predis'),
             'prefix' => env('REDIS_PREFIX', ''),
         ],

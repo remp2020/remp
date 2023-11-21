@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
-use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
 use Illuminate\Support\ServiceProvider;
 use DeviceDetector\Cache\PSR6Bridge;
 use DeviceDetector\DeviceDetector;
@@ -14,10 +13,15 @@ class DeviceDetectorServiceProvider extends ServiceProvider implements Deferrabl
     public function register()
     {
         $this->app->bind(DeviceDetector::class, function ($app) {
+            if (config("database.redis.client") === 'phpredis') {
+                $cachePool = new \Cache\Adapter\Redis\RedisCachePool(Redis::connection()->client());
+            } else {
+                $cachePool = new \Cache\Adapter\Predis\PredisCachePool(Redis::connection()->client());
+            }
             $dd = new DeviceDetector();
             $dd->setCache(
                 new PSR6Bridge(
-                    new \Cache\Adapter\Predis\PredisCachePool(Redis::connection())
+                    $cachePool
                 )
             );
 

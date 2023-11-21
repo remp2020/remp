@@ -7,7 +7,6 @@ use App\Contracts\RedisAwareInterface;
 use App\Contracts\SegmentAggregator;
 use App\Contracts\SegmentContract;
 use App\Contracts\SegmentException;
-use App\Jobs\CacheSegmentJob;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
@@ -28,14 +27,14 @@ class Segment implements SegmentContract, RedisAwareInterface
 
     private $redis;
 
-    public function __construct(Client $client, \Predis\Client $redis)
+    public function __construct(Client $client, \Predis\Client|\Redis $redis)
     {
         $this->client = $client;
         $this->providerData = new \stdClass;
         $this->redis = $redis;
     }
 
-    public function setRedisClient(\Predis\Client $redis): self
+    public function setRedisClient(\Predis\Client|\Redis $redis): self
     {
         $this->redis = $redis;
 
@@ -136,7 +135,10 @@ class Segment implements SegmentContract, RedisAwareInterface
 
     public function addUserToCache(CampaignSegment $campaignSegment, string $userId): bool
     {
-        return $this->redis->sadd(SegmentAggregator::cacheKey($campaignSegment), [$userId]) ?: false;
+        return $this->redis->sadd(
+            SegmentAggregator::cacheKey($campaignSegment),
+            $this->redis instanceof \Redis ? $userId : [$userId]
+        ) ?: false;
     }
 
     public function removeUserFromCache(CampaignSegment $campaignSegment, string $userId): bool

@@ -60,11 +60,18 @@ class CacheSegmentJob implements ShouldQueue
             throw $e;
         }
 
-        Redis::connection()->set($cacheTimestampKey, date('U'), 'EX', 60*60*24);
-        Redis::connection()->del([$cacheKey]);
+        $redis = Redis::connection()->client();
+
+        $redis->setex($cacheTimestampKey, 60*60*24, date('U'));
+        $redis->del([$cacheKey]);
         if ($users->isNotEmpty()) {
-            Redis::connection()->sadd($cacheKey, $users->toArray());
-            Redis::connection()->expire($cacheKey, 60*60*24);
+            $users = $users->toArray();
+            if ($redis instanceof \Redis) {
+                $redis->sAdd($cacheKey, ...$users);
+            } else {
+                $redis->sadd($cacheKey, $users);
+            }
+            $redis->expire($cacheKey, 60*60*24);
         }
     }
 }

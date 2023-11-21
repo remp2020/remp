@@ -18,8 +18,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added campaign collections. remp/remp#1286
 - Added `ONE_TIME_BANNER_ENABLED` env variable to disable fetching data for one time banners.
 - Added `REDIS_PERSISTENT` env variable to enable presistent redis connection.
-- Added showtime optimizations to better performance.
+- Added showtime optimizations for better performance.
 - Fixed routes same name conflict.
+- Added support for Redis PHP extension.
 
 ### [Mailer]
 

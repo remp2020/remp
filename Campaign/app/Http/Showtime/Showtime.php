@@ -40,7 +40,7 @@ class Showtime
     private array $localCache = [];
 
     public function __construct(
-        private ClientInterface $redis,
+        private ClientInterface|\Redis $redis,
         private SegmentAggregator $segmentAggregator,
         private LazyGeoReader $geoReader,
         private ShowtimeConfig $showtimeConfig,
@@ -146,7 +146,7 @@ class Showtime
             }
             if ($banner) {
                 $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $snippets);
-                return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData());
+                return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData(), []);
             }
         }
 

@@ -3,17 +3,15 @@
 namespace App\Http\Showtime;
 
 use DeviceDetector\Cache\PSR6Bridge;
-use Predis\ClientInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 class LazyDeviceDetector
 {
     private $detector;
 
-    private $redis;
-
-    public function __construct(ClientInterface $redis)
-    {
-        $this->redis = $redis;
+    public function __construct(
+        private CacheItemPoolInterface $cachePool,
+    ) {
     }
 
     public function get($userAgent)
@@ -22,7 +20,7 @@ class LazyDeviceDetector
             $this->detector = new \DeviceDetector\DeviceDetector();
             $this->detector->setCache(
                 new PSR6Bridge(
-                    new \Cache\Adapter\Predis\PredisCachePool($this->redis)
+                    $this->cachePool
                 )
             );
         }
