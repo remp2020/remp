@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added showtime optimizations for better performance.
 - Fixed routes same name conflict.
 - Added support for Redis PHP extension.
+- Added `REDIS_PARAMETER_LIMIT` env variable to avoid errors when calling Redis functions with large arrays. remp/remp#1307
 
 ### [Mailer]
 

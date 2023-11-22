@@ -65,11 +65,13 @@ class CacheSegmentJob implements ShouldQueue
         $redis->setex($cacheTimestampKey, 60*60*24, date('U'));
         $redis->del([$cacheKey]);
         if ($users->isNotEmpty()) {
-            $users = $users->toArray();
-            if ($redis instanceof \Redis) {
-                $redis->sAdd($cacheKey, ...$users);
-            } else {
-                $redis->sadd($cacheKey, $users);
+            $userChunks = array_chunk($users->toArray(), config('redis.redis_parameter_limit'));
+            foreach ($userChunks as $users) {
+                if ($redis instanceof \Redis) {
+                    $redis->sAdd($cacheKey, ...$users);
+                } else {
+                    $redis->sadd($cacheKey, $users);
+                }
             }
             $redis->expire($cacheKey, 60*60*24);
         }
