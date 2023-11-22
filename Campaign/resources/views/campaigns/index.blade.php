@@ -110,6 +110,7 @@
                         ],
                         'active' => [
                             'header' => 'Is active',
+                            'orderable' => true,
                             'priority' => 5,
                             'render' => 'raw',
                         ],

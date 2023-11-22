@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yajra\Datatables\Datatables;
 
@@ -179,6 +180,13 @@ class CampaignController extends Controller
                     'active' => $active,
                     'title' => $active ? 'Deactivate campaign' : 'Activate campaign'
                 ])->render();
+            })
+            ->orderColumn('active', function (Builder $query, $order) {
+                $query
+                    ->withAggregate(['schedules' => function ($scheduleQuery) {
+                        $scheduleQuery->running();
+                    }], 'id')
+                    ->orderBy(DB::raw('ISNULL(schedules_id)'), $order);
             })
             ->addColumn('is_running', function (Campaign $campaign) {
                 foreach ($campaign->schedules as $schedule) {
