@@ -486,6 +486,46 @@ class Showtime
             return null;
         }
 
+        // pageview attributes - check if sent pageview attributes match conditions
+        if (!empty($campaign->pageview_attributes)) {
+            if (empty($userData->pageviewAttributes)) {
+                return null;
+            }
+
+            foreach ($campaign->pageview_attributes as $attribute) {
+                $attrName = $attribute['name'];
+                $attrValue = $attribute['value'];
+                $attrOperator = $attribute['operator'];
+
+                if ($attrOperator === self::PAGEVIEW_ATTRIBUTE_OPERATOR_IS) {
+                    if (!property_exists($userData->pageviewAttributes, $attrName)) {
+                        return null;
+                    }
+                    if (is_array($userData->pageviewAttributes->{$attrName})) {
+                        if (!in_array($attrValue, $userData->pageviewAttributes->{$attrName})) {
+                            return null;
+                        }
+                    } elseif ($userData->pageviewAttributes->{$attrName} !== $attrValue) {
+                        return null;
+                    }
+                }
+
+                if ($attrOperator === self::PAGEVIEW_ATTRIBUTE_OPERATOR_IS_NOT) {
+                    if (property_exists($userData->pageviewAttributes, $attrName)) {
+                        if (is_array($userData->pageviewAttributes->{$attrName})) {
+                            if (in_array($attrValue, $userData->pageviewAttributes->{$attrName})) {
+                                return null;
+                            }
+                        } else {
+                            if ($userData->pageviewAttributes->{$attrName} === $attrValue) {
+                                return null;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Active campaign is campaign that targets selected user (previous rules were passed),
         // but whether it displays or not depends on pageview counting rules (every n-th page, up to N pageviews).
         // We need to track such campaigns on the client-side too.
@@ -545,46 +585,6 @@ class Showtime
                     $threshold = time() - $afterClickedHours * 60 * 60;
                     if ($seenCampaign->clickedAt > $threshold) {
                         return null;
-                    }
-                }
-            }
-        }
-
-        // pageview attributes - check if sent pageview attributes match conditions
-        if (!empty($campaign->pageview_attributes)) {
-            if (empty($userData->pageviewAttributes)) {
-                return null;
-            }
-
-            foreach ($campaign->pageview_attributes as $attribute) {
-                $attrName = $attribute['name'];
-                $attrValue = $attribute['value'];
-                $attrOperator = $attribute['operator'];
-
-                if ($attrOperator === self::PAGEVIEW_ATTRIBUTE_OPERATOR_IS) {
-                    if (!property_exists($userData->pageviewAttributes, $attrName)) {
-                        return null;
-                    }
-                    if (is_array($userData->pageviewAttributes->{$attrName})) {
-                        if (!in_array($attrValue, $userData->pageviewAttributes->{$attrName})) {
-                            return null;
-                        }
-                    } elseif ($userData->pageviewAttributes->{$attrName} !== $attrValue) {
-                        return null;
-                    }
-                }
-
-                if ($attrOperator === self::PAGEVIEW_ATTRIBUTE_OPERATOR_IS_NOT) {
-                    if (property_exists($userData->pageviewAttributes, $attrName)) {
-                        if (is_array($userData->pageviewAttributes->{$attrName})) {
-                            if (in_array($attrValue, $userData->pageviewAttributes->{$attrName})) {
-                                return null;
-                            }
-                        } else {
-                            if ($userData->pageviewAttributes->{$attrName} === $attrValue) {
-                                return null;
-                            }
-                        }
                     }
                 }
             }

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Changed campaign display rules evaluation to evaluate pageview attributes before including campaign between active campaigns. remp/remp#1302
+
 ## Archive
 
 - [v3.4](./changelogs/CHANGELOG-v3.4.md)
