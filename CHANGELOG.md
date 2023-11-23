@@ -6,41 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-### Project
-
-- Fixed possible redirect issue after login causing HTTP 404 after successful login. remp/remp#1235
-
-### [Campaign]
-
-- Fixed search by name on snippets listing. remp/remp#1303
-- Added snippet search to the universal search bar. remp/remp#1303
-- Fixed Campaign's `showtime.php` crashing if there are no active campaigns.
-- Added campaign collections. remp/remp#1286
-- Added `ONE_TIME_BANNER_ENABLED` env variable to disable fetching data for one time banners.
-- Added `REDIS_PERSISTENT` env variable to enable presistent redis connection.
-- Added showtime optimizations for better performance.
-- Fixed routes same name conflict.
-- Added support for Redis PHP extension.
-- Added `REDIS_PARAMETER_LIMIT` env variable to avoid errors when calling Redis functions with large arrays. remp/remp#1307
-- Added index to `created_at` and `updated_at` campaign columns. remp/remp#1286
-- Fixed sorting campaigns by `is active` column. remp/helpdesk#2231
-
-### [Mailer]
-
-- **BREAKING**: Removed `EnvironmentConfig::setParam()` and `EnvironmentConfig::getParam()` methods. remp/remp#1299
-  - Use of these could lead to circular dependency issues if values were read by environment config itself.
-  - We recommend the extraction of these values to their separate config classes.
-- Fixed circular dependency issue with configs using environment variables. remp/remp#1299
-- Added new parameter `start_at` into `v1/mailer/jobs` and `v2/mailer/jobs` to allow schedule the start of sending. remp/respekt#19
-- Added `BeforeUsersDeleteEvent` and `UsersDeletedEvent` events to emit before and after users are deleted. remp/remp#1301
-
-### [Sso]
-
-- Fixed scenario when invalidated token was allowed to be refreshed just to be evaluated as invalid again.
-- Fixed blacklist-related exception if token was blacklisted but the blacklist was not enabled.
-
 ## Archive
 
+- [v3.4](./changelogs/CHANGELOG-v3.4.md)
 - [v3.3](./changelogs/CHANGELOG-v3.3.md)
 - [v3.2](./changelogs/CHANGELOG-v3.2.md)
 - [v3.1](./changelogs/CHANGELOG-v3.1.md)
