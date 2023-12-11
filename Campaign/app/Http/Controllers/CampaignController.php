@@ -292,8 +292,13 @@ class CampaignController extends Controller
     public function store(CampaignRequest $request, CampaignCollection $collection = null)
     {
         $campaign = new Campaign();
+        $requestData = $request->all();
 
-        $this->saveCampaign($campaign, $request->all(), $collection);
+        // if copying data from existing campaign, ignore 'removed_segments',
+        // since they are CampaignSegments referenced from the old campaign
+        unset($requestData['removed_segments']);
+
+        $this->saveCampaign($campaign, $requestData, $collection);
 
         $message = ['success' => sprintf('Campaign [%s] was created', $campaign->name)];
 
@@ -612,8 +617,8 @@ class CampaignController extends Controller
             ]);
         }
 
-        if (isset($data['removedSegments'])) {
-            CampaignSegment::destroy($data['removedSegments']);
+        if (isset($data['removed_segments'])) {
+            CampaignSegment::destroy($data['removed_segments']);
         }
 
         if ($collection !== null && !$campaign->collections->contains($collection)) {
@@ -675,9 +680,7 @@ class CampaignController extends Controller
             $variants,
             $selectedCountries,
             $campaign->languages,
-            isset($data['countries_blacklist'])
-                ? $data['countries_blacklist']
-                : $blacklisted
+            $data['countries_blacklist'] ?? $blacklisted
         ];
     }
 

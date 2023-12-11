@@ -229,7 +229,7 @@
                                         </div>
 
                                         <div v-for="(id,i) in removedSegments">
-                                            <input type="hidden" name="removedSegments[]" v-model="removedSegments[i]" />
+                                            <input type="hidden" name="removed_segments[]" v-model="removedSegments[i]" />
                                         </div>
 
                                         <div class="row m-t-10 m-l-30">
@@ -274,7 +274,7 @@
                                         </div>
 
                                         <div v-for="(id,i) in removedSegments">
-                                            <input type="hidden" name="removedSegments[]" v-model="removedSegments[i]" />
+                                            <input type="hidden" name="removed_segments[]" v-model="removedSegments[i]" />
                                         </div>
 
                                         <div class="row m-t-10 m-l-30">
