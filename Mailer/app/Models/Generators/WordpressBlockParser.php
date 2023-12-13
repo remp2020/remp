@@ -20,6 +20,9 @@ class WordpressBlockParser
     public const BLOCK_CORE_EMBED = 'core/embed';
 
     public const BLOCK_DN_MINUTE = 'dn-newsletter/r5m-minute';
+    public const BLOCK_DN_GROUP = 'dn-newsletter/r5m-group';
+    public const BLOCK_DN_HEADER = 'dn-newsletter/r5m-header';
+    public const BLOCK_DN_ADVERTISEMENT = 'dn-newsletter/r5m-ad';
 
     /** @var TwigEngine $twig */
     private IEngine $twig;
@@ -27,6 +30,8 @@ class WordpressBlockParser
     private int $minuteOrderCounter = 1;
 
     private bool $isFirstDNMinuteInGroup = true;
+
+    private bool $isFirstDnHeaderInMinuteGroup = true;
 
     public function __construct(
         EngineFactory $engineFactory,
@@ -91,6 +96,9 @@ class WordpressBlockParser
 
         if ($block->name === self::BLOCK_DN_MINUTE) {
             $data['isFirstDNMinuteInGroup'] = $this->isFirstDNMinuteInGroup;
+            if (isset($block->attributes->bullet) && !empty($block->attributes->bullet)) {
+                $data['bullet'] = $block->attributes->bullet;
+            }
         }
 
         if ($block->name === self::BLOCK_CORE_HEADING) {
@@ -113,6 +121,10 @@ class WordpressBlockParser
             $data['paragraph_hr'] = true;
         }
 
+        if ($block->name === self::BLOCK_DN_HEADER) {
+            $data['isFirstDnHeaderInMinuteGroup'] = $this->isFirstDnHeaderInMinuteGroup;
+        }
+
         return $data;
     }
 
@@ -131,6 +143,12 @@ class WordpressBlockParser
             $this->isFirstDNMinuteInGroup = true;
         } elseif ($block->name === self::BLOCK_DN_MINUTE) {
             $this->isFirstDNMinuteInGroup = false;
+            $this->isFirstDnHeaderInMinuteGroup = false;
+        } elseif ($block->name === self::BLOCK_DN_GROUP) {
+            $this->isFirstDNMinuteInGroup = true;
+            $this->isFirstDnHeaderInMinuteGroup = true;
+        } elseif ($block->name === self::BLOCK_DN_HEADER) {
+            $this->isFirstDnHeaderInMinuteGroup = false;
         }
 
         $template = $this->getTemplate($block->name);
@@ -159,7 +177,11 @@ class WordpressBlockParser
             self::BLOCK_CORE_LIST_ITEM => __DIR__ . '/resources/templates/WordpressBlockParser/core-list-item.twig',
             self::BLOCK_CORE_EMBED => __DIR__ . '/resources/templates/WordpressBlockParser/core-embed.twig',
             self::BLOCK_DN_MINUTE => __DIR__ . '/resources/templates/WordpressBlockParser/dn-minute.twig',
-            default => throw new \Exception('not existing block template'),
+            self::BLOCK_DN_GROUP => __DIR__  . '/resources/templates/WordpressBlockParser/dn-group.twig',
+            self::BLOCK_DN_HEADER =>  __DIR__  . '/resources/templates/WordpressBlockParser/dn-header.twig',
+            self::BLOCK_DN_ADVERTISEMENT => __DIR__ . '/resources/templates/WordpressBlockParser/dn-advertisement.twig',
+
+            default => throw new \Exception("not existing block template: '{$blockName}'"),
         };
 
         return file_get_contents($templateFile);

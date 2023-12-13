@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed campaign display rules evaluation to evaluate pageview attributes before including campaign between active campaigns. remp/remp#1302
 - Fixed bug - when copying campaign, removal of assigned segment affected existing campaign segments. remp/remp#1308
 
+### [Mailer]
+
+- Added support for the new object types into parser used by R5M mail generator. remp/web#2312
+
 ## Archive
 
 - [v3.4](./changelogs/CHANGELOG-v3.4.md)

@@ -1,6 +1,10 @@
 <!-- dn-newsletter/r5m-minute -->
 <div style="{% if not isFirstDNMinuteInGroup %}border-top: 1px solid #E2E2E2;{% endif %} padding-top: 15px; padding-bottom: 15px;" class="m-b-15">
-    {% if minuteOrderCounter %}<div style="color: #BF2134; font-family: Georgia, Times New Roman, serif; font-size:26px; margin: 0; padding: 0; line-height: 1; margin-bottom: 4px; font-weight: normal;">{{ minuteOrderCounter }}.</div>{% endif %}
+    {% if bullet %}
+        <div style="color: #BF2134; font-family: Georgia, Times New Roman, serif; font-size:26px; margin: 0; padding: 0; line-height: 1; margin-bottom: 4px; font-weight: normal;">{{ bullet }}</div>
+    {% else %}
+        {% if minuteOrderCounter %}<div style="color: #BF2134; font-family: Georgia, Times New Roman, serif; font-size:26px; margin: 0; padding: 0; line-height: 1; margin-bottom: 4px; font-weight: normal;">{{ minuteOrderCounter }}.</div>{% endif %}
+    {% endif%}
 
     {{ contents|raw }}
 </div>
