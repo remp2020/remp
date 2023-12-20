@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added support for the new object types into parser used by R5M mail generator. remp/web#2312
+- Added setup methods into R5M related generator to allow work with another layout. remp/novydenik#1184
 
 ## Archive
 

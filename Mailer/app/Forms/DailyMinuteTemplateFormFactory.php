@@ -24,6 +24,12 @@ class DailyMinuteTemplateFormFactory
 
     public $onSave;
 
+    private string $layoutCode;
+
+    private string $typeCode;
+
+    private string $from;
+
     public function __construct(
         private string $segment,
         private TemplatesRepository $templatesRepository,
@@ -36,8 +42,33 @@ class DailyMinuteTemplateFormFactory
     ) {
     }
 
+    public function setLayoutCode(string $layoutCode): void
+    {
+        $this->layoutCode = $layoutCode;
+    }
+
+    public function setTypeCode(string $typeCode): void
+    {
+        $this->typeCode = $typeCode;
+    }
+
+    public function setFrom(string $from): void
+    {
+        $this->from = $from;
+    }
+
     public function create()
     {
+        $mailLayout = $this->layoutsRepository->findBy('code', $this->layoutCode);
+        if (!$mailLayout) {
+            throw new \Exception("No mail layout found with code: '{$this->layoutCode}'");
+        }
+
+        $mailType = $this->listsRepository->findByCode($this->typeCode)->fetch();
+        if (!$mailType) {
+            throw new \Exception("No mail type found with code: '{$this->typeCode}'");
+        }
+
         $form = new Form;
         $form->addProtection();
 
@@ -67,9 +98,9 @@ class DailyMinuteTemplateFormFactory
         $form->setDefaults([
             'name' => 'Daily minute ' . date('j.n.Y'),
             'code' => 'daily_minute_' . date('dmY'),
-            'mail_layout_id' => 33, // layout for subscribers
-            'mail_type_id' => 8, // Denný súhrn z Minúty po minúte
-            'from' => 'Denník N <info@dennikn.sk>',
+            'mail_layout_id' => $mailLayout->id,
+            'mail_type_id' => $mailType->id,
+            'from' => $this->from,
         ]);
 
         if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {

@@ -6,7 +6,7 @@ services:
 	- Remp\Mailer\Forms\TldrTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\Mailer\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\Mailer\Forms\GrafdnaTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-	- Remp\Mailer\Forms\DailyMinuteTemplateFormFactory('minuta-daily-digest')
+	dailyMinuteTemplateFormFactory: Remp\Mailer\Forms\DailyMinuteTemplateFormFactory('minuta-daily-digest')
 	articleUrlParserTemplateFormFactory: Remp\Mailer\Forms\ArticleUrlParserTemplateFormFactory()
 
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\NewsfilterWidget\NewsfilterWidget

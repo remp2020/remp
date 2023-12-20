@@ -16,6 +16,8 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class DailyMinuteGenerator implements IGenerator
 {
+    private string $nameDaySourceFile;
+
     public $onSubmit;
 
     public function __construct(
@@ -23,6 +25,11 @@ class DailyMinuteGenerator implements IGenerator
         private SourceTemplatesRepository $sourceTemplatesRepository,
         private EngineFactory $engineFactory
     ) {
+    }
+
+    public function setNameDaySourceFile(string $nameDaySourceFile): void
+    {
+        $this->nameDaySourceFile = $nameDaySourceFile;
     }
 
     public function generateForm(Form $form): void
@@ -116,8 +123,6 @@ class DailyMinuteGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'subject'");
         }
 
-        $output->from = "Ranných 5 minút | Denník N <minuta@dennikn.sk>";
-
         $output->blocks_json = $data->blocks;
         $output->subject = $data->subject;
 
@@ -126,7 +131,10 @@ class DailyMinuteGenerator implements IGenerator
 
     private function getNameDayNamesForDate(DateTime $date): string
     {
-        $json = file_get_contents(__DIR__ . '/resources/namedays.json');
+        if (!isset($this->nameDaySourceFile)) {
+            throw new \Exception("No value set for configurable value 'nameDaySourceFile'. Provide file name in configuration file through 'setNameDaySourceFile()' method.");
+        }
+        $json = file_get_contents(__DIR__ . '/resources/' . $this->nameDaySourceFile);
         $nameDays = json_decode($json, true);
 
         // javascript array of months in namedays.json starts from 0
