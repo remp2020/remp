@@ -57,6 +57,11 @@ class DailyMinuteTemplateFormFactory
         $this->from = $from;
     }
 
+    public function overrideSegment(string $segment): void
+    {
+        $this->segment = $segment;
+    }
+
     public function create()
     {
         $mailLayout = $this->layoutsRepository->findBy('code', $this->layoutCode);
