@@ -18,6 +18,8 @@ class DailyMinuteGenerator implements IGenerator
 {
     private string $nameDaySourceFile;
 
+    private string $from;
+
     public $onSubmit;
 
     public function __construct(
@@ -30,6 +32,11 @@ class DailyMinuteGenerator implements IGenerator
     public function setNameDaySourceFile(string $nameDaySourceFile): void
     {
         $this->nameDaySourceFile = $nameDaySourceFile;
+    }
+
+    public function setFrom(string $from): void
+    {
+        $this->from = $from;
     }
 
     public function generateForm(Form $form): void
@@ -123,6 +130,7 @@ class DailyMinuteGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'subject'");
         }
 
+        $output->from = $this->from;
         $output->blocks_json = $data->blocks;
         $output->subject = $data->subject;
 
