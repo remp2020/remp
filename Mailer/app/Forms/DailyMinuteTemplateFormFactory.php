@@ -139,7 +139,9 @@ class DailyMinuteTemplateFormFactory
                 $values['mail_type_id']
             );
 
-            $jobContext = 'daily_minute.' . date('Ymd');
+            // Temporary disable contenxt for CZ testing purposes
+            // $jobContext = 'daily_minute.' . date('Ymd');
+            $jobContext = null;
             $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, Crm::PROVIDER_ALIAS), $jobContext);
             $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
