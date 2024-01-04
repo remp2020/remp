@@ -456,7 +456,8 @@ class Showtime
                 $this->logger->error("Unable to identify country for campaign '{$campaign->id}': " . $e->getMessage());
                 return null;
             } catch (\GeoIp2\Exception\AddressNotFoundException $e) {
-                $this->logger->debug("Unable to identify country for campaign '{$campaign->id}': " . $e->getMessage());
+                // This may happen, do not throw exception here
+                // see https://github.com/maxmind/GeoIP2-php/issues/105
                 return null;
             }
 
