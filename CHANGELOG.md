@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - If you write your own migrations, you might want to test them against an empty DB. Types are now strict and older migrations could be broken if you used incorrect type in the past.
 - **BREAKING**: Updated `latte/latte` templating system to version `^3.0`. remp/remp#1315
   - If you create your own presenters/templates, please see the migration guide at https://latte.nette.org/en/cookbook/migration-from-latte2.
+- **BREAKING**: Updated `nette/mail` library to version `^4.0`. remp/remp#1315
+  - If you use it directly or extend our `SmtpMailer`, please review breaking changes from https://github.com/nette/mail/releases/tag/v4.0.0.
+- **IMPORTANT**: Updated Nette's underlying libraries to version `^4.0` (`nette/robot-loader`, `nette/utils`). remp/remp#1315
+- 
 - Added support for the new object types into parser used by R5M mail generator. remp/web#2312
 - Added setup methods into R5M related generator to allow work with another layout. remp/novydenik#1184
 - Changed generator rule for `<em>` HTML tag - removed new line. remp/crm#3012

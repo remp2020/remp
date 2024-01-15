@@ -78,17 +78,17 @@ class MailgunMailer extends Mailer
         $this->mailer = new Mailgun($clientConfigurator);
     }
 
-    public function send(Message $message): void
+    public function send(Message $mail): void
     {
         $this->initMailer();
 
         $from = null;
-        foreach ($message->getFrom() as $email => $name) {
+        foreach ($mail->getFrom() as $email => $name) {
             $from = "$name <$email>";
         }
 
-        $toHeader = $message->getHeader('To');
-        $recipientVariablesHeaderJson = $message->getHeader('X-Mailer-Template-Params');
+        $toHeader = $mail->getHeader('To');
+        $recipientVariablesHeaderJson = $mail->getHeader('X-Mailer-Template-Params');
         if (count($toHeader) > 1 && !$recipientVariablesHeaderJson) {
             throw new MailerBatchException("unsafe use of Mailgun mailer with multiple recipients: recipient variables (X-Mailer-Template-Params header) missing");
         }
@@ -120,7 +120,7 @@ class MailgunMailer extends Mailer
         }
 
         $attachments = [];
-        foreach ($message->getAttachments() as $attachment) {
+        foreach ($mail->getAttachments() as $attachment) {
             preg_match('/(?<filename>\w+\.\w+)/', $attachment->getHeader('Content-Disposition'), $attachmentName);
             $attachments[] = [
                 'fileContent' => $attachment->getBody(),
@@ -128,16 +128,16 @@ class MailgunMailer extends Mailer
             ];
         }
 
-        $tag = $message->getHeader('X-Mailer-Tag');
-        $clickTracking = $message->getHeader('X-Mailer-Click-Tracking');
-        $listUnsubscribe = $message->getHeader('List-Unsubscribe');
+        $tag = $mail->getHeader('X-Mailer-Tag');
+        $clickTracking = $mail->getHeader('X-Mailer-Click-Tracking');
+        $listUnsubscribe = $mail->getHeader('List-Unsubscribe');
 
         $data = [
             'from' => $from,
             'to' => $to,
-            'subject' => $message->getSubject(),
-            'text' => $message->getBody(),
-            'html' => $message->getHtmlBody(),
+            'subject' => $mail->getSubject(),
+            'text' => $mail->getBody(),
+            'html' => $mail->getHtmlBody(),
             'attachment' => $attachments,
             'recipient-variables' => Json::encode($recipientVariablesHeader),
             'h:Precedence' => 'bulk', // https://blog.returnpath.com/precedence/
@@ -153,7 +153,7 @@ class MailgunMailer extends Mailer
             $data['h:List-Unsubscribe'] = $listUnsubscribe;
         }
 
-        $mailVariables = Json::decode($message->getHeader('X-Mailer-Variables'), Json::FORCE_ARRAY);
+        $mailVariables = Json::decode($mail->getHeader('X-Mailer-Variables'), Json::FORCE_ARRAY);
         foreach ($mailVariables as $key => $val) {
             $data["v:".$key] = (string) $val;
         }

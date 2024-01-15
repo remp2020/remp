@@ -47,24 +47,22 @@ class SmtpMailer extends Mailer
     ) {
         parent::__construct($config, $configsRepository, $code);
 
-        // SMTP Mailer expects plain options
-        $options = [];
-        foreach ($this->options as $name => $option) {
-            if (isset($option['value'])) {
-                $options[$name] = $option['value'];
-            }
-        }
-
-        $this->mailer = new NetteSmtpMailer($options);
+        $this->mailer = new NetteSmtpMailer(
+            host: $this->options['host']['value'] ?? '',
+            username: $this->options['username']['value'] ?? '',
+            password: $this->options['password']['value'] ?? '',
+            port: $this->options['port']['value'] ?? null,
+            encryption: $this->options['secure']['value'] ?? null,
+        );
     }
 
-    public function send(Message $message): void
+    public function send(Message $mail): void
     {
         // Removing this header prevents leaking template parameters that may contain sensitive information.
         // This header is historically used in MailgunMailer for passing template parameters to Mailgun.
         // We rather not pass this to SMTP mailer.
-        $message->clearHeader('X-Mailer-Template-Params');
+        $mail->clearHeader('X-Mailer-Template-Params');
 
-        $this->mailer->send($message);
+        $this->mailer->send($mail);
     }
 }
