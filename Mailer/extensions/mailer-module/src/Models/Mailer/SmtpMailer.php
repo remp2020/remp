@@ -51,7 +51,7 @@ class SmtpMailer extends Mailer
             host: $this->options['host']['value'] ?? '',
             username: $this->options['username']['value'] ?? '',
             password: $this->options['password']['value'] ?? '',
-            port: $this->options['port']['value'] ?? null,
+            port: (int) $this->options['port']['value'] ?? null,
             encryption: $this->options['secure']['value'] ?? null,
         );
     }
