@@ -5,6 +5,7 @@ namespace Tests\Feature\Api\v1\Handlers\Users;
 
 use Nette\Http\IResponse;
 use Nette\Utils\Json;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\MailerModule\Api\v1\Handlers\Users\SubscribeHandler;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -287,9 +288,7 @@ class SubscribeHandlerTest extends BaseApiHandlerTestCase
         $this->assertFalse($isSubscribed);
     }
 
-    /**
-     * @dataProvider forceNoVariantSubscriptionDataProvider
-     */
+    #[DataProvider('forceNoVariantSubscriptionDataProvider')]
     public function testUseOfForceNoVariantSubscriptionFlag(bool $multi, bool $default)
     {
         $mailType = $this->createMailTypeWithCategory(
@@ -338,7 +337,7 @@ class SubscribeHandlerTest extends BaseApiHandlerTestCase
         $this->assertFalse($isVariantSubscribed);
     }
 
-    public function forceNoVariantSubscriptionDataProvider()
+    public static function forceNoVariantSubscriptionDataProvider()
     {
         return [
             'NoMultiVariant_NoDefaultVariant' => [

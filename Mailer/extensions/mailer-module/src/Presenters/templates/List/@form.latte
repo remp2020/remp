@@ -162,8 +162,8 @@
 
 {define jsCallbackRenderSorting}
     <script>
-        var $category = $('#{$control['listForm']['mail_type_category_id']->htmlId|noescape}'),
-            $sorting = $('[name={$control['listForm']['sorting']->name|noescape}]');
+        var $category = $('#' + {$control['listForm']['mail_type_category_id']->htmlId}),
+            $sorting = $('[name=' + {$control['listForm']['sorting']->name} + ']');
 
         var renderSortingAction = function () {
             $.nette.ajax({

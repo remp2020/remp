@@ -65,7 +65,7 @@
 
     $(function() {
         $.fn.dataTable.ext.errMode = 'none';
-        var dataTable = $('#{$tableId|noescape}').on('error.dt', function(e, settings, techNote, message) {
+        var dataTable = $('#' + {$tableId}).on('error.dt', function(e, settings, techNote, message) {
             if (typeof settings.jqXHR.responseJSON.error !== 'undefined') {
                 $.notify({
                     message: settings.jqXHR.responseJSON.error
@@ -169,7 +169,7 @@
             'scrollX': {$tableSettings['scrollX']},
             {/ifset}
             'drawCallback': function(settings) {
-                $.fn.dataTables.pagination(settings, 'dt-nav-{$tableId|noescape}');
+                $.fn.dataTables.pagination(settings, 'dt-nav-' + {$tableId});
             },
             'initComplete': function (a,b,c,d) {
                 var state = this.api().state().columns;
@@ -216,11 +216,11 @@
         });
 
         dataTable.buttons().container()
-                .appendTo( $('#dt-buttons-{$tableId|noescape}') );
+                .appendTo( $('#dt-buttons-' + {$tableId}) );
         {/if}
 
-        $.fn.dataTables.search(dataTable, 'dt-search-{$tableId|noescape}');
-        $.fn.dataTables.navigation(dataTable, 'dt-nav-{$tableId|noescape}');
+        $.fn.dataTables.search(dataTable, 'dt-search-' + {$tableId});
+        $.fn.dataTables.navigation(dataTable, 'dt-nav-' + {$tableId});
 
         {ifset $rowLinkAction}
         $('#{$tableId|noescape} tbody').on('click', 'tr', function () {

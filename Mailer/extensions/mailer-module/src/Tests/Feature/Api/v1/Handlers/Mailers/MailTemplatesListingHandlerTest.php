@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api\v1\Handlers\Mailers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\MailTemplatesListingHandler;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -39,9 +40,7 @@ class MailTemplatesListingHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals('template_5', $response->getPayload()[1]['code']);
     }
 
-    /**
-     * @dataProvider badRequestDataProvider
-     */
+    #[DataProvider('badRequestDataProvider')]
     public function testBadRequest($params, $error)
     {
         $handler = $this->getHandler(MailTemplatesListingHandler::class);
@@ -50,7 +49,7 @@ class MailTemplatesListingHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals($error, $response->getPayload()['code']);
     }
 
-    public function badRequestDataProvider()
+    public static function badRequestDataProvider()
     {
         return [
             'PageLimit_MissingPage' => [

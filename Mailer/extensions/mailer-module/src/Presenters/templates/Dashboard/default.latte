@@ -26,7 +26,7 @@
                                     <div class="pull-right hidden-sm">
                                         <canvas id="mailer-dashboard-subscribers-statistics-graph-{$key}" width="80" height="40"></canvas>
                                         <script>
-                                            var ctx = document.getElementById("mailer-dashboard-subscribers-statistics-graph-{$key}").getContext('2d');
+                                            var ctx = document.getElementById("mailer-dashboard-subscribers-statistics-graph-" + {$key}).getContext('2d');
                                             var myLineChart = new Chart(ctx, {
                                                 type: "line",
                                                 data: {
@@ -182,7 +182,7 @@
                                     <div class="pull-right hidden-sm">
                                         <canvas id="mailer-dashboard-statistics-graph-{$key}" width="80" height="40"></canvas>
                                         <script>
-                                            var ctx = document.getElementById("mailer-dashboard-statistics-graph-{$key}").getContext('2d');
+                                            var ctx = document.getElementById("mailer-dashboard-statistics-graph-" + {$key}).getContext('2d');
                                             var myLineChart = new Chart(ctx, {
                                                 type: "line",
                                                 data: {

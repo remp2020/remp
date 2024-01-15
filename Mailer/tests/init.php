@@ -27,3 +27,6 @@ $configurator->addConfig(__DIR__ . '/../app/config/config.neon');
 $configurator->addConfig(__DIR__ . '/../app/config/config.test.neon');
 
 $container = $configurator->createContainer();
+
+$GLOBALS['configurator'] = $configurator;
+$GLOBALS['container'] = $configurator->createContainer();

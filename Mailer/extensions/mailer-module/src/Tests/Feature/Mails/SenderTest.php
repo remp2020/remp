@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Mails;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\MailerModule\Models\Mailer\EmailAllowList;
 use Remp\MailerModule\Models\Sender;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
@@ -69,7 +70,7 @@ class SenderTest extends BaseFeatureTestCase
         $this->truncate($this->configsRepository);
     }
 
-    public function dataProvider()
+    public static function dataProvider()
     {
         return [
             'SendEmailSuccess' => [
@@ -159,7 +160,7 @@ class SenderTest extends BaseFeatureTestCase
         ];
     }
 
-    /** @dataProvider dataProvider */
+    #[DataProvider('dataProvider')]
     public function testSender(
         array $allowList = [],
         array $subscribedEmails = [],

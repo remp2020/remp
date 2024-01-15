@@ -36,15 +36,20 @@ class RedisDriverTest extends TestCase
     {
         $message = new Message('message_1', ['a' => 'b']);
 
-        $this->mockQueue->method('getTask')
-            ->withConsecutive(
-                ['priority'],
-                ['default']
-            )
-            ->willReturnOnConsecutiveCalls(
-                null,
-                [(new MessageSerializer)->serialize($message)]
-            );
+        $matcher = $this->exactly(2);
+        $this->mockQueue->expects($matcher)->method('getTask')
+            ->willReturnCallback(function (string $queueKey) use ($matcher, $message) {
+                switch ($matcher->numberOfInvocations()) {
+                    case 1:
+                        $this->assertEquals($queueKey, 'priority');
+                        return null;
+                    case 2:
+                        $this->assertEquals($queueKey, 'default');
+                        return [(new MessageSerializer)->serialize($message)];
+                    default:
+                        throw new \Exception('unhandled getTask() invocation');
+                }
+            });
 
         $processed = [];
 
@@ -59,23 +64,32 @@ class RedisDriverTest extends TestCase
 
     public function testSendMultiplePriorityMessage(): void
     {
-        $message1 = new Message('message_1', ['a' => 'b']);
-        $message2 = new Message('message_2', ['a' => 'b']);
-        $message3 = new Message('message_3', ['a' => 'b']);
+        $messages = [
+            1 => new Message('message_1', ['a' => 'b']),
+            2 => new Message('message_2', ['a' => 'b']),
+            3 => new Message('message_3', ['a' => 'b']),
+        ];
 
-        $this->mockQueue->method('getTask')
-            ->withConsecutive(
-                ['priority'],
-                ['priority'],
-                ['priority'],
-                ['default']
-            )
-            ->willReturnOnConsecutiveCalls(
-                [(new MessageSerializer)->serialize($message2)], // 2 tasks in priority queue
-                [(new MessageSerializer)->serialize($message3)], // 1 tasks in priority queue
-                null, // 0 tasks in priority queue, moving on
-                [(new MessageSerializer)->serialize($message1)] // 1 task in default queue
-            );
+        $matcher = $this->exactly(4);
+        $this->mockQueue->expects($matcher)->method('getTask')
+            ->willReturnCallback(function (string $queueKey) use ($matcher, $messages) {
+                switch ($matcher->numberOfInvocations()) {
+                    case 1:
+                        $this->assertEquals($queueKey, 'priority');
+                        return [(new MessageSerializer)->serialize($messages[2])]; // 2 tasks in priority queue;
+                    case 2:
+                        $this->assertEquals($queueKey, 'priority');
+                        return [(new MessageSerializer)->serialize($messages[3])]; // 1 tasks in priority queue
+                    case 3:
+                        $this->assertEquals($queueKey, 'priority');
+                        return null; // 0 tasks in priority queue, moving on
+                    case 4:
+                        $this->assertEquals($queueKey, 'default');
+                        return [(new MessageSerializer)->serialize($messages[1])]; // 1 task in default queue
+                    default:
+                        throw new \Exception('unhandled getTask() invocation');
+                }
+            });
 
         $processed = [];
         $this->driver->setMaxProcessItems(3);
@@ -84,34 +98,45 @@ class RedisDriverTest extends TestCase
         });
 
         $this->assertCount(3, $processed);
-        $this->assertEquals($message2->getId(), $processed[0]->getId());
-        $this->assertEquals($message3->getId(), $processed[1]->getId());
-        $this->assertEquals($message1->getId(), $processed[2]->getId());
+        $this->assertEquals($messages[2]->getId(), $processed[0]->getId());
+        $this->assertEquals($messages[3]->getId(), $processed[1]->getId());
+        $this->assertEquals($messages[1]->getId(), $processed[2]->getId());
     }
 
     public function testNewPriorityTaskDuringRun(): void
     {
-        $message1 = new Message('message_1', ['a' => 'b']);
-        $message2 = new Message('message_2', ['a' => 'b']);
-        $message3 = new Message('message_3', ['a' => 'b']);
+        $messages = [
+            1 => new Message('message_1', ['a' => 'b']),
+            2 => new Message('message_2', ['a' => 'b']),
+            3 => new Message('message_3', ['a' => 'b']),
+        ];
 
-        $this->mockQueue->method('getTask')
-            ->withConsecutive(
-                ['priority'],
-                ['default'],
-                ['priority'],
-                ['priority'],
-                ['default'],
-                ['priority'],
-            )
-            ->willReturnOnConsecutiveCalls(
-                null, // 0 tasks in priority queue, moving on
-                [(new MessageSerializer)->serialize($message1)], // 1 task in default queue
-                [(new MessageSerializer)->serialize($message2)], // 1 task in priority queue
-                null, // priority check again, 0 tasks in queue, moving on
-                null, // 0 tasks in default queue, moving on
-                [(new MessageSerializer)->serialize($message3)], // 1 task in default queue
-            );
+        $matcher = $this->exactly(6);
+        $this->mockQueue->expects($matcher)->method('getTask')
+            ->willReturnCallback(function (string $queueKey) use ($matcher, $messages) {
+                switch ($matcher->numberOfInvocations()) {
+                    case 1:
+                        $this->assertEquals($queueKey, 'priority');
+                        return null; // 0 tasks in priority queue, moving on
+                    case 2:
+                        $this->assertEquals($queueKey, 'default');
+                        return [(new MessageSerializer)->serialize($messages[1])]; // 1 task in default queue
+                    case 3:
+                        $this->assertEquals($queueKey, 'priority');
+                        return [(new MessageSerializer)->serialize($messages[2])]; // 1 task in priority queue
+                    case 4:
+                        $this->assertEquals($queueKey, 'priority');
+                        return null; // priority check again, 0 tasks in queue, moving on
+                    case 5:
+                        $this->assertEquals($queueKey, 'default');
+                        return null; // 0 tasks in default queue, moving on
+                    case 6:
+                        $this->assertEquals($queueKey, 'priority');
+                        return [(new MessageSerializer)->serialize($messages[3])]; // 1 task in default queue
+                    default:
+                        throw new \Exception('unhandled getTask() invocation');
+                }
+            });
 
         $processed = [];
         $this->driver->setMaxProcessItems(3);
@@ -120,8 +145,8 @@ class RedisDriverTest extends TestCase
         });
 
         $this->assertCount(3, $processed);
-        $this->assertEquals($message1->getId(), $processed[0]->getId());
-        $this->assertEquals($message2->getId(), $processed[1]->getId());
-        $this->assertEquals($message3->getId(), $processed[2]->getId());
+        $this->assertEquals($messages[1]->getId(), $processed[0]->getId());
+        $this->assertEquals($messages[2]->getId(), $processed[1]->getId());
+        $this->assertEquals($messages[3]->getId(), $processed[2]->getId());
     }
 }

@@ -45,3 +45,9 @@ services:
 
 local_configs:
 	mail_click_tracker: true
+
+latte:
+    extensions:
+        - Remp\MailerModule\Latte\MailerModuleExtension
+        - Nette\Bridges\FormsLatte\FormsExtension
+        - Nette\Bridges\ApplicationLatte\UIExtension(null)

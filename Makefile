@@ -28,7 +28,7 @@ composer-install:
 phpunit:
 	# Mailer test must run first, since they use migrations (which are later deleted by Laravel tests)
 	cd $(SUB_MAILER) && php bin/command.php migrate:migrate -vvv
-	cd $(SUB_MAILER) && vendor/bin/phpunit -vvv
+	cd $(SUB_MAILER) && vendor/bin/phpunit
 	# Beam and Campaign DBs are migrated automatically when running tests
 	cd $(SUB_BEAM) && vendor/bin/phpunit -vvv
 	cd $(SUB_CAMPAIGN) && vendor/bin/phpunit --configuration=phpunit_gitlab.xml

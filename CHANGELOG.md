@@ -14,6 +14,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Updated `monolog/monolog` to version `^3.0`. remp/remp#1315
+  - If any of your extensions rely on monolog, please review your implementation.
+- **BREAKING**: Updated `robmorgan/phinx` library to the latest version. remp/remp#1315
+  - If you write your own migrations, you might want to test them against an empty DB. Types are now strict and older migrations could be broken if you used incorrect type in the past.
+- **BREAKING**: Updated `latte/latte` templating system to version `^3.0`. remp/remp#1315
+  - If you create your own presenters/templates, please see the migration guide at https://latte.nette.org/en/cookbook/migration-from-latte2.
 - Added support for the new object types into parser used by R5M mail generator. remp/web#2312
 - Added setup methods into R5M related generator to allow work with another layout. remp/novydenik#1184
 - Changed generator rule for `<em>` HTML tag - removed new line. remp/crm#3012

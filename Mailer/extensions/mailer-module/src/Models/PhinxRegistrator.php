@@ -71,6 +71,9 @@ class PhinxRegistrator
         $env = $_ENV['ENV'];
 
         $configData = [
+            'feature_flags' => [
+                'unsigned_primary_keys' => false,
+            ],
             'paths' => [
                 'migrations' => [
                     $this->appRootDir . '/app/migrations',
@@ -80,7 +83,7 @@ class PhinxRegistrator
             ],
             'environments' => [
                 'default_migration_table' => 'phinxlog',
-                'default_database' => $env,
+                'default_environment' => $env,
             ],
         ];
 

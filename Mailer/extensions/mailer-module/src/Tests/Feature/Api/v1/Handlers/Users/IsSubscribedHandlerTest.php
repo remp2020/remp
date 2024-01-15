@@ -5,15 +5,14 @@ namespace Tests\Feature\Api\v1\Handlers\Users;
 
 use Nette\Http\IResponse;
 use Nette\Utils\Json;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\MailerModule\Api\v1\Handlers\Users\IsSubscribedHandler;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class IsSubscribedHandlerTest extends BaseApiHandlerTestCase
 {
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
     public function testIsSubscribed($testParams, $isSubscribed)
     {
         // Prepare data
@@ -60,7 +59,7 @@ class IsSubscribedHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals($isSubscribed, $payload['is_subscribed']);
     }
 
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         return [
             [

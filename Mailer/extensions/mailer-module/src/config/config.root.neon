@@ -60,3 +60,7 @@ database:
 		password: @environmentConfig::get('DB_PASS')
 		options:
 			lazy: yes
+
+latte:
+    extensions:
+        - Remp\MailerModule\Latte\MailerModuleExtension

@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
-use Latte\Macros\CoreMacros;
+use Latte\Essential\CoreExtension;
 use Nette\Application\ForbiddenRequestException;
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
-use Nette\Bridges\ApplicationLatte\UIMacros;
+use Nette\Bridges\ApplicationLatte\UIExtension;
 use Nette\Http\IResponse;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory;
@@ -157,8 +157,8 @@ final class JobPresenter extends BasePresenter
         }
 
         $latte = $this->latteFactory->create();
-        CoreMacros::install($latte->getCompiler());
-        UIMacros::install($latte->getCompiler());
+        $latte->addExtension(new CoreExtension());
+        $latte->addExtension(new UIExtension($this));
         $latte->addProvider('uiControl', $this->linkGenerator);
 
         /** @var ActiveRow $job */

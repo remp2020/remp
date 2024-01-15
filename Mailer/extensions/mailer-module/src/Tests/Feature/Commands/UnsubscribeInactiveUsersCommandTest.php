@@ -4,6 +4,7 @@ namespace Tests\Feature\Commands;
 
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\MailerModule\Commands\UnsubscribeInactiveUsersCommand;
 use Remp\MailerModule\Models\RedisClientFactory;
 use Remp\MailerModule\Models\RedisClientTrait;
@@ -86,7 +87,7 @@ class UnsubscribeInactiveUsersCommandTest extends BaseFeatureTestCase
         }
     }
 
-    public function dataProvider()
+    public static function dataProvider()
     {
         return [
             'TooLittleDeliveredEmails_ShouldNotUnsubscribe' => [
@@ -242,9 +243,7 @@ class UnsubscribeInactiveUsersCommandTest extends BaseFeatureTestCase
         ];
     }
 
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
     public function testUnsubscribeInactive(array $subscribe, array $logs, bool $isAppleBotOpenedEmail, array $result, array $omit = [], bool $dryRun = false, int $days = null)
     {
         foreach ($subscribe as $mailTypeCode) {

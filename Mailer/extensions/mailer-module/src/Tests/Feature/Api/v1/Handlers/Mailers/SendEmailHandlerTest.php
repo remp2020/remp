@@ -5,6 +5,7 @@ namespace Tests\Feature\Api\v1\Handlers\Mailers;
 
 use Mockery;
 use Nette\Utils\Json;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\SendEmailHandler;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
@@ -34,7 +35,7 @@ class SendEmailHandlerTest extends BaseApiHandlerTestCase
         $this->dispatcher = $this->inject(Dispatcher::class);
     }
 
-    public function dataProvider()
+    public static function dataProvider()
     {
         return [
             'ValidParams_ShouldEmitSendEmail' => [
@@ -82,7 +83,7 @@ class SendEmailHandlerTest extends BaseApiHandlerTestCase
         ];
     }
 
-    /** @dataProvider dataProvider */
+    #[DataProvider('dataProvider')]
     public function testSendEmailHandler(array $params, int $emitted, int $httpCode, callable $beforeTest = null)
     {
         if ($beforeTest) {
