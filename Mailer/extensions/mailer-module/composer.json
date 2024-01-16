@@ -15,7 +15,7 @@
     "justinrainbow/json-schema": "^5.2",
     "latte/latte": "^3.0",
     "league/event": "^3.0",
-    "mailgun/mailgun-php": "^3.1",
+    "mailgun/mailgun-php": "^4.0",
     "monolog/monolog": "^3.0",
     "nette/application": "^3.0",
     "nette/bootstrap": "^3.0",

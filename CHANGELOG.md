@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Updated `nette/mail` library to version `^4.0`. remp/remp#1315
   - If you use it directly or extend our `SmtpMailer`, please review breaking changes from https://github.com/nette/mail/releases/tag/v4.0.0.
 - **IMPORTANT**: Updated Nette's underlying libraries to version `^4.0` (`nette/robot-loader`, `nette/utils`). remp/remp#1315
+- **IMPORTANT**: Updated `mailgun/mailgun-php` to version `^4.0`. remp/remp#1315
 - Fixed possible render time / memory issues on job detail belonging to newsletter list with lots of emails.
 - Added support for the new object types into parser used by R5M mail generator. remp/web#2312
 - Added setup methods into R5M related generator to allow work with another layout. remp/novydenik#1184

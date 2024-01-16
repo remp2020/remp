@@ -1573,16 +1573,16 @@
         },
         {
             "name": "mailgun/mailgun-php",
-            "version": "v3.6.3",
+            "version": "v4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mailgun/mailgun-php.git",
-                "reference": "3dbdc2f220fa64e78e903477efa22858c72509be"
+                "reference": "c1832496b479708ca47276459268d454e557319d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/3dbdc2f220fa64e78e903477efa22858c72509be",
-                "reference": "3dbdc2f220fa64e78e903477efa22858c72509be",
+                "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/c1832496b479708ca47276459268d454e557319d",
+                "reference": "c1832496b479708ca47276459268d454e557319d",
                 "shasum": ""
             },
             "require": {
@@ -1628,9 +1628,9 @@
             "description": "The Mailgun SDK provides methods for all API functions.",
             "support": {
                 "issues": "https://github.com/mailgun/mailgun-php/issues",
-                "source": "https://github.com/mailgun/mailgun-php/tree/v3.6.3"
+                "source": "https://github.com/mailgun/mailgun-php/tree/v4.0.1"
             },
-            "time": "2023-12-01T10:04:01+00:00"
+            "time": "2024-01-08T19:37:43+00:00"
         },
         {
             "name": "ml/iri",
@@ -4223,7 +4223,7 @@
             "dist": {
                 "type": "path",
                 "url": "extensions/mailer-module",
-                "reference": "f77bb1b9a04e620a111b2d7ebaf4e4942ac35838"
+                "reference": "2d811e521daf1a100e1cab9b9fb695094e00cf26"
             },
             "require": {
                 "contributte/webpack": "^2.2",
@@ -4236,7 +4236,7 @@
                 "justinrainbow/json-schema": "^5.2",
                 "latte/latte": "^3.0",
                 "league/event": "^3.0",
-                "mailgun/mailgun-php": "^3.1",
+                "mailgun/mailgun-php": "^4.0",
                 "monolog/monolog": "^3.0",
                 "nette/application": "^3.0",
                 "nette/bootstrap": "^3.0",
