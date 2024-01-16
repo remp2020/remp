@@ -27,15 +27,20 @@ class TemplatesRepository extends Repository
         return $this->all()->select('id, name')->where(['mail_type_id' => $listId])->fetchPairs('id', 'name');
     }
 
-    public function filteredPairs(int $listId, array $filterTemplateIds): array
+    public function filteredPairs(int $listId, array $filterTemplateIds, ?int $limit = null): array
     {
-        return $this->all()
+        $query = $this->all()
             ->select('id, name')
             ->where([
                 'mail_type_id' => $listId,
                 'id NOT IN' => $filterTemplateIds
-            ])
-            ->fetchPairs('id', 'name');
+            ]);
+
+        if (isset($limit)) {
+            $query->limit($limit);
+        }
+
+        return $query->fetchPairs('id', 'name');
     }
 
     public function triples(): array

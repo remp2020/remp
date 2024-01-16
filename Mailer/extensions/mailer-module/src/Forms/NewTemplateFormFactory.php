@@ -44,7 +44,11 @@ class NewTemplateFormFactory
         $batchTemplates = $this->batchTemplatesRepository->findByBatchId((int) $batchId);
         $mailTypeId = $batchTemplates->fetch()->mail_template->mail_type_id;
 
-        $templateList = $this->templatesRepository->filteredPairs($mailTypeId, array_values($batchTemplates->fetchPairs('id', 'mail_template_id')));
+        $templateList = $this->templatesRepository->filteredPairs(
+            listId: $mailTypeId,
+            filterTemplateIds: array_values($batchTemplates->fetchPairs('id', 'mail_template_id')),
+            limit: 10000, // this limit is arbitrary, but things could get ugly without it
+        );
 
         $form->addSelect('template_id', 'Email', $templateList);
         $form->addHidden('batch_id', $batchId);
