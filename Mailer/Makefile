@@ -48,12 +48,13 @@ composer-install-dev:
 composer-install:
 	composer install --optimize-autoloader --no-dev
 
-update-dev: composer-install-dev js-dev
-	php bin/command.php migrate:migrate
-	php bin/command.php db:seed
+clear-cache:
 	rm -rf temp/cache
 
-update-prod: composer-install js
+update-dev: clear-cache composer-install-dev js-dev
 	php bin/command.php migrate:migrate
 	php bin/command.php db:seed
-	rm -rf temp/cache
+
+update-prod: clear-cache composer-install js
+	php bin/command.php migrate:migrate
+	php bin/command.php db:seed

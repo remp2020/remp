@@ -17,12 +17,15 @@ class SegmentSeeder extends Seeder
     {
         $this->command->getOutput()->writeln('Generating segments...');
 
-        $rempGroup = new SegmentGroup();
-        $rempGroup->name = 'REMP Segments';
-        $rempGroup->code = SegmentGroup::CODE_REMP_SEGMENTS;
-        $rempGroup->type = SegmentGroup::TYPE_RULE;
-        $rempGroup->sorting = 100;
-        $rempGroup->save();
+        $rempGroup = SegmentGroup::getByCode(SegmentGroup::CODE_REMP_SEGMENTS);
+        if (!$rempGroup) {
+            $rempGroup = new SegmentGroup();
+            $rempGroup->name = 'REMP Segments';
+            $rempGroup->code = SegmentGroup::CODE_REMP_SEGMENTS;
+            $rempGroup->type = SegmentGroup::TYPE_RULE;
+            $rempGroup->sorting = 100;
+            $rempGroup->save();
+        }
 
         foreach ($this->industrySegments() as $blueprint) {
             if (!Segment::where(['code' => $blueprint['code']])->exists()) {

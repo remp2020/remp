@@ -6,11 +6,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed entity and segment group seeder to avoid duplicates in the database. remp/remp#1317
+- Added `--force` parameter to migration in `update-prod` make target. remp/remp#1317
+
 ### [Campaign]
 
 - Changed campaign display rules evaluation to evaluate pageview attributes before including campaign between active campaigns. remp/remp#1302
 - Fixed bug - when copying campaign, removal of assigned segment affected existing campaign segments. remp/remp#1308
 - Fixed reporting unknown country as exception. remp/remp#1314
+- Added `--force` parameter to migration in `update-prod` make target. remp/remp#1317
 
 ### [Mailer]
 
@@ -28,6 +34,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for the new object types into parser used by R5M mail generator. remp/web#2312
 - Added setup methods into R5M related generator to allow work with another layout. remp/novydenik#1184
 - Changed generator rule for `<em>` HTML tag - removed new line. remp/crm#3012
+- Changed command order in `update-dev` and `update-prod` make targets to clear cache before running other command. remp/remp#1317
+
+### [Sso]
+- Added `--force` parameter to migration in `update-prod` make target. remp/remp#1317
 
 ## Archive
 

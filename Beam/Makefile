@@ -82,6 +82,6 @@ update-dev: composer-install-dev js-dev
 	php artisan migrate
 
 update-prod: composer-install js
-	php artisan migrate
+	php artisan migrate --force
 	php artisan config:cache
 	php artisan route:cache

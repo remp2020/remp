@@ -15,23 +15,25 @@ class EntitySeeder extends Seeder
      */
     public function run()
     {
-        $userEntity = new Entity();
+        if (!Entity::where(['name' => 'user'])->exists()) {
+            $userEntity = new Entity();
 
-        $userEntity->name = "user";
-        $userEntity->save();
+            $userEntity->name = "user";
+            $userEntity->save();
 
-        $userIdParam = new EntityParam();
-        $userIdParam->name = "id";
-        $userIdParam->type = EntityParam::TYPE_STRING;
+            $userIdParam = new EntityParam();
+            $userIdParam->name = "id";
+            $userIdParam->type = EntityParam::TYPE_STRING;
 
-        $userEmailParam = new EntityParam();
-        $userEmailParam->name = "email";
-        $userEmailParam->type = EntityParam::TYPE_STRING;
+            $userEmailParam = new EntityParam();
+            $userEmailParam->name = "email";
+            $userEmailParam->type = EntityParam::TYPE_STRING;
 
 
-        $userEntity->params()->saveMany([
-            $userIdParam,
-            $userEmailParam,
-        ]);
+            $userEntity->params()->saveMany([
+                $userIdParam,
+                $userEmailParam,
+            ]);
+        }
     }
 }
