@@ -19,7 +19,7 @@ class ProcessGenderBalanceCommand extends Command
 
     public function handle(GenderBalance $genderBalance): void
     {
-        $articlesQuery = Article::query();
+        $articlesQuery = Article::query()->whereNotNull('image_url');
 
         if ($fromOption = $this->option('from')) {
             $from = new Carbon($fromOption);
