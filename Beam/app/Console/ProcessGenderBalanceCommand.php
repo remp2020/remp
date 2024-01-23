@@ -37,7 +37,12 @@ class ProcessGenderBalanceCommand extends Command
         /** @var Article $article */
         foreach ($articles as $article) {
             $this->output->write("  * {$article->url}: ");
-            GenderBalanceJob::dispatchSync($article);
+
+            try {
+                GenderBalanceJob::dispatchSync($article);
+            } catch (\Exception $e) {
+                $this->output->writeln("ERROR ({$e->getMessage()}");
+            }
 
             $menCountMeta = ArticleMeta::where('article_id', $article->id)
                 ->where('key', GenderBalanceJob::MEN_COUNT_KEY)
@@ -48,7 +53,6 @@ class ProcessGenderBalanceCommand extends Command
                 ->where('key', GenderBalanceJob::WOMEN_COUNT_KEY)
                 ->first()
                 ?->value;
-
 
             $this->output->writeln("OK ({$menCountMeta}M, {$womenCountMeta}F)");
         }
