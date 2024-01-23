@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Console\MigrateMakeCommand;
+use App\Console\ProcessGenderBalanceCommand;
 use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Composer;
@@ -36,6 +37,10 @@ class AppServiceProvider extends ServiceProvider
         }
 
         SearchResource::withoutWrapping();
+
+        $this->commands([
+            ProcessGenderBalanceCommand::class,
+        ]);
     }
 
     /**

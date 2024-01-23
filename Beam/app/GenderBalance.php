@@ -50,6 +50,8 @@ class GenderBalance
 
     private function identifyPeople($imageUrl): array
     {
+        $imageUrl = preg_replace('/img.projektn.sk\/wp-static/', 'a-static.projektn.sk', $imageUrl);
+
         try {
             $response = $this->client->post('computervision/imageanalysis:analyze', [
                 'query' => [
@@ -80,7 +82,7 @@ class GenderBalance
                     continue;
                 }
 
-                $newImageUrl = preg_replace('/a-static.projektn.(\w+)\//', 'img.projektn.$1/wp-static/', $imageUrl);
+                $newImageUrl = preg_replace('/a-static.projektn.sk\//', 'img.projektn.sk/wp-static/', $imageUrl);
                 $newImageUrl .= "?crop=$w,$h,$x,$y";
                 $personCropUrls[] = $newImageUrl;
             }
@@ -105,7 +107,6 @@ class GenderBalance
         } catch (ClientException $exception) {
             throw new \Exception($exception->getResponse()->getBody()->getContents());
         }
-
 
         $c = json_decode($response->getBody()->getContents(), false);
 
