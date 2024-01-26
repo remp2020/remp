@@ -75,6 +75,7 @@ final class HealthPresenter extends Presenter
             $resultCode = IResponse::S500_InternalServerError;
         }
 
+        $this->getHttpResponse()->setCode($resultCode);
         $this->sendResponse(new JsonApiResponse($resultCode, $result));
     }
 
@@ -126,7 +127,7 @@ final class HealthPresenter extends Presenter
     private function mailWorkerCheck(): array
     {
         $result['status'] = $this->healthChecker->isHealthy(MailWorkerCommand::COMMAND_NAME) ? self::STATUS_OK : self::STATUS_PROBLEM;
-        if (!$result['status']) {
+        if ($result['status'] === self::STATUS_PROBLEM) {
             $result['message'] = 'Mail worker command is not running';
         }
         return $result;
@@ -135,7 +136,7 @@ final class HealthPresenter extends Presenter
     private function hermesWorkerCheck(): array
     {
         $result['status'] = $this->healthChecker->isHealthy(HermesWorkerCommand::COMMAND_NAME) ? self::STATUS_OK : self::STATUS_PROBLEM;
-        if (!$result['status']) {
+        if ($result['status'] === self::STATUS_PROBLEM) {
             $result['message'] = 'Hermes worker command is not running';
         }
         return $result;
@@ -144,7 +145,7 @@ final class HealthPresenter extends Presenter
     private function processJobCommandCheck(): array
     {
         $result['status'] = $this->healthChecker->isHealthy(ProcessJobCommand::COMMAND_NAME) ? self::STATUS_OK : self::STATUS_PROBLEM;
-        if (!$result['status']) {
+        if ($result['status'] === self::STATUS_PROBLEM) {
             $result['message'] = 'Process Job command is not running';
         }
         return $result;
