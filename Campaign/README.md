@@ -608,7 +608,7 @@ Newsletter API is required to respond with proper HTTP response code. On both su
 
 ### Custom Events
 
-Custom events `rempNewsletterSubscribeError` or `rempNewsletterSubscribeSuccess` are available if requests are configured with XHR. Events are fired on `form` element. Event contains following items in `detail` prop:
+Custom events `rempNewsletterSubscribeFailure` or `rempNewsletterSubscribeSuccess` are available if requests are configured with XHR. Events are fired on `form` element. Event contains following items in `detail` prop:
 
 | field      | type     | description  |
 |------------|----------|--------------|
