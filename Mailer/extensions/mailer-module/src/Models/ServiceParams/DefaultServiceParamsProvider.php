@@ -36,6 +36,8 @@ class DefaultServiceParamsProvider implements ServiceParamsProviderInterface
         if (isset($_ENV['SETTINGS_URL'])) {
             $params['settings'] = $_ENV['SETTINGS_URL'] . $autoLogin;
         }
+
+        $params['newsletter'] = $template->mail_type;
         return $params;
     }
 

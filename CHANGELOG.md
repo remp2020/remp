@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed incorrect `/mailer/health` healthcheck HTTP status code in case of failure (was always 200). remp/remp#1322
 - Fixed conditions to unreachable healthcheck messages. remp/remp#1322
+- Added new default email template parameter `newsletter` - represents mail type. remp/remp#1321
 
 ## Archive
 
