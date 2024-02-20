@@ -265,7 +265,7 @@ class CampaignController extends Controller
             'selectedLanguages' => $selectedLanguages,
             'countriesBlacklist' => $countriesBlacklist,
             'banners' => Banner::all(),
-            'availableCountries' => Country::all(),
+            'availableCountries' => Country::all()->keyBy("iso_code"),
             'availableLanguages' => json_encode(Campaign::getAvailableLanguages()),
             'segments' => $this->getAllSegments($segmentAggregator),
             'collection' => $collection,
