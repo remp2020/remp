@@ -55,7 +55,7 @@ class EmbedParser
     {
         $html = "<br>";
 
-        if ($isVideo) {
+        if ($isVideo && isset($this->videoLinkText)) {
             $html .= "<p style='text-align: center; font-weight: normal;'><i>{$this->videoLinkText}</i></p><br>";
         }
 

@@ -26,7 +26,7 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
             $html .= "<span style='text-decoration: underline; color: #1F3F83;'>" . $link . "</span>";
         }
 
-        if ($isVideo) {
+        if ($isVideo && isset($this->videoLinkText)) {
             $html .= "<p style='color: #888;font-family: Arial,sans-serif;font-size: 14px;margin: 0; padding: 0;margin-top:5px;line-height: 1.3;text-align: left; text-decoration: none;'><i>{$this->videoLinkText}</i></p><br>";
         }
 
