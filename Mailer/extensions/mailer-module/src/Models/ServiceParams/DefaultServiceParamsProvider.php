@@ -5,12 +5,14 @@ namespace Remp\MailerModule\Models\ServiceParams;
 
 use Nette\Caching\Cache;
 use Nette\Caching\Storage;
+use Nette\Utils\Json;
 use Remp\MailerModule\Repositories\BatchesRepository;
 
 class DefaultServiceParamsProvider implements ServiceParamsProviderInterface
 {
     private const CACHE_PREFIX = 'batch_to_variant_code_';
-    private const NO_ASSIGNED_VARIANT_CODE = '__NO_ASSIGNED_VARIANT_CODE__';
+    private const CACHE_PREFIX_VARIANT_DATA = 'batch_to_variant_';
+    private const NO_ASSIGNED_VARIANT_DATA = '__NO_ASSIGNED_VARIANT_DATA__';
 
     public function __construct(
         private BatchesRepository $batchesRepository,
@@ -22,7 +24,10 @@ class DefaultServiceParamsProvider implements ServiceParamsProviderInterface
     {
         $variantCode = null;
         if ($batchId) {
-            $variantCode = $this->loadVariantCode($batchId);
+            $variantData = $this->loadVariantData($batchId);
+            if (isset($variantData['code'])) {
+                $variantCode = $variantData['code'];
+            }
         }
 
         $params = [];
@@ -37,23 +42,43 @@ class DefaultServiceParamsProvider implements ServiceParamsProviderInterface
             $params['settings'] = $_ENV['SETTINGS_URL'] . $autoLogin;
         }
 
-        $params['newsletter'] = $template->mail_type;
+        $params['newsletter_id'] = $template->mail_type->id;
+        $params['newsletter_code'] = $template->mail_type->code;
+        $params['newsletter_title'] = $template->mail_type->title;
+
+        if (!empty($variantData)) {
+            $params['variant_id'] = $variantData['id'];
+            $params['variant_code'] = $variantData['code'];
+            $params['variant_title'] = $variantData['title'];
+        }
+
         return $params;
     }
 
-    private function loadVariantCode(int $batchId): ?string
+    private function loadVariantData(int $batchId): array
     {
-        $variantCode = $this->cacheStorage->read(self::CACHE_PREFIX . ((string) $batchId));
+        $variantData = $this->cacheStorage->read(self::CACHE_PREFIX_VARIANT_DATA . ((string) $batchId));
 
-        if (!$variantCode) {
+        if (!$variantData) {
             $batch = $this->batchesRepository->find($batchId);
-            $variantCode = $batch->mail_job->mail_type_variant->code ?? self::NO_ASSIGNED_VARIANT_CODE;
-            $this->cacheStorage->write(self::CACHE_PREFIX . ((string) $batchId), $variantCode, [
-                Cache::Expire => 60*20 // 20 minutes
+            $variant = $batch->mail_job->mail_type_variant;
+
+            $variantData = [];
+            if ($variant) {
+                $variantData = [
+                    'id' => $variant->id,
+                    'code' => $variant->code,
+                    'title' => $variant->title,
+                ];
+            }
+
+            $this->cacheStorage->write(self::CACHE_PREFIX_VARIANT_DATA . ((string) $batchId), Json::encode($variantData), [
+                Cache::Expire => 60*20, // 20 minutes
             ]);
+
+            return $variantData;
         }
 
-        // convert NO_ASSIGNED_VARIANT_CODE to null
-        return $variantCode === self::NO_ASSIGNED_VARIANT_CODE ? null : $variantCode;
+        return Json::decode($variantData, true);
     }
 }
