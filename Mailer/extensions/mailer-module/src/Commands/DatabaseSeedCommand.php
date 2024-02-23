@@ -47,6 +47,7 @@ class DatabaseSeedCommand extends Command
         $configValues = [
             ['default_mailer', 'Default Mailer', SmtpMailer::ALIAS, '', 'string'],
             [RtmClickReplace::CONFIG_NAME, 'Mail click tracker', false, '', 'boolean'],
+            ['one_click_unsubscribe', 'One-Click Unsubscribe', false, 'If enabled, adds <code class="muted">List-Unsubscribe=One-Click</code> header to emails that signals support for One-Click unsubscribe from the newsletters according to RFC 8058. The unsubscribe URL must support the POST method, must immediately unsubscribe the user from the newsletter, must not use redirection or any additional user verification; all the necessary data for unsubscribing must be part of the URL address.', 'boolean']
         ];
         foreach ($configValues as $configValue) {
             $config = $this->configsRepository->findBy('name', $configValue['0']);

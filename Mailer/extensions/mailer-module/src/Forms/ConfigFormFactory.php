@@ -7,6 +7,7 @@ use Exception;
 use Nette\Application\UI\Form;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Html;
 use Nette\Utils\Json;
 use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Config\LocalConfig;
@@ -17,26 +18,13 @@ class ConfigFormFactory
 {
     use SmartObject;
 
-    /** @var ConfigsRepository */
-    private $configsRepository;
-
-    /** @var MailerFactory */
-    private $mailerFactory;
-
-    /** @var LocalConfig */
-    private $localConfig;
-
     public $onSuccess;
 
-
     public function __construct(
-        ConfigsRepository $configsRepository,
-        MailerFactory $mailerFactory,
-        LocalConfig $localConfig
+        private ConfigsRepository $configsRepository,
+        private MailerFactory $mailerFactory,
+        private LocalConfig $localConfig
     ) {
-        $this->configsRepository = $configsRepository;
-        $this->mailerFactory = $mailerFactory;
-        $this->localConfig = $localConfig;
     }
 
     public function create(): Form
@@ -78,7 +66,7 @@ class ConfigFormFactory
                     : false;
                 $item = null;
 
-                if ($config['type'] === 'string') {
+                if ($config['type'] === Config::TYPE_STRING) {
                     $item = $mailerContainer
                         ->addText($config['name'], $config['display_name'])
                         ->setOption('description', $config['description'])
@@ -105,39 +93,42 @@ class ConfigFormFactory
                 switch ($config['type']) :
                     case Config::TYPE_STRING:
                     case Config::TYPE_PASSWORD:
-                        $othersContainer->addText($config['name'], $config['display_name'])
-                            ->setDefaultValue($config['value']);
+                        $element = $othersContainer->addText($config['name'], $config['display_name']);
                         break;
                     case Config::TYPE_TEXT:
-                        $othersContainer->addTextArea($config['name'], $config['display_name'])
-                            ->setDefaultValue($config['value'])
-                            ->getControlPrototype()
+                        $element = $othersContainer->addTextArea($config['name'], $config['display_name']);
+                        $element->getControlPrototype()
                             ->addAttributes(['class' => 'auto-size']);
                         break;
                     case Config::TYPE_HTML:
-                        $othersContainer->addTextArea($config['name'], $config['display_name'])
-                            ->setHtmlAttribute('rows', 15)
-                            ->setDefaultValue($config['value'])
+                        $element = $othersContainer->addTextArea($config['name'], $config['display_name']);
+                        $element->setHtmlAttribute('rows', 15)
                             ->getControlPrototype()
                             ->addAttributes(['class' => 'html-editor']);
                         break;
                     case Config::TYPE_BOOLEAN:
-                        $othersContainer->addCheckbox($config['name'], $config['display_name'])
-                            ->setDefaultValue($config['value']);
+                        $element = $othersContainer->addCheckbox($config['name'], $config['display_name']);
                         break;
                     case Config::TYPE_INT:
-                        $othersContainer->addText($config['name'], $config['display_name'])
-                            ->setDefaultValue($config['value'])
-                            ->addCondition(Form::FILLED)
+                        $element = $othersContainer->addText($config['name'], $config['display_name']);
+                        $element->addCondition(Form::FILLED)
                             ->addRule(Form::INTEGER);
                         break;
                     case Config::TYPE_SELECT:
-                        $selectOptions = $config['options'] ? Json::decode($config['options'], Json::FORCE_ARRAY) : [];
-                        $othersContainer->addSelect($config['name'], $config['display_name'] ?? $config['name'], $selectOptions);
+                        $selectOptions = $config['options'] ? Json::decode($config['options'], true) : [];
+                        $element = $othersContainer->addSelect($config['name'], $config['display_name'] ?? $config['name'], $selectOptions);
                         break;
                     default:
                         throw new Exception('unhandled config type: ' . $config['type']);
                 endswitch;
+
+                $element->setDefaultValue($config['value']);
+                if (isset($overriddenConfigs[$config['name']])) {
+                    $element->setOption('configOverridden', "{$defaultMailerKey}: {$this->localConfig->value($config['name'])}");
+                }
+                if (isset($config['description'])) {
+                    $element->setOption('description', Html::el('span')->setHtml($config['description']));
+                }
             }
         }
 

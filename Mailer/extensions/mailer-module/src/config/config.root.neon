@@ -4,7 +4,7 @@ parameters:
 	timezone: @environmentConfig::get('TIMEZONE')
 	sso_addr: @environmentConfig::get('SSO_ADDR')
 	sso_error_url: @environmentConfig::get('SSO_ERROR_URL')
-	max_result_count: @environmentConfig::get('SEARCH_MAX_RESULT_COUNT')
+	max_result_count: @environmentConfig::getInt('SEARCH_MAX_RESULT_COUNT')
 	redis:
 		host: @environmentConfig::get('REDIS_HOST')
 		port: @environmentConfig::getInt('REDIS_PORT')

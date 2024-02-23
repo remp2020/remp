@@ -9,6 +9,7 @@ use Nette\Utils\AssertionException;
 use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Models\Auth\AutoLogin;
+use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Config\ConfigNotExistsException;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
@@ -40,7 +41,8 @@ class Sender
         private ContentGenerator $contentGenerator,
         private GeneratorInputFactory $generatorInputFactory,
         private ServiceParamsProviderInterface $serviceParamsProvider,
-        private EmailAllowList $emailAllowList
+        private EmailAllowList $emailAllowList,
+        private Config $config
     ) {
     }
 
@@ -350,18 +352,28 @@ class Sender
 
     private function setMessageHeaders(Message $message, $mailSenderId, ?array $templateParams, bool $isBatch = false): void
     {
+        $enableOneClickUnsubscribing = $this->config->get('one_click_unsubscribe');
         if (!$this->template->mail_type->locked) {
             if ($isBatch) {
                 $message->setHeader('List-Unsubscribe', '%recipient.list_unsubscribe%');
+                if ($enableOneClickUnsubscribing) {
+                    $message->setHeader('List-Unsubscribe-Post', '%recipient.list_unsubscribe_post%');
+                }
                 foreach ($templateParams as $email => $variables) {
                     if (isset($variables['unsubscribe'])) {
                         $templateParams[$email]['list_unsubscribe'] = "<{$variables['unsubscribe']}>";
+                        if ($enableOneClickUnsubscribing) {
+                            $templateParams[$email]['list_unsubscribe_post'] = 'List-Unsubscribe=One-Click';
+                        }
                     }
                 }
             } else {
                 foreach ($templateParams as $email => $variables) {
                     if (isset($variables['unsubscribe'])) {
                         $message->setHeader('List-Unsubscribe', "<{$variables['unsubscribe']}>");
+                        if ($enableOneClickUnsubscribing) {
+                            $message->setHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
+                        }
                     }
                 }
             }

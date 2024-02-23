@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed incorrect `/mailer/health` healthcheck HTTP status code in case of failure (was always 200). remp/remp#1322
 - Fixed conditions to unreachable healthcheck messages. remp/remp#1322
 - Added new parameters between default template parameters to identify newsletter (`newsletter_id`, `newsletter_code`, `newsletter_title`) and variant (`variant_id`, `variant_code`, `variant_title`). remp/remp#1321
+- Added support for One-Click unsubscribe according to RFC8058. [remp2020/mailer-module#3](https://github.com/remp2020/mailer-module/pull/3)
 
 ## Archive
 

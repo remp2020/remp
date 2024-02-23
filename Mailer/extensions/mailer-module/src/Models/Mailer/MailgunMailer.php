@@ -131,6 +131,7 @@ class MailgunMailer extends Mailer
         $tag = $mail->getHeader('X-Mailer-Tag');
         $clickTracking = $mail->getHeader('X-Mailer-Click-Tracking');
         $listUnsubscribe = $mail->getHeader('List-Unsubscribe');
+        $listUnsubscribePost = $mail->getHeader('List-Unsubscribe-Post');
 
         $data = [
             'from' => $from,
@@ -151,6 +152,9 @@ class MailgunMailer extends Mailer
         }
         if (isset($listUnsubscribe)) {
             $data['h:List-Unsubscribe'] = $listUnsubscribe;
+        }
+        if (isset($listUnsubscribe)) {
+            $data['h:List-Unsubscribe-Post'] = $listUnsubscribePost;
         }
 
         $mailVariables = Json::decode($mail->getHeader('X-Mailer-Variables'), Json::FORCE_ARRAY);

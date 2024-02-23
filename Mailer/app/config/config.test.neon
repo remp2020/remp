@@ -45,6 +45,7 @@ services:
 
 local_configs:
 	mail_click_tracker: true
+	one_click_unsubscribe: true
 
 latte:
     extensions:
