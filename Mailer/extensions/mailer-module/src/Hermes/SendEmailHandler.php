@@ -6,24 +6,23 @@ namespace Remp\MailerModule\Hermes;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Models\Sender;
 use Tomaj\Hermes\Handler\HandlerInterface;
-use Tomaj\Hermes\Handler\RetryTrait;
 use Tomaj\Hermes\MessageInterface;
 use Tracy\Debugger;
 
 class SendEmailHandler implements HandlerInterface
 {
-    use RetryTrait;
-
-    private $templatesRepository;
-
-    private $sender;
+    // Default value copied from Tomaj\Hermes\Handler\RetryTrait
+    private int $maxRetries = 25;
 
     public function __construct(
-        TemplatesRepository $templatesRepository,
-        Sender $sender
+        private TemplatesRepository $templatesRepository,
+        private Sender $sender,
     ) {
-        $this->templatesRepository = $templatesRepository;
-        $this->sender = $sender;
+    }
+
+    public function setMaxRetries(int $maxRetries)
+    {
+        $this->maxRetries = $maxRetries;
     }
 
     public function handle(MessageInterface $message): bool
@@ -53,5 +52,15 @@ class SendEmailHandler implements HandlerInterface
 
         $email->send(false);
         return true;
+    }
+
+    public function canRetry(): bool
+    {
+        return $this->maxRetries > 0;
+    }
+
+    public function maxRetry(): int
+    {
+        return $this->maxRetries;
     }
 }

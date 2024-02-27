@@ -104,6 +104,8 @@ services:
 	- Remp\MailerModule\Hermes\HermesTasksQueue
 	- Remp\MailerModule\Repositories\HermesTasksRepository
 
+	sendEmailHermesHandler: Remp\MailerModule\Hermes\SendEmailHandler
+
 	hermesWorker:
 		factory: Remp\MailerModule\Commands\HermesWorkerCommand
 		setup:
@@ -111,7 +113,7 @@ services:
 			- add('mailgun-event', Remp\MailerModule\Hermes\MailgunEventHandler())
 			- add('mailgun-event', Remp\MailerModule\Hermes\MailgunEventClickHandler())
 			- add('heartbeat', Remp\MailerModule\Hermes\PingMysql())
-			- add('send-email', Remp\MailerModule\Hermes\SendEmailHandler())
+			- add('send-email', @sendEmailHermesHandler)
 			- add('user-subscribed', Remp\MailerModule\Hermes\SubscribeHandler())
 			- add('user-unsubscribed', Remp\MailerModule\Hermes\UnsubscribeHandler())
 

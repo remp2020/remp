@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed conditions to unreachable healthcheck messages. remp/remp#1322
 - Added new parameters between default template parameters to identify newsletter (`newsletter_id`, `newsletter_code`, `newsletter_title`) and variant (`variant_id`, `variant_code`, `variant_title`). remp/remp#1321
 - Added support for One-Click unsubscribe according to RFC8058. [remp2020/mailer-module#3](https://github.com/remp2020/mailer-module/pull/3)
+- Added option to configure maximum number of send attempts in `SendEmailHandler`. remp/remp#1331
+  - You can configure this in your `config.local.neon` by calling e.g. `setMaxRetries(10)` within `setup` directive of `sendEmailHermesHandler` service. 
 
 ## Archive
 
