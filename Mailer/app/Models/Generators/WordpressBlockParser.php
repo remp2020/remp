@@ -124,6 +124,11 @@ class WordpressBlockParser
             $data['isFirstDnHeaderInMinuteGroup'] = $this->isFirstDnHeaderInMinuteGroup;
         }
 
+        if ($block->name === self::BLOCK_CORE_IMAGE) {
+            $imageSize = getimagesize($block->attributes->url)[0];
+            $data['imageWidth'] = min($imageSize, 660);
+        }
+
         return $data;
     }
 
