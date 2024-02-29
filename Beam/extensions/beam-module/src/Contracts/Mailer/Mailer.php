@@ -7,7 +7,6 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Psy\Util\Json;
 
 class Mailer implements MailerContract
 {
@@ -145,7 +144,7 @@ class Mailer implements MailerContract
         } catch (ConnectException $e) {
             throw new MailerException("Could not connect to Mailer endpoint: {$e->getMessage()}");
         } catch (ClientException $e) {
-            Log::error('Unable to create Mailer template: ' . self::ENDPOINT_CREATE_TEMPLATE . ': ' . Json::encode($multipart));
+            Log::error('Unable to create Mailer template: ' . self::ENDPOINT_CREATE_TEMPLATE . ': ' . json_encode($multipart));
             throw $e;
         }
 
