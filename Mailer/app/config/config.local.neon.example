@@ -93,6 +93,9 @@ services:
 
     # If you are using REMP Beam, enable Tracker (parameters are loaded from .env)
 #    - Remp\MailerModule\Models\Tracker\Remp(%remp.beam.tracker_addr%, %remp.beam.tracker_property_token%)
+    # otherwise keep NullTracker enabled
+    # (ITracker implementation is required by UnsubscribeInactiveUsersCommand initialized by MailerModule)
+    - Tests\Unit\NullTracker
 
 #    eventDispatcher:
 #        factory: League\Event\EventDispatcher
