@@ -289,7 +289,7 @@ export default {
     computed: {
         newsletterIdHint: function(){
             if (this.rempMailerAddr !== null){
-                let url = this.rempMailerAddr + '/list';
+                let url = this.rempMailerAddr + '/mailer/list';
                 return `Newsletter <code>code</code> as found in REMP Mailer <a href="${url}" target="_blank">Newsletter lists</a>.`;
 
             }
