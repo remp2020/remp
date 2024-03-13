@@ -43,7 +43,7 @@
                         'visible' => false,
                     ],
                 ],
-                'dataSource' => route('schedule.json', ['collection' => $collection, 'active' => true, 'limit' => 5]),
+                'dataSource' => route('schedule.json', ['collection' => $collection, 'active' => true]),
                 'rowActions' => [
                     ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit schedule'],
                     ['name' => 'start', 'class' => 'zmdi-palette-Cyan zmdi-play', 'title' => 'Start schedule'],
