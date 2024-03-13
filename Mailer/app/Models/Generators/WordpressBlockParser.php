@@ -45,14 +45,29 @@ class WordpressBlockParser
         $data = preg_replace('/[[:cntrl:]]/', '', $json);
         $data = json_decode($data);
 
-        $result = '';
+        $isFirstBlock = true;
+        $htmlResult = '';
         $textResult = '';
         foreach ($data as $block) {
-            $result .= $this->parseBlock($block);
-            $textResult .= strip_tags($result);
+            $parsedBlock = $this->parseBlock($block);
+            $htmlResult .= $parsedBlock;
+
+            $textBlock = html_entity_decode(strip_tags($parsedBlock));
+            $textBlock = preg_replace('/\n(\s*)\n(\s*)\n/', "\n\n", $textBlock);
+            $textBlock = preg_replace('/^\s/', "", $textBlock);
+            $textBlock = str_replace('  ', " ", $textBlock);
+
+            $textResult .= $textBlock;
+
+            // put advertisement snippet into template after first main block
+            if ($isFirstBlock) {
+                $htmlResult .= "{{ include('r5m-advertisement') }}";
+                $textResult .= "\n\n{{ include('r5m-advertisement') }}\n\n";
+            }
+            $isFirstBlock = false;
         }
 
-        return [$result, $textResult];
+        return [$htmlResult, $textResult];
     }
 
     public function getBlockTemplateData(object $block, array $innerBlockParams = []): array
