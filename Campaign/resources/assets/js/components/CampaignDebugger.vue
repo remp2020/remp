@@ -178,7 +178,8 @@ export default {
     &__title {
       color: #9c9c9c;
       font-size: 12px;
-      margin-bottom: 13px;
+      margin-bottom: 12px;
+      margin-top: 12px;
     }
   }
 
