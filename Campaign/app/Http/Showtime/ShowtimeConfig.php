@@ -4,15 +4,18 @@ namespace App\Http\Showtime;
 
 class ShowtimeConfig
 {
-    private ?string $acceptLanguage = null;
+    public function __construct(
+        private ?string $debugKey = null,
+        private ?string $acceptLanguage = null,
+        private bool $prioritizeBannerOnSamePosition = false,
+        private bool $oneTimeBannerEnabled = true,
+    ) {
+    }
 
-    private bool $prioritizeBannerOnSamePosition = false;
-
-    private bool $oneTimeBannerEnabled = true;
-
-    public function setAcceptLanguage(string $language): void
+    public function setAcceptLanguage(string $language): self
     {
         $this->acceptLanguage = $language;
+        return $this;
     }
 
     public function getAcceptLanguage(): ?string
@@ -41,6 +44,17 @@ class ShowtimeConfig
     {
         $this->oneTimeBannerEnabled = $oneTimeBannerEnabled;
 
+        return $this;
+    }
+
+    public function getDebugKey(): ?string
+    {
+        return $this->debugKey;
+    }
+
+    public function setDebugKey(?string $debugKey): self
+    {
+        $this->debugKey = $debugKey;
         return $this;
     }
 }

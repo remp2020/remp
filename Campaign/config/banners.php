@@ -93,4 +93,5 @@ return [
     ],
     'prioritize_banners_on_same_position' => env('PRIORITIZE_BANNERS_ON_SAME_POSITION', false),
     'one_time_banner_enabled' => env('ONE_TIME_BANNER_ENABLED', true),
+    'campaign_debug_key' => env('CAMPAIGN_DEBUG_KEY'),
 ];

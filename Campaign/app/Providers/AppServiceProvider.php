@@ -50,9 +50,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(ShowtimeConfig::class, function () {
-            return (new ShowtimeConfig())
-                ->setOneTimeBannerEnabled(config("banners.one_time_banner_enabled"))
-                ->setPrioritizeBannerOnSamePosition(config('banners.prioritize_banners_on_same_position'));
+            return (new ShowtimeConfig(
+                debugKey: config('banners.campaign_debug_key'),
+                prioritizeBannerOnSamePosition: config('banners.prioritize_banners_on_same_position'),
+                oneTimeBannerEnabled: config("banners.one_time_banner_enabled"),
+            ));
         });
 
         $this->app->bind(SegmentAggregator::class, function (Application $app) {

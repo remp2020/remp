@@ -18,20 +18,24 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             ]);
     }
 
-    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners)
+    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners, array $evaluationMessages = [])
     {
-        return response()
-            ->jsonp($callback, [
-                'success' => true,
-                'errors' => [],
-                'data' => empty($data) ? [] : $data,
-                'activeCampaignIds' => array_column($activeCampaigns, 'uuid'),
-                'activeCampaigns' => $activeCampaigns,
-                'providerData' => $providerData,
-                'suppressedBanners' => $suppressedBanners,
-            ]);
-    }
+        $responseData = [
+            'success' => true,
+            'errors' => [],
+            'data' => empty($data) ? [] : $data,
+            'activeCampaignIds' => array_column($activeCampaigns, 'uuid'),
+            'activeCampaigns' => $activeCampaigns,
+            'providerData' => $providerData,
+            'suppressedBanners' => $suppressedBanners
+        ];
 
+        if ($evaluationMessages) {
+            $responseData['evaluationMessages'] = $evaluationMessages;
+        }
+
+        return response()->jsonp($callback, $responseData);
+    }
 
     public function renderBanner(
         Banner $banner,

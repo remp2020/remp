@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Showtime\ShowtimeConfig;
+use App\Http\Showtime\ShowtimeTestable;
 use Database\Seeders\CountrySeeder;
 use App\Banner;
 use App\Campaign;
@@ -29,16 +30,10 @@ class ShowtimeTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @var Showtime */
-    protected $showtime;
-
+    protected ShowtimeTestable $showtime;
     protected $segmentAggregator;
-
-    /** @var Campaign */
-    protected $campaign;
-
-    /** @var CampaignBanner */
-    protected $campaignBanner;
+    protected Campaign $campaign;
+    protected CampaignBanner $campaignBanner;
 
     protected function setUp(): void
     {
@@ -53,7 +48,7 @@ class ShowtimeTest extends TestCase
         $logger = Mockery::mock(Logger::class);
 
         $showtimeConfig = new ShowtimeConfig();
-        $showtime = new Showtime($redis, $this->segmentAggregator, $geoReader, $showtimeConfig, resolve(LazyDeviceDetector::class), $logger);
+        $showtime = new ShowtimeTestable($redis, $this->segmentAggregator, $geoReader, $showtimeConfig, resolve(LazyDeviceDetector::class), $logger);
         $showtime->setDimensionMap(resolve(\App\Models\Dimension\Map::class));
         $showtime->setAlignmentsMap(resolve(\App\Models\Alignment\Map::class));
         $showtime->setPositionMap(resolve(\App\Models\Position\Map::class));
@@ -746,6 +741,7 @@ class ShowtimeTest extends TestCase
             'campaign_banner_public_id' => $campaignBanner1->public_id,
             'banner_public_id' => $campaignBanner1->banner->public_id,
             'campaign_public_id' => $campaign1->public_id,
+            'suppressed_by_campaign_public_id' => $campaign2->public_id,
         ], array_pop($suppressedBanners));
 
 
@@ -770,6 +766,7 @@ class ShowtimeTest extends TestCase
             'campaign_banner_public_id' => $campaignBanner2->public_id,
             'banner_public_id' => $campaignBanner2->banner->public_id,
             'campaign_public_id' => $campaign2->public_id,
+            'suppressed_by_campaign_public_id' => $campaign1->public_id,
         ], array_pop($suppressedBanners));
     }
 

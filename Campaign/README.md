@@ -366,6 +366,20 @@ Campaign supports use of snippets in your banner template contents, custom javas
 
 You can use created snippets by adding `{{ snippet_name }}` to one of the fields used in banner content or in custom javascript & css.
 
+### Campaign Debugger
+
+To be able to debug live campaigns and troubleshoot problems, Campaign provides Campaign Debugger tool.
+
+#### Setup
+
+- Set `CAMPAIGN_DEBUG_KEY` in Campaign `.env` file. It can be any (preferrably random) value - you will be asked for the key later, when working with debugger.
+
+#### Running debugger
+
+- To start debugger, go to page that displays campaign(s) you want to debug and append `#campaignDebug` to the URL.  
+- In the debugger window, fill in required parameters `Debug key` and `Campaign public ID` and submit.
+- After page reload, debugger should provide you with a reason why the particular campaign was shown/not shown.
+
 ### API Documentation
 
 Campaign provides a simple API for several tasks described bellow.

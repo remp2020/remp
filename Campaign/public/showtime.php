@@ -140,9 +140,9 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         ], $statusCode);
     }
 
-    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners)
+    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners, array $evaluationMessages = [])
     {
-        $this->jsonpResponse($callback, [
+        $responseData = [
             'success' => true,
             'errors' => [],
             'data' => empty($data) ? [] : $data,
@@ -150,7 +150,13 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
             'activeCampaigns' => $activeCampaigns,
             'providerData' => $providerData,
             'suppressedBanners' => $suppressedBanners,
-        ]);
+        ];
+
+        if ($evaluationMessages) {
+            $responseData['evaluationMessages'] = $evaluationMessages;
+        }
+
+        $this->jsonpResponse($callback, $responseData);
     }
 
     public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $snippets, mixed $userData): string {
@@ -416,6 +422,7 @@ $showtimeConfig = new ShowtimeConfig();
 if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
     $showtimeConfig->setAcceptLanguage($_SERVER['HTTP_ACCEPT_LANGUAGE']);
 }
+$showtimeConfig->setDebugKey(env('CAMPAIGN_DEBUG_KEY'));
 
 if ($data === null || $callback === null) {
     $showtimeResponse->jsonResponse(['errors' => ['invalid request, data or callback params missing']]);

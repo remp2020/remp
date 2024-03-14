@@ -24,6 +24,8 @@ class Campaign {
 
     bannerUrlParams = {};
 
+    debug = null;
+
     /* JSONP START */
 
     showtime = {
@@ -35,7 +37,7 @@ class Campaign {
         },
         jsonpParameter: "data",
         prepareData: function() {
-            return {
+            const data = {
                 "version": 1,
                 "userId": remplib.getUserId(),
                 "browserId": remplib.getBrowserId(),
@@ -48,7 +50,13 @@ class Campaign {
                 "userAgent": window.navigator.userAgent,
                 "usingAdblock": remplib.usingAdblock,
                 "pageviewAttributes": remplib.campaign.pageviewAttributes,
+            };
+
+            if (window.location.hash === '#campaignDebug' && remplib.campaign.debug && remplib.campaign.debug.key) {
+                data["debug"] = remplib.campaign.debug;
             }
+
+            return data;
         },
         processResponse: function(result) {
             if (!result["success"]) {
@@ -61,6 +69,9 @@ class Campaign {
             // deprecated
             window.dispatchEvent(new CustomEvent("campaign_showtime", {
                 detail: result.providerData,
+            }));
+            window.dispatchEvent(new CustomEvent("campaign_showtime_response", {
+                detail: result,
             }));
 
             let promises = [];
@@ -116,6 +127,10 @@ class Campaign {
 
         remplib.init(config);
 
+        if (config.campaign.debug) {
+            this.debug = config.campaign.debug;
+        }
+
         this.url = config.campaign.url;
 
         for (let pageviewAttribute in config.campaign.pageviewAttributes) {
@@ -148,6 +163,10 @@ class Campaign {
 
         if (window.opener && window.location.hash === '#bannerPicker') {
             remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
+        }
+
+        if (window.location.hash === '#campaignDebug') {
+            remplib.loadScript(this.url + '/assets/lib/js/campaignDebug.js');
         }
 
         // configure campaign-based internal storage keys

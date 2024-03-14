@@ -36,7 +36,11 @@ export default {
 
     usingAdblock: null,
 
+    config: null,
+
     init: function(config) {
+        remplib.config = config;
+
         if (typeof config.userId !== 'undefined' && config.userId !== null) {
             remplib.userId = config.userId;
         }
@@ -89,6 +93,10 @@ export default {
         remplib.internalStorageKeys["rtm_campaign"] = true;
         remplib.internalStorageKeys["rtm_content"] = true;
         remplib.internalStorageKeys["rtm_variant"] = true;
+    },
+
+    getConfig: function() {
+        return this.config;
     },
 
     getUserId: function() {

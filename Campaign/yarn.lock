@@ -1333,6 +1333,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@interactjs/types@npm:1.10.26":
+  version: 1.10.26
+  resolution: "@interactjs/types@npm:1.10.26"
+  checksum: 9cf2e5394c7c344cc8cfb07512281ccbca0794f370aba170538ebc53377986440d5851c44c2b4726231ad3b0f9728c45b62288768c12fa7a69a2b66bbadd8451
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -5057,6 +5064,15 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
+"interactjs@npm:^1.10.26":
+  version: 1.10.26
+  resolution: "interactjs@npm:1.10.26"
+  dependencies:
+    "@interactjs/types": 1.10.26
+  checksum: d2f044eeae063a9336c8e72147b06a286d0142fa12691a14676dd6b7193cb0718662d074f56394f3ce6eeb34f22781841727d243e0a4a3c1a7ab9646ffaee999
+  languageName: node
+  linkType: hard
+
 "interpret@npm:^2.2.0":
   version: 2.2.0
   resolution: "interpret@npm:2.2.0"
@@ -7790,6 +7806,7 @@ resolve@^1.10.0:
     eonasdan-bootstrap-datetimepicker: ^4.17.49
     global: ^4.3.2
     google-material-color: ^1.3.1
+    interactjs: ^1.10.26
     jquery: 3.6.0
     jquery-placeholder: ^2.3.1
     jquery-typeahead: ^2.11

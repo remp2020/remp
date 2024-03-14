@@ -26,6 +26,7 @@ if (process.env.REMP_TARGET === 'lib') {
         .js("resources/assets/js/banner.js", "js/banner.js")
         .js("resources/assets/js/remplib.js", "js/remplib.js")
         .js("resources/assets/js/bannerSelector.js", "js/bannerSelector.js")
+        .js("resources/assets/js/campaignDebug.js", "js/campaignDebug.js")
         .vue()
         .polyfill({
             enabled: true,
