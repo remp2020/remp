@@ -424,7 +424,7 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 			if err := json.Unmarshal(hit.Source, pv); err != nil {
 				return nil, errors.Wrap(err, "error reading timespent record from elastic")
 			}
-			timespentForPageviews[pv.ID] = pv.Timespent
+			timespentForPageviews[hit.Id] = pv.Timespent
 		}
 	}
 

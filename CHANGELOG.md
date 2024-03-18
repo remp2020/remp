@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed issue with `load_timespent` parameter in `/journal/pageviews/list` which didn't include the timespent into pageview object. remp/remp#1334
+
 ### [Campaign]
 
 - Fixed typo in event name for Newsletter banner in README.
