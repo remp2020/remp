@@ -8,6 +8,9 @@ extensions:
 #	crm:
 #		addr: @environmentConfig::get('CRM_API_ADDR')
 #		api_token: @environmentConfig::get('CRM_API_TOKEN')
+#	respekt:
+#		content_url: @environmentConfig::get('RESPEKT_CONTENT_URL')
+#		content_token: @environmentConfig::get('RESPEKT_CONTENT_TOKEN')
 
 services:
     # All console commands you need to use should be registered here

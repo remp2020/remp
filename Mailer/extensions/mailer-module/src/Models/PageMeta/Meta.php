@@ -5,20 +5,13 @@ namespace Remp\MailerModule\Models\PageMeta;
 
 class Meta
 {
-    private ?string $title;
-
-    private ?string $description;
-
-    private ?string $image;
-
-    private array $authors;
-
-    public function __construct(?string $title = null, ?string $description = null, ?string $image = null, array $authors = [])
-    {
-        $this->title = $title;
-        $this->description = $description;
-        $this->image = $image;
-        $this->authors = $authors;
+    public function __construct(
+        private readonly ?string $title = null,
+        private readonly ?string $description = null,
+        private readonly ?string $image = null,
+        private readonly array $authors = [],
+        private readonly ?string $type = null
+    ) {
     }
 
     public function getTitle(): ?string
@@ -34,6 +27,11 @@ class Meta
     public function getImage(): ?string
     {
         return $this->image;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
     }
 
     public function getAuthors(): array

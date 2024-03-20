@@ -1,0 +1,169 @@
+{define previewCallback}
+  <script type="text/javascript">
+      $('[aria-controls="url-parser-preview"]').on('shown.bs.tab', function () {
+          var form = $("#" + {$control['templateForm']->getElementPrototype()->getId()})[0];
+
+          if ($('select[name="mail_type_id"]').val()) {
+            $.nette.ajax({
+                type: 'POST',
+                url: {link preview!},
+                data: {
+                    'html_content': {$htmlContent},
+                    'text_content': {$textContent},
+                    'name': $('#' + {$control["templateForm"]['name']->htmlId}).val(),
+                    'mail_layout_id': $('input[name="mail_layout_id"]').val(),
+                    'mail_type_id': $('select[name="mail_type_id"]').val(),
+                    'from': $('#' + {$control["templateForm"]['from']->htmlId}).val(),
+                    'subject': $('#' + {$control["templateForm"]['subject']->htmlId}).val(),
+                },
+                success: function(data) {
+                    previewFrame('#url-parser-preview-full-frame', data['generatedHtml']);
+                }
+            });
+          } else {
+              alert("Field 'Type' is required.");
+              $('[aria-controls="url-parser-form"]').tab('show');
+          }
+      });
+
+      function previewFrame(id, html) {
+          var iframe = $(id);
+          var idoc = iframe[0].contentDocument;
+          idoc.open();
+          idoc.write(html);
+          idoc.close();
+      }
+  </script>
+{/define}
+
+<div class="card">
+  <div class="card-header">
+    <h2>Newsletter details<small></small></h2>
+  </div>
+
+  {if count($errors) > 0}
+  <div class="alert alert-danger" role="alert">
+      There are URLs Mailer couldn't process and were ignored:
+      <ul>
+          <li n:foreach="$errors as $error">
+              {$error}
+          </li>
+      </ul>
+  </div>
+  {/if}
+
+  <div class="card-body card-padding">
+    <div role="tabpanel">
+      <ul class="tab-nav" role="tablist">
+        <li role="tab" class="active"><a href="#url-parser-form" aria-controls="url-parser-form" role="tab" data-toggle="tab">Email info</a></li>
+        <li role="tab"><a href="#url-parser-preview" aria-controls="url-parser-preview" role="tab" data-toggle="tab">Final preview</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="url-parser-form">
+
+          {form templateForm, class => form-horizontal}
+
+            <div n:if="$form->hasErrors()">
+              <div n:foreach="$form->errors as $error" class="alert alert-danger">{$error}</div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                  {input name, class => 'form-control fg-input'}
+                  {label name, class => 'fg-label' /}
+                </div>
+              </div>
+
+              <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                  {input code, class => 'form-control fg-input'}
+                  {label code, class => 'fg-label' /}
+                </div>
+              </div>
+
+              <div class="form-group fg-float m-b-30">
+                {label mail_type_id /}
+                {input mail_type_id, id => 'mail-type-id', class => 'form-control selectpicker',  data-live-search => 'true'}
+              </div>
+
+              <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                  {label from, class => 'fg-label' /}
+                  {input from, class => 'form-control fg-input'}
+                </div>
+              </div>
+
+              <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                  {label subject, class => 'fg-label' /}
+                  {input subject, class => 'form-control fg-input'}
+                </div>
+              </div>
+
+              <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                  {label subject_b /}  <i class="zmdi zmdi-help" data-toggle="tooltip" data-placement="top" title="If you want to include A/B test within your batch, you can specify the other variant of email subject."></i>
+                  {input subject_b, class => 'form-control fg-input'}
+                </div>
+              </div>
+
+              <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                  {label email_count /} <i class="zmdi zmdi-help" data-toggle="tooltip" data-placement="top" title=" Limits number of emails to be sent within the batch."></i>
+                  {input email_count, class => 'form-control fg-input'}
+                </div>
+              </div>
+
+              <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                  {label start_at /} <i class="zmdi zmdi-help" data-toggle="tooltip" data-placement="top" title="Specifies when the batch should be sent (now or in the future)."></i>
+                  {input start_at, class => 'form-control date-time-picker', autocomplete => 'off'}
+                </div>
+              </div>
+
+              <div class="form-group fg-float m-b-30">
+                {input generate_emails_jobs_created, class => 'btn palette-Cyan bg waves-effect'}
+                {if isset($form['generate_emails_jobs'])}
+                  {input generate_emails_jobs, class => 'btn palette-Cyan bg waves-effect'}
+                {/if}
+              </div>
+            </div>
+
+            <div class="row">
+              {input html_content, value => $htmlContent}
+              {input text_content, value => $textContent}
+            </div>
+          {/form}
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="url-parser-preview">
+          {snippet urlParserPreviewWrapper}
+            <div class="row">
+              <div class="col-md-12 text-center">
+                <h4>Mobile preview
+                  <a target="_blank" style="font-size: 12px" href="{plink MailGenerator:preview false}"><i class="zmdi zmdi-arrow-right-top zmdi-hc-fw"></i> Full-screen preview</a>
+                </h4>
+                <iframe id="url-parser-preview-full-frame" frameBorder="0" style="max-width: 700px; width:100%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
+              </div>
+            </div>
+          {/snippet}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{include previewCallback}
+
+<script type="application/javascript">
+  let lists = {$lists};
+
+  $('#mail-type-id').on('changed.bs.select', function (e) {
+    let selectedTypeId = $(e.target).val();
+    let fromInput = $('input[name="from"]');
+
+    fromInput.val(lists[selectedTypeId].mail_from);
+  });
+</script>
