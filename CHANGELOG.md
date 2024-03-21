@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed issue with `load_timespent` parameter in `/journal/pageviews/list` which didn't include the timespent into pageview object. remp/remp#1334
+- Added average spent times into article detail page. remp/remp#1328
 
 ### [Campaign]
 

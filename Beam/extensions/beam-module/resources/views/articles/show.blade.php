@@ -163,6 +163,30 @@
                     </div>
                 </div>
 
+                <div class="pmb-block">
+                    <div class="pmbb-header">
+                        <h2><i class="zmdi zmdi-time m-r-5"></i> Time spent</h2>
+                    </div>
+                    <div class="pmbb-body p-l-30">
+                        <div class="pmbb-view">
+                            <dl class="dl-horizontal">
+                                <dt>Avg time subscribers</dt>
+                                <dd>{{ $averageTimeSpentSubscribers }}</dd>
+                            </dl>
+
+                            <dl class="dl-horizontal">
+                                <dt>Avg time signed-in</dt>
+                                <dd>{{ $averageTimeSpentSignedId }}</dd>
+                            </dl>
+
+                            <dl class="dl-horizontal">
+                                <dt>Avg time all</dt>
+                                <dd>{{ $averageTimeSpentAll }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
                 @widgetGroup('article.show.info')
 
             </div>

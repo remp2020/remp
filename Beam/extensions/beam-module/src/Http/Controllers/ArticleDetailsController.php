@@ -2,6 +2,7 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
+use Remp\BeamModule\Helpers\Misc;
 use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Helpers\Journal\JournalHelpers;
 use Remp\BeamModule\Helpers\Colors;
@@ -458,6 +459,9 @@ class ArticleDetailsController extends Controller
                 'visitedFrom' => $request->input('visited_from', 'today - 30 days'),
                 'visitedTo' => $request->input('visited_to', 'now'),
                 'externalEvents' => $externalEvents,
+                'averageTimeSpentSubscribers' => Misc::secondsIntoReadableTime($article->pageviews_subscribers ? round($article->timespent_subscribers / $article->pageviews_subscribers) : 0),
+                'averageTimeSpentSignedId' => Misc::secondsIntoReadableTime($article->pageviews_signed_in ? round($article->timespent_signed_in / $article->pageviews_signed_in) : 0),
+                'averageTimeSpentAll' => Misc::secondsIntoReadableTime( $article->pageviews_all ? round($article->timespent_all / $article->pageviews_all) : 0)
             ]),
             'json' => new ArticleResource($article),
         ]);

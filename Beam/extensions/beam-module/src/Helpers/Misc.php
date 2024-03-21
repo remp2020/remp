@@ -2,6 +2,7 @@
 
 namespace Remp\BeamModule\Helpers;
 
+use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 
 class Misc
@@ -47,5 +48,28 @@ class Misc
         return Carbon::parse($date)
             ->tz(date_default_timezone_get())
             ->toDateTimeString();
+    }
+
+    public static function secondsIntoReadableTime(int $seconds): string
+    {
+        if ($seconds === 0) {
+            return "0s";
+        }
+
+        $output = '';
+        $interval = CarbonInterval::seconds($seconds)->cascade();
+        if ($interval->hours > 0) {
+            $output .= "{$interval->hours}h ";
+        }
+
+        if ($interval->minutes > 0) {
+            $output .= "{$interval->minutes}m ";
+        }
+
+        if ($interval->seconds > 0) {
+            $output .= "{$interval->seconds}s";
+        }
+
+        return trim($output);
     }
 }
