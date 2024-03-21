@@ -25,7 +25,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added option to configure maximum number of send attempts in `SendEmailHandler`. remp/remp#1331
   - You can configure this in your `config.local.neon` by calling e.g. `setMaxRetries(10)` within `setup` directive of `sendEmailHermesHandler` service. 
 - Fixed issue with oversize images in MS Outlook. remp/remp#1330
-- Added `type` to `Remp\MailerModule\Models\PageMeta\Meta`. remp/respekt#159
 
 ## Archive
 

@@ -17,9 +17,9 @@ class RespektUrlParserGenerator implements IGenerator
     public $onSubmit;
 
     public function __construct(
-        private ContentInterface $content,
-        private SourceTemplatesRepository $sourceTemplatesRepository,
-        private EngineFactory $engineFactory
+        private readonly ContentInterface $content,
+        private readonly SourceTemplatesRepository $sourceTemplatesRepository,
+        private readonly EngineFactory $engineFactory
     ) {
     }
 

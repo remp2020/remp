@@ -10,7 +10,6 @@ class Meta
         private readonly ?string $description = null,
         private readonly ?string $image = null,
         private readonly array $authors = [],
-        private readonly ?string $type = null
     ) {
     }
 
@@ -27,11 +26,6 @@ class Meta
     public function getImage(): ?string
     {
         return $this->image;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
     }
 
     public function getAuthors(): array

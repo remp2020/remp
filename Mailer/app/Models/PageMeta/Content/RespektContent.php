@@ -4,6 +4,7 @@ namespace Remp\Mailer\Models\PageMeta\Content;
 
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use Remp\Mailer\Models\PageMeta\RespektMeta;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Models\PageMeta\Meta;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
@@ -43,24 +44,11 @@ class RespektContent implements ContentInterface
         // get article title
         $title = $article['title'];
 
-        // get article description
-        $description = null;
-        foreach ($article['content']['parts'] as $contentPart) {
-            try {
-                $contentPartData = Json::decode($contentPart['json'], true);
-            } catch (JsonException $e) {
-                Debugger::log($e->getMessage(), ILogger::ERROR);
-                return null;
-            }
+        // get article subtitle
+        $subtitle = $this->getFirstParagraphFromParts($article['subtitle']['parts']);
 
-            foreach ($contentPartData['children'] as $contentPartChild) {
-                if ($contentPartChild['type'] === 'paragraph') {
-                    $paragraph = reset($contentPartChild['children']);
-                    $description = $paragraph['text'];
-                    break 2;
-                }
-            }
-        }
+        // get first paragraph
+        $firstParagraph = $this->getFirstParagraphFromParts($article['content']['parts']);
 
         // get article cover image
         $image = $article['coverPhoto']['image']['url'];
@@ -83,6 +71,32 @@ class RespektContent implements ContentInterface
             }
         }
 
-        return new Meta($title, $description, $image, $authors, $articleType);
+        return new RespektMeta($title, $image, $authors, $articleType, $subtitle, $firstParagraph);
+    }
+
+    private function getFirstParagraphFromParts($parts): ?string
+    {
+        $description = null;
+        foreach ($parts as $contentPart) {
+            try {
+                $contentPartData = Json::decode($contentPart['json'], true);
+            } catch (JsonException $e) {
+                Debugger::log($e->getMessage(), ILogger::ERROR);
+                return null;
+            }
+
+            foreach ($contentPartData['children'] as $contentPartChild) {
+                if ($contentPartChild['type'] === 'paragraph') {
+                    foreach ($contentPartChild['children'] as $child) {
+                        $text = trim($child['text']);
+                        if ($text) {
+                            $description = $text;
+                            break 3;
+                        }
+                    }
+                }
+            }
+        }
+        return $description;
     }
 }
