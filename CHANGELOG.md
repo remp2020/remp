@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added option to configure maximum number of send attempts in `SendEmailHandler`. remp/remp#1331
   - You can configure this in your `config.local.neon` by calling e.g. `setMaxRetries(10)` within `setup` directive of `sendEmailHermesHandler` service. 
 - Fixed issue with oversize images in MS Outlook. remp/remp#1330
+- Fixed issue with persistent embed cookies stored in system `tmp` folder, which were shared across releases. remp/helpdesk#2587
+  - Each release now stores embed cookies in its own temp folder.
 
 ## Archive
 

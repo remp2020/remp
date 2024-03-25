@@ -340,3 +340,8 @@ services:
 	- Remp\MailerModule\Presenters\HealthPresenter(%tempDir%)
 
 	- Remp\MailerModule\Components\MailLinkStats\MailLinkStats
+
+	embedCurlClient:
+		factory: Embed\Http\CurlClient
+		setup:
+			- setSettings([cookies_path: %tempDir%/embed-cookies.txt])

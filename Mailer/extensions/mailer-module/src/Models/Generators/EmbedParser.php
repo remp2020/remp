@@ -4,10 +4,16 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Models\Generators;
 
 use Embed\Embed;
+use Embed\Http\Crawler;
+use Embed\Http\CurlClient;
 
 class EmbedParser
 {
     protected ?string $videoLinkText;
+
+    public function __construct(private CurlClient $curlClient)
+    {
+    }
 
     public function setVideoLinkText(?string $videoLinkText = null): void
     {
@@ -16,7 +22,7 @@ class EmbedParser
 
     private function fetch(string $url): ?array
     {
-        $embed = new Embed();
+        $embed = new Embed(new Crawler($this->curlClient));
         $embed = $embed->get($url);
 
         $oEmbed = $embed->getOEmbed();
