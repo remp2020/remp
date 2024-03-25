@@ -19,7 +19,7 @@ use Nette\Utils\Html;
 
 class MaterialRenderer extends DefaultFormRenderer
 {
-    public $wrappers = [
+    public array $wrappers = [
         'form' => [
             'container' => null,
         ],
