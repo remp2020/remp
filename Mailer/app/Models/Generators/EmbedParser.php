@@ -12,13 +12,13 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
         $this->twitterLinkText = $twitterLinkText;
     }
 
-    public function createEmbedMarkup(string $link, string $title, ?string $image = null, bool $isVideo = false): string
+    public function createEmbedMarkup(string $link, ?string $title = null, ?string $image = null, bool $isVideo = false): string
     {
         $html = "<br>";
 
         $html .= "<a href='{$link}' target='_blank' style='color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-decoration:none;text-align: center; display: block;width:100%;'>";
 
-        if (!is_null($image)) {
+        if (!is_null($image) && !is_null($title)) {
             $html .= "<img src='{$image}' alt='{$title}' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;max-width:100%;clear:both;display:inline;width:100%;height:auto;'>";
         } elseif (preg_match('/twitt/', $link)) {
             return "<br><a style=\"display: block;margin: 0 0 20px;padding: 7px 10px;text-decoration: none;text-align: center;font-weight: bold;font-family:'Helvetica Neue', Helvetica, Arial;color: #249fdc; background: #ffffff; border: 3px solid #249fdc;margin: 16px 0 16px 0\" href=\"{$link}\" target=\"_blank\">{$this->twitterLinkText}</a>";

@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Models\Generators;
 use Embed\Embed;
 use Embed\Http\Crawler;
 use Embed\Http\CurlClient;
+use Tracy\Debugger;
 
 class EmbedParser
 {
@@ -49,15 +50,20 @@ class EmbedParser
             || str_contains($link, 'youtu')
             || str_contains($link, 'twitt')
         ) {
-            if ($data = $this->fetch($link)) {
-                return $this->createEmbedMarkup($data['link'], $data['title'], $data['image'], $data['isVideo']);
+            try {
+                if ($data = $this->fetch($link)) {
+                    return $this->createEmbedMarkup($data['link'], $data['title'], $data['image'], $data['isVideo']);
+                }
+            } catch (\Embed\Http\NetworkException $exception) {
+                Debugger::log("Network error while retrieving embedded link [$link], reason: " . $exception->getMessage(), Debugger::EXCEPTION);
+                return $this->createEmbedMarkup($link);
             }
         }
 
         return null;
     }
 
-    public function createEmbedMarkup(string $link, string $title, ?string $image = null, bool $isVideo = false): string
+    public function createEmbedMarkup(string $link, ?string $title = null, ?string $image = null, bool $isVideo = false): string
     {
         $html = "<br>";
 
@@ -67,7 +73,7 @@ class EmbedParser
 
         $html .= "<a href='{$link}' target='_blank' style='color:#181818;padding:0;margin:0;line-height:1.3;text-decoration:none;text-align: center; display: block;'>";
 
-        if (!is_null($image)) {
+        if (!is_null($image) && !is_null($title)) {
             $html .= "<img src='{$image}' alt='{$title}' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:inline;'>";
         } else {
             $html .= "<span style='text-decoration: underline; color: #1F3F83;'>" . $link . "</span>";
