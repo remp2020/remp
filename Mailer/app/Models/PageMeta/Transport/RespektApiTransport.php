@@ -6,6 +6,7 @@ namespace Remp\Mailer\Models\PageMeta\Transport;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Uri;
+use Nette\Utils\Json;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
 use Tracy\Debugger;
 use Tracy\ILogger;
@@ -59,5 +60,52 @@ GRAPHQL;
         }
 
         return $response->getBody()->getContents();
+    }
+
+    public function resolveRedirects(string $url): ?string
+    {
+        $uri = new Uri($url);
+        $contentPath = trim($uri->getPath(), '/');
+
+        $client = new Client();
+        try {
+            $query = <<<'GRAPHQL'
+query GetRedirectUrlForMailer($articleUrl: String) {
+  getUrl(by: { url: $articleUrl}) {
+    redirectType
+    target {
+      internalTarget {
+        url
+      }
+    }
+  }
+}
+GRAPHQL;
+
+            $response = $client->post($this->respektContentUrl, [
+                'headers' => ['Authorization' => 'Bearer ' . $this->respektContentToken],
+                'json' => [
+                    'query' => $query,
+                    'variables' => [
+                        'articleUrl' => $contentPath
+                    ]
+                ]
+            ]);
+        } catch (GuzzleException $e) {
+            Debugger::log($e->getMessage(), ILogger::ERROR);
+            return null;
+        }
+
+        $response = $response->getBody()->getContents();
+        $json = Json::decode($response);
+
+        $path = $json->data->getUrl->target->internalTarget->url ?? null;
+        if (!$path) {
+            return null;
+        }
+
+        $resolvedUrl = new Uri($url);
+        $resolvedUrl = $resolvedUrl->withPath($path);
+        return (string) $resolvedUrl;
     }
 }

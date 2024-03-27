@@ -2,10 +2,13 @@
 
 namespace Remp\Mailer\Models\PageMeta\Content;
 
+use GuzzleHttp\Exception\RequestException;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Remp\Mailer\Models\PageMeta\RespektMeta;
+use Remp\Mailer\Models\PageMeta\Transport\RespektApiTransport;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
+use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Models\PageMeta\Meta;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
 use Tracy\Debugger;
@@ -27,19 +30,34 @@ class RespektContent implements ContentInterface
 
     public function fetchUrlMeta(string $url): ?Meta
     {
-        $data = $this->transport->getContent($url);
-        if ($data === null) {
-            return null;
-        }
-
         try {
-            $data = Json::decode($data, true);
-        } catch (JsonException $e) {
-            Debugger::log($e->getMessage(), ILogger::ERROR);
-            return null;
-        }
+            $data = $this->transport->getContent($url);
+            if ($data === null) {
+                return null;
+            }
 
-        $article = $data['data']['getArticle'];
+            try {
+                $data = Json::decode($data, true);
+            } catch (JsonException $e) {
+                Debugger::log($e->getMessage(), ILogger::ERROR);
+                return null;
+            }
+
+            $article = $data['data']['getArticle'];
+            if ($article === null) {
+                // URL has changed, we need to follow redirects and determine new URL
+                if ($this->transport instanceof RespektApiTransport) {
+                    $resolvedUrl = $this->transport->resolveRedirects($url);
+                    if ($url && $resolvedUrl !== $url) {
+                        return $this->fetchUrlMeta($resolvedUrl);
+                    }
+                }
+
+                return null;
+            }
+        } catch (RequestException $e) {
+            throw new InvalidUrlException("Invalid URL: {$url}", 0, $e);
+        }
 
         // get article title
         $title = $article['title'];
