@@ -12,18 +12,31 @@ class EmbedParser
 {
     protected ?string $videoLinkText;
 
-    public function __construct(private CurlClient $curlClient)
-    {
-    }
+    protected array $curlSettings = [];
 
     public function setVideoLinkText(?string $videoLinkText = null): void
     {
         $this->videoLinkText = $videoLinkText;
     }
 
+    public function setCurlSettings(array $settings)
+    {
+        $this->curlSettings = $settings;
+    }
+
     private function fetch(string $url): ?array
     {
-        $embed = new Embed(new Crawler($this->curlClient));
+        $curlSettings = [
+            // Twitter may generate infinite redirect (2024/03),
+            // fix according to https://github.com/oscarotero/Embed/issues/520#issue-1782756560
+            'follow_location' => !$this->isTwitterLink($url),
+            ...$this->curlSettings,
+        ];
+
+        $curlClient = new CurlClient();
+        $curlClient->setSettings($curlSettings);
+
+        $embed = new Embed(new Crawler($curlClient));
         $embed = $embed->get($url);
 
         $oEmbed = $embed->getOEmbed();
@@ -38,8 +51,13 @@ class EmbedParser
             'link' => $embed->url->__toString(),
             'title' => $embed->title ?? '',
             'image' => $image,
-            'isVideo' => $type === 'video'
+            'isVideo' => $type === 'video',
         ];
+    }
+
+    private function isTwitterLink($link)
+    {
+        return str_contains($link, 'twitt');
     }
 
     public function parse(string $link): ?string
@@ -48,7 +66,7 @@ class EmbedParser
 
         if (preg_match('/^(?:(?:https?:)?\/\/)?(?:www\.)?facebook\.com\/[a-zA-Z0-9.]+\/videos\/(?:[a-zA-Z0-9.]+\/)?([0-9]+)/', $link)
             || str_contains($link, 'youtu')
-            || str_contains($link, 'twitt')
+            || $this->isTwitterLink($link)
         ) {
             try {
                 if ($data = $this->fetch($link)) {

@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed issue with oversize images in MS Outlook. remp/remp#1330
 - Fixed issue with persistent embed cookies stored in system `tmp` folder, which were shared across releases. remp/helpdesk#2587
   - Each release now stores embed cookies in its own temp folder.
+- Added ability to set custom CURL settings for `EmbedParser`. remp/helpdesk#2594 
 
 ## Archive
 
