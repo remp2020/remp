@@ -66,7 +66,11 @@ class RespektContent implements ContentInterface
         $subtitle = $this->getFirstParagraphFromParts($article['subtitle']['parts']);
 
         // get first paragraph
-        $firstParagraph = $this->getFirstParagraphFromParts($article['content']['parts']);
+        $firstContentParagraph = $this->getFirstParagraphFromParts($article['content']['parts']);
+
+        // get first content part type
+        $firstPart = Json::decode($article['content']['parts'][0]['json'], true);
+        $firstContentPartType = $firstPart['children'][0]['type'];
 
         // get article cover image
         $image = $article['coverPhoto']['image']['url'];
@@ -89,7 +93,15 @@ class RespektContent implements ContentInterface
             }
         }
 
-        return new RespektMeta($title, $image, $authors, $articleType, $subtitle, $firstParagraph);
+        return new RespektMeta(
+            title: $title,
+            image: $image,
+            authors: $authors,
+            type: $articleType,
+            subtitle: $subtitle,
+            firstParagraph: $firstContentParagraph,
+            firstContentPartType: $firstContentPartType,
+        );
     }
 
     private function getFirstParagraphFromParts($parts): ?string

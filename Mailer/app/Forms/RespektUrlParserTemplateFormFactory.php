@@ -112,6 +112,7 @@ class RespektUrlParserTemplateFormFactory
             'name' => "{$sourceTemplate->title} " . date('d. m. Y'),
             'code' => "{$sourceTemplate->code}_" . date('Y-m-d'),
             'mail_type_id' => $mailType->id,
+            'from' => $mailType->mail_from,
         ];
 
         if ($this->layoutCode) {

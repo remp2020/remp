@@ -11,29 +11,15 @@ class RespektMeta extends Meta
         ?string $title = null,
         ?string $image = null,
         array $authors = [],
-        private readonly ?string $type = null,
-        private readonly ?string $subtitle = null,
-        private readonly ?string $firstParagraph = null,
+        public readonly ?string $type = null,
+        public readonly ?string $subtitle = null,
+        public readonly ?string $firstParagraph = null,
+        public readonly ?string $firstContentPartType = null,
     ) {
         parent::__construct(
             title: $title,
             image: $image,
             authors: $authors,
         );
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function getFirstParagraph(): ?string
-    {
-        return $this->firstParagraph;
-    }
-
-    public function getSubtitle(): ?string
-    {
-        return $this->subtitle;
     }
 }
