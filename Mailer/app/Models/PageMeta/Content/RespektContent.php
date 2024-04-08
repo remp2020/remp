@@ -63,7 +63,7 @@ class RespektContent implements ContentInterface
         $title = $article['title'];
 
         // get article subtitle
-        $subtitle = $this->getFirstParagraphFromParts($article['subtitle']['parts']);
+        $subtitle = $this->getFirstParagraphFromParts($article['subtitle']['parts'] ?? []);
 
         // get first paragraph
         $firstContentParagraph = $this->getFirstParagraphFromParts($article['content']['parts']);
@@ -117,13 +117,24 @@ class RespektContent implements ContentInterface
 
             foreach ($contentPartData['children'] as $contentPartChild) {
                 if ($contentPartChild['type'] === 'paragraph') {
+                    $description = '';
                     foreach ($contentPartChild['children'] as $child) {
-                        $text = trim($child['text']);
-                        if ($text) {
-                            $description = $text;
-                            break 3;
+                        if ($child['text']) {
+                            $node = $child['text'];
+                            if (isset($child['isBold']) && $child['isBold'] === true) {
+                                $node = "<strong>{$node}</strong>";
+                            }
+                            if (isset($child['isUnderlined']) && $child['isUnderlined'] === true) {
+                                $node = "<u>{$node}</u>";
+                            }
+                            if (isset($child['isItalic']) && $child['isItalic'] === true) {
+                                $node = "<em>{$node}</em>";
+                            }
+                            $description .= $node;
                         }
                     }
+
+                    break 2;
                 }
             }
         }
