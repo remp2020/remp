@@ -29,7 +29,7 @@ trait RulesTrait
             '/\[lock e\]/i' => "",
 
             // remove new style of shortcodes
-            '/<div.*?class=".*?">/is' => '',
+            '/<div[^>]*class="[^>]*"[^>]*>/is' => '',
             '/<\/div>/is' => '',
 
             // remove iframes
