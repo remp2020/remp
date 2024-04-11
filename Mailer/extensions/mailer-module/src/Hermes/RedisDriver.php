@@ -19,9 +19,9 @@ class RedisDriver implements DriverInterface
     use ShutdownTrait;
     use MaxItemsTrait;
 
-    public const PRIORITY_LOW = 100;
-    public const PRIORITY_MEDIUM = 200;
-    public const PRIORITY_HIGH = 300;
+    public const PRIORITY_LOW = 50;
+    public const PRIORITY_MEDIUM = 100; // default priority (see Tomaj\Hermes\Dispatcher::DEFAULT_PRIORITY)
+    public const PRIORITY_HIGH = 200;
 
     private $tasksRepository;
 

@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **IMPORTANT**: The default Hermes queue for asynchronous events is now `hermes_tasks` (medium priority) instead of `hermes_tasks_low` (low priority). remp/remp#1342
+  - If you emit your own Hermes events with the default priority, please revise whether they should keep using the default priority, or whether they should be explicitly emitted as "low priority".
 - Fixed incorrect `/mailer/health` healthcheck HTTP status code in case of failure (was always 200). remp/remp#1322
 - Fixed conditions to unreachable healthcheck messages. remp/remp#1322
 - Added new parameters between default template parameters to identify newsletter (`newsletter_id`, `newsletter_code`, `newsletter_title`) and variant (`variant_id`, `variant_code`, `variant_title`). remp/remp#1321
