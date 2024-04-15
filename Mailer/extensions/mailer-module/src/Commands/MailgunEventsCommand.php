@@ -116,7 +116,7 @@ class MailgunEventsCommand extends Command
                 }
             }
 
-            $eventResponse = $this->mailgun->mailer()->events()->nextPage($eventResponse);
+            $eventResponse = $this->mailgun->createMailer()->events()->nextPage($eventResponse);
         }
 
         return Command::SUCCESS;
@@ -124,7 +124,7 @@ class MailgunEventsCommand extends Command
 
     private function getEvents(DateTime $begin, DateTime $end): EventResponse
     {
-        return $this->mailgun->mailer()->events()->get($this->mailgun->option('domain'), [
+        return $this->mailgun->createMailer()->events()->get($this->mailgun->option('domain'), [
             'ascending' => true,
             'begin' => $begin->getTimestamp(),
             'end' => $end->getTimestamp(),

@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - If you emit your own Hermes events with the default priority, please revise whether they should keep using the default priority, or whether they should be explicitly emitted as "low priority".
 - **DEPRECATED**: Deprecated `autoload` flag within configs. From now on, all configs are loaded regardless of this flag and this flag will be removed in the next major release. remp/remp#992
   - Consequently deprecated method `ConfigsRepository::loadAllAutoload()`. Use `ConfigsRepository::all()` instead.
+- **DEPRECATED**: Deprecated `MailgunMailer::mailer()`. Use `MailgunMailer::createMailer()` instead. remp/remp#992
 - Fixed incorrect `/mailer/health` healthcheck HTTP status code in case of failure (was always 200). remp/remp#1322
 - Fixed conditions to unreachable healthcheck messages. remp/remp#1322
 - Added new parameters between default template parameters to identify newsletter (`newsletter_id`, `newsletter_code`, `newsletter_title`) and variant (`variant_id`, `variant_code`, `variant_title`). remp/remp#1321
@@ -35,6 +36,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added ability to set custom CURL settings for `EmbedParser`. remp/helpdesk#2594
 - Fixed buggy regexp pattern in `NewsfilterGenerator` causing elements to be removed non-voluntary. remp/crm#3151
 - Added ability to refresh internal config cache after a certain amount of time mainly for a longer running processes/workers. remp/remp#992
+- Added ability for `MailgunMailer` and `SmtpMailer` to refresh config during the runtime (for example when there's long-running worker and the config is changed). remp/remp#992
 
 ## Archive
 

@@ -4,15 +4,11 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Models\Mailer;
 
 use Nette\Mail\Message;
-use Remp\MailerModule\Models\Config\Config;
-use Remp\MailerModule\Repositories\ConfigsRepository;
 use Nette\Mail\SmtpMailer as NetteSmtpMailer;
 
 class SmtpMailer extends Mailer
 {
     public const ALIAS = 'remp_smtp';
-
-    private NetteSmtpMailer $mailer;
 
     protected array $options = [
         'host' => [
@@ -40,22 +36,6 @@ class SmtpMailer extends Mailer
         ],
     ];
 
-    public function __construct(
-        Config $config,
-        ConfigsRepository $configsRepository,
-        ?string $code = null,
-    ) {
-        parent::__construct($config, $configsRepository, $code);
-
-        $this->mailer = new NetteSmtpMailer(
-            host: $this->options['host']['value'] ?? '',
-            username: $this->options['username']['value'] ?? '',
-            password: $this->options['password']['value'] ?? '',
-            port: (int) $this->options['port']['value'] ?? null,
-            encryption: $this->options['secure']['value'] ?? null,
-        );
-    }
-
     public function send(Message $mail): void
     {
         // Removing this header prevents leaking template parameters that may contain sensitive information.
@@ -63,6 +43,20 @@ class SmtpMailer extends Mailer
         // We rather not pass this to SMTP mailer.
         $mail->clearHeader('X-Mailer-Template-Params');
 
-        $this->mailer->send($mail);
+        $mailer = $this->createMailer();
+        $mailer->send($mail);
+    }
+
+    private function createMailer(): NetteSmtpMailer
+    {
+        $this->buildConfig();
+
+        return new NetteSmtpMailer(
+            host: $this->options['host']['value'] ?? '',
+            username: $this->options['username']['value'] ?? '',
+            password: $this->options['password']['value'] ?? '',
+            port: (int) $this->options['port']['value'] ?? null,
+            encryption: $this->options['secure']['value'] ?? null,
+        );
     }
 }

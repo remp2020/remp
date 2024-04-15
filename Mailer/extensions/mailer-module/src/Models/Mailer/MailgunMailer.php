@@ -18,8 +18,6 @@ class MailgunMailer extends Mailer
 {
     public const ALIAS = 'remp_mailgun';
 
-    private Mailgun $mailer;
-
     private ?LoggerInterface $logger = null;
 
     protected array $options = [
@@ -50,11 +48,9 @@ class MailgunMailer extends Mailer
         $this->logger = $logger;
     }
 
-    private function initMailer(): void
+    public function createMailer(): Mailgun
     {
-        if (isset($this->mailer)) {
-            return;
-        }
+        $this->buildConfig(); // fetch newer values
 
         $clientConfigurator = (new HttpClientConfigurator())
             ->setApiKey($this->option('api_key'));
@@ -75,12 +71,12 @@ class MailgunMailer extends Mailer
             $clientConfigurator->setHttpClient($client);
         }
 
-        $this->mailer = new Mailgun($clientConfigurator);
+        return new Mailgun($clientConfigurator);
     }
 
     public function send(Message $mail): void
     {
-        $this->initMailer();
+        $mailer = $this->createMailer();
 
         $from = null;
         foreach ($mail->getFrom() as $email => $name) {
@@ -162,13 +158,15 @@ class MailgunMailer extends Mailer
             $data["v:".$key] = (string) $val;
         }
 
-        $this->mailer->messages()->send($this->option('domain'), $data);
+        $mailer->messages()->send($this->option('domain'), $data);
     }
 
+    /**
+     * @deprecated Use `createMailer()` method instead.
+     */
     public function mailer(): Mailgun
     {
-        $this->initMailer();
-        return $this->mailer;
+        return $this->createMailer();
     }
 
     public function option(string $key): ?string
