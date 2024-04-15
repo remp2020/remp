@@ -42,9 +42,6 @@ final class SettingsPresenter extends BasePresenter
         $form = $this->configFormFactory->create();
 
         $this->configFormFactory->onSuccess = function () {
-            // force sync all cached configs with db
-            $this->config->initAutoload(true);
-
             $this->flashMessage('Config was updated.');
             $this->redirect('Settings:default');
         };

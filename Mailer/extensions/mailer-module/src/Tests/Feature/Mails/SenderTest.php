@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Mails;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Mailer\EmailAllowList;
 use Remp\MailerModule\Models\Sender;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
@@ -23,6 +24,8 @@ class SenderTest extends BaseFeatureTestCase
 
     protected TestMailer $testMailer;
 
+    private Config $config;
+
     protected array $usersList = [];
 
     protected $mailType;
@@ -41,6 +44,7 @@ class SenderTest extends BaseFeatureTestCase
         $this->emailAllowList = $this->inject(EmailAllowList::class);
         $this->configsRepository = $this->inject(ConfigsRepository::class);
         $this->mailerFactory = $this->inject(MailerFactory::class);
+        $this->config = $this->inject(Config::class);
 
         $this->setDefaultMailer(TestMailer::ALIAS);
 
@@ -274,9 +278,14 @@ class SenderTest extends BaseFeatureTestCase
             $this->configsRepository->update($defaultMailer, [
                 'value' => $name
             ]);
-            return;
+        } else {
+            $this->configsRepository->add('default_mailer', 'Default mailer', $name, '', '');
         }
 
-        $this->configsRepository->add('default_mailer', 'Default mailer', $name, '', '');
+        /**
+         * Normally it isn't needed to force refresh as the possibly new source code/behavior is not reloaded yet and
+         * the config isn't needed to be reloaded immediately (as it's needed in the test).
+         */
+        $this->config->refresh(force: true);
     }
 }

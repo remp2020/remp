@@ -81,6 +81,7 @@ abstract class Mailer implements \Nette\Mail\Mailer
                     $definition['description'] ?? null,
                     Config::TYPE_STRING
                 );
+                $this->config->refresh(true);
 
                 $this->options[$name] = [
                     'label' => $definition['label'],

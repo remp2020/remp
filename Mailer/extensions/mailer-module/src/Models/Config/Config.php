@@ -9,24 +9,25 @@ use Remp\MailerModule\Repositories\ConfigsRepository;
 
 class Config
 {
-    const TYPE_STRING = 'string';
-    const TYPE_INT = 'integer';
-    const TYPE_TEXT = 'text';
-    const TYPE_PASSWORD = 'password';
-    const TYPE_HTML = 'html';
-    const TYPE_SELECT = 'select';
-    const TYPE_BOOLEAN = 'boolean';
+    public const TYPE_STRING = 'string';
+    public const TYPE_INT = 'integer';
+    public const TYPE_TEXT = 'text';
+    public const TYPE_PASSWORD = 'password';
+    public const TYPE_HTML = 'html';
+    public const TYPE_SELECT = 'select';
+    public const TYPE_BOOLEAN = 'boolean';
 
-    private bool $loaded = false;
+    private int $cacheExpirationInSeconds = 60;
+    private int $lastConfigRefreshTimestamp = 0;
 
     private bool $allowLocalConfigFallback = false;
 
     private ?array $items = null;
 
     public function __construct(
-        private ConfigsRepository $configsRepository,
-        private LocalConfig $localConfig,
-        private Storage $cacheStorage
+        private readonly ConfigsRepository $configsRepository,
+        private readonly LocalConfig $localConfig,
+        private readonly Storage $cacheStorage,
     ) {
     }
 
@@ -37,21 +38,12 @@ class Config
 
     public function get(string $name)
     {
-        if (!$this->loaded) {
-            $this->initAutoload();
+        if ($this->needsRefresh()) {
+            $this->refresh();
         }
 
         if (isset($this->items[$name])) {
             $item = $this->items[$name];
-            $value = $this->localConfig->exists($name)
-                ? $this->localConfig->value($name)
-                : $item->value;
-
-            return $this->formatValue($value, $item->type);
-        }
-
-        $item = $this->configsRepository->loadByName($name);
-        if ($item) {
             $value = $this->localConfig->exists($name)
                 ? $this->localConfig->value($name)
                 : $item->value;
@@ -66,19 +58,27 @@ class Config
         throw new ConfigNotExistsException("Setting {$name} does not exists.");
     }
 
-    public function initAutoload(bool $force = false): void
+    public function refresh(bool $force = false): void
     {
-        $cacheData = $this->cacheStorage->read('application_autoload_cache');
+        $cacheData = $this->cacheStorage->read('application_config_cache');
         if (!$force && $cacheData) {
             $this->items = $cacheData;
         } else {
-            $items = $this->configsRepository->loadAllAutoload();
+            $items = $this->configsRepository->all();
             foreach ($items as $item) {
                 $this->items[$item->name] = (object)$item->toArray();
             }
-            $this->cacheStorage->write('application_autoload_cache', $this->items, [Cache::Expire => 60]);
+            $this->cacheStorage->write('application_config_cache', $this->items, [
+                Cache::Expire => $this->cacheExpirationInSeconds
+            ]);
         }
-        $this->loaded = true;
+        $this->lastConfigRefreshTimestamp = time();
+    }
+
+    private function needsRefresh(): bool
+    {
+        $refreshAt = $this->lastConfigRefreshTimestamp + $this->cacheExpirationInSeconds;
+        return time() > $refreshAt;
     }
 
     private function formatValue($value, $type = 'string')
