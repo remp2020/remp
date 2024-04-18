@@ -16,13 +16,11 @@ class Config extends BaseModel
         'description',
         'type',
         'sorting',
-        'autoload',
         'config_category_id'
     ];
 
     protected $casts = [
         'sorting' => 'integer',
-        'autoload' => 'boolean',
         'locked' => 'boolean',
     ];
 
