@@ -306,6 +306,12 @@ class NewsfilterTemplateFormFactory
                 'mail_type_code' => 'pat-knih',
                 'from' => 'Denník N <info@dennikn.sk>',
             ],
+            'do-hlbky' => [
+                'name' => 'Do hĺbky s Jánom Markošom ' . date('j.n.Y'),
+                'code' => 'dohlbky_' . date('dmY'),
+                'mail_type_code' => 'do-hlbky',
+                'from' => 'Denník N <info@dennikn.sk>',
+            ],
             default => throw new \Exception("No default values found for source template code='{$sourceTemplate->code}'"),
         };
 
