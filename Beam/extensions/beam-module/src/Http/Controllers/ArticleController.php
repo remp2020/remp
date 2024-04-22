@@ -20,11 +20,6 @@ use Yajra\DataTables\EloquentDataTable;
 
 class ArticleController extends Controller
 {
-    public function __construct(
-        private ConversionRateConfig $conversionRateConfig
-    ) {
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -152,6 +147,8 @@ class ArticleController extends Controller
             $conversionAverages[$record->article_id][$record->currency] = $record->avg;
         }
 
+        $conversionRateConfig = ConversionRateConfig::build();
+
         /** @var EloquentDataTable $dt */
         $dt =  $datatables->of($articlesQuery);
 
@@ -165,8 +162,8 @@ class ArticleController extends Controller
                     'text' => $article->title,
                 ];
             })
-            ->addColumn('conversions_rate', function (Article $article) {
-                return Article::computeConversionRate($article->conversions_count, $article->pageviews_all, $this->conversionRateConfig);
+            ->addColumn('conversions_rate', function (Article $article) use ($conversionRateConfig) {
+                return Article::computeConversionRate($article->conversions_count, $article->pageviews_all, $conversionRateConfig);
             })
             ->addColumn('amount', function (Article $article) use ($conversionSums) {
                 if (!isset($conversionSums[$article->id])) {

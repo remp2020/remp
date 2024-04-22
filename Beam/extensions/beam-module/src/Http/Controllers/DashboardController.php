@@ -37,21 +37,17 @@ class DashboardController extends Controller
 
     private $snapshotHelpers;
 
-    private $conversionRateConfig;
-
     private $selectedProperty;
 
     public function __construct(
         JournalContract $journal,
         SnapshotHelpers $snapshotHelpers,
         SelectedProperty $selectedProperty,
-        ConversionRateConfig $conversionRateConfig
     ) {
         $this->journal = $journal;
         $this->journalHelper = new JournalHelpers($journal);
         $this->snapshotHelpers = $snapshotHelpers;
         $this->selectedProperty = $selectedProperty;
-        $this->conversionRateConfig = $conversionRateConfig;
     }
 
     public function index()
@@ -66,9 +62,11 @@ class DashboardController extends Controller
 
     private function dashboardView($template)
     {
+        $conversionRateConfig = ConversionRateConfig::build();
+
         $data = [
             'options' => $this->options(),
-            'conversionRateMultiplier' => $this->conversionRateConfig->getMultiplier(),
+            'conversionRateMultiplier' => $conversionRateConfig->getMultiplier(),
         ];
 
         if (!config('beam.disable_token_filtering')) {
@@ -641,6 +639,7 @@ class DashboardController extends Controller
         // Check for A/B titles/images for last 5 minutes
         $externalIdsToAbTestFlags = $this->journalHelper->abTestFlagsForArticles($topArticles, Carbon::now()->subMinutes(5));
 
+        $conversionRateConfig = ConversionRateConfig::build();
         $threeMonthsAgo = Carbon::now()->subMonths(3);
         foreach ($topPages as $item) {
             if ($item->external_article_id) {
@@ -651,7 +650,7 @@ class DashboardController extends Controller
                 $item->unique_browsers_count = $externalIdsToUniqueUsersCount[$item->external_article_id];
                 // Show conversion rate only for articles published in last 3 months
                 if ($item->conversions_count !== 0 && $item->article->published_at->gte($threeMonthsAgo)) {
-                    $item->conversion_rate = Article::computeConversionRate($item->conversions_count, $item->unique_browsers_count, $this->conversionRateConfig);
+                    $item->conversion_rate = Article::computeConversionRate($item->conversions_count, $item->unique_browsers_count, $conversionRateConfig);
                 }
 
                 $item->has_title_test = $externalIdsToAbTestFlags[$item->external_article_id]->has_title_test ?? false;

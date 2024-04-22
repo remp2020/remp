@@ -4,17 +4,37 @@ namespace Remp\BeamModule\Model\Config;
 
 class ConversionRateConfig
 {
-    private $multiplier;
+    private int $multiplier;
 
-    private $decimalNumbers;
+    private int $decimalNumbers;
 
-    public function load()
+    /**
+     * @deprecated Use static method build() instead. This constructor will be marked as private in the next major release.
+     */
+    public function __construct()
+    { }
+
+    public static function build(): self
     {
-        $this->multiplier = Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER);
-        $this->decimalNumbers = Config::loadByName(ConfigNames::CONVERSION_RATE_DECIMAL_NUMBERS);
+        $config = new self();
+        $config->multiplier = Config::loadByName(ConfigNames::CONVERSION_RATE_MULTIPLIER);
+        $config->decimalNumbers = Config::loadByName(ConfigNames::CONVERSION_RATE_DECIMAL_NUMBERS);
+
+        return $config;
     }
 
-    public function getMultiplier()
+    /**
+     * @deprecated Use static method build() instead. This method will be removed in the next major release.
+     */
+    public function load()
+    {
+        $loadedConfig = self::build();
+
+        $this->multiplier = $loadedConfig->multiplier;
+        $this->decimalNumbers = $loadedConfig->decimalNumbers;
+    }
+
+    public function getMultiplier(): int
     {
         if (!$this->multiplier) {
             $this->load();
@@ -22,7 +42,7 @@ class ConversionRateConfig
         return $this->multiplier;
     }
 
-    public function getDecimalNumbers()
+    public function getDecimalNumbers(): int
     {
         if (!$this->decimalNumbers) {
             $this->load();

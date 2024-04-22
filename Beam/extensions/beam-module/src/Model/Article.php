@@ -36,6 +36,7 @@ class Article extends BaseModel implements Searchable
     private $cachedAttributes = [];
 
     private $conversionRateConfig;
+    private int $conversionRateConfigLastLoadTimestamp = 0;
 
     protected $fillable = [
         'property_uuid',
@@ -203,14 +204,24 @@ class Article extends BaseModel implements Searchable
 
     /**
      * conversion_rate
+     *
+     * Deprecated usage without passing ConversionRateConfig. For now when using without passing $conversionRateConfig,
+     * it'll fallback to default config until next major release when we'll remove nullable type and
+     * $conversionRateConfig become mandatory.
+     *
      * @return string
      */
-    public function getConversionRateAttribute(): string
+    public function getConversionRateAttribute(?ConversionRateConfig $conversionRateConfig = null): string
     {
+        if ($conversionRateConfig === null) {
+            $conversionRateConfig = $this->getConversionRateConfig();
+            trigger_error('Usage of this method without $conversionRateConfig argument is deprecated.', E_USER_DEPRECATED);
+        }
+
         return self::computeConversionRate(
             $this->conversions->count(),
             $this->unique_browsers_count,
-            $this->getConversionRateConfig()
+            $conversionRateConfig
         );
     }
 
@@ -419,10 +430,18 @@ SQL;
 
     // Resolvers
 
+    /**
+     * @deprecated Create your own instance of ConversionRateConfig.
+     */
     protected function getConversionRateConfig()
     {
-        if (!$this->conversionRateConfig) {
-            $this->conversionRateConfig = resolve(ConversionRateConfig::class);
+        $cacheDurationInSeconds = 60;
+        $refreshAfter = $this->conversionRateConfigLastLoadTimestamp + $cacheDurationInSeconds;
+        $needsRefresh = time() > $refreshAfter;
+
+        if (!$this->conversionRateConfig || $needsRefresh) {
+            $this->conversionRateConfig = ConversionRateConfig::build();
+            $this->conversionRateConfigLastLoadTimestamp = time();
         }
         return $this->conversionRateConfig;
     }

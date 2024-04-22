@@ -50,6 +50,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        /**
+         * @deprecated Use static `ConversionRateConfig::build()` method instead of resolving from container.
+         */
         $this->app->singleton(ConversionRateConfig::class);
 
         Connection::resolverFor('mysql', function ($connection, $database, $prefix, $config) {

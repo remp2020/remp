@@ -10,8 +10,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **BREAKING**: Removed unused `autoload` property within `Config`.  remp/remp#992
   - If you're loading configs yourself and actively using `autoload` property, you need to remove dependency on it before updating to this version.
+- **DEPRECATED**: Deprecated usage of `ConversionRateConfig` from DI container or creating directly through constructor. Use `ConversionRateConfig::build()` method instead. remp/remp#992
+  - Remember, by using `ConversionRateConfig::build()` you'll get newer values from the config and not cached ones.
+- **DEPRECATED**: Deprecated `Article::getConversionRateConfig()`. Create your own instance of ConversionRateConfig instead. remp/remp#992
+- **DEPRECATED**: Deprecated usage of `Article::getConversionRateAttribute` without passing ConversionRateConfig as a first parameter. remp/remp#992
 - Fixed issue with `load_timespent` parameter in `/journal/pageviews/list` which didn't include the timespent into pageview object. remp/remp#1334
 - Added average spent times into article detail page. remp/remp#1328
+- Added parameter to pass `ConversionRateConfig` as a first parameter to `Article::getConversionRateAttribute()`. remp/remp#992
+- Added `ConversionRateConfig::build()` to create new instance of `ConversionRateConfig` with fresh values from the config. remp/remp#992
+- Added ability to cache values for 60 seconds within `Article::getConversionRateConfig()` for long-running processes/workers. remp/remp#992
 
 ### [Campaign]
 
