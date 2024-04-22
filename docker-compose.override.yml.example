@@ -9,8 +9,10 @@ services:
 
   campaign:
     environment:
-      XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
+      XDEBUG_CONFIG: "client_host=host.docker.internal"
       PHP_IDE_CONFIG: "serverName=campaign.remp.press"
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux Docker engine doesn't have this host by default
 
     # Add these volumes only after initial installation (containers would otherwise override each other's cache).
     # Also make sure, the host machine folders already exist; otherwise Docker would create them with root owner,
@@ -21,8 +23,10 @@ services:
 
   mailer:
     environment:
-      XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
+      XDEBUG_CONFIG: "client_host=host.docker.internal"
       PHP_IDE_CONFIG: "serverName=mailer.remp.press"
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux Docker engine doesn't have this host by default
 
     # Add these volumes only after initial installation (containers would otherwise override each other's cache).
     # Also make sure, the host machine folders already exist; otherwise Docker would create them with root owner,
@@ -33,8 +37,10 @@ services:
 
   beam:
     environment:
-      XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
+      XDEBUG_CONFIG: "client_host=host.docker.internal"
       PHP_IDE_CONFIG: "serverName=beam.remp.press"
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux Docker engine doesn't have this host by default
 
     # Add these volumes only after initial installation (containers would otherwise override each other's cache).
     # Also make sure, the host machine folders already exist; otherwise Docker would create them with root owner,
@@ -45,8 +51,10 @@ services:
 
   sso:
     environment:
-      XDEBUG_CONFIG: "client_host=172.17.0.1" # find the ip of your host machine within docker network
+      XDEBUG_CONFIG: "client_host=host.docker.internal"
       PHP_IDE_CONFIG: "serverName=sso.remp.press"
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux Docker engine doesn't have this host by default
 
     # Add these volumes only after initial installation (containers would otherwise override each other's cache).
     # Also make sure, the host machine folders already exist; otherwise Docker would create them with root owner,
