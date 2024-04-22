@@ -331,15 +331,15 @@
                                 <div class="row">
                                     <div class="col-md-8 col-sm-12">
                                         <url-rules
-                                            label="Referer"
-                                            hint="Rule is matched if pageview's referer contains one of these strings. Filter does not support any wildcards."
-                                            id="referer_filter"
-                                            title="Referer filter"
-                                            filter-name="referer_filter"
-                                            patterns-name="referer_patterns"
-                                            :urlFilterTypes="urlFilterTypes"
-                                            :urlFilter="refererFilter"
-                                            :urlPatterns="refererPatterns"
+                                            label="Traffic source"
+                                            hint="Rule is matched if traffic source contains one of these strings. Filter does not support any wildcards. Session source is effectively referer of the first pageview of the visit."
+                                            id="source_filter"
+                                            title="Source filter"
+                                            filter-name="source_filter"
+                                            patterns-name="source_patterns"
+                                            :urlFilterTypes="sourceFilterTypes"
+                                            :urlFilter="sourceFilter"
+                                            :urlPatterns="sourcePatterns"
                                         ></url-rules>
                                     </div>
                                 </div>
@@ -601,10 +601,11 @@
         "_selectedDevices",
         "_validateUrl",
         "_urlFilterTypes",
+        "_sourceFilterTypes",
         "_urlFilter",
         "_urlPatterns",
-        "_refererFilter",
-        "_refererPatterns",
+        "_sourceFilter",
+        "_sourcePatterns",
         "_statsLink",
         "_showLink",
         "_editLink",
@@ -693,10 +694,11 @@
                 "validateUrl": null,
                 "submitAction": null,
                 "urlFilterTypes": null,
+                "sourceFilterTypes": null,
                 "urlFilter": null,
                 "urlPatterns": null,
-                "refererFilter": null,
-                "refererPatterns": null,
+                "sourceFilter": null,
+                "sourcePatterns": null,
                 "prioritizeBannersSamePosition": false,
 
                 "banners": null,
@@ -777,7 +779,7 @@
                 return this.signedIn || this.usingAdblock;
             },
             highlightWhereToCollapse: function () {
-                return (this.urlFilter !== 'everywhere' || this.refererFilter !== 'everywhere');
+                return (this.urlFilter !== 'everywhere' || this.sourceFilter !== 'everywhere');
             },
             highlightBannerRulesCollapse: function () {
                 return (this.pageviewRulesNotDefault || this.oncePerSession === true);

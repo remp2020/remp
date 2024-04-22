@@ -44,6 +44,7 @@ class Campaign {
                 "language": navigator.language,
                 "url": window.location.href,
                 "referer": document.referrer || null,
+                "sessionReferer": remplib.getRempSessionReferer() || null,
                 "campaigns": remplib.campaign.getCampaignsForShowtime(),
                 "campaignsSession": remplib.campaign.getCampaignsSessionsForShowtime(),
                 "cache": JSON.parse(localStorage.getItem(remplib.segmentProviderCacheKey)),

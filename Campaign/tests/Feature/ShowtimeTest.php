@@ -12,7 +12,6 @@ use App\CampaignSegment;
 use App\Contracts\SegmentAggregator;
 use App\Http\Showtime\LazyDeviceDetector;
 use App\Http\Showtime\LazyGeoReader;
-use App\Http\Showtime\Showtime;
 use App\Schedule;
 use App\ShortMessageTemplate;
 
@@ -325,14 +324,15 @@ class ShowtimeTest extends TestCase
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
     }
 
-    public function testRefererFilters()
+    public function testTraficSourceFilters()
     {
         $this->scheduleCampaign();
         $activeCampaignUuids = [];
 
+        // test referer source
         $this->campaign->update([
-            'referer_filter' => Campaign::URL_FILTER_ONLY_AT,
-            'referer_patterns' => ['facebook.com']
+            'source_filter' => Campaign::SOURCE_FILTER_REFERER_ONLY_AT,
+            'source_patterns' => ['facebook.com'],
         ]);
 
         $userData = $this->getUserData();
@@ -343,14 +343,38 @@ class ShowtimeTest extends TestCase
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
 
         $this->campaign->update([
-            'referer_filter' => Campaign::URL_FILTER_EXCEPT_AT,
-            'referer_patterns' => ['facebook.com']
+            'source_filter' => Campaign::SOURCE_FILTER_REFERER_EXCEPT_AT,
+            'source_patterns' => ['facebook.com']
         ]);
 
         $userData->referer = 'http://facebook.com/abcd';
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
 
         $userData->referer = 'twitter.com/realDonaldTrump';
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+
+        // test session source
+        $this->campaign->update([
+            'source_filter' => Campaign::SOURCE_FILTER_SESSION_ONLY_AT,
+            'source_patterns' => ['facebook.com'],
+        ]);
+
+        $userData = $this->getUserData();
+        $userData->sessionReferer = 'http://facebook.com/abcd';
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+
+        $userData->sessionReferer = 'twitter.com/realDonaldTrump';
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+
+        $this->campaign->update([
+            'source_filter' => Campaign::SOURCE_FILTER_SESSION_EXCEPT_AT,
+            'source_patterns' => ['facebook.com']
+        ]);
+
+        $userData->sessionReferer = 'http://facebook.com/abcd';
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+
+        $userData->sessionReferer = 'twitter.com/realDonaldTrump';
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
     }
 
@@ -777,7 +801,7 @@ class ShowtimeTest extends TestCase
             'signed_in' => null,
             'using_adblock' => null,
             'url_filter' => 'everywhere',
-            'referer_filter' => 'everywhere',
+            'source_filter' => 'everywhere',
             'devices' => [Campaign::DEVICE_DESKTOP, Campaign::DEVICE_MOBILE],
             'pageview_rules' => null,
         ]);

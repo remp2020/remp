@@ -462,26 +462,51 @@ class Showtime
             }
         }
 
-        // referer filters
-        if ($campaign->referer_filter === Campaign::URL_FILTER_EXCEPT_AT && $userData->referer) {
-            foreach ($campaign->referer_patterns as $refererPattern) {
-                if (strpos($userData->referer, $refererPattern) !== false) {
-                    return "Campaign not shown because of the referer filter [{$refererPattern}] (provided referer [{$userData->referer}])";
+        // source referer filters
+        if ($campaign->source_filter === Campaign::SOURCE_FILTER_REFERER_EXCEPT_AT && $userData->referer) {
+            foreach ($campaign->source_patterns as $sourcePattern) {
+                if (strpos($userData->referer, $sourcePattern) !== false) {
+                    return "Campaign not shown because of the referer source filter [{$sourcePattern}] (provided referer [{$userData->referer}])";
                 }
             }
         }
-        if ($campaign->referer_filter === Campaign::URL_FILTER_ONLY_AT) {
-            if (!$userData->referer) {
-                return "Campaign not shown because user does provide a referer and campaign has filter on it";
+        if ($campaign->source_filter === Campaign::SOURCE_FILTER_REFERER_ONLY_AT) {
+            if (!isset($userData->referer) || $userData->referer === '') {
+                return "Campaign not shown because user didn't provide a referer and campaign has filter on it";
             }
             $matched = false;
-            foreach ($campaign->referer_patterns as $refererPattern) {
-                if (strpos($userData->referer, $refererPattern) !== false) {
+            foreach ($campaign->source_patterns as $sourcePattern) {
+                if (strpos($userData->referer, $sourcePattern) !== false) {
                     $matched = true;
+                    break;
                 }
             }
             if (!$matched) {
-                return "Campaign not shown because it does not match referer filter (provided referer [{$userData->referer}])";
+                return "Campaign not shown because it does not match referer source filter (provided referer [{$userData->referer}])";
+            }
+        }
+
+        // session referer filters
+        if ($campaign->source_filter === Campaign::SOURCE_FILTER_SESSION_EXCEPT_AT && $userData->sessionReferer) {
+            foreach ($campaign->source_patterns as $sourcePattern) {
+                if (strpos($userData->sessionReferer, $sourcePattern) !== false) {
+                    return "Campaign not shown because of the session source filter [{$sourcePattern}] (provided session source [{$userData->sessionReferer}])";
+                }
+            }
+        }
+        if ($campaign->source_filter === Campaign::SOURCE_FILTER_SESSION_ONLY_AT) {
+            if (!isset($userData->sessionReferer) || $userData->sessionReferer === '') {
+                return "Campaign not shown because user didn't provide a session source and campaign has filter on it";
+            }
+            $matched = false;
+            foreach ($campaign->source_patterns as $sourcePattern) {
+                if (strpos($userData->sessionReferer, $sourcePattern) !== false) {
+                    $matched = true;
+                    break;
+                }
+            }
+            if (!$matched) {
+                return "Campaign not shown because it does not match session source filter (provided session referer [{$userData->sessionReferer}])";
             }
         }
 

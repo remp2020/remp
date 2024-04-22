@@ -14,6 +14,8 @@ export default {
 
     rempSessionIDKey: "remp_session_id",
 
+    rempSessionRefererKey: "remp_session_referer",
+
     commerceSessionIDKey: "commerce_session_id",
 
     storage: "local_storage", // "cookie", "local_storage"
@@ -88,6 +90,7 @@ export default {
         remplib.internalStorageKeys[remplib.rempSessionIDKey] = true;
         remplib.internalStorageKeys[remplib.rempPageviewIDKey] = true;
         remplib.internalStorageKeys[remplib.commerceSessionIDKey] = true;
+        remplib.internalStorageKeys[remplib.rempSessionRefererKey] = true;
         remplib.internalStorageKeys["rtm_source"] = true;
         remplib.internalStorageKeys["rtm_medium"] = true;
         remplib.internalStorageKeys["rtm_campaign"] = true;
@@ -138,7 +141,15 @@ export default {
         }
         rempSessionID = remplib.uuidv4();
         this.setToStorage(storageKey, rempSessionID);
+
+        // store referer for this session
+        this.setToStorage(this.rempSessionRefererKey, document.referrer)
+
         return rempSessionID;
+    },
+
+    getRempSessionReferer: function() {
+        return this.getFromStorage(this.rempSessionRefererKey)
     },
 
     getRempPageviewID: function() {

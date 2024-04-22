@@ -45,7 +45,7 @@ class CampaignRequest extends FormRequest
             'pageview_attributes.*.operator' => 'required|string',
             'pageview_attributes.*.value' => 'required|string',
             'url_patterns.*' => 'string',
-            'referer_patterns.*' => 'string',
+            'source_patterns.*' => 'string',
             'devices.0' => 'required',
             'variants.*.proportion' => 'integer|required|min:0|max:100',
             'variants.*.control_group' => 'integer|required',
@@ -73,8 +73,8 @@ class CampaignRequest extends FormRequest
         if (is_array($data['url_patterns'])) {
             $data['url_patterns'] = array_values(array_filter($data['url_patterns']));
         }
-        if (is_array($data['referer_patterns'])) {
-            $data['referer_patterns'] = array_values(array_filter($data['referer_patterns']));
+        if (is_array($data['source_patterns'])) {
+            $data['source_patterns'] = array_values(array_filter($data['source_patterns']));
         }
         $data['pageview_rules']['display_times'] = filter_var(
             $data['pageview_rules']['display_times'],

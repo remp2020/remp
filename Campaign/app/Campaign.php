@@ -31,6 +31,12 @@ class Campaign extends Model implements Searchable
     const URL_FILTER_ONLY_AT = 'only_at';
     const URL_FILTER_EXCEPT_AT = 'except_at';
 
+    const SOURCE_FILTER_ALL = 'everywhere';
+    const SOURCE_FILTER_SESSION_ONLY_AT = 'session_only_at';
+    const SOURCE_FILTER_SESSION_EXCEPT_AT = 'session_except_at';
+    const SOURCE_FILTER_REFERER_ONLY_AT = 'only_at';
+    const SOURCE_FILTER_REFERER_EXCEPT_AT = 'except_at';
+
     private static $activeCache;
 
     protected $fillable = [
@@ -44,8 +50,8 @@ class Campaign extends Model implements Searchable
         'using_adblock',
         'url_filter',
         'url_patterns',
-        'referer_filter',
-        'referer_patterns',
+        'source_filter',
+        'source_patterns',
     ];
 
     protected $casts = [
@@ -58,7 +64,7 @@ class Campaign extends Model implements Searchable
         'languages' => 'json',
         'using_adblock' => 'boolean',
         'url_patterns' => 'json',
-        'referer_patterns' => 'json',
+        'source_patterns' => 'json',
     ];
 
     protected $attributes = [
@@ -68,7 +74,7 @@ class Campaign extends Model implements Searchable
         'pageview_attributes' => '[]',
         'devices' => "[\"desktop\", \"mobile\"]",
         'url_filter' => self::URL_FILTER_EVERYWHERE,
-        'referer_filter' => self::URL_FILTER_EVERYWHERE,
+        'source_filter' => self::SOURCE_FILTER_ALL,
     ];
 
     protected $appends = ['active'];
@@ -235,6 +241,17 @@ class Campaign extends Model implements Searchable
             self::URL_FILTER_EVERYWHERE => 'Everywhere',
             self::URL_FILTER_ONLY_AT => 'Only at',
             self::URL_FILTER_EXCEPT_AT => 'Except at',
+        ];
+    }
+
+    public function getAllSourceFilterTypes(): array
+    {
+        return [
+            self::SOURCE_FILTER_ALL => 'Everywhere',
+            self::SOURCE_FILTER_REFERER_ONLY_AT => 'Only referers',
+            self::SOURCE_FILTER_REFERER_EXCEPT_AT => 'Except referers',
+            self::SOURCE_FILTER_SESSION_ONLY_AT => 'Only session sources',
+            self::SOURCE_FILTER_SESSION_EXCEPT_AT => 'Except session sources',
         ];
     }
 

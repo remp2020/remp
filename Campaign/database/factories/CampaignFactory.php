@@ -38,7 +38,7 @@ class CampaignFactory extends Factory
             'signed_in' => $this->faker->boolean(),
             'once_per_session' => $this->faker->boolean(),
             'url_filter' => 'everywhere',
-            'referer_filter' => 'everywhere',
+            'source_filter' => 'everywhere',
         ];
     }
 }

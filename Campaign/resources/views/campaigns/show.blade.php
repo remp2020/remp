@@ -92,15 +92,15 @@
                             </li>
                             <li>
                                 Referer:
-                                @if ($campaign->referer_filter === 'everywhere') Everywhere
-                                @elseif($campaign->referer_filter === 'only_at') Only at
-                                @elseif($campaign->referer_filter === 'except_at') Except at
+                                @if ($campaign->source_filter === 'everywhere') Everywhere
+                                @elseif($campaign->source_filter === 'only_at') Only at
+                                @elseif($campaign->source_filter === 'except_at') Except at
                                 @endif
 
-                                @if($campaign->referer_filter !== 'everywhere')
+                                @if($campaign->source_filter !== 'everywhere')
                                     <ul>
-                                        @foreach($campaign->referer_patterns as $refererPattern)
-                                            <li><code>{{ $refererPattern }}</code></li>
+                                        @foreach($campaign->source_patterns as $sourcePattern)
+                                            <li><code>{{ $sourcePattern }}</code></li>
                                         @endforeach
                                     </ul>
                                 @endif

@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed typo in event name for Newsletter banner in README.
 - Fixed loading of available countries for campaign copy action. remp/remp#1323
 - Fixed the paging of scheduled campaigns. remp/remp#1310
+- Refactored referer filter to traffic source filter. remp/remp#1336
+- Added ability to filter campaign by session referer (traffic source) in showtime. remp/remp#1336
 
 ### [Mailer]
 
