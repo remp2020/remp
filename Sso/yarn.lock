@@ -364,12 +364,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/parser@npm:^7.18.4":
-  version: 7.22.10
-  resolution: "@babel/parser@npm:7.22.10"
+"@babel/parser@npm:^7.23.5":
+  version: 7.24.4
+  resolution: "@babel/parser@npm:7.24.4"
   bin:
     parser: ./bin/babel-parser.js
-  checksum: a4dcca80954f055d0be392276cd9673f24b3a0a70445005c3c33ca68f931497419374f3eed478ff53cd47c6f068832fc399e8bc0028df9d12e3e453b0e397bb9
+  checksum: 5fbe1c5e0611de9d01150c437483e1612b822947dad66e1b4833386351b3fb7ceebe0287e78f38901be9017486b411bcd89ae32f55603690a9a9265f6dac4769
   languageName: node
   linkType: hard
 
@@ -1792,14 +1792,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/compiler-sfc@npm:2.7.14":
-  version: 2.7.14
-  resolution: "@vue/compiler-sfc@npm:2.7.14"
+"@vue/compiler-sfc@npm:2.7.16":
+  version: 2.7.16
+  resolution: "@vue/compiler-sfc@npm:2.7.16"
   dependencies:
-    "@babel/parser": ^7.18.4
+    "@babel/parser": ^7.23.5
     postcss: ^8.4.14
+    prettier: ^1.18.2 || ^2.0.0
     source-map: ^0.6.1
-  checksum: e99c478edb2f66dd6082fb583302cef7198924f40916a6356368e6789b1675f6f5785aeeb249468d13d75ec83f75309e52dc5a5c4a9c37ca5ffdd1d051671379
+  dependenciesMeta:
+    prettier:
+      optional: true
+  checksum: 64ad1202556bd912adba94c34f135a48298df540866e69dc114afe7b4086edf723b92ce7e145e65ac4400e99b9870d51c75df3a87d7a25649f5d5fd9ac3ddcf7
   languageName: node
   linkType: hard
 
@@ -6856,6 +6860,15 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
+"prettier@npm:^1.18.2 || ^2.0.0":
+  version: 2.8.8
+  resolution: "prettier@npm:2.8.8"
+  bin:
+    prettier: bin-prettier.js
+  checksum: a2afc2fea5326d1e3667e385652f4f82ebb3467a79fd893ad237e683a65ad865ecf108658cfc296cc1224ce5862340417a4eddea2174917d3b4bc732e3e83501
+  languageName: node
+  linkType: hard
+
 "pretty-time@npm:^1.1.0":
   version: 1.1.0
   resolution: "pretty-time@npm:1.1.0"
@@ -7319,7 +7332,7 @@ resolve@^1.10.0:
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
     "@babel/core": ^7.0.0
-    "@remp/js-commons": ^1.3
+    "@remp/js-commons": ^2.3.1
     animate.css: ^3.7.2
     autosize: ^4.0.2
     bootstrap: ^3.4.1
@@ -8440,12 +8453,12 @@ resolve@^1.10.0:
   linkType: hard
 
 "vue@npm:^2.7.14":
-  version: 2.7.14
-  resolution: "vue@npm:2.7.14"
+  version: 2.7.16
+  resolution: "vue@npm:2.7.16"
   dependencies:
-    "@vue/compiler-sfc": 2.7.14
+    "@vue/compiler-sfc": 2.7.16
     csstype: ^3.1.0
-  checksum: 7aafbb1e438c16bb7ec7b6bce3a59fe0494ed26ac80579627c0be0f88a37328af7a7e3996e4574df23f26a5a6a33041f55f93d332d5724004316530e4dfaf25e
+  checksum: ba2ab021d24327ba1b9f692809f818a90374ff20a4d69f6900efb315870c7004c134c7ac1320b496d2084782077781474e32cb6108d1ac7414b8f304ee819d25
   languageName: node
   linkType: hard
 

@@ -15,7 +15,7 @@
   },
   "packageManager": "yarn@2.4.3",
   "dependencies": {
-    "@remp/js-commons": "^2.2.0",
+    "@remp/js-commons": "^2.3.1",
     "animate.css": "^3.7.0",
     "autosize": "^4.0.2",
     "bootstrap": "^3.4.1",
