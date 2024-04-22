@@ -23,7 +23,7 @@ class SectionController extends Controller
     {
         return response()->format([
             'html' => view('beam::sections.index', [
-                'sections' => Section::all()->pluck('name', 'id'),
+                'sections' => Section::query()->pluck('name', 'id'),
                 'contentTypes' => array_merge(
                     ['all'],
                     Article::groupBy('content_type')->pluck('content_type')->toArray()

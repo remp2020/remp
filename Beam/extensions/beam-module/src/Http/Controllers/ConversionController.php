@@ -37,9 +37,9 @@ class ConversionController extends Controller
         return response()->format([
             'html' => view('beam::conversions.index', [
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
-                'authors' => Author::all()->pluck('name', 'id'),
-                'sections' => Section::all()->pluck('name', 'id'),
-                'tags' => Tag::all()->pluck('name', 'id'),
+                'authors' => Author::query()->pluck('name', 'id'),
+                'sections' => Section::query()->pluck('name', 'id'),
+                'tags' => Tag::query()->pluck('name', 'id'),
                 'conversionFrom' => $request->get('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->get('conversion_to', 'now'),
             ]),

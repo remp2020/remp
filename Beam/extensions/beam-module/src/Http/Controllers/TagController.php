@@ -19,7 +19,7 @@ class TagController extends Controller
     {
         return response()->format([
             'html' => view('beam::tags.index', [
-                'tags' => Tag::all()->pluck('name', 'id'),
+                'tags' => Tag::query()->pluck('name', 'id'),
                 'contentTypes' => array_merge(
                     ['all'],
                     Article::groupBy('content_type')->pluck('content_type')->toArray()

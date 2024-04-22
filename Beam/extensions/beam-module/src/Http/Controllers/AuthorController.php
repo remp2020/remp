@@ -23,7 +23,7 @@ class AuthorController extends Controller
     {
         return response()->format([
             'html' => view('beam::authors.index', [
-                'authors' => Author::all()->pluck('name', 'id'),
+                'authors' => Author::query()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
@@ -44,9 +44,9 @@ class AuthorController extends Controller
             'html' => view('beam::authors.show', [
                 'author' => $author,
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
-                'sections' => Section::all(['name', 'id'])->pluck('name', 'id'),
-                'tags' => Tag::all(['name', 'id'])->pluck('name', 'id'),
-                'authors' => Author::all(['name', 'id'])->pluck('name', 'id'),
+                'sections' => Section::query()->pluck('name', 'id'),
+                'tags' => Tag::query()->pluck('name', 'id'),
+                'authors' => Author::query()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),

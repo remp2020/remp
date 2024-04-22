@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added parameter to pass `ConversionRateConfig` as a first parameter to `Article::getConversionRateAttribute()`. remp/remp#992
 - Added `ConversionRateConfig::build()` to create new instance of `ConversionRateConfig` with fresh values from the config. remp/remp#992
 - Added ability to cache values for 60 seconds within `Article::getConversionRateConfig()` for long-running processes/workers. remp/remp#992
+- Fixed slow load of datatables for systems with high amount of authors and tags. remp/remp#1347
 
 ### [Campaign]
 

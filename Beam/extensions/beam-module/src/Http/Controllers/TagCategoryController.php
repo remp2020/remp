@@ -21,7 +21,7 @@ class TagCategoryController extends Controller
     {
         return response()->format([
             'html' => view('beam::tagcategories.index', [
-                'tagCategories' => TagCategory::all()->pluck('name', 'id'),
+                'tagCategories' => TagCategory::query()->pluck('name', 'id'),
                 'contentTypes' => array_merge(
                     ['all'],
                     Article::groupBy('content_type')->pluck('content_type')->toArray()
@@ -41,10 +41,10 @@ class TagCategoryController extends Controller
         return response()->format([
             'html' => view('beam::tagcategories.show', [
                 'tagCategory' => $tagCategory,
-                'tags' => Tag::all()->pluck('name', 'id'),
+                'tags' => Tag::query()->pluck('name', 'id'),
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
-                'sections' => Section::all()->pluck('name', 'id'),
-                'authors' => Author::all()->pluck('name', 'id'),
+                'sections' => Section::query()->pluck('name', 'id'),
+                'authors' => Author::query()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),

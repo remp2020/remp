@@ -236,10 +236,10 @@ class ArticleController extends Controller
     {
         return response()->format([
             'html' => view('beam::articles.pageviews', [
-                'authors' => Author::all()->pluck('name', 'id'),
+                'authors' => Author::query()->pluck('name', 'id'),
                 'contentTypes' => Article::groupBy('content_type')->pluck('content_type', 'content_type'),
-                'sections' => Section::all()->pluck('name', 'id'),
-                'tags' => Tag::all()->pluck('name', 'id'),
+                'sections' => Section::query()->pluck('name', 'id'),
+                'tags' => Tag::query()->pluck('name', 'id'),
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
             ]),
