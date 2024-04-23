@@ -5,7 +5,9 @@ namespace Remp\MailerModule\Models\Users;
 
 use League\Event\EventDispatcher;
 use Nette\Database\Explorer;
+use Remp\MailerModule\Events\BeforeUserEmailChangeEvent;
 use Remp\MailerModule\Events\BeforeUsersDeleteEvent;
+use Remp\MailerModule\Events\UserEmailChangedEvent;
 use Remp\MailerModule\Events\UsersDeletedEvent;
 use Remp\MailerModule\Repositories\AutoLoginTokensRepository;
 use Remp\MailerModule\Repositories\JobQueueRepository;
@@ -26,8 +28,26 @@ class UserManager
     ) {
     }
 
+    public function changeEmail(string $originalEmail, string $newEmail): bool
+    {
+        $this->eventDispatcher->dispatch(new BeforeUserEmailChangeEvent($originalEmail, $newEmail));
+
+        $subscriptions = $this->userSubscriptionsRepository->findByEmail($originalEmail);
+        if (!count($subscriptions)) {
+            return false;
+        }
+
+        foreach ($subscriptions as $subscription) {
+            $this->userSubscriptionsRepository->update($subscription, ['user_email' => $newEmail]);
+        }
+
+        $this->eventDispatcher->dispatch(new UserEmailChangedEvent($originalEmail, $newEmail));
+        return true;
+    }
+
     /**
      * @param array<string> $emails
+     * @throws \Exception
      */
     public function deleteUsers(array $emails): bool
     {

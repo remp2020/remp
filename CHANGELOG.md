@@ -49,6 +49,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed buggy regexp pattern in `NewsfilterGenerator` causing elements to be removed non-voluntary. remp/crm#3151
 - Added ability to refresh internal config cache after a certain amount of time mainly for a longer running processes/workers. remp/remp#992
 - Added ability for `MailgunMailer` and `SmtpMailer` to refresh config during the runtime (for example when there's long-running worker and the config is changed). remp/remp#992
+- Added new events emitted before (`Remp\MailerModule\Events\BeforeUserEmailChangeEvent`) and after (`Remp\MailerModule\Events\UserEmailChangedEvent`) email change. remp/remp#1348
 
 ## Archive
 
