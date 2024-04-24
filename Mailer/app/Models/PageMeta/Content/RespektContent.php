@@ -48,6 +48,10 @@ class RespektContent implements ContentInterface
                 // URL has changed, we need to follow redirects and determine new URL
                 if ($this->transport instanceof RespektApiTransport) {
                     $resolvedUrl = $this->transport->resolveRedirects($url);
+                    if (!$resolvedUrl) {
+                        // The article wasn't published yet.
+                        return null;
+                    }
                     if ($url && $resolvedUrl !== $url) {
                         return $this->fetchUrlMeta($resolvedUrl);
                     }
