@@ -29,8 +29,6 @@ class SendNewslettersCommand extends Command
         parent::__construct();
 
         $config = new ArrayTransformerConfig();
-        // we need max 2 recurrences
-        $config->setVirtualLimit(2);
         $this->transformer = new ArrayTransformer($config);
         $this->mailer = $mailer;
     }
@@ -66,7 +64,7 @@ class SendNewslettersCommand extends Command
 
                 $this->line(sprintf("Processing newsletter: %s", $newsletter->name));
                 $this->sendNewsletter($newsletter);
-                $newsletter->last_sent_at = $nextSending;
+                $newsletter->last_sent_at = Carbon::now();
 
                 if (!$hasMore) {
                     $newsletter->state = Newsletter::STATE_FINISHED;
@@ -91,7 +89,16 @@ class SendNewslettersCommand extends Command
             new AfterConstraint($newsletter->starts_at, true);
 
         $recurrenceCollection = $this->transformer->transform($newsletter->rule_object, $afterConstraint);
-        $nextSending = $recurrenceCollection->isEmpty() ? null : Carbon::instance($recurrenceCollection->first()->getStart());
+
+        $nextSending = null;
+        $now = Carbon::now();
+        foreach ($recurrenceCollection as $recurrence) {
+            if ($recurrence->getStart() >= $now) {
+                break;
+            }
+            $nextSending = Carbon::instance($recurrence->getStart());
+        }
+
         $hasMore = $recurrenceCollection->count() > 1;
         return [$nextSending, $hasMore];
     }

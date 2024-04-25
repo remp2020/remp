@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
 
+- Fixed newsletters not being sent anymore if there was an issue with sending for more than two sending periods. remp/remp#1351
 
 ## Archive
 
