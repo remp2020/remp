@@ -177,12 +177,12 @@ class UserSubscriptionsRepository extends Repository
                     if (!$mailType->is_multi_variant) {
                         $this->userSubscriptionVariantsRepository->removeSubscribedVariants($actual);
                     }
-                    $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variantId);
+                    $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variantId, $rtmParams);
                 }
             } elseif (!$variantId && $mailType->is_multi_variant) {
                 // subscribe all mail variants for multi_variant type without default variant
                 foreach ($this->listVariantsRepository->getVariantsForType($mailType)->fetchAll() as $variant) {
-                    $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variant->id);
+                    $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variant->id, $rtmParams);
                 }
             }
         }

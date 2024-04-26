@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed newsletters not being sent anymore if there was an issue with sending for more than two sending periods. remp/remp#1351
 
+### [Mailer]
+
+- Added option to track variant subscriptions to Tracker. remp/web#2404
+
 ## Archive
 
 - [v3.6](./changelogs/CHANGELOG-v3.6.md)

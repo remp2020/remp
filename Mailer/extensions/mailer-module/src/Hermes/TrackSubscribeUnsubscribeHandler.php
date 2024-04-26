@@ -7,6 +7,7 @@ use Nette\Utils\DateTime;
 use Remp\MailerModule\Models\Tracker\EventOptions;
 use Remp\MailerModule\Models\Tracker\ITracker;
 use Remp\MailerModule\Models\Tracker\User;
+use Remp\MailerModule\Repositories\ListVariantsRepository;
 use Remp\MailerModule\Repositories\MailTypesRepository;
 use Tomaj\Hermes\Handler\HandlerInterface;
 use Tomaj\Hermes\Handler\RetryTrait;
@@ -18,7 +19,8 @@ class TrackSubscribeUnsubscribeHandler implements HandlerInterface
 
     public function __construct(
         private ITracker $tracker,
-        private MailTypesRepository $mailTypesRepository
+        private MailTypesRepository $mailTypesRepository,
+        private ListVariantsRepository $listVariantsRepository,
     ) {
     }
 
@@ -26,9 +28,9 @@ class TrackSubscribeUnsubscribeHandler implements HandlerInterface
     {
         $payload = $message->getPayload();
 
-        if (!in_array($message->getType(), ['user-subscribed', 'user-unsubscribed'], true)) {
+        if (!in_array($message->getType(), ['user-subscribed', 'user-unsubscribed', 'user-subscribed-variant'], true)) {
             throw new HermesException(
-                "unable to handle event: wrong type '{$message->getType()}', only 'user-subscribed' and 'user-unsubscribed' types are allowed"
+                "unable to handle event: wrong type '{$message->getType()}', only 'user-subscribed', 'user-unsubscribed' and 'user-subscribed-variant' types are allowed"
             );
         }
 
@@ -54,16 +56,33 @@ class TrackSubscribeUnsubscribeHandler implements HandlerInterface
             'rtm_medium' => $payload['rtm_medium'] ?? null,
             'rtm_campaign' => $payload['rtm_campaign'] ?? null,
             'rtm_content' => $payload['rtm_content'] ?? null,
+            'rtm_variant' => $payload['rtm_variant'] ?? null,
         ];
+
         $mailType = $this->mailTypesRepository->find($payload['mail_type_id']);
-        $options->setFields([
+        $fields = [
             'mail_type' => $mailType->code
-        ] + array_filter($rtmParams));
+        ] + array_filter($rtmParams);
+
+        if (isset($payload['mail_type_variant_id'])) {
+            $variant = $this->listVariantsRepository->find($payload['mail_type_variant_id']);
+            if ($variant) {
+                $fields['mail_type_variant'] = $variant->code;
+            }
+        }
+
+        $options->setFields($fields);
+
+        $action = match ($message->getType()) {
+            'user-subscribed' => 'subscribe',
+            'user-unsubscribed' => 'unsubscribe',
+            'user-subscribed-variant' => 'subscribe-variant'
+        };
 
         $this->tracker->trackEvent(
             DateTime::from($payload['time']),
             'mail-type',
-            $message->getType() === 'user-subscribed' ? 'subscribe': 'unsubscribe',
+            $action,
             $options
         );
 

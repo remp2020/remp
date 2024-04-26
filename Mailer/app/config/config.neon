@@ -31,4 +31,5 @@ services:
 	hermesWorker:
 		setup:
 			- add('user-subscribed', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())
+			- add('user-subscribed-variant', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())
 			- add('user-unsubscribed', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())

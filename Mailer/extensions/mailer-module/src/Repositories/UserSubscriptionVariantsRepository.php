@@ -103,7 +103,7 @@ class UserSubscriptionVariantsRepository extends Repository
         return $this->getTable()->where($where)->delete();
     }
 
-    public function addVariantSubscription(ActiveRow $userSubscription, int $variantId): ActiveRow
+    public function addVariantSubscription(ActiveRow $userSubscription, int $variantId, array $rtmParams = []): ActiveRow
     {
         $this->emitter->emit(new HermesMessage('user-subscribed-variant', [
             'user_id' => $userSubscription->user_id,
@@ -111,6 +111,10 @@ class UserSubscriptionVariantsRepository extends Repository
             'mail_type_id' => $userSubscription->mail_type->id,
             'mail_type_variant_id' => $variantId,
             'time' => new DateTime(),
+            'rtm_source' => $rtmParams['rtm_source'] ?? null,
+            'rtm_medium' => $rtmParams['rtm_medium'] ?? null,
+            'rtm_campaign' => $rtmParams['rtm_campaign'] ?? null,
+            'rtm_content' => $rtmParams['rtm_content'] ?? null,
         ]));
 
         return $this->insert([
