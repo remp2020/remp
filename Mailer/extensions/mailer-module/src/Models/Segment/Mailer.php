@@ -9,6 +9,8 @@ class Mailer implements ISegment
 {
     public const PROVIDER_ALIAS = 'mailer-segment';
 
+    private const SEGMENT_EVERYONE = 'everyone';
+
     public function __construct(
         private MailTypesRepository $mailTypesRepository,
         private UserSubscriptionsRepository $userSubscriptionsRepository,
@@ -22,7 +24,14 @@ class Mailer implements ISegment
 
     public function list(): array
     {
-        $segments = [];
+        $segments = [
+            [
+                'name' => 'Everyone',
+                'provider' => static::PROVIDER_ALIAS,
+                'code' => self::SEGMENT_EVERYONE,
+            ],
+        ];
+
         $mailTypes = $this->mailTypesRepository->all()->where(['deleted_at' => null]);
         foreach ($mailTypes as $mailType) {
             $segments[] = [
@@ -37,6 +46,10 @@ class Mailer implements ISegment
 
     public function users(array $segment): array
     {
+        if ($segment['code'] === self::SEGMENT_EVERYONE) {
+            return $this->userSubscriptionsRepository->allSubscribers();
+        }
+
         $code = preg_replace('/^subscribers-/', '', $segment['code']);
         return $this->userSubscriptionsRepository->findSubscribedUserIdsByMailTypeCode($code);
     }

@@ -9,6 +9,7 @@ use Nette\Security\User;
 use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Models\Segment\Crm;
+use Remp\MailerModule\Models\Segment\Mailer;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
@@ -25,6 +26,8 @@ class RespektUrlParserTemplateFormFactory
     private string $layoutCode;
 
     private string $segmentCode;
+
+    private string $segmentProvider = Mailer::PROVIDER_ALIAS;
 
     private string $defaultMailTypeCode;
 
@@ -50,9 +53,10 @@ class RespektUrlParserTemplateFormFactory
         $this->layoutCode = $layoutCode;
     }
 
-    public function setSegmentCode(string $segmentCode): void
+    public function setSegmentCode(string $segmentCode, string $segmentProvider = Mailer::PROVIDER_ALIAS): void
     {
         $this->segmentCode = $segmentCode;
+        $this->segmentProvider = $segmentProvider;
     }
 
     public function setDefaultMailTypeCode(string $defaultMailTypeCode): void
@@ -139,7 +143,7 @@ class RespektUrlParserTemplateFormFactory
 
     public function formSucceeded(Form $form, $values)
     {
-        $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values, $form) {
+        $generate = function ($htmlBody, $textBody, $mailLayoutId) use ($values, $form) {
             $mailTemplate = $this->templatesRepository->add(
                 $values['name'],
                 $this->templatesRepository->getUniqueTemplateCode($values['code']),
@@ -154,7 +158,7 @@ class RespektUrlParserTemplateFormFactory
 
             $jobContext = null;
 
-            $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, Crm::PROVIDER_ALIAS), $jobContext);
+            $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($this->segmentCode, $this->segmentProvider), $jobContext);
             $batch = $this->batchesRepository->add(
                 $mailJob->id,
                 (int)$values['email_count'],
@@ -192,7 +196,6 @@ class RespektUrlParserTemplateFormFactory
             $values['html_content'],
             $values['text_content'],
             $values['mail_layout_id'],
-            $this->segmentCode,
         );
 
         $this->onSave->__invoke();

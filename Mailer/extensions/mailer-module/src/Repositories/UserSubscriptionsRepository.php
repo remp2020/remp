@@ -67,9 +67,30 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_email' => $email])->fetchAll();
     }
 
-    public function findByEmailList(string $email, int $listId): ?ActiveRow
+    public function allSubscribers(): array
     {
-        return $this->getTable()->where(['user_email' => $email, 'mail_type_id' => $listId])->fetch();
+        $result = [];
+
+        $lastUserId = 0;
+        $query = $this->getTable()
+            ->select('DISTINCT user_id')
+            ->order('user_id')
+            ->limit(100000);
+
+        while (true) {
+            $userIds = (clone $query)
+                ->where('user_id > ?', $lastUserId)
+                ->fetchPairs('user_id', 'user_id');
+
+            if (!count($userIds)) {
+                break;
+            }
+
+            $result += $userIds;
+            $lastUserId = array_key_last($userIds);
+        }
+
+        return $result;
     }
 
     public function findSubscribedUserIdsByMailTypeCode(string $mailTypeCode): array

@@ -9,6 +9,7 @@ use Nette\Security\User;
 use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Models\Segment\Crm;
+use Remp\MailerModule\Models\Segment\Mailer;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
@@ -21,53 +22,32 @@ class ArticleUrlParserTemplateFormFactory
     private const FORM_ACTION_WITH_JOBS_CREATED = 'generate_emails_jobs_created';
     private const FORM_ACTION_WITH_JOBS_STARTED = 'generate_emails_jobs';
 
-    private $segmentCode;
+    private string $segmentCode;
 
-    private $layoutCode;
+    private string $segmentProvider = Mailer::PROVIDER_ALIAS;
 
-    private $templatesRepository;
-
-    private $layoutsRepository;
-
-    private $jobsRepository;
-
-    private $batchesRepository;
-
-    private $listsRepository;
-
-    private $sourceTamplatesRepository;
-
-    private $permissionManager;
-
-    private $user;
+    private string $layoutCode;
 
     public $onUpdate;
 
     public $onSave;
 
     public function __construct(
-        TemplatesRepository $templatesRepository,
-        LayoutsRepository $layoutsRepository,
-        ListsRepository $listsRepository,
-        JobsRepository $jobsRepository,
-        BatchesRepository $batchesRepository,
-        SourceTemplatesRepository $sourceTemplatesRepository,
-        PermissionManager $permissionManager,
-        User $user
+        private readonly TemplatesRepository $templatesRepository,
+        private readonly LayoutsRepository $layoutsRepository,
+        private readonly ListsRepository $listsRepository,
+        private readonly JobsRepository $jobsRepository,
+        private readonly BatchesRepository $batchesRepository,
+        private readonly SourceTemplatesRepository $sourceTemplatesRepository,
+        private readonly PermissionManager $permissionManager,
+        private readonly User $user
     ) {
-        $this->templatesRepository = $templatesRepository;
-        $this->layoutsRepository = $layoutsRepository;
-        $this->listsRepository = $listsRepository;
-        $this->jobsRepository = $jobsRepository;
-        $this->batchesRepository = $batchesRepository;
-        $this->sourceTamplatesRepository = $sourceTemplatesRepository;
-        $this->permissionManager = $permissionManager;
-        $this->user = $user;
     }
 
-    public function setSegmentCode(string $segmentCode): void
+    public function setSegmentCode(string $segmentCode, string $segmentProvider = Mailer::PROVIDER_ALIAS): void
     {
         $this->segmentCode = $segmentCode;
+        $this->segmentProvider = $segmentProvider;
     }
 
     public function setLayoutCode(string $layoutCode): void
@@ -123,7 +103,7 @@ class ArticleUrlParserTemplateFormFactory
         $form->addHidden('html_content');
         $form->addHidden('text_content');
 
-        $sourceTemplate = $this->sourceTamplatesRepository->find($_POST['source_template_id']);
+        $sourceTemplate = $this->sourceTemplatesRepository->find($_POST['source_template_id']);
 
         $defaults = [
             'source_template_id' => $sourceTemplate->id,
@@ -155,7 +135,7 @@ class ArticleUrlParserTemplateFormFactory
 
     public function formSucceeded(Form $form, $values)
     {
-        $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values, $form) {
+        $generate = function ($htmlBody, $textBody, $mailLayoutId) use ($values, $form) {
             $mailTemplate = $this->templatesRepository->add(
                 $values['name'],
                 $this->templatesRepository->getUniqueTemplateCode($values['code']),
@@ -169,8 +149,9 @@ class ArticleUrlParserTemplateFormFactory
             );
 
             $jobContext = null;
+            $jobSegmentsManager = (new JobSegmentsManager())->includeSegment($this->segmentCode, $this->segmentProvider);
 
-            $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, Crm::PROVIDER_ALIAS), $jobContext);
+            $mailJob = $this->jobsRepository->add($jobSegmentsManager, $jobContext);
             $batch = $this->batchesRepository->add(
                 $mailJob->id,
                 (int)$values['email_count'],
@@ -208,7 +189,6 @@ class ArticleUrlParserTemplateFormFactory
             $values['html_content'],
             $values['text_content'],
             $values['mail_layout_id'],
-            $this->segmentCode
         );
 
         $this->onSave->__invoke();
