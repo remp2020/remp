@@ -156,9 +156,17 @@ class RespektUrlParserTemplateFormFactory
                 $values['mail_type_id']
             );
 
+            if (isset($this->segmentCode)) {
+                $segmentCode = $this->segmentCode;
+                $segmentProvider = $this->segmentProvider;
+            } else {
+                $segmentCode = Mailer::mailTypeSegment($mailTemplate->mail_type->code);
+                $segmentProvider = Mailer::PROVIDER_ALIAS;
+            }
+
             $jobContext = null;
 
-            $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($this->segmentCode, $this->segmentProvider), $jobContext);
+            $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, $segmentProvider), $jobContext);
             $batch = $this->batchesRepository->add(
                 $mailJob->id,
                 (int)$values['email_count'],

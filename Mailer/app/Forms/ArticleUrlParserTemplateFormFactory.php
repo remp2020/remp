@@ -60,10 +60,6 @@ class ArticleUrlParserTemplateFormFactory
         $form = new Form;
         $form->addProtection();
 
-        if (!$this->segmentCode) {
-            $form->addError("Default value 'segment code' is missing.");
-        }
-
         if (!$this->layoutCode) {
             $form->addError("Default value 'layout code' is missing.");
         }
@@ -148,8 +144,16 @@ class ArticleUrlParserTemplateFormFactory
                 $values['mail_type_id']
             );
 
+            if (isset($this->segmentCode)) {
+                $segmentCode = $this->segmentCode;
+                $segmentProvider = $this->segmentProvider;
+            } else {
+                $segmentCode = Mailer::mailTypeSegment($mailTemplate->mail_type->code);
+                $segmentProvider = Mailer::PROVIDER_ALIAS;
+            }
+
             $jobContext = null;
-            $jobSegmentsManager = (new JobSegmentsManager())->includeSegment($this->segmentCode, $this->segmentProvider);
+            $jobSegmentsManager = (new JobSegmentsManager())->includeSegment($segmentCode, $segmentProvider);
 
             $mailJob = $this->jobsRepository->add($jobSegmentsManager, $jobContext);
             $batch = $this->batchesRepository->add(

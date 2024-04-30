@@ -37,7 +37,7 @@ class Mailer implements ISegment
             $segments[] = [
                 'name' => 'Subscribers of ' . $mailType->title,
                 'provider' => static::PROVIDER_ALIAS,
-                'code' => 'subscribers-' . $mailType->code,
+                'code' => $this->mailTypeSegment($mailType->code),
             ];
         }
 
@@ -52,5 +52,10 @@ class Mailer implements ISegment
 
         $code = preg_replace('/^subscribers-/', '', $segment['code']);
         return $this->userSubscriptionsRepository->findSubscribedUserIdsByMailTypeCode($code);
+    }
+
+    public static function mailTypeSegment(string $mailTypeCode): string
+    {
+        return 'subscribers-' . $mailTypeCode;
     }
 }

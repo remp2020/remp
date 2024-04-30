@@ -75,7 +75,7 @@ class UserSubscriptionsRepository extends Repository
         $query = $this->getTable()
             ->select('DISTINCT user_id')
             ->order('user_id')
-            ->limit(100000);
+            ->limit(10000);
 
         while (true) {
             $userIds = (clone $query)
@@ -95,16 +95,32 @@ class UserSubscriptionsRepository extends Repository
 
     public function findSubscribedUserIdsByMailTypeCode(string $mailTypeCode): array
     {
-        $query = $this->getTable()->where([
-            'mail_type.code' => $mailTypeCode,
-            'subscribed' => true,
-        ]);
+        $result = [];
 
-        $userIds = [];
-        foreach ($query as $row) {
-            $userIds[] = $row->user_id;
+        $lastUserId = 0;
+        $query = $this->getTable()
+            ->select('DISTINCT user_id')
+            ->where([
+                'mail_type.code' => $mailTypeCode,
+                'subscribed' => true,
+            ])
+            ->order('user_id')
+            ->limit(10000);
+
+        while (true) {
+            $userIds = (clone $query)
+                ->where('user_id > ?', $lastUserId)
+                ->fetchPairs('user_id', 'user_id');
+
+            if (!count($userIds)) {
+                break;
+            }
+
+            $result += $userIds;
+            $lastUserId = array_key_last($userIds);
         }
-        return $userIds;
+
+        return $result;
     }
 
     public function isEmailSubscribed(string $email, int $typeId): bool
