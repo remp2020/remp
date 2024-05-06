@@ -33,14 +33,6 @@ class ConfigsRepository extends Repository
         return $result;
     }
 
-    /**
-     * @deprecated Flag `autoload` will be removed in the next major release and consequently this method as well. Use `ConfigsRepository::all()` instead.
-     */
-    public function loadAllAutoload(): Selection
-    {
-        return $this->getTable()->where('autoload', true)->order('sorting');
-    }
-
     public function loadByName(string $name): ?ActiveRow
     {
         return $this->getTable()->where('name', $name)->fetch();
