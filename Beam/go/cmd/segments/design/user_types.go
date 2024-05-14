@@ -1,21 +1,22 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
-	. "github.com/goadesign/goa/design/apidsl"
+	. "goa.design/goa/v3/dsl"
 )
 
 var RuleOverrides = Type("RuleOverrides", func() {
 	Description("Additional parameters to override all rules configuration")
 
-	Attribute("fields", HashOf(String, String), "Field values")
+	Attribute("fields", MapOf(String, String), "Field values")
 })
 
 var SegmentRuleCache = Type("SegmentRuleCache", func() {
 	Description("Internal cache object with count of event")
 
-	Param("s", DateTime, "Date of last sync with DB.")
-	Param("c", Integer, "Count of events occurred within timespan of segment rule.")
+	Attribute("s", String, "Date of last sync with DB.", func() {
+		Format(FormatDateTime)
+	})
+	Attribute("c", Int, "Count of events occurred within timespan of segment rule.")
 
 	Required("s", "c")
 })
@@ -34,8 +35,12 @@ var EventOptionsPayload = Type("EventOptionsPayload", func() {
 
 	Attribute("filter_by", ArrayOf(EventOptionsFilterBy), "Selection of data filtering type")
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
-	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
-	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("time_after", String, "Include all pageviews that happened after specified RFC3339 datetime", func() {
+		Format(FormatDateTime)
+	})
+	Attribute("time_before", String, "Include all pageviews that happened before specified RFC3339 datetime", func() {
+		Format(FormatDateTime)
+	})
 	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into buckets")
 
 	Attribute("action", String, "Event action")
@@ -55,7 +60,7 @@ var OptionsCountHistogram = Type("OptionsCountHistogram", func() {
 	Description("Values used to split results in count buckets")
 
 	Attribute("field", String, "Name of the field for aggregation")
-	Attribute("interval", Number, "Interval of buckets")
+	Attribute("interval", Float64, "Interval of buckets")
 
 	Required("field", "interval")
 })
@@ -87,10 +92,21 @@ var PageviewOptionsPayload = Type("PageviewOptionsPayload", func() {
 
 	Attribute("filter_by", ArrayOf(PageviewOptionsFilterBy), "Selection of data filtering type")
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
-	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
-	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("time_after", String, "Include all pageviews that happened after specified RFC3339 datetime", func() {
+		Format(FormatDateTime)
+	})
+	Attribute("time_before", String, "Include all pageviews that happened before specified RFC3339 datetime", func() {
+		Format(FormatDateTime)
+	})
 	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into time-based buckets")
 	Attribute("count_histogram", OptionsCountHistogram, "Attribute containing values for splitting result into count-based buckets based on provided Field")
+
+	Attribute("action", String, "Identification of pageview action", func() {
+		Enum("load", "progress", "timespent")
+	})
+	Attribute("item", String, "Identification of queried unique items", func() {
+		Enum("browsers")
+	})
 })
 
 var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
@@ -106,8 +122,12 @@ var PageviewOptionsFilterBy = Type("PageviewOptionsFilterBy", func() {
 var ConcurrentsOptionsPayload = Type("ConcurrentsOptionsPayload", func() {
 	Description("Parameters to filter concurrent views")
 
-	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
-	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("time_after", String, "Include all pageviews that happened after specified RFC3339 datetime", func() {
+		Format(FormatDateTime)
+	})
+	Attribute("time_before", String, "Include all pageviews that happened before specified RFC3339 datetime", func() {
+		Format(FormatDateTime)
+	})
 	Attribute("filter_by", ArrayOf(PageviewOptionsFilterBy), "Selection of data filtering type")
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
 })
@@ -126,8 +146,12 @@ var CommerceOptionsPayload = Type("CommerceOptionsPayload", func() {
 
 	Attribute("filter_by", ArrayOf(CommerceOptionsFilterBy), "Selection of data filtering type")
 	Attribute("group_by", ArrayOf(String), "Select tags by which should be data grouped")
-	Attribute("time_after", DateTime, "Include all pageviews that happened after specified RFC3339 datetime")
-	Attribute("time_before", DateTime, "Include all pageviews that happened before specified RFC3339 datetime")
+	Attribute("time_after", String, "Include all pageviews that happened after specified RFC3339 datetime", func() {
+		Format(FormatDateTime)
+	})
+	Attribute("time_before", String, "Include all pageviews that happened before specified RFC3339 datetime", func() {
+		Format(FormatDateTime)
+	})
 	Attribute("time_histogram", OptionsTimeHistogram, "Attribute containing values for splitting result into time-based buckets")
 	Attribute("step", String, "Filter particular step", func() {
 		Enum("checkout", "payment", "purchase", "refund")
@@ -149,10 +173,11 @@ var SegmentPayload = Type("SegmentPayload", func() {
 
 	Attribute("name", String, "Name of segment")
 	Attribute("table_name", String, "Name of table above which this segment is calculated")
-	Attribute("group_id", Integer, "ID of parent group")
+	Attribute("group_id", Int, "ID of parent group")
 	Attribute("fields", ArrayOf(String), "List of fields to select")
 
 	Attribute("criteria", SegmentCreateCriteria, "Segment's criteria")
+	Attribute("id", Int, "Segment ID")
 
 	Required("name", "table_name", "group_id", "fields", "criteria")
 })

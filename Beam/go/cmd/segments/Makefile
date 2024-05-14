@@ -2,12 +2,14 @@
 
 DESIGN_PKG="beam/cmd/segments/design"
 
+.PHONY: all test build gen
+
 TARGET_GOOS?=linux
 TARGET_GOARCH?=amd64
 TARGET_SUFFIX?=
 export TARGET_GOOS TARGET_GOARCH TARGET_SUFFIX
 
-all: clean gen build
+all: clean build
 
 build: gen build-only
 
@@ -23,10 +25,8 @@ clean:
 
 gen:
 	set -e
-	# revert following back to go install github.com/goadesign/goa/...@v3 once we use the latest goa
-	command -v goagen || (git clone https://github.com/rootpd/goa.git && cd goa && git checkout v1 && make goagen)
-	goagen app -d=$(DESIGN_PKG)
-	goagen swagger -d=$(DESIGN_PKG)
+	go install goa.design/goa/v3/cmd/goa@v3
+	goa gen $(DESIGN_PKG) --output .
 
 build-static: gen
 	CGO_ENABLED=0 GOOS=$(TARGET_GOOS) GOARCH=$(TARGET_GOARCH) go build -a -installsuffix cgo -o segments$(TARGET_SUFFIX)

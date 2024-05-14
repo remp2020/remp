@@ -1,71 +1,80 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
-	. "github.com/goadesign/goa/design/apidsl"
+	. "goa.design/goa/v3/dsl"
 )
 
-var _ = Resource("swagger", func() {
-	Origin("*", func() {
-		Methods("GET", "OPTIONS")
-		Headers("*")
-	})
-	NoSecurity()
-	Files("/swagger.json", "swagger/swagger.json")
+var _ = Service("swagger", func() {
+	Files("/swagger.json", "gen/http/openapi.json")
+	Files("/openapi3.json", "gen/http/openapi3.json")
 })
 
-var _ = Resource("track", func() {
-
+var _ = Service("track", func() {
 	Description("Track different types of events")
-	BasePath("/track")
-	NoSecurity()
 
-	Action("pageview", func() {
+	HTTP(func() {
+		Path("/track")
+	})
+
+	Method("pageview", func() {
 		Description("Track new pageview")
 		Payload(Pageview)
-		Routing(POST("/pageview"))
-		Response(BadRequest, func() {
+		HTTP(func() {
+			POST("/pageview")
+			Response(StatusAccepted)
+			Response("bad_request", StatusBadRequest)
+			Response("not_found", StatusNotFound)
+		})
+		Error("bad_request", func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
-		Response(NotFound, func() {
+		Error("not_found", func() {
 			Description("Returned when property_token was not found")
 		})
-		Response(Accepted)
 	})
-	Action("commerce", func() {
+
+	Method("commerce", func() {
 		Description("Track new pageview")
 		Payload(Commerce)
-		Routing(POST("/commerce"))
-		Response(BadRequest, func() {
+		HTTP(func() {
+			POST("/commerce")
+			Response(StatusAccepted)
+		})
+		Error("bad_request", func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
-		Response(NotFound, func() {
+		Error("not_found", func() {
 			Description("Returned when property_token was not found")
 		})
-		Response(Accepted)
 	})
-	Action("event", func() {
+
+	Method("event", func() {
 		Description("Track generic event")
 		Payload(Event)
-		Routing(POST("/event"))
-		Response(BadRequest, func() {
+		HTTP(func() {
+			POST("/event")
+			Response(StatusAccepted)
+		})
+		Error("bad_request", func() {
 			Description("Returned when request does not comply with Swagger specification")
 		})
-		Response(NotFound, func() {
+		Error("not_found", func() {
 			Description("Returned when property_token was not found")
 		})
-		Response(Accepted)
 	})
-	Action("entity", func() {
+
+	Method("entity", func() {
 		Description("Track generic entity")
 		Payload(Entity)
-		Routing(POST("/entity"))
-		Response(BadRequest, func() {
+		HTTP(func() {
+			POST("/entity")
+			Response(StatusAccepted)
+		})
+		Error("bad_request", func() {
 			Description("Returned when request does not comply with Swagger specification or entity data does not pass validation")
 		})
-		Response(NotFound, func() {
+		Error("not_found", func() {
 			Description("Returned when property_token was not found")
 		})
-		Response(Accepted)
 	})
 })

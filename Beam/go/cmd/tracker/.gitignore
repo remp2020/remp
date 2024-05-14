@@ -1,6 +1,6 @@
-app/
+gen/
+example/
 client/
-swagger/
 tool/
 goa/
 tracker*

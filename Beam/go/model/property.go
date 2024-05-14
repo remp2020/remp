@@ -55,7 +55,7 @@ func (pDB *PropertyDB) Get(UUID string) (*Property, bool, error) {
 }
 
 // Cache stores the properties in memory.
-func (pDB *PropertyDB) Cache() error {
+func (pDB *PropertyDB) Cache(logger *log.Logger) error {
 	pm := make(map[string]*Property)
 	pc := PropertyCollection{}
 
@@ -70,7 +70,7 @@ func (pDB *PropertyDB) Cache() error {
 		pm[p.UUID] = p
 	}
 	if !reflect.DeepEqual(pDB.Properties, pm) {
-		log.Println("property cache reloaded")
+		logger.Println("property cache reloaded")
 	}
 	pDB.Properties = pm
 	return nil

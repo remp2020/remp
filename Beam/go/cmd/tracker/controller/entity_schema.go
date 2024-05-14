@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"beam/cmd/tracker/app"
+	"beam/cmd/tracker/gen/track"
 	"beam/model"
 	"fmt"
 	"reflect"
@@ -10,11 +10,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-// EntitySchema represents extendended entity schema definition with validation capability.
+// EntitySchema represents extended entity schema definition with validation capability.
 type EntitySchema model.EntitySchema
 
 // Validate validates provided entity against provided schema.
-func (es *EntitySchema) Validate(payload *app.Entity) error {
+func (es *EntitySchema) Validate(payload *track.Entity2) error {
 	for name, val := range payload.EntityDef.Data {
 		paramDef := es.Params[name]
 

@@ -1,33 +1,32 @@
 package controller
 
 import (
-	"beam/cmd/segments/app"
+	"beam/cmd/segments/gen/concurrents"
 	"beam/model"
-
-	"github.com/goadesign/goa"
+	"context"
+	"time"
 )
 
 // ConcurrentsController implements the event resource.
 type ConcurrentsController struct {
-	*goa.Controller
 	ConcurrentsStorage model.ConcurrentsStorage
 }
 
 // NewConcurrentsController creates a concurrent controller.
-func NewConcurrentsController(service *goa.Service, cs model.ConcurrentsStorage) *ConcurrentsController {
-	return &ConcurrentsController{
-		Controller:         service.NewController("ConcurrentController"),
-		ConcurrentsStorage: cs,
-	}
+func NewConcurrentsController(cs model.ConcurrentsStorage) concurrents.Service {
+	return &ConcurrentsController{cs}
 }
 
-// Count runs the count action.
-func (c *ConcurrentsController) Count(ctx *app.CountConcurrentsContext) error {
-	o := aggregateOptionsFromConcurrentOptions(ctx.Payload)
+// CountEndpoint runs the count action.
+func (c *ConcurrentsController) CountEndpoint(ctx context.Context, p *concurrents.ConcurrentsOptionsPayload) (res concurrents.CountCollection, err error) {
+	o, err := aggregateOptionsFromConcurrentOptions(p)
+	if err != nil {
+		return nil, err
+	}
 
 	crc, ok, err := c.ConcurrentsStorage.Count(o)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !ok {
@@ -39,12 +38,12 @@ func (c *ConcurrentsController) Count(ctx *app.CountConcurrentsContext) error {
 		crc = append(crc, cr)
 	}
 
-	acrc := CountRowCollection(crc).ToMediaType()
-	return ctx.OK(acrc)
+	cmt := CountRowCollection(crc).ToConcurrentsMediaType()
+	return cmt, nil
 }
 
 // aggregateOptionsFromConcurrentOptions converts payload data to AggregateOptions.
-func aggregateOptionsFromConcurrentOptions(payload *app.ConcurrentsOptionsPayload) model.AggregateOptions {
+func aggregateOptionsFromConcurrentOptions(payload *concurrents.ConcurrentsOptionsPayload) (model.AggregateOptions, error) {
 	var o model.AggregateOptions
 
 	for _, val := range payload.FilterBy {
@@ -62,11 +61,19 @@ func aggregateOptionsFromConcurrentOptions(payload *app.ConcurrentsOptionsPayloa
 	o.GroupBy = payload.GroupBy
 
 	if payload.TimeAfter != nil {
-		o.TimeAfter = *payload.TimeAfter
+		t, err := time.Parse(time.RFC3339, *payload.TimeAfter)
+		if err != nil {
+			return o, err
+		}
+		o.TimeAfter = t
 	}
 	if payload.TimeBefore != nil {
-		o.TimeBefore = *payload.TimeBefore
+		t, err := time.Parse(time.RFC3339, *payload.TimeBefore)
+		if err != nil {
+			return o, err
+		}
+		o.TimeBefore = t
 	}
 
-	return o
+	return o, nil
 }

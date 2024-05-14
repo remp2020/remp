@@ -1,15 +1,14 @@
 package controller
 
 import (
-	"beam/cmd/segments/app"
+	"beam/cmd/segments/gen/segments"
 	"beam/model"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"time"
-
-	"github.com/goadesign/goa"
 	"github.com/pkg/errors"
+	"time"
 )
 
 // SegmentType represents type of segment (source of data used for segment)
@@ -23,25 +22,9 @@ const (
 
 // SegmentController implements the segment resource.
 type SegmentController struct {
-	*goa.Controller
 	SegmentStorage          model.SegmentStorage
 	SegmentBlueprintStorage model.SegmentBlueprintStorage
 	Config                  SegmentConfig
-}
-
-// NewSegmentController creates a segment controller.
-func NewSegmentController(
-	service *goa.Service,
-	segmentStorage model.SegmentStorage,
-	segmentBlueprintStorage model.SegmentBlueprintStorage,
-	config SegmentConfig,
-) *SegmentController {
-	return &SegmentController{
-		Controller:              service.NewController("SegmentController"),
-		SegmentStorage:          segmentStorage,
-		SegmentBlueprintStorage: segmentBlueprintStorage,
-		Config:                  config,
-	}
 }
 
 // SegmentConfig represent configuration settings of Segment controller.
@@ -49,129 +32,143 @@ type SegmentConfig struct {
 	URLEdit string
 }
 
-// Get runs the get action.
-func (c *SegmentController) Get(ctx *app.GetSegmentsContext) error {
-	s, ok, err := c.SegmentStorage.GetByID(ctx.ID)
+// NewSegmentController creates a segment controller.
+func NewSegmentController(
+	segmentStorage model.SegmentStorage,
+	segmentBlueprintStorage model.SegmentBlueprintStorage,
+	config SegmentConfig,
+) *SegmentController {
+	return &SegmentController{
+		SegmentStorage:          segmentStorage,
+		SegmentBlueprintStorage: segmentBlueprintStorage,
+		Config:                  config,
+	}
+}
+
+// Get segment
+func (c *SegmentController) Get(ctx context.Context, p *segments.GetPayload) (res *segments.SegmentersSegment, err error) {
+	s, ok, err := c.SegmentStorage.GetByID(p.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !ok {
-		return ctx.NotFound()
+		return nil, segments.MakeNotFound(errors.New(fmt.Sprintf("Segment [%d] not found", p.ID)))
 	}
 
 	response, err := (*Segment)(s).ToSegmenterMediaType()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return ctx.OK(&app.SegmentersSegment{
+	return &segments.SegmentersSegment{
 		Status:  "ok",
 		Segment: response,
-	})
+	}, nil
 }
 
 // List runs the list action.
-func (c *SegmentController) List(ctx *app.ListSegmentsContext) error {
+func (c *SegmentController) List(ctx context.Context) (res segments.SegmentCollection, err error) {
 	sc, err := c.SegmentStorage.List()
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	return ctx.OKTiny((SegmentCollection)(sc).ToTinyMediaType())
+	return (SegmentCollection)(sc).ToTinyMediaType(), nil
 }
 
 // Groups runs the groups action.
-func (c *SegmentController) Groups(ctx *app.GroupsSegmentsContext) error {
+func (c *SegmentController) Groups(ctx context.Context) (res *segments.SegmentGroupsFallback, err error) {
 	sgc, err := c.SegmentStorage.Groups()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return ctx.OK(&app.SegmentGroupsFallback{
+	return &segments.SegmentGroupsFallback{
 		Status: "ok",
 		Groups: (SegmentGroupCollection)(sgc).ToMediaType(),
-	})
+	}, nil
 }
 
 // CheckUser runs the check_user action.
-func (c *SegmentController) CheckUser(ctx *app.CheckUserSegmentsContext) error {
-	sc, ok, err := c.handleCheck(UserSegment, ctx.SegmentCode, ctx.UserID, ctx.Fields, ctx.Cache)
+func (c *SegmentController) CheckUser(ctx context.Context, p *segments.CheckUserPayload) (res *segments.SegmentCheck, err error) {
+	sc, ok, err := c.handleCheck(UserSegment, *p.SegmentCode, *p.UserID, p.Fields, p.Cache)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !ok {
-		return ctx.NotFound()
+		return nil, segments.MakeNotFound(errors.New(fmt.Sprintf("Segment with code [%s] not found", *p.SegmentCode)))
 	}
-	return ctx.OK(sc)
+	return sc, nil
 }
 
 // CheckBrowser runs the check_browser action.
-func (c *SegmentController) CheckBrowser(ctx *app.CheckBrowserSegmentsContext) error {
-	sc, ok, err := c.handleCheck(BrowserSegment, ctx.SegmentCode, ctx.BrowserID, ctx.Fields, ctx.Cache)
+func (c *SegmentController) CheckBrowser(ctx context.Context, p *segments.CheckBrowserPayload) (res *segments.SegmentCheck, err error) {
+	sc, ok, err := c.handleCheck(BrowserSegment, *p.SegmentCode, *p.BrowserID, p.Fields, p.Cache)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !ok {
-		return ctx.NotFound()
+		return nil, segments.MakeNotFound(errors.New(fmt.Sprintf("Segment with code [%s] not found", *p.SegmentCode)))
 	}
-	return ctx.OK(sc)
+	return sc, nil
 }
 
 // Users runs the users action.
-func (c *SegmentController) Users(ctx *app.UsersSegmentsContext) error {
-	s, ok, err := c.SegmentStorage.Get(ctx.SegmentCode)
+func (c *SegmentController) Users(ctx context.Context, p *segments.UsersPayload) (res []string, err error) {
+	s, ok, err := c.SegmentStorage.Get(*p.SegmentCode)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !ok {
-		return ctx.NotFound()
+		return nil, segments.MakeNotFound(errors.New(fmt.Sprintf("Segment with code [%s] not found", *p.SegmentCode)))
 	}
 	ro := model.RuleOverrides{}
-	if ctx.Fields != nil {
+	if p.Fields != nil {
 		overrides := make(map[string]string)
-		if err := json.Unmarshal([]byte(*ctx.Fields), &overrides); err != nil {
-			return errors.Wrap(err, "invalid format of fields JSON string")
+		if err := json.Unmarshal([]byte(*p.Fields), &overrides); err != nil {
+			return nil, errors.Wrap(err, "invalid format of fields JSON string")
 		}
 		ro.Fields = overrides
 	}
 	uc, err := c.SegmentStorage.Users(s, time.Now(), ro)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return ctx.OK(uc)
+	return uc, nil
 }
 
 // Criteria runs the criteria action.
-func (c *SegmentController) Criteria(ctx *app.CriteriaSegmentsContext) error {
+func (c *SegmentController) Criteria(ctx context.Context) (res *segments.SegmentBlueprint, err error) {
 	sbtc, err := c.SegmentBlueprintStorage.Get()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	mtsbtc := (SegmentBlueprintTableCollection)(sbtc).ToMediaType()
 
-	mtsb := &app.SegmentBlueprint{
+	mtsb := &segments.SegmentBlueprint{
 		Blueprint: mtsbtc,
 	}
 
-	return ctx.OK(mtsb)
+	return mtsb, nil
 }
 
 // CreateOrUpdate runs the create_or_update action.
-func (c *SegmentController) CreateOrUpdate(ctx *app.CreateOrUpdateSegmentsContext) error {
-	if ctx.ID != nil {
-		return c.handleUpdate(ctx)
+func (c *SegmentController) CreateOrUpdate(ctx context.Context, p *segments.SegmentPayload) (res *segments.Segment, view string, err error) {
+	if p.ID != nil {
+		segment, err := c.handleUpdate(p)
+		return segment, "default", err
 	}
-	return c.handleCreate(ctx)
+	segment, err := c.handleCreate(p)
+	return segment, "default", err
 }
 
 // Count runs the count action.
-func (c *SegmentController) Count(ctx *app.CountSegmentsContext) error {
+func (c *SegmentController) Count(ctx context.Context, p *segments.SegmentTinyPayload) (res *segments.SegmentCount, err error) {
 	var usersCount int
-	if ctx.Payload.Criteria != nil && len(ctx.Payload.Criteria.Nodes) != 0 && len(ctx.Payload.Criteria.Nodes[0].Nodes) != 0 {
+	if p.Criteria != nil && len(p.Criteria.Nodes) != 0 && len(p.Criteria.Nodes[0].Nodes) != 0 {
 		var s model.Segment
 
-		criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+		criteriaJSON, err := json.Marshal(p.Criteria)
 		if err != nil {
-			return errors.Wrap(err, "unable to marshal segment's criteria payload")
+			return nil, errors.Wrap(err, "unable to marshal segment's criteria payload")
 		}
 
 		s.SegmentData = model.SegmentData{
@@ -182,67 +179,66 @@ func (c *SegmentController) Count(ctx *app.CountSegmentsContext) error {
 		}
 		sr, ok, err := c.SegmentStorage.BuildRules(&s)
 		if err != nil {
-			return nil
+			return nil, err
 		}
 		if ok {
 			s.Rules = sr
 			users, err := c.SegmentStorage.Users(&s, time.Now(), model.RuleOverrides{})
 			if err != nil {
-				return err
+				return nil, err
 			}
 			usersCount = len(users)
 		}
 	} else {
 		ca, err := c.SegmentStorage.CountAll()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		usersCount = ca
 	}
 
-	return ctx.OK(&app.SegmentCount{
+	return &segments.SegmentCount{
 		Count:  usersCount,
 		Status: "ok",
-	})
+	}, nil
 }
 
-// Related runs the related action.
-func (c *SegmentController) Related(ctx *app.RelatedSegmentsContext) error {
+// Returns segments with same or similar criteria
+func (c *SegmentController) Related(ctx context.Context, p *segments.SegmentTinyPayload) (res *segments.SegmentsRelated, err error) {
 	// scan whole criteria as SegmentCriteria
-	cJSON, err := json.Marshal(ctx.Payload.Criteria)
+	cJSON, err := json.Marshal(p.Criteria)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var criteria model.SegmentCriteria
 	err = criteria.Scan(string(cJSON))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	sc, err := c.SegmentStorage.Related(criteria)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	mt := app.SegmentsRelated{
+	mt := segments.SegmentsRelated{
 		Segments: (SegmentCollection)(sc).ToExtendedMediaType(c.Config.URLEdit),
 	}
-	return ctx.OK(&mt)
+	return &mt, nil
 }
 
 // handleCreate handles creation of Segment.
-func (c *SegmentController) handleCreate(ctx *app.CreateOrUpdateSegmentsContext) error {
-	p := ctx.Payload
+func (c *SegmentController) handleCreate(p *segments.SegmentPayload) (*segments.Segment, error) {
 
-	criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+	criteriaJSON, err := json.Marshal(p.Criteria)
 	if err != nil {
-		return errors.Wrap(err, "unable to marshal segment's criteria payload")
+		return nil, errors.Wrap(err, "unable to marshal segment's criteria payload")
 	}
 
 	// TODO: maybe code should be also part of payload? check with CRM
 	code, err := model.Webalize(p.Name)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	sd := model.SegmentData{
@@ -257,23 +253,21 @@ func (c *SegmentController) handleCreate(ctx *app.CreateOrUpdateSegmentsContext)
 	}
 	s, err := c.SegmentStorage.Create(sd)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	response, err := (*Segment)(s).ToMediaType()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return ctx.OK(response)
+	return response, nil
 }
 
 // handleUpdate handles update of Segment.
-func (c *SegmentController) handleUpdate(ctx *app.CreateOrUpdateSegmentsContext) error {
-	p := ctx.Payload
-
-	criteriaJSON, err := json.Marshal(ctx.Payload.Criteria)
+func (c *SegmentController) handleUpdate(p *segments.SegmentPayload) (*segments.Segment, error) {
+	criteriaJSON, err := json.Marshal(p.Criteria)
 	if err != nil {
-		return errors.Wrap(err, "unable to marshal segment's criteria payload")
+		return nil, errors.Wrap(err, "unable to marshal segment's criteria payload")
 	}
 	sd := model.SegmentData{
 		Name:           p.Name,
@@ -284,23 +278,23 @@ func (c *SegmentController) handleUpdate(ctx *app.CreateOrUpdateSegmentsContext)
 			Valid:  true,
 		},
 	}
-	s, ok, err := c.SegmentStorage.Update(*ctx.ID, sd)
+	s, ok, err := c.SegmentStorage.Update(*p.ID, sd)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !ok {
-		return ctx.NotFound()
+		return nil, segments.MakeNotFound(errors.New(fmt.Sprintf("Segment [%d] not found", *p.ID)))
 	}
 
 	response, err := (*Segment)(s).ToMediaType()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return ctx.OK(response)
+	return response, nil
 }
 
 // handleCheck determines whether provided identifier is part of segment based on given segment type.
-func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, identifier string, fields, cache *string) (*app.SegmentCheck, bool, error) {
+func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, identifier string, fields, cache *string) (*segments.SegmentCheck, bool, error) {
 	s, ok, err := c.SegmentStorage.Get(segmentCode)
 	if err != nil {
 		return nil, false, err
@@ -354,7 +348,7 @@ func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, id
 	of := c.SegmentStorage.OverridableFields()
 	flags := c.SegmentStorage.Flags()
 
-	return &app.SegmentCheck{
+	return &segments.SegmentCheck{
 		Check:             ok,
 		Cache:             (SegmentCache(segmentCache)).ToMediaType(),
 		EventRules:        er,

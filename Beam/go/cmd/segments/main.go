@@ -1,11 +1,15 @@
-//go:generate goagen -d gitlab.com/remp/remp/Beam/go/cmd/segments/design
-
 package main
 
 import (
+	"beam/cmd/segments/gen/commerce"
+	"beam/cmd/segments/gen/concurrents"
+	"beam/cmd/segments/gen/events"
+	"beam/cmd/segments/gen/journal"
+	"beam/cmd/segments/gen/pageviews"
+	"beam/cmd/segments/gen/segments"
 	"context"
+	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -14,46 +18,42 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/goadesign/goa"
-	"github.com/goadesign/goa/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/olivere/elastic/v7"
-	cache "github.com/patrickmn/go-cache"
+	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
-	"beam/cmd/segments/app"
 	"beam/cmd/segments/controller"
 	"beam/model"
 )
 
 func main() {
+	logger := log.New(os.Stderr, "[segments] ", log.Ltime)
+
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to load .env file"))
+		logger.Fatalln(errors.Wrap(err, "unable to load .env file"))
 	}
 	var c Config
 	if err := envconfig.Process("segments", &c); err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to process envconfig"))
+		logger.Fatalln(errors.Wrap(err, "unable to process envconfig"))
 	}
 
-	stop := make(chan os.Signal, 3)
-	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	// Create channel used by both the signal handler and server goroutines
+	// to notify the main goroutine when to stop the server.
 
-	ctx, cancelCtx := context.WithCancel(context.Background())
+	errc := make(chan error)
 
-	service := goa.New("segments")
+	go func() {
+		c := make(chan os.Signal, 3)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+		errc <- fmt.Errorf("%s", <-c)
+	}()
 
-	service.Use(middleware.RequestID())
-	if c.Debug {
-		service.Use(middleware.LogRequest(true))
-		service.Use(middleware.LogResponse())
-	}
-	service.Use(middleware.ErrorHandler(service, true))
-	service.Use(middleware.Recover())
-
-	app.MountSwaggerController(service, service.NewController("swagger"))
+	var wg sync.WaitGroup
+	ctx, cancel := context.WithCancel(context.Background())
 
 	// DB init
 
@@ -68,7 +68,7 @@ func main() {
 	}
 	mysqlDB, err := sqlx.Connect("mysql", mysqlDBConfig.FormatDSN())
 	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to connect to MySQL"))
+		logger.Fatalln(errors.Wrap(err, "unable to connect to MySQL"))
 	}
 
 	var eventStorage model.EventStorage
@@ -78,7 +78,7 @@ func main() {
 
 	eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initElasticEventStorages(ctx, c)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatalln(err)
 	}
 
 	countCache := cache.New(5*time.Minute, 10*time.Minute)
@@ -96,10 +96,6 @@ func main() {
 		CommerceStorage: commerceStorage,
 	}
 
-	// server cancellation
-
-	var wg sync.WaitGroup
-
 	// caching
 
 	ticker10s := time.NewTicker(10 * time.Second)
@@ -112,23 +108,23 @@ func main() {
 	defer ticker1h.Stop()
 
 	cacheSegmentDB := func() {
-		if err := segmentStorage.Cache(); err != nil {
-			service.LogError("unable to cache segments", "err", err)
+		if err = segmentStorage.Cache(); err != nil {
+			logger.Fatalln("unable to cache segments", "err", err)
 		}
 	}
 	cacheExplicitSegments := func() {
-		if err := segmentStorage.CacheExplicitSegments(); err != nil {
-			service.LogError("unable to cache explicit segment", "err", err)
+		if err = segmentStorage.CacheExplicitSegments(); err != nil {
+			logger.Fatalln("unable to cache explicit segment", "err", err)
 		}
 	}
 	cacheSegmentsCount := func() {
-		if _, err := segmentStorage.CountAll(); err != nil {
-			service.LogError("unable to cache counts for segment", "err", err)
+		if _, err = segmentStorage.CountAll(); err != nil {
+			logger.Fatalln("unable to cache counts for segment", "err", err)
 		}
 	}
 	cacheEventDB := func() {
-		if err := eventStorage.Cache(); err != nil {
-			service.LogError("unable to cache events", "err", err)
+		if err = eventStorage.Cache(); err != nil {
+			logger.Fatalln("unable to cache events", "err", err)
 		}
 	}
 
@@ -139,7 +135,10 @@ func main() {
 	cacheSegmentsCount()
 	go func() {
 		defer wg.Done()
-		service.LogInfo("starting property caching")
+		logger.Println("starting segment caching")
+		logger.Println("starting explicit segment caching")
+		logger.Println("starting events caching")
+		logger.Println("starting segment counts caching")
 		for {
 			select {
 			case <-ticker10s.C:
@@ -150,7 +149,10 @@ func main() {
 			case <-ticker1h.C:
 				cacheEventDB()
 			case <-ctx.Done():
-				service.LogInfo("property caching stopped")
+				logger.Println("segment caching stopped")
+				logger.Println("explicit segment caching stopped")
+				logger.Println("events caching stopped")
+				logger.Println("segment counts caching stopped")
 				return
 			}
 		}
@@ -162,38 +164,48 @@ func main() {
 		URLEdit: c.URLEdit,
 	}
 
-	app.MountJournalController(service, controller.NewJournalController(service, eventStorage, commerceStorage, pageviewStorage))
-	app.MountEventsController(service, controller.NewEventController(service, eventStorage))
-	app.MountCommerceController(service, controller.NewCommerceController(service, commerceStorage))
-	app.MountPageviewsController(service, controller.NewPageviewController(service, pageviewStorage))
-	app.MountSegmentsController(service, controller.NewSegmentController(service, segmentStorage, segmentBlueprintStorage, segmentConfig))
-	app.MountConcurrentsController(service, controller.NewConcurrentsController(service, concurrentsStorage))
+	// Initialize the services.
 
-	// server init
+	journalSvc := controller.NewJournalController(eventStorage, commerceStorage, pageviewStorage)
+	eventsSvc := controller.NewEventController(eventStorage)
+	pageviewsSvc := controller.NewPageviewController(pageviewStorage)
+	concurrentsSvc := controller.NewConcurrentsController(concurrentsStorage)
+	commerceSvc := controller.NewCommerceController(commerceStorage)
+	segmentsSvc := controller.NewSegmentController(segmentStorage, segmentBlueprintStorage, segmentConfig)
 
-	service.LogInfo("starting server", "bind", c.SegmentsAddr)
-	srv := &http.Server{
-		Addr:    c.SegmentsAddr,
-		Handler: service.Mux,
-	}
+	// Wrap the services in endpoints that can be invoked from other services
+	// potentially running in different processes.
 
-	wg.Add(1)
-	go func() {
-		if err := srv.ListenAndServe(); err != nil {
-			if err != http.ErrServerClosed {
-				service.LogError("startup", "err", err)
-				stop <- syscall.SIGQUIT
-			}
-			wg.Done()
-		}
-	}()
+	journalEndpoints := journal.NewEndpoints(journalSvc)
+	eventsEndpoints := events.NewEndpoints(eventsSvc)
+	pageviewsEndpoints := pageviews.NewEndpoints(pageviewsSvc)
+	concurrentsEndpoints := concurrents.NewEndpoints(concurrentsSvc)
+	commerceEndpoints := commerce.NewEndpoints(commerceSvc)
+	segmentsEndpoints := segments.NewEndpoints(segmentsSvc)
 
-	s := <-stop
-	service.LogInfo("shutting down", "signal", s)
-	srv.Shutdown(ctx)
-	cancelCtx()
+	handleHTTPServer(
+		ctx,
+		c.SegmentsAddr,
+		journalEndpoints,
+		eventsEndpoints,
+		pageviewsEndpoints,
+		concurrentsEndpoints,
+		commerceEndpoints,
+		segmentsEndpoints,
+		&wg,
+		errc,
+		logger,
+		c.Debug,
+	)
+
+	// Wait for signal.
+	logger.Printf("exiting (%v)", <-errc)
+
+	// Send cancellation signal to the goroutines.
+	cancel()
+
 	wg.Wait()
-	service.LogInfo("bye bye")
+	logger.Println("bye bye")
 }
 
 func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {

@@ -1,38 +1,32 @@
 package controller
 
 import (
-	"beam/cmd/segments/app"
+	"beam/cmd/segments/gen/pageviews"
 	"beam/model"
+	"context"
 	"time"
-
-	"github.com/goadesign/goa"
 )
 
 // PageviewController implements the event resource.
 type PageviewController struct {
-	*goa.Controller
 	PageviewStorage model.PageviewStorage
 }
 
 // NewPageviewController creates a pageview controller.
-func NewPageviewController(service *goa.Service, ps model.PageviewStorage) *PageviewController {
-	return &PageviewController{
-		Controller:      service.NewController("PageviewController"),
-		PageviewStorage: ps,
-	}
+func NewPageviewController(ps model.PageviewStorage) pageviews.Service {
+	return &PageviewController{ps}
 }
 
-// Count runs the count action.
-func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
-	o, err := aggregateOptionsFromPageviewOptions(ctx.Payload)
+// CountEndpoint runs the count action.
+func (c *PageviewController) CountEndpoint(ctx context.Context, p *pageviews.PageviewOptionsPayload) (res pageviews.CountCollection, err error) {
+	o, err := aggregateOptionsFromPageviewOptions(p)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	o.Action = ctx.Action
 
 	crc, ok, err := c.PageviewStorage.Count(o)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !ok {
@@ -45,20 +39,19 @@ func (c *PageviewController) Count(ctx *app.CountPageviewsContext) error {
 	}
 
 	acrc := CountRowCollection(crc).ToMediaType()
-	return ctx.OK(acrc)
+	return acrc, nil
 }
 
-// Sum runs the sum action.
-func (c *PageviewController) Sum(ctx *app.SumPageviewsContext) error {
-	o, err := aggregateOptionsFromPageviewOptions(ctx.Payload)
+// SumEndpoint runs the sum action.
+func (c *PageviewController) SumEndpoint(ctx context.Context, p *pageviews.PageviewOptionsPayload) (res pageviews.SumCollection, err error) {
+	o, err := aggregateOptionsFromPageviewOptions(p)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	o.Action = ctx.Action
 
 	src, ok, err := c.PageviewStorage.Sum(o)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !ok {
@@ -71,20 +64,19 @@ func (c *PageviewController) Sum(ctx *app.SumPageviewsContext) error {
 	}
 
 	asrc := SumRowCollection(src).ToMediaType()
-	return ctx.OK(asrc)
+	return asrc, nil
 }
 
-// Avg runs the avg action.
-func (c *PageviewController) Avg(ctx *app.AvgPageviewsContext) error {
-	o, err := aggregateOptionsFromPageviewOptions(ctx.Payload)
+// AvgEndpoint runs the avg action.
+func (c *PageviewController) AvgEndpoint(ctx context.Context, p *pageviews.PageviewOptionsPayload) (res pageviews.AvgCollection, err error) {
+	o, err := aggregateOptionsFromPageviewOptions(p)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	o.Action = ctx.Action
 
 	src, ok, err := c.PageviewStorage.Avg(o)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !ok {
@@ -97,20 +89,19 @@ func (c *PageviewController) Avg(ctx *app.AvgPageviewsContext) error {
 	}
 
 	asrc := AvgRowCollection(src).ToMediaType()
-	return ctx.OK(asrc)
+	return asrc, nil
 }
 
 // Unique runs the cardinality count action.
-func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
-	o, err := aggregateOptionsFromPageviewOptions(ctx.Payload)
+func (c *PageviewController) Unique(ctx context.Context, p *pageviews.PageviewOptionsPayload) (res pageviews.CountCollection, err error) {
+	o, err := aggregateOptionsFromPageviewOptions(p)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	o.Action = ctx.Action
 
-	src, ok, err := c.PageviewStorage.Unique(o, ctx.Item)
+	src, ok, err := c.PageviewStorage.Unique(o, *p.Item)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !ok {
@@ -123,52 +114,44 @@ func (c *PageviewController) Unique(ctx *app.UniquePageviewsContext) error {
 	}
 
 	asrc := CountRowCollection(src).ToMediaType()
-	return ctx.OK(asrc)
+	return asrc, nil
 }
 
 // List runs the list action.
-func (c *PageviewController) List(ctx *app.ListPageviewsContext) error {
-	aggOptions, err := aggregateOptionsFromPageviewOptions(ctx.Payload.Conditions)
+func (c *PageviewController) List(ctx context.Context, p *pageviews.ListPageviewOptionsPayload) (res pageviews.PageviewsCollection, err error) {
+	aggOptions, err := aggregateOptionsFromPageviewOptions(p.Conditions)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	o := model.ListPageviewsOptions{
 		AggregateOptions: aggOptions,
-		SelectFields:     ctx.Payload.SelectFields,
-		LoadTimespent:    ctx.Payload.LoadTimespent,
+		SelectFields:     p.SelectFields,
+		LoadTimespent:    p.LoadTimespent,
 	}
 
 	prc, err := c.PageviewStorage.List(o)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	mt, err := PageviewRowCollection(prc).ToMediaType()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return ctx.OK(mt)
+	return mt, nil
 }
 
 // Categories runs the categories action.
-func (c *PageviewController) Categories(ctx *app.CategoriesPageviewsContext) error {
-	categories, err := c.PageviewStorage.Categories()
-	if err != nil {
-		return err
-	}
-	return ctx.OK(categories)
+func (c *PageviewController) Categories(ctx context.Context) (res []string, err error) {
+	return c.PageviewStorage.Categories()
 }
 
 // Actions runs the action action. :)
-func (c *PageviewController) Actions(ctx *app.ActionsPageviewsContext) error {
-	actions, err := c.PageviewStorage.Actions(ctx.Category)
-	if err != nil {
-		return err
-	}
-	return ctx.OK(actions)
+func (c *PageviewController) Actions(ctx context.Context, p *pageviews.ActionsPayload) (res []string, err error) {
+	return c.PageviewStorage.Actions(*p.Category)
 }
 
 // aggregateOptionsFromPageviewOptions converts payload data to AggregateOptions.
-func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) (model.AggregateOptions, error) {
+func aggregateOptionsFromPageviewOptions(payload *pageviews.PageviewOptionsPayload) (model.AggregateOptions, error) {
 	var o model.AggregateOptions
 
 	for _, val := range payload.FilterBy {
@@ -185,10 +168,18 @@ func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) (m
 
 	o.GroupBy = payload.GroupBy
 	if payload.TimeAfter != nil {
-		o.TimeAfter = *payload.TimeAfter
+		t, err := time.Parse(time.RFC3339, *payload.TimeAfter)
+		if err != nil {
+			return o, err
+		}
+		o.TimeAfter = t
 	}
 	if payload.TimeBefore != nil {
-		o.TimeBefore = *payload.TimeBefore
+		t, err := time.Parse(time.RFC3339, *payload.TimeBefore)
+		if err != nil {
+			return o, err
+		}
+		o.TimeBefore = t
 	}
 
 	if payload.TimeHistogram != nil {
@@ -210,6 +201,10 @@ func aggregateOptionsFromPageviewOptions(payload *app.PageviewOptionsPayload) (m
 			Field:    payload.CountHistogram.Field,
 			Interval: payload.CountHistogram.Interval,
 		}
+	}
+
+	if payload.Action != nil {
+		o.Action = *payload.Action
 	}
 
 	return o, nil

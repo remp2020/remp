@@ -1,28 +1,32 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
-	. "github.com/goadesign/goa/design/apidsl"
+	. "goa.design/goa/v3/dsl"
+	cors "goa.design/plugins/v3/cors/dsl"
 )
 
-var _ = API("beam", func() {
+var _ = API("tracker", func() {
 	Title("Beam tracker")
 	Description("Track events and pageviews")
 	License(func() {
 		Name("MIT")
 	})
-	Scheme("http")
-	Consumes("application/json")
-	Produces("application/json")
-	Origin("*", func() {
-		Methods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-		Headers("Content-Type")
-		MaxAge(3600)
+
+	HTTP(func() {
+		Consumes("application/json")
+		Produces("application/json")
 	})
-	ResponseTemplate(BadRequest, func() {
-		Description("Invalid request sent")
-		Status(400)
-		Media(ErrorMedia)
+
+	cors.Origin("*", func() {
+		cors.Methods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+		cors.Headers("Content-Type")
+		cors.MaxAge(3600)
 	})
-	Host("localhost:8081")
+
+	Server("tracker_server", func() {
+		Host("localhost", func() {
+			Description("default host")
+			URI("http://localhost:8081/")
+		})
+	})
 })

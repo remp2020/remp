@@ -1,14 +1,12 @@
-//go:generate goagen bootstrap -d beam/cmd/tracker/design
-
 package main
 
 import (
-	"beam/cmd/tracker/app"
 	"beam/cmd/tracker/controller"
+	"beam/cmd/tracker/gen/track"
 	"beam/model"
 	"context"
+	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -17,8 +15,6 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/goadesign/goa"
-	"github.com/goadesign/goa/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -26,36 +22,37 @@ import (
 )
 
 func main() {
+	logger := log.New(os.Stderr, "[tracker] ", log.Ltime)
+
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to load .env file"))
+		logger.Fatalln(errors.Wrap(err, "unable to load .env file"))
 	}
 	var c Config
 	if err := envconfig.Process("tracker", &c); err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to process envconfig"))
+		logger.Fatalln(errors.Wrap(err, "unable to process envconfig"))
 	}
 
-	stop := make(chan os.Signal, 3)
-	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	// Create channel used by both the signal handler and server goroutines
+	// to notify the main goroutine when to stop the server.
 
-	ctx, cancelCtx := context.WithCancel(context.Background())
+	errc := make(chan error)
 
-	service := goa.New("tracker")
+	go func() {
+		c := make(chan os.Signal, 3)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+		errc <- fmt.Errorf("%s", <-c)
+	}()
 
-	service.Use(middleware.RequestID())
-	if c.Debug {
-		service.Use(middleware.LogRequest(true))
-		service.Use(middleware.LogResponse())
-	}
-	service.Use(middleware.ErrorHandler(service, true))
-	service.Use(middleware.Recover())
+	var wg sync.WaitGroup
+	ctx, cancel := context.WithCancel(context.Background())
 
 	// Broker init
 
-	service.LogInfo("initializing message broker producer", "implementation", c.BrokerImpl)
-	eventProducer, err := newProducer(ctx, &c, service)
+	logger.Println("initializing message broker producer", "implementation", c.BrokerImpl)
+	eventProducer, err := newProducer(ctx, &c, logger)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatalln(err)
 	}
 	defer eventProducer.Close()
 
@@ -72,7 +69,7 @@ func main() {
 	}
 	mysqlDB, err := sqlx.Connect("mysql", mysqlDBConfig.FormatDSN())
 	if err != nil {
-		log.Fatalln(errors.Wrap(err, "unable to connect to MySQL"))
+		logger.Fatalln(errors.Wrap(err, "unable to connect to MySQL"))
 	}
 
 	propertyDB := &model.PropertyDB{
@@ -85,22 +82,20 @@ func main() {
 
 	// server cancellation
 
-	var wg sync.WaitGroup
-
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	cacheProperties := func() {
-		if err := propertyDB.Cache(); err != nil {
-			service.LogError("unable to cache properties", "err", err)
+		if err = propertyDB.Cache(logger); err != nil {
+			logger.Fatalln("unable to cache properties", "err", err)
 		}
 	}
 
 	wg.Add(1)
 
 	cacheEntities := func() {
-		if err := entitySchemaDB.Cache(); err != nil {
-			service.LogError("unable to cache entity schemas", "err", err)
+		if err = entitySchemaDB.Cache(logger); err != nil {
+			logger.Fatalln("unable to cache entity schemas", "err", err)
 		}
 	}
 	wg.Add(1)
@@ -108,13 +103,13 @@ func main() {
 	cacheProperties()
 	go func() {
 		defer wg.Done()
-		service.LogInfo("starting property caching")
+		logger.Println("starting property caching")
 		for {
 			select {
 			case <-ticker.C:
 				cacheProperties()
 			case <-ctx.Done():
-				service.LogInfo("property caching stopped")
+				logger.Println("property caching stopped")
 				return
 			}
 		}
@@ -123,63 +118,49 @@ func main() {
 	cacheEntities()
 	go func() {
 		defer wg.Done()
-		service.LogInfo("starting entity schemas caching")
+		logger.Println("starting entity schemas caching")
 		for {
 			select {
 			case <-ticker.C:
 				cacheEntities()
 			case <-ctx.Done():
-				service.LogInfo("entity schemas caching stopped")
+				logger.Println("entity schemas caching stopped")
 				return
 			}
 		}
 	}()
 
-	// controllers init
-
-	app.MountSwaggerController(service, service.NewController("swagger"))
-	app.MountTrackController(service, controller.NewTrackController(
-		service,
+	// Initialize the services.
+	trackSvc := controller.NewTrackController(
 		eventProducer,
 		propertyDB,
 		entitySchemaDB,
 		strings.Split(c.InternalHosts, ","),
 		c.TimespentLimit,
-	))
+	)
 
-	// server init
+	// Wrap the services in endpoints that can be invoked from other services
+	// potentially running in different processes.
+	trackEndpoints := track.NewEndpoints(trackSvc)
 
-	service.LogInfo("starting server", "bind", c.TrackerAddr)
-	srv := &http.Server{
-		Addr:    c.TrackerAddr,
-		Handler: service.Mux,
-	}
+	handleHTTPServer(ctx, c.TrackerAddr, trackEndpoints, &wg, errc, logger, c.Debug)
 
-	wg.Add(1)
-	go func() {
-		if err := srv.ListenAndServe(); err != nil {
-			if err != http.ErrServerClosed {
-				service.LogError("startup", "err", err)
-				stop <- syscall.SIGQUIT
-			}
-			wg.Done()
-		}
-	}()
+	// Wait for signal.
+	logger.Printf("exiting (%v)", <-errc)
 
-	s := <-stop
-	service.LogInfo("shutting down", "signal", s)
-	srv.Shutdown(ctx)
-	cancelCtx()
+	// Send cancellation signal to the goroutines.
+	cancel()
+
 	wg.Wait()
-	service.LogInfo("bye bye")
+	logger.Println("bye bye")
 }
 
-func newProducer(ctx context.Context, config *Config, service *goa.Service) (controller.EventProducer, error) {
+func newProducer(ctx context.Context, config *Config, logger *log.Logger) (controller.EventProducer, error) {
 	switch config.BrokerImpl {
 	case "kafka":
 		brokerAddrs := strings.Split(config.BrokerAddrs, ",")
 		for _, addr := range brokerAddrs {
-			service.LogInfo("connecting to kafka broker", "bind", addr)
+			logger.Println("connecting to kafka broker", "bind", addr)
 		}
 		saslConfig := &controller.SaslConfig{
 			Username: config.KafkaSaslUser,
@@ -192,7 +173,7 @@ func newProducer(ctx context.Context, config *Config, service *goa.Service) (con
 		return producer, nil
 
 	case "pubsub":
-		service.LogInfo("connecting to pubsub", "projectID", config.PubSubProjectID, "topicID", config.PubSubTopicID)
+		logger.Println("connecting to pubsub", "projectID", config.PubSubProjectID, "topicID", config.PubSubTopicID)
 		producer, err := controller.NewPubSubEventProducer(ctx, config.PubSubProjectID, config.PubSubTopicID)
 		if err != nil {
 			return nil, err

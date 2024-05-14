@@ -1,8 +1,7 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
-	. "github.com/goadesign/goa/design/apidsl"
+	. "goa.design/goa/v3/dsl"
 )
 
 var User = Type("User", func() {
@@ -17,8 +16,8 @@ var User = Type("User", func() {
 		Format("uri")
 	})
 	Attribute("adblock", Boolean, "Flag whether user has adblock enabled")
-	Attribute("window_height", Number, "Height of the users browser window")
-	Attribute("window_width", Number, "Width of the users browser window")
+	Attribute("window_height", Int, "Height of the users browser window")
+	Attribute("window_width", Int, "Width of the users browser window")
 	Attribute("cookies", Boolean, "Flag whether user has cookies enabled")
 	Attribute("websockets", Boolean, "Flag whether user has websockets supported browser")
 	Attribute("user_agent", String, "User agent of client")
@@ -33,11 +32,14 @@ var User = Type("User", func() {
 })
 
 var System = Type("System", func() {
-	Attribute("property_token", UUID, "Property token")
-	Attribute("time", DateTime, "Time of occurrence")
+	Attribute("property_token", String, "Property token", func() {
+		Format(FormatUUID)
+	})
+	Attribute("time", String, "Time of occurrence", func() {
+		Format(FormatDateTime)
+	})
 	Required("property_token", "time")
 })
-
 var Pageview = Type("Pageview", func() {
 	Description("Pageview is the payload for tracking pageview event")
 
@@ -80,9 +82,9 @@ var Event = Type("Event", func() {
 
 	Attribute("category", String, "Category of event (time, video, comment)")
 	Attribute("action", String, "Specific action (read, pause, reply)")
-	Attribute("value", Number, "Numeric value of event (read 60 seconds, paused after 200 seconds, 3rd comment")
-	Attribute("tags", HashOf(String, String), "Custom filtering tags")
-	Attribute("fields", HashOf(String, Any), "Additinal key-value data")
+	Attribute("value", Int, "Numeric value of event (read 60 seconds, paused after 200 seconds, 3rd comment")
+	Attribute("tags", MapOf(String, String), "Custom filtering tags")
+	Attribute("fields", MapOf(String, Any), "Additinal key-value data")
 	Attribute("remp_event_id", String, "ID of event")
 	Attribute("article_id", String, "ID of article this event is linked to. Events linked to the specific article can be later displayed at Beam dashboard timeline and at article detail timeline.")
 
@@ -98,7 +100,7 @@ var Article = Type("Article", func() {
 	Attribute("author_id", String, "ID of author")
 	Attribute("content_type", String, "Content type, e.g. 'article' (by default)")
 	Attribute("locked", Boolean, "Flag whether content was locked for the visitor")
-	Attribute("variants", HashOf(String, String), "Hash of key-value pairs bearing A/B test variant information (what's A/B-tested / variant label)")
+	Attribute("variants", MapOf(String, String), "Hash of key-value pairs bearing A/B test variant information (what's A/B-tested / variant label)")
 
 	Required("id")
 })
@@ -106,7 +108,7 @@ var Article = Type("Article", func() {
 var TimeSpent = Type("TimeSpent", func() {
 	Description("Update time spent on page")
 
-	Attribute("seconds", Integer, "Number of seconds from previous update of time spent on page")
+	Attribute("seconds", Int, "Number of seconds from previous update of time spent on page")
 	Attribute("unload", Boolean, "Flag to indicate last update of time spent on page before unload event")
 
 	Required("seconds")
@@ -115,11 +117,11 @@ var TimeSpent = Type("TimeSpent", func() {
 var Progress = Type("Progress", func() {
 	Description("Update reading progress on pageview")
 
-	Attribute("page_ratio", Number, "Whole page reading ratio", func() {
+	Attribute("page_ratio", Float64, "Whole page reading ratio", func() {
 		Minimum(0)
 		Maximum(1)
 	})
-	Attribute("article_ratio", Number, "Article reading ratio", func() {
+	Attribute("article_ratio", Float64, "Article reading ratio", func() {
 		Minimum(0)
 		Maximum(1)
 	})
@@ -161,7 +163,7 @@ var CommercePayment = Type("CommercePayment", func() {
 })
 
 var Revenue = Type("Revenue", func() {
-	Attribute("amount", Number, "Numeric amount of money")
+	Attribute("amount", Float64, "Numeric amount of money")
 	Attribute("currency", String, "ISO 4217 representation of currency")
 
 	Required("amount", "currency")
@@ -171,7 +173,7 @@ var Entity = Type("Entity", func() {
 	Attribute("entity_def", func() {
 		Attribute("id", String)
 		Attribute("name", String)
-		Attribute("data", HashOf(String, Any))
+		Attribute("data", MapOf(String, Any))
 
 		Required("id", "name", "data")
 	})

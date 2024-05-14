@@ -1,111 +1,79 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
-	. "github.com/goadesign/goa/design/apidsl"
+	. "goa.design/goa/v3/dsl"
 )
 
-var EventCount = MediaType("application/vnd.event.count+json", func() {
+var EventCount = ResultType("application/vnd.event.count+json", func() {
 	Description("Count")
 	Attributes(func() {
-		Attribute("count", Integer)
-	})
-	View("default", func() {
-		Attribute("count")
+		Attribute("count", Int)
 	})
 	Required("count")
 })
 
-var Count = MediaType("application/vnd.count+json", func() {
+var Count = ResultType("application/vnd.count+json", func() {
 	Description("Count")
 	Attributes(func() {
-		Attribute("tags", HashOf(String, String))
-		Attribute("count", Integer)
+		Attribute("tags", MapOf(String, String))
+		Attribute("count", Int)
 		Attribute("time_histogram", CollectionOf(TimeHistogram))
 		Attribute("count_histogram", CollectionOf(CountHistogram))
-	})
-	View("default", func() {
-		Attribute("tags")
-		Attribute("count")
-		Attribute("time_histogram")
-		Attribute("count_histogram")
 	})
 	Required("tags", "count")
 })
 
-var Sum = MediaType("application/vnd.sum+json", func() {
+var Sum = ResultType("application/vnd.sum+json", func() {
 	Description("Sum")
 	Attributes(func() {
-		Attribute("tags", HashOf(String, String))
-		Attribute("sum", Number)
+		Attribute("tags", MapOf(String, String))
+		Attribute("sum", Float64)
 		Attribute("time_histogram", CollectionOf(TimeHistogram))
-	})
-	View("default", func() {
-		Attribute("tags")
-		Attribute("sum")
-		Attribute("time_histogram")
 	})
 	Required("tags", "sum")
 })
 
-var Avg = MediaType("application/vnd.avg+json", func() {
+var Avg = ResultType("application/vnd.avg+json", func() {
 	Description("Avg")
 	Attributes(func() {
-		Attribute("tags", HashOf(String, String))
-		Attribute("avg", Number)
+		Attribute("tags", MapOf(String, String))
+		Attribute("avg", Float64)
 		Attribute("time_histogram", CollectionOf(TimeHistogram))
-	})
-	View("default", func() {
-		Attribute("tags")
-		Attribute("avg")
-		Attribute("time_histogram")
 	})
 	Required("tags", "avg")
 })
 
-var Pageviews = MediaType("application/vnd.pageviews+json", func() {
+var Pageviews = ResultType("application/vnd.pageviews+json", func() {
 	Description("Pageviews")
 	Attributes(func() {
-		Attribute("tags", HashOf(String, String))
+		Attribute("tags", MapOf(String, String))
 		Attribute("pageviews", CollectionOf(Pageview))
-	})
-	View("default", func() {
-		Attribute("tags")
-		Attribute("pageviews")
 	})
 	Required("tags", "pageviews")
 })
 
-var Events = MediaType("application/vnd.events+json", func() {
+var Events = ResultType("application/vnd.events+json", func() {
 	Description("Events")
 	Attributes(func() {
-		Attribute("tags", HashOf(String, String))
+		Attribute("tags", MapOf(String, String))
 		Attribute("events", CollectionOf(Event))
-	})
-	View("default", func() {
-		Attribute("tags")
-		Attribute("events")
 	})
 	Required("tags", "events")
 })
 
-var Commerces = MediaType("application/vnd.commerces+json", func() {
+var Commerces = ResultType("application/vnd.commerces+json", func() {
 	Description("Commerce events")
 	Attributes(func() {
-		Attribute("tags", HashOf(String, String))
+		Attribute("tags", MapOf(String, String))
 		Attribute("commerces", CollectionOf(Commerce))
-	})
-	View("default", func() {
-		Attribute("tags")
-		Attribute("commerces")
 	})
 	Required("tags", "commerces")
 })
 
-var Segment = MediaType("application/vnd.segment+json", func() {
+var Segment = ResultType("application/vnd.segment+json", func() {
 	Description("Segment")
 	Attributes(func() {
-		Attribute("id", Integer, "ID of segment")
+		Attribute("id", Int, "ID of segment")
 		Attribute("code", String, "Code-friendly identificator of segment")
 		Attribute("name", String, "User-friendly name of segment")
 		Attribute("group", SegmentGroup)
@@ -114,7 +82,7 @@ var Segment = MediaType("application/vnd.segment+json", func() {
 
 		Attribute("table_name", String)
 		Attribute("fields", ArrayOf(String))
-		Attribute("group_id", Integer)
+		Attribute("group_id", Int)
 	})
 	View("default", func() {
 		Attribute("id")
@@ -150,7 +118,7 @@ var Segment = MediaType("application/vnd.segment+json", func() {
 	Required("id", "code", "name", "group")
 })
 
-var RelatedSegments = MediaType("application/vnd.segments.related+json", func() {
+var RelatedSegments = ResultType("application/vnd.segments.related+json", func() {
 	Description("Related segments")
 	Attributes(func() {
 		Attribute("segments", CollectionOf(Segment))
@@ -163,7 +131,7 @@ var RelatedSegments = MediaType("application/vnd.segments.related+json", func() 
 	Required("segments")
 })
 
-var SegmentersSegment = MediaType("application/vnd.segmenters.segment.+json", func() {
+var SegmentersSegment = ResultType("application/vnd.segmenters.segment.+json", func() {
 	Description("Segment returned for segmenter")
 	Attributes(func() {
 		Attribute("status", String)
@@ -178,67 +146,47 @@ var SegmentersSegment = MediaType("application/vnd.segmenters.segment.+json", fu
 	Required("status", "segment")
 })
 
-var SegmentCheck = MediaType("application/vnd.segment.check+json", func() {
+var SegmentCheck = ResultType("application/vnd.segment.check+json", func() {
 	Description("Segment check")
 	Attributes(func() {
 		Attribute("check", Boolean, "Flag whether user is in the segment or not")
-		Attribute("cache", HashOf(Integer, SegmentRuleCache), "Cache object for third party (remplib.js) to use indexed by SegmentRule-based key")
-		Attribute("event_rules", HashOf(String, ArrayOf(Integer)), "Map of which rules should be incremented for selected events.")
-		Attribute("overridable_fields", HashOf(Integer, ArrayOf(String)), "Array of overridable fields belonging to rules.")
-		Attribute("flags", HashOf(Integer, HashOf(String, String)), "Array of flags belonging to rules.")
-	})
-	View("default", func() {
-		Attribute("check")
-		Attribute("cache")
-		Attribute("event_rules")
-		Attribute("overridable_fields")
-		Attribute("flags")
+		Attribute("cache", MapOf(Int, SegmentRuleCache), "Cache object for third party (remplib.js) to use indexed by SegmentRule-based key")
+		Attribute("event_rules", MapOf(String, ArrayOf(Int)), "Map of which rules should be incremented for selected events.")
+		Attribute("overridable_fields", MapOf(Int, ArrayOf(String)), "Array of overridable fields belonging to rules.")
+		Attribute("flags", MapOf(Int, MapOf(String, String)), "Array of flags belonging to rules.")
 	})
 	Required("check", "cache", "event_rules", "overridable_fields", "flags")
 })
 
-var SegmentGroup = MediaType("application/vnd.segment.group+json", func() {
+var SegmentGroup = ResultType("application/vnd.segment.group+json", func() {
 	Description("Segment group")
 	Attributes(func() {
-		Attribute("id", Integer, "Internal ID of segment group")
+		Attribute("id", Int, "Internal ID of segment group")
 		Attribute("name", String, "User-friendly name of segment group")
-		Attribute("sorting", Integer, "Sort order index")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("name")
-		Attribute("sorting")
+		Attribute("sorting", Int, "Sort order index")
 	})
 	Required("id", "name", "sorting")
 })
 
-var SegmentBlueprint = MediaType("application/vnd.segment.blueprint+json", func() {
+var SegmentBlueprint = ResultType("application/vnd.segment.blueprint+json", func() {
 	Description("Segment blueprint")
 	Attributes(func() {
 		Attribute("blueprint", CollectionOf(SegmentBlueprintTable))
 	})
-	View("default", func() {
-		Attribute("blueprint")
-	})
 	Required("blueprint")
 })
 
-var SegmentBlueprintTable = MediaType("application/vnd.segment.blueprint.table+json", func() {
+var SegmentBlueprintTable = ResultType("application/vnd.segment.blueprint.table+json", func() {
 	Description("Blueprint of one table available for segment")
 	Attributes(func() {
 		Attribute("table", String, "Table name")
 		Attribute("fields", ArrayOf(String), "Fields of table")
 		Attribute("criteria", CollectionOf(SegmentBlueprintTableCriterion), "Processing criteria for fields of table")
 	})
-	View("default", func() {
-		Attribute("table")
-		Attribute("fields")
-		Attribute("criteria")
-	})
 	Required("table", "fields", "criteria")
 })
 
-var SegmentBlueprintTableCriterion = MediaType("application/vnd.segment.blueprint.table.criterion+json", func() {
+var SegmentBlueprintTableCriterion = ResultType("application/vnd.segment.blueprint.table.criterion+json", func() {
 	Description("Criterion for one field of table available for segment")
 	Attributes(func() {
 		Attribute("key", String, "Field of table to which is this criterion related")
@@ -246,29 +194,19 @@ var SegmentBlueprintTableCriterion = MediaType("application/vnd.segment.blueprin
 		Attribute("params", Any, "Criteria of field parameters")
 		Attribute("fields", ArrayOf(String), "Field parameters")
 	})
-	View("default", func() {
-		Attribute("key")
-		Attribute("label")
-		Attribute("params")
-		Attribute("fields")
-	})
 	Required("key", "label", "params")
 })
 
-var SegmentCount = MediaType("application/vnd.segment.count+json", func() {
+var SegmentCount = ResultType("application/vnd.segment.count+json", func() {
 	Description("Segment count")
 	Attributes(func() {
-		Attribute("count", Integer, "Number of users in segment based on provided criteria")
+		Attribute("count", Int, "Number of users in segment based on provided criteria")
 		Attribute("status", String, "Status of count. If everything is fine, returns `ok`.")
-	})
-	View("default", func() {
-		Attribute("count")
-		Attribute("status")
 	})
 	Required("count", "status")
 })
 
-var Event = MediaType("application/vnd.event+json", func() {
+var Event = ResultType("application/vnd.event+json", func() {
 	Description("Generic event")
 	Attributes(func() {
 		Attribute("id", String)
@@ -278,33 +216,11 @@ var Event = MediaType("application/vnd.event+json", func() {
 		Attribute("user", User)
 		Attribute("article_id", String)
 
-		// REMP's utm
 		Attribute("rtm_source", String)
 		Attribute("rtm_campaign", String)
 		Attribute("rtm_medium", String)
 		Attribute("rtm_content", String)
 
-		// Deprecated, will be removed (replaced with rtm_ parameters)
-		Attribute("utm_source", String)
-		Attribute("utm_campaign", String)
-		Attribute("utm_medium", String)
-		Attribute("utm_content", String)
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("category")
-		Attribute("action")
-		Attribute("system")
-		Attribute("user")
-		Attribute("article_id", String)
-
-		// REMP's utm
-		Attribute("rtm_source", String)
-		Attribute("rtm_campaign", String)
-		Attribute("rtm_medium", String)
-		Attribute("rtm_content", String)
-
-		// deprecated
 		Attribute("utm_source", String)
 		Attribute("utm_campaign", String)
 		Attribute("utm_medium", String)
@@ -313,33 +229,27 @@ var Event = MediaType("application/vnd.event+json", func() {
 	Required("id", "system", "category", "action")
 })
 
-var TimeHistogram = MediaType("application/vnd.time.histogram+json", func() {
+var TimeHistogram = ResultType("application/vnd.time.histogram+json", func() {
 	Description("Time histogram data")
 	Attributes(func() {
-		Attribute("time", DateTime)
-		Attribute("value", Number)
-	})
-	View("default", func() {
-		Attribute("time")
-		Attribute("value")
+		Attribute("time", String, func() {
+			Format(FormatDateTime)
+		})
+		Attribute("value", Float64)
 	})
 	Required("time", "value")
 })
 
-var CountHistogram = MediaType("application/vnd.count.histogram+json", func() {
+var CountHistogram = ResultType("application/vnd.count.histogram+json", func() {
 	Description("Count histogram data")
 	Attributes(func() {
-		Attribute("bucket_key", Number)
-		Attribute("value", Integer)
-	})
-	View("default", func() {
-		Attribute("bucket_key")
-		Attribute("value")
+		Attribute("bucket_key", Float64)
+		Attribute("value", Int)
 	})
 	Required("bucket_key", "value")
 })
 
-var Commerce = MediaType("application/vnd.commerce+json", func() {
+var Commerce = ResultType("application/vnd.commerce+json", func() {
 	Description("Commerce event")
 	Attributes(func() {
 		Attribute("id", String)
@@ -356,24 +266,10 @@ var Commerce = MediaType("application/vnd.commerce+json", func() {
 		Attribute("system", System)
 		Attribute("user", User)
 	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("step")
-
-		Attribute("checkout")
-		Attribute("payment")
-		Attribute("purchase")
-		Attribute("refund")
-
-		Attribute("source")
-		Attribute("article")
-		Attribute("system")
-		Attribute("user")
-	})
 	Required("id", "step", "system", "user")
 })
 
-var Pageview = MediaType("application/vnd.pageview+json", func() {
+var Pageview = ResultType("application/vnd.pageview+json", func() {
 	Description("Pageview event")
 	Attributes(func() {
 		Attribute("id", String)
@@ -381,16 +277,10 @@ var Pageview = MediaType("application/vnd.pageview+json", func() {
 		Attribute("user", User)
 		Attribute("article", Article)
 	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("system")
-		Attribute("user")
-		Attribute("article")
-	})
 	Required("system")
 })
 
-var User = MediaType("application/vnd.user+json", func() {
+var User = ResultType("application/vnd.user+json", func() {
 	Attributes(func() {
 		Attribute("id", String, "ID of reader")
 		Attribute("subscriber", Boolean, "Flag whether user is subscriber (has paid for access)")
@@ -412,41 +302,22 @@ var User = MediaType("application/vnd.user+json", func() {
 		Attribute("derived_referer_medium", String, "Medium which trigerred the pageview (e.g. internal, search, ...)")
 		Attribute("derived_referer_source", String, "Specific source of medium which trigerred the pageview (e.g. Google, Gmail, ...)")
 		Attribute("derived_referer_host_with_path", String, "Referer without query parameters (only host and path)")
-		Attribute("timespent", Integer, "Number of seconds spent during pageview (if recorded)")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("subscriber")
-		Attribute("browser_id")
-		Attribute("url")
-		Attribute("canonical_url")
-		Attribute("user_agent")
-		Attribute("ip_address")
-		Attribute("source")
-		Attribute("remp_session_id")
-		Attribute("remp_pageview_id")
-		Attribute("referer")
-		Attribute("derived_referer_medium")
-		Attribute("derived_referer_source")
-		Attribute("derived_referer_host_with_path")
-		Attribute("timespent")
+		Attribute("timespent", Int, "Number of seconds spent during pageview (if recorded)")
 	})
 	Required("remp_pageview_id")
 })
 
-var System = MediaType("application/vnd.system+json", func() {
+var System = ResultType("application/vnd.system+json", func() {
 	Attributes(func() {
-		Attribute("property_token", UUID, "Property token")
-		Attribute("time", DateTime, "Time of occurrence")
-	})
-	View("default", func() {
-		Attribute("property_token")
-		Attribute("time")
+		Attribute("property_token", String, "Property token")
+		Attribute("time", String, "Time of occurrence", func() {
+			Format(FormatDateTime)
+		})
 	})
 	Required("property_token", "time")
 })
 
-var Article = MediaType("application/vnd.article+json", func() {
+var Article = ResultType("application/vnd.article+json", func() {
 	Attributes(func() {
 		Attribute("id", String, "ID of article")
 		Attribute("category", String, "Page category (homepage, world news...")
@@ -454,108 +325,64 @@ var Article = MediaType("application/vnd.article+json", func() {
 		Attribute("author_id", String, "ID of author")
 		Attribute("content_type", String, "Type of the content, e.g. 'article'")
 		Attribute("locked", Boolean, "Flag whether content was locked for the visitor")
-		Attribute("variants", HashOf(String, String), "Hash of key-value pairs bearing A/B test variant information (what's A/B-tested / variant label)")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("category")
-		Attribute("tags")
-		Attribute("author_id")
-		Attribute("content_type")
-		Attribute("locked")
-		Attribute("variants")
+		Attribute("variants", MapOf(String, String), "Hash of key-value pairs bearing A/B test variant information (what's A/B-tested / variant label)")
 	})
 	Required("id")
 })
 
-var Source = MediaType("application/vnd.source+json", func() {
+var Source = ResultType("application/vnd.source+json", func() {
 	Attributes(func() {
 		Attribute("rtm_source", String, "Origin of user (e.g. remp_campaign)")
 		Attribute("rtm_medium", String, "Medium through which the came (e.g. overlay, inline)")
 		Attribute("rtm_campaign", String, "Reference to specific campaign (e.g. campaign ID")
 		Attribute("rtm_content", String, "Reference to specific campaign mean (e.g. banner ID)")
 
-		// Deprecated, will be removed
 		Attribute("utm_source", String, "[DEPRECATED] Origin of user (e.g. remp_campaign). Deprecated, please use rtm_source.")
 		Attribute("utm_medium", String, "[DEPRECATED] Medium through which the came (e.g. overlay, inline). Deprecated, please use rtm_medium.")
 		Attribute("utm_campaign", String, "[DEPRECATED] Reference to specific campaign (e.g. campaign ID). Deprecated, please use rtm_campaign.")
 		Attribute("utm_content", String, "[DEPRECATED] Reference to specific campaign mean (e.g. banner ID). Deprecated, please use rtm_content.")
 	})
-	View("default", func() {
-		Attribute("rtm_source")
-		Attribute("rtm_medium")
-		Attribute("rtm_campaign")
-		Attribute("rtm_content")
-
-		// deprecated
-		Attribute("utm_source")
-		Attribute("utm_medium")
-		Attribute("utm_campaign")
-		Attribute("utm_content")
-	})
 })
 
-var CommerceCheckout = MediaType("application/vnd.commerce.checkout+json", func() {
+var CommerceCheckout = ResultType("application/vnd.commerce.checkout+json", func() {
 	Attributes(func() {
 		Attribute("funnel_id", String, "ID of funnel user is being routed trough")
-	})
-	View("default", func() {
-		Attribute("funnel_id")
 	})
 	Required("funnel_id")
 })
 
-var CommercePayment = MediaType("application/vnd.commerce.payment+json", func() {
-	// var CommerceDetails = MediaType("application/vnd.commerce_details+json", func() {
+var CommercePayment = ResultType("application/vnd.commerce.payment+json", func() {
+
 	Attributes(func() {
 		Attribute("funnel_id", String, "ID of funnel user is being routed trough")
 		Attribute("transaction_id", String, "Public ID of transaction (variable symbol)")
 		Attribute("product_ids", ArrayOf(String), "Public IDs of selected products")
 		Attribute("revenue", Revenue, "Amount of money for given payment")
 	})
-	View("default", func() {
-		Attribute("funnel_id")
-		Attribute("transaction_id")
-		Attribute("product_ids")
-		Attribute("revenue")
-	})
 	Required("funnel_id", "revenue", "transaction_id", "product_ids")
 })
 
-var Revenue = MediaType("application/vnd.revenue+json", func() {
+var Revenue = ResultType("application/vnd.revenue+json", func() {
 	Attributes(func() {
-		Attribute("amount", Number, "Numeric amount of money")
+		Attribute("amount", Float64, "Numeric amount of money")
 		Attribute("currency", String, "ISO 4217 representation of currency")
-	})
-	View("default", func() {
-		Attribute("amount")
-		Attribute("currency")
 	})
 	Required("amount", "currency")
 })
 
-var Flags = MediaType("application/vnd.flags+json", func() {
+var Flags = ResultType("application/vnd.flags+json", func() {
 	Attributes(func() {
 		Attribute("pageviews", ArrayOf(String), "Pageviews category flags")
 		Attribute("commerce", ArrayOf(String), "Commerce category flags")
 		Attribute("events", ArrayOf(String), "Events category flags")
 	})
-	View("default", func() {
-		Attribute("pageviews")
-		Attribute("commerce")
-		Attribute("events")
-	})
 	Required("pageviews", "commerce", "events")
 })
 
-var SegmentGroupsFallback = MediaType("application/vnd.segment.groups.fallback", func() {
+var SegmentGroupsFallback = ResultType("application/vnd.segment.groups.fallback", func() {
 	Attributes(func() {
 		Attribute("status", String, "OK flag to check before reading the data")
 		Attribute("groups", CollectionOf(SegmentGroup))
-	})
-	View("default", func() {
-		Attribute("status")
-		Attribute("groups")
 	})
 	Required("status", "groups")
 })

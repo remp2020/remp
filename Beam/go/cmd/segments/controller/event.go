@@ -1,56 +1,86 @@
 package controller
 
 import (
-	"beam/cmd/segments/app"
+	"beam/cmd/segments/gen/events"
 	"beam/model"
+	"context"
 	"time"
-
-	"github.com/goadesign/goa"
 )
 
 // EventController implements the event resource.
 type EventController struct {
-	*goa.Controller
 	EventStorage model.EventStorage
 }
 
 // NewEventController creates an event controller.
-func NewEventController(service *goa.Service, es model.EventStorage) *EventController {
-	return &EventController{
-		Controller:   service.NewController("EventController"),
-		EventStorage: es,
-	}
+func NewEventController(es model.EventStorage) events.Service {
+	return &EventController{es}
 }
 
-// Count runs the count action
-func (c *EventController) Count(ctx *app.CountEventsContext) error {
-	o, err := aggregateOptionsFromEventsOptions(ctx.Payload)
+// CountAction returns counts of events for given action and category
+func (c *EventController) CountAction(ctx context.Context, p *events.EventOptionsPayload) (res events.CountCollection, err error) {
+	o, err := aggregateOptionsFromEventsOptions(p)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	acrc, err := processEventCount(c, o)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return ctx.OK(acrc)
+	return acrc, nil
 }
 
-// CountAction runs the count action, action and category has to be specified
-func (c *EventController) CountAction(ctx *app.CountActionEventsContext) error {
-	o, err := aggregateOptionsFromEventsOptions(ctx.Payload)
+// CountEndpoint runs the count action
+func (c *EventController) CountEndpoint(ctx context.Context, p *events.EventOptionsPayload) (res events.CountCollection, err error) {
+	o, err := aggregateOptionsFromEventsOptions(p)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	o.Action = ctx.Action
-	o.Category = ctx.Category
 	acrc, err := processEventCount(c, o)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return ctx.OK(acrc)
+	return acrc, nil
 }
 
-func processEventCount(c *EventController, ao model.AggregateOptions) (app.CountCollection, error) {
+// List runs the list action.
+func (c *EventController) List(ctx context.Context, p *events.ListEventOptionsPayload) (res events.EventsCollection, err error) {
+	aggOptions, err := aggregateOptionsFromEventsOptions(p.Conditions)
+	if err != nil {
+		return nil, err
+	}
+	o := model.ListOptions{
+		AggregateOptions: aggOptions,
+		SelectFields:     p.SelectFields,
+	}
+
+	erc, err := c.EventStorage.List(o)
+	if err != nil {
+		return nil, err
+	}
+	mt, err := EventRowCollection(erc).ToMediaType()
+	if err != nil {
+		return nil, err
+	}
+	return mt, nil
+}
+
+// Categories runs the categories action.
+func (c *EventController) Categories(ctx context.Context) (res []string, err error) {
+	return c.EventStorage.Categories()
+}
+
+// Actions runs the action action. :)
+func (c *EventController) Actions(ctx context.Context, p *events.ActionsPayload) (res []string, err error) {
+	return c.EventStorage.Actions(*p.Category)
+}
+
+// Users runs the users action.
+func (c *EventController) Users(ctx context.Context) (res []string, err error) {
+	return c.EventStorage.Users()
+}
+
+func processEventCount(c *EventController, ao model.AggregateOptions) (events.CountCollection, error) {
 	crc, ok, err := c.EventStorage.Count(ao)
 	if err != nil {
 		return nil, err
@@ -64,60 +94,11 @@ func processEventCount(c *EventController, ao model.AggregateOptions) (app.Count
 		crc = append(crc, cr)
 	}
 
-	return CountRowCollection(crc).ToMediaType(), nil
-}
-
-// List runs the list action.
-func (c *EventController) List(ctx *app.ListEventsContext) error {
-	aggOptions, err := aggregateOptionsFromEventsOptions(ctx.Payload.Conditions)
-	if err != nil {
-		return err
-	}
-	o := model.ListOptions{
-		AggregateOptions: aggOptions,
-		SelectFields:     ctx.Payload.SelectFields,
-	}
-
-	erc, err := c.EventStorage.List(o)
-	if err != nil {
-		return err
-	}
-	mt, err := EventRowCollection(erc).ToMediaType()
-	if err != nil {
-		return err
-	}
-	return ctx.OK(mt)
-}
-
-// Categories runs the categories action.
-func (c *EventController) Categories(ctx *app.CategoriesEventsContext) error {
-	categories, err := c.EventStorage.Categories()
-	if err != nil {
-		return err
-	}
-	return ctx.OK(categories)
-}
-
-// Actions runs the action action. :)
-func (c *EventController) Actions(ctx *app.ActionsEventsContext) error {
-	actions, err := c.EventStorage.Actions(ctx.Category)
-	if err != nil {
-		return err
-	}
-	return ctx.OK(actions)
-}
-
-// Users runs the users action.
-func (c *EventController) Users(ctx *app.UsersEventsContext) error {
-	users, err := c.EventStorage.Users()
-	if err != nil {
-		return err
-	}
-	return ctx.OK(users)
+	return CountRowCollection(crc).ToEventsMediaType(), nil
 }
 
 // aggregateOptionsFromEventsOptions converts payload data to AggregateOptions.
-func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) (model.AggregateOptions, error) {
+func aggregateOptionsFromEventsOptions(payload *events.EventOptionsPayload) (model.AggregateOptions, error) {
 	var o model.AggregateOptions
 
 	for _, val := range payload.FilterBy {
@@ -134,10 +115,12 @@ func aggregateOptionsFromEventsOptions(payload *app.EventOptionsPayload) (model.
 
 	o.GroupBy = payload.GroupBy
 	if payload.TimeAfter != nil {
-		o.TimeAfter = *payload.TimeAfter
+		t, _ := time.Parse(time.RFC3339, *payload.TimeAfter)
+		o.TimeAfter = t
 	}
 	if payload.TimeBefore != nil {
-		o.TimeBefore = *payload.TimeBefore
+		t, _ := time.Parse(time.RFC3339, *payload.TimeBefore)
+		o.TimeBefore = t
 	}
 
 	if payload.TimeHistogram != nil {

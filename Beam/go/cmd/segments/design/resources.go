@@ -1,8 +1,7 @@
 package design
 
 import (
-	. "github.com/goadesign/goa/design"
-	. "github.com/goadesign/goa/design/apidsl"
+	. "goa.design/goa/v3/dsl"
 )
 
 // set of constants reused within multiple actions
@@ -25,439 +24,479 @@ const (
 	}`
 )
 
-var _ = Resource("swagger", func() {
-	Origin("*", func() {
-		Methods("GET", "OPTIONS")
-		Headers("*")
-	})
-	NoSecurity()
-	Files("/swagger.json", "swagger/swagger.json")
+var _ = Service("swagger", func() {
+	Files("/swagger.json", "gen/http/openapi.json")
+	Files("/openapi3.json", "gen/http/openapi3.json")
 })
 
-var _ = Resource("segments", func() {
+var _ = Service("segments", func() {
 	Description("Segment operations")
-	BasePath("/segments")
-	NoSecurity()
 
-	Action("get", func() {
+	HTTP(func() {
+		Path("/segments")
+	})
+
+	Method("get", func() {
 		Description("Get segment")
-		Routing(GET("/show"))
-		Params(func() {
-			Param("id", Integer, "Segment ID")
+		Payload(func() {
+			Attribute("id", Int, "Segment ID")
 			Required("id")
 		})
-		Response(NotFound)
-		Response(BadRequest)
-		Response(OK, SegmentersSegment)
+		Result(SegmentersSegment)
+		Error("not_found")
+		Error("bad_request")
+		HTTP(func() {
+			GET("/show")
+			Response("not_found", StatusNotFound)
+			Response("bad_request", StatusBadRequest)
+			Response(StatusOK)
+		})
 	})
-	Action("list", func() {
+
+	Method("list", func() {
 		Description("List all segments.")
-		Routing(GET("/"))
-		Response(NotFound)
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(CollectionOf(Segment, func() {
-				View("default")
-				View("tiny")
-				View("extended")
-				View("segmenter")
-			}))
+		Error("not_found")
+		Error("bad_request")
+		Result(CollectionOf(Segment), func() {
+			View("default")
+			View("tiny")
+			View("extended")
+			View("segmenter")
+		})
+		HTTP(func() {
+			GET("/")
+			Response("not_found", StatusNotFound)
+			Response("bad_request", StatusBadRequest)
+			Response(StatusOK)
 		})
 	})
-	Action("groups", func() {
+	Method("groups", func() {
 		Description("List all segment groups.")
-		Routing(GET("/groups"))
-		Response(OK, func() {
-			Media(SegmentGroupsFallback)
+		Result(SegmentGroupsFallback)
+		HTTP(func() {
+			GET("/groups")
+			Response(StatusOK)
 		})
 	})
-	Action("check_user", func() {
+
+	Method("check_user", func() {
 		Description("Check whether given user ID belongs to segment.")
-		Routing(GET("/:segment_code/users/check/:user_id"))
-		Params(func() {
-			Param("segment_code", String, "Segment code", func() {
+		Payload(func() {
+			Attribute("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
 			})
-			Param("user_id", String, "User ID", func() {
+			Attribute("user_id", String, "User ID", func() {
 				Pattern(UserPattern)
 			})
-			Param("fields", String, FieldsParamDescription)
-			Param("cache", String, CacheParamDescription)
+			Attribute("fields", String, FieldsParamDescription)
+			Attribute("cache", String, CacheParamDescription)
 		})
-		Response(NotFound)
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(SegmentCheck)
+		Error("not_found")
+		Error("bad_request")
+		Result(SegmentCheck)
+		HTTP(func() {
+			GET("/{segment_code}/users/check/{user_id}")
+			Response("not_found", StatusNotFound)
+			Response("bad_request", StatusBadRequest)
+			Response(StatusOK)
 		})
 	})
-	Action("check_browser", func() {
+
+	Method("check_browser", func() {
 		Description("Check whether given browser ID belongs to segment.")
-		Routing(GET("/:segment_code/browsers/check/:browser_id"))
-		Params(func() {
-			Param("segment_code", String, "Segment code", func() {
+		Error("not_found")
+		Error("bad_request")
+		Payload(func() {
+			Attribute("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
 			})
-			Param("browser_id", String, "Browser ID", func() {
+			Attribute("browser_id", String, "Browser ID", func() {
 				Pattern(UserPattern)
 			})
-			Param("fields", String, FieldsParamDescription)
-			Param("cache", String, CacheParamDescription)
+			Attribute("fields", String, FieldsParamDescription)
+			Attribute("cache", String, CacheParamDescription)
 		})
-		Response(NotFound)
-		Response(BadRequest)
-		Response(OK, func() {
-			Media(SegmentCheck)
+		Result(SegmentCheck)
+		HTTP(func() {
+			GET("/{segment_code}/browsers/check/{browser_id}")
+
+			Response("not_found", StatusNotFound)
+			Response("bad_request", StatusBadRequest)
+			Response(StatusOK)
 		})
 	})
-	Action("users", func() {
+
+	Method("users", func() {
 		Description("List users of segment.")
-		Routing(
-			GET("/:segment_code/users"),
-		)
-		Params(func() {
-			Param("segment_code", String, "Segment code", func() {
+		Error("not_found")
+		Error("bad_request")
+		Payload(func() {
+			Attribute("segment_code", String, "Segment code", func() {
 				Pattern(SegmentPattern)
 			})
-			Param("fields", String, FieldsParamDescription)
+			Attribute("fields", String, FieldsParamDescription)
 		})
-		Response(NotFound)
-		Response(BadRequest)
-		Response(OK, ArrayOf(String))
+		Result(ArrayOf(String))
+		HTTP(func() {
+			GET("/{segment_code}/users")
+			Response("not_found", StatusNotFound)
+			Response("bad_request", StatusBadRequest)
+			Response(StatusOK)
+		})
 	})
-	Action("criteria", func() {
+
+	Method("criteria", func() {
 		Description("Provide segment blueprint with criteria for individual tables and fields")
-		Routing(
-			GET("/criteria"),
-		)
-		Response(OK, SegmentBlueprint)
+		Result(SegmentBlueprint)
+		HTTP(func() {
+			GET("/criteria")
+			Response(StatusOK)
+		})
 	})
-	// TODO: divide to two separate endpoints after CRM API refactoring
-	Action("create_or_update", func() {
-		Description("Create or update segment (for fupdate, use GET parameter ?id={segment_id})")
+
+	Method("create_or_update", func() {
+		Description("Create or update segment (for update, use GET parameter ?id={segment_id})")
 		Payload(SegmentPayload)
-		Routing(POST("/detail"))
-		Params(func() {
-			Param("id", Integer, "Segment ID")
+		Result(Segment)
+		Error("bad_request")
+		Error("not_found")
+		HTTP(func() {
+			POST("/detail")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
+			})
+			Response("not_found", StatusNotFound, func() {
+				Description("Returned when segment with provided ID doesn't exist")
+			})
+			Response(StatusOK)
 		})
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(NotFound, func() {
-			Description("Returned when segment with provided ID doesn't exist")
-		})
-		Response(OK, Segment)
 	})
-	Action("count", func() {
+
+	Method("count", func() {
 		Description("Returns number of users in segment based on provided criteria")
 		Payload(SegmentTinyPayload)
-		Routing(POST("/count"))
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
+		Error("bad_request")
+		Result(SegmentCount)
+		HTTP(func() {
+			POST("/count")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
+			})
+			Response(StatusOK)
 		})
-		Response(OK, SegmentCount)
 	})
-	Action("related", func() {
+
+	Method("related", func() {
 		Description("Returns segments with same or similar criteria")
 		Payload(SegmentTinyPayload)
-		Routing(POST("/related"))
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
+		Error("bad_request")
+		Result(RelatedSegments)
+		HTTP(func() {
+			POST("/related")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
+			})
+			Response(StatusOK)
 		})
-		Response(OK, RelatedSegments)
 	})
 })
 
-var _ = Resource("journal", func() {
+var _ = Service("journal", func() {
 	Description("Common journal calls")
-	BasePath("/journal")
-	NoSecurity()
 
-	Action("flags", func() {
+	HTTP(func() {
+		Path("/journal")
+	})
+
+	Method("flags", func() {
 		Description("List of all available flags")
-		Routing(GET("/flags"))
-		Response(OK, Flags)
+		Result(Flags)
+		HTTP(func() {
+			GET("/flags")
+			Response(StatusOK)
+		})
 	})
 })
 
-var _ = Resource("events", func() {
+var _ = Service("events", func() {
 	Description("Events journal")
-	BasePath("/journal/events")
-	NoSecurity()
 
-	Action("count_action", func() {
+	HTTP(func() {
+		Path("/journal/events")
+	})
+
+	Method("count_action", func() {
 		Description("Returns counts of events for given action and category")
-		Routing(POST("/categories/:category/actions/:action/count"))
 		Payload(EventOptionsPayload)
-		Params(func() {
-			Param("action", String, "Event action")
-			Param("category", String, "Event category")
-		})
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Count, func() {
-				View("default")
-			}))
+		Error("bad_request")
+		Result(CollectionOf(Count))
+		HTTP(func() {
+			POST("/categories/{category}/actions/{action}/count")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
+			})
+			Response(StatusOK)
 		})
 	})
-	Action("count", func() {
+
+	Method("count", func() {
 		Description("Returns counts of events")
-		Routing(POST("/count"))
 		Payload(EventOptionsPayload)
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Count, func() {
-				View("default")
-			}))
+		Error("bad_request")
+		Result(CollectionOf(Count))
+		HTTP(func() {
+			POST("/count")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
+			})
+			Response(StatusOK)
 		})
 	})
-	Action("list", func() {
+	Method("list", func() {
 		Description("Returns full list of events")
-		Routing(POST("/list"))
 		Payload(ListEventOptionsPayload)
-		Response(OK, func() {
-			Media(CollectionOf(Events, func() {
-				View("default")
-			}))
+		Result(CollectionOf(Events))
+		HTTP(func() {
+			POST("/list")
+			Response(StatusOK)
 		})
 	})
-	Action("categories", func() {
+	Method("categories", func() {
 		Description("List of all tracked categories")
-		Routing(GET("/categories"))
-		Response(OK, ArrayOf(String))
+		Result(ArrayOf(String))
+		HTTP(func() {
+			GET("/categories")
+			Response(StatusOK)
+		})
 	})
-	Action("actions", func() {
+
+	Method("actions", func() {
 		Description("List of all tracked actions for given category")
-		Routing(GET("/categories/:category/actions"))
-		Params(func() {
-			Param("category", String, "Category under which the actions were tracked")
+		Payload(func() {
+			Attribute("category", String, "Category under which the actions were tracked")
 		})
-		Response(OK, ArrayOf(String))
+		Result(ArrayOf(String))
+		HTTP(func() {
+			GET("/categories/{category}/actions")
+			Response(StatusOK)
+		})
 	})
-	Action("users", func() {
+
+	Method("users", func() {
 		Description("List of all tracked users")
-		Routing(GET("/users"))
-		Response(OK, ArrayOf(String))
+		Result(ArrayOf(String))
+		HTTP(func() {
+			GET("/users")
+			Response(StatusOK)
+		})
 	})
 })
 
-var _ = Resource("commerce", func() {
+var _ = Service("commerce", func() {
 	Description("Commerce journal")
-	BasePath("/journal/commerce")
-	NoSecurity()
 
-	Action("count_step", func() {
+	HTTP(func() {
+		Path("/journal/commerce")
+	})
+
+	Method("count_step", func() {
+		Description("Returns counts of commerce events")
+		Error("bad_request")
+		Result(CollectionOf(Count))
+		Payload(CommerceOptionsPayload)
+		HTTP(func() {
+			POST("/steps/{step}/count")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
+			})
+			Response(StatusOK)
+		})
+	})
+
+	Method("count", func() {
 		Description("Returns counts of commerce events")
 		Payload(CommerceOptionsPayload)
-		Routing(POST("/steps/:step/count"))
-		Params(func() {
-			Param("step", String, "Identification of commerce step", func() {
-				Enum("checkout", "payment", "purchase", "refund")
+		Error("bad_request")
+		Result(CollectionOf(Count))
+		HTTP(func() {
+			POST("/count")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
 			})
-		})
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Count, func() {
-				View("default")
-			}))
+			Response(StatusOK)
 		})
 	})
 
-	Action("count", func() {
-		Description("Returns counts of commerce events")
-		Payload(CommerceOptionsPayload)
-		Routing(POST("/count"))
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Count, func() {
-				View("default")
-			}))
-		})
-	})
-
-	Action("sum_step", func() {
+	Method("sum_step", func() {
 		Description("Returns sum of amounts within events")
 		Payload(CommerceOptionsPayload)
-		Routing(POST("/steps/:step/sum"))
-		Params(func() {
-			Param("step", String, "Identification of commerce step", func() {
-				Enum("checkout", "payment", "purchase", "refund")
+		Error("bad_request")
+		Result(CollectionOf(Sum))
+		HTTP(func() {
+			POST("/steps/{step}/sum")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
 			})
-		})
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Sum, func() {
-				View("default")
-			}))
+			Response(StatusOK)
 		})
 	})
 
-	Action("sum", func() {
+	Method("sum", func() {
 		Description("Returns sum of amounts within events")
 		Payload(CommerceOptionsPayload)
-		Routing(POST("/sum"))
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Sum, func() {
-				View("default")
-			}))
+		Error("bad_request")
+		Result(CollectionOf(Sum))
+		HTTP(func() {
+			POST("/sum")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
+			})
+			Response(StatusOK)
 		})
 	})
 
-	Action("list", func() {
+	Method("list", func() {
 		Description("Returns full list of events")
-		Routing(POST("/list"))
 		Payload(ListCommerceOptionsPayload)
-		Response(OK, func() {
-			Media(CollectionOf(Commerces, func() {
-				View("default")
-			}))
+		Result(CollectionOf(Commerces))
+		HTTP(func() {
+			POST("/list")
+			Response(StatusOK)
 		})
 	})
-	Action("categories", func() {
+
+	Method("categories", func() {
 		Description("List of all available categories")
-		Routing(GET("/categories"))
-		Response(OK, ArrayOf(String))
-	})
-	Action("actions", func() {
-		Description("List of all available actions for given category")
-		Routing(GET("/categories/:category/actions"))
-		Params(func() {
-			Param("category", String, "Category (step) under which the actions were tracked")
+		Result(ArrayOf(String))
+		HTTP(func() {
+			GET("/categories")
+			Response(StatusOK)
 		})
-		Response(OK, ArrayOf(String))
+	})
+
+	Method("actions", func() {
+		Description("List of all available actions for given category")
+		Result(ArrayOf(String))
+		Payload(func() {
+			Attribute("category", String, "Category (step) under which the actions were tracked")
+		})
+		HTTP(func() {
+			GET("/categories/{category}/actions")
+			Response(StatusOK)
+		})
 	})
 })
 
-var _ = Resource("pageviews", func() {
+var _ = Service("pageviews", func() {
 	Description("Pageviews journal")
-	BasePath("/journal/pageviews")
-	NoSecurity()
 
-	Action("count", func() {
+	HTTP(func() {
+		Path("/journal/pageviews")
+	})
+
+	Method("count", func() {
 		Description("Returns counts of pageviews")
 		Payload(PageviewOptionsPayload)
-		Routing(POST("/actions/:action/count"))
-		Params(func() {
-			Param("action", String, "Identification of pageview action", func() {
-				Enum("load", "progress")
+		Error("bad_request")
+		Result(CollectionOf(Count))
+		HTTP(func() {
+			POST("/actions/{action}/count")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
 			})
-		})
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Count, func() {
-				View("default")
-			}))
+			Response(StatusOK)
 		})
 	})
-	Action("sum", func() {
+
+	Method("sum", func() {
 		Description("Returns sum of amounts within events")
 		Payload(PageviewOptionsPayload)
-		Routing(POST("/actions/:action/sum"))
-		Params(func() {
-			Param("action", String, "Identification of pageview action", func() {
-				Enum("timespent")
+		Error("bad_request")
+		Result(CollectionOf(Sum))
+		HTTP(func() {
+			POST("/actions/{action}/sum")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
 			})
-		})
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Sum, func() {
-				View("default")
-			}))
+			Response(StatusOK)
 		})
 	})
-	Action("avg", func() {
+
+	Method("avg", func() {
 		Description("Returns avg of amounts within events")
 		Payload(PageviewOptionsPayload)
-		Routing(POST("/actions/:action/avg"))
-		Params(func() {
-			Param("action", String, "Identification of pageview action", func() {
-				Enum("timespent")
+		Error("bad_request")
+		Result(CollectionOf(Avg))
+		HTTP(func() {
+			POST("/actions/{action}/avg")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
 			})
-		})
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Avg, func() {
-				View("default")
-			}))
+			Response(StatusOK)
 		})
 	})
-	Action("unique", func() {
+
+	Method("unique", func() {
 		Description("Returns unique count of amounts within events")
 		Payload(PageviewOptionsPayload)
-		Routing(POST("/actions/:action/unique/:item"))
-		Params(func() {
-			Param("action", String, "Identification of pageview action", func() {
-				Enum("load")
+		Error("bad_request")
+		Result(CollectionOf(Count))
+		HTTP(func() {
+			POST("/actions/{action}/unique/{item}")
+			Response("bad_request", StatusBadRequest, func() {
+				Description("Returned when request does not comply with Swagger specification")
 			})
-			Param("item", String, "Identification of queried unique items", func() {
-				Enum("browsers")
-			})
-		})
-		Response(BadRequest, func() {
-			Description("Returned when request does not comply with Swagger specification")
-		})
-		Response(OK, func() {
-			Media(CollectionOf(Count, func() {
-				View("default")
-			}))
+			Response(StatusOK)
 		})
 	})
-	Action("list", func() {
+
+	Method("list", func() {
 		Description("Returns full list of pageviews")
-		Routing(POST("/list"))
 		Payload(ListPageviewOptionsPayload)
-		Response(OK, func() {
-			Media(CollectionOf(Pageviews, func() {
-				View("default")
-			}))
+		Result(CollectionOf(Pageviews))
+		HTTP(func() {
+			POST("/list")
+			Response(StatusOK)
 		})
 	})
-	Action("categories", func() {
+
+	Method("categories", func() {
 		Description("List of all available categories")
-		Routing(GET("/categories"))
-		Response(OK, ArrayOf(String))
-	})
-	Action("actions", func() {
-		Description("List of all available actions for given category")
-		Routing(GET("/categories/:category/actions"))
-		Params(func() {
-			Param("category", String, "Category under which the actions were tracked")
+		Result(ArrayOf(String))
+		HTTP(func() {
+			GET("/categories")
+			Response(StatusOK)
 		})
-		Response(OK, ArrayOf(String))
+	})
+
+	Method("actions", func() {
+		Description("List of all available actions for given category")
+		Payload(func() {
+			Attribute("category", String, "Category under which the actions were tracked")
+		})
+		Result(ArrayOf(String))
+		HTTP(func() {
+			GET("/categories/{category}/actions")
+			Response(StatusOK)
+		})
 	})
 })
 
-var _ = Resource("concurrents", func() {
+var _ = Service("concurrents", func() {
 	Description("Show recent concurrent connections")
-	BasePath("/journal/concurrents")
-	NoSecurity()
 
-	Action("count", func() {
+	Method("count", func() {
 		Description("Returns recent concurrent connections identified by browser id")
 		Payload(ConcurrentsOptionsPayload)
-		Routing(POST("/count"))
-		Response(OK, func() {
-			Media(CollectionOf(Count, func() {
-				View("default")
-			}))
+
+		Result(CollectionOf(Count))
+
+		HTTP(func() {
+			POST("/count")
+			Response(StatusOK)
 		})
+	})
+	HTTP(func() {
+		Path("/journal/concurrents")
 	})
 })

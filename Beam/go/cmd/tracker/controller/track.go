@@ -1,25 +1,22 @@
 package controller
 
 import (
-	"beam/cmd/tracker/app"
+	"beam/cmd/tracker/gen/track"
 	"beam/cmd/tracker/refererparser"
 	"beam/model"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/avct/uasurfer"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"net/url"
 	"strings"
 	"time"
-
-	"github.com/avct/uasurfer"
-	"github.com/goadesign/goa"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 )
 
 // TrackController implements the track resource.
 type TrackController struct {
-	*goa.Controller
 	EventProducer       EventProducer
 	PropertyStorage     model.PropertyStorage
 	EntitySchemaStorage model.EntitySchemaStorage
@@ -35,10 +32,9 @@ type Event struct {
 	Value    float64                `json:"value"`
 }
 
-// NewTrackController creates a track controller.
-func NewTrackController(service *goa.Service, ep EventProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage, ih []string, tl int) *TrackController {
+// NewTrackController returns the track service implementation.
+func NewTrackController(ep EventProducer, ps model.PropertyStorage, ess model.EntitySchemaStorage, ih []string, tl int) track.Service {
 	return &TrackController{
-		Controller:          service.NewController("TrackController"),
 		EventProducer:       ep,
 		PropertyStorage:     ps,
 		EntitySchemaStorage: ess,
@@ -48,30 +44,30 @@ func NewTrackController(service *goa.Service, ep EventProducer, ps model.Propert
 }
 
 // Commerce runs the commerce action.
-func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
-	_, ok, err := c.PropertyStorage.Get(ctx.Payload.System.PropertyToken.String())
+func (c *TrackController) Commerce(ctx context.Context, p *track.Commerce2) (err error) {
+	_, ok, err := c.PropertyStorage.Get(p.System.PropertyToken)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		return ctx.NotFound()
+		return track.MakeNotFound(errors.New(fmt.Sprintf("unable to find property: %s", p.System.PropertyToken)))
 	}
 
 	tags := map[string]string{
-		"step": ctx.Payload.Step,
+		"step": p.Step,
 	}
-	if ctx.Payload.RempCommerceID != nil {
-		tags["remp_commerce_id"] = *ctx.Payload.RempCommerceID
+	if p.RempCommerceID != nil {
+		tags["remp_commerce_id"] = *p.RempCommerceID
 	}
 
-	if ctx.Payload.CommerceSessionID != nil {
-		tags["commerce_session_id"] = *ctx.Payload.CommerceSessionID
+	if p.CommerceSessionID != nil {
+		tags["commerce_session_id"] = *p.CommerceSessionID
 	}
 
 	fields := map[string]interface{}{}
 
-	if ctx.Payload.Article != nil {
-		at, av := articleValues(ctx.Payload.Article)
+	if p.Article != nil {
+		at, av := articleValues(p.Article)
 		for key, tag := range at {
 			tags[key] = tag
 		}
@@ -80,139 +76,149 @@ func (c *TrackController) Commerce(ctx *app.CommerceTrackContext) error {
 		}
 	}
 
-	switch ctx.Payload.Step {
+	switch p.Step {
 	case "checkout":
-		fields["funnel_id"] = ctx.Payload.Checkout.FunnelID
+		fields["funnel_id"] = p.Checkout.FunnelID
 	case "payment":
-		if ctx.Payload.Payment.FunnelID != nil {
-			fields["funnel_id"] = *ctx.Payload.Payment.FunnelID
+		if p.Payment.FunnelID != nil {
+			fields["funnel_id"] = *p.Payment.FunnelID
 		}
-		fields["product_ids"] = strings.Join(ctx.Payload.Payment.ProductIds, ",")
-		fields["revenue"] = ctx.Payload.Payment.Revenue.Amount
-		fields["transaction_id"] = ctx.Payload.Payment.TransactionID
-		tags["currency"] = ctx.Payload.Payment.Revenue.Currency
+		fields["product_ids"] = strings.Join(p.Payment.ProductIds, ",")
+		fields["revenue"] = p.Payment.Revenue.Amount
+		fields["transaction_id"] = p.Payment.TransactionID
+		tags["currency"] = p.Payment.Revenue.Currency
 	case "purchase":
-		if ctx.Payload.Purchase.FunnelID != nil {
-			fields["funnel_id"] = *ctx.Payload.Purchase.FunnelID
+		if p.Purchase.FunnelID != nil {
+			fields["funnel_id"] = *p.Purchase.FunnelID
 		}
-		fields["product_ids"] = strings.Join(ctx.Payload.Purchase.ProductIds, ",")
-		fields["revenue"] = ctx.Payload.Purchase.Revenue.Amount
-		fields["transaction_id"] = ctx.Payload.Purchase.TransactionID
-		tags["currency"] = ctx.Payload.Purchase.Revenue.Currency
+		fields["product_ids"] = strings.Join(p.Purchase.ProductIds, ",")
+		fields["revenue"] = p.Purchase.Revenue.Amount
+		fields["transaction_id"] = p.Purchase.TransactionID
+		tags["currency"] = p.Purchase.Revenue.Currency
 	case "refund":
-		if ctx.Payload.Refund.FunnelID != nil {
-			fields["funnel_id"] = *ctx.Payload.Refund.FunnelID
+		if p.Refund.FunnelID != nil {
+			fields["funnel_id"] = *p.Refund.FunnelID
 		}
-		fields["product_ids"] = strings.Join(ctx.Payload.Refund.ProductIds, ",")
-		fields["revenue"] = ctx.Payload.Refund.Revenue.Amount
-		fields["transaction_id"] = ctx.Payload.Refund.TransactionID
-		tags["currency"] = ctx.Payload.Refund.Revenue.Currency
+		fields["product_ids"] = strings.Join(p.Refund.ProductIds, ",")
+		fields["revenue"] = p.Refund.Revenue.Amount
+		fields["transaction_id"] = p.Refund.TransactionID
+		tags["currency"] = p.Refund.Revenue.Currency
 	default:
-		return fmt.Errorf("unhandled commerce step: %s", ctx.Payload.Step)
+		return fmt.Errorf("unhandled commerce step: %s", p.Step)
 	}
 
-	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
-	if err := c.pushInternal(ctx.Context, model.TableCommerce, ctx.Payload.System.Time, tags, fields); err != nil {
+	t, err := time.Parse(time.RFC3339, p.System.Time)
+	if err != nil {
 		return err
 	}
 
-	return ctx.Accepted()
+	tags, fields = c.payloadToTagsFields(p.System, p.User, tags, fields)
+	if err = c.pushInternal(ctx, model.TableCommerce, t, tags, fields); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Event runs the event action.
-func (c *TrackController) Event(ctx *app.EventTrackContext) error {
-	_, ok, err := c.PropertyStorage.Get(ctx.Payload.System.PropertyToken.String())
+func (c *TrackController) Event(ctx context.Context, p *track.Event2) (err error) {
+	_, ok, err := c.PropertyStorage.Get(p.System.PropertyToken)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		return ctx.NotFound()
+		return track.MakeNotFound(errors.New(fmt.Sprintf("unable to find property: %s", p.System.PropertyToken)))
 	}
 
 	tags := map[string]string{}
-	if ctx.Payload.RempEventID != nil {
-		tags["remp_event_id"] = *ctx.Payload.RempEventID
+	if p.RempEventID != nil {
+		tags["remp_event_id"] = *p.RempEventID
 	} else {
 		// remp_event_id is required, if not provided, generate one
 		tags["remp_event_id"] = uuid.New().String()
 	}
-	if ctx.Payload.ArticleID != nil {
-		tags["article_id"] = *ctx.Payload.ArticleID
+	if p.ArticleID != nil {
+		tags["article_id"] = *p.ArticleID
 	}
 	fields := map[string]interface{}{}
-	if ctx.Payload.Value != nil {
-		fields["value"] = *ctx.Payload.Value
+	if p.Value != nil {
+		fields["value"] = *p.Value
 	}
-	for key, val := range ctx.Payload.Tags {
+	for key, val := range p.Tags {
 		tags[key] = val
 	}
-	for key, val := range ctx.Payload.Fields {
+	for key, val := range p.Fields {
 		fields[key] = val
 	}
 
-	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
+	tags, fields = c.payloadToTagsFields(p.System, p.User, tags, fields)
 
-	tags["category"] = ctx.Payload.Category
-	tags["action"] = ctx.Payload.Action
+	tags["category"] = p.Category
+	tags["action"] = p.Action
 
-	if err := c.pushInternal(ctx.Context, model.TableEvents, ctx.Payload.System.Time, tags, fields); err != nil {
+	t, err := time.Parse(time.RFC3339, p.System.Time)
+	if err != nil {
 		return err
 	}
 
-	return ctx.Accepted()
+	if err = c.pushInternal(ctx, model.TableEvents, t, tags, fields); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Pageview runs the pageview action.
-func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
-	_, ok, err := c.PropertyStorage.Get(ctx.Payload.System.PropertyToken.String())
+func (c *TrackController) Pageview(ctx context.Context, p *track.Pageview2) (err error) {
+	_, ok, err := c.PropertyStorage.Get(p.System.PropertyToken)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		return ctx.NotFound()
+		return track.MakeNotFound(errors.New(fmt.Sprintf("unable to find property: %s", p.System.PropertyToken)))
 	}
 
 	tags := map[string]string{}
 	fields := map[string]interface{}{}
 
 	var table string
-	switch ctx.Payload.Action {
+	switch p.Action {
 	case model.ActionPageviewLoad:
 		tags["action"] = model.ActionPageviewLoad
 		table = model.TablePageviews
 	case model.ActionPageviewTimespent:
 		tags["action"] = model.ActionPageviewTimespent
 		table = model.TableTimespent
-		if ctx.Payload.Timespent != nil {
-			fields["timespent"] = ctx.Payload.Timespent.Seconds
+		if p.Timespent != nil {
+			fields["timespent"] = p.Timespent.Seconds
 			// limit maximum timespent; filters out broken tracking of open articles (forgotten browser window on different workspace/monitor)
-			if c.TimespentLimit > 0 && ctx.Payload.Timespent.Seconds > c.TimespentLimit {
+			if c.TimespentLimit > 0 && p.Timespent.Seconds > c.TimespentLimit {
 				fields["timespent"] = c.TimespentLimit
 			}
 			fields["unload"] = false
-			if ctx.Payload.Timespent.Unload != nil && *ctx.Payload.Timespent.Unload {
+			if p.Timespent.Unload != nil && *p.Timespent.Unload {
 				fields["unload"] = true
 			}
 		}
 	case model.ActionPageviewProgress:
 		tags["action"] = model.ActionPageviewProgress
 		table = model.TableProgress
-		if ctx.Payload.Progress != nil {
-			fields["page_progress"] = ctx.Payload.Progress.PageRatio
-			if ctx.Payload.Progress.ArticleRatio != nil {
-				fields["article_progress"] = *ctx.Payload.Progress.ArticleRatio
+		if p.Progress != nil {
+			fields["page_progress"] = p.Progress.PageRatio
+			if p.Progress.ArticleRatio != nil {
+				fields["article_progress"] = *p.Progress.ArticleRatio
 			}
 			fields["unload"] = false
-			if ctx.Payload.Progress.Unload != nil && *ctx.Payload.Progress.Unload {
+			if p.Progress.Unload != nil && *p.Progress.Unload {
 				fields["unload"] = true
 			}
 		}
 	default:
-		return ctx.BadRequest(fmt.Errorf("incorrect pageview action [%s]", ctx.Payload.Action))
+		return track.MakeBadRequest(fmt.Errorf("incorrect pageview action [%s]", p.Action))
 	}
 
-	if ctx.Payload.Article != nil {
-		at, av := articleValues(ctx.Payload.Article)
+	if p.Article != nil {
+		at, av := articleValues(p.Article)
 		for key, tag := range at {
 			tags[key] = tag
 		}
@@ -225,50 +231,60 @@ func (c *TrackController) Pageview(ctx *app.PageviewTrackContext) error {
 
 	tags["category"] = model.CategoryPageview
 
-	tags, fields = c.payloadToTagsFields(ctx.Payload.System, ctx.Payload.User, tags, fields)
-	if err := c.pushInternal(ctx.Context, table, ctx.Payload.System.Time, tags, fields); err != nil {
+	t, err := time.Parse(time.RFC3339, p.System.Time)
+	if err != nil {
 		return err
 	}
 
-	return ctx.Accepted()
+	tags, fields = c.payloadToTagsFields(p.System, p.User, tags, fields)
+	if err = c.pushInternal(ctx, table, t, tags, fields); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Entity runs the entity action.
-func (c *TrackController) Entity(ctx *app.EntityTrackContext) error {
-	_, ok, err := c.PropertyStorage.Get(ctx.Payload.System.PropertyToken.String())
+func (c *TrackController) Entity(ctx context.Context, p *track.Entity2) (err error) {
+	_, ok, err := c.PropertyStorage.Get(p.System.PropertyToken)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		return ctx.NotFound()
+		return track.MakeNotFound(errors.New(fmt.Sprintf("unable to find property: %s", p.System.PropertyToken)))
 	}
 
 	// try to get entity schema
-	schema, ok, err := c.EntitySchemaStorage.Get(ctx.Payload.EntityDef.Name)
+	schema, ok, err := c.EntitySchemaStorage.Get(p.EntityDef.Name)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		return ctx.BadRequest(goa.ErrBadRequest(fmt.Errorf("can't find entity schema for entity: %s", ctx.Payload.EntityDef.Name)))
+		return track.MakeBadRequest(fmt.Errorf("can't find entity schema for entity: %s", p.EntityDef.Name))
 	}
 
 	// validate entity schema
-	err = (*EntitySchema)(schema).Validate(ctx.Payload)
+	err = (*EntitySchema)(schema).Validate(p)
 	if err != nil {
-		return ctx.BadRequest(goa.ErrBadRequest(errors.Wrap(err, "schema validation failed")))
+		return track.MakeBadRequest(errors.Wrap(err, "schema validation failed"))
 	}
 
-	fields := ctx.Payload.EntityDef.Data
-	fields["remp_entity_id"] = ctx.Payload.EntityDef.ID
+	fields := p.EntityDef.Data
+	fields["remp_entity_id"] = p.EntityDef.ID
 
-	if err := c.pushInternal(ctx.Context, model.TableEntities, ctx.Payload.System.Time, nil, fields); err != nil {
+	t, err := time.Parse(time.RFC3339, p.System.Time)
+	if err != nil {
 		return err
 	}
 
-	return ctx.Accepted()
+	if err = c.pushInternal(ctx, model.TableEntities, t, nil, fields); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func articleValues(article *app.Article) (map[string]string, map[string]interface{}) {
+func articleValues(article *track.Article) (map[string]string, map[string]interface{}) {
 	tags := map[string]string{
 		"article_id": article.ID,
 	}
@@ -303,7 +319,7 @@ func articleValues(article *app.Article) (map[string]string, map[string]interfac
 	return tags, values
 }
 
-func (c *TrackController) payloadToTagsFields(system *app.System, user *app.User,
+func (c *TrackController) payloadToTagsFields(system *track.System, user *track.User,
 	tags map[string]string, fields map[string]interface{}) (map[string]string, map[string]interface{}) {
 	fields["token"] = system.PropertyToken
 

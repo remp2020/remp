@@ -3,4 +3,4 @@ set -e
 
 cp -a /src/build/. /go/src/gitlab.com/remp/remp/Beam/go 1>&2
 cd cmd/segments && make build-static 1>&2
-tar -cf - segments${TARGET_SUFFIX} swagger
+tar -cf - segments${TARGET_SUFFIX}

@@ -2,12 +2,14 @@
 
 DESIGN_PKG="beam/cmd/tracker/design"
 
+.PHONY: all test build gen
+
 TARGET_GOOS?=linux
 TARGET_GOARCH?=amd64
 TARGET_SUFFIX?=
 export TARGET_GOOS TARGET_GOARCH TARGET_SUFFIX
 
-all: clean gen build
+all: clean build
 
 build: gen build-only
 
@@ -23,10 +25,8 @@ clean:
 
 gen:
 	set -e
-	# revert following back to go install github.com/goadesign/goa/...@v3 once we use the latest goa
-	command -v goagen || (git clone https://github.com/rootpd/goa.git && cd goa && git checkout v1 && make goagen)
-	goagen app -d=$(DESIGN_PKG)
-	goagen swagger -d=$(DESIGN_PKG)
+	go install goa.design/goa/v3/cmd/goa@v3
+	goa gen $(DESIGN_PKG) --output .
 	go install github.com/go-bindata/go-bindata/go-bindata
 	go-bindata -pkg=data -o=./data/bindata.go -ignore=bindata.go data/
 
@@ -43,7 +43,7 @@ docker-build:
 
 docker-run: docker-build
 	docker build -t remp-beam-tracker .
-
+	
 install: gen
 	go install
 

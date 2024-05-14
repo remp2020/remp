@@ -16,7 +16,7 @@ type EntitySchemaStorage interface {
 	// Get returns EntitySchema based on provided EntityName.
 	Get(name string) (*EntitySchema, bool, error)
 	// Cache caches entity definitions.
-	Cache() error
+	Cache(logger *log.Logger) error
 }
 
 // EntitySchemaParam represents single parameter of EntitySchema.
@@ -69,7 +69,7 @@ func (eDB *EntitySchemaDB) Get(name string) (*EntitySchema, bool, error) {
 }
 
 // Cache caches entity definitions.
-func (eDB *EntitySchemaDB) Cache() error {
+func (eDB *EntitySchemaDB) Cache(logger *log.Logger) error {
 	em := make(map[string]*EntitySchema)
 	ec := EntitySchemaCollection{}
 
@@ -113,7 +113,7 @@ func (eDB *EntitySchemaDB) Cache() error {
 		em[e.Name].Params = epm
 	}
 	if !reflect.DeepEqual(eDB.Entities, em) {
-		log.Println("entity schema cache reloaded")
+		logger.Println("entity schema cache reloaded")
 	}
 
 	eDB.Entities = em
