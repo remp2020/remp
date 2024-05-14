@@ -219,7 +219,10 @@ class UserSubscriptionsRepository extends Repository
             } elseif (!$variantId && $mailType->is_multi_variant) {
                 // subscribe all mail variants for multi_variant type without default variant
                 foreach ($this->listVariantsRepository->getVariantsForType($mailType)->fetchAll() as $variant) {
-                    $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variant->id, $rtmParams);
+                    $variantSubscribed = $this->userSubscriptionVariantsRepository->variantSubscribed($actual, $variant->id);
+                    if (!$variantSubscribed) {
+                        $this->userSubscriptionVariantsRepository->addVariantSubscription($actual, $variant->id, $rtmParams);
+                    }
                 }
             }
         }

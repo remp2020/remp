@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - This segment should ideally replace `all_users` provided by CRM and effectively serve as a default. Mailer still filters users based on their newsletter subscription to the email they're receiving.
 - URL parser generator's segment is now optional. remp/crm#2973
   - If not provided, Mailer's segment with subscribers of selected mail type is used as a default.
+- Fixed duplicate entry error when subscribing to already subscribed variant within `UserSubscriptionsRepository->subscribeUser`. remp/remp#1355
 
 ## Archive
 
