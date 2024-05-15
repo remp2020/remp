@@ -47,6 +47,9 @@ var _ = Service("segments", func() {
 		Error("bad_request")
 		HTTP(func() {
 			GET("/show")
+			Params(func() {
+				Param("id")
+			})
 			Response("not_found", StatusNotFound)
 			Response("bad_request", StatusBadRequest)
 			Response(StatusOK)
@@ -96,6 +99,10 @@ var _ = Service("segments", func() {
 		Result(SegmentCheck)
 		HTTP(func() {
 			GET("/{segment_code}/users/check/{user_id}")
+			Params(func() {
+				Param("fields")
+				Param("cache")
+			})
 			Response("not_found", StatusNotFound)
 			Response("bad_request", StatusBadRequest)
 			Response(StatusOK)
@@ -119,7 +126,10 @@ var _ = Service("segments", func() {
 		Result(SegmentCheck)
 		HTTP(func() {
 			GET("/{segment_code}/browsers/check/{browser_id}")
-
+			Params(func() {
+				Param("fields")
+				Param("cache")
+			})
 			Response("not_found", StatusNotFound)
 			Response("bad_request", StatusBadRequest)
 			Response(StatusOK)
@@ -139,6 +149,9 @@ var _ = Service("segments", func() {
 		Result(ArrayOf(String))
 		HTTP(func() {
 			GET("/{segment_code}/users")
+			Params(func() {
+				Param("fields")
+			})
 			Response("not_found", StatusNotFound)
 			Response("bad_request", StatusBadRequest)
 			Response(StatusOK)
@@ -162,6 +175,9 @@ var _ = Service("segments", func() {
 		Error("not_found")
 		HTTP(func() {
 			POST("/detail")
+			Params(func() {
+				Param("id")
+			})
 			Response("bad_request", StatusBadRequest, func() {
 				Description("Returned when request does not comply with Swagger specification")
 			})
