@@ -8,11 +8,15 @@ use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Hermes\RedisDriver;
+use Remp\MailerModule\Models\DataRetentionInterface;
+use Remp\MailerModule\Models\DataRetentionTrait;
 use Remp\MailerModule\Models\Job\MailCache;
 use Tomaj\Hermes\Emitter;
 
-class BatchesRepository extends Repository
+class BatchesRepository extends Repository implements DataRetentionInterface
 {
+    use DataRetentionTrait;
+
     const STATUS_CREATED = 'created';
     const STATUS_READY_TO_PROCESS_AND_SEND = 'ready_to_process_and_send';
     const STATUS_READY_TO_PROCESS = 'ready_to_process';
@@ -45,6 +49,8 @@ class BatchesRepository extends Repository
         Explorer $database,
         protected Emitter $emitter,
         protected MailCache $mailCache,
+        protected BatchTemplatesRepository $batchTemplatesRepository,
+        protected JobQueueRepository $jobQueueRepository,
         Storage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
@@ -176,14 +182,31 @@ class BatchesRepository extends Repository
             ->where(['status NOT IN' => self::EDITABLE_STATUSES]);
     }
 
-    public function getBatchToRemove(): ?ActiveRow
+    public function removeData(): ?int
     {
-        return $this->getTable()
-            ->where([
-                'status' => self::STATUS_PROCESSED,
-                'updated_at < ?' => new DateTime('- 1 day')
-            ])
-            ->limit(1)
-            ->fetch();
+        if ($this->retentionForever) {
+            return null;
+        }
+
+        $threshold = (new \DateTime())->modify('-' . $this->retentionThreshold);
+        $idsToDelete = $this->getTable()
+            ->select('mail_job_batch.id')
+            ->joinWhere(':mail_logs', 'mail_job_batch.id = :mail_logs.mail_job_batch_id')
+            ->where("mail_job_batch.{$this->getRetentionRemovingField()} < ?", $threshold)
+            ->where('status = ?', self::STATUS_PROCESSED)
+            ->where(':mail_logs.id IS NULL')
+            ->fetchPairs('id', 'id'); // delete only batches that were never sent
+
+        if (!count($idsToDelete)) {
+            return 0;
+        }
+
+        foreach ($idsToDelete as $batchId) {
+            $this->batchTemplatesRepository->deleteByBatchId($batchId);
+            $this->mailCache->removeQueue($batchId);
+            $this->jobQueueRepository->deleteJobsByBatch($batchId);
+        }
+
+        return $this->getTable()->where('mail_job_batch.id IN (?)', $idsToDelete)->delete();
     }
 }

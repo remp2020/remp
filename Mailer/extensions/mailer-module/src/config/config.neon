@@ -59,12 +59,12 @@ services:
 			- add(Remp\MailerModule\Commands\AggregateMailTemplateStatsCommand())
 			- add(Remp\MailerModule\Commands\HeartbeatCommand())
 			- add(Remp\MailerModule\Commands\MailTypeStatsCommand())
-			- add(Remp\MailerModule\Commands\RemoveOldMailJobBatchesCommand())
 			- add(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand())
 			- add(Remp\MailerModule\Commands\MigrateUserSubscriptionsAndVariantsCommand())
 			- add(Remp\MailerModule\Commands\MigrateAutologinTokensCommand())
 			- add(Remp\MailerModule\Commands\BigintMigrationCleanupCommand())
 			- add(Remp\MailerModule\Commands\UnsubscribeInactiveUsersCommand())
+			- add(Remp\MailerModule\Commands\CleanupCommand())
 			- add(@hermesWorker)
 			- setCatchExceptions(true)
 
@@ -278,16 +278,19 @@ services:
 
 	- Remp\MailerModule\Repositories\ActiveRowFactory
 
-	- Remp\MailerModule\Repositories\LayoutsRepository
-	- Remp\MailerModule\Repositories\SnippetsRepository
-	- Remp\MailerModule\Repositories\ListsRepository
-	- Remp\MailerModule\Repositories\ListCategoriesRepository
-	- Remp\MailerModule\Repositories\ListVariantsRepository
-	- Remp\MailerModule\Repositories\TemplatesRepository
-	- Remp\MailerModule\Repositories\JobsRepository
-	- Remp\MailerModule\Repositories\JobQueueRepository
-	- Remp\MailerModule\Repositories\BatchesRepository
-	- Remp\MailerModule\Repositories\BatchTemplatesRepository
+	layoutsRepository: Remp\MailerModule\Repositories\LayoutsRepository
+	snippetsRepository: Remp\MailerModule\Repositories\SnippetsRepository
+	listsRepository: Remp\MailerModule\Repositories\ListsRepository
+	listCategoriesRepository: Remp\MailerModule\Repositories\ListCategoriesRepository
+	listVariantsRepository: Remp\MailerModule\Repositories\ListVariantsRepository
+	templatesRepository: Remp\MailerModule\Repositories\TemplatesRepository
+	jobsRepository: Remp\MailerModule\Repositories\JobsRepository
+	jobQueueRepository: Remp\MailerModule\Repositories\JobQueueRepository
+	batchesRepository:
+	    factory: Remp\MailerModule\Repositories\BatchesRepository
+	    setup:
+	    	- setRetentionThreshold('1 day')
+	batchTemplatesRepository: Remp\MailerModule\Repositories\BatchTemplatesRepository
 
 	autologinTokensRepository:
 		factory: Remp\MailerModule\Repositories\AutoLoginTokensRepository
@@ -295,6 +298,8 @@ services:
 			- setNewTableName('autologin_tokens_v2')
 			- setNewTableDataMigrationIsRunningFlag(Remp\MailerModule\Commands\MigrateAutologinTokensCommand::AUTOLOGIN_TOKENS_MIGRATION_IS_RUNNING)
 			- setRedisClientFactory(@redisClientFactory)
+			- setRetentionThreshold('7 days')
+			- setRetentionRemovingField('valid_to')
 
 	- Remp\MailerModule\Repositories\SourceTemplatesRepository
 	- Remp\MailerModule\Repositories\MailTypesRepository

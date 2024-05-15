@@ -4,10 +4,13 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Repositories;
 
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Models\DataRetentionInterface;
+use Remp\MailerModule\Models\DataRetentionTrait;
 
-class AutoLoginTokensRepository extends Repository
+class AutoLoginTokensRepository extends Repository implements DataRetentionInterface
 {
     use NewTableDataMigrationTrait;
+    use DataRetentionTrait;
 
     protected $tableName = 'autologin_tokens';
 

@@ -15,12 +15,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - **BREAKING**: Removed `autoload` flag from configs table and `ConfigsRepository::loadAllAutoload`.
+- **BREAKING**: Removed command `mail:remove-old-batches`. remp/remp#1354
+  - Use newly added `application:cleanup` instead.
 - Added option to track variant subscriptions to Tracker. remp/web#2404
 - Added Mailer's segment "Everyone" which lists all subscribers known to Mailer. remp/crm#2973
   - This segment should ideally replace `all_users` provided by CRM and effectively serve as a default. Mailer still filters users based on their newsletter subscription to the email they're receiving.
 - URL parser generator's segment is now optional. remp/crm#2973
   - If not provided, Mailer's segment with subscribers of selected mail type is used as a default.
 - Fixed duplicate entry error when subscribing to already subscribed variant within `UserSubscriptionsRepository->subscribeUser`. remp/remp#1355
+- Added `application:cleanup` command to execute configured data retention policies. remp/remp#1354
+  - By default, the system purges all expired autologin tokens and processed batches not sent within 24 hours.
+  - You can configure/change the retention polices in `config.neon`, see README for more information.
 
 ## Archive
 
