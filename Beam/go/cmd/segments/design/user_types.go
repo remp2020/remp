@@ -82,6 +82,9 @@ var ListPageviewOptionsPayload = Type("ListPageviewOptionsPayload", func() {
 	Attribute("load_timespent", Boolean, "If true, load timespent for each pageview", func() {
 		Default(false)
 	})
+	Attribute("load_progress", Boolean, "If true, load page and article progress for each pageview", func() {
+		Default(false)
+	})
 	Attribute("conditions", PageviewOptionsPayload, "Condition definition")
 
 	Required("conditions")

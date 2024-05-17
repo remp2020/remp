@@ -556,6 +556,12 @@ func (p *Pageview) ToMediaType() (*pageviews.Pageview, error) {
 	if p.Timespent != 0 {
 		pageview.User.Timespent = &p.Timespent
 	}
+	if p.PageProgress != 0.0 {
+		pageview.User.PageProgress = &p.PageProgress
+	}
+	if p.ArticleProgress != 0.0 {
+		pageview.User.ArticleProgress = &p.ArticleProgress
+	}
 
 	return pageview, nil
 }

@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed newsletters not being sent anymore if there was an issue with sending for more than two sending periods. remp/remp#1351
 - [Tracker] Changed Goa library from v1 to v3. remp/remp#1341
 - [Segments] Changed Goa library from v1 to v3. remp/remp#1341
+- [Segments] Added `load_progress` attribute to journal list pageviews. remp/remp#1335
 
 ### [Mailer]
 

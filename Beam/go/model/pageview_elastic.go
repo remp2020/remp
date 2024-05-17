@@ -372,10 +372,26 @@ func (pDB *PageviewElastic) List(options ListPageviewsOptions) (PageviewRowColle
 		}
 	}
 
+	// Load page and article progress
+	articleProgressForPageviews := make(map[string]float32)
+	pageProgressForPageviews := make(map[string]float32)
+	if len(pageviewIDs) > 0 && options.LoadProgress {
+		pageProgressForPageviews, articleProgressForPageviews, err = loadProgress(pDB, pageviewIDs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	for _, pr := range prBuckets {
 		for _, pv := range pr.Pageviews {
 			if timespent, ok := timespentForPageviews[pv.ID]; ok {
 				pv.Timespent = timespent
+			}
+			if articleProgress, ok := articleProgressForPageviews[pv.ID]; ok {
+				pv.ArticleProgress = articleProgress
+			}
+			if pageProgress, ok := pageProgressForPageviews[pv.ID]; ok {
+				pv.PageProgress = pageProgress
 			}
 		}
 
@@ -429,6 +445,56 @@ func loadTimespent(pDB *PageviewElastic, pageviewIDs []string) (map[string]int, 
 	}
 
 	return timespentForPageviews, nil
+}
+
+func loadProgress(pDB *PageviewElastic, pageviewIDs []string) (map[string]float32, map[string]float32, error) {
+	index := pDB.DB.resolveIndex("pageviews_progress")
+	fsc := elastic.NewFetchSourceContext(true).Include(
+		"article_progress",
+		"page_progress",
+		"remp_pageview_id",
+	)
+	scroll := pDB.DB.Client.Scroll(index).Size(1000).FetchSourceContext(fsc)
+
+	var ao AggregateOptions
+
+	fb := &FilterBy{
+		Tag:     "remp_pageview_id",
+		Values:  pageviewIDs,
+		Inverse: false,
+	}
+	ao.FilterBy = append(ao.FilterBy, fb)
+
+	scroll, err := pDB.DB.addScrollFilters(scroll, index, ao)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer scroll.Clear(pDB.DB.Context)
+
+	pageProgressForPageviews := make(map[string]float32)
+	articleProgressForPageviews := make(map[string]float32)
+
+	for {
+		results, err := scroll.Do(pDB.DB.Context)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "error while reading list data from elastic")
+		}
+
+		for _, hit := range results.Hits.Hits {
+			pv := &Pageview{}
+			if err := json.Unmarshal(hit.Source, pv); err != nil {
+				return nil, nil, errors.Wrap(err, "error reading timespent record from elastic")
+			}
+			pageProgressForPageviews[hit.Id] = pv.PageProgress
+			articleProgressForPageviews[hit.Id] = pv.ArticleProgress
+
+		}
+	}
+
+	return pageProgressForPageviews, articleProgressForPageviews, nil
 }
 
 // Categories lists all tracked categories.

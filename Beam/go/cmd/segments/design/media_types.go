@@ -303,6 +303,8 @@ var User = ResultType("application/vnd.user+json", func() {
 		Attribute("derived_referer_source", String, "Specific source of medium which trigerred the pageview (e.g. Google, Gmail, ...)")
 		Attribute("derived_referer_host_with_path", String, "Referer without query parameters (only host and path)")
 		Attribute("timespent", Int, "Number of seconds spent during pageview (if recorded)")
+		Attribute("page_progress", Float32, "Page reading progress (0.0-1.0, if recorded)")
+		Attribute("article_progress", Float32, "Article reading progress (0.0-1.0, if recorded)")
 	})
 	Required("remp_pageview_id")
 })

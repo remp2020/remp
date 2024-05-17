@@ -66,6 +66,8 @@ type Pageview struct {
 	WindowWidth     int       `json:"window_width"`
 	WindowHeight    int       `json:"window_height"`
 	Timespent       int       `json:"timespent"`
+	PageProgress    float32   `json:"page_progress"`
+	ArticleProgress float32   `json:"article_progress"`
 
 	DerivedRefererMedium       string `json:"derived_referer_medium"`
 	DerivedRefererHostWithPath string `json:"derived_referer_host_with_path"`
@@ -86,6 +88,7 @@ type ListPageviewsOptions struct {
 	AggregateOptions
 	SelectFields  []string
 	LoadTimespent bool
+	LoadProgress  bool
 }
 
 // PageviewStorage is an interface to get pageview events related data.

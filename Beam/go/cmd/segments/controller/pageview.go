@@ -127,6 +127,7 @@ func (c *PageviewController) List(ctx context.Context, p *pageviews.ListPageview
 		AggregateOptions: aggOptions,
 		SelectFields:     p.SelectFields,
 		LoadTimespent:    p.LoadTimespent,
+		LoadProgress:     p.LoadProgress,
 	}
 
 	prc, err := c.PageviewStorage.List(o)
