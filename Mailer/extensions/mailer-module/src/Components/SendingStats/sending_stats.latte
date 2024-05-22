@@ -22,7 +22,12 @@
             <div class="easy-pie" data-percent="{$clicked_stat['per']|number:0}">
                 <span class="ep-value c-black">{$clicked_stat['per']|number:2}</span>
             </div>
-            <div class="pgi-title c-black">Clicked<br>{$clicked_stat['value']}</div>
+            <div class="pgi-title c-black">
+                <span style="text-decoration: underline dashed; cursor: help" data-toggle="tooltip" title="Number of recipients who clicked on any link in the email (possibly including unsubscribe link) if the click tracking was enabled.">
+                    Clicked
+                </span>
+                <br>
+                {$clicked_stat['value']}</div>
         </div>
     </div>
 
