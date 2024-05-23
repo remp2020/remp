@@ -123,6 +123,22 @@ services:
 #		setup:
 #			- addDomain('dennikn.sk')
 
+# configuration required by Respekt's URL parser generators
+# (this is whole configuration; merge it with your existing configuration (other generators)
+#	generator:
+#		factory: Remp\MailerModule\Models\Generators\GeneratorFactory
+#		setup:
+#			- registerGenerator('respekt_url_parser', 'Respekt URL parser', \Remp\Mailer\Models\Generators\RespektUrlParserGenerator(\Remp\Mailer\Models\PageMeta\Content\RespektContent()))
+#			- registerGenerator('respekt_article', 'Respekt article', \Remp\Mailer\Models\Generators\RespektArticleGenerator(\Remp\Mailer\Models\PageMeta\Content\RespektContent()))
+#
+#	respektUrlParserTemplateFormFactory:
+#		setup:
+#			- setLayoutCode('layout-code')
+#			- setDefaultMailTypeCode('mail-type-code')
+#	transporter:
+#		factory: Remp\Mailer\Models\PageMeta\Transport\RespektApiTransport(%respekt.content_url%, %respekt.content_token%)
+# (END) configuration required by Respekt's URL parser generators
+
 # local_configs override DBs configs records.
 local_configs:
 

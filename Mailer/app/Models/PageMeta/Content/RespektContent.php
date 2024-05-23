@@ -30,6 +30,11 @@ class RespektContent implements ContentInterface
 
     public function fetchUrlMeta(string $url): ?Meta
     {
+        if (!$this->transport instanceof RespektApiTransport) {
+            Debugger::log(self::class . ' depends on ' . RespektApiTransport::class . '.', ILogger::ERROR);
+            return null;
+        }
+
         try {
             $data = $this->transport->getContent($url);
             if ($data === null) {
@@ -46,15 +51,13 @@ class RespektContent implements ContentInterface
             $article = $data['data']['getArticle'];
             if ($article === null) {
                 // URL has changed, we need to follow redirects and determine new URL
-                if ($this->transport instanceof RespektApiTransport) {
-                    $resolvedUrl = $this->transport->resolveRedirects($url);
-                    if (!$resolvedUrl) {
-                        // The article wasn't published yet.
-                        return null;
-                    }
-                    if ($url && $resolvedUrl !== $url) {
-                        return $this->fetchUrlMeta($resolvedUrl);
-                    }
+                $resolvedUrl = $this->transport->resolveRedirects($url);
+                if (!$resolvedUrl) {
+                    // The article wasn't published yet.
+                    return null;
+                }
+                if ($url && $resolvedUrl !== $url) {
+                    return $this->fetchUrlMeta($resolvedUrl);
                 }
 
                 return null;
@@ -67,19 +70,25 @@ class RespektContent implements ContentInterface
         $title = $article['title'];
 
         // get article subtitle
-        $subtitle = $this->getFirstParagraphFromParts($article['subtitle']['parts'] ?? []);
+        $subtitle = $this->getContentFromParts(
+            parts: $article['subtitle']['parts'] ?? [],
+            firstParagraphOnly: true,
+        );
 
         // get first paragraph
-        $firstContentParagraph = $this->getFirstParagraphFromParts($article['content']['parts']);
+        $firstContentParagraph = $this->getContentFromParts(
+            parts: $article['content']['parts'],
+            firstParagraphOnly: true,
+        );
 
         // get first content part type
         $firstPart = Json::decode($article['content']['parts'][0]['json'], true);
         $firstContentPartType = $firstPart['children'][0]['type'];
 
+        $fullContent = $this->getContentFromParts($article['content']['parts']);
+
         // get article cover image
-        $image = $article['coverPhoto']['image']['url'];
-        $image = ltrim($image, 'https://');
-        $image = self::RESPEKT_IMAGE_URL . $image . '?width=500&fit=crop';
+        $image = $this->getImageUrl($article['coverPhoto']['image']['url']);
 
         // get article authors
         $authors = [];
@@ -105,25 +114,48 @@ class RespektContent implements ContentInterface
             subtitle: $subtitle,
             firstParagraph: $firstContentParagraph,
             firstContentPartType: $firstContentPartType,
+            fullContent: $fullContent,
         );
     }
 
-    private function getFirstParagraphFromParts($parts): ?string
+    private function getContentFromParts(array $parts, bool $firstParagraphOnly = false): ?string
     {
-        $description = null;
+        $processedContent = null;
+        $references = [];
+
+        $textChildTypes = [
+            'paragraph' => true,
+            'interTitle' => true,
+        ];
+
         foreach ($parts as $contentPart) {
             try {
+                // decode content
                 $contentPartData = Json::decode($contentPart['json'], true);
             } catch (JsonException $e) {
                 Debugger::log($e->getMessage(), ILogger::ERROR);
                 return null;
             }
 
+            // remap links so we can look by key (reference id)
+            if (isset($contentPart['references'])) {
+                foreach ($contentPart['references'] as $reference) {
+                    $references[$reference['id']] = $reference;
+                }
+            }
+
             foreach ($contentPartData['children'] as $contentPartChild) {
-                if ($contentPartChild['type'] === 'paragraph') {
-                    $description = '';
+                if ($textChildTypes[$contentPartChild['type']] ?? false) {
+                    $processedPart = '<p>';
+                    if ($contentPartChild['type'] === 'interTitle') {
+                        $processedPart = '<strong>';
+                    }
+
+                    $processedChildren = '';
                     foreach ($contentPartChild['children'] as $child) {
-                        if ($child['text']) {
+                        $node = '';
+
+                        if (isset($child['text'])) {
                             $node = $child['text'];
                             if (isset($child['isBold']) && $child['isBold'] === true) {
                                 $node = "<strong>{$node}</strong>";
@@ -134,14 +166,54 @@ class RespektContent implements ContentInterface
                             if (isset($child['isItalic']) && $child['isItalic'] === true) {
                                 $node = "<em>{$node}</em>";
                             }
-                            $description .= $node;
+                        } elseif (isset($child['type']) && $child['type'] === 'link') {
+                            $linkTarget = $references[$child['referenceId']]['target'];
+                            $link = ($linkTarget['externalTarget'] ?? $linkTarget['internalTarget']) ?? null;
+                            if ($link !== null) {
+                                $node = $child['children'][0]['text']; // TODO[respekt#192]: this can contain multiple children with formatting
+                                $node = "<a href='{$link}'>{$node}</a>";
+                            }
                         }
+
+                        $processedChildren .= $node;
                     }
 
-                    break 2;
+                    if ($processedChildren) {
+                        $processedPart .= $processedChildren;
+                        if ($contentPartChild['type'] === 'interTitle') {
+                            $processedPart .= '</strong>';
+                        }
+                        $processedContent .= $processedPart . '</p>';
+                    }
+
+                    if ($firstParagraphOnly) {
+                        break 2;
+                    }
+                }
+
+                if ($contentPartChild['type'] === 'reference' && isset($references[$contentPartChild['referenceId']])) {
+                    $reference = $references[$contentPartChild['referenceId']];
+                    if (isset($reference['image'])) {
+                        $caption = $reference['image']['image']['title'];
+                        if (!$caption && isset($reference['image']['image']['author']['name'])) {
+                            $caption = 'Autor: ' . $reference['image']['image']['author']['name'];
+                        }
+                        $processedContent .= sprintf(
+                            '<figure><img src="%s" alt="%s"><figcaption style="font-size: 0.8rem; color: #6b6b6b">%s</figcaption></figure>',
+                            $this->getImageUrl($reference['image']['image']['url']),
+                            $reference['image']['image']['author']['name'] ?? null,
+                            $caption,
+                        );
+                    }
                 }
             }
         }
-        return $description;
+        return $processedContent;
+    }
+
+    private function getImageUrl(string $sourceUrl): string
+    {
+        $image = preg_replace('#^https://#', '', $sourceUrl);
+        return self::RESPEKT_IMAGE_URL . $image . '?width=500&fit=crop';
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\Mailer\Models\PageMeta\Transport;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Uri;
 use Nette\Utils\Json;
@@ -36,9 +37,10 @@ query GetArticleForMailer($articleUrl: String) {
     publishAt
     subtitle {parts {json order}}
     content {
-      parts(filter: { order: { eq: 0 } }) {
+      parts {
         json
         order
+        references {id target {type externalTarget internalTarget {url}} image { image { url title author {name} } }}
       }
     }
   }
@@ -54,6 +56,9 @@ GRAPHQL;
                     ]
                 ]
             ]);
+        } catch (ClientException $e) {
+            Debugger::log($e->getMessage() . ': ' . $e->getResponse()->getBody()->getContents(), ILogger::ERROR);
+            return null;
         } catch (GuzzleException $e) {
             Debugger::log($e->getMessage(), ILogger::ERROR);
             return null;

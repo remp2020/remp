@@ -15,7 +15,7 @@ use Tomaj\NetteApi\Params\PostInputParam;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
-class RespektUrlParserGenerator implements IGenerator
+class RespektArticleGenerator implements IGenerator
 {
     public $onSubmit;
 
@@ -28,10 +28,9 @@ class RespektUrlParserGenerator implements IGenerator
 
     public function generateForm(Form $form): void
     {
-        $form->addTextArea('articles', 'Article')
-            ->setHtmlAttribute('rows', 7)
-            ->setOption('description', 'Paste article URLs. Each on separate line.')
-            ->setRequired(true)
+        $form->addText('article', 'Article')
+            ->setOption('description', 'Paste article URL.')
+            ->setRequired()
             ->getControlPrototype()
             ->setHtmlAttribute('class', 'form-control html-editor');
 
@@ -75,8 +74,7 @@ class RespektUrlParserGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('articles'))->setRequired(),
-            (new PostInputParam('utm_campaign'))->setRequired(),
+            (new PostInputParam('article'))->setRequired(),
         ];
     }
 
@@ -84,30 +82,21 @@ class RespektUrlParserGenerator implements IGenerator
     {
         $sourceTemplate = $this->sourceTemplatesRepository->find($values['source_template_id']);
 
-        $items = [];
         $errors = [];
 
-        $urls = explode("\n", trim($values['articles']));
-        foreach ($urls as $url) {
-            $url = trim($url);
-            if (empty($url)) {
-                // people sometimes enter blank lines
-                continue;
-            }
-            try {
-                $meta = $this->content->fetchUrlMeta($url);
-                if ($meta) {
-                    $items[$url] = $meta;
-                } else {
-                    $errors[] = $url;
-                }
-            } catch (InvalidUrlException $e) {
+        $url = trim($values['article']);
+        try {
+            $article = $this->content->fetchUrlMeta($url);
+            if (!$article) {
                 $errors[] = $url;
             }
+        } catch (InvalidUrlException $e) {
+            $errors[] = $url;
         }
 
         $params = [
-            'items' => $items,
+            'article' => $article ?? null,
+            'url' => $url,
         ];
 
         $engine = $this->engineFactory->engine();

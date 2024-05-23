@@ -8,7 +8,6 @@ use Nette\Forms\Controls\SubmitButton;
 use Nette\Security\User;
 use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
-use Remp\MailerModule\Models\Segment\Crm;
 use Remp\MailerModule\Models\Segment\Mailer;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
