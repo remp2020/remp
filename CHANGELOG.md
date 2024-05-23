@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `application:cleanup` command to execute configured data retention policies. remp/remp#1354
   - By default, the system purges all expired autologin tokens and processed batches not sent within 24 hours.
   - You can configure/change the retention polices in `config.neon`, see README for more information.
+- Fixed status set to batch by `ProcessJobCommand` after processing failed. Batch is now set to original status. remp/remp#1360
 
 ## Archive
 

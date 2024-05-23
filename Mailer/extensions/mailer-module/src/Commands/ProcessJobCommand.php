@@ -49,10 +49,10 @@ class ProcessJobCommand extends Command
         $pid = getmypid();
 
         while ($batch = $this->batchesRepository->getBatchReady()) {
+            $originalStatus = $batch->status;
             try {
                 $this->healthChecker->ping(self::COMMAND_NAME, 600);
 
-                $originalStatus = $batch->status;
                 $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_PROCESSING);
                 $output->writeln("  * processing mail batch <info>#{$batch->id}</info>");
 
@@ -74,7 +74,7 @@ class ProcessJobCommand extends Command
             } catch (Exception $e) {
                 Debugger::log($e, ILogger::ERROR);
                 $reschedule = DateTime::from('+5 minutes');
-                $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_READY_TO_PROCESS_AND_SEND);
+                $this->batchesRepository->updateStatus($batch, $originalStatus);
                 $this->batchesRepository->update($batch, [
                     'start_at' => $reschedule,
                 ]);
@@ -83,7 +83,7 @@ class ProcessJobCommand extends Command
         }
 
         $output->writeln('  * no batch to process');
-        
+
         $this->healthChecker->ping(self::COMMAND_NAME);
 
         $output->writeln('');
