@@ -18,6 +18,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Removed `autoload` flag from configs table and `ConfigsRepository::loadAllAutoload`.
 - **BREAKING**: Removed command `mail:remove-old-batches`. remp/remp#1354
   - Use newly added `application:cleanup` instead.
+- **BREAKING**: Fixed `RedisClientTrait` default database value from `0` to `null`. remp/remp#1357
+  - This affects you only if you configure Redis database manually to something other than `0` in your config.  
+  - The change fixes use of `RedisClientTrait` ignoring database configured in `RedisClientFactory` and forcing DB `0` instead, causing your data to be stored in DB `0` even if you configured your environment/`RedisClientFactory` to use other database.
+  - **IMPORTANT**: It is important to move hermes keys `hermes_tasks_high`, `hermes_tasks`, `hermes_tasks_low` (with `MOVE` command) to correct Redis DB after you shut down your old Hermes workers, and before you start the new ones.
+  - **IMPORTANT**: We also recommend not having any active jobs (processing or sending) during the release process. 
 - Added option to track variant subscriptions to Tracker. remp/web#2404
 - Added Mailer's segment "Everyone" which lists all subscribers known to Mailer. remp/crm#2973
   - This segment should ideally replace `all_users` provided by CRM and effectively serve as a default. Mailer still filters users based on their newsletter subscription to the email they're receiving.

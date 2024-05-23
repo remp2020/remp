@@ -11,7 +11,7 @@ trait RedisClientTrait
 
     private Client $redis;
 
-    private ?int $redisDatabase = 0;
+    private ?int $redisDatabase = null;
 
     private bool $redisUseKeysPrefix = false;
 
