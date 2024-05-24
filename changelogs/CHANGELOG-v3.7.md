@@ -9,8 +9,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed newsletters not being sent anymore if there was an issue with sending for more than two sending periods. remp/remp#1351
-- [Tracker] Changed Goa library from v1 to v3. remp/remp#1341
-- [Segments] Changed Goa library from v1 to v3. remp/remp#1341
+- [Tracker] Updated Goa library from v1 to v3. remp/remp#1341
+- [Segments] Updated Goa library from v1 to v3. remp/remp#1341
 - [Segments] Added `load_progress` attribute to journal list pageviews. remp/remp#1335
 
 ### [Mailer]
@@ -36,24 +36,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed `ContentGenerator` bug where static time from class instance creation was being passed to the email template instead of an actual time. remp/remp#1316  
 - Added ability to filter mail_logs by mail template codes in `LogsHandler` api handler. remp/respekt#211
 
-## Archive
-
-- [v3.6](./changelogs/CHANGELOG-v3.6.md)
-- [v3.5](./changelogs/CHANGELOG-v3.5.md)
-- [v3.4](./changelogs/CHANGELOG-v3.4.md)
-- [v3.3](./changelogs/CHANGELOG-v3.3.md)
-- [v3.2](./changelogs/CHANGELOG-v3.2.md)
-- [v3.1](./changelogs/CHANGELOG-v3.1.md)
-- [v3.0](./changelogs/CHANGELOG-v3.0.md)
-- [v2.2](./changelogs/CHANGELOG-v2.2.md)
-- [v2.1](./changelogs/CHANGELOG-v2.1.md)
-- [v2.0](./changelogs/CHANGELOG-v2.0.md)
-- [v1.2](./changelogs/CHANGELOG-v1.2.md)
-- [v1.1](./changelogs/CHANGELOG-v1.1.md)
-- [v1.0](./changelogs/CHANGELOG-v1.0.md)
-- [v0.*](./changelogs/CHANGELOG-v0.md)
-
 ---
+
+[3.7]: https://github.com/remp2020/remp/compare/3.6.0...3.7.0
 
 [Beam]: https://github.com/remp2020/remp/tree/master/Beam
 [Campaign]: https://github.com/remp2020/remp/tree/master/Campaign
@@ -61,5 +46,3 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 [Sso]: https://github.com/remp2020/remp/tree/master/Sso
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
-
-[Unreleased]: https://github.com/remp2020/remp/compare/3.2.0...master
