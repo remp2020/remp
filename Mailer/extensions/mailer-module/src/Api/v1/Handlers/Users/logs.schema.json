@@ -4,9 +4,19 @@
   "type": "object",
   "$id": "POST /api/v1/mailers/logs-for-email",
   "title": "Logs",
-  "oneOf": [
-    { "required": ["email"] },
-    { "required": ["user_id"] }
+  "allOf": [
+    {
+      "oneOf": [
+        { "required": ["email"] },
+        { "required": ["user_id"] }
+      ]
+    },
+    {
+      "oneOf": [
+        { "not": {"required": ["mail_template_ids"]} },
+        { "not": {"required": ["mail_template_codes"]} }
+      ]
+    }
   ],
   "examples": [
     {
@@ -88,6 +98,13 @@
       "title": "Mail template ids",
       "items": {
         "type": "integer"
+      }
+    },
+    "mail_template_codes": {
+      "type": "array",
+      "title": "Mail template codes",
+      "items": {
+        "type": "string"
       }
     }
   },

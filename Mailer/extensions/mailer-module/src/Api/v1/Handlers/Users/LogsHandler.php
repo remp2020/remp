@@ -49,6 +49,9 @@ class LogsHandler extends BaseHandler
         if (isset($payload['mail_template_ids'])) {
             $logs->where('mail_template_id', $payload['mail_template_ids']);
         }
+        if (isset($payload['mail_template_codes'])) {
+            $logs->where('mail_template.code', $payload['mail_template_codes']);
+        }
         if (isset($payload['page'])) {
             $logs->limit($payload['limit'], ($payload['page'] - 1) * $payload['limit']);
         }
