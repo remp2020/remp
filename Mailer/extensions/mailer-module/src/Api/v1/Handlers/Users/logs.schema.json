@@ -13,8 +13,16 @@
     },
     {
       "oneOf": [
-        { "not": {"required": ["mail_template_ids"]} },
-        { "not": {"required": ["mail_template_codes"]} }
+        {"required": ["mail_template_ids"]},
+        {"required": ["mail_template_codes"]},
+        {
+          "not": {
+            "anyOf": [
+              {"required": ["mail_template_ids"]},
+              {"required": ["mail_template_codes"]}
+            ]
+          }
+        }
       ]
     }
   ],
