@@ -3,4 +3,4 @@ set -e
 
 cp -a /src/build/. /go/src/gitlab.com/remp/remp/Beam/go 1>&2
 cd cmd/tracker && make build-static 1>&2
-tar -cf - tracker${TARGET_SUFFIX}
+tar -cf - tracker${TARGET_SUFFIX} gen/http/openapi.json gen/http/openapi3.json
