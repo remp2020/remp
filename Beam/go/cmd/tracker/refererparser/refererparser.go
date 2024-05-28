@@ -25,7 +25,7 @@ func init() {
 
 // loadRefererData loads and parses the JSON files.
 func loadRefererData() refererData {
-	snowplowReferers, err := bindata.Asset("data/referers-20200930.json")
+	snowplowReferers, err := bindata.Asset("data/referers.json")
 	if err != nil {
 		panic(err)
 	}

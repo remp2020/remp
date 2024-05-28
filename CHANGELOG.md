@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- [Tracker] Updated list of referer sources so that the newer social/searches are recognized. remp/remp#1313
+
 ## Archive
 
 - [v3.7](./changelogs/CHANGELOG-v3.7.md)
