@@ -937,8 +937,8 @@ example based on integration with REMP CRM and replace the classes with your own
 
 ### REMP CRM integration
 
-See the `Remp\MailerModule\Auth\Authenticator` implementation and
-`Remp\MailerModule\Auth\RemoteBearerTokenRepository` implementation to check how you can initialize
+See the `Remp\MailerModule\Models\Auth\Authenticator` implementation and
+`Remp\MailerModule\Models\Auth\RemoteBearerTokenRepository` implementation to check how you can initialize
 your class the dependencies, structure the request and process the result
 
 The following snippet needs to be added to your `config.local.neon` to enable integration with CRM.
@@ -948,13 +948,13 @@ Classes from the snippet are using REMP CRM to authenticate users and API keys.
 services:
     # user authentication
     authenticator:
-        class: Remp\MailerModule\Auth\Authenticator
+        factory: Remp\MailerModule\Models\Auth\Authenticator
     security.userStorage:
-        class: Nette\Http\UserStorage
+        factory: Nette\Bridges\SecurityHttp\SessionStorage
 
     # api authentication
     apiTokenRepository:
-        class: Remp\MailerModule\Auth\RemoteBearerTokenRepository(%crm.addr%)
+        factory: Remp\MailerModule\Models\Auth\RemoteBearerTokenRepository(%crm.addr%)
 ```
 
 You can see that you override here two services with your own implementation. The third service
