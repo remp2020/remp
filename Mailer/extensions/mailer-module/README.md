@@ -746,6 +746,18 @@ an API handler to receive the stats and process them.
 
 Our Mailgun webhook implementation validates the request and marks the event to be processed later asynchronously.
 
+In case of having **multiple** mailgun mailers, each webhook URL should have mailer code specified in query params. It is the same code as specified in your `config.local.neon`
+
+For example, you should use webhook URL `https://mailer.remp.press/api/v2/mailers/mailgun?code=us` to process events for emails sent by Mailer defined by this configuration:
+
+```neon
+services:
+    mailFactory:
+        setup:
+            - addMailer(Remp\MailerModule\Models\Mailer\MailgunMailer(code: us))
+
+```
+
 * API handler: [`Remp\MailerModule\Api\v2\Handlers\Mailers\MailgunEventsHandler`](./src/Api/v2/Handlers/Mailers/MailgunEventsHandler.php):
   Mind the event type in `HermesMessage` constructor. It has to be the same as you'll use in `config.local.neon` below.
 * Background event processing: [Remp\MailerModule\Hermes\MailgunEventHandler](./src/Hermes/MailgunEventHandler.php)
@@ -2694,15 +2706,11 @@ If the *preprocess* is called for a generator not supporting it, *HTTP 400 Bad R
 
 #### POST `/api/v1/mailers/mailgun`
 
-Webhook endpoint for legacy Mailgun event reporting. We advise using `v2` of this endpoint and new implementation
-of webhooks on Mailgun.
+Webhook endpoint for legacy Mailgun event reporting. We advise using `v2` of this endpoint and new implementation of webhooks on Mailgun.
 
-You can configure Mailgun webhooks in the Mailgun's [control panel](https://app.mailgun.com/app/webhooks). For more
-information about Mailgun webhooks, please check the [documentation](https://documentation.mailgun.com/en/latest/user_manual.html#webhooks)
-, [quick guide](https://www.mailgun.com/blog/a-guide-to-using-mailguns-webhooks) or [guide to webhooks](https://www.mailgun.com/guides/your-guide-to-webhooks).
+You can configure Mailgun webhooks in the Mailgun's [control panel](https://app.mailgun.com/app/webhooks). For more information about Mailgun webhooks, please check the [documentation](https://documentation.mailgun.com/en/latest/user_manual.html#webhooks), [quick guide](https://www.mailgun.com/blog/a-guide-to-using-mailguns-webhooks) or [guide to webhooks](https://www.mailgun.com/guides/your-guide-to-webhooks).
 
-Webhook configuration should be enough to enable the tracking in Mailer. Following example is displayed primarily for
-testing purposes and completeness.
+Webhook configuration should be enough to enable the tracking in Mailer. Following example is displayed primarily for testing purposes and completeness.
 
 ##### *Params:*
 

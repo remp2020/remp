@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v2\Handlers\Mailers;
 
-use Nette\Utils\Json;
-use Nette\Utils\JsonException;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Hermes\RedisDriver;
 use Remp\MailerModule\Models\Mailer\MailgunMailer;
-use Remp\MailerModule\Models\Sender;
+use Remp\MailerModule\Models\Sender\MailerFactory;
+use Remp\MailerModule\Models\Sender\MailerNotExistsException;
 use Tomaj\Hermes\Emitter;
 use Tomaj\NetteApi\Handlers\BaseHandler;
+use Tomaj\NetteApi\Params\GetInputParam;
+use Tomaj\NetteApi\Params\JsonInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
 
@@ -38,52 +39,51 @@ use Tomaj\NetteApi\Response\ResponseInterface;
  */
 class MailgunEventsHandler extends BaseHandler
 {
-    private $sender;
 
-    private $emitter;
-
-    public function __construct(Sender $sender, Emitter $emitter)
+    public function __construct(private readonly MailerFactory $mailerFactory, private readonly Emitter $emitter)
     {
         parent::__construct();
-        $this->sender = $sender;
-        $this->emitter = $emitter;
+    }
+
+    public function params(): array
+    {
+        return [
+            new GetInputParam('code'),
+            (new JsonInputParam('data', file_get_contents(__DIR__ . '/mailgun-webhook.schema.json')))->setRequired(),
+        ];
     }
 
     public function handle(array $params): ResponseInterface
     {
-        $json = file_get_contents("php://input");
-        if (empty($json)) {
-            $response = new JsonApiResponse(400, ['status' => 'error', 'message' => 'Empty request']);
-            return $response;
-        }
-
+        $data = $params['data'];
         try {
-            $params = Json::decode($json, Json::FORCE_ARRAY);
-        } catch (JsonException $e) {
-            $response = new JsonApiResponse(400, ['status' => 'error', 'message' => 'Invalid JSON payload: ' . $e->getMessage()]);
-            return $response;
+            $mailer = $this->mailerFactory->getMailerByAliasAndCode(MailgunMailer::ALIAS, $params['code']);
+        } catch (MailerNotExistsException $e) {
+            return new JsonApiResponse(403, [
+                'status' => 'error',
+                'code' => 'invalid_mailgun_mailer_code',
+                'message' => "Mailgun mailer with code '{$params['code']}' doesn't exist.",
+            ]);
         }
-
-        $mailer = $this->sender->getMailer(MailgunMailer::ALIAS);
 
         $signKey = $mailer->getConfig('http_webhook_signing_key');
         if (!$signKey) {
             // Fallback to the API key that was used as a signing key in the past.
             $signKey = $mailer->getConfig('api_key');
         }
-        if (hash_hmac('sha256', $params['signature']['timestamp'] . $params['signature']['token'], $signKey) !== $params['signature']['signature']) {
+        if (hash_hmac('sha256', $data['signature']['timestamp'] . $data['signature']['token'], $signKey) !== $data['signature']['signature']) {
             return new JsonApiResponse(403, ['status' => 'error', 'message' => 'Wrong signature.']);
         }
 
         $this->emitter->emit(new HermesMessage('mailgun-event', [
-            'mail_sender_id' => $params['event-data']['user-variables']['mail_sender_id'] ?? null,
-            'timestamp' => $params['event-data']['timestamp'],
-            'event' => $params['event-data']['event'],
-            'email' => $params['event-data']['recipient'],
-            'reason' => $params['event-data']['reason'] ?? null,
-            'severity' => $params['event-data']['severity'] ?? null,
-            'client' => $params['event-data']['client-info'] ?? null,
-            'url' => $params['event-data']['url'] ?? null,
+            'mail_sender_id' => $data['event-data']['user-variables']['mail_sender_id'] ?? null,
+            'timestamp' => $data['event-data']['timestamp'],
+            'event' => $data['event-data']['event'],
+            'email' => $data['event-data']['recipient'],
+            'reason' => $data['event-data']['reason'] ?? null,
+            'severity' => $data['event-data']['severity'] ?? null,
+            'client' => $data['event-data']['client-info'] ?? null,
+            'url' => $data['event-data']['url'] ?? null,
         ]), RedisDriver::PRIORITY_LOW);
 
         return new JsonApiResponse(200, ['status' => 'ok']);

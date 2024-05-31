@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Processes mailgun event webhook",
+  "title": "Mailgun events webhook",
+  "type": "object",
+  "properties": {
+    "signature": {
+      "type": "object"
+    },
+    "event-data": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "signature",
+    "event-data"
+  ]
+}
+
