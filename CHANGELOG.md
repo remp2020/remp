@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - [Tracker] Updated list of referer sources so that the newer social/searches are recognized. remp/remp#1313
+- Fixed an XSS vulnerability within creating and editing a segment. remp/remp#1343
+
+### [Campaign]
+
+- Fixed an XSS vulnerability within creating and editing a campaign. remp/remp#1343
 
 ## Archive
 

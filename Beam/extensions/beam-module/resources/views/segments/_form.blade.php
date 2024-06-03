@@ -5,15 +5,15 @@
 @push('scripts')
 
 <script type="text/javascript">
-    let segment = {
-        "name": '{!! $segment->name !!}' || null,
-        "code": '{!! $segment->code !!}' || null,
-        "active": {!! @json($segment->active) !!} || null,
-        "rules": {!! $segment->rules->toJson() !!},
-        "removedRules": {!! @json($segment->removedRules) !!},
-        "eventCategories": {!! $categories->toJson() !!},
-        "eventActions": {},
-    }
+    let segment = {{ Illuminate\Support\Js::from([
+        "name" => $segment->name,
+        "code" => $segment->code,
+        "active" => $segment->active,
+        "rules" => $segment->rules,
+        "removedRules" => $segment->removedRules,
+        "eventCategories" => $categories,
+        "eventActions" => [],
+    ]) }};
 
     remplib.segmentForm.bind("#segment-form", segment);
 </script>

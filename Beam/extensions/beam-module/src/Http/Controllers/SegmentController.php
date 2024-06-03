@@ -49,7 +49,7 @@ class SegmentController extends Controller
                     'text' => $segment->name,
                 ];
             })
-            ->rawColumns(['active', 'actions'])
+            ->rawColumns(['name.text', 'code', 'active', 'actions'])
             ->make(true);
     }
 
