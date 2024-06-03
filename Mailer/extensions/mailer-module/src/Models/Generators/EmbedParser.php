@@ -57,7 +57,7 @@ class EmbedParser
 
     private function isTwitterLink($link)
     {
-        return str_contains($link, 'twitt');
+        return str_contains($link, 'twitt') || str_contains($link, 'x.com');
     }
 
     public function parse(string $link): ?string

@@ -15,6 +15,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed an XSS vulnerability within creating and editing a campaign. remp/remp#1343
 
+### [Mailer]
+
+- Added match `x.com` domain in `EmbedParser::isTwitterLink`. remp/helpdesk#2759
+
 ## Archive
 
 - [v3.7](./changelogs/CHANGELOG-v3.7.md)
