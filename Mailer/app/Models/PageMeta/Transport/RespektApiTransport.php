@@ -40,7 +40,7 @@ query GetArticleForMailer($articleUrl: String) {
       parts {
         json
         order
-        references {id target {type externalTarget internalTarget {url}} image { image { url title author {name} } }}
+        references {id type target {type externalTarget internalTarget {url}} image { image { url title author {name} } }}
       }
     }
   }

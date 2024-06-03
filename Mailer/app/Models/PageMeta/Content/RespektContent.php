@@ -193,7 +193,7 @@ class RespektContent implements ContentInterface
 
                 if ($contentPartChild['type'] === 'reference' && isset($references[$contentPartChild['referenceId']])) {
                     $reference = $references[$contentPartChild['referenceId']];
-                    if (isset($reference['image'])) {
+                    if ($reference['type'] === 'image') {
                         $caption = $reference['image']['image']['title'];
                         if (!$caption && isset($reference['image']['image']['author']['name'])) {
                             $caption = 'Autor: ' . $reference['image']['image']['author']['name'];
