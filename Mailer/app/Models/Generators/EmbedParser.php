@@ -14,7 +14,7 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
 
     private function isTwitterLink($link): bool
     {
-        return str_contains($link, 'twitt');
+        return str_contains($link, 'twitt') || str_contains($link, 'x.com');
     }
 
     public function createEmbedMarkup(string $link, ?string $title = null, ?string $image = null, bool $isVideo = false): string
