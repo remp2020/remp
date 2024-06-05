@@ -5505,7 +5505,7 @@ fsevents@~2.3.2:
 
 "mailer-module@file:extensions/mailer-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 2.0.0
-  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=bb596f&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=35c10f&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@remp/js-commons": ^2.3.1
     animate.css: ^3.7.0
@@ -5538,7 +5538,7 @@ fsevents@~2.3.2:
     salvattore: ^1.0.9
     trumbowyg: ^2.25.1
     vue: ^2.6.14
-  checksum: bbbe5b73c2cbf38c8d3f36acbf629e2cac2d63717455657666ba9e86d8c8d9a9d2928fb2df73383b8c5364f810921ceb2b9bef8ff0b7a127cdc85f2a2ea1fd98
+  checksum: 68573f942151ea149291f735b95b0141a1fcdce697ceed7710c6d715d1bc1636cd2b02e75082c809f3d2fabc61b46541aeaf6f7170bbf3726ad0b82f0028e8cb
   languageName: node
   linkType: hard
 

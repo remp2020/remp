@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added edit button to newsletter list detail. remp/remp#1367
 - Changed `Preview url` and `List image` buttons to disabled if their url is not provided. remp/remp#1367
 - Added edit and show button to sent emails detail. remp/remp#1367
+- Added preview and fullscreen edit for text layout. remp/remp#1094
 
 ## Archive
 

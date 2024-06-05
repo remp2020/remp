@@ -81,29 +81,38 @@
                                 </div>
                             </div>
 
-                            <div class="form-group fg-float">
-                                <div class="fg-line">
-                                    {input mail_body_text, class => 'form-control fg-input auto-size'}
-                                    {label mail_body_text, class => 'fg-label' /}
+                            <div class="email-editors">
+                                <div class="editors-container">
+                                    <div class="fullscreen-edit-btn-div">
+                                        <button type="button" class="fullscreen-edit-btn btn palette-Cyan bg" data-sync="text"><i class="zmdi zmdi-fullscreen"></i> <span>Fullscreen edit</span></button>
+                                    </div>
+                                </div>
+                                <div class="textarea-group form-group fg-float">
+                                    <div class="fg-line">
+                                        {input mail_body_text, class => 'form-control fg-input auto-size textarea-editor'}
+                                            {label mail_body_text, class => 'fg-label' /}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div id="email-editors">
-                                <div class="m-b-10 editor-choice-container row">
-                                    <div class="js-editor-choice col-sm-7">
-                                        <label class="radio radio-inline m-r-20">
-                                            <input type="radio" name="js-editor-choice" value="code" {if $templateEditor != 'wysiwyg'}checked="checked"{/if} class="js-editor-choice">
-                                            <i class="input-helper"></i>
-                                            HTML Code View
-                                        </label>
-                                        <label class="radio radio-inline m-r-20" style="margin-left: 0;">
-                                            <input type="radio" name="js-editor-choice" value="editor" {if $templateEditor == 'wysiwyg'}checked="checked"{/if} class="js-editor-choice">
-                                            <i class="input-helper"></i>
-                                            Editor View (WYSIWYG)
-                                        </label>
+                            <div class="email-editors">
+                                <div class="editors-container">
+                                    <div class="fullscreen-edit-btn-div">
+                                        <button type="button" class="fullscreen-edit-btn btn palette-Cyan bg" data-sync="html"><i class="zmdi zmdi-fullscreen"></i> <span>Fullscreen edit</span></button>
                                     </div>
-                                    <div class="col-sm-5 fullscreen-edit-btn-div">
-                                        <button id="fullscreen-edit-btn" type="button" class="btn palette-Cyan bg"><i class="zmdi zmdi-fullscreen"></i> <span>Fullscreen edit</span></button>
+                                    <div class="m-b-10 editor-choice row">
+                                        <div class="js-editor-choice col-sm-7">
+                                            <label class="radio radio-inline m-r-20">
+                                                <input type="radio" name="js-editor-choice" value="code" {if $templateEditor != 'wysiwyg'}checked="checked"{/if} class="js-editor-choice">
+                                                <i class="input-helper"></i>
+                                                HTML Code View
+                                            </label>
+                                            <label class="radio radio-inline m-r-20" style="margin-left: 0;">
+                                                <input type="radio" name="js-editor-choice" value="editor" {if $templateEditor == 'wysiwyg'}checked="checked"{/if} class="js-editor-choice">
+                                                <i class="input-helper"></i>
+                                                Editor View (WYSIWYG)
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 

@@ -7,34 +7,44 @@
         name: 'mail-preview',
         data() {
             return {
-                iframe: null
+                iframe: null,
             }
         },
         methods: {
-            rerenderIframe: function () {
+            rerenderIframe: function (textLayout = false) {
+                this.showHtmlPreview = !textLayout;
                 let finalContent = "";
-                let layout = this.$parent.htmlLayout;
+                let layout = textLayout ? this.$parent.textLayout : this.$parent.htmlLayout;
                 let content = this.$parent.htmlContent.replace(new RegExp('\{%.*?%\}', 'g'), '').replace("{{ content|raw }}", '');
+
                 if (!layout) {
                     finalContent += content;
                 } else {
                     finalContent += layout.replace("{{ content|raw }}", content).replace(new RegExp('\{%.*?%\}', 'g'), '');
                 }
 
-                this.iframe = window.document.createElement('iframe');
-                this.iframe.classList.add('previewFrame');
-                let wrapEl = window.document.getElementById('previewFrameWrap');
+                if (!this.iframe) {
+                    this.iframe = window.document.createElement('iframe');
+                    this.iframe.classList.add('previewFrame');
+                    let wrapEl = window.document.getElementById('previewFrameWrap');
 
-                wrapEl.innerHTML = "";
+                    wrapEl.innerHTML = "";
 
-                wrapEl.appendChild(this.iframe);
+                    wrapEl.appendChild(this.iframe);
+                }
 
                 this.iframe.contentWindow.document.open('text/html', 'replace');
                 this.iframe.contentWindow.document.write(finalContent);
                 this.iframe.contentWindow.document.close();
 
-                // auto height iframe on content
-                this.iframe.style.height = (this.iframe.contentWindow.document.body.scrollHeight + 100) + 'px';
+                if (textLayout) {
+                    this.iframe.contentWindow.document.body.style.whiteSpace = 'pre-wrap';
+                }
+
+                this.$nextTick(() => {
+                    // auto height iframe on content
+                    this.iframe.style.height = (this.iframe.contentWindow.document.body.scrollHeight + 100) + 'px';
+                });
             }
         },
         mounted: function () {
@@ -42,8 +52,8 @@
 
             this.rerenderIframe();
 
-            $('body').on('preview:change', function (e) {
-                self.rerenderIframe();
+            $('body').on('preview:change', function (e, data) {
+                self.rerenderIframe(data?.textarea);
             })
         }
     }
@@ -54,5 +64,6 @@
         width: 100%;
         height: 100%;
         border: none;
+        all: initial;
     }
 </style>

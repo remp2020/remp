@@ -74,7 +74,7 @@ code.muted {
   margin-right: 15px !important;
 }
 
-.editor-choice-container {
+.editor-choice {
   display: flex;
   align-items: center;
 }
@@ -93,17 +93,20 @@ code.muted {
     overflow: hidden;
   }
 
-  #email-editors, #previewFrameWrap {
+  .email-editors.full-screen, #previewFrameWrap {
     position: fixed;
     top: 0;
     width: 50%;
     margin: 0;
     padding: 0;
+    bottom: 0;
     z-index: 99999;
     background: white;
+    display: flex;
+    flex-direction: column;
   }
 
-  #email-editors {
+  .email-editors.full-screen {
     left: 0;
     border-right: 1px solid rgba(0, 0, 0, 0.15);
   }
@@ -115,21 +118,63 @@ code.muted {
     overflow: auto !important;
   }
 
-  .editor-choice-container {
-    margin: 10px;
-  }
+  .email-editors.full-screen {
+    .editors-container,
+    .textarea-group {
+      margin: 10px;
+    }
 
-  .trumbowyg-box {
-    border: none !important;
-  }
+    .trumbowyg-box {
+      border: none !important;
+    }
 
-  .trumbowyg-editor {
-    height: calc(100vh - var(--trumbowyg-header-height) - var(--editor-choice-height)) !important;
-    overflow: auto !important;
-  }
+    .textarea-group {
+      flex: 1 1 auto;
 
-  .CodeMirror-scroll {
-    height: calc(100vh - var(--editor-choice-height)) !important;
+      > div {
+        height: 100%;
+
+        .textarea-editor {
+          height: 100% !important;
+          max-height: 100% !important;
+          overflow: auto !important;
+        }
+      }
+    }
+
+    .trumbowyg-box {
+      flex: 1 1 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .trumbowyg-editor {
+      flex: 1 1 100%;
+      overflow: auto !important;
+    }
+
+    .trumbowyg-button-pane {
+      flex: 0 0 auto;
+    }
+
+    .js-codemirror {
+      flex: 1 1 100%;
+      overflow: hidden;
+      width: 100%;
+
+      .CodeMirror {
+        margin-top: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        .CodeMirror-scroll {
+          flex: 0 1 auto;
+          width: 100%;
+        }
+      }
+    }
   }
 }
 

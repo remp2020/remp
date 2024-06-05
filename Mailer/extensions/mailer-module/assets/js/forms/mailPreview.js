@@ -98,14 +98,17 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                     return {
                         "htmlContent": initialContent,
                         "htmlLayout": getLayoutTemplate().layout_html,
+                        "textLayout": getLayoutTemplate().layout_text,
                     }
                 },
                 render: h => h(MailPreview),
             });
             mailLayoutSelect.addEventListener('change', function(e) {
                 vue.htmlLayout = getLayoutTemplate().layout_html;
+                vue.textLayout = getLayoutTemplate().layout_text;
                 $('body').trigger('preview:change');
             });
+
             return vue;
         },
         showTrumbowyg: (codeMirror, trumbowyg) => {
@@ -117,7 +120,7 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                 trumbowyg.trumbowyg('html', remplib.templateForm.screwTwig(mailBody));
                 remplib.templateForm.codeMirrorChanged = false;
             }
-            $(codeMirror.display.wrapper).hide();
+            $(codeMirror.display.wrapper).closest('.js-codemirror').hide();
         },
         showCodemirror: (codeMirror, trumbowyg) => {
             trumbowyg.data('trumbowyg').$box.hide();
@@ -133,7 +136,7 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
             setTimeout(function() {
                 codeMirror.refresh();
             }, 0);
-            $(codeMirror.display.wrapper).show();
+            $(codeMirror.display.wrapper).closest('.js-codemirror').show();
         },
         selectEditor: (codeMirror, trumbowyg) => {
             if (remplib.templateForm.editorChoice() === 'editor')
@@ -157,10 +160,12 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
 
             const codeMirror = remplib.templateForm.codeMirror($('.js-codemirror')[0]);
             const trumbowyg = remplib.templateForm.trumbowyg('.js-html-editor');
+            const textarea = $('.textarea-editor')
 
             remplib.templateForm.fullscreenEditToggle();
             remplib.templateForm.syncCodeMirrorWithPreview(vue, codeMirror);
             remplib.templateForm.syncTrumbowygWithPreview(vue, trumbowyg);
+            remplib.templateForm.syncTextareaWithPreview(vue, textarea);
 
             // initialize code editors on tab change, prevents bugs with initialisation of invisible elements.
             $('a[data-toggle="tab"]').one('shown.bs.tab', function (e) {
@@ -177,16 +182,33 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
             });
         },
         syncTrumbowygWithPreview: (vue, trumbowyg) => {
-            trumbowyg.on('tbwchange', () => {
-                if (remplib.templateForm.editorChoice() !== 'editor') {
-                    return;
-                }
+            const syncWithPreview = () => {
                 vue.htmlContent = remplib.templateForm.buildMailFromTrumbowyg(trumbowyg.trumbowyg('html'));
                 $('body').trigger('preview:change');
                 remplib.templateForm.trumbowygChanged = true;
+            }
+
+            trumbowyg.on('tbwchange tbwfocus', () => {
+                if (remplib.templateForm.editorChoice() !== 'editor') {
+                    return;
+                }
+                syncWithPreview();
             });
+
+            $('.fullscreen-edit-btn[data-sync="html"]').on('click', () => {
+                if (remplib.templateForm.editorChoice() === 'editor') {
+                    syncWithPreview();
+                }
+            })
         },
         syncCodeMirrorWithPreview: (vue, codeMirror) => {
+            const syncWithPreview = () => {
+                vue.htmlContent = codeMirror.doc.getValue();
+                remplib.templateForm.displayedMailContent = codeMirror.doc.getValue();
+                $('body').trigger('preview:change');
+                remplib.templateForm.codeMirrorChanged = true;
+            }
+
             codeMirror.on('change', function( editor, change ) {
                 if (remplib.templateForm.editorChoice() !== 'code') {
                     return;
@@ -195,15 +217,33 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                 if ( change.origin === 'setValue' ) {
                     return;
                 }
-                vue.htmlContent = editor.doc.getValue();
-                remplib.templateForm.displayedMailContent = editor.doc.getValue();
-                $('body').trigger('preview:change');
-                remplib.templateForm.codeMirrorChanged = true;
+
+                syncWithPreview();
             });
+
+            $('.fullscreen-edit-btn[data-sync="html"]').on('click', () => {
+                if (remplib.templateForm.editorChoice() === 'code') {
+                    syncWithPreview();
+                }
+            })
+            $(codeMirror.display.wrapper).on('click', syncWithPreview)
+        },
+        syncTextareaWithPreview: (vue, textarea) => {
+            const syncWithPreview = () => {
+                vue.htmlContent = textarea.val();
+                $('body').trigger('preview:change', { textarea: true });
+            }
+
+            $('.fullscreen-edit-btn[data-sync="text"]').on('click', () => {
+                syncWithPreview();
+                autosize.update(textarea);
+            });
+            textarea.on('input click', syncWithPreview);
         },
         fullscreenEditToggle: () => {
-            $('#fullscreen-edit-btn').click(function () {
+            $('.fullscreen-edit-btn').click(function () {
                 $('body').toggleClass('fullscreen-edit');
+                $(this).closest('.email-editors').toggleClass('full-screen');
                 $(this).children('span').text(
                     $(this).children('span').text() == 'Fullscreen edit' ? 'Exit fullscreen' : 'Fullscreen edit'
                 );
@@ -218,7 +258,7 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
 
             //calculating height for SCSS vars (see app.scss) so the editors are correctly stretched to 100% of viewport height
             $(':root').css({
-                '--editor-choice-height': $('.fullscreen-edit .editor-choice-container').outerHeight(true) + 'px',
+                '--editor-choice-height': $('.fullscreen-edit .editors-container').outerHeight(true) + 'px',
             });
 
             if (remplib.templateForm.editorChoice() === 'editor') {
