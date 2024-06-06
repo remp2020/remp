@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Fixed default sender in template form - update it to default of newsletter list when newsletter list is selected. remp/respekt#220
+- Added functionality to duplicate newsletter lists with the possibility to copy subscribers. remp/remp#1363
 
 ## Archive
 

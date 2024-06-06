@@ -12,6 +12,7 @@ use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Forms\DuplicateListFormFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Hermes\RedisDriver;
@@ -42,6 +43,8 @@ final class ListPresenter extends BasePresenter
 
     private $listFormFactory;
 
+    private $duplicateListFormFactory;
+
     private $listVariantsRepository;
 
     private $emitter;
@@ -55,6 +58,7 @@ final class ListPresenter extends BasePresenter
         MailTemplateStatsRepository $mailTemplateStatsRepository,
         UserSubscriptionsRepository $userSubscriptionsRepository,
         ListFormFactory $listFormFactory,
+        DuplicateListFormFactory $duplicateListFormFactory,
         ListVariantsRepository $listVariantsRepository,
         Emitter $emitter,
         DataTableFactory $dataTableFactory
@@ -66,6 +70,7 @@ final class ListPresenter extends BasePresenter
         $this->mailTypeStatsRepository = $mailTypeStatsRepository;
         $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
         $this->listFormFactory = $listFormFactory;
+        $this->duplicateListFormFactory = $duplicateListFormFactory;
         $this->listVariantsRepository = $listVariantsRepository;
         $this->emitter = $emitter;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
@@ -109,6 +114,7 @@ final class ListPresenter extends BasePresenter
             ->setAllColSetting('orderable', false)
             ->setRowAction('show', 'palette-Cyan zmdi-eye', 'Show list')
             ->setRowAction('edit', 'palette-Cyan zmdi-edit', 'Edit list')
+            ->setRowAction('duplicate', 'palette-Cyan zmdi-copy', 'Duplicate list')
             ->setRowAction('delete', 'palette-Red zmdi-delete', 'Delete list', [
                 'onclick' => 'return confirm(\'Are you sure you want to delete this item?\');'
             ])
@@ -135,6 +141,7 @@ final class ListPresenter extends BasePresenter
         foreach ($lists as $list) {
             $showUrl = $this->link('Show', $list->id);
             $editUrl = $this->link('Edit', $list->id);
+            $duplicateUrl = $this->link('Duplicate', $list->id);
             $deleteUrl = $this->link('Delete!', $list->id);
             $sentEmailsDetail = $this->link('sentEmailsDetail', $list->id);
             $editCategory = $this->link('ListCategory:edit', $list->mail_type_category_id);
@@ -142,6 +149,7 @@ final class ListPresenter extends BasePresenter
                 'actions' => [
                     'show' => $showUrl,
                     'edit' => $editUrl,
+                    'duplicate' => $duplicateUrl,
                     'delete' => $deleteUrl,
                     'sentEmailsDetail' => $sentEmailsDetail,
                 ],
@@ -260,6 +268,22 @@ final class ListPresenter extends BasePresenter
         $list = $this->listsRepository->find($id);
         if (!$list) {
             throw new BadRequestException();
+        }
+
+        $this->template->list = $list;
+    }
+
+    public function renderDuplicate($id): void
+    {
+        $list = $this->listsRepository->find($id);
+        if (!$list) {
+            throw new BadRequestException();
+        }
+
+        $variantsCount = $this->listVariantsRepository->getVariantsForType($list)->count('*');
+        if ($variantsCount !== 0) {
+            $this->flashMessage('Source list has variants. Duplication is not implemented.', 'danger');
+            $this->redirect('default');
         }
 
         $this->template->list = $list;
@@ -426,6 +450,31 @@ final class ListPresenter extends BasePresenter
 
             $presenter->flashMessage('Newsletter list was updated');
             $presenter->redirect('Edit', $list->id);
+        };
+
+        return $form;
+    }
+
+    public function createComponentDuplicateListForm(): Form
+    {
+        if (!isset($this->params['id'])) {
+            throw new BadRequestException();
+        }
+
+        $sourceListId = (int)$this->params['id'];
+        $form = $this->duplicateListFormFactory->create($sourceListId);
+
+        $presenter = $this;
+        $this->duplicateListFormFactory->onCreate = function ($newList, $sourceList, $copySubscribers) use ($presenter) {
+            $this->emitter->emit(new HermesMessage('list-created', [
+                'list_id' => $newList->id,
+                'source_list_id' => $sourceList->id,
+                'duplicate' => true,
+                'copy_subscribers' => $copySubscribers
+            ]), RedisDriver::PRIORITY_HIGH);
+
+            $presenter->flashMessage('Newsletter list was duplicated');
+            $presenter->redirect('Edit', $newList->id);
         };
 
         return $form;

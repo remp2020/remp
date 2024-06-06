@@ -1,0 +1,69 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Newsletter lists</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2 n:block="title">Duplicate newsletter list "{$list->title}"</h2>
+    </div>
+    <div class="card-body card-padding">
+        {snippetArea wrapper}
+            {form duplicateListForm}
+                {input id}
+                <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
+                    {$error}<br>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group fg-float m-b-30">
+                            <div class="fg-line">
+                                {input title, class => 'form-control fg-input'}
+                                {label title, class => 'fg-label' /}
+                            </div>
+                        </div>
+
+                        <div class="form-group fg-float m-b-30">
+                            <div class="fg-line">
+                                {input code, class => 'form-control fg-input'}
+                                {label code, class => 'fg-label' /}
+                            </div>
+                        </div>
+
+                        <div class="form-group m-b-30">
+                            <div class="toggle-switch" data-ts-color="cyan">
+                                {label copy_subscribers:, class => 'ts-label' /}
+                                {input copy_subscribers:, hidden => 'hidden'}
+                                <label for="{$form['copy_subscribers']->htmlId}" class="ts-helper"></label>
+                                <small class="help-block">
+                                    Toggles whether subscribers should also be copied to the new list.
+                                </small>
+                                {if $form['copy_subscribers']->disabled}
+                                    <small class="help-block">
+                                        Copy subscribers is not available for lists with variants.
+                                    </small>
+                                {/if}
+                            </div>
+                        </div>
+
+                        <div class="form-group m-b-30">
+                            <div class="toggle-switch" data-ts-color="cyan">
+                                {label auto_subscribe:, class => 'ts-label' /}
+                                {input auto_subscribe:, hidden => 'hidden'}
+                                <label for="{$form['auto_subscribe']->htmlId}" class="ts-helper"></label>
+                                <small class="help-block">
+                                    Toggles whether user should be automatically subscribed to the newsletter after the registration.
+                                </small>
+                            </div>
+                        </div>
+
+                        {input save, class => 'btn btn-info waves-effect'}
+                    </div>
+                </div>
+            {/form}
+        {/snippetArea}
+    </div>
+</div>
