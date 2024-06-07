@@ -200,7 +200,16 @@
 
         $.fn.dataTableExt.errMode = function (e, settings, techNote, message) {
             console.warn(techNote);
-            alert('Error while loading data table, try again later please.');
+
+            if (e.jqXHR.status < 500) {
+                console.error(e.jqXHR.responseJSON);
+                let message = Object.values(e.jqXHR.responseJSON.errors)
+                    .reduce((acc, errors) => acc.concat(errors), [])
+                    .join(',');
+                alert('Unable to display one of the data tables: ' + message + ' Is your URL correct?');
+            } else {
+                alert('Error while loading data table, try again later please.');
+            }
         };
 
         @foreach ($refreshTriggers as $def)
