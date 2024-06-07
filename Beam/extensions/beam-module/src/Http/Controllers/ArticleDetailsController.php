@@ -11,6 +11,7 @@ use Remp\BeamModule\Http\Requests\ArticlesListRequest;
 use Remp\BeamModule\Http\Resources\ArticleResource;
 use Remp\BeamModule\Model\ConversionSource;
 use Remp\BeamModule\Model\Pageviews\PageviewsHelper;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Remp\BeamModule\Model\Snapshots\SnapshotHelpers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -469,6 +470,11 @@ class ArticleDetailsController extends Controller
 
     public function dtReferers(Article $article, Request $request)
     {
+        $request->validate([
+            'visited_to' => ['sometimes', new ValidCarbonDate],
+            'visited_from' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $length = $request->input('length');
         $start = $request->input('start');
         $orderOptions = $request->input('order');

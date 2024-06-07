@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- Added a custom Carbon date request validator and integrated it into `ArticleDetailsController::dtReferers` to validate `visited_to` and `visited_from` request inputs. remp/remp#1101
 - [Tracker] Updated list of referer sources so that the newer social/searches are recognized. remp/remp#1313
 - Fixed an XSS vulnerability within creating and editing a segment. remp/remp#1343
 
