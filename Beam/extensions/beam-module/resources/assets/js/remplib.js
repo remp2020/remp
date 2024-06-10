@@ -746,7 +746,6 @@ class Tracker {
     }
 
     timespentParamsCleanup(params) {
-        delete params.user.source.user_agent;
         delete params.user.source.rtm_source;
         delete params.user.source.rtm_medium;
         delete params.user.source.rtm_campaign;
