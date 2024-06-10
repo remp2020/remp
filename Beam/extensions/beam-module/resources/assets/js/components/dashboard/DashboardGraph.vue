@@ -4,7 +4,27 @@
 
         <div id="chartContainerHeader" class="row">
             <div class="col-md-6">
-                <h4>Concurrents: <animated-integer :value="concurrents"></animated-integer></h4>
+                <h4>
+                    <text-with-tooltip>
+                        <template #default>
+                            <span>
+                                👥 <animated-integer :value="concurrents"></animated-integer>
+                            </span>
+                            <span class="mobile-percentage" :class="{ 'mobile-percentage--null': mobileConcurrentsPercentage === null }">
+                                (📱<animated-integer :value="mobileConcurrentsPercentage || 0"></animated-integer>%)
+                            </span>
+                        </template>
+                        <template #tooltip>
+                            <span v-if="mobileConcurrentsPercentage === null">
+                                You have to configure "concurrents" block in Telegraf in order to see percentage of concurrent mobile users visiting your website.
+                                <a href="https://github.com/remp2020/remp/blob/master/Docker/telegraf/telegraf.conf" target="_blank">https://github.com/remp2020/remp/blob/master/Docker/telegraf/telegraf.conf</a>
+                            </span>
+                            <span v-else>
+                                Shows number of concurrent users visiting website and percentage of users using mobile device.
+                            </span>
+                        </template>
+                    </text-with-tooltip>
+                </h4>
             </div>
             <div class="col-md-6">
                 <options :classes="['pull-right', 'm-l-15', 'm-b-5']"></options>
@@ -94,7 +114,7 @@
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     #article-chart {
         height: 200px;
         position: relative;
@@ -196,6 +216,14 @@
         border: 2px solid #00bdf1;
         transform: translate(-50%, 0px)
     }
+
+    .mobile-percentage {
+      font-size: 12px;
+
+      &--null {
+        opacity: 0.6;
+      }
+    }
 </style>
 
 <script>
@@ -206,6 +234,7 @@
     import {debounce, formatInterval} from './constants'
     import axios from 'axios'
     import * as d3 from 'd3'
+    import TextWithTooltip from '../TextWithTooltip.vue'
 
     let props = {
         url: {
@@ -219,6 +248,9 @@
         concurrents: {
             type: Number,
             required: true
+        },
+        mobileConcurrentsPercentage: {
+            type: Number,
         },
         externalEvents: {
             type: Array,
@@ -242,7 +274,7 @@
 
     export default {
         components: {
-            ButtonSwitcher, AnimatedInteger, Options
+            TextWithTooltip, ButtonSwitcher, AnimatedInteger, Options
         },
         name: 'dashboard-graph',
         props: props,
@@ -314,7 +346,7 @@
             },
             selectedExternalEvents(values) {
                 this.reload()
-            },
+            }
         },
         mounted() {
             this.createGraph()

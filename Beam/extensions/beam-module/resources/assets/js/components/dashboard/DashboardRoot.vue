@@ -5,6 +5,7 @@
                             :url="timeHistogramUrl"
                             :url-new="timeHistogramUrlNew"
                             :concurrents="totalConcurrents"
+                            :mobile-concurrents-percentage="mobileConcurrentsPercentage"
                             :external-events="externalEvents"
                             :show-interval7-days="options.article_traffic_graph_show_interval_7d"
                             :show-interval30-days="options.article_traffic_graph_show_interval_30d"
@@ -305,6 +306,7 @@
             return {
                 articles: null,
                 totalConcurrents: 0,
+                mobileConcurrentsPercentage: 0,
                 propertiesSwitchUrl: route('properties.switch'),
                 conversionRateDescription: "",
                 error: null,
@@ -352,6 +354,7 @@
                             return item
                         })
                         that.totalConcurrents = response.data.totalConcurrents
+                        that.mobileConcurrentsPercentage = response.data.mobileConcurrentsPercentage
                     })
                     .catch(error => {
                         this.error = error

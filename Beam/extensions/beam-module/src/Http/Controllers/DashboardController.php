@@ -550,6 +550,15 @@ class DashboardController extends Controller
             }
         }, $timeBefore);
 
+        $computerConcurrents = $this->journalHelper->currentConcurrentsCount(function (ConcurrentsRequest $req) use ($filterFrontPage, $frontpageReferers) {
+            $req->addFilter('derived_ua_device', 'Computer');
+
+            if ($filterFrontPage) {
+                $req->addFilter('derived_referer_host_with_path', ...$frontpageReferers);
+            }
+        }, $timeBefore);
+        $computerConcurrentsCount = $computerConcurrents->first()->count;
+
         $articlesIds = array_filter($records->pluck('tags.article_id')->toArray());
         $articleQuery = Article::with(['dashboardArticle', 'conversions'])
             ->whereIn(
@@ -611,6 +620,13 @@ class DashboardController extends Controller
             $topPages[$key] = $obj;
         }
 
+        $mobileConcurrentsPercentage = 0;
+        if ($totalConcurrents > 0 && $computerConcurrentsCount > 0) {
+            $mobileConcurrentsPercentage = (($totalConcurrents - $computerConcurrentsCount) / $totalConcurrents) * 100;
+        } elseif ($totalConcurrents > 0 && $computerConcurrentsCount === 0) {
+            $mobileConcurrentsPercentage = null;
+        }
+
         usort($topPages, function ($a, $b) {
             return -($a->count <=> $b->count);
         });
@@ -662,6 +678,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'articles' => $topPages,
+            'mobileConcurrentsPercentage' => $mobileConcurrentsPercentage,
             'totalConcurrents' => $totalConcurrents,
         ]);
     }
