@@ -243,17 +243,16 @@
 
 
 <script>
-    import HtmlPreview from "./previews/Html";
-    import MediumRectanglePreview from "./previews/MediumRectangle";
-    import BarPreview from "./previews/Bar";
-    import CollapsibleBarPreview from "./previews/CollapsibleBar";
-    import ShortMessagePreview from "./previews/ShortMessage";
-    import OverlayRectanglePreview from "./previews/OverlayRectangle";
-    import HtmlOverlayPreview from "./previews/HtmlOverlay";
-    import OverlayTwoButtonsSignaturePreview from "./previews/OverlayTwoButtonsSignature";
-    import NewsletterRectanglePreview from "./previews/NewsletterRectangle";
-
     import lib from "@remp/js-commons/js/remplib.js";
+    import HtmlPreview from "./previews/Html"
+    import MediumRectanglePreview from "./previews/MediumRectangle"
+    import BarPreview from "./previews/Bar"
+    import CollapsibleBarPreview from "./previews/CollapsibleBar"
+    import ShortMessagePreview from "./previews/ShortMessage"
+    import OverlayRectanglePreview from "./previews/OverlayRectangle"
+    import HtmlOverlayPreview from "./previews/HtmlOverlay"
+    import OverlayTwoButtonsSignaturePreview from "./previews/OverlayTwoButtonsSignature"
+    import NewsletterRectanglePreview from "./previews/NewsletterRectangle"
 
     const props = [
         "name",

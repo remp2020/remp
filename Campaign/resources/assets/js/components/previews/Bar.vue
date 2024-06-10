@@ -1,4 +1,4 @@
-<style type="text/css">
+<style type="text/css" scoped>
 @import url('../../../sass/transitions.scss');
 
 .bar-preview-close {

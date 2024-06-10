@@ -37,6 +37,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added ability to filter mail_logs by mail template codes in `LogsHandler` api handler. remp/respekt#211
 - Added ability to process webhooks from different mailgun domains by code query param in `MailgunEventsHandler` api handler. remp/remp#1267
 
+### [Campaign]
+
+- Scoped preview components styles. remp/remp#1141
+
 ---
 
 [3.7]: https://github.com/remp2020/remp/compare/3.6.0...3.7.0
