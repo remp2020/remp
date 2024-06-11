@@ -5,8 +5,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Utils\DateTime;
 use DateInterval;
-use IntlDateFormatter;
-use Remp\MailerModule\Models\Formatters\DateFormatterFactory;
+use Remp\MailerModule\Models\ChartTrait;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\MailTemplateStatsRepository;
@@ -14,11 +13,11 @@ use Remp\MailerModule\Repositories\MailTypeStatsRepository;
 
 final class DashboardPresenter extends BasePresenter
 {
+    use ChartTrait;
+
     private $batchesRepository;
 
     private $listsRepository;
-
-    private $dateFormatter;
 
     /**
      * @var MailTypeStatsRepository
@@ -31,14 +30,10 @@ final class DashboardPresenter extends BasePresenter
     public function __construct(
         MailTemplateStatsRepository $mailTemplateStatsRepository,
         MailTypeStatsRepository $mailTypeStatsRepository,
-        DateFormatterFactory $dateFormatterFactory,
         BatchesRepository $batchesRepository,
         ListsRepository $listsRepository
     ) {
         parent::__construct();
-
-        $this->dateFormatter = $dateFormatterFactory
-            ->getInstance(IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 
         $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
         $this->mailTypeStatsRepository = $mailTypeStatsRepository;
@@ -66,12 +61,13 @@ final class DashboardPresenter extends BasePresenter
             'lineColor' => '#FDECB7',
             'prevPeriodCount' => 0,
             'fill' => true,
-            'count' => 0
+            'count' => 0,
+            'lineTension' => 0.1,
         ];
 
         // fill graph column labels
         for ($i = $numOfDays; $i >= 0; $i--) {
-            $graphLabels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
+            $graphLabels[] = DateTime::from('-' . $i . ' days')->format('Y-m-d');
         }
 
         $allMailTypes = $this->listsRepository->all();
@@ -80,7 +76,7 @@ final class DashboardPresenter extends BasePresenter
         foreach ($allMailTypes as $mailType) {
             $typeDataSets[$mailType->id] = [
                 'id' => $mailType->id,
-                'label' => $mailType->title
+                'label' => $mailType->title,
             ] + $defaultGraphSettings;
         }
 
@@ -93,7 +89,7 @@ final class DashboardPresenter extends BasePresenter
         // parse all sent mails data to chart.js format
         foreach ($allSentMailsData as $row) {
             $foundAt = array_search(
-                $this->dateFormatter->format($row->date),
+                $row->date->format('Y-m-d'),
                 $graphLabels
             );
 
@@ -108,7 +104,7 @@ final class DashboardPresenter extends BasePresenter
         // parse sent mails by type data to chart.js format
         foreach ($typesData as $row) {
             $foundAt = array_search(
-                $this->dateFormatter->format($row->date->getTimestamp()),
+                $row->date->format('Y-m-d'),
                 $graphLabels
             );
 
@@ -140,7 +136,7 @@ final class DashboardPresenter extends BasePresenter
         $typeSubscribersData = $this->mailTypeStatsRepository->getDashboardDataGroupedByTypes($from, $now);
         foreach ($typeSubscribersData as $row) {
             $foundAt = array_search(
-                $this->dateFormatter->format($row->created_date),
+                $row->created_date->format('Y-m-d'),
                 $graphLabels
             );
 
@@ -150,13 +146,11 @@ final class DashboardPresenter extends BasePresenter
             }
         }
 
-        // change subscriber data sets to start from zero because of graph readability
         foreach ($typeSubscriberDataSets as $mailTypeId => $typeSubscriberDataSet) {
-            $minValue = min($typeSubscriberDataSet['data']);
-
-            foreach ($typeSubscriberDataSet['data'] as $key => $value) {
-                $typeSubscriberDataSets[$mailTypeId]['data'][$key] -= $minValue;
-            }
+            $typeSubscriberDataSets[$mailTypeId]['suggestedMin'] = $this->getChartSuggestedMin([$typeSubscriberDataSet['data']]);
+        }
+        foreach ($typeDataSets as $mailTypeId => $typeDataSet) {
+            $typeDataSets[$mailTypeId]['suggestedMin'] = $this->getChartSuggestedMin([$typeDataSet['data']]);
         }
 
         $prevPeriodSubscribersTypeData = $this->mailTypeStatsRepository->getDashboardDataGroupedByTypes($prevPeriodFrom, $from);

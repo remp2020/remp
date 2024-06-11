@@ -28,45 +28,53 @@
                                         <script>
                                             var ctx = document.getElementById("mailer-dashboard-subscribers-statistics-graph-" + {$key}).getContext('2d');
                                             var myLineChart = new Chart(ctx, {
-                                                type: "line",
+                                                type: "bar",
                                                 data: {
                                                     "labels": {$labels},
                                                     "datasets": [{$dataset}]
                                                 },
                                                 options: {
-                                                    elements: {
-                                                        point: {
-                                                            radius: 0,
-                                                            hitRadius: 4
-                                                        }
-                                                    },
-                                                    layout: {
-                                                        padding: -20
+                                                    responsive: true,
+                                                    barPercentage: 1.0,
+                                                    categoryPercentage: 1.0,
+                                                    plugins: {
+                                                        legend: {
+                                                            display: false,
+                                                        },
+                                                        tooltip: {
+                                                            enabled: false,
+                                                            external: Chart.mailerTooltip,
+                                                            callbacks: {
+                                                                labelColor: function(context) {
+                                                                    return {
+                                                                        backgroundColor: '#000',
+                                                                    };
+                                                                },
+                                                            },
+                                                            displayColors: false,
+                                                        },
                                                     },
                                                     scales: {
-                                                        yAxes: [{
-                                                            ticks: {
-                                                                display: false,
-                                                                beginAtZero: true
+                                                        x: {
+                                                            time: {
+                                                                tooltipFormat: "LL",
                                                             },
-                                                            gridLines: {
+                                                            grid: {
                                                                 display: false,
-                                                                // color: "rgba(255, 255, 255, 1)",
-                                                                color: "rgba(0, 0, 0, 0)",
-                                                                lineWidth: 0
-                                                            }
-                                                        }],
-                                                        xAxes: [{
+                                                            },
                                                             ticks: {
                                                                 display: false
                                                             },
-                                                            gridLines: {
+                                                            type: "timeseries",
+                                                            display: false,
+                                                        },
+                                                        y: {
+                                                            min: {$dataset['suggestedMin']},
+                                                            grid: {
                                                                 display: false,
-                                                                // color: "rgba(255, 255, 255, 1)",
-                                                                color: "rgba(0, 0, 0, 0)",
-                                                                lineWidth: 0
-                                                            }
-                                                        }]
+                                                            },
+                                                            display: false,
+                                                        },
                                                     },
                                                     legend: {
                                                         display: false
@@ -125,39 +133,51 @@
                                 "datasets": [{$allSentEmailsDataSet}]
                             },
                             options: {
-                                elements: { 
-                                    point: { 
+                                elements: {
+                                    point: {
                                         radius: 0,
-                                        hitRadius: 3
+                                        hitRadius: 30,
                                     }
-                                }, 
-                                layout: {
-                                    padding: -20
+                                },
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        display: false,
+                                    },
+                                    tooltip: {
+                                        enabled: false,
+                                        external: Chart.mailerTooltip,
+                                        callbacks: {
+                                            labelColor: function(context) {
+                                                return {
+                                                    backgroundColor: '#000',
+                                                };
+                                            },
+                                        },
+                                        displayColors: false,
+                                    },
                                 },
                                 scales: {
-                                    yAxes: [{
-                                        ticks: {
-                                            display: false,
-                                            beginAtZero: true
+                                    x: {
+                                        time: {
+                                            tooltipFormat: "LL",
                                         },
-                                        gridLines: {
+                                        grid: {
                                             display: false,
-                                            // color: "rgba(255, 255, 255, 1)",
-                                            color: "rgba(0, 0, 0, 0)",
-                                            lineWidth: 0
-                                        }
-                                    }],
-                                    xAxes: [{
+                                        },
                                         ticks: {
                                             display: false
                                         },
-                                        gridLines: {
+                                        type: "timeseries",
+                                        display: false,
+                                    },
+                                    y: {
+                                        min: {$dataset['suggestedMin']},
+                                        grid: {
                                             display: false,
-                                            // color: "rgba(255, 255, 255, 1)",
-                                            color: "rgba(0, 0, 0, 0)",
-                                            lineWidth: 0
-                                        }
-                                    }]
+                                        },
+                                        display: false,
+                                    },
                                 },
                                 legend: {
                                     display: false
@@ -190,39 +210,51 @@
                                                     "datasets": [{$dataset}]
                                                 },
                                                 options: {
-                                                    elements: { 
+                                                    elements: {
                                                         point: {
                                                             radius: 0,
-                                                            hitRadius: 4
+                                                            hitRadius: 30,
                                                         }
-                                                    }, 
-                                                    layout: {
-                                                        padding: -20
+                                                    },
+                                                    responsive: true,
+                                                    plugins: {
+                                                        legend: {
+                                                            display: false,
+                                                        },
+                                                        tooltip: {
+                                                            enabled: false,
+                                                            external: Chart.mailerTooltip,
+                                                            callbacks: {
+                                                                labelColor: function(context) {
+                                                                    return {
+                                                                        backgroundColor: '#000',
+                                                                    };
+                                                                },
+                                                            },
+                                                            displayColors: false,
+                                                        },
                                                     },
                                                     scales: {
-                                                        yAxes: [{
-                                                            ticks: {
-                                                                display: false,
-                                                                beginAtZero: true
+                                                        x: {
+                                                            time: {
+                                                                tooltipFormat: "LL",
                                                             },
-                                                            gridLines: {
+                                                            grid: {
                                                                 display: false,
-                                                                // color: "rgba(255, 255, 255, 1)",
-                                                                color: "rgba(0, 0, 0, 0)",
-                                                                lineWidth: 0
-                                                            }
-                                                        }],
-                                                        xAxes: [{
+                                                            },
                                                             ticks: {
                                                                 display: false
                                                             },
-                                                            gridLines: {
+                                                            type: "timeseries",
+                                                            display: false,
+                                                        },
+                                                        y: {
+                                                            min: {$dataset['suggestedMin']},
+                                                            grid: {
                                                                 display: false,
-                                                                // color: "rgba(255, 255, 255, 1)",
-                                                                color: "rgba(0, 0, 0, 0)",
-                                                                lineWidth: 0
-                                                            }
-                                                        }]
+                                                            },
+                                                            display: false,
+                                                        },
                                                     },
                                                     legend: {
                                                         display: false

@@ -15,6 +15,7 @@ use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Hermes\RedisDriver;
+use Remp\MailerModule\Models\ChartTrait;
 use Remp\MailerModule\Models\Formatters\DateFormatterFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
@@ -27,6 +28,8 @@ use Tomaj\Hermes\Emitter;
 
 final class ListPresenter extends BasePresenter
 {
+    use ChartTrait;
+
     private $listsRepository;
 
     private $templatesRepository;
@@ -41,8 +44,6 @@ final class ListPresenter extends BasePresenter
 
     private $listVariantsRepository;
 
-    private $dateFormatter;
-
     private $emitter;
 
     private $dataTableFactory;
@@ -53,16 +54,12 @@ final class ListPresenter extends BasePresenter
         MailTypeStatsRepository $mailTypeStatsRepository,
         MailTemplateStatsRepository $mailTemplateStatsRepository,
         UserSubscriptionsRepository $userSubscriptionsRepository,
-        DateFormatterFactory $dateFormatterFactory,
         ListFormFactory $listFormFactory,
         ListVariantsRepository $listVariantsRepository,
         Emitter $emitter,
         DataTableFactory $dataTableFactory
     ) {
         parent::__construct();
-
-        $this->dateFormatter = $dateFormatterFactory
-            ->getInstance(IntlDateFormatter::SHORT, IntlDateFormatter::NONE);
 
         $this->listsRepository = $listsRepository;
         $this->templatesRepository = $templatesRepository;
@@ -215,7 +212,7 @@ final class ListPresenter extends BasePresenter
 
         // fill graph columns
         for ($i = $numOfDays; $i >= 0; $i--) {
-            $labels[] = $this->dateFormatter->format(strtotime('-' . $i . ' days'));
+            $labels[] = DateTime::from('-' . $i . ' days')->format('Y-m-d');
         }
 
         $mailType = $this->listsRepository->find($id);
@@ -223,9 +220,7 @@ final class ListPresenter extends BasePresenter
         $dataSet = [
             'label' => $mailType->title,
             'data' => array_fill(0, $numOfDays, 0),
-            'fill' => false,
-            'borderColor' => 'rgb(75, 192, 192)',
-            'lineTension' => 0.5
+            'backgroundColor' => '#008494',
         ];
 
         $data = $this->mailTypeStatsRepository->getDashboardDetailData($id, $from, $now);
@@ -237,15 +232,16 @@ final class ListPresenter extends BasePresenter
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
             $foundAt = array_search(
-                $this->dateFormatter->format($row->created_date),
+                DateTime::from($row->created_date)->format('Y-m-d'),
                 $labels
             );
 
             if ($foundAt !== false) {
-                $dataSet['data'][$foundAt] = $row->count - $minRow->count;
+                $dataSet['data'][$foundAt] = $row->count;
             }
         }
 
+        $this->template->suggestedMin = $this->getChartSuggestedMin([$dataSet['data']]);
         $this->template->dataSet = $dataSet;
         $this->template->labels = $labels;
     }
@@ -452,19 +448,19 @@ final class ListPresenter extends BasePresenter
     public function renderSentEmailsDetail($id): void
     {
         $mailType = $this->listsRepository->find($id);
+        $groupBy = $this->getParameter('group_by', 'day');
 
         $this->template->mailTypeId = $mailType->id;
         $this->template->mailTypeTitle = $mailType->title;
+        $this->template->groupBy = $groupBy;
 
         if (!$this->isAjax()) {
             $from = $this->getParameter('published_from', 'today - 30 days');
             $to = $this->getParameter('published_to', 'now');
             $tz = $this->getParameter('tz');
-            $groupBy = $this->getParameter('group_by', 'day');
 
             $this->template->from = $from;
             $this->template->to = $to;
-            $this->template->groupBy = $groupBy;
 
             $data = $this->emailsDetailData($id, $from, $to, $groupBy, $tz);
 
@@ -488,13 +484,11 @@ final class ListPresenter extends BasePresenter
         $from = new DateTime($from, $tz);
         $to = new DateTime($to, $tz);
 
-        $dateFormat = 'd/m/y';
+        $dateFormat = 'Y-m-d';
         $dateInterval = '+1 day';
         if ($groupBy === 'week') {
-            $dateFormat = 'W/y';
             $dateInterval = '+1 week';
         } elseif ($groupBy === 'month') {
-            $dateFormat = 'm/y';
             $dateInterval = '+1 month';
         }
 
@@ -510,7 +504,7 @@ final class ListPresenter extends BasePresenter
             'data' => array_fill(0, $numOfGroups, 0),
             'fill' => false,
             'borderColor' => 'rgb(0,150,136)',
-            'lineTension' => 0.5
+            'lineTension' => 0.2,
         ];
 
         $openedDataSet = [
@@ -518,7 +512,7 @@ final class ListPresenter extends BasePresenter
             'data' => array_fill(0, $numOfGroups, 0),
             'fill' => false,
             'borderColor' => 'rgb(33,150,243)',
-            'lineTension' => 0.5
+            'lineTension' => 0.2,
         ];
 
         $clickedDataSet = [
@@ -526,7 +520,7 @@ final class ListPresenter extends BasePresenter
             'data' => array_fill(0, $numOfGroups, 0),
             'fill' => false,
             'borderColor' => 'rgb(230,57,82)',
-            'lineTension' => 0.5
+            'lineTension' => 0.2,
         ];
 
         $data = $this->mailTemplateStatsRepository->getMailTypeGraphData((int) $id, $from, $to)->fetchAll();
@@ -613,10 +607,11 @@ final class ListPresenter extends BasePresenter
         ];
     }
 
-    public function handleFilterChanged($id, $from, $to, $groupBy, $tz)
+    public function handleFilterChanged($id, $from, $to, $group_by, $tz)
     {
-        $data = $this->emailsDetailData($id, $from, $to, $groupBy, $tz);
+        $data = $this->emailsDetailData($id, $from, $to, $group_by, $tz);
 
+        $this->template->groupBy = $group_by;
         $this->template->labels = $data['labels'];
         $this->template->sentDataSet = $data['sentDataSet'];
         $this->template->openedDataSet = $data['openedDataSet'];
@@ -627,7 +622,6 @@ final class ListPresenter extends BasePresenter
 
         $this->redrawControl('graph');
         $this->redrawControl('relativeGraph');
-        $this->redrawControl('unsubscribedGraph');
     }
 
     public function createComponentDataTableSubscriberEmails(): DataTable

@@ -1418,6 +1418,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kurkle/color@npm:^0.3.0":
+  version: 0.3.2
+  resolution: "@kurkle/color@npm:0.3.2"
+  checksum: c9241d020b123b1c586b4d88e85cdfecad036512374dfe3db407f4bbf775c62ab8e53f0abdbe4a75843e1cba605c1e611c26c698df30e66ac87cd2a36282b075
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -2792,6 +2799,15 @@ __metadata:
     chartjs-color: ^2.1.0
     moment: ^2.10.2
   checksum: 4551932943bc5e42d25ae5632d91878fb89e22937095a2742e23c4d0d0bde405bed6be2cb8480694ba599d6dbb9882c8bce6bac1e4667c820eb24c38416380aa
+  languageName: node
+  linkType: hard
+
+"chart.js@npm:^4.4":
+  version: 4.4.3
+  resolution: "chart.js@npm:4.4.3"
+  dependencies:
+    "@kurkle/color": ^0.3.0
+  checksum: 70e01da30240e1e87394faf343f2674adad246faf3cce52684bffdf857730f3a63cb272b9d62dd19e9d944047d9d68d403575cd01d1a4077e58e2dae080babba
   languageName: node
   linkType: hard
 
@@ -5489,7 +5505,7 @@ fsevents@~2.3.2:
 
 "mailer-module@file:extensions/mailer-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 2.0.0
-  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=4fe450&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=bb596f&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@remp/js-commons": ^2.3.1
     animate.css: ^3.7.0
@@ -5497,7 +5513,7 @@ fsevents@~2.3.2:
     bootstrap: ^3.4.1
     bootstrap-notify: ^3.1.3
     bootstrap-select: ^1.13.18
-    chart.js: ^2.9.3
+    chart.js: ^4.4
     codemirror: ^5.45.0
     datatables.net: ^1.10.25
     datatables.net-buttons: ^1.6.5
@@ -5522,7 +5538,7 @@ fsevents@~2.3.2:
     salvattore: ^1.0.9
     trumbowyg: ^2.25.1
     vue: ^2.6.14
-  checksum: 8b49a8279fd8a392c8dcd543afa9273c66442a8b77e7931e5560d16f055672996c846d2160869ae2d417047d7be7f6f0cf77880abd53226fe07a45f156c511ef
+  checksum: bbbe5b73c2cbf38c8d3f36acbf629e2cac2d63717455657666ba9e86d8c8d9a9d2928fb2df73383b8c5364f810921ceb2b9bef8ff0b7a127cdc85f2a2ea1fd98
   languageName: node
   linkType: hard
 

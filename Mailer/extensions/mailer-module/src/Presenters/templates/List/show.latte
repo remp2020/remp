@@ -41,28 +41,29 @@
     <script>
         var ctx = document.getElementById("mailer-dashboard-detail-statistics-graph").getContext('2d');
         var myLineChart = new Chart(ctx, {
-            type: "line",
+            type: "bar",
             data: {
-                "labels": {$labels},
-                "datasets": [{$dataSet}]
+                labels: {$labels},
+                datasets: [{$dataSet}],
             },
             options: {
+                responsive: true,
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
+                    x: {
+                        type: "timeseries",
+                        time: {
+                            displayFormats: {
+                                "day": "ll",
+                            },
+                            unit: "day",
+                            tooltipFormat: "LL",
                         }
-                    }],
-                    xAxes: [{
-                        ticks: {
-                            display: true
-                        }
-                    }]
+                    },
+                    y: {
+                        type: 'linear',
+                        min: {$suggestedMin},
+                    },
                 },
-                legend: {
-                    display: false,
-                    position: "right"
-                }
             }
         });
     </script>

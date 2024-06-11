@@ -21,6 +21,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added match `x.com` domain in `EmbedParser::isTwitterLink`. remp/helpdesk#2759
 
+### [Mailer]
+
+- Updated Chart.js library which handles charts in the application. remp/remp#1361
+- Fixed chart on the newsletter list detail, so it makes some sense now. remp/remp#1361
+
 ## Archive
 
 - [v3.7](./changelogs/CHANGELOG-v3.7.md)
