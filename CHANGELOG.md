@@ -20,11 +20,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added match `x.com` domain in `EmbedParser::isTwitterLink`. remp/helpdesk#2759
-
-### [Mailer]
-
 - Updated Chart.js library which handles charts in the application. remp/remp#1361
 - Fixed chart on the newsletter list detail, so it makes some sense now. remp/remp#1361
+- Added ability to edit newsletter list category. remp/remp#724
+- Added option to prefill newsletter list preview URL by using existing email's public preview URL. remp/remp#724
+- Added support for group actions in `data_table.latte`. remp/remp#724
 
 ## Archive
 

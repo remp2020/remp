@@ -114,7 +114,8 @@ final class ListPresenter extends BasePresenter
             ])
             ->setRowAction('sentEmailsDetail', 'palette-Cyan zmdi-chart', 'List stats')
             ->setTableSetting('displayNavigation', false)
-            ->setTableSetting('rowGroup', 0);
+            ->setTableSetting('rowGroup', 0)
+            ->setTableSetting('rowGroupActions', 'groupActions');
 
         return $dataTable;
     }
@@ -136,6 +137,7 @@ final class ListPresenter extends BasePresenter
             $editUrl = $this->link('Edit', $list->id);
             $deleteUrl = $this->link('Delete!', $list->id);
             $sentEmailsDetail = $this->link('sentEmailsDetail', $list->id);
+            $editCategory = $this->link('ListCategory:edit', $list->mail_type_category_id);
             $result['data'][] = [
                 'actions' => [
                     'show' => $showUrl,
@@ -153,6 +155,13 @@ final class ListPresenter extends BasePresenter
                 $list->auto_subscribe,
                 $list->locked,
                 $list->public_listing,
+                'groupActions' => [
+                    [
+                        'url' => $editCategory,
+                        'title' => 'Edit category',
+                        'icon' => 'palette-Cyan zmdi-edit',
+                    ]
+                ]
             ];
         }
 

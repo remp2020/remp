@@ -36,6 +36,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed `ContentGenerator` bug where static time from class instance creation was being passed to the email template instead of an actual time. remp/remp#1316  
 - Added ability to filter mail_logs by mail template codes in `LogsHandler` api handler. remp/respekt#211
 - Added ability to process webhooks from different mailgun domains by code query param in `MailgunEventsHandler` api handler. remp/remp#1267
+- Added ability to edit list category and set its preview template. remp/remp#724
+- Added support for group actions in `data_table.latte`. remp/remp#724
 
 ### [Campaign]
 

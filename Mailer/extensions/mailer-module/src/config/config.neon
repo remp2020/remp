@@ -323,6 +323,7 @@ services:
 	- Remp\MailerModule\Forms\SignInFormFactory
 	- Remp\MailerModule\Forms\ConfigFormFactory
 	- Remp\MailerModule\Forms\ListFormFactory
+	- Remp\MailerModule\Forms\ListCategoryFormFactory
 	- Remp\MailerModule\Forms\LayoutFormFactory
 	- Remp\MailerModule\Forms\SnippetFormFactory
 	- Remp\MailerModule\Forms\TemplateFormFactory

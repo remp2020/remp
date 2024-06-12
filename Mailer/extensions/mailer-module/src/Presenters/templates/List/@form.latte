@@ -71,12 +71,21 @@
                 </div>
             </div>
 
+            {if isset($list)}
+                <div class="form-group fg-float m-b-0">
+                    {label preview_template /}
+                    {input preview_template, class => 'selectpicker', data-live-search => 'true' }
+                </div>
+            {/if}
+
             <div class="form-group fg-float m-b-30">
                 <div class="fg-line">
                     {input preview_url, class => 'form-control fg-input'}
+                    {if !isset($list)}
                     {label preview_url, class => 'fg-label' /}
+                    {/if}
                     <small class="help-block">
-                        Frontend URL with preview (usually older edition) of newsletter.
+                        Public URL with preview of newsletter.
                     </small>
                 </div>
             </div>
@@ -86,7 +95,7 @@
                     {input page_url, class => 'form-control fg-input'}
                     {label page_url, class => 'fg-label' /}
                     <small class="help-block">
-                        Frontend URL where information about this newsletter (with past editions) is available.
+                        Public URL where information about this newsletter (with past editions) is available.
                     </small>
                 </div>
             </div>
@@ -162,10 +171,23 @@
 
 {define jsCallbackRenderSorting}
     <script>
-        var $category = $('#' + {$control['listForm']['mail_type_category_id']->htmlId}),
+        const $category = $('#' + {$control['listForm']['mail_type_category_id']->htmlId}),
             $sorting = $('[name=' + {$control['listForm']['sorting']->name} + ']');
 
-        var renderSortingAction = function () {
+        {if isset($list)}
+            const $templateSelect = $('[name=' + {$control['listForm']['preview_template']->name} + ']'),
+                $previewUrl = $('[name=' + {$control['listForm']['preview_url']->name} + ']');
+
+            const setTemplatePreviewUrl = () => {
+                if ($templateSelect.val() !== '') {
+                    $previewUrl.val($templateSelect.val()).focus().blur()
+                }
+            }
+
+            $templateSelect.off('change').on('change', setTemplatePreviewUrl);
+        {/if}
+
+        const renderSortingAction = function () {
             $.nette.ajax({
                 type: 'GET',
                 url: {link {$link}!},

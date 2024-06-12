@@ -1,3 +1,15 @@
+<style>
+    .row-group-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    td.actions-cell {
+        text-align: right;
+    }
+</style>
+
 <div class="table-responsive">
     {if !isset($tableSettings['displayNavigation']) || $tableSettings['displayNavigation'] === true}
     <div class="action-header m-0 palette-White bg clearfix">
@@ -111,6 +123,7 @@
                 {
                     data: 'actions',
                     name: 'actions',
+                    className: 'actions-cell',
                     orderable: false,
                     render: $.fn.dataTables.render.actions({json_encode($rowActions)|noescape}, {
                         {ifset $rowLinkAction}
@@ -146,7 +159,37 @@
             ],
             {ifset $tableSettings['rowGroup']}
             'rowGroup':  {
-                'dataSrc': {$tableSettings['rowGroup']}
+                'dataSrc': {$tableSettings['rowGroup']},
+                {ifset $tableSettings['rowGroupActions']}
+                /**
+                 * Inserts action buttons to group row.
+                 * By default, group row contains only group name.
+                 */
+                'startRender': function (row, group) {
+                    const rowGroup = row.data()[0][{$tableSettings['rowGroup']}]
+
+                    if (!rowGroup) {
+                        return group
+                    }
+
+                    const rowGroupActions = row.data()[0][{$tableSettings['rowGroupActions']}]
+                    const wrapper = $('<div class="row-group-wrapper"></div>')
+                        .append($('<span></span>').text(rowGroup))
+
+                    const buttons = $('<span class="actions"></span>')
+                        .appendTo(wrapper)
+
+                    for (const action of rowGroupActions) {
+                        $('<a class="btn btn-sm palette-Cyan bg waves-effect"></a>')
+                            .attr('title', action.title)
+                            .attr('href', action.url)
+                            .append($('<i class="zmdi"/>').addClass(action.icon))
+                            .appendTo(buttons)
+                    }
+
+                    return wrapper
+                }
+                {/ifset}
             },
             {/ifset}
             'autoWidth': false,

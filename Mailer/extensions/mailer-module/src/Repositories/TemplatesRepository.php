@@ -43,6 +43,35 @@ class TemplatesRepository extends Repository
         return $query->fetchPairs('id', 'name');
     }
 
+    public function findByList(int $listId, ?int $limit = null): Selection
+    {
+        $query = $this->all()
+            ->where([
+                'mail_type_id' => $listId
+            ]);
+
+        if (isset($limit)) {
+            $query->limit($limit);
+        }
+
+        return $query;
+    }
+
+    public function findByListCategory(int $listCategoryId, ?int $limit = null): Selection
+    {
+        $query = $this->all()
+            ->where([
+                'mail_type.mail_type_category_id' => $listCategoryId
+            ])
+            ->group('mail_templates.id');
+
+        if (isset($limit)) {
+            $query->limit($limit);
+        }
+
+        return $query;
+    }
+
     public function triples(): array
     {
         $result = [];

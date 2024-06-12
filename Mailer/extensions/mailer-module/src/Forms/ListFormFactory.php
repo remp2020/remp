@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Forms;
 
+use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\BaseControl;
 use Nette\Forms\Controls\SelectBox;
@@ -22,27 +23,16 @@ class ListFormFactory
     private const MAIL_TYPE_CATEGORY = 'mail_type_category_id';
     private const LIST_ID = 'id';
 
-    private ListsRepository $listsRepository;
-
-    private ListCategoriesRepository $listCategoriesRepository;
-
-    private TemplatesRepository $templatesRepository;
-
-    private MailerFactory $mailerFactory;
-
     public $onCreate;
     public $onUpdate;
 
     public function __construct(
-        ListsRepository $listsRepository,
-        ListCategoriesRepository $listCategoriesRepository,
-        MailerFactory $mailerFactory,
-        TemplatesRepository $templatesRepository
+        private readonly ListsRepository $listsRepository,
+        private readonly ListCategoriesRepository $listCategoriesRepository,
+        private readonly MailerFactory $mailerFactory,
+        private readonly TemplatesRepository $templatesRepository,
+        private readonly LinkGenerator $linkGenerator
     ) {
-        $this->listsRepository = $listsRepository;
-        $this->listCategoriesRepository = $listCategoriesRepository;
-        $this->mailerFactory = $mailerFactory;
-        $this->templatesRepository = $templatesRepository;
     }
 
     public function create(?int $id = null): Form
@@ -56,12 +46,23 @@ class ListFormFactory
         if ($id !== null) {
             $list = $this->listsRepository->find($id);
             $defaults = $list->toArray();
+
+            $templates = $this->templatesRepository->findByList($id, 1000)->order('created_at DESC')->fetchAll();
+            $templatePairs = [null => "Select email to prefill email's public preview URL or enter the URL directly."];
+
+            foreach ($templates as $template) {
+                $previewUrl = $this->linkGenerator->link('Mailer:Preview:Public', [$template['public_code']]);
+                $templatePairs[$previewUrl] = $template['name'];
+            }
+
+            $form->addSelect('preview_template', 'Preview email', $templatePairs);
         }
 
         $categoryPairs = $this->listCategoriesRepository->all()->fetchPairs('id', 'title');
         if (!isset($defaults['mail_type_category_id'])) {
             $defaults['mail_type_category_id'] = key($categoryPairs);
         }
+
         $form->addSelect(
             'mail_type_category_id',
             'Category',
@@ -120,7 +121,7 @@ class ListFormFactory
 
         $form->addText('mail_from', 'From');
 
-        $form->addText('preview_url', 'Preview URL');
+        $form->addText('preview_url', 'Preview URL')->setNullable();
 
         $form->addText('page_url', 'Page URL');
 
@@ -242,7 +243,7 @@ class ListFormFactory
             $list->sorting ?? null
         );
 
-        unset($values[self::SORTING_AFTER]);
+        unset($values[self::SORTING_AFTER], $values['preview_template']);
 
         if ($list) {
             $this->listsRepository->update($list, (array) $values);
