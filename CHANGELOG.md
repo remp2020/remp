@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed an XSS vulnerability within creating and editing a campaign. remp/remp#1343
+- **IMPORTANT**: Added unique suffix to banner position (for hidden html banners) in `Showtime::prioritizeCampaignBannerOnPosition`. Prevents suppressing other banners. remp/remp#1346
 
 ### [Mailer]
 

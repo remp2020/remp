@@ -239,6 +239,11 @@ class Showtime
         foreach ($campaignBanners as $campaignBanner) {
             $position = "{$campaignBanner->banner->display_type}_{$campaignBanner->banner->position}_{$campaignBanner->banner->target_selector}";
 
+            // add unique suffix to banner position, so it doesn't suppress other visible and hidden banners remp/remp#1346
+            if ($campaignBanner->banner->template === 'html' && $campaignBanner->banner->htmlTemplate->dimensions === 'hidden') {
+                $position .= "_hidden_{$campaignBanner->id}";
+            }
+
             if (isset($bannersOnPosition[$position])) {
                 /** @var CampaignBanner $bannerOnPosition */
                 $bannerOnPosition = $bannersOnPosition[$position];
