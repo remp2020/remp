@@ -25,7 +25,13 @@
         </div>
 
         <div class="col-md-4 text-right">
-            <a n:href="Dashboard:default" class="btn btn-sm palette-Cyan bg waves-effect m-l-15">Back to dashboard</a>
+            <a n:href="show $mailTypeId" class="btn btn-sm palette-Cyan bg waves-effect">
+                <i class="zmdi zmdi-eye"></i> Show
+            </a>
+            <a n:href="edit $mailTypeId" class="btn btn-sm palette-Cyan bg waves-effect">
+                <i class="zmdi zmdi-edit"></i> Edit
+            </a>
+            <a n:href="Dashboard:default" class="btn btn-sm palette-Cyan bg waves-effect">Back to dashboard</a>
         </div>
     </div>
 </div>

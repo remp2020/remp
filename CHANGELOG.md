@@ -26,6 +26,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added ability to edit newsletter list category. remp/remp#724
 - Added option to prefill newsletter list preview URL by using existing email's public preview URL. remp/remp#724
 - Added support for group actions in `data_table.latte`. remp/remp#724
+- Added edit button to newsletter list detail. remp/remp#1367
+- Changed `Preview url` and `List image` buttons to disabled if their url is not provided. remp/remp#1367
+- Added edit and show button to sent emails detail. remp/remp#1367
 
 ## Archive
 

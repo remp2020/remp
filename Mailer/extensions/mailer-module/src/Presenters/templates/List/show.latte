@@ -2,6 +2,12 @@
 
 {block #content}
 
+<style>
+    a.disabled {
+        cursor: not-allowed;
+    }
+</style>
+
 <div class="c-header">
     <h2>Newsletter lists</h2>
 </div>
@@ -9,14 +15,17 @@
     <div class="card-header">
         <h2 n:block="title">Show newsletter list <span class="text-muted"></span> <small>{$list->title}</small></h2>
         <div class="actions">
-            <a n:ifset="$list->preview_url" href="{$list->preview_url}">
-                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-search"></i> Preview</button>
+            <a href="{$list->preview_url}" n:class="!$list->preview_url ? 'disabled'" target="_blank" data-toggle="tooltip" data-placement="top" n:attr="title: !$list->preview_url ? 'Preview URL not configured.'">
+                <button type="button" class="btn palette-Cyan bg waves-effect {!$list->preview_url ? 'disabled'}"><i class="zmdi zmdi-search"></i> Preview</button>
             </a>
-            <a n:ifset="$list->image_url" href="{$list->image_url}">
-                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-image-o"></i> List image</button>
+            <a href="{$list->image_url}" n:class="!$list->image_url ? 'disabled'" target="_blank" data-toggle="tooltip" data-placement="top" n:attr="title: !$list->image_url ? 'List image not configured.'">
+                <button type="button" class="btn palette-Cyan bg waves-effect {!$list->image_url ? 'disabled'}"><i class="zmdi zmdi-image-o"></i> List image</button>
             </a>
             <a n:href="sentEmailsDetail $list->id">
                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-chart"></i> Sent emails</button>
+            </a>
+            <a n:href="edit $list->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Edit</button>
             </a>
         </div>
     </div>
@@ -176,3 +185,9 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('.actions').on('click', 'a.disabled', function(e) {
+        e.preventDefault()
+    })
+</script>
