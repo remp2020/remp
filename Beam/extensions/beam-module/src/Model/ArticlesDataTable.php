@@ -5,6 +5,7 @@ namespace Remp\BeamModule\Model;
 use Remp\BeamModule\Model\Author;
 use Remp\BeamModule\Model\Conversion;
 use Remp\BeamModule\Model\Article;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Remp\BeamModule\Model\Tag;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -27,6 +28,13 @@ class ArticlesDataTable
 
     public function getDataTable(Request $request, DataTables $datatables)
     {
+        $request->validate([
+            'published_from' => ['sometimes', new ValidCarbonDate],
+            'published_to' => ['sometimes', new ValidCarbonDate],
+            'conversion_from' => ['sometimes', new ValidCarbonDate],
+            'conversion_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         // main articles query to fetch list of all articles with related metadata
         $articles = Article::selectRaw(implode(',', [
             "articles.id",

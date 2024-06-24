@@ -8,6 +8,7 @@ use Remp\BeamModule\Http\Requests\ArticleRequest;
 use Remp\BeamModule\Http\Requests\ArticlesListRequest;
 use Remp\BeamModule\Http\Resources\ArticleResource;
 use Remp\BeamModule\Model\Config\ConversionRateConfig;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Remp\BeamModule\Model\Tag;
 use Remp\BeamModule\Model\Section;
 use Html;
@@ -71,6 +72,13 @@ class ArticleController extends Controller
 
     public function dtConversions(Request $request, Datatables $datatables)
     {
+        $request->validate([
+            'published_from' => ['sometimes', new ValidCarbonDate],
+            'published_to' => ['sometimes', new ValidCarbonDate],
+            'conversion_from' => ['sometimes', new ValidCarbonDate],
+            'conversion_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $articlesQuery = Article::query()->selectRaw(implode(',', [
                 "articles.id",
                 "articles.external_id",
@@ -249,6 +257,11 @@ class ArticleController extends Controller
 
     public function dtPageviews(Request $request, Datatables $datatables)
     {
+        $request->validate([
+            'published_from' => ['sometimes', new ValidCarbonDate],
+            'published_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $articles = Article::selectRaw('articles.*,' .
             'CASE pageviews_all WHEN 0 THEN 0 ELSE (pageviews_subscribers/pageviews_all)*100 END AS pageviews_subscribers_ratio')
             ->with(['authors', 'sections', 'tags'])

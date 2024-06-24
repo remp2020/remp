@@ -7,6 +7,7 @@ use App\CampaignBanner;
 use App\CampaignBannerStats;
 use App\Contracts\StatsContract;
 use App\Contracts\StatsHelper;
+use App\Rules\ValidCarbonDate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,11 @@ class StatsController extends Controller
 
     public function getStats(Campaign $campaign, Request $request)
     {
+        $request->validate([
+            'from' => ['sometimes', new ValidCarbonDate],
+            'to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $tz = $request->input('tz');
 
         $from = Carbon::parse($request->get('from'), $tz);

@@ -7,12 +7,20 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Yajra\DataTables\DataTables;
 
 class TagCategoriesDataTable
 {
     public function getDataTable(Request $request, DataTables $datatables)
     {
+        $request->validate([
+            'published_from' => ['sometimes', new ValidCarbonDate],
+            'published_to' => ['sometimes', new ValidCarbonDate],
+            'conversion_from' => ['sometimes', new ValidCarbonDate],
+            'conversion_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $cols = [
             'tag_categories.id',
             'tag_categories.name',

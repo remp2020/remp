@@ -12,11 +12,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Tracker] Updated list of referer sources so that the newer social/searches are recognized. remp/remp#1313
 - Fixed an XSS vulnerability within creating and editing a segment. remp/remp#1343
 - Added mobile concurrents percentage value to `DashboardController::mostReadArticles` response. remp/remp#1352
+- Added custom Carbon date request validator to validate date inputs in requests. remp/remp#1101
 
 ### [Campaign]
 
 - Fixed an XSS vulnerability within creating and editing a campaign. remp/remp#1343
 - **IMPORTANT**: Added unique suffix to banner position (for hidden html banners) in `Showtime::prioritizeCampaignBannerOnPosition`. Prevents suppressing other banners. remp/remp#1346
+- Added custom Carbon date request validator to validate date inputs in `campaigns/{campaign}/stats/data` API endpoint. remp/remp#1101
 
 ### [Mailer]
 

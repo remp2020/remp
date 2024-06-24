@@ -13,6 +13,7 @@ use Remp\BeamModule\Http\Requests\ConversionRequest;
 use Remp\BeamModule\Http\Requests\ConversionUpsertRequest;
 use Remp\BeamModule\Http\Resources\ConversionResource;
 use Remp\BeamModule\Jobs\ProcessConversionJob;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Remp\BeamModule\Model\Tag;
 use Remp\BeamModule\Model\Section;
 use Illuminate\Database\Eloquent\Builder;
@@ -49,6 +50,11 @@ class ConversionController extends Controller
 
     public function json(Request $request, Datatables $datatables)
     {
+        $request->validate([
+            'conversion_from' => ['sometimes', new ValidCarbonDate],
+            'conversion_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $conversions = Conversion::select('conversions.*', 'articles.content_type')
             ->with(['article', 'article.authors', 'article.sections', 'article.tags'])
             ->ofSelectedProperty()

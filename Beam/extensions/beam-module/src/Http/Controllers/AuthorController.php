@@ -8,6 +8,7 @@ use Remp\BeamModule\Model\ArticlesDataTable;
 use Remp\BeamModule\Model\Author;
 use Remp\BeamModule\Model\Conversion;
 use Remp\BeamModule\Http\Resources\AuthorResource;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Remp\BeamModule\Model\Tag;
 use Remp\BeamModule\Model\Section;
 use Illuminate\Database\Eloquent\Builder;
@@ -58,6 +59,13 @@ class AuthorController extends Controller
 
     public function dtAuthors(Request $request, Datatables $datatables)
     {
+        $request->validate([
+            'published_from' => ['sometimes', new ValidCarbonDate],
+            'published_to' => ['sometimes', new ValidCarbonDate],
+            'conversion_from' => ['sometimes', new ValidCarbonDate],
+            'conversion_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $cols = [
             'authors.id',
             'authors.name',

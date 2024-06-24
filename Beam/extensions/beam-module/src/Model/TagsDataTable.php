@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Model\Conversion;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Remp\BeamModule\Model\Tag;
 use Illuminate\Database\Eloquent\Builder;
 use Html;
@@ -20,6 +21,13 @@ class TagsDataTable
 
     public function getDataTable(Request $request, DataTables $datatables)
     {
+        $request->validate([
+            'published_from' => ['sometimes', new ValidCarbonDate],
+            'published_to' => ['sometimes', new ValidCarbonDate],
+            'conversion_from' => ['sometimes', new ValidCarbonDate],
+            'conversion_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $cols = [
             'tags.id',
             'tags.name',

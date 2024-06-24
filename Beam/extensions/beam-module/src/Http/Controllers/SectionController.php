@@ -9,6 +9,7 @@ use Remp\BeamModule\Model\Author;
 use Remp\BeamModule\Model\Conversion;
 use Illuminate\Http\Request;
 use Remp\BeamModule\Http\Resources\SectionResource;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Remp\BeamModule\Model\Tag;
 use Remp\BeamModule\Model\Section;
 use Illuminate\Support\Carbon;
@@ -58,6 +59,13 @@ class SectionController extends Controller
 
     public function dtSections(Request $request, DataTables $datatables)
     {
+        $request->validate([
+            'published_from' => ['sometimes', new ValidCarbonDate],
+            'published_to' => ['sometimes', new ValidCarbonDate],
+            'conversion_from' => ['sometimes', new ValidCarbonDate],
+            'conversion_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $cols = [
             'sections.id',
             'sections.name',

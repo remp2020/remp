@@ -2,6 +2,7 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Remp\BeamModule\Model\SessionDevice;
 use Remp\BeamModule\Model\SessionReferer;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,6 +39,11 @@ class VisitorController extends Controller
 
     public function dtBrowsers(Request $request, Datatables $datatables)
     {
+        $request->validate([
+            'visited_from' => ['sometimes', new ValidCarbonDate],
+            'visited_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $devices = SessionDevice::selectRaw(implode(',', [
             'client_name',
             'client_type',
@@ -72,6 +78,11 @@ class VisitorController extends Controller
 
     public function dtDevices(Request $request, Datatables $datatables)
     {
+        $request->validate([
+            'visited_from' => ['sometimes', new ValidCarbonDate],
+            'visited_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $devices = SessionDevice::selectRaw(implode(',', [
             'model',
             'brand',
@@ -107,6 +118,11 @@ class VisitorController extends Controller
 
     public function dtReferers(Request $request, Datatables $datatables)
     {
+        $request->validate([
+            'visited_from' => ['sometimes', new ValidCarbonDate],
+            'visited_to' => ['sometimes', new ValidCarbonDate],
+        ]);
+
         $devices = SessionReferer::selectRaw(implode(',', [
             'medium',
             'source',
