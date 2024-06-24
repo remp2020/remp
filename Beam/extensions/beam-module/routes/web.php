@@ -30,7 +30,6 @@ use Remp\BeamModule\Http\Controllers\TagCategoryController;
 use Remp\BeamModule\Http\Controllers\TagController;
 use Remp\BeamModule\Http\Controllers\EntitiesController;
 use Remp\BeamModule\Http\Controllers\SettingsController;
-use Remp\BeamModule\Http\Controllers\GoogleAnalyticsReportingController;
 
 Route::get('/error', [AuthController::class, 'error'])->name('sso.error');
 
@@ -148,13 +147,6 @@ Route::middleware('auth.jwt')->group(function () {
     Route::post('entities/validate/{entity?}', [EntitiesController::class, 'validateForm'])->name('entities.validateForm');
     Route::get('entities/json', [EntitiesController::class, 'json'])->name('entities.json');
     Route::resource('entities', EntitiesController::class);
-
-    if(config('google.ga_reporting_enabled')) {
-        Route::get('googleanalyticsreporting', [GoogleAnalyticsReportingController::class, 'index'])
-            ->name('googleanalyticsreporting.index');
-        Route::get('googleanalyticsreporting/histogramJson', [GoogleAnalyticsReportingController::class, 'timeHistogram'])
-            ->name('googleanalyticsreporting.timeHistogram.json');
-    }
 
     Route::get('search', [SearchController::class, 'search'])->name('search');
 });

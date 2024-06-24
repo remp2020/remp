@@ -182,11 +182,6 @@
             <li {!! route_active(['tag-categories']) !!}>
                 <a href="{{ route('tag-categories.index') }}" ><i class="zmdi zmdi-filter-list"></i> Tag Categories</a>
             </li>
-            @if (config('google.ga_reporting_enabled'))
-            <li {!! route_active(['googleanalyticsreporting']) !!}>
-                <a href="{{ route('googleanalyticsreporting.index') }}" ><i class="zmdi zmdi-chart-donut"></i> GA Reporting</a>
-            </li>
-            @endif
         </ul>
     </aside>
 

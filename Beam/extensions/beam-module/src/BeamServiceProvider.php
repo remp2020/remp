@@ -2,8 +2,6 @@
 
 namespace Remp\BeamModule;
 
-use Google_Client;
-use Google_Service_AnalyticsReporting;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
@@ -16,8 +14,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Remp\BeamModule\Console\Commands\AggregateArticlesViews;
-use Remp\BeamModule\Contracts\GoogleAnalytics\GoogleAnalyticsReporting;
-use Remp\BeamModule\Contracts\GoogleAnalytics\GoogleAnalyticsReportingContract;
 use Remp\BeamModule\Contracts\Mailer\Mailer;
 use Remp\BeamModule\Contracts\Mailer\MailerContract;
 use Remp\BeamModule\Http\Controllers\JournalProxyController;
@@ -198,16 +194,6 @@ class BeamServiceProvider extends ServiceProvider
         $this->app->bind(Parser::class, function ($app) {
             $configReader = new YamlConfigReader(base_path("/vendor/snowplow/referer-parser/resources/referers.yml"));
             return new Parser($configReader);
-        });
-
-        // GoogleAnalyticsReporting
-        $this->app->bind(GoogleAnalyticsReportingContract::class, function () {
-            $client = new Google_Client();
-            $client->setApplicationName(config('google.app_name'));
-            $client->setAuthConfig(config('google.service_account_file'));
-            $client->setScopes(['https://www.googleapis.com/auth/analytics.readonly']);
-            $analytics = new Google_Service_AnalyticsReporting($client);
-            return new GoogleAnalyticsReporting($analytics);
         });
     }
 

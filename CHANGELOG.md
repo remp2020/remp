@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **IMPORTANT** Removed section Visitors. remp/remp#1349
   - Related data (tables `session_devices` & `session_referers`) are persisted in DB until the next major update.
   - New data are not processed (command `pageviews:process-sessions` was removed).
+- **IMPORTANT** Removed section Google Analytics Reporting. remp/remp#1349
+  - Data were loaded from discontinued version of Google Analytics.
 
 ### [Mailer]
 
