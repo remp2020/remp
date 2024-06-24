@@ -5,8 +5,6 @@ namespace Remp\BeamModule\Console\Commands;
 use Remp\BeamModule\Model\ArticlePageviews;
 use Remp\BeamModule\Model\ArticleTimespent;
 use Remp\BeamModule\Model\Aggregable;
-use Remp\BeamModule\Model\SessionDevice;
-use Remp\BeamModule\Model\SessionReferer;
 use Carbon\Carbon;
 use Remp\BeamModule\Console\Command;
 use Illuminate\Database\Eloquent\Model;
@@ -42,12 +40,6 @@ class CompressAggregations extends Command
 
         $this->line('Processing <info>ArticleTimespents</info> table');
         $this->aggregate(ArticleTimespent::class, $threshold, $debug);
-
-        $this->line('Processing <info>SessionReferers</info> table');
-        $this->aggregate(SessionReferer::class, $threshold, $debug);
-
-        $this->line('Processing <info>SessionDevices</info> table');
-        $this->aggregate(SessionDevice::class, $threshold, $debug);
 
         $this->line(' <info>OK!</info>');
         return 0;

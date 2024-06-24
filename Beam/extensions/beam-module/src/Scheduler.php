@@ -12,7 +12,6 @@ use Remp\BeamModule\Console\Commands\ComputeAuthorsSegments;
 use Remp\BeamModule\Console\Commands\ComputeSectionSegments;
 use Remp\BeamModule\Console\Commands\DashboardRefresh;
 use Remp\BeamModule\Console\Commands\DeleteOldAggregations;
-use Remp\BeamModule\Console\Commands\ProcessPageviewSessions;
 use Remp\BeamModule\Console\Commands\SendNewslettersCommand;
 use Remp\BeamModule\Console\Commands\SnapshotArticlesViews;
 
@@ -108,12 +107,6 @@ class Scheduler
             ->cron('1-59/20 * * * *')
             ->runInBackground()
             ->appendOutputTo(storage_path('logs/aggregate_pageviews.log'));
-
-        $schedule->command(ProcessPageviewSessions::COMMAND)
-            ->everyFiveMinutes()
-            ->runInBackground()
-            ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
-            ->appendOutputTo(storage_path('logs/process_pageview_sessions.log'));
 
         $schedule->command(DeleteOldAggregations::COMMAND)
             ->dailyAt('00:10')

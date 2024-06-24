@@ -28,7 +28,6 @@ use Remp\BeamModule\Http\Controllers\SectionController;
 use Remp\BeamModule\Http\Controllers\SectionSegmentsController;
 use Remp\BeamModule\Http\Controllers\TagCategoryController;
 use Remp\BeamModule\Http\Controllers\TagController;
-use Remp\BeamModule\Http\Controllers\VisitorController;
 use Remp\BeamModule\Http\Controllers\EntitiesController;
 use Remp\BeamModule\Http\Controllers\SettingsController;
 use Remp\BeamModule\Http\Controllers\GoogleAnalyticsReportingController;
@@ -86,12 +85,6 @@ Route::middleware('auth.jwt')->group(function () {
 
     Route::get('authors/dtAuthors', [AuthorController::class, 'dtAuthors'])->name('authors.dtAuthors');
     Route::get('authors/{author}/dtArticles', [AuthorController::class, 'dtArticles'])->name('authors.dtArticles');
-
-    Route::get('visitors/devices', [VisitorController::class, 'devices'])->name('visitors.devices');
-    Route::get('visitors/sources', [VisitorController::class, 'sources'])->name('visitors.sources');
-    Route::get('visitors/dtBrowsers', [VisitorController::class, 'dtBrowsers'])->name('visitors.dtBrowsers');
-    Route::get('visitors/dtDevices', [VisitorController::class, 'dtDevices'])->name('visitors.dtDevices');
-    Route::get('visitors/dtReferers', [VisitorController::class, 'dtReferers'])->name('visitors.dtReferers');
 
     Route::get('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
 

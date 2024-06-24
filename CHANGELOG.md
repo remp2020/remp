@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- **IMPORTANT** Removed section Visitors. remp/remp#1349
+  - Related data (tables `session_devices` & `session_referers`) are persisted in DB until the next major update.
+  - New data are not processed (command `pageviews:process-sessions` was removed).
+
 ### [Mailer]
 
 - Fixed default sender in template form - update it to default of newsletter list when newsletter list is selected. remp/respekt#220

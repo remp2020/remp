@@ -79,7 +79,6 @@ Laravel's scheduler currently includes:
 * *pageviews:aggregate-load*: Reads pageview/load data from journal and stores aggregated data
 * *pageviews:aggregate-timespent*: Reads pageview/timespent data from journal and stores aggregated data
 * *pageviews:loyal-visitors*: Determines number of articles read by top 10% of readers and creates segment based on it
-* *pageviews:process-sessions*: Reads and parses session referers tracked within Beam
 
 #### Author segments computation
 

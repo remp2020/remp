@@ -182,17 +182,6 @@
             <li {!! route_active(['tag-categories']) !!}>
                 <a href="{{ route('tag-categories.index') }}" ><i class="zmdi zmdi-filter-list"></i> Tag Categories</a>
             </li>
-            <li {!! route_active(['visitors.devices', 'visitors.sources'], 'sub-menu', 'toggled') !!}>
-                <a href="#" data-ma-action="submenu-toggle"><i class="zmdi zmdi-face"></i> Visitors</a>
-                <ul>
-                    <li {!! route_active(['visitors.devices']) !!}>
-                        <a href="{{ route('visitors.devices') }}" ><i class="zmdi zmdi-smartphone"></i> Devices</a>
-                    </li>
-                    <li {!! route_active(['visitors.sources']) !!}>
-                        <a href="{{ route('visitors.sources') }}" ><i class="zmdi zmdi-shape"></i> Sources</a>
-                    </li>
-                </ul>
-            </li>
             @if (config('google.ga_reporting_enabled'))
             <li {!! route_active(['googleanalyticsreporting']) !!}>
                 <a href="{{ route('googleanalyticsreporting.index') }}" ><i class="zmdi zmdi-chart-donut"></i> GA Reporting</a>

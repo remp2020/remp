@@ -230,7 +230,6 @@ class BeamServiceProvider extends ServiceProvider
             Console\Commands\ElasticWriteAliasRollover::class,
             Console\Commands\ProcessConversionSources::class,
             Console\Commands\ProcessPageviewLoyalVisitors::class,
-            Console\Commands\ProcessPageviewSessions::class,
             Console\Commands\SendNewslettersCommand::class,
             Console\Commands\SnapshotArticlesViews::class,
         ]);
