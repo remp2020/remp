@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed `Preview url` and `List image` buttons to disabled if their url is not provided. remp/remp#1367
 - Added edit and show button to sent emails detail. remp/remp#1367
 - Added preview and fullscreen edit for text layout. remp/remp#1094
+- Added `locked` parameter to `NewsfilterGenerator` params to differentiate between locked and unlocked version when rendering template. remp/remp#1358
 
 ## Archive
 

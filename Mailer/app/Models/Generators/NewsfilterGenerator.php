@@ -113,6 +113,7 @@ class NewsfilterGenerator implements IGenerator
             'url' => $values['url'],
             'html' => $post,
             'text' => strip_tags($post),
+            'locked' => false,
         ];
         $lockedParams = [
             'title' => $values['title'],
@@ -121,6 +122,7 @@ class NewsfilterGenerator implements IGenerator
             'url' => $values['url'],
             'html' => $lockedPost,
             'text' => strip_tags($lockedPost),
+            'locked' => true,
         ];
 
         $engine = $this->engineFactory->engine();
