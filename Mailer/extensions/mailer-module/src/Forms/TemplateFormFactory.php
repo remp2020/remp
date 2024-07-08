@@ -8,6 +8,7 @@ use Nette\Database\Explorer;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
+use Remp\MailerModule\Api\v1\Handlers\Mailers\MailCreateTemplateHandler;
 use Remp\MailerModule\Forms\Rules\FormRules;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
@@ -92,7 +93,12 @@ class TemplateFormFactory implements IFormFactory
         $form->addHidden('lang', $lang);
 
         $form->addText('name', 'Name')
-            ->setRequired("Field 'Name' is required.");
+            ->setRequired("Field 'Name' is required.")
+            ->addRule(
+                Form::MaxLength,
+                "The name cannot be longer than %d characters.",
+                MailCreateTemplateHandler::NAME_MAX_LENGTH
+            );
 
         if (isset($id) && $count > 0) {
             $form->addText('code', 'Code')

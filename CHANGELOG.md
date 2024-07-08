@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- Changed the maximum length of the `name` column in the `mail_templates` table to 768 characters. remp/remp#1257
 - Added match `x.com` domain in `EmbedParser::isTwitterLink`. remp/helpdesk#2759
 - Updated Chart.js library which handles charts in the application. remp/remp#1361
 - Fixed chart on the newsletter list detail, so it makes some sense now. remp/remp#1361

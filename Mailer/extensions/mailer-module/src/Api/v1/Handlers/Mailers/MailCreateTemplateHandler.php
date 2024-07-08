@@ -16,6 +16,8 @@ use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailCreateTemplateHandler extends BaseHandler
 {
+    public const NAME_MAX_LENGTH = 768;
+
     private $templatesRepository;
 
     private $listsRepository;
@@ -53,6 +55,15 @@ class MailCreateTemplateHandler extends BaseHandler
 
     public function handle(array $params): ResponseInterface
     {
+        $nameLength = strlen($params['name']);
+        if ($nameLength > self::NAME_MAX_LENGTH) {
+            return new JsonApiResponse(IResponse::S400_BadRequest, [
+                'status' => 'error',
+                'code' => 'name_too_long',
+                'message' => 'Name length is ' . $nameLength . ' characters, exceeding the max of ' . self::NAME_MAX_LENGTH,
+            ]);
+        }
+
         // TODO - mail layouts are not identified by code
         if (!$params['mail_layout_id'] && !$params['mail_layout_code']) {
             // TODO: remove this fallback once internal API's provide the layout themselves

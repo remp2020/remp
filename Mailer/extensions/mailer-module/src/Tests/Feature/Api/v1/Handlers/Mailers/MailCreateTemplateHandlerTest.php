@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api\v1\Handlers\Mailers;
 
+use Nette\Utils\Random;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\MailCreateTemplateHandler;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -45,6 +46,21 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
 
         $template = $this->templatesRepository->findBy('code', $response->getPayload()['code']);
         $this->assertEquals('layout', $template->mail_layout->code);
+    }
+
+    public function testApiWithNameTooLongShouldReturnBadRequest()
+    {
+        $name = Random::generate(MailCreateTemplateHandler::NAME_MAX_LENGTH + 1);
+
+        $params = $this->getDefaultParams([
+            'name' => $name,
+        ]);
+
+        /** @var JsonApiResponse $response */
+        $response =  $this->handler->handle($params);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertEquals(400, $response->getCode());
+        $this->assertEquals('name_too_long', $response->getPayload()['code']);
     }
 
     public function testApiWithoutLayoutIdOrCoudShouldReturnNotFound()
