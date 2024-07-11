@@ -54,6 +54,7 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         "statsLink" => $campaign->id ? route('campaigns.stats', $campaign) : null,
         "editLink" => $campaign->id ? route('campaigns.edit', $campaign) : null,
         "showLink" => $campaign->id ? route('campaigns.show', $campaign) : null,
+        "copyLink" => $campaign->id ? route('campaigns.copy', $campaign) : null,
         "prioritizeBannersSamePosition" => Config::get('banners.prioritize_banners_on_same_position', false),
 
         "banners" => $banners,

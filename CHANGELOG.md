@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **IMPORTANT** Removed section Google Analytics Reporting. remp/remp#1349
   - Data were loaded from discontinued version of Google Analytics.
 
+### [Campaign]
+
+- Added copy buttons to the campaign edit and detail pages. remp/remp#1369
+
 ### [Mailer]
 
 - Fixed default sender in template form - update it to default of newsletter list when newsletter list is selected. remp/respekt#220

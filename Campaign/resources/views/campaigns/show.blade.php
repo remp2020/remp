@@ -20,6 +20,9 @@
                     <a href="{{ route('campaigns.stats', ['campaign' => $campaign])  }}" class="btn palette-Cyan bg waves-effect">
                         <i class="zmdi zmdi-palette-Cyan zmdi-chart"></i> Stats
                     </a>
+                    <a href="{{ route('campaigns.copy', ['sourceCampaign' => $campaign])  }}" class="btn palette-Cyan bg waves-effect">
+                        <i class="zmdi zmdi-palette-Cyan zmdi-copy"></i> Copy
+                    </a>
                 </div>
             </div>
             <div class="card-body">

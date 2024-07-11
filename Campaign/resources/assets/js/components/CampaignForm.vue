@@ -17,11 +17,14 @@
                                 <small v-if="name">{{ name }}</small>
                             </h2>
                             <div class="actions">
-                                <a v-if="statsLink" :href="statsLink" class="btn btn palette-Cyan bg waves-effect">
-                                  <i class="zmdi zmdi-palette-Cyan zmdi-chart"></i> Stats
-                                </a>
                                 <a v-if="showLink" :href="showLink" class="btn palette-Cyan bg waves-effect">
-                                  <i class="zmdi zmdi-palette-Cyan zmdi-eye"></i> Show
+                                    <i class="zmdi zmdi-palette-Cyan zmdi-eye"></i> Show
+                                </a>
+                                <a v-if="statsLink" :href="statsLink" class="btn btn palette-Cyan bg waves-effect">
+                                    <i class="zmdi zmdi-palette-Cyan zmdi-chart"></i> Stats
+                                </a>
+                                <a v-if="copyLink" :href="copyLink" class="btn palette-Cyan bg waves-effect">
+                                    <i class="zmdi zmdi-palette-Cyan zmdi-copy"></i> Copy
                                 </a>
                             </div>
                         </div>
@@ -608,6 +611,7 @@
         "_sourcePatterns",
         "_statsLink",
         "_showLink",
+        "_copyLink",
         "_editLink",
         "_prioritizeBannersSamePosition",
 
