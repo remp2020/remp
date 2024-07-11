@@ -47,7 +47,7 @@ class ListFormFactory
             $list = $this->listsRepository->find($id);
             $defaults = $list->toArray();
 
-            $templates = $this->templatesRepository->findByList($id, 1000)->order('created_at DESC')->fetchAll();
+            $templates = $this->templatesRepository->findByList($id, 500)->order('created_at DESC')->fetchAll();
             $templatePairs = [null => "Select email to prefill email's public preview URL or enter the URL directly."];
 
             foreach ($templates as $template) {
