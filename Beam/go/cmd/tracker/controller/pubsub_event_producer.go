@@ -12,8 +12,8 @@ import (
 
 // PubSubEventProducer is a Cloud PubSub implementation of EventProducer interface.
 type PubSubEventProducer struct {
-	client pubsub.Client
-	topic  pubsub.Topic
+	client *pubsub.Client
+	topic  *pubsub.Topic
 }
 
 // NewPubSubEventProducer creates new PubSubEventProducer
@@ -22,6 +22,7 @@ func NewPubSubEventProducer(ctx context.Context, projectID string, topicID strin
 	if err != nil {
 		return nil, err
 	}
+	defer client.Close()
 
 	topic := client.Topic(topicID)
 	ok, err := topic.Exists(ctx)
@@ -33,8 +34,8 @@ func NewPubSubEventProducer(ctx context.Context, projectID string, topicID strin
 	}
 
 	return &PubSubEventProducer{
-		client: *client,
-		topic:  *topic,
+		client: client,
+		topic:  topic,
 	}, nil
 }
 
@@ -50,6 +51,10 @@ func (psep PubSubEventProducer) Produce(ctx context.Context, table string, time 
 	})
 
 	go func(res *pubsub.PublishResult) {
+		// Wait until the result is ready. If we called res.Get once the ctx is Done (it is once the request
+		// is handled by HTTP server), this would log an error. If the result is ready, ctx status is ignored.
+		<-res.Ready()
+
 		_, err := res.Get(ctx)
 		if err != nil {
 			log.Printf("PubSub: failed to publish message: %v\n", err)
@@ -61,5 +66,6 @@ func (psep PubSubEventProducer) Produce(ctx context.Context, table string, time 
 
 // Close closes the connection with the Cloud Pub/Sub client.
 func (psep PubSubEventProducer) Close() error {
+	psep.topic.Stop()
 	return psep.client.Close()
 }
