@@ -1,6 +1,11 @@
 {input id}
 
 <div class="form-group fg-float">
+    {label mail_type_id /}
+    {input mail_type_id, id => 'mail-type-id', class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+</div>
+
+<div class="form-group fg-float">
     <div class="fg-line">
         {input name, class => 'form-control fg-input'}
         {label name, class => 'fg-label' /}
@@ -38,11 +43,6 @@
         {input description, class => 'form-control fg-input'}
         {label description, class => 'fg-label' /}
     </div>
-</div>
-
-<div class="form-group fg-float">
-    {label mail_type_id /}
-    {input mail_type_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
 </div>
 
 <div class="form-group js-mail-layouts-templates" data-mail-layouts="{json_encode($layouts)}">

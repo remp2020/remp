@@ -41,3 +41,21 @@
         </div>
     </div>
 </div>
+
+<script>
+    let lists = {$lists};
+
+    $('#mail-type-id').on('changed.bs.select', function (e) {
+        let selectedTypeId = $(e.target).val(),
+            fromInput = $('input[name="from"]'),
+            mailFrom = lists[selectedTypeId].mail_from,
+            $from = $('[name="from"]');
+
+        if (mailFrom) {
+            $from.parent().addClass('fg-toggled')
+        } else {
+            $from.parent().removeClass('fg-toggled')
+        }
+        fromInput.val(mailFrom);
+    });
+</script>

@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
 
+- Fixed default sender in template form - update it to default of newsletter list when newsletter list is selected. remp/respekt#220
 
 ## Archive
 
