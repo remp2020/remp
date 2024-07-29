@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed default sender in template form - update it to default of newsletter list when newsletter list is selected. remp/respekt#220
 - Added functionality to duplicate newsletter lists with the possibility to copy subscribers. remp/remp#1363
+- Set `opened` and `clicked` columns in `TemplatePresenter` template listing, to not orderable in favor of more precise numbers. remp/remp#611
 
 ## Archive
 

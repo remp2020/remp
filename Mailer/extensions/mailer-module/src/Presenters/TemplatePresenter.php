@@ -84,11 +84,13 @@ final class TemplatePresenter extends BasePresenter
                 'search' => $this->params['layout'] ?? null,
             ])
             ->setColSetting('opened', [
+                'orderable' => false,
                 'priority' => 3,
                 'render' => 'number',
                 'class' => 'text-right',
             ])
             ->setColSetting('clicked', [
+                'orderable' => false,
                 'priority' => 3,
                 'render' => 'number',
                 'class' => 'text-right',
