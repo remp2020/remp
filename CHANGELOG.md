@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - If auto subscribe is enabled:
     - When adding newsletter list, all existing users are subscribed to this new newsletter list (see [\Remp\MailerModule\Hermes\ListCreatedHandler](https://github.com/remp2020/mailer-module/blob/b63effb11421cd3582dc0280e6e5bf293223b3b2/src/Hermes/ListCreatedHandler.php#L48)).
     - When editing newsletter list, only new users will be subscribed to edited newsletter list.
+- Added article url support to DailyMinuteGenerator. remp/remp#1370
 
 ## Archive
 

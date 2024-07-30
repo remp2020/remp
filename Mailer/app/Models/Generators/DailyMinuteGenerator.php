@@ -51,6 +51,9 @@ class DailyMinuteGenerator implements IGenerator
         $form->addText('from', 'From')
             ->setHtmlAttribute('class', 'form-control');
 
+        $form->addText('url', 'URL')
+            ->setHtmlAttribute('class', 'form-control');
+
         $form->addTextArea('blocks_json', 'Blocks JSON')
             ->setHtmlAttribute('rows', 8)
             ->setHtmlAttribute('class', 'form-control')
@@ -90,7 +93,7 @@ class DailyMinuteGenerator implements IGenerator
     public function apiParams(): array
     {
         return [
-            (new PostInputParam('url')),
+            (new PostInputParam('url'))->setRequired(),
             (new PostInputParam('subject'))->setRequired(),
             (new PostInputParam('blocks_json'))->setRequired(),
             (new PostInputParam('from')),
@@ -104,7 +107,8 @@ class DailyMinuteGenerator implements IGenerator
         $now = new DateTime();
         $additionalParams = [
             'date' => $now,
-            'nameDay' => $this->getNameDayNamesForDate($now)
+            'nameDay' => $this->getNameDayNamesForDate($now),
+            'url' => $values['url'],
         ];
 
         $engine = $this->engineFactory->engine();
@@ -130,9 +134,14 @@ class DailyMinuteGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'subject'");
         }
 
+        if (!isset($data->url)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'url'");
+        }
+
         $output->from = $this->from;
         $output->blocks_json = $data->blocks;
         $output->subject = $data->subject;
+        $output->url = $data->url;
 
         return $output;
     }
