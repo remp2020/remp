@@ -15,13 +15,18 @@
             </smart-range-selector>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-2">
             <h4>Group by:</h4>
             <div role="group" class="btn-group btn-group-sm pull-left">
                 <button type="button" data-value="day" class="btn group-by-trigger {if $groupBy === 'day'}btn-info{else}btn-default{/if}">Day</button>
                 <button type="button" data-value="week" class="btn group-by-trigger {if $groupBy === 'week'}btn-info{else}btn-default{/if}">Week</button>
                 <button type="button" data-value="month" class="btn group-by-trigger {if $groupBy === 'month'}btn-info{else}btn-default{/if}">Month</button>
             </div>
+        </div>
+
+        <div class="col-md-2">
+            <h4>Export:</h4>
+            <button id="export-data" type="button" class="btn btn-info">CSV</button>
         </div>
 
         <div class="col-md-4 text-right">
@@ -229,6 +234,7 @@
 
                     $('#snippet--graph').html(data["snippets"]["snippet--graph"]);
                     $('#snippet--relativeGraph').html(data["snippets"]["snippet--relativeGraph"]);
+                    $('#snippet--exportData').html(data["snippets"]["snippet--exportData"]);
                 },
                 error: function () {
                     console.log('response error');
@@ -265,4 +271,55 @@
     })();
 </script>
 
+{snippet exportData}
+    <script>
+        var labels = {$labels},
+            sentDataSet = {$sentDataSet},
+            openedDataSet = {$openedDataSet},
+            clickedDataSet = {$clickedDataSet},
+            unsubscribedDataSet = {$unsubscibedDataSet},
+            openRateDataSet = {$openRateDataSet},
+            clickRateDataSet = {$clickRateDataSet};
+    </script>
+{/snippet}
 
+<script>
+    $(function () {
+        var header = [null, 'Sent', 'Opened', 'Clicked', 'Unsubscribed', 'Open Rate', 'Click Rate'],
+            columnDelimiter = ',',
+            lineDelimiter = '\n',
+            fileName = 'export-data.csv';
+
+        $("#export-data").on('click', function () {
+            var data = [header];
+            for (var i = 0; i < labels.length; i++) {
+                data.push([
+                    labels[i],
+                    sentDataSet.data[i],
+                    openedDataSet.data[i],
+                    clickedDataSet.data[i],
+                    unsubscribedDataSet.data[i],
+                    openRateDataSet.data[i],
+                    clickRateDataSet.data[i],
+                ])
+            }
+
+            var result = '';
+            data.forEach(function (row) {
+                row.forEach(function (column) {
+                    result += column + columnDelimiter;
+                })
+                result = result.slice(0, -1) + lineDelimiter;
+            });
+
+            var csv = 'data:text/csv;charset=utf-8,' + result;
+            var uri = encodeURI(csv);
+            link = document.createElement('a');
+            link.setAttribute('href', uri);
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link); // Required for FF
+            link.click();
+            document.body.removeChild(link);
+        });
+    });
+</script>

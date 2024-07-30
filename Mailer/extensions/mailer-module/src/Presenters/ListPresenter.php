@@ -5,7 +5,6 @@ namespace Remp\MailerModule\Presenters;
 
 use DateInterval;
 use DateTimeZone;
-use IntlDateFormatter;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Utils\DateTime;
@@ -17,7 +16,6 @@ use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Hermes\RedisDriver;
 use Remp\MailerModule\Models\ChartTrait;
-use Remp\MailerModule\Models\Formatters\DateFormatterFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
@@ -31,50 +29,19 @@ final class ListPresenter extends BasePresenter
 {
     use ChartTrait;
 
-    private $listsRepository;
-
-    private $templatesRepository;
-
-    private $mailTypeStatsRepository;
-
-    private $mailTemplateStatsRepository;
-
-    private $userSubscriptionsRepository;
-
-    private $listFormFactory;
-
-    private $duplicateListFormFactory;
-
-    private $listVariantsRepository;
-
-    private $emitter;
-
-    private $dataTableFactory;
-
     public function __construct(
-        ListsRepository $listsRepository,
-        TemplatesRepository $templatesRepository,
-        MailTypeStatsRepository $mailTypeStatsRepository,
-        MailTemplateStatsRepository $mailTemplateStatsRepository,
-        UserSubscriptionsRepository $userSubscriptionsRepository,
-        ListFormFactory $listFormFactory,
-        DuplicateListFormFactory $duplicateListFormFactory,
-        ListVariantsRepository $listVariantsRepository,
-        Emitter $emitter,
-        DataTableFactory $dataTableFactory
+        private readonly ListsRepository $listsRepository,
+        private readonly TemplatesRepository $templatesRepository,
+        private readonly MailTypeStatsRepository $mailTypeStatsRepository,
+        private readonly MailTemplateStatsRepository $mailTemplateStatsRepository,
+        private readonly UserSubscriptionsRepository $userSubscriptionsRepository,
+        private readonly ListFormFactory $listFormFactory,
+        private readonly DuplicateListFormFactory $duplicateListFormFactory,
+        private readonly ListVariantsRepository $listVariantsRepository,
+        private readonly Emitter $emitter,
+        private readonly DataTableFactory $dataTableFactory,
     ) {
         parent::__construct();
-
-        $this->listsRepository = $listsRepository;
-        $this->templatesRepository = $templatesRepository;
-        $this->mailTypeStatsRepository = $mailTypeStatsRepository;
-        $this->mailTemplateStatsRepository = $mailTemplateStatsRepository;
-        $this->listFormFactory = $listFormFactory;
-        $this->duplicateListFormFactory = $duplicateListFormFactory;
-        $this->listVariantsRepository = $listVariantsRepository;
-        $this->emitter = $emitter;
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
-        $this->dataTableFactory = $dataTableFactory;
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -680,6 +647,7 @@ final class ListPresenter extends BasePresenter
 
         $this->redrawControl('graph');
         $this->redrawControl('relativeGraph');
+        $this->redrawControl('exportData');
     }
 
     public function createComponentDataTableSubscriberEmails(): DataTable
