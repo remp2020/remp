@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed default sender in template form - update it to default of newsletter list when newsletter list is selected. remp/respekt#220
 - Added functionality to duplicate newsletter lists with the possibility to copy subscribers. remp/remp#1363
 - Set `opened` and `clicked` columns in `TemplatePresenter` template listing, to not orderable in favor of more precise numbers. remp/remp#611
+- Fixed description of auto subscribe toggle when editing newsletter list. remp/remp#1366
+  - If auto subscribe is enabled:
+    - When adding newsletter list, all existing users are subscribed to this new newsletter list (see [\Remp\MailerModule\Hermes\ListCreatedHandler](https://github.com/remp2020/mailer-module/blob/b63effb11421cd3582dc0280e6e5bf293223b3b2/src/Hermes/ListCreatedHandler.php#L48)).
+    - When editing newsletter list, only new users will be subscribed to edited newsletter list.
 
 ## Archive
 

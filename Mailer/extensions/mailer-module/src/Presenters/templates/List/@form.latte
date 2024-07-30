@@ -135,8 +135,13 @@
                     {label auto_subscribe:, class => 'ts-label' /}
                     {input auto_subscribe:, hidden => 'hidden'}
                     <label for="{$form['auto_subscribe']->htmlId}" class="ts-helper"></label>
+
+                    {var $whichUsers = 'new users'}
+                    {if $form['id']->getValue() === ''} {* missing ID => we are adding new newsletter list *}
+                        {var $whichUsers = 'existing and new users'}
+                    {/if}
                     <small class="help-block">
-                        Toggles whether user should be automatically subscribed to the newsletter after the registration.
+                        Toggles whether <b>{$whichUsers}</b> should be automatically subscribed to the newsletter after the registration.
                     </small>
                 </div>
             </div>
