@@ -20,6 +20,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **IMPORTANT**: Changed setting of Symfony Console to stop quietly catch exceptions. remp/remp#1364
+  - Changed setting of `Symfony\Component\Console\Application->setCatchExceptions()` to false.
+  - We don't want Symfony to catch these errors (and only show them in the command's output). We want all exceptions of the application to bubble up to Tracy.
+  - If you want to keep previous behaviour, you can override it within your `config.local.neon` by calling `setCatchExceptions(true)` within `setup` directive of `console` service.
+    ```neon
+    console:
+      setup:
+        - setCatchExceptions(true)
+    ```
 - Fixed default sender in template form - update it to default of newsletter list when newsletter list is selected. remp/respekt#220
 - Added functionality to duplicate newsletter lists with the possibility to copy subscribers. remp/remp#1363
 - Set `opened` and `clicked` columns in `TemplatePresenter` template listing, to not orderable in favor of more precise numbers. remp/remp#611
