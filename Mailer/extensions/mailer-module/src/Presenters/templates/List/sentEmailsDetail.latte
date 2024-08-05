@@ -41,6 +41,12 @@
     </div>
 </div>
 
+<script>
+    function weekParser(value) {
+        return moment(value, 'YYYY-WW').isoWeekday(4);
+    }
+</script>
+
 <div class="card">
     <div class="card-header">
         <h2 n:block="title">
@@ -102,11 +108,12 @@
                             time: {
                                 displayFormats: {
                                     "day": "ll",
-                                    "week": "w/YYYY",
+                                    "week": "W/YYYY",
                                     "month": "MMMM YY",
                                 },
-                                tooltipFormat: "LL",
+                                tooltipFormat: {$tooltipFormat},
                                 unit: {$groupBy},
+                                parser: {if $groupBy === 'week'} weekParser {else} {$parser} {/if},
                             },
                             grid: {
                                 display: false,
@@ -121,7 +128,6 @@
         </script>
     {/snippet}
 </div>
-
 <div class="card">
     {snippet relativeGraph}
         <div class="card-header">
@@ -186,8 +192,9 @@
                                     "week": "w/YYYY",
                                     "month": "MMMM YY",
                                 },
-                                tooltipFormat: "LL",
+                                tooltipFormat: {$tooltipFormat},
                                 unit: {$groupBy},
+                                parser: {if $groupBy === 'week'} weekParser {else} {$parser} {/if},
                             },
                             grid: {
                                 display: false,
@@ -252,8 +259,8 @@
                 callback: function (from, to) {
                     getDataAndRenderGraphs(from, to, $('.group-by-trigger.btn-info').data('value'));
 
-                    $('[name="from"]').val(from);
-                    $('[name="to"]').val(to).trigger("change");
+                    $from.val(from);
+                    $to.val(to).trigger("change");
                 }
             }
         });

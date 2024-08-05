@@ -360,13 +360,19 @@ class UserSubscriptionsRepository extends Repository
         }
     }
 
-    public function getMailTypeGraphData(int $mailTypeId, \DateTime $from, \DateTime $to): Selection
+    public function getMailTypeGraphData(int $mailTypeId, \DateTime $from, \DateTime $to, string $groupBy = 'day'): Selection
     {
+        $dateFormat = match ($groupBy) {
+            'week' => '%x-%v',
+            'month' => '%Y-%m',
+            default => '%Y-%m-%d'
+        };
+
         return $this->getTable()
             ->select('
-                count(id) AS unsubscribed_users,
-                DATE(updated_at) AS label_date
-            ')
+                count(id) AS unsubscribed_users, 
+                DATE_FORMAT(updated_at, ?) AS label_date
+            ', $dateFormat)
             ->where('subscribed = 0')
             ->where('mail_type_id = ?', $mailTypeId)
             ->where('updated_at >= DATE(?)', $from)

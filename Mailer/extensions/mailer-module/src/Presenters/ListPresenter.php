@@ -490,6 +490,8 @@ final class ListPresenter extends BasePresenter
             $data = $this->emailsDetailData($id, $from, $to, $groupBy, $tz);
 
             $this->template->labels = $data['labels'];
+            $this->template->parser = $data['parser'];
+            $this->template->tooltipFormat = $data['tooltipFormat'];
             $this->template->sentDataSet = $data['sentDataSet'];
             $this->template->openedDataSet = $data['openedDataSet'];
             $this->template->clickedDataSet = $data['clickedDataSet'];
@@ -511,10 +513,18 @@ final class ListPresenter extends BasePresenter
 
         $dateFormat = 'Y-m-d';
         $dateInterval = '+1 day';
+        $parser = 'YYYY-MM-DD';
+        $tooltipFormat = 'LL';
         if ($groupBy === 'week') {
+            $dateFormat = 'o-W';
             $dateInterval = '+1 week';
+            $parser = 'YYYY-WW';
+            $tooltipFormat = 'w/YYYY';
         } elseif ($groupBy === 'month') {
+            $dateFormat = 'Y-m';
             $dateInterval = '+1 month';
+            $parser = 'YYYY-MM';
+            $tooltipFormat = 'MMMM YY';
         }
 
         $fromLimit = clone $from;
@@ -548,12 +558,12 @@ final class ListPresenter extends BasePresenter
             'lineTension' => 0.2,
         ];
 
-        $data = $this->mailTemplateStatsRepository->getMailTypeGraphData((int) $id, $from, $to)->fetchAll();
+        $data = $this->mailTemplateStatsRepository->getMailTypeGraphData((int) $id, $from, $to, $groupBy)->fetchAll();
 
         // parse sent mails by type data to chart.js format
         foreach ($data as $row) {
             $foundAt = array_search(
-                $row->label_date->format($dateFormat),
+                $row->label_date,
                 $labels
             );
 
@@ -605,11 +615,11 @@ final class ListPresenter extends BasePresenter
             'lineTension' => 0.5
         ];
 
-        $unsubscribedData = $this->userSubscriptionsRepository->getMailTypeGraphData((int) $id, $from, $to)
+        $unsubscribedData = $this->userSubscriptionsRepository->getMailTypeGraphData((int) $id, $from, $to, $groupBy)
             ->fetchAll();
         foreach ($unsubscribedData as $unsubscibedDataRow) {
             $foundAt = array_search(
-                $unsubscibedDataRow->label_date->format($dateFormat),
+                $unsubscibedDataRow->label_date,
                 $labels,
                 true
             );
@@ -621,6 +631,8 @@ final class ListPresenter extends BasePresenter
 
         return [
             'labels' => $labels,
+            'parser' => $parser,
+            'tooltipFormat' => $tooltipFormat,
             'sentDataSet' => $sentDataSet,
             'openedDataSet' => $openedDataSet,
             'clickedDataSet' => $clickedDataSet,
@@ -638,6 +650,8 @@ final class ListPresenter extends BasePresenter
 
         $this->template->groupBy = $group_by;
         $this->template->labels = $data['labels'];
+        $this->template->parser = $data['parser'];
+        $this->template->tooltipFormat = $data['tooltipFormat'];
         $this->template->sentDataSet = $data['sentDataSet'];
         $this->template->openedDataSet = $data['openedDataSet'];
         $this->template->clickedDataSet = $data['clickedDataSet'];

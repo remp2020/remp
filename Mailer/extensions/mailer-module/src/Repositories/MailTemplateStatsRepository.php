@@ -45,14 +45,22 @@ class MailTemplateStatsRepository extends Repository
         return $this->getTable();
     }
 
-    public function getMailTypeGraphData(int $mailTypeId, DateTime $from, DateTime $to): Selection
+    public function getMailTypeGraphData(int $mailTypeId, DateTime $from, DateTime $to, string $groupBy = 'day'): Selection
     {
+        $dateFormat = match ($groupBy) {
+            'week' => '%x-%v',
+            'month' => '%Y-%m',
+            'day' => '%Y-%m-%d',
+            default => throw new \Exception('Unrecognized $groupBy value:' . $groupBy),
+        };
+
         return $this->getTable()
             ->select('
                 SUM(COALESCE(mail_template_stats.sent, 0)) AS sent_mails,
                 SUM(COALESCE(mail_template_stats.opened, 0)) AS opened_mails,
                 SUM(COALESCE(mail_template_stats.clicked, 0)) AS clicked_mails,
-                date AS label_date')
+                DATE_FORMAT(date, ?) AS label_date
+            ', $dateFormat)
             ->where('mail_template.mail_type_id = ?', $mailTypeId)
             ->where('date >= DATE(?)', $from)
             ->where('date <= DATE(?)', $to)
