@@ -13,47 +13,47 @@ class CampaignSeeder extends Seeder
      */
     public function run()
     {
-        /** @var \App\Banner $banner */
-        $banner = \App\Banner::factory()->create([
+        /** @var \Remp\CampaignModule\Banner $banner */
+        $banner = \Remp\CampaignModule\Banner::factory()->create([
             'name' => 'DEMO Medium Rectangle Banner',
             'template' => 'medium_rectangle',
             'offset_horizontal' => 10,
             'offset_vertical' => 10,
         ]);
         $banner->mediumRectangleTemplate()->save(
-            \App\MediumRectangleTemplate::factory()->make()
+            \Remp\CampaignModule\MediumRectangleTemplate::factory()->make()
         );
 
-        /** @var \App\Banner $altBanner */
-        $altBanner = \App\Banner::factory()->create([
+        /** @var \Remp\CampaignModule\Banner $altBanner */
+        $altBanner = \Remp\CampaignModule\Banner::factory()->create([
             'name' => 'DEMO Bar Banner',
             'template' => 'bar',
             'offset_horizontal' => 10,
             'offset_vertical' => 10,
         ]);
         $altBanner->barTemplate()->save(
-            \App\BarTemplate::factory()->make()
+            \Remp\CampaignModule\BarTemplate::factory()->make()
         );
 
-        /** @var \App\Campaign $campaign */
-        $campaign = \App\Campaign::factory()->create();
+        /** @var \Remp\CampaignModule\Campaign $campaign */
+        $campaign = \Remp\CampaignModule\Campaign::factory()->create();
 
         $campaign->segments()->save(
-            \App\CampaignSegment::factory()->make()
+            \Remp\CampaignModule\CampaignSegment::factory()->make()
         );
 
-        $campaignBanner = \App\CampaignBanner::factory()->create([
+        $campaignBanner = \Remp\CampaignModule\CampaignBanner::factory()->create([
             'banner_id' => $banner->id,
             'campaign_id' => $campaign->id,
         ]);
 
-        $altCampaignBanner = \App\CampaignBanner::factory()->create([
+        $altCampaignBanner = \Remp\CampaignModule\CampaignBanner::factory()->create([
             'banner_id' => $altBanner->id,
             'campaign_id' => $campaign->id,
             'weight' => 2,
         ]);
 
-        $controlGroup = \App\CampaignBanner::factory()->create([
+        $controlGroup = \Remp\CampaignModule\CampaignBanner::factory()->create([
             'banner_id' => null,
             'campaign_id' => $campaign->id,
             'weight' => 3,

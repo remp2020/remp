@@ -1,9 +1,11 @@
 /node_modules
 /public/storage
 /public/hot
-/public/assets/vendor
-/public/assets/showtime
+/public/vendor/campaign
 /public/assets/lib
+/extensions/campaign-module/public/assets/vendor
+/extensions/campaign-module/public/assets/showtime
+/extensions/campaign-module/public/assets/lib
 /storage/*.key
 /vendor
 /.idea
@@ -23,3 +25,7 @@ npm-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+/config/services.remp.php
+/config/search.php
+/config/banners.php
+/config/newsletter_banners.php

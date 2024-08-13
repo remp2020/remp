@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Country;
+use Remp\CampaignModule\Country;
 
 class CountrySeeder extends Seeder
 {

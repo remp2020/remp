@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "359d0e48f88453026c57be691a4dd448",
+    "content-hash": "72a0d072f863a438aabe133846c13f54",
     "packages": [
         {
             "name": "airbrake/phpbrake",
@@ -5414,6 +5414,108 @@
                 }
             ],
             "time": "2023-01-12T18:13:24+00:00"
+        },
+        {
+            "name": "remp/campaign-module",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "extensions/campaign-module",
+                "reference": "ff043d7e1f028e7cc3d31a724c3494b48a988985"
+            },
+            "require": {
+                "cache/predis-adapter": "^1.0",
+                "cache/redis-adapter": "^1.2",
+                "doctrine/dbal": "^3.1",
+                "ext-intl": "*",
+                "ext-json": "*",
+                "fico7489/laravel-pivot": "^3.0",
+                "fideloper/proxy": "^4.4",
+                "fruitcake/laravel-cors": "^2.0",
+                "geoip2/geoip2": "~2.0",
+                "guzzlehttp/guzzle": "^7.0.1",
+                "kouz/laravel-airbrake": "^0.7.0",
+                "laracasts/flash": "^3.2",
+                "laravel/framework": "v8.76.2",
+                "laravel/serializable-closure": "^1.2",
+                "laravelcollective/html": "^6.2",
+                "nicolaslopezj/searchable": "^1.13",
+                "php": "^8.1",
+                "php-amqplib/php-amqplib": "^2.7",
+                "piwik/device-detector": "^3.10",
+                "predis/predis": "^1.1",
+                "remp/laravel-helpers": "*",
+                "remp/laravel-sso": "*",
+                "remp/laravel-widgets": "*",
+                "remp/remp-commons": "*",
+                "sentry/sentry-laravel": "^2.5",
+                "spatie/laravel-searchable": "^1.9",
+                "symfony/psr-http-message-bridge": "^v2.1.2",
+                "tightenco/ziggy": "^1.2",
+                "ukfast/laravel-health-check": "^1.5",
+                "yajra/laravel-datatables-oracle": "^9.18"
+            },
+            "require-dev": {
+                "barryvdh/laravel-debugbar": "^3.7",
+                "barryvdh/laravel-ide-helper": "^2.10",
+                "facade/ignition": "^2.5",
+                "fakerphp/faker": "^1.9.1",
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "josiasmontag/laravel-redis-mock": "~1.2",
+                "laravel/tinker": "^2.0",
+                "mockery/mockery": "^1.4.2",
+                "nunomaduro/collision": "^5.0",
+                "phpunit/phpunit": "^9.3.3",
+                "squizlabs/php_codesniffer": "^3.6"
+            },
+            "suggest": {
+                "ext-redis": "The extension required for better performance."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Remp\\CampaignModule\\CampaignServiceProvider",
+                        "Remp\\CampaignModule\\Providers\\BeamSegmentsServiceProvider",
+                        "Remp\\CampaignModule\\Providers\\CrmSegmentServiceProvider",
+                        "Remp\\CampaignModule\\Providers\\DeviceDetectorServiceProvider",
+                        "Remp\\CampaignModule\\Providers\\PythiaSegmentsServiceProvider",
+                        "Remp\\CampaignModule\\Providers\\ShowtimeServiceProvider",
+                        "Remp\\CampaignModule\\Providers\\StatsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "database"
+                ],
+                "psr-4": {
+                    "Remp\\CampaignModule\\": "src/",
+                    "Remp\\CampaignModule\\Database\\Factories\\": "database/factories/",
+                    "Remp\\CampaignModule\\Database\\Seeders\\": "database/seeders/",
+                    "Remp\\CampaignModule\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "post-root-package-install": [
+                    "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+                ],
+                "post-create-project-cmd": [
+                    "@php artisan key:generate"
+                ],
+                "post-autoload-dump": [
+                    "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+                    "@php artisan package:discover"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "REMP Campaign Laravel package",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "remp/laravel-helpers",
@@ -12617,14 +12719,12 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "remp/campaign-module": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": {
-        "php": "^8.1",
-        "ext-intl": "*",
-        "ext-json": "*"
-    },
+    "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }

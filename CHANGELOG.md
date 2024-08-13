@@ -17,6 +17,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
+- **BREAKING**: Changed internals of the application causing cached/generated files not to work anymore.
+  - After the release, please run `php artisan optimize:clear` on each server the app is deployed to. This applies also to the development environment after you checkout the latest version. If you deploy to the clean environment, you can skip this step.
+  - After the release, please run `php artisan campaigns:refresh-cache` command at least once to refresh the Redis cache.
+- **IMPORTANT**: Changed `/showtime.php` path to `/vendor/campaign/showtime.php` in `remplib.js` remp/remp#1287
+    - Make sure this new path is accessible on your running installations.
+- Extracted campaign to separate campaign module, that will be includable by the skeleton app in the future. remp/remp#1287
 - Added copy buttons to the campaign edit and detail pages. remp/remp#1369
 
 ### [Mailer]

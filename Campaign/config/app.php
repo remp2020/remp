@@ -152,14 +152,8 @@ return [
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\CrmSegmentServiceProvider::class,
-        App\Providers\BeamSegmentsServiceProvider::class,
-        App\Providers\PythiaSegmentsServiceProvider::class,
-        App\Providers\StatsServiceProvider::class,
-        App\Providers\ShowtimeServiceProvider::class,
     ],
 
     /*

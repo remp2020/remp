@@ -1,0 +1,7 @@
+/node_modules
+.env
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+/vendor
+/.idea

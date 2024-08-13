@@ -32,6 +32,7 @@ modules_paths=(
   [mailer-module]="Mailer/extensions/mailer-module"
   [newrelic-module]="Mailer/extensions/newrelic-module"
   [beam-module]="Beam/extensions/beam-module"
+  [campaign-module]="Campaign/extensions/campaign-module"
 )
 
 if [ -z $MODULE ]; then
@@ -44,6 +45,7 @@ if [ -z $MODULE ]; then
     mailer-module
     newrelic-module
     beam-module
+    campaign-module
   )
 else
   if ! [[ -v "modules_paths[${MODULE}]" ]]; then

@@ -2,14 +2,8 @@
 
 namespace App\Console;
 
-use App\Campaign;
-use App\Console\Commands\AggregateCampaignStats;
-use App\Jobs\CacheSegmentJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Carbon;
-use Schema;
-use Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -19,8 +13,6 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\CampaignsRefreshCache::class,
-        Commands\AggregateCampaignStats::class,
     ];
 
     /**
@@ -31,43 +23,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // Collect campaign stats if Beam Journal is configured
-        $beamJournalConfigured = !empty(config('services.remp.beam.segments_addr'));
-        if ($beamJournalConfigured) {
-            $schedule->command(AggregateCampaignStats::COMMAND)
-                ->everyMinute()
-                ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
-                ->appendOutputTo(storage_path('logs/aggregate_campaign_stats.log'));
-        }
-
-        // invalidate segments cache
-        try {
-            $campaigns = Campaign::selectRaw('campaigns.*')
-                ->join('schedules', 'campaigns.id', '=', 'campaign_id')
-                ->where(function (\Illuminate\Database\Eloquent\Builder $query) {
-                    $query
-                        ->whereNull('end_time')
-                        ->orWhere('end_time', '>=', Carbon::now());
-                })
-                ->whereIn('status', [\App\Schedule::STATUS_READY, \App\Schedule::STATUS_EXECUTED, \App\Schedule::STATUS_PAUSED])->cursor();
-
-            /** @var Campaign $campaign */
-            foreach ($campaigns as $campaign) {
-                foreach ($campaign->segments as $campaignSegment) {
-                    $schedule->job(new CacheSegmentJob($campaignSegment, true))
-                        ->hourly()
-                        ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
-                        ->appendOutputTo(storage_path('logs/cache_segments.log'));
-
-                    $schedule->job(new CacheSegmentJob($campaignSegment, false))
-                        ->everyMinute()
-                        ->withoutOverlapping(config('system.commands_overlapping_expires_at'))
-                        ->appendOutputTo(storage_path('logs/cache_segments.log'));
-                }
-            }
-        } catch (\PDOException $e) {
-            // no action, the tables are not ready yet
-        }
     }
 
     /**

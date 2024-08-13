@@ -15,14 +15,14 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        \App\Http\Middleware\TrustProxies::class,
+        \Remp\CampaignModule\Http\Middleware\TrustProxies::class,
         \Fruitcake\Cors\HandleCors::class,
-        \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
+        \Remp\CampaignModule\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \App\Http\Middleware\TrimStrings::class,
+        \Remp\CampaignModule\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        \App\Http\Middleware\ConvertStringBooleans::class,
-        \App\Http\Middleware\SerializeSegmentAggregator::class,
+        \Remp\CampaignModule\Http\Middleware\ConvertStringBooleans::class,
+        \Remp\CampaignModule\Http\Middleware\SerializeSegmentAggregator::class,
     ];
 
     /**
@@ -32,12 +32,12 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            \App\Http\Middleware\EncryptCookies::class,
+            \Remp\CampaignModule\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
+            \Remp\CampaignModule\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
@@ -66,7 +66,7 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'jsonApi' => \App\Http\Middleware\JsonApiMiddleware::class,
-        'collectionQueryString' => \App\Http\Middleware\CollectionQueryString::class,
+        'jsonApi' => \Remp\CampaignModule\Http\Middleware\JsonApiMiddleware::class,
+        'collectionQueryString' => \Remp\CampaignModule\Http\Middleware\CollectionQueryString::class,
     ];
 }
