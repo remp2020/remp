@@ -109,7 +109,7 @@ class CampaignServiceProvider extends ServiceProvider
             return Redis::connection()->client();
         });
         $this->app->bind(LazyGeoReader::class, function () {
-            return new LazyGeoReader(config("services.maxmind.database"));
+            return new LazyGeoReader(config("services.remp.maxmind.database"));
         });
 
         $this->app->bind(ShowtimeConfig::class, function () {

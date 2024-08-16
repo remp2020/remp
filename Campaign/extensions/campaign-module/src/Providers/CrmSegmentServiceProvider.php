@@ -30,16 +30,17 @@ class CrmSegmentServiceProvider extends ServiceProvider
     {
         $this->app->bind(Segment::class, function (Application $app) {
             $client = new Client([
-                'base_uri' => config('services.crm_segment.base_url'),
+                'base_uri' => config('services.remp.crm_segment.base_url'),
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $app['config']->get('services.crm_segment.token'),
+                    'Authorization' => 'Bearer ' . $app['config']->get('services.remp.crm_segment.token'),
                 ],
             ]);
             /** @var \Predis\Client|\Redis $redis */
             $redis = $app->make('redis')->connection()->client();
             return new Segment($client, $redis);
         });
-        if (config('services.crm_segment.base_url')) {
+
+        if (config('services.remp.crm_segment.base_url')) {
             $this->app->tag(Segment::class, [SegmentAggregator::TAG]);
         }
     }

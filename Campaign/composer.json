@@ -69,7 +69,7 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover",
-            "@php artisan vendor:publish --tag=campaign-assets"
+            "@php artisan vendor:publish --tag=campaign-assets --force"
         ]
     },
     "config": {
