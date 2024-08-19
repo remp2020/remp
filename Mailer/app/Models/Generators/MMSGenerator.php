@@ -245,8 +245,8 @@ class MMSGenerator implements IGenerator
         }
         $output->sub_title = $data->post_excerpt;
 
-        if (isset($data->post_image->image_sizes->medium_large->file)) {
-            $output->image_url = $data->post_image->image_sizes->medium_large->file;
+        if (isset($data->post_image->image_sizes->medium->file)) {
+            $output->image_url = $data->post_image->image_sizes->medium->file;
         }
 
         if (isset($data->post_image->image_title)) {
