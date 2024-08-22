@@ -45,6 +45,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - When editing newsletter list, only new users will be subscribed to edited newsletter list.
 - Added article url support to DailyMinuteGenerator. remp/remp#1370
 - Added ability to export sent emails stats in `ListPresenter`. remp/remp#1362
+- Fixed Delete User API response not being actually as empty as HTTP code states. remp/remp#1378 
 
 ## Archive
 

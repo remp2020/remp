@@ -11,6 +11,7 @@ use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
+use Tomaj\NetteApi\Response\TextApiResponse;
 
 class UserDeleteApiHandler extends BaseHandler
 {
@@ -60,6 +61,6 @@ class UserDeleteApiHandler extends BaseHandler
             ]);
         }
 
-        return new JsonApiResponse(IResponse::S204_NoContent, []);
+        return new TextApiResponse(IResponse::S204_NoContent, null);
     }
 }

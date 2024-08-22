@@ -12,6 +12,7 @@ use Remp\MailerModule\Models\Auth\TokenGenerator;
 use Remp\MailerModule\Repositories\JobQueueRepository;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
 use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\TextApiResponse;
 
 class UserDeleteApiHandlerTest extends BaseApiHandlerTestCase
 {
@@ -79,13 +80,11 @@ class UserDeleteApiHandlerTest extends BaseApiHandlerTestCase
             ])
         ];
 
-        /** @var JsonApiResponse $response */
+        /** @var TextApiResponse $response */
         $response = $this->handler->handle($params);
-        $payload = $response->getPayload();
 
-        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertInstanceOf(TextApiResponse::class, $response);
         $this->assertEquals(IResponse::S204_NoContent, $response->getCode());
-        $this->assertEmpty($payload);
 
         // check user data after removal; check if correct user was removed (has zero data); other two users should be untouched
         $this->assertEquals(2, $this->autoLoginTokensRepository->totalCount());
