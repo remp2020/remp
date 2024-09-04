@@ -48,10 +48,12 @@ services:
 
 	redisClientFactory: Remp\MailerModule\Models\RedisClientFactory(%redis.host%, %redis.port%, %redis.db%, %redis.password%, %redis_client_factory.prefix%)
 
+	processJobCommand: Remp\MailerModule\Commands\ProcessJobCommand()
+
 	console:
 		factory: Symfony\Component\Console\Application
 		setup:
-			- add(Remp\MailerModule\Commands\ProcessJobCommand())
+			- add(@processJobCommand)
 			- add(@mailWorkerCommand)
 			- add(Remp\MailerModule\Commands\DatabaseSeedCommand())
 			- add(Remp\MailerModule\Commands\DemoSeedCommand())

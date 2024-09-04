@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
 
+- Added ability to set custom health check TTL for `ProcessJobCommand`. remp/remp#1376
 
 ## Archive
 

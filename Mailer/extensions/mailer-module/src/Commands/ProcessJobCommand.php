@@ -17,22 +17,14 @@ use Tracy\ILogger;
 class ProcessJobCommand extends Command
 {
     public const COMMAND_NAME = "mail:process-job";
-
-    private $batchesRepository;
-
-    private $batchEmailGenerator;
-
-    private HealthChecker $healthChecker;
+    private int $healthCheckTTLSeconds = 600;
 
     public function __construct(
-        BatchesRepository $batchesRepository,
-        BatchEmailGenerator $batchEmailGenerator,
-        HealthChecker $healthChecker
+        private readonly BatchesRepository $batchesRepository,
+        private readonly BatchEmailGenerator $batchEmailGenerator,
+        private readonly HealthChecker $healthChecker,
     ) {
         parent::__construct();
-        $this->batchesRepository = $batchesRepository;
-        $this->batchEmailGenerator = $batchEmailGenerator;
-        $this->healthChecker = $healthChecker;
     }
 
     protected function configure(): void
@@ -51,7 +43,7 @@ class ProcessJobCommand extends Command
         while ($batch = $this->batchesRepository->getBatchReady()) {
             $originalStatus = $batch->status;
             try {
-                $this->healthChecker->ping(self::COMMAND_NAME, 600);
+                $this->healthChecker->ping(self::COMMAND_NAME, $this->healthCheckTTLSeconds);
 
                 $this->batchesRepository->updateStatus($batch, BatchesRepository::STATUS_PROCESSING);
                 $output->writeln("  * processing mail batch <info>#{$batch->id}</info>");
@@ -91,5 +83,10 @@ class ProcessJobCommand extends Command
         $output->writeln('');
 
         return Command::SUCCESS;
+    }
+
+    public function setHealthCheckTTLSeconds(int $seconds): void
+    {
+        $this->healthCheckTTLSeconds = $seconds;
     }
 }
