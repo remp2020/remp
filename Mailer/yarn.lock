@@ -1479,7 +1479,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@remp/js-commons@portal:../Package/remp::locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
-    chart.js: ^2.9.3
+    chart.js: ^4.4
     datatables.net: ^1.10.25
     datatables.net-responsive: ^2.2.9
     datatables.net-rowgroup: ^1.1.3
@@ -2792,41 +2792,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chart.js@npm:^2.9.3":
-  version: 2.9.4
-  resolution: "chart.js@npm:2.9.4"
-  dependencies:
-    chartjs-color: ^2.1.0
-    moment: ^2.10.2
-  checksum: 4551932943bc5e42d25ae5632d91878fb89e22937095a2742e23c4d0d0bde405bed6be2cb8480694ba599d6dbb9882c8bce6bac1e4667c820eb24c38416380aa
-  languageName: node
-  linkType: hard
-
 "chart.js@npm:^4.4":
   version: 4.4.3
   resolution: "chart.js@npm:4.4.3"
   dependencies:
     "@kurkle/color": ^0.3.0
   checksum: 70e01da30240e1e87394faf343f2674adad246faf3cce52684bffdf857730f3a63cb272b9d62dd19e9d944047d9d68d403575cd01d1a4077e58e2dae080babba
-  languageName: node
-  linkType: hard
-
-"chartjs-color-string@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "chartjs-color-string@npm:0.6.0"
-  dependencies:
-    color-name: ^1.0.0
-  checksum: 29f7ef3ebf5af1a76034da3148e1f230eee0c0f6df497ab7072ce5fb9c11ff37f5f030d2a2a5f1fd9230895d9aa294b455c5dd0f0e04f38688c69d0ccbdca7dd
-  languageName: node
-  linkType: hard
-
-"chartjs-color@npm:^2.1.0":
-  version: 2.4.1
-  resolution: "chartjs-color@npm:2.4.1"
-  dependencies:
-    chartjs-color-string: ^0.6.0
-    color-convert: ^1.9.3
-  checksum: 850408dfcda057ef0115018d5c83b88f5539cf93bbae8389bd3c5caa405a18e1f1d89b22a26107e1559248206a4ad6243294a820d50f042c6782a1d9d09fb3de
   languageName: node
   linkType: hard
 
@@ -2947,7 +2918,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-convert@npm:^1.9.0, color-convert@npm:^1.9.3":
+"color-convert@npm:^1.9.0":
   version: 1.9.3
   resolution: "color-convert@npm:1.9.3"
   dependencies:
@@ -2972,7 +2943,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-name@npm:^1.0.0, color-name@npm:~1.1.4":
+"color-name@npm:~1.1.4":
   version: 1.1.4
   resolution: "color-name@npm:1.1.4"
   checksum: 3e1c9a4dee12eada307436f61614dd11fe300469db2b83f80c8b7a7cd8a1015f0f18dd13403f018927b249003777ff60baba4a03c65f12e6bddc0dfd9642021f
@@ -5505,9 +5476,9 @@ fsevents@~2.3.2:
 
 "mailer-module@file:extensions/mailer-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 2.0.0
-  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=35c10f&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=f2448e&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
-    "@remp/js-commons": ^2.3.1
+    "@remp/js-commons": ^2.4.0
     animate.css: ^3.7.0
     autosize: ^4.0.2
     bootstrap: ^3.4.1
@@ -5538,7 +5509,7 @@ fsevents@~2.3.2:
     salvattore: ^1.0.9
     trumbowyg: ^2.25.1
     vue: ^2.6.14
-  checksum: 68573f942151ea149291f735b95b0141a1fcdce697ceed7710c6d715d1bc1636cd2b02e75082c809f3d2fabc61b46541aeaf6f7170bbf3726ad0b82f0028e8cb
+  checksum: e7e287b0ee60d6ce1fab5a94906c3aa5d545e405886f75e1105de49402baf7b165a7b548005b6abfb7c085a8d46804c6c153db9188fa32f52e54ea0ac592cd30
   languageName: node
   linkType: hard
 
@@ -5908,7 +5879,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"moment@npm:>= 2.6.0, moment@npm:^2.10, moment@npm:^2.10.2, moment@npm:^2.24.0, moment@npm:^2.29.4":
+"moment@npm:>= 2.6.0, moment@npm:^2.10, moment@npm:^2.24.0, moment@npm:^2.29.4":
   version: 2.29.4
   resolution: "moment@npm:2.29.4"
   checksum: 5aa949ddcfc8dee4984123410cc0cd504caa6ef691bd191a527a1de67529895dcc8a8342cd67fb1953ae87172ea701bb957cea6d30abf0677ca9c62e834a5b5a
