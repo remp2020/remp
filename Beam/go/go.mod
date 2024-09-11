@@ -91,3 +91,5 @@ require (
 	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/olivere/elastic/v7 => github.com/rootpd/elastic/v7 v7.0.0-20240911082621-bad91d4bff6b
