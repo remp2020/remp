@@ -22,7 +22,6 @@ func NewPubSubEventProducer(ctx context.Context, projectID string, topicID strin
 	if err != nil {
 		return nil, err
 	}
-	defer client.Close()
 
 	topic := client.Topic(topicID)
 	ok, err := topic.Exists(ctx)

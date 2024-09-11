@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+`### [Beam]
+
+- [Tracker] Fixed Tracker not publishing messages to pub sub due to prematurely closed client. remp/remp#1384
+
 ### [Mailer]
 
 - Added ability to set custom health check TTL for `ProcessJobCommand`. remp/remp#1376
