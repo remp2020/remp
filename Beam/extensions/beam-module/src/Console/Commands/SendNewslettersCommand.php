@@ -35,9 +35,7 @@ class SendNewslettersCommand extends Command
 
     public function handle()
     {
-        $this->line('');
-        $this->line('<info>***** Sending newsletters *****</info>');
-        $this->line('');
+        $this->line(Carbon::now() . ': Processing newsletters');
 
         $newsletters = Newsletter::where('state', Newsletter::STATE_STARTED)
             ->where('starts_at', '<=', Carbon::now())
@@ -49,6 +47,7 @@ class SendNewslettersCommand extends Command
         }
 
         foreach ($newsletters as $newsletter) {
+            $this->line(Carbon::now() . ":   * {$newsletter->name}");
             $nextSending = $newsletter->starts_at;
             $hasMore = false;
 
@@ -57,26 +56,23 @@ class SendNewslettersCommand extends Command
             }
 
             if ($nextSending) {
-                if ($nextSending->gt(Carbon::now())) {
-                    // Not sending, date is in future
-                    continue;
-                }
-
-                $this->line(sprintf("Processing newsletter: %s", $newsletter->name));
+                $this->line(Carbon::now() . ":     * sending");
                 $this->sendNewsletter($newsletter);
+                $this->line(Carbon::now() . ":     * sent");
                 $newsletter->last_sent_at = Carbon::now();
 
                 if (!$hasMore) {
                     $newsletter->state = Newsletter::STATE_FINISHED;
                 }
-            } else {
+            } elseif (!$hasMore) {
+                $this->line(Carbon::now() . ":     * marking as finished");
                 $newsletter->state = Newsletter::STATE_FINISHED;
             }
 
             $newsletter->save();
         }
 
-        $this->line('<info>Done!</info>');
+        $this->line(Carbon::now() . ': Done!');
         return 0;
     }
 

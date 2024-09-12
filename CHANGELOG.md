@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - [Tracker] Fixed Tracker not publishing messages to pub/sub due to prematurely closed client. remp/remp#1384
 - [Segments] Fixed Elasticsearch 8 incompatibility in mapping caching. remp/remp#1385
+- Fixed newsletters being marked as `finished` in some occurences. remp/respekt#289
 
 ### [Campaign]
 
