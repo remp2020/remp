@@ -6,10 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-`### [Beam]
+### [Beam]
 
 - [Tracker] Fixed Tracker not publishing messages to pub/sub due to prematurely closed client. remp/remp#1384
 - [Segments] Fixed Elasticsearch 8 incompatibility in mapping caching. remp/remp#1385
+
+### [Campaign]
+
+- Fixed missing session source on showtime requests which got executed before the session source could be stored. remp/web#2656
 
 ### [Mailer]
 

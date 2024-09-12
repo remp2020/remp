@@ -149,6 +149,9 @@ export default {
     },
 
     getRempSessionReferer: function() {
+        // just making sure the session was initialized before reading session referer
+        this.getRempSessionID();
+
         return this.getFromStorage(this.rempSessionRefererKey)
     },
 
