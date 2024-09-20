@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed missing session source on showtime requests which got executed before the session source could be stored. remp/web#2656
+- Fixed campaign-module migrations by moving country seeder into campaign-module. remp/remp#1287
 
 ### [Mailer]
 

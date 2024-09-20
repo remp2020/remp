@@ -1,9 +1,9 @@
 <?php
 
-use Database\Seeders\CountrySeeder;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Remp\CampaignModule\Database\Seeders\CountrySeeder;
 
 class CampaignGeotargeting extends Migration
 {

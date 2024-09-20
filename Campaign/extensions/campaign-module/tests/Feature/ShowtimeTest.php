@@ -2,9 +2,9 @@
 
 namespace Remp\CampaignModule\Tests\Feature;
 
+use Remp\CampaignModule\Database\Seeders\CountrySeeder;
 use Remp\CampaignModule\Http\Showtime\ShowtimeConfig;
 use Remp\CampaignModule\Http\Showtime\ShowtimeTestable;
-use Database\Seeders\CountrySeeder;
 use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;

@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Database\Seeders\CountrySeeder;
-use Database\Seeders\CampaignSeeder;
 use Illuminate\Database\Seeder;
+use Remp\CampaignModule\Database\Seeders\CountrySeeder;
 
 class DatabaseSeeder extends Seeder
 {

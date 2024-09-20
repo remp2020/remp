@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Remp\CampaignModule\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Remp\CampaignModule\Country;
