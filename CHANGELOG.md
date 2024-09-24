@@ -21,6 +21,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added ability to set custom health check TTL for `ProcessJobCommand`. remp/remp#1376
+- Fixed parsing of attachment's filename from header within `MailgunMailer`. remp/remp#1386
+  - Previous implementation incorrectly parsed filenames with dash. Filename of attached file "invoice-2024-09-24.pdf" would be only last part "24.pdf".
+  - Added `MailHeaderTrait` with method `getHeaderParameter()` and tests to validate it.
 
 ## Archive
 

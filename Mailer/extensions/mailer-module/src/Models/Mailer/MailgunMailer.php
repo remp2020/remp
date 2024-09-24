@@ -16,6 +16,8 @@ use Remp\MailerModule\Models\Sender\MailerBatchException;
 
 class MailgunMailer extends Mailer
 {
+    use MailHeaderTrait;
+
     public const ALIAS = 'remp_mailgun';
 
     private ?LoggerInterface $logger = null;
@@ -117,10 +119,11 @@ class MailgunMailer extends Mailer
 
         $attachments = [];
         foreach ($mail->getAttachments() as $attachment) {
-            preg_match('/(?<filename>\w+\.\w+)/', $attachment->getHeader('Content-Disposition'), $attachmentName);
+            // example header with attachment: `Content-Disposition: attachment; filename="invoice-2024-09-24.pdf"`
+            $filename = $this->getHeaderParameter($attachment->getHeader('Content-Disposition'), 'filename');
             $attachments[] = [
                 'fileContent' => $attachment->getBody(),
-                'filename' => $attachmentName['filename'],
+                'filename' => $filename,
             ];
         }
 
