@@ -9,6 +9,7 @@
     font-size: 14px;
     margin: 0 5px;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .bar-preview-close.hidden {
@@ -154,9 +155,12 @@
        class="bar-preview-link">
         <transition appear v-bind:name="transition">
             <div class="bar-preview-box sans-serif" v-bind:style="[boxStyles]">
-                <a class="bar-preview-close" title="Close banner" href="javascript://"
-                   v-bind:class="[{hidden: !closeable, 'bar-close-text-filled-button': closeText}]"
+                <a class="bar-preview-close" title="Close banner"
+                   role="button"
+                   tabindex="0"
                    v-on:click.stop="$parent.closed"
+                   v-on:keydown.enter.space="$parent.closed"
+                   v-bind:class="[{hidden: !closeable, 'bar-close-text-filled-button': closeText}]"
                    v-bind:style="closeStyles">
                     <span>{{ closeText }} <span style="font-size: 18px">&#215;</span></span>
                 </a>

@@ -112,6 +112,7 @@
     .overlay-with-two-btn-signature .close-button a {
         color: #999;
         text-decoration: underline;
+        cursor: pointer;
     }
     .overlay-with-two-btn-signature .signature {
         width: 260px;
@@ -183,7 +184,12 @@
                         </div>
 
                         <p class="close-button sans-serif">
-                            <a href="javascript://" v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed"><span>{{ closeText }}</span></a>
+                            <a v-bind:class="[{hidden: !closeable}]"
+                               role="button"
+                               tabindex="0"
+                               v-on:click.stop="$parent.closed"
+                               v-on:keydown.enter.space="$parent.closed"
+                            ><span>{{ closeText }}</span></a>
                         </p>
 
                         <div class="text-after-buttons" v-html="$parent.injectSnippets(textAfterMultiLine)"></div>

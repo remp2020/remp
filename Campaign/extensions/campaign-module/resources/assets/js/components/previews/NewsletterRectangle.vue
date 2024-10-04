@@ -16,6 +16,7 @@
     line-height: 40px;
     padding-right: 3px;
     text-align: right;
+    cursor: pointer;
 }
 
 a.newsletter-rectangle-preview-close::after {
@@ -144,9 +145,11 @@ a.newsletter-rectangle-preview-close::after {
                   v-on:submit="_formSubmit"
             >
                 <a class="newsletter-rectangle-preview-close"
-                   href="javascript://"
                    v-bind:class="[{hidden: !closeable}]"
+                   role="button"
+                   tabindex="0"
                    v-on:click.stop="$parent.closed"
+                   v-on:keydown.enter.space="$parent.closed"
                    v-bind:style="[linkStyles]">{{ closeText }}</a>
 
                 <div class="newsletter-rectangle-title"

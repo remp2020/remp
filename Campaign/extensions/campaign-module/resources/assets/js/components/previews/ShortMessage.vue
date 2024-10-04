@@ -9,6 +9,7 @@
     width: 40px;
     height: 40px;
     text-decoration: none;
+    cursor: pointer;
 }
 
 a.short-message-preview-close::after {
@@ -69,9 +70,11 @@ a.short-message-preview-close::after {
             >
                 <a class="short-message-preview-close"
                    title="Close banner"
-                   href="javascript://"
                    v-bind:class="[{hidden: !closeable}]"
+                   role="button"
+                   tabindex="0"
                    v-on:click.stop="$parent.closed"
+                   v-on:keydown.enter.space="$parent.closed"
                    v-bind:style="closeStyles"></a>
                 <div class="short-message-main" v-html="$parent.injectSnippets(text)"></div>
             </div>

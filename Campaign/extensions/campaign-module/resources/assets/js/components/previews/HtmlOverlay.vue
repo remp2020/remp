@@ -17,6 +17,7 @@
     padding-right: 3px;
     text-align: right;
     color: #000;
+    cursor: pointer;
 }
 
 a.html-overlay-rectangle-preview-close::after {
@@ -137,9 +138,11 @@ a.html-overlay-rectangle-preview-close::after {
 
                         <a class="html-overlay-rectangle-preview-close"
                            title="Close banner"
-                           href="javascript://"
                            v-bind:class="[{hidden: !closeable}]"
+                           role="button"
+                           tabindex="0"
                            v-on:click.stop="$parent.closed"
+                           v-on:keydown.enter.space="$parent.closed"
                            v-bind:style="closeStyles"><small>{{ closeText }}</small></a>
 
                         <a v-bind:href="$parent.url"

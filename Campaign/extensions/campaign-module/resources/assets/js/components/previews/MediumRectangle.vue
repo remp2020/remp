@@ -16,6 +16,7 @@
     line-height: 40px;
     padding-right: 3px;
     text-align: right;
+    cursor: pointer;
 }
 
 a.medium-rectangle-preview-close::after {
@@ -77,8 +78,12 @@ a.medium-rectangle-preview-close::after {
     ]">
         <transition appear v-bind:name="transition">
             <div class="medium-rectangle-preview-box sans-serif" v-bind:style="[boxStyles]">
-                <a class="medium-rectangle-preview-close" title="Close banner" href="javascript://"
-                   v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed"
+                <a class="medium-rectangle-preview-close" title="Close banner"
+                   v-bind:class="[{hidden: !closeable}]"
+                   role="button"
+                   tabindex="0"
+                   v-on:click.stop="$parent.closed"
+                   v-on:keydown.enter.space="$parent.closed"
                    v-bind:style="[closeStyles]"><span>{{ closeText }}</span></a>
                 <div class="medium-rectangle-header" v-html="$parent.injectSnippets(headerText)"></div>
                 <div class="medium-rectangle-main" v-html="$parent.injectSnippets(mainText)"></div>

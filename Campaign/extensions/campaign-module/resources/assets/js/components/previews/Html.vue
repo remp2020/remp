@@ -44,6 +44,7 @@
     line-height: 40px;
     padding-right: 3px;
     text-align: right;
+    cursor: pointer;
 }
 
 a.html-preview-close::after {
@@ -69,8 +70,12 @@ a.html-preview-close::after {
                 dimensionOptions[dimensions],
                 customBoxStyles
             ]">
-                <a class="html-preview-close" title="Close banner" href="javascript://"
-                   v-bind:class="[{hidden: !closeable}]" v-on:click.stop="$parent.closed"
+                <a class="html-preview-close" title="Close banner"
+                   v-bind:class="[{hidden: !closeable}]"
+                   role="button"
+                   tabindex="0"
+                   v-on:click.stop="$parent.closed"
+                   v-on:keydown.enter.space="$parent.closed"
                    v-bind:style="closeStyles"><small>{{ closeText }}</small></a>
                 <div v-html="$parent.injectSnippets(text)" class="html-preview-text"
                      v-bind:style="[_textAlign, textStyles]"></div>
