@@ -469,7 +469,8 @@
                 }
                 return str;
             },
-            closed: function() {
+            closed: function(event) {
+                event.preventDefault();
                 remplib.campaign.storeCampaignClosed(this.campaignPublicId);
 
                 this.visible = false;
