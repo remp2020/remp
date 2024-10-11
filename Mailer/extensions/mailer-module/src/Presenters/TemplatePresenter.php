@@ -179,7 +179,7 @@ final class TemplatePresenter extends BasePresenter
         }
 
         $this->template->mailTemplate = $template;
-        $this->template->isClickTrackerEnabled = $this->config->get(RtmClickReplace::CONFIG_NAME);
+        $this->template->isClickTrackerEnabled = $this->config->get(RtmClickReplace::CONFIG_NAME) && ($template->click_tracking === null || $template->click_tracking);
     }
 
     public function actionShowByCode($id): void

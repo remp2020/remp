@@ -9,7 +9,9 @@ class AnchorRtmClickReplace extends RtmClickReplace
 {
     public function replace(string $content, GeneratorInput $generatorInput, array $context = null): string
     {
-        if (!$this->isEnabled()) {
+        $template = $generatorInput->template();
+
+        if (!$this->isEnabled($template)) {
             return $content;
         }
 
@@ -17,8 +19,6 @@ class AnchorRtmClickReplace extends RtmClickReplace
         if ($content === strip_tags($content)) {
             return $content;
         }
-
-        $template = $generatorInput->template();
 
         if (isset($context['sendingMode']) && $context['sendingMode'] === 'batch') {
             [$mailContent, $urls] = $this->hashLinkWithCache($content, $template);

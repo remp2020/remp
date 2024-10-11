@@ -3,6 +3,7 @@
 namespace Remp\MailerModule\Models\ContentGenerator\Replace;
 
 use Nette\Caching\Storage;
+use Nette\Database\Table\ActiveRow;
 use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Repositories\MailTemplateLinksRepository;
 
@@ -18,9 +19,9 @@ abstract class RtmClickReplace implements IReplace
     ) {
     }
 
-    protected function isEnabled(): bool
+    protected function isEnabled(ActiveRow $template): bool
     {
-        return $this->config->get(self::CONFIG_NAME);
+        return $this->config->get(self::CONFIG_NAME) && ($template->click_tracking === null || $template->click_tracking);
     }
 
     protected function computeUrlHash(string $url, string $additionalInfo = ''): string

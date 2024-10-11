@@ -8,7 +8,9 @@ class UrlRtmClickReplace extends RtmClickReplace
 {
     public function replace(string $content, GeneratorInput $generatorInput, array $context = null): string
     {
-        if (!$this->isEnabled()) {
+        $template = $generatorInput->template();
+
+        if (!$this->isEnabled($template)) {
             return $content;
         }
 
@@ -17,7 +19,6 @@ class UrlRtmClickReplace extends RtmClickReplace
             return $content;
         }
 
-        $template = $generatorInput->template();
         $urlEmptyParams = $this->removeQueryParams($content);
         $hash = $this->computeUrlHash($urlEmptyParams, $template->code);
         $finalUrl = $this->setRtmClickHashInUrl($content, $hash);
