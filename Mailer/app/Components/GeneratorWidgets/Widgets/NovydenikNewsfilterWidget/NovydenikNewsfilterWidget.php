@@ -89,6 +89,7 @@ class NovydenikNewsfilterWidget extends BaseControl implements IGeneratorWidget
                 'mail_type_id' => $request->getPost('mail_type_id'),
                 'mail_type' => $mailType,
                 'params' => null,
+                'click_tracking' => false,
             ]);
 
             return $this->contentGenerator->render($this->generatorInputFactory->create($mailTemplate));
