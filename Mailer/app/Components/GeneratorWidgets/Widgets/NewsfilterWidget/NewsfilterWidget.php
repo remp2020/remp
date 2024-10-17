@@ -70,9 +70,9 @@ class NewsfilterWidget extends BaseControl implements IGeneratorWidget
         $lockedHtmlContent = $request->getPost('locked_html_content');
         $lockedTextContent = $request->getPost('locked_text_content');
 
-        $mailLayout = $this->layoutsRepository->findBy('code', $_POST['mail_layout_code']);
-        $lockedMailLayout = $this->layoutsRepository->findBy('code', $_POST['locked_mail_layout_code']);
-        $mailType = $this->listsRepository->findBy('code', $_POST['mail_type_code']);
+        $mailLayout = $this->layoutsRepository->findBy('code', $request->getPost('mail_layout_code'));
+        $lockedMailLayout = $this->layoutsRepository->findBy('code', $request->getPost('locked_mail_layout_code'));
+        $mailType = $this->listsRepository->findBy('code', $request->getPost('mail_type_code'));
 
         $generate = function ($htmlContent, $textContent, $mailLayout, $mailType) use ($request) {
             $mailTemplate = $this->activeRowFactory->create([
