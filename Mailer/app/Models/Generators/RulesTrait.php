@@ -50,7 +50,7 @@ trait RulesTrait
             '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace hrefs
-            '/<a.*?href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">$2</a>',
+            '/<a\s[^>]*href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">$2</a>',
 
             // replace h2
             '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;line-height:1.3;font-weight:bold;text-align:left;margin:0 0 30px 0;font-size:24px;">$1</h2>' . PHP_EOL,
