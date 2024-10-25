@@ -3,7 +3,6 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
 class Kernel extends HttpKernel
 {
@@ -44,7 +43,6 @@ class Kernel extends HttpKernel
         'api' => [
             // 'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            'jsonApi',
         ],
     ];
 
@@ -58,7 +56,6 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => \Remp\CampaignModule\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'auth.jwt' => VerifyJwtToken::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \Remp\CampaignModule\Http\Middleware\RedirectIfAuthenticated::class,
@@ -66,7 +63,5 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'jsonApi' => \Remp\CampaignModule\Http\Middleware\JsonApiMiddleware::class,
-        'collectionQueryString' => \Remp\CampaignModule\Http\Middleware\CollectionQueryString::class,
     ];
 }
