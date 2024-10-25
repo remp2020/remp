@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed mail type stats when groupped by week or month. remp/remp#1374
 - Changed behavior of `rtm_click` parameter. If the mail template disables click tracking, `rtm_click` is not added to the links anymore. remp/respekt#305
 - Fixed removed `<a>` by the newsfilter replace rules which didn't expect anchors without `href` attribute. remp/helpdesk#3082
+- Fixed possible issues with chart rendering if there's no data to evaluate yet.
 
 ## Archive
 
