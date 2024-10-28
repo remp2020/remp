@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Fixed ARIA-compatibility of all campaign banners. remp/remp#1368 
+
 ## Archive
 
 - [v3.10](./changelogs/CHANGELOG-v3.10.md)

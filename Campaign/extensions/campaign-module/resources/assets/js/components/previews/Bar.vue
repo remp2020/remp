@@ -44,9 +44,8 @@
 }
 
 .bar-preview-link {
-    text-decoration: none;
     overflow: hidden;
-    width: 100%;
+    cursor: pointer;
 }
 
 .bar-preview-box {
@@ -64,6 +63,7 @@
 
 .bar-main {
     font-size: 17px;
+    text-decoration: none;
     word-wrap: break-word;
     padding-right: 5px;
     margin-top: 5px;
@@ -83,6 +83,8 @@
 .bar-button-wrap {
     order: 1;
     margin-left: auto;
+    display: flex;
+    align-items: center;
 }
 
 @media (max-width: 640px) {
@@ -131,18 +133,18 @@
 
 <template>
   <div class="bar-wrap"
-       v-bind:style="[
-        linkStyles,
-        _position,
-        boxStyles
-    ]"
+       role="alert"
+       v-bind:style="[linkStyles, _position, boxStyles]"
        v-if="isVisible">
     <div class="bar-header sans-serif"
          v-if="closeable"
          v-bind:class="{'bar-close-text-filled-bar': closeText}">
       <div class="bar-close"
            v-on:click.stop="$parent.closed"
-           v-bind:style="closeStyles">
+           v-bind:style="closeStyles"
+           v-bind:title="closeText || 'Close banner'"
+           v-bind:aria-label="closeText || 'Close banner'"
+      >
           <div>
               {{ closeText }}
               <span style="font-size: 18px">&#215;</span>
@@ -151,31 +153,43 @@
       </div>
     </div>
 
-    <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}"
-       class="bar-preview-link">
+    <div v-on:click="click" class="bar-preview-link">
         <transition appear v-bind:name="transition">
             <div class="bar-preview-box sans-serif" v-bind:style="[boxStyles]">
-                <a class="bar-preview-close" title="Close banner"
-                   role="button"
+                <a class="bar-preview-close"
                    tabindex="0"
                    v-on:click.stop="$parent.closed"
                    v-on:keydown.enter.space="$parent.closed"
                    v-bind:class="[{hidden: !closeable, 'bar-close-text-filled-button': closeText}]"
-                   v-bind:style="closeStyles">
+                   v-bind:style="closeStyles"
+                   v-bind:title="closeText || 'Close banner'"
+                   v-bind:aria-label="closeText || 'Close banner'"
+                >
                     <span>{{ closeText }} <span style="font-size: 18px">&#215;</span></span>
                 </a>
-                <div class="bar-main" v-html="$parent.injectSnippets(mainText)"></div>
+
+                <a class="bar-main"
+                   ref="mainLink"
+                   v-html="$parent.injectSnippets(mainText)"
+                   v-bind:href="$parent.url"
+                   v-bind:style="[mainTextStyles]"
+                   v-bind:aria-label="$parent.injectSnippets(mainText) + (buttonText.length > 0 ? ', ' + $parent.injectSnippets(buttonText) : '') | strip_html"
+                   v-on:click.stop="$parent.clicked($event, !$parent.url)"
+                   v-on:keydown.enter.space="$parent.clicked($event, !$parent.url)"
+                ></a>
+
                 <div class="bar-button-wrap">
-                    <div class="bar-button"
-                         v-if="buttonText.length > 0"
-                         v-bind:class="{'bar-button-margin': closeable}"
-                         v-on:click="$parent.clicked($event, !$parent.url)"
-                         v-html="$parent.injectSnippets(buttonText)"
-                         v-bind:style="[buttonStyles]"></div>
+                    <button class="bar-button"
+                        v-if="buttonText.length > 0"
+                        v-bind:class="{'bar-button-margin': closeable}"
+                        v-on:click.stop="click"
+                        v-on:keydown.enter.space="click"
+                        v-html="$parent.injectSnippets(buttonText)"
+                        v-bind:style="[buttonStyles]"></button>
                 </div>
             </div>
         </transition>
-    </a>
+    </div>
   </div>
 </template>
 
@@ -257,6 +271,11 @@ export default {
                 color: this.textColor,
             }
         },
+        mainTextStyles: function () {
+            return {
+                color: this.textColor,
+            }
+        },
         buttonStyles: function () {
             return {
                 color: this.buttonTextColor,
@@ -272,5 +291,10 @@ export default {
             return this.show && this.visible;
         },
     },
+    methods: {
+        click: function () {
+            this.$refs.mainLink.click();
+        }
+    }
 }
 </script>

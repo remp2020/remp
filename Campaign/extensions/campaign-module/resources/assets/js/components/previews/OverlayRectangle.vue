@@ -83,10 +83,8 @@ a.overlay-rectangle-preview-close::after {
 }
 
 .overlay-rectangle-preview-link {
-    position: relative;
-    display: block;
-    text-decoration: none;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .overlay-rectangle-content {
@@ -124,6 +122,7 @@ a.overlay-rectangle-preview-close::after {
 .overlay-rectangle-main {
     font-size: 26px;
     word-wrap: break-word;
+    text-decoration: none;
 }
 
 .overlay-rectangle-button {
@@ -151,30 +150,30 @@ a.overlay-rectangle-preview-close::after {
 </style>
 
 <template>
-    <div>
+    <div role="dialog">
         <a href="#"
            class="preview-admin-close"
            v-on:click.stop="$parent.closed"
+           v-on:keydown.enter.space.stop="$parent.closed"
            v-if="isVisible && !closeable && adminPreview">CLOSE BANNER</a>
-        <transition appear name="fade">
 
+        <transition appear name="fade">
             <div class="overlay-rectangle-overlay sans-serif" v-if="isVisible">
                 <transition appear v-bind:name="transition">
                     <div class="overlay-rectangle-wrap" :class="{ closeable: closeable }">
 
                         <a class="overlay-rectangle-preview-close"
-                           title="Close banner"
+                           href="#" tabindex="0"
                            v-bind:class="[{hidden: !closeable}]"
-                           role="button"
-                           tabindex="0"
+                           v-bind:style="closeStyles"
+                           v-bind:title="closeText || 'Close banner'"
+                           v-bind:aria-label="closeText || 'Close banner'"
                            v-on:click.stop="$parent.closed"
-                           v-on:keydown.enter.space="$parent.closed"
-                           v-bind:style="closeStyles"><small>{{ closeText }}</small></a>
+                           v-on:keydown.enter.space.stop="$parent.closed"
+                        ><small>{{ closeText }}</small></a>
 
-                        <a v-bind:href="$parent.url"
-                           v-on="$parent.url ? { click: $parent.clicked } : {}"
-                           class="overlay-rectangle-preview-link"
-                           v-bind:style="[linkStyles]">
+                        <div v-on:click="click" class="overlay-rectangle-preview-link"
+                            v-bind:style="[linkStyles]">
                             <div class="overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
                                 <div v-if="imageLink"
                                      class="overlay-rectangle-image">
@@ -186,17 +185,25 @@ a.overlay-rectangle-preview-close::after {
                                          v-html="$parent.injectSnippets(headerText)"
                                          class="overlay-rectangle-header"></div>
 
-                                    <div class="overlay-rectangle-main"
-                                         v-html="$parent.injectSnippets(mainText)"></div>
+                                    <a class="overlay-rectangle-main"
+                                         ref="mainLink"
+                                         v-bind:href="$parent.url"
+                                         v-bind:style="[mainTextStyles]"
+                                         v-bind:aria-label="$parent.injectSnippets(mainText) + (buttonText.length > 0 ? ', ' + $parent.injectSnippets(buttonText) : '') | strip_html"
+                                         v-on:click.stop="$parent.clicked($event, !$parent.url)"
+                                         v-on:keydown.enter.space="$parent.clicked($event, !$parent.url)"
+                                         v-html="$parent.injectSnippets(mainText)"
+                                    ></a>
 
-                                    <div class="overlay-rectangle-button"
+                                    <div class="overlay-rectangle-button" aria-hidden="true"
                                          v-if="buttonText.length > 0"
-                                         v-on:click="$parent.clicked($event, !$parent.url)"
+                                         v-on:click.stop="click"
+                                         v-on:keydown.enter.space="click"
                                          v-html="$parent.injectSnippets(buttonText)"
                                          v-bind:style="[buttonStyles]"></div>
                                 </div>
                             </div>
-                        </a>
+                        </div>
 
                     </div>
                 </transition>
@@ -270,6 +277,11 @@ export default {
                 maxHeight: this.height || '600px',
             }
         },
+        mainTextStyles: function () {
+            return {
+                color: this.textColor,
+            }
+        },
         buttonStyles: function () {
             return {
                 color: this.buttonTextColor,
@@ -285,5 +297,10 @@ export default {
             return this.show && this.visible;
         },
     },
+    methods: {
+        click: function () {
+            this.$refs.mainLink.click();
+        }
+    }
 }
 </script>

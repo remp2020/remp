@@ -1,6 +1,10 @@
 <style type="text/css" scoped>
 @import url('../../../sass/transitions.scss');
 
+.short-message-preview-wrap {
+    cursor: pointer;
+}
+
 .short-message-preview-close {
     position: absolute;
     display: block;
@@ -28,7 +32,7 @@ a.short-message-preview-close::after {
 }
 
 .short-message-preview-link {
-    text-decoration: none;
+    cursor: pointer;
     overflow: hidden;
 }
 
@@ -49,6 +53,7 @@ a.short-message-preview-close::after {
     font-size: 16px;
     word-wrap: break-word;
     padding: 10px;
+    text-decoration: none;
 }
 
 .short-message-preview-box.short-message-closable {
@@ -58,28 +63,39 @@ a.short-message-preview-close::after {
 </style>
 
 <template>
-    <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}" v-if="isVisible"
-       class="short-message-preview-link" v-bind:style="[
-        linkStyles,
-        _position
-    ]">
+    <div
+        class="short-message-preview-wrap"
+        role="alert"
+        v-if="isVisible"
+        v-on:click="click"
+        v-bind:style="[linkStyles, _position]"
+    >
         <transition appear v-bind:name="transition">
             <div class="short-message-preview-box sans-serif"
                  v-bind:style="[boxStyles]"
                  v-bind:class="{'short-message-closable': closeable}"
             >
                 <a class="short-message-preview-close"
-                   title="Close banner"
                    v-bind:class="[{hidden: !closeable}]"
                    role="button"
                    tabindex="0"
+                   v-bind:aria-label="closeText || 'Close banner'"
+                   v-bind:title="closeText || 'Close banner'"
+                   v-bind:style="closeStyles"
                    v-on:click.stop="$parent.closed"
-                   v-on:keydown.enter.space="$parent.closed"
-                   v-bind:style="closeStyles"></a>
-                <div class="short-message-main" v-html="$parent.injectSnippets(text)"></div>
+                   v-on:keydown.enter.space="$parent.closed"></a>
+
+                <a class="short-message-main"
+                   ref="mainLink"
+                   v-html="$parent.injectSnippets(text)"
+                   v-bind:style="[mainTextStyles]"
+                   v-bind:href="$parent.url"
+                   v-on:click.stop="$parent.clicked($event, !$parent.url)"
+                   v-on:keydown.enter.space="$parent.clicked($event, !$parent.url)"
+                ></a>
             </div>
         </transition>
-    </a>
+    </div>
 </template>
 
 <script>
@@ -154,6 +170,11 @@ export default {
                 minHeight: '25px',
             }
         },
+        mainTextStyles: function () {
+            return {
+                color: this.textColor,
+            }
+        },
         closeStyles: function () {
             return {
                 color: this.textColor,
@@ -163,5 +184,10 @@ export default {
             return this.show && this.visible;
         },
     },
+    methods: {
+        click: function () {
+            this.$refs.mainLink.click();
+        }
+    }
 }
 </script>

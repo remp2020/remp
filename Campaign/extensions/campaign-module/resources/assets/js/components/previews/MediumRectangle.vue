@@ -32,8 +32,8 @@ a.medium-rectangle-preview-close::after {
     display: none;
 }
 
-.medium-rectangle-preview-link {
-    text-decoration: none;
+.medium-rectangle-preview-wrap {
+    cursor: pointer;
     overflow: hidden;
 }
 
@@ -58,6 +58,7 @@ a.medium-rectangle-preview-close::after {
 .medium-rectangle-main {
     font-size: 26px;
     word-wrap: break-word;
+    text-decoration: none;
 }
 
 .medium-rectangle-button {
@@ -71,28 +72,47 @@ a.medium-rectangle-preview-close::after {
 </style>
 
 <template>
-    <a v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}" v-if="isVisible"
-       class="medium-rectangle-preview-link" v-bind:style="[
-        linkStyles,
-        _position
-    ]">
+    <div class="medium-rectangle-preview-wrap"
+         role="alert"
+         v-if="isVisible"
+         v-bind:style="[linkStyles, _position]"
+    >
         <transition appear v-bind:name="transition">
-            <div class="medium-rectangle-preview-box sans-serif" v-bind:style="[boxStyles]">
-                <a class="medium-rectangle-preview-close" title="Close banner"
+            <div class="medium-rectangle-preview-box sans-serif"
+                 v-bind:style="[boxStyles]"
+                 v-on:click="click"
+                 v-on:keydown.enter.space="click"
+            >
+                <a class="medium-rectangle-preview-close" href="javascript://" tabindex="0"
                    v-bind:class="[{hidden: !closeable}]"
-                   role="button"
-                   tabindex="0"
+                   v-bind:style="[closeStyles]"
+                   v-bind:title="closeText || 'Close banner'"
+                   v-bind:aria-label="closeText || 'Close banner'"
                    v-on:click.stop="$parent.closed"
                    v-on:keydown.enter.space="$parent.closed"
-                   v-bind:style="[closeStyles]"><span>{{ closeText }}</span></a>
+                ><span>{{ closeText }}</span></a>
+
                 <div class="medium-rectangle-header" v-html="$parent.injectSnippets(headerText)"></div>
-                <div class="medium-rectangle-main" v-html="$parent.injectSnippets(mainText)"></div>
-                <div class="medium-rectangle-button" v-if="buttonText.length > 0"
-                     v-on:click="$parent.clicked($event, !$parent.url)" v-html="$parent.injectSnippets(buttonText)"
-                     v-bind:style="[buttonStyles]"></div>
+
+                <a class="medium-rectangle-main"
+                   ref="mainLink"
+                   v-html="$parent.injectSnippets(mainText)"
+                   v-bind:href="$parent.url"
+                   v-bind:style="[mainTextStyles]"
+                   v-bind:aria-label="$parent.injectSnippets(mainText) + (buttonText.length > 0 ? ', ' + $parent.injectSnippets(buttonText) : '') | strip_html"
+                   v-on:click.stop="$parent.clicked($event, !$parent.url)"
+                   v-on:keydown.enter.space.stop="$parent.clicked($event, !$parent.url)"
+                ></a>
+
+                <div class="medium-rectangle-button" aria-hidden="true"
+                     v-if="buttonText.length > 0"
+                     v-html="$parent.injectSnippets(buttonText)"
+                     v-bind:style="[buttonStyles]"
+                     v-on:click.stop="click"
+                     v-on:keydown.enter.space.stop="click"></div>
             </div>
         </transition>
-    </a>
+    </div>
 </template>
 
 <script>
@@ -182,6 +202,11 @@ export default {
                 maxHeight: this.height || '370px',
             }
         },
+        mainTextStyles: function () {
+            return {
+                color: this.textColor,
+            }
+        },
         buttonStyles: function () {
             return {
                 color: this.buttonTextColor,
@@ -196,6 +221,11 @@ export default {
         isVisible: function () {
             return this.show && this.visible;
         },
+    },
+    "methods": {
+        click: function () {
+            this.$refs.mainLink.click();
+        }
     },
 }
 </script>

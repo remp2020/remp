@@ -77,8 +77,11 @@ a.html-overlay-rectangle-preview-close::after {
 .html-overlay-rectangle-preview-link {
     position: relative;
     display: block;
-    text-decoration: none;
     overflow: hidden;
+}
+
+.html-overlay-rectangle-preview-link.clickable {
+    cursor: pointer;
 }
 
 .html-overlay-rectangle-content {
@@ -125,39 +128,46 @@ a.html-overlay-rectangle-preview-close::after {
 </style>
 
 <template>
-    <div>
+    <div role="dialog">
         <a href="#"
            class="preview-admin-close"
            v-on:click.stop="$parent.closed"
+           v-on:keydown.enter.space="$parent.closed"
            v-if="isVisible && !closeable && adminPreview">CLOSE BANNER</a>
         <transition appear name="fade">
-
-            <div class="html-overlay-rectangle-overlay sans-serif" v-if="isVisible">
+            <div class="html-overlay-rectangle-overlay sans-serif">
                 <transition appear v-bind:name="transition">
-                    <div class="html-overlay-rectangle-wrap" :class="{ closeable: closeable }">
-
-                        <a class="html-overlay-rectangle-preview-close"
-                           title="Close banner"
+                    <div
+                        class="html-overlay-rectangle-wrap"
+                        role="button"
+                        tabindex="0"
+                        v-if="isVisible"
+                        v-bind:class="{ closeable: closeable }"
+                        v-on:click.stop="click"
+                        v-on:keydown.enter.space="click"
+                    >
+                        <a class="html-overlay-rectangle-preview-close" tabindex="0"
                            v-bind:class="[{hidden: !closeable}]"
-                           role="button"
-                           tabindex="0"
+                           v-bind:style="closeStyles"
+                           v-bind:title="closeText || 'Close banner'"
+                           v-bind:aria-label="closeText || 'Close banner'"
                            v-on:click.stop="$parent.closed"
-                           v-on:keydown.enter.space="$parent.closed"
-                           v-bind:style="closeStyles"><small>{{ closeText }}</small></a>
+                           v-on:keydown.enter.space.stop="$parent.closed"
+                        ><small>{{ closeText }}</small></a>
 
-                        <a v-bind:href="$parent.url"
-                           v-on="$parent.url ? { click: $parent.clicked } : {}"
-                           class="html-overlay-rectangle-preview-link"
-                           v-bind:style="[linkStyles]">
+                        <div
+                            v-bind:style="[linkStyles]"
+                            v-bind:class="{'html-overlay-rectangle-preview-link': true, 'clickable': !!$parent.url}"
+                        >
                             <div class="html-overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
                                 <div class="html-overlay-rectangle-content" v-if="text">
                                     <div class="html-overlay-rectangle-main"
                                          v-html="$parent.injectSnippets(text)"
-                                         v-bind:style="[_textAlign, textStyles]"></div>
+                                         v-bind:style="[_textAlign, textStyles]"
+                                    ></div>
                                 </div>
                             </div>
-                        </a>
-
+                        </div>
                     </div>
                 </transition>
             </div>
@@ -255,5 +265,15 @@ export default {
             style.appendChild(document.createTextNode(this.$parent.injectSnippets(styles)));
         }
     },
+    methods: {
+        click: function (event) {
+            if (!this.$parent.url) {
+                return;
+            }
+
+            this.$parent.clicked(event);
+            window.location.href = this.$parent.url;
+        }
+    }
 }
 </script>

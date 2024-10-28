@@ -152,10 +152,11 @@
 </style>
 
 <template>
-    <div>
+    <div role="dialog">
         <a href="#"
            class="preview-admin-close"
            v-on:click.stop="$parent.closed"
+           v-on:keydown.enter.space="$parent.closed"
            v-if="isVisible && !closeable && adminPreview">CLOSE BANNER</a>
         <transition appear name="fade">
             <div class="overlay-with-two-btn-signature-background" v-if="isVisible">
@@ -167,9 +168,10 @@
                         <div class="text-before-buttons" v-html="$parent.injectSnippets(textBeforeMultiLine)"></div>
 
                         <div class="buttons sans-serif">
-                            <a class="btn btn-primary"
+                            <a class="btn btn-primary" tabindex="0" role="button"
                                v-bind:href="$parent.injectSnippets(targetUrl)"
-                               v-on:click="$parent.clicked($event, !$parent.url)"
+                               v-on:click.stop="$parent.clicked($event, !$parent.url)"
+                               v-on:keydown.enter.space.stop="$parent.clicked($event, !$parent.url)"
                                data-param-rtm_keyword="btn-primary">
                                 <span class="item title" v-html="$parent.injectSnippets(textBtnPrimary)"></span>
                                 <span class="item desc" v-if="hasTextBtnPrimaryMinor" v-html="$parent.injectSnippets(textBtnPrimaryMinor)"></span>
@@ -177,25 +179,28 @@
 
                             <div class="spacer" v-if="hasSecondaryButton">&nbsp;</div>
 
-                            <a class="btn btn-secondary" v-if="hasSecondaryButton" v-bind:href="$parent.injectSnippets(targetUrlSecondary)" data-param-rtm_keyword="btn-secondary">
+                            <a class="btn btn-secondary" v-if="hasSecondaryButton"
+                               v-bind:href="$parent.injectSnippets(targetUrlSecondary)"
+                               data-param-rtm_keyword="btn-secondary">
                                 <span class="item title" v-html="$parent.injectSnippets(textBtnSecondary)"></span>
                                 <span class="item desc" v-if="hasTextBtnSecondaryMinor" v-html="$parent.injectSnippets(textBtnSecondaryMinor)"></span>
                             </a>
                         </div>
 
                         <p class="close-button sans-serif">
-                            <a v-bind:class="[{hidden: !closeable}]"
-                               role="button"
-                               tabindex="0"
+                            <a href="#"
+                               v-bind:class="[{hidden: !closeable}]"
+                               v-bind:title="closeText || 'Close banner'"
+                               v-bind:aria-label="closeText || 'Close banner'"
                                v-on:click.stop="$parent.closed"
-                               v-on:keydown.enter.space="$parent.closed"
+                               v-on:keydown.enter.space.stop="$parent.closed"
                             ><span>{{ closeText }}</span></a>
                         </p>
 
                         <div class="text-after-buttons" v-html="$parent.injectSnippets(textAfterMultiLine)"></div>
 
                         <div class="signature">
-                            <img v-bind:src="$parent.injectSnippets(signatureImageUrl)" alt="" />
+                            <img v-bind:src="$parent.injectSnippets(signatureImageUrl)" alt="Signature" />
                             <p v-html="$parent.injectSnippets(textSignatureMultiLine)"></p>
                         </div>
 

@@ -2,8 +2,8 @@
 @import url('../../../sass/transitions.scss');
 
 .html-preview-link {
-    text-decoration: none;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .html-preview-close.hidden {
@@ -58,30 +58,40 @@ a.html-preview-close::after {
 </style>
 
 <template>
-    <a class="html-preview-link" v-bind:href="$parent.url" v-on="$parent.url ? { click: $parent.clicked } : {}"
-       v-if="isVisible" v-bind:style="[
-        linkStyles,
-        _position,
-        dimensionOptions[dimensions]
-    ]">
+    <div class="html-preview-link"
+         role="alert"
+         v-if="isVisible"
+         v-bind:style="[linkStyles, _position, dimensionOptions[dimensions]]"
+    >
         <transition appear v-bind:name="transition">
-            <div class="html-preview-box sans-serif" v-bind:style="[
-                boxStyles,
-                dimensionOptions[dimensions],
-                customBoxStyles
+            <div class="html-preview-box sans-serif"
+                 role="button"
+                 tabindex="0"
+                 v-on:click="click"
+                 v-on:keydown.enter.space="click"
+                 v-bind:style="[
+                 boxStyles,
+                 dimensionOptions[dimensions],
+                 customBoxStyles
             ]">
-                <a class="html-preview-close" title="Close banner"
-                   v-bind:class="[{hidden: !closeable}]"
-                   role="button"
+                <a class="html-preview-close"
                    tabindex="0"
+                   v-bind:class="[{hidden: !closeable}]"
+                   v-bind:title="closeText || 'Close banner'"
+                   v-bind:aria-label="closeText || 'Close banner'"
+                   v-bind:style="closeStyles"
                    v-on:click.stop="$parent.closed"
-                   v-on:keydown.enter.space="$parent.closed"
-                   v-bind:style="closeStyles"><small>{{ closeText }}</small></a>
-                <div v-html="$parent.injectSnippets(text)" class="html-preview-text"
-                     v-bind:style="[_textAlign, textStyles]"></div>
+                   v-on:keydown.enter.space.stop="$parent.closed">
+                    <small>{{ closeText }}</small>
+                </a>
+
+                <div v-html="$parent.injectSnippets(text)"
+                     class="html-preview-text"
+                     v-bind:style="[_textAlign, textStyles]"
+                ></div>
             </div>
         </transition>
-    </a>
+    </div>
 </template>
 
 <script>
@@ -197,5 +207,15 @@ export default {
             return this.show && this.visible;
         },
     },
+    methods: {
+        click: function (event) {
+            if (!this.$parent.url) {
+                return;
+            }
+
+            this.$parent.clicked(event);
+            window.location.href = this.$parent.url;
+        }
+    }
 }
 </script>

@@ -132,29 +132,35 @@ a.newsletter-rectangle-preview-close::after {
 </style>
 
 <template>
-    <div v-if="isVisible"
-         class="newsletter-rectangle-preview"
-         v-bind:style="[containerStyles, _position]"
+    <div
+        role="alert"
+        class="newsletter-rectangle-preview"
+        v-if="isVisible"
+        v-bind:style="[containerStyles, _position]"
     >
         <transition appear v-bind:name="transition">
 
             <form class="newsletter-rectangle-form" method="POST"
-                  v-bind:style="[boxStyles]"
+                  v-bind:style="[boxStyles, formStyles]"
                   v-bind:action="endpoint"
                   v-bind:class="boxClass"
                   v-on:submit="_formSubmit"
             >
                 <a class="newsletter-rectangle-preview-close"
-                   v-bind:class="[{hidden: !closeable}]"
                    role="button"
                    tabindex="0"
+                   v-bind:class="[{hidden: !closeable}]"
+                   v-bind:style="[linkStyles]"
+                   v-bind:title="closeText || 'Close banner'"
+                   v-bind:aria-label="closeText || 'Close banner'"
                    v-on:click.stop="$parent.closed"
                    v-on:keydown.enter.space="$parent.closed"
-                   v-bind:style="[linkStyles]">{{ closeText }}</a>
+                >{{ closeText }}</a>
 
-                <div class="newsletter-rectangle-title"
+                <div class="newsletter-rectangle-title" role="heading" aria-level="1"
                      v-html="$parent.injectSnippets(title)"></div>
-                <div class="newsletter-rectangle-text" v-html="$parent.injectSnippets(text)"></div>
+                <div class="newsletter-rectangle-text"  role="heading" aria-level="2"
+                     v-html="$parent.injectSnippets(text)"></div>
 
                 <fieldset class="newsletter-rectangle-form-inputs">
                     <label class="newsletter-rectangle-form-label" for="newsletter-rectangle-form-email">Email</label>
@@ -184,15 +190,19 @@ a.newsletter-rectangle-preview-close::after {
                     >
 
                     <button class="newsletter-rectangle-form-button"
-                           v-bind:disabled="doingAjax || subscriptionSuccess !== null"
-                           v-bind:class="{
-                               'newsletter-rectangle-doing-ajax': doingAjax,
-                               'newsletter-rectangle-failure': subscriptionSuccess === false,
-                               'newsletter-rectangle-success': subscriptionSuccess === true }"
-                           v-bind:style="[buttonStyles]" v-html="_btnSubmit"></button>
+                            v-bind:disabled="doingAjax || subscriptionSuccess !== null"
+                            v-bind:class="{
+                                'newsletter-rectangle-doing-ajax': doingAjax,
+                                'newsletter-rectangle-failure': subscriptionSuccess === false,
+                                'newsletter-rectangle-success': subscriptionSuccess === true }"
+                            v-bind:style="[buttonStyles]"
+                            v-bind:aria-label="(_btnSubmit + (terms ? ', ' + terms : '')) | strip_html"
+                            v-html="_btnSubmit"></button>
                 </fieldset>
                 <div class="newsletter-rectangle-failure-message"></div>
-                <div class="newsletter-rectangle-disclaimer" v-html="_terms" ></div>
+                <div class="newsletter-rectangle-disclaimer" v-html="terms" ></div>
+
+                <div v-html="_formStyles" aria-hidden="true"></div>
             </form>
         </transition>
     </div>
@@ -371,12 +381,8 @@ export default {
                 return location.href;
             }
         },
-        _terms: function (){
-            if(!this.terms){
-                return '';
-            }
-            let css = `<style>.newsletter-rectangle-form a {color: ${this.buttonBackgroundColor}</style>`;
-            return this.terms + css;
+        _formStyles: function (){
+            return `<style>.newsletter-rectangle-form a {color: ${this.buttonBackgroundColor}</style>`;
         },
         _position: function () {
             if (!this.$parent.customPositioned()) {

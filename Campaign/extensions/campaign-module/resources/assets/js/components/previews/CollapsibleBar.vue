@@ -22,10 +22,8 @@
 }
 
 .collapsible-bar-preview-link {
-    display: block;
-    text-decoration: none;
     overflow: hidden;
-    width: 100%;
+    cursor: pointer;
 }
 
 .collapsible-bar-preview-box {
@@ -50,6 +48,7 @@
     font-size: 17px;
     word-wrap: break-word;
     padding-right: 5px;
+    text-decoration: none;
 }
 
 .collapsible-bar-button {
@@ -62,23 +61,39 @@
 }
 
 .collapsible-bar-header {
-    text-align: center;
-    padding: 5px 0;
+    position: relative;
+    min-height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: #fff;
     font-size: 14px;
     color: #5e5e5e;
-    min-height: 31px;
+}
+
+.collapsible-bar-title {
+    margin-bottom: 3px;
 }
 
 .collapsible-bar-toggle {
     position: absolute;
-    top: 7px;
+    height: 100%;
+    top: 0;
     right: 0;
     text-transform: uppercase;
     color: #000;
     padding-right: 15px;
     cursor: pointer;
     font-size: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.collapsible-bar-toggle-button {
+    display: flex;
+    gap: 4px;
+    align-items: center;
 }
 
 .collapsible-bar-body {
@@ -111,45 +126,54 @@
 
 <template>
     <div class="collapsible-bar-wrap"
+         role="alert"
          v-bind:style="[containerStyles]">
         <div class="collapsible-bar-header sans-serif">
-            {{ headerText }}
+            <span class="collapsible-bar-title">
+                {{ headerText }}
+            </span>
 
             <div class="collapsible-bar-toggle">
-                <div v-if="collapsed" @click="handleCollapse()" class="collapsible-bar-toggle-expand">
-                    {{ expandText }}
-                    <span>&#9650;</span>
-                </div>
-
-                <div v-if="!collapsed" @click="handleCollapse()" class="collapsible-bar-toggle-collapse">
-                    {{ collapseText }}
-                    <span>&#9660;</span>
+                <div role="button"
+                     tabindex="0"
+                     v-on:click="handleCollapse()"
+                     v-on:keydown.enter.space="handleCollapse()"
+                     v-bind:class="{'collapsible-bar-toggle-button': true, 'collapsible-bar-toggle-expand': collapsed, 'collapsible-bar-toggle-collapse': !collapsed}"
+                     v-bind:aria-expanded="collapsed ? 'false' : 'true'"
+                     v-bind:aria-label="collapsed ? expandText : collapseText"
+                >
+                    {{ collapsed ? expandText : collapseText }}
+                    <span>{{ collapsed ? '&#9650;' : '&#9660;'}}</span>
                 </div>
             </div>
         </div>
 
         <slide-up-down :active="!collapsed" :duration="600">
-            <div id="collapsible-bar-body" class="collapsible-bar-body">
-                <a v-bind:href="$parent.url"
-                   v-on="$parent.url ? { click: $parent.clicked } : {}"
-                   id="collapsible-bar-preview-link"
-                   class="collapsible-bar-preview-link">
-
+            <div id="collapsible-bar-body" class="collapsible-bar-body" v-bind:aria-hidden="collapsed ? 'true' : 'false'">
+                <div v-on:click="click" id="collapsible-bar-preview-link" class="collapsible-bar-preview-link">
                     <transition appear name="slide">
                         <div class="collapsible-bar-preview-box sans-serif" v-bind:style="[ boxStyles ]">
 
-                            <div class="collapsible-bar-main"
-                                 v-html="$parent.injectSnippets(mainText)"></div>
+                            <a class="collapsible-bar-main"
+                                ref="mainLink"
+                                v-bind:href="$parent.url"
+                                v-bind:style="[mainTextStyles]"
+                                v-bind:aria-label="$parent.injectSnippets(mainText) + (buttonText.length > 0 ? ', ' + $parent.injectSnippets(buttonText) : '') | strip_html"
+                                v-on:click.stop="$parent.clicked($event, !$parent.url)"
+                                v-on:keydown.enter.space="$parent.clicked($event, !$parent.url)"
+                                v-html="$parent.injectSnippets(mainText)"
+                            ></a>
 
-                            <div class="collapsible-bar-button"
-                                 v-if="buttonText.length > 0"
-                                 v-on:click="$parent.clicked($event, !$parent.url)"
-                                 v-html="$parent.injectSnippets(buttonText)"
-                                 v-bind:style="[buttonStyles]"></div>
-
+                            <button class="collapsible-bar-button" aria-hidden="true"
+                                v-if="buttonText.length > 0"
+                                v-on:click.stop="click"
+                                v-on:keydown.enter.space="click"
+                                v-html="$parent.injectSnippets(buttonText)"
+                                v-bind:style="[buttonStyles]"
+                            ></button>
                         </div>
                     </transition>
-                </a>
+                </div>
             </div>
         </slide-up-down>
 
@@ -218,6 +242,11 @@ export default {
                 color: this.textColor,
             }
         },
+        mainTextStyles: function () {
+            return {
+                color: this.textColor,
+            }
+        },
         buttonStyles() {
             return {
                 color: this.buttonTextColor,
@@ -250,7 +279,10 @@ export default {
         handleCollapse: function () {
             this.collapsed = !this.collapsed;
             this.$parent.collapsed(this.collapsed)
-        }
+        },
+        click: function () {
+            this.$refs.mainLink.click();
+        },
     }
 }
 </script>
