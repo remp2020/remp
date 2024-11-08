@@ -154,10 +154,10 @@ class Sender
         $message->setSubject($mailContent->subject());
         $message->setFrom($mailContent->from());
 
-        if ($this->template->mail_body_text) {
+        if (!empty($mailContent->text())) {
             $message->setBody($mailContent->text());
         }
-        if ($this->template->mail_body_html) {
+        if (!empty($mailContent->html())) {
             $message->setHtmlBody($mailContent->html());
         }
 

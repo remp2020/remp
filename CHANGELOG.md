@@ -8,7 +8,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
-- Fixed ARIA-compatibility of all campaign banners. remp/remp#1368 
+- Fixed ARIA-compatibility of all campaign banners. remp/remp#1368
+
+### [Mailer]
+
+- Changed Sender condition to include HTML/text version of email based on the generated content and not mail template content. remp/remp#1392
 
 ## Archive
 
