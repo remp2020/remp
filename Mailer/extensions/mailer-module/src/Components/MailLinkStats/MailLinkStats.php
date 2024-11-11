@@ -117,9 +117,9 @@ class MailLinkStats extends Control
     {
         $matches = [];
         $rtmClickQueryParam = RtmClickReplace::HASH_PARAM . '=';
-        preg_match_all('/<a(\s[^>]*)href\s*=\s*([\"\']??)(http[^\"\' >]*?' . $rtmClickQueryParam . '.*)\2[^>]*>(.*)<\/a>/isU', $mailContent, $matches);
+        $matched = preg_match_all('/<a(\s[^>]*)href\s*=\s*([\"\']??)(http[^\"\' >]*?' . $rtmClickQueryParam . '.*)\2[^>]*>(.*)<\/a>/isU', $mailContent, $matches);
 
-        if (empty($matches)) {
+        if (!$matched) {
             return [];
         }
 

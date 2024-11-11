@@ -53,9 +53,9 @@ class AnchorRtmClickReplace extends RtmClickReplace
     {
         $matches = [];
         $links = [];
-        preg_match_all('/<a(\s[^>]*)href\s*=\s*([\"\']??)(http[^\"\'>]*?)\2([^>]*)>/iU', $mailContent, $matches);
+        $matched = preg_match_all('/<a(\s[^>]*)href\s*=\s*([\"\']??)(http[^\"\'>]*?)\2([^>]*)>/iU', $mailContent, $matches);
 
-        if (empty($matches)) {
+        if (!$matched) {
             return [$mailContent, $links];
         }
 
