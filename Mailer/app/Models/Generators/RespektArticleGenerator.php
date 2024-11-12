@@ -98,7 +98,7 @@ class RespektArticleGenerator implements IGenerator
         $params = [
             'article' => $article ?? null,
             'url' => $url,
-            'author_name' => $values['author_name'],
+            'author_name' => $values['author_name'] ?? null,
         ];
 
         $engine = $this->engineFactory->engine();
