@@ -75,6 +75,7 @@ class RespektArticleGenerator implements IGenerator
     {
         return [
             (new PostInputParam('article'))->setRequired(),
+            (new PostInputParam('author_name')),
         ];
     }
 
@@ -97,6 +98,7 @@ class RespektArticleGenerator implements IGenerator
         $params = [
             'article' => $article ?? null,
             'url' => $url,
+            'author_name' => $values['author_name'],
         ];
 
         $engine = $this->engineFactory->engine();
