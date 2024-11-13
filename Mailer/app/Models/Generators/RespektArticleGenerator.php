@@ -34,6 +34,9 @@ class RespektArticleGenerator implements IGenerator
             ->getControlPrototype()
             ->setHtmlAttribute('class', 'form-control html-editor');
 
+        $form->addText('author_name', 'Author')
+            ->setOption('description', 'Author name for use in notification email.');
+
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
