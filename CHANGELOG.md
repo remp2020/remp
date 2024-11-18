@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Changed Sender condition to include HTML/text version of email based on the generated content and not mail template content. remp/remp#1392
+- Added `created_at` to the mail subscription objects in `/api/v1/users/user-preferences` API. remp/respekt#301
 
 ## Archive
 

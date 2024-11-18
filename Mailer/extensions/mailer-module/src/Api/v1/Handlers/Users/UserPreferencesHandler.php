@@ -90,6 +90,7 @@ class UserPreferencesHandler extends BaseHandler
                 'title' => $row->mail_type->title,
                 'is_subscribed' => (bool) $row->subscribed,
                 'variants' => $variants,
+                'created_at' => $row->created_at->format(DateTime::RFC3339),
                 'updated_at' => $row->updated_at->format(DateTime::RFC3339),
             ];
         }
