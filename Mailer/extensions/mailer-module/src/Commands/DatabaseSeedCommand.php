@@ -71,7 +71,7 @@ class DatabaseSeedCommand extends Command
         ];
         $output->writeln('Newsletter list categories:');
         foreach ($listCategories as $category) {
-            if ($this->listCategoriesRepository->getTable()->where(['title' => $category['title']])->count('*') > 0) {
+            if ($this->listCategoriesRepository->getTable()->where(['code' => $category['code']])->count('*') > 0) {
                 $output->writeln(" * Newsletter list <info>{$category['title']}</info> exists");
                 continue;
             }
