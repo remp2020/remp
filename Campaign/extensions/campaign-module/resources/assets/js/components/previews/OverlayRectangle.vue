@@ -298,8 +298,13 @@ export default {
         },
     },
     methods: {
-        click: function () {
-            this.$refs.mainLink.click();
+        click: function (event) {
+            if (!this.$parent.url) {
+                return;
+            }
+
+            this.$parent.clicked(event);
+            window.location.href = this.$parent.url;
         }
     }
 }
