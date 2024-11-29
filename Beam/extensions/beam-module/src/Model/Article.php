@@ -325,7 +325,7 @@ SQL;
 
     public function scopeMostReadByPageviews(Builder $query, Carbon $start, string $getBy, int $limit = null): Builder
     {
-        $innerQuery = ArticleTimespent::where('time_from', '>=', $start)
+        $innerQuery = ArticlePageviews::where('time_from', '>=', $start)
             ->groupBy('article_id')
             ->select(['article_id', DB::raw("sum($getBy) as total_sum")])
             ->orderByDesc('total_sum');

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed scopeMostReadByPageviews causing newsletter criterion use timespent sum instead of pageviews count.
+
 ### [Campaign]
 
 - Fixed ARIA-compatibility of all campaign banners. remp/remp#1368
@@ -15,9 +19,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Changed Sender condition to include HTML/text version of email based on the generated content and not mail template content. remp/remp#1392
 - Added `created_at` to the mail subscription objects in `/api/v1/users/user-preferences` API. remp/respekt#301
-
-### [Mailer]
-
 - Fixed newsletter list seeder. remp/remp#1391
 - Added `FrontendPresenter` for identification of presenters available to public. remp/remp#1395
 
