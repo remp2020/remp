@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Fixed newsletter list seeder. remp/remp#1391
+- Added `FrontendPresenter` for identification of presenters available to public. remp/remp#1395
 
 ## Archive
 

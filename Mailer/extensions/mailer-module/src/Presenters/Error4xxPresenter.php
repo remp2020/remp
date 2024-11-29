@@ -4,12 +4,10 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Presenters;
 
 use Nette;
-use Remp\MailerModule\Components\MissingConfiguration\IMissingConfigurationFactory;
-use Remp\MailerModule\Components\MissingConfiguration\MissingConfiguration;
 use Remp\MailerModule\Models\Config\LinkedServices;
 use Remp\MailerModule\Models\Config\LocalizationConfig;
 
-class Error4xxPresenter extends BasePresenter
+class Error4xxPresenter extends FrontendPresenter
 {
     /** @var LocalizationConfig @inject */
     public $localizationConfig;
@@ -26,8 +24,12 @@ class Error4xxPresenter extends BasePresenter
         }
     }
 
-    public function renderDefault(Nette\Application\BadRequestException $exception): void
+    public function renderDefault(Nette\Application\BadRequestException $exception, Nette\Application\UI\Presenter $previousPresenter): void
     {
+        if ($previousPresenter instanceof FrontendPresenter) {
+            $this->setLayout('layout_public');
+        }
+
         $this->template->currentUser = $this->getUser();
         $this->template->linkedServices = $this->linkedServices->getServices();
         $this->template->locale = $this->localizationConfig->getDefaultLocale();

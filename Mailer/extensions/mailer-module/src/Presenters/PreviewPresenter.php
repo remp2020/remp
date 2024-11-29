@@ -9,7 +9,7 @@ use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
-final class PreviewPresenter extends Presenter
+final class PreviewPresenter extends FrontendPresenter
 {
     /** @var TemplatesRepository @inject */
     public $templatesRepository;
