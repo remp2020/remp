@@ -133,7 +133,7 @@
                                                                   :options.sync="signedInOptions"
                                                                   :title="'Everyone'"
                                                         ></v-select>
-                                                        <small class="help-block">To use this filter, you have to be setting <code>signedIn: Boolean</code> within your REMP tracking code.</small>
+                                                        <small class="help-block">To use this filter, you have to be setting <code>userId: String</code> within your REMP tracking code.</small>
                                                     </div>
                                                 </div>
                                             </div>
