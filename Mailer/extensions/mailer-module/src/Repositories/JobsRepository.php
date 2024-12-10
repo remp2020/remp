@@ -82,6 +82,7 @@ class JobsRepository extends Repository
             throw new Exception("Job can't be updated. One or more Mail Job Batches were already started.");
         }
 
+        $data['updated_at'] = new \DateTime();
         $result = parent::update($row, $data);
 
         $this->getDatabase()->commit();

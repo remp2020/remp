@@ -105,7 +105,6 @@ class MailgunEventsCommand extends Command
                 foreach ($logs as $log) {
                     $updated = $this->logsRepository->update($log, [
                         $mappedEvent => $date,
-                        'updated_at' => new DateTime(),
                     ]);
 
                     if (!$updated) {

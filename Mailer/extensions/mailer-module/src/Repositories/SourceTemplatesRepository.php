@@ -34,6 +34,12 @@ class SourceTemplatesRepository extends Repository
         ]);
     }
 
+    public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
+    {
+        $data['updated_at'] = new \DateTime();
+        return parent::update($row, $data);
+    }
+
     public function exists(string $title): int
     {
         return $this->getTable()->where('title', $title)->count('*');

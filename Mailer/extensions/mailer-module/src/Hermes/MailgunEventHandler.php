@@ -58,7 +58,6 @@ class MailgunEventHandler implements HandlerInterface
 
         $this->logsRepository->update($log, [
             $mailgunEvent => $date,
-            'updated_at' => new DateTime(),
         ]);
 
         $column = $this->batchTemplatesRepository->mapEvent($mailgunEvent);

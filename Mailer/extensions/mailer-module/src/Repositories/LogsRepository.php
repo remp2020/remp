@@ -277,4 +277,14 @@ class LogsRepository extends Repository
         }
         return $result;
     }
+
+    public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
+    {
+        $data['updated_at'] = new \DateTime();
+        $result = parent::update($row, $data);
+        if ($this->newTableDataMigrationIsRunning()) {
+            $this->getNewTable()->where('id', $row->id)->update($data);
+        }
+        return $result;
+    }
 }

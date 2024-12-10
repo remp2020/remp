@@ -74,11 +74,16 @@ class BatchesRepository extends Repository implements DataRetentionInterface
         return $result;
     }
 
+    public function update(\Nette\Database\Table\ActiveRow $row, array $data): bool
+    {
+        $data['updated_at'] = new DateTime();
+        return parent::update($row, $data);
+    }
+
     public function updateStatus(ActiveRow $batch, $status): bool
     {
         $result = $this->update($batch, [
             'status' => $status,
-            'updated_at' => new DateTime()
         ]);
 
         if (in_array($status, self::SENDING_STATUSES, true)) {
