@@ -24,8 +24,10 @@ class Error4xxPresenter extends FrontendPresenter
         }
     }
 
-    public function renderDefault(Nette\Application\BadRequestException $exception, Nette\Application\UI\Presenter $previousPresenter): void
-    {
+    public function renderDefault(
+        Nette\Application\BadRequestException $exception,
+        ?Nette\Application\UI\Presenter $previousPresenter = null,
+    ): void {
         if ($previousPresenter instanceof FrontendPresenter) {
             $this->setLayout('layout_public');
         }

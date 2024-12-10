@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed newsletter list seeder. remp/remp#1391
 - Added `FrontendPresenter` for identification of presenters available to public. remp/remp#1395
 - Added `update()` (to updated `updated_at`) methods to `BatchesRepository`, `JobsRepository`, `LogsRepository`, `SourceTemplatesRepository`. remp/remp#1397
+- Fixed missing parameter exception in Error4xxPresenter. remp/remp#1399
 
 ## Archive
 
