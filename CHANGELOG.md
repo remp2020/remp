@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed ARIA-compatibility of all campaign banners. remp/remp#1368
 - Fixed an unclickable Overlay Rectangle banner when no main text and button text is present. remp/remp#1393
+- Changed path to maxmind database in .env.example. remp/remp#1402
 
 ### [Mailer]
 
