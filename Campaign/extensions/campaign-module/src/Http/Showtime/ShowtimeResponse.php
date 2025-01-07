@@ -12,19 +12,20 @@ interface ShowtimeResponse
 
     public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners, array $evaluationMessages = []);
 
-    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $snippets): string;
+    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $colorSchemes, array $snippets): string;
 
     /**
      * render is responsible for rendering JS to be executed on client.
      *
      * @param CampaignBanner $variant
      * @param Campaign $campaign
-     * @param $alignments
-     * @param $dimensions
-     * @param $positions
-     * @param $snippets
+     * @param array $alignments
+     * @param array $dimensions
+     * @param array $positions
+     * @param array $colorSchemes
+     * @param array $snippets
      * @param $userData
      * @return string
      */
-    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $snippets, mixed $userData): string;
+    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $colorSchemes, array $snippets, mixed $userData): string;
 }

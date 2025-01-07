@@ -29,6 +29,7 @@
                                     </div>
                                     <div class="col-md-12">
                                         <v-select v-model="colorScheme"
+                                                  name="color_scheme"
                                                   id="color_scheme"
                                                   :value="colorScheme"
                                                   :options.sync="colorSchemeOptions"
@@ -66,10 +67,6 @@
                             </div>
                         </div>
 
-                        <input type="hidden" name="background_color" v-bind:value="_backgroundColor" />
-                        <input type="hidden" name="text_color" v-bind:value="_textColor" />
-                        <input type="hidden" name="button_background_color" v-bind:value="_buttonBackgroundColor" />
-                        <input type="hidden" name="button_text_color" v-bind:value="_buttonTextColor" />
                         <input type="hidden" name="width" v-bind:value="_width" />
                         <input type="hidden" name="height" v-bind:value="_height" />
 
@@ -119,10 +116,8 @@
         "_headerText",
         "_mainText",
         "_buttonText",
-        "_backgroundColor",
-        "_textColor",
-        "_buttonBackgroundColor",
-        "_buttonTextColor",
+        "_colorSchemes",
+        "_colorScheme",
         "_width",
         "_height",
         "_imageLink",
@@ -141,7 +136,6 @@
                 this.buttonText = "Visit offer"
             }
 
-            this.colorScheme = this.colorSchemeByBackground(this._backgroundColor) || this.colorScheme;
             this.dimensions = this.dimensionsByWidthHeight(this._width, this._height) || this.dimensions;
             this.emitValuesChanged();
         },
@@ -155,61 +149,6 @@
             imageLink: null,
 
             colorScheme: "green",
-            colorSchemes: {
-                "grey": {
-                    "label": "Grey",
-                    "textColor": "#000000", "backgroundColor": "#ededed",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                    "closeTextColor": "#000000",
-                },
-                "yellow": {
-                    "label": "Yellow",
-                    "backgroundColor": "#f7bc1e", "textColor": "#000000",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                    "closeTextColor": "#000000",
-                },
-                "blue": {
-                    "label": "Blue",
-                    "textColor": "#ffffff", "backgroundColor": "#00b7db",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                    "closeTextColor": "#000000",
-                },
-                "dark_blue": {
-                    "label": "Dark Blue",
-                    "textColor": "#ffffff", "backgroundColor": "#1f3f82",
-                    "buttonTextColor": "#000000", "buttonBackgroundColor": "#ffffff",
-                },
-                "green": {
-                    "label": "Green",
-                    "textColor": "#ffffff", "backgroundColor": "#009688",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                    "closeTextColor": "#000000",
-                },
-                "violet": {
-                    "label": "Violet",
-                    "textColor": "#ffffff", "backgroundColor": "#9c27b0",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                    "closeTextColor": "#000000",
-                },
-                "red": {
-                    "label": "Red",
-                    "backgroundColor": "#e91e63", "textColor": "#ffffff",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                    "closeTextColor": "#000000",
-                },
-                "darkRed": {
-                    "label": "Dark red",
-                    "backgroundColor": "#b00c28", "textColor": "#ffffff",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                    "closeTextColor": "#000000",
-                },
-                "black": {
-                    "label": "Black",
-                    "textColor": "#ffffff", "backgroundColor": "#262325",
-                    "buttonTextColor": "#000000", "buttonBackgroundColor": "#ffffff",
-                    "closeTextColor": "#000000",
-                },
-            },
 
             dimensions: "dynamic",
             availableDimensions: {
@@ -264,14 +203,8 @@
                     mainText: this.mainText,
                     buttonText: this.buttonText,
                     imageLink: this.imageLink,
+                    colorScheme: this.colorScheme,
                 };
-                if (this.colorSchemes[this.colorScheme]) {
-                    let cs = this.colorSchemes[this.colorScheme];
-                    val.backgroundColor = cs.backgroundColor;
-                    val.textColor = cs.textColor;
-                    val.buttonBackgroundColor = cs.buttonBackgroundColor;
-                    val.buttonTextColor = cs.buttonTextColor;
-                }
                 if (this.availableDimensions[this.dimensions]) {
                     let d = this.availableDimensions[this.dimensions];
                     val.width = d.width;
@@ -281,17 +214,6 @@
                     key: "overlayRectangleTemplate",
                     val: val,
                 }]);
-            },
-            colorSchemeByBackground: function(bgColor) {
-                for (let idx in this.colorSchemes) {
-                    if (!this.colorSchemes.hasOwnProperty(idx)) {
-                        continue;
-                    }
-                    if (this.colorSchemes[idx].backgroundColor === bgColor) {
-                        return idx;
-                    }
-                }
-                return null;
             },
             dimensionsByWidthHeight: function(width, height) {
                 for (let idx in this.availableDimensions) {

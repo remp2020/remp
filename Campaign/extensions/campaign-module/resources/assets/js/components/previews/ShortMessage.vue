@@ -105,9 +105,9 @@ export default {
         "positionOptions",
         "alignmentOptions",
 
-        "backgroundColor",
-        "textColor",
+        "colorScheme",
         "text",
+        "closeText",
 
         "show",
         "transition",
@@ -164,20 +164,20 @@ export default {
         },
         boxStyles: function () {
             return {
-                backgroundColor: this.backgroundColor,
-                color: this.textColor,
+                backgroundColor: this.colorScheme.backgroundColor,
+                color: this.colorScheme.textColor,
                 minWidth: '50px',
                 minHeight: '25px',
             }
         },
         mainTextStyles: function () {
             return {
-                color: this.textColor,
+                color: this.colorScheme.textColor,
             }
         },
         closeStyles: function () {
             return {
-                color: this.textColor,
+                color: this.colorScheme.textColor,
             }
         },
         isVisible: function () {

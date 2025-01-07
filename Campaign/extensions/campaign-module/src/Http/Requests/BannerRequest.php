@@ -61,10 +61,7 @@ class BannerRequest extends FormRequest
                     break;
                 case Banner::TEMPLATE_MEDIUM_RECTANGLE:
                     $templateValidator = Validator::make($this->all(), [
-                        'background_color' => 'string|required',
-                        'text_color' => 'string|required',
-                        'button_background_color' => 'string|required',
-                        'button_text_color' => 'string|required',
+                        'color_scheme' => 'string|required',
                         'header_text' => 'string|nullable',
                         'main_text' => 'string|nullable',
                         'button_text' => 'string|nullable',
@@ -75,10 +72,7 @@ class BannerRequest extends FormRequest
 
                 case Banner::TEMPLATE_OVERLAY_RECTANGLE:
                     $templateValidator = Validator::make($this->all(), [
-                        'background_color' => 'string|required',
-                        'text_color' => 'string|required',
-                        'button_background_color' => 'string|required',
-                        'button_text_color' => 'string|required',
+                        'color_scheme' => 'string|required',
                         'header_text' => 'string|nullable',
                         'main_text' => 'string|nullable',
                         'button_text' => 'string|nullable',
@@ -102,20 +96,14 @@ class BannerRequest extends FormRequest
                     break;
                 case Banner::TEMPLATE_BAR:
                     $templateValidator = Validator::make($this->all(), [
-                        'background_color' => 'string|required',
-                        'text_color' => 'string|required',
-                        'button_background_color' => 'string|required',
-                        'button_text_color' => 'string|required',
+                        'color_scheme' => 'string|required',
                         'main_text' => 'string|nullable',
                         'button_text' => 'string|nullable',
                     ]);
                     break;
                 case Banner::TEMPLATE_COLLAPSIBLE_BAR:
                     $templateValidator = Validator::make($this->all(), [
-                        'background_color' => 'string|required',
-                        'text_color' => 'string|required',
-                        'button_background_color' => 'string|required',
-                        'button_text_color' => 'string|required',
+                        'color_scheme' => 'string|required',
                         'header_text' => 'string|nullable',
                         'collapse_text' => 'string|nullable',
                         'expand_text' => 'string|nullable',
@@ -127,8 +115,7 @@ class BannerRequest extends FormRequest
                     break;
                 case Banner::TEMPLATE_SHORT_MESSAGE:
                     $templateValidator = Validator::make($this->all(), [
-                        'background_color' => 'string|required',
-                        'text_color' => 'string|required',
+                        'color_scheme' => 'string|required',
                         'text' => 'string|required',
                     ]);
                     break;
@@ -141,6 +128,7 @@ class BannerRequest extends FormRequest
                     break;
                 case Banner::TEMPLATE_NEWSLETTER_RECTANGLE:
                     $templateValidator = Validator::make($this->all(), [
+                        'color_scheme' => 'string|required',
                         'newsletter_id' => 'string|required',
                         'btn_submit' => 'string|required',
                         'title' => 'string|nullable',

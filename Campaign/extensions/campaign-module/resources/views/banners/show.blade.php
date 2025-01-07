@@ -24,12 +24,14 @@
     var positions = JSON.parse('{!! json_encode($positions) !!}');
     var snippets = {!! json_encode($snippets) !!};
     var banner = remplib.banner.fromModel({!! $banner->toJson() !!});
+    var colorSchemes = JSON.parse('{!! json_encode($colorSchemes) !!}');
 
     banner.show = true;
     banner.forcedPosition = 'absolute';
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
+    banner.colorSchemes = colorSchemes;
     banner.snippets = snippets;
     banner.adminPreview = true;
 

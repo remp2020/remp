@@ -32,8 +32,7 @@ class ShortMessageTemplateFactory extends Factory
     {
         return [
             'text' => $this->faker->words(3, true),
-            'text_color' => '#000000',
-            'background_color' => '#f7bc1e',
+            'color_scheme' => 'grey',
         ];
     }
 }

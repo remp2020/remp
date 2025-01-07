@@ -190,10 +190,6 @@ export default {
         SlideUpDown
     },
     props: [
-        "backgroundColor",
-        "buttonBackgroundColor",
-        "textColor",
-        "buttonTextColor",
         "headerText",
         "mainText",
         "headerText",
@@ -201,6 +197,7 @@ export default {
         "expandText",
         "buttonText",
         "displayType",
+        "colorScheme",
 
         "show",
         "transition",
@@ -238,24 +235,24 @@ export default {
         },
         boxStyles() {
             return {
-                backgroundColor: this.backgroundColor,
-                color: this.textColor,
+                backgroundColor: this.colorScheme.backgroundColor,
+                color: this.colorScheme.textColor,
             }
         },
         mainTextStyles: function () {
             return {
-                color: this.textColor,
+                color: this.colorScheme.textColor,
             }
         },
         buttonStyles() {
             return {
-                color: this.buttonTextColor,
-                backgroundColor: this.buttonBackgroundColor,
+                color: this.colorScheme.buttonTextColor,
+                backgroundColor: this.colorScheme.buttonBackgroundColor,
             }
         },
         closeStyles() {
             return {
-                color: this.textColor,
+                color: this.colorScheme.textColor,
             }
         },
         containerStyles: function () {

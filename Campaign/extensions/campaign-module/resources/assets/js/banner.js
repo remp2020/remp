@@ -43,10 +43,7 @@ window.remplib = window.remplib || {};
                     buttonText: model['medium_rectangle_template']['button_text'] || "",
                     width: model['medium_rectangle_template']['width'] || null,
                     height: model['medium_rectangle_template']['height'] || null,
-                    backgroundColor: model['medium_rectangle_template']['background_color'] || null,
-                    textColor: model['medium_rectangle_template']['text_color'] || null,
-                    buttonBackgroundColor: model['medium_rectangle_template']['button_background_color'] || null,
-                    buttonTextColor: model['medium_rectangle_template']['button_text_color'] || null,
+                    colorScheme: model['medium_rectangle_template']['color_scheme'] || null,
                 }
             }
 
@@ -58,11 +55,8 @@ window.remplib = window.remplib || {};
                     buttonText: model['overlay_rectangle_template']['button_text'] || "",
                     width: model['overlay_rectangle_template']['width'] || null,
                     height: model['overlay_rectangle_template']['height'] || null,
-                    backgroundColor: model['overlay_rectangle_template']['background_color'] || null,
-                    textColor: model['overlay_rectangle_template']['text_color'] || null,
-                    buttonBackgroundColor: model['overlay_rectangle_template']['button_background_color'] || null,
-                    buttonTextColor: model['overlay_rectangle_template']['button_text_color'] || null,
                     imageLink:  model['overlay_rectangle_template']['image_link'] || null,
+                    colorScheme: model['overlay_rectangle_template']['color_scheme'] || null,
                 }
             }
 
@@ -86,10 +80,7 @@ window.remplib = window.remplib || {};
                     id: model['bar_template']['id'] || null,
                     mainText: model['bar_template']['main_text'] || "",
                     buttonText: model['bar_template']['button_text'] || "",
-                    backgroundColor: model['bar_template']['background_color'] || null,
-                    textColor: model['bar_template']['text_color'] || null,
-                    buttonBackgroundColor: model['bar_template']['button_background_color'] || null,
-                    buttonTextColor: model['bar_template']['button_text_color'] || null
+                    colorScheme: model['bar_template']['color_scheme'] || null,
                 }
             }
 
@@ -101,12 +92,9 @@ window.remplib = window.remplib || {};
                     collapseText: model['collapsible_bar_template']['collapse_text'] || "",
                     expandText: model['collapsible_bar_template']['expand_text'] || "",
                     buttonText: model['collapsible_bar_template']['button_text'] || "",
-                    backgroundColor: model['collapsible_bar_template']['background_color'] || null,
-                    textColor: model['collapsible_bar_template']['text_color'] || null,
-                    buttonBackgroundColor: model['collapsible_bar_template']['button_background_color'] || null,
-                    buttonTextColor: model['collapsible_bar_template']['button_text_color'] || null,
                     initialState: model['collapsible_bar_template']['initial_state'] || "expanded",
                     forceInitialState: model['collapsible_bar_template']['force_initial_state'] || false,
+                    colorScheme: model['collapsible_bar_template']['color_scheme'] || null,
                 }
             }
 
@@ -138,9 +126,8 @@ window.remplib = window.remplib || {};
             if (banner.template === 'short_message') {
                 banner.shortMessageTemplate = {
                     id: model['short_message_template']['id'] || null,
-                    backgroundColor: model['short_message_template']['background_color'] || null,
-                    textColor: model['short_message_template']['text_color'] || null,
                     text: model['short_message_template']['text'] || null,
+                    colorScheme: model['short_message_template']['color_scheme'] || null,
                 }
             }
 
@@ -153,10 +140,6 @@ window.remplib = window.remplib || {};
                     text: model['newsletter_rectangle_template']['text'] || null,
                     success: model['newsletter_rectangle_template']['success'] || null,
                     failure: model['newsletter_rectangle_template']['failure'] || null,
-                    textColor: model['newsletter_rectangle_template']['text_color'] || null,
-                    backgroundColor: model['newsletter_rectangle_template']['background_color'] || null,
-                    buttonBackgroundColor: model['newsletter_rectangle_template']['button_background_color'] || null,
-                    buttonTextColor: model['newsletter_rectangle_template']['button_text_color'] || null,
                     width: model['newsletter_rectangle_template']['width'] || null,
                     height: model['newsletter_rectangle_template']['height'] || null,
                     terms: model['newsletter_rectangle_template']['terms'] || null,
@@ -167,6 +150,7 @@ window.remplib = window.remplib || {};
                     paramsTransposition: model['newsletter_rectangle_template']['params_transposition'] || null,
                     paramsExtra: model['newsletter_rectangle_template']['params_extra'] || null,
                     rempMailerAddr: model['newsletter_rectangle_template']['remp_mailer_addr'] || null,
+                    colorScheme: model['newsletter_rectangle_template']['color_scheme'] || null,
                 }
             }
 

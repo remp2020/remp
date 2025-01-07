@@ -9,7 +9,7 @@ class Map
     const POSITIONS_MAP_REDIS_KEY = 'positions_map';
 
     /** @var Position[] */
-    protected $positions = [];
+    protected array $positions = [];
 
     public function __construct(array $positionsConfig)
     {

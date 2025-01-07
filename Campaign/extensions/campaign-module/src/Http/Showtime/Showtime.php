@@ -26,6 +26,7 @@ class Showtime
     private $positionMap;
     private $dimensionMap;
     private $alignmentsMap;
+    private $colorSchemesMap;
     private $snippets;
     private array $localCache = [];
 
@@ -70,6 +71,11 @@ class Showtime
     public function setAlignmentsMap(\Remp\CampaignModule\Models\Alignment\Map $alignments)
     {
         $this->alignmentsMap = $alignments->alignments();
+    }
+
+    public function setColorSchemesMap(\Remp\CampaignModule\Models\ColorScheme\Map $colorSchemes)
+    {
+        $this->colorSchemesMap = $colorSchemes->colorSchemes();
     }
 
     public function flushLocalCache(): self
@@ -141,6 +147,7 @@ class Showtime
         $positions = $this->positionMap;
         $dimensions = $this->dimensionMap;
         $alignments = $this->alignmentsMap;
+        $colorSchemes = $this->colorSchemesMap;
         $snippets = $this->snippets;
 
         $displayData = [];
@@ -218,6 +225,7 @@ class Showtime
                 alignments: $alignments,
                 dimensions: $dimensions,
                 positions: $positions,
+                colorSchemes: $colorSchemes,
                 snippets: $snippets,
                 userData: $data,
             );
@@ -721,6 +729,10 @@ class Showtime
             $keys[] = \Remp\CampaignModule\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY;
         }
 
+        if (!$this->colorSchemesMap) {
+            $keys[] = \Remp\CampaignModule\Models\ColorScheme\Map::COLOR_SCHEMES_MAP_REDIS_KEY;
+        }
+
         if (!$this->snippets) {
             $keys[] = \Remp\CampaignModule\Snippet::REDIS_CACHE_KEY;
         }
@@ -739,6 +751,9 @@ class Showtime
                     break;
                 case \Remp\CampaignModule\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY:
                     $this->alignmentsMap = json_decode($map, true) ?? [];
+                    break;
+                case \Remp\CampaignModule\Models\ColorScheme\Map::COLOR_SCHEMES_MAP_REDIS_KEY:
+                    $this->colorSchemesMap = json_decode($map, true) ?? [];
                     break;
                 case \Remp\CampaignModule\Snippet::REDIS_CACHE_KEY:
                     $this->snippets = json_decode($map, true) ?? [];

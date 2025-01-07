@@ -42,6 +42,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
         array $alignments,
         array $dimensions,
         array $positions,
+        array $colorSchemes,
         array $snippets
     ): string {
         return View::make('banners.preview', [
@@ -51,6 +52,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             'positions' => $positions,
             'dimensions' => $dimensions,
             'alignments' => $alignments,
+            'colorSchemes' => $colorSchemes,
             'snippets' => $snippets,
             'controlGroup' => 0
         ])->render();
@@ -62,6 +64,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
         array $alignments,
         array $dimensions,
         array $positions,
+        array $colorSchemes,
         array $snippets,
         mixed $userData,
     ): string {
@@ -74,6 +77,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             'positions' => $positions,
             'dimensions' => $dimensions,
             'alignments' => $alignments,
+            'colorSchemes' => $colorSchemes,
             'snippets' => $snippets,
             'controlGroup' => $variant->control_group,
             'userData' => $userData,

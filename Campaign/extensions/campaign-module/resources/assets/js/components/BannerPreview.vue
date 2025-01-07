@@ -44,10 +44,7 @@
                 :buttonText="mediumRectangleTemplate.buttonText"
                 :width="mediumRectangleTemplate.width"
                 :height="mediumRectangleTemplate.height"
-                :backgroundColor="mediumRectangleTemplate.backgroundColor"
-                :textColor="mediumRectangleTemplate.textColor"
-                :buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
-                :buttonTextColor="mediumRectangleTemplate.buttonTextColor"
+                :colorScheme="colorSchemes[mediumRectangleTemplate.colorScheme]"
 
                 :position="position"
                 :offsetVertical="offsetVertical"
@@ -69,10 +66,7 @@
 
                 :mainText="barTemplate.mainText"
                 :buttonText="barTemplate.buttonText"
-                :backgroundColor="barTemplate.backgroundColor"
-                :textColor="barTemplate.textColor"
-                :buttonBackgroundColor="barTemplate.buttonBackgroundColor"
-                :buttonTextColor="barTemplate.buttonTextColor"
+                :colorScheme="colorSchemes[barTemplate.colorScheme]"
 
                 :position="position"
                 :offsetVertical="offsetVertical"
@@ -97,10 +91,7 @@
                 :collapseText="collapsibleBarTemplate.collapseText"
                 :expandText="collapsibleBarTemplate.expandText"
                 :buttonText="collapsibleBarTemplate.buttonText"
-                :backgroundColor="collapsibleBarTemplate.backgroundColor"
-                :textColor="collapsibleBarTemplate.textColor"
-                :buttonBackgroundColor="collapsibleBarTemplate.buttonBackgroundColor"
-                :buttonTextColor="collapsibleBarTemplate.buttonTextColor"
+                :colorScheme="colorSchemes[collapsibleBarTemplate.colorScheme]"
                 :initialState="collapsibleBarTemplate.initialState"
 
                 :targetUrl="targetUrl"
@@ -117,8 +108,7 @@
                 :forcedPosition="forcedPosition"
 
                 :text="shortMessageTemplate.text"
-                :backgroundColor="shortMessageTemplate.backgroundColor"
-                :textColor="shortMessageTemplate.textColor"
+                :colorScheme="colorSchemes[shortMessageTemplate.colorScheme]"
 
                 :position="position"
                 :offsetVertical="offsetVertical"
@@ -141,10 +131,7 @@
                 :buttonText="overlayRectangleTemplate.buttonText"
                 :width="overlayRectangleTemplate.width"
                 :height="overlayRectangleTemplate.height"
-                :backgroundColor="overlayRectangleTemplate.backgroundColor"
-                :textColor="overlayRectangleTemplate.textColor"
-                :buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
-                :buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+                :colorScheme="colorSchemes[overlayRectangleTemplate.colorScheme]"
                 :imageLink="overlayRectangleTemplate.imageLink"
 
                 :targetUrl="targetUrl"
@@ -216,10 +203,7 @@
                                       :success="newsletterRectangleTemplate.success"
                                       :failure="newsletterRectangleTemplate.failure"
                                       :terms="newsletterRectangleTemplate.terms"
-                                      :textColor="newsletterRectangleTemplate.textColor"
-                                      :backgroundColor="newsletterRectangleTemplate.backgroundColor"
-                                      :buttonBackgroundColor="newsletterRectangleTemplate.buttonBackgroundColor"
-                                      :buttonTextColor="newsletterRectangleTemplate.buttonTextColor"
+                                      :colorScheme="colorSchemes[newsletterRectangleTemplate.colorScheme]"
                                       :width="newsletterRectangleTemplate.width"
                                       :height="newsletterRectangleTemplate.height"
 
@@ -289,6 +273,7 @@
         "alignmentOptions",
         "dimensionOptions",
         "positionOptions",
+        "colorSchemes",
 
         "variantUuid",
         "campaignPublicId",

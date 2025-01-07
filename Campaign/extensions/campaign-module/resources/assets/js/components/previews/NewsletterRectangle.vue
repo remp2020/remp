@@ -227,10 +227,7 @@ export default {
         "success",
         "failure",
         "terms",
-        "backgroundColor",
-        "buttonBackgroundColor",
-        "textColor",
-        "buttonTextColor",
+        "colorScheme",
         "width",
         "height",
 
@@ -382,7 +379,7 @@ export default {
             }
         },
         _formStyles: function (){
-            return `<style>.newsletter-rectangle-form a {color: ${this.buttonBackgroundColor}</style>`;
+            return `<style>.newsletter-rectangle-form a {color: ${this.colorScheme.buttonBackgroundColor}</style>`;
         },
         _position: function () {
             if (!this.$parent.customPositioned()) {
@@ -419,8 +416,8 @@ export default {
         },
         boxStyles: function () {
             return {
-                backgroundColor: this.backgroundColor,
-                color: this.textColor,
+                backgroundColor: this.colorScheme.backgroundColor,
+                color: this.colorScheme.textColor,
                 minWidth: this.width || '100px',
                 maxWidth: this.width || '',
                 minHeight: this.height || '250px',
@@ -436,18 +433,18 @@ export default {
         buttonStyles: function () {
             if (this.subscriptionSuccess === true || this.subscriptionSuccess === false){
                 return {
-                    backgroundColor: this.buttonTextColor,
-                    color: this.buttonBackgroundColor,
+                    backgroundColor: this.colorScheme.buttonTextColor,
+                    color: this.colorScheme.buttonBackgroundColor,
                 }
             }
             return {
-                color: this.buttonTextColor,
-                backgroundColor: this.buttonBackgroundColor,
+                color: this.colorScheme.buttonTextColor,
+                backgroundColor: this.colorScheme.buttonBackgroundColor,
             }
         },
         linkStyles: function () {
             return {
-                color: this.textColor,
+                color: this.colorScheme.textColor,
             }
         },
         isVisible: function () {

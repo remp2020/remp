@@ -29,6 +29,7 @@
                                     </div>
                                     <div class="col-md-12">
                                         <v-select v-model="colorScheme"
+                                                  name="color_scheme"
                                                   id="color_scheme"
                                                   :value="colorScheme"
                                                   :options.sync="colorSchemeOptions"
@@ -38,9 +39,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <input type="hidden" name="background_color" v-bind:value="_backgroundColor" />
-                        <input type="hidden" name="text_color" v-bind:value="_textColor" />
 
                         <div class="input-group fg-float m-t-30">
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
@@ -68,71 +66,23 @@
 
     let props = [
         "_text",
-        "_backgroundColor",
-        "_textColor",
+        "_colorSchemes",
+        "_colorScheme",
     ];
     export default {
         name: "short-message-template",
         components: { vSelect },
         props: props,
-        created: function(){
+        created: function() {
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop] || this[prop.slice(1)];
             });
-            this.colorScheme = this.colorSchemeByBackground(this._backgroundColor) || this.colorScheme;
             this.emitValuesChanged();
         },
         data: () => ({
             text: "We think you might like this...",
 
             colorScheme: "green",
-            colorSchemes: {
-                "grey": {
-                    "label": "Grey",
-                    "textColor": "#000000", "backgroundColor": "#ededed",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "yellow": {
-                    "label": "Yellow",
-                    "backgroundColor": "#f7bc1e", "textColor": "#000000",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "blue": {
-                    "label": "Blue",
-                    "textColor": "#ffffff", "backgroundColor": "#00b7db",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "dark_blue": {
-                    "label": "Dark Blue",
-                    "textColor": "#ffffff", "backgroundColor": "#1f3f82",
-                    "buttonTextColor": "#000000", "buttonBackgroundColor": "#ffffff",
-                },
-                "green": {
-                    "label": "Green",
-                    "textColor": "#ffffff", "backgroundColor": "#009688",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "violet": {
-                    "label": "Violet",
-                    "textColor": "#ffffff", "backgroundColor": "#9c27b0",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "red": {
-                    "label": "Red",
-                    "backgroundColor": "#e91e63", "textColor": "#ffffff",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "darkRed": {
-                    "label": "Dark red",
-                    "backgroundColor": "#b00c28", "textColor": "#ffffff",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "black": {
-                    "label": "Black",
-                    "textColor": "#ffffff", "backgroundColor": "#262325",
-                    "buttonTextColor": "#000000", "buttonBackgroundColor": "#ffffff",
-                },
-            },
         }),
         computed: {
             colorSchemeOptions: function() {
@@ -157,27 +107,12 @@
             emitValuesChanged: function() {
                 let val = {
                     text: this.text,
+                    colorScheme: this.colorScheme,
                 };
-                if (this.colorSchemes[this.colorScheme]) {
-                    let cs = this.colorSchemes[this.colorScheme];
-                    val.backgroundColor = cs.backgroundColor;
-                    val.textColor = cs.textColor;
-                }
                 this.$parent.$emit("values-changed", [{
                     key: "shortMessageTemplate",
                     val: val,
                 }]);
-            },
-            colorSchemeByBackground: function(bgColor) {
-                for (let idx in this.colorSchemes) {
-                    if (!this.colorSchemes.hasOwnProperty(idx)) {
-                        continue;
-                    }
-                    if (this.colorSchemes[idx].backgroundColor === bgColor) {
-                        return idx;
-                    }
-                }
-                return null;
             },
         }
     }

@@ -97,6 +97,7 @@ class CampaignServiceProvider extends ServiceProvider
         $dimensionMap = new \Remp\CampaignModule\Models\Dimension\Map(config('banners.dimensions', []));
         $positionsMap = new \Remp\CampaignModule\Models\Position\Map(config('banners.positions', []));
         $alignmentsMap = new \Remp\CampaignModule\Models\Alignment\Map(config('banners.alignments', []));
+        $colorSchemesMap = new \Remp\CampaignModule\Models\ColorScheme\Map(config('banners.color_schemes', []));
 
         $this->app->bind(\Remp\CampaignModule\Models\Dimension\Map::class, function () use ($dimensionMap) {
             return $dimensionMap;
@@ -106,6 +107,9 @@ class CampaignServiceProvider extends ServiceProvider
         });
         $this->app->bind(\Remp\CampaignModule\Models\Alignment\Map::class, function () use ($alignmentsMap) {
             return $alignmentsMap;
+        });
+        $this->app->bind(\Remp\CampaignModule\Models\ColorScheme\Map::class, function () use ($colorSchemesMap) {
+            return $colorSchemesMap;
         });
         $this->app->bind(ClientInterface::class, function () {
             return Redis::connection()->client();

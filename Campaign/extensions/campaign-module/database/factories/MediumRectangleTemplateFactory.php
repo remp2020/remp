@@ -34,10 +34,7 @@ class MediumRectangleTemplateFactory extends Factory
             'header_text' => $this->faker->words(1, true),
             'main_text' => $this->faker->words(3, true),
             'button_text' => $this->faker->words(1, true),
-            'text_color' => '#000000',
-            'background_color' => '#f7bc1e',
-            'button_text_color' => '#ffffff',
-            'button_background_color' => '#000000',
+            'color_scheme' => 'grey',
         ];
     }
 }

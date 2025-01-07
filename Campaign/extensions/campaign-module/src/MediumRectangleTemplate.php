@@ -15,10 +15,11 @@ class MediumRectangleTemplate extends AbstractTemplate
         'button_text',
         'width',
         'height',
-        'background_color',
-        'text_color',
-        'button_background_color',
-        'button_text_color',
+        'color_scheme',
+    ];
+
+    protected $attributes = [
+        'color_scheme' => 'grey',
     ];
 
     protected static function newFactory(): MediumRectangleTemplateFactory

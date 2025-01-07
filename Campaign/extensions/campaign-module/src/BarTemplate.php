@@ -12,10 +12,11 @@ class BarTemplate extends AbstractTemplate
     protected $fillable = [
         'main_text',
         'button_text',
-        'background_color',
-        'text_color',
-        'button_background_color',
-        'button_text_color',
+        'color_scheme',
+    ];
+
+    protected $attributes = [
+        'color_scheme' => 'grey',
     ];
 
     protected static function newFactory(): BarTemplateFactory

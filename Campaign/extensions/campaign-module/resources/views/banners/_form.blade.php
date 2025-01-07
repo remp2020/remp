@@ -3,6 +3,7 @@
 /* @var $dimensions \Illuminate\Support\Collection */
 /* @var $positions \Illuminate\Support\Collection */
 /* @var $alignments \Illuminate\Support\Collection */
+/* @var $colorSchemes \Illuminate\Support\Collection */
 /* @var $banner \Remp\CampaignModule\Banner */
 @endphp
 
@@ -16,6 +17,7 @@
     var alignments = JSON.parse('{!! json_encode($alignments) !!}');
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
+    var colorSchemes = JSON.parse('{!! json_encode($colorSchemes) !!}');
 
     var snippets = {!! json_encode($snippets) !!};
     snippets = snippets.length === 0 ? {} : snippets;
@@ -24,6 +26,7 @@
     banner.show = true;
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
+    banner.colorSchemes = colorSchemes;
     banner.positionOptions = positions;
     banner.forcedPosition = 'absolute';
     banner.snippets = snippets;

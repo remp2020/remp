@@ -10,12 +10,13 @@ class CollapsibleBarTemplate extends AbstractTemplate
         'collapse_text',
         'expand_text',
         'button_text',
-        'background_color',
-        'text_color',
-        'button_background_color',
-        'button_text_color',
         'initial_state',
         'force_initial_state',
+        'color_scheme',
+    ];
+
+    protected $attributes = [
+        'color_scheme' => 'grey',
     ];
 
     /**

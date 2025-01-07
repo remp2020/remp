@@ -7,6 +7,7 @@ use Remp\CampaignModule\Http\Requests\BannerOneTimeDisplayRequest;
 use Remp\CampaignModule\Http\Requests\BannerRequest;
 use Remp\CampaignModule\Http\Resources\BannerResource;
 use Remp\CampaignModule\Http\Showtime\Showtime;
+use Remp\CampaignModule\Models\ColorScheme\Map as ColorSchemeMap;
 use Remp\CampaignModule\Models\Dimension\Map as DimensionMap;
 use Remp\CampaignModule\Models\Position\Map as PositionMap;
 use Remp\CampaignModule\Models\Alignment\Map as AlignmentMap;
@@ -20,17 +21,13 @@ use Yajra\Datatables\Datatables;
 
 class BannerController extends Controller
 {
-    protected $dimensionMap;
-    protected $positionMap;
-    protected $alignmentMap;
-    private $showtime;
-
-    public function __construct(DimensionMap $dm, PositionMap $pm, AlignmentMap $am, Showtime $showtime)
-    {
-        $this->dimensionMap = $dm;
-        $this->positionMap = $pm;
-        $this->alignmentMap = $am;
-        $this->showtime = $showtime;
+    public function __construct(
+        protected DimensionMap $dimensionMap,
+        protected PositionMap $positionMap,
+        protected AlignmentMap $alignmentMap,
+        protected ColorSchemeMap $colorSchemeMap,
+        private readonly Showtime $showtime
+    ) {
     }
 
     /**
@@ -113,6 +110,7 @@ class BannerController extends Controller
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
+            'colorSchemes' => $this->colorSchemeMap->colorSchemes(),
             'snippets' => Snippet::all()->pluck('value', 'name'),
         ]);
     }
@@ -139,6 +137,7 @@ class BannerController extends Controller
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
+            'colorSchemes' => $this->colorSchemeMap->colorSchemes(),
             'snippets' => Snippet::all()->pluck('value', 'name'),
         ]);
     }
@@ -198,6 +197,7 @@ class BannerController extends Controller
                 'positions' => $this->positionMap->positions(),
                 'dimensions' => $this->dimensionMap->dimensions(),
                 'alignments' => $this->alignmentMap->alignments(),
+                'colorSchemes' => $this->colorSchemeMap->colorSchemes(),
                 'snippets' => Snippet::all()->pluck('value', 'name'),
             ]),
             'json' => new BannerResource($banner),
@@ -221,6 +221,7 @@ class BannerController extends Controller
             'positions' => $this->positionMap->positions(),
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
+            'colorSchemes' => $this->colorSchemeMap->colorSchemes(),
             'snippets' => Snippet::all()->pluck('value', 'name'),
         ]);
     }

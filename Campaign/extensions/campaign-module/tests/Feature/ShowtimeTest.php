@@ -51,6 +51,7 @@ class ShowtimeTest extends TestCase
         $showtime->setDimensionMap(resolve(\Remp\CampaignModule\Models\Dimension\Map::class));
         $showtime->setAlignmentsMap(resolve(\Remp\CampaignModule\Models\Alignment\Map::class));
         $showtime->setPositionMap(resolve(\Remp\CampaignModule\Models\Position\Map::class));
+        $showtime->setColorSchemesMap(resolve(\Remp\CampaignModule\Models\ColorScheme\Map::class));
         $this->showtime = $showtime;
 
         // Prepare banner and campaign

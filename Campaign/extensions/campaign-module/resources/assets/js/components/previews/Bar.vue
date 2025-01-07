@@ -200,13 +200,10 @@ export default {
         "positionOptions",
         "alignmentOptions",
 
-        "backgroundColor",
-        "buttonBackgroundColor",
-        "textColor",
-        "buttonTextColor",
         "headerText",
         "mainText",
         "buttonText",
+        "colorScheme",
 
         "show",
         "transition",
@@ -267,24 +264,24 @@ export default {
         },
         boxStyles: function () {
             return {
-                backgroundColor: this.backgroundColor,
-                color: this.textColor,
+                backgroundColor: this.colorScheme.backgroundColor,
+                color: this.colorScheme.textColor,
             }
         },
         mainTextStyles: function () {
             return {
-                color: this.textColor,
+                color: this.colorScheme.textColor,
             }
         },
         buttonStyles: function () {
             return {
-                color: this.buttonTextColor,
-                backgroundColor: this.buttonBackgroundColor,
+                color: this.colorScheme.buttonTextColor,
+                backgroundColor: this.colorScheme.buttonBackgroundColor,
             }
         },
         closeStyles: function () {
             return {
-                color: this.textColor,
+                color: this.colorScheme.textColor,
             }
         },
         isVisible: function () {

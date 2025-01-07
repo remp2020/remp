@@ -28,4 +28,5 @@ npm-error.log
 /config/services.remp.php
 /config/search.php
 /config/banners.php
+/config/banners.local.php
 /config/newsletter_banners.php

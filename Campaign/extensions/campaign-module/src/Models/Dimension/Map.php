@@ -9,7 +9,7 @@ class Map
     const DIMENSIONS_MAP_REDIS_KEY = 'dimensions_map';
 
     /** @var Dimensions[] */
-    protected $dimensions = [];
+    protected array $dimensions = [];
 
     public function __construct(array $dimensionsConfig)
     {

@@ -159,12 +159,13 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         $this->jsonpResponse($callback, $responseData);
     }
 
-    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $snippets, mixed $userData): string {
+    public function renderCampaign(CampaignBanner $variant, Campaign $campaign, array $alignments, array $dimensions, array $positions, array $colorSchemes, array $snippets, mixed $userData): string {
         return $this->renderInternal(
             banner: $variant->banner,
             alignments: $alignments,
             dimensions: $dimensions,
             positions: $positions,
+            colorSchemes: $colorSchemes,
             snippets: $snippets,
             variantUuid: $variant->uuid,
             campaignUuid: $campaign->uuid,
@@ -175,12 +176,13 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         );
     }
 
-    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $snippets): string {
+    public function renderBanner(Banner $banner, array $alignments, array $dimensions, array $positions, array $colorSchemes, array $snippets): string {
         return $this->renderInternal(
             banner: $banner,
             alignments: $alignments,
             dimensions: $dimensions,
             positions: $positions,
+            colorSchemes: $colorSchemes,
             snippets: $snippets,
         );
     }
@@ -190,6 +192,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         $alignments,
         $dimensions,
         $positions,
+        $colorSchemes,
         $snippets,
         $variantUuid = null,
         $campaignUuid = null,
@@ -201,6 +204,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         $alignmentsJson = json_encode($alignments);
         $dimensionsJson = json_encode($dimensions);
         $positionsJson = json_encode($positions);
+        $colorSchemesJson = json_encode($colorSchemes);
         $snippetsJson = json_encode($snippets);
         $userDataJson = json_encode($userData);
 
@@ -252,6 +256,7 @@ var run = function() {
     var alignments = JSON.parse('{$alignmentsJson}');
     var dimensions = JSON.parse('{$dimensionsJson}');
     var positions = JSON.parse('{$positionsJson}');
+    var colorSchemes = JSON.parse('{$colorSchemesJson}');
     var snippets = {$snippetsJson};
     var userData = JSON.parse('{$userDataJson}');
 
@@ -267,6 +272,7 @@ var run = function() {
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
+    banner.colorSchemes = colorSchemes;
     banner.snippets = snippets;
 
     banner.campaignUuid = campaignUuid;

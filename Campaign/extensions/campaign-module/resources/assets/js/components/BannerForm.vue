@@ -31,10 +31,8 @@
                v-bind:_buttonText="mediumRectangleTemplate.buttonText"
                v-bind:_width="mediumRectangleTemplate.height"
                v-bind:_height="mediumRectangleTemplate.width"
-               v-bind:_backgroundColor="mediumRectangleTemplate.backgroundColor"
-               v-bind:_textColor="mediumRectangleTemplate.textColor"
-               v-bind:_buttonBackgroundColor="mediumRectangleTemplate.buttonBackgroundColor"
-               v-bind:_buttonTextColor="mediumRectangleTemplate.buttonTextColor"
+               v-bind:_colorScheme="mediumRectangleTemplate.colorScheme"
+               v-bind:_colorSchemes="colorSchemes"
                v-bind:show="show"
             ></medium-rectangle-template>
 
@@ -45,11 +43,9 @@
                v-bind:_buttonText="overlayRectangleTemplate.buttonText"
                v-bind:_width="overlayRectangleTemplate.height"
                v-bind:_height="overlayRectangleTemplate.width"
-               v-bind:_backgroundColor="overlayRectangleTemplate.backgroundColor"
-               v-bind:_textColor="overlayRectangleTemplate.textColor"
-               v-bind:_buttonBackgroundColor="overlayRectangleTemplate.buttonBackgroundColor"
-               v-bind:_buttonTextColor="overlayRectangleTemplate.buttonTextColor"
+               v-bind:_colorScheme="overlayRectangleTemplate.colorScheme"
                v-bind:_imageLink="overlayRectangleTemplate.imageLink"
+               v-bind:_colorSchemes="colorSchemes"
                v-bind:show="show"
             ></overlay-rectangle-template>
 
@@ -82,10 +78,8 @@
                v-bind:_templateId="barTemplate.id"
                v-bind:_mainText="barTemplate.mainText"
                v-bind:_buttonText="barTemplate.buttonText"
-               v-bind:_backgroundColor="barTemplate.backgroundColor"
-               v-bind:_textColor="barTemplate.textColor"
-               v-bind:_buttonBackgroundColor="barTemplate.buttonBackgroundColor"
-               v-bind:_buttonTextColor="barTemplate.buttonTextColor"
+               v-bind:_colorScheme="barTemplate.colorScheme"
+               v-bind:_colorSchemes="colorSchemes"
                v-bind:show="show"
             ></bar-template>
 
@@ -96,19 +90,17 @@
                v-bind:_headerText="collapsibleBarTemplate.headerText"
                v-bind:_collapseText="collapsibleBarTemplate.collapseText"
                v-bind:_expandText="collapsibleBarTemplate.expandText"
-               v-bind:_backgroundColor="collapsibleBarTemplate.backgroundColor"
-               v-bind:_textColor="collapsibleBarTemplate.textColor"
-               v-bind:_buttonBackgroundColor="collapsibleBarTemplate.buttonBackgroundColor"
-               v-bind:_buttonTextColor="collapsibleBarTemplate.buttonTextColor"
+               v-bind:_colorScheme="collapsibleBarTemplate.colorScheme"
                v-bind:_initialState="collapsibleBarTemplate.initialState"
                v-bind:_forceInitialState="collapsibleBarTemplate.forceInitialState"
+               v-bind:_colorSchemes="colorSchemes"
                v-bind:show="show"
             ></collapsible-bar-template>
 
             <short-message-template v-if="template === 'short_message'"
               v-bind:_text="shortMessageTemplate.text"
-              v-bind:_backgroundColor="shortMessageTemplate.backgroundColor"
-              v-bind:_textColor="shortMessageTemplate.textColor"
+              v-bind:_colorScheme="shortMessageTemplate.colorScheme"
+              v-bind:_colorSchemes="colorSchemes"
               v-bind:show="show"
             ></short-message-template>
 
@@ -120,10 +112,7 @@
                                            v-bind:_text="newsletterRectangleTemplate.text"
                                            v-bind:_success="newsletterRectangleTemplate.success"
                                            v-bind:_failure="newsletterRectangleTemplate.failure"
-                                           v-bind:_textColor="newsletterRectangleTemplate.textColor"
-                                           v-bind:_backgroundColor="newsletterRectangleTemplate.backgroundColor"
-                                           v-bind:_buttonBackgroundColor="newsletterRectangleTemplate.buttonBackgroundColor"
-                                           v-bind:_buttonTextColor="newsletterRectangleTemplate.buttonTextColor"
+                                           v-bind:_colorScheme="newsletterRectangleTemplate.colorScheme"
                                            v-bind:_width="newsletterRectangleTemplate.width"
                                            v-bind:_height="newsletterRectangleTemplate.height"
                                            v-bind:_terms="newsletterRectangleTemplate.terms"
@@ -134,6 +123,7 @@
                                            v-bind:_paramsTransposition="newsletterRectangleTemplate.paramsTransposition"
                                            v-bind:_paramsExtra="newsletterRectangleTemplate.paramsExtra"
                                            v-bind:_rempMailerAddr="newsletterRectangleTemplate.rempMailerAddr"
+                                           v-bind:_colorSchemes="colorSchemes"
                                            v-bind:v-show="show"
             ></newsletter-rectangle-template>
 
@@ -392,6 +382,7 @@
                                         :alignmentOptions="alignmentOptions"
                                         :dimensionOptions="dimensionOptions"
                                         :positionOptions="positionOptions"
+                                        :colorSchemes="colorSchemes"
                                         :show="show"
                                         :template="template"
                                         :snippets="snippets"
@@ -484,6 +475,7 @@
         "_dimensionOptions": Object,
         "_positionOptions": Object,
         "_snippets": Object,
+        "_colorSchemes": Object,
 
         "_validateUrl": String,
         "_clientSiteUrl": String,
@@ -553,6 +545,7 @@
             alignmentOptions: [],
             dimensionOptions: [],
             positionOptions: [],
+            colorSchemes: [],
             snippets: {},
             show: true,
             mobile: true,

@@ -31,6 +31,7 @@ var run = function() {
     var alignments = JSON.parse('{!! json_encode($alignments) !!}');
     var dimensions = JSON.parse('{!! json_encode($dimensions) !!}');
     var positions = JSON.parse('{!! json_encode($positions) !!}');
+    var colorSchemes = JSON.parse('{!! json_encode($colorSchemes) !!}');
 
     if (!isControlGroup) {
         var banner = remplib.banner.fromModel(bannerJsonData);
@@ -40,6 +41,7 @@ var run = function() {
     banner.alignmentOptions = alignments;
     banner.dimensionOptions = dimensions;
     banner.positionOptions = positions;
+    banner.colorSchemes = colorSchemes;
 
     banner.campaignUuid = campaignUuid;
     banner.campaignPublicId = campaignPublicId;

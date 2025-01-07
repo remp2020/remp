@@ -10,11 +10,12 @@ class OverlayRectangleTemplate extends AbstractTemplate
         'button_text',
         'width',
         'height',
-        'background_color',
-        'text_color',
-        'button_background_color',
-        'button_text_color',
         'image_link',
+        'color_scheme',
+    ];
+
+    protected $attributes = [
+        'color_scheme' => 'grey',
     ];
 
     public function text()

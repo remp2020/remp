@@ -30,6 +30,7 @@
                                     </div>
                                     <div class="col-md-12">
                                         <v-select v-model="colorScheme"
+                                                  name="color_scheme"
                                                   id="color_scheme"
                                                   v-bind:value="colorScheme"
                                                   v-bind:options.sync="colorSchemeOptions"
@@ -69,12 +70,6 @@
                                 </small>
                             </label>
                         </div><!-- .input-group -->
-
-
-                        <input type="hidden" name="background_color" v-bind:value="_backgroundColor" />
-                        <input type="hidden" name="text_color" v-bind:value="_textColor" />
-                        <input type="hidden" name="button_background_color" v-bind:value="_buttonBackgroundColor" />
-                        <input type="hidden" name="button_text_color" v-bind:value="_buttonTextColor" />
 
                         <div class="input-group fg-float m-t-30">
                             <span class="input-group-addon"><i class="zmdi zmdi-text-format"></i></span>
@@ -142,10 +137,8 @@
         "_collapseText",
         "_expandText",
         "_buttonText",
-        "_backgroundColor",
-        "_textColor",
-        "_buttonBackgroundColor",
-        "_buttonTextColor",
+        "_colorScheme",
+        "_colorSchemes",
         "_initialState",
         "_forceInitialState",
     ];
@@ -155,7 +148,7 @@
             vSelect,
         },
         props: props,
-        created: function(){
+        created: function() {
             props.forEach((prop) => {
                 this[prop.slice(1)] = this[prop] || this[prop.slice(1)];
             });
@@ -168,7 +161,6 @@
                 this.buttonText = "Visit offer";
             }
 
-            this.colorScheme = this.colorSchemeByBackground(this._backgroundColor) || this.colorScheme;
             this.emitValuesChanged();
         },
         data: () => ({
@@ -178,6 +170,7 @@
             expandText: null,
             buttonText: null,
             colorScheme: "green",
+            colorSchemes: null,
             initialStateOptions: [
                 {
                     "label": "Collapsed",
@@ -188,53 +181,6 @@
                     "value": "expanded"
                 }
             ],
-            colorSchemes: {
-                "grey": {
-                    "label": "Grey",
-                    "textColor": "#000000", "backgroundColor": "#ededed",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "yellow": {
-                    "label": "Yellow",
-                    "backgroundColor": "#f7bc1e", "textColor": "#000000",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "blue": {
-                    "label": "Blue",
-                    "textColor": "#ffffff", "backgroundColor": "#00b7db",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "dark_blue": {
-                    "label": "Dark Blue",
-                    "textColor": "#ffffff", "backgroundColor": "#1f3f82",
-                    "buttonTextColor": "#000000", "buttonBackgroundColor": "#ffffff",
-                },
-                "green": {
-                    "label": "Green",
-                    "textColor": "#ffffff", "backgroundColor": "#009688",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "violet": {
-                    "label": "Violet",
-                    "textColor": "#ffffff", "backgroundColor": "#9c27b0",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "red": {
-                    "label": "Red",
-                    "backgroundColor": "#e91e63", "textColor": "#ffffff",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "darkRed": {
-                    "label": "Dark red",
-                    "backgroundColor": "#b00c28", "textColor": "#ffffff",
-                    "buttonTextColor": "#ffffff", "buttonBackgroundColor": "#000000",
-                },
-                "black": {
-                    "label": "Black",
-                    "textColor": "#ffffff", "backgroundColor": "#262325",
-                    "buttonTextColor": "#000000", "buttonBackgroundColor": "#ffffff",
-                },
-            },
         }),
         computed: {
             colorSchemeOptions: function() {
@@ -263,30 +209,13 @@
                     collapseText: this.collapseText,
                     expandText: this.expandText,
                     buttonText: this.buttonText,
+                    colorScheme: this.colorScheme,
                 };
-                if (this.colorSchemes[this.colorScheme]) {
-                    let cs = this.colorSchemes[this.colorScheme];
-                    val.backgroundColor = cs.backgroundColor;
-                    val.textColor = cs.textColor;
-                    val.buttonBackgroundColor = cs.buttonBackgroundColor;
-                    val.buttonTextColor = cs.buttonTextColor;
-                }
                 this.$parent.$emit("values-changed", [{
                     key: "collapsibleBarTemplate",
                     val: val,
                 }]);
             },
-            colorSchemeByBackground: function(bgColor) {
-                for (let idx in this.colorSchemes) {
-                    if (!this.colorSchemes.hasOwnProperty(idx)) {
-                        continue;
-                    }
-                    if (this.colorSchemes[idx].backgroundColor === bgColor) {
-                        return idx;
-                    }
-                }
-                return null;
-            }
         }
     }
 </script>

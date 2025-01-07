@@ -122,10 +122,7 @@ export default {
         "positionOptions",
         "alignmentOptions",
 
-        "backgroundColor",
-        "buttonBackgroundColor",
-        "textColor",
-        "buttonTextColor",
+        "colorScheme",
         "headerText",
         "mainText",
         "buttonText",
@@ -194,8 +191,8 @@ export default {
         },
         boxStyles: function () {
             return {
-                backgroundColor: this.backgroundColor,
-                color: this.textColor,
+                backgroundColor: this.colorScheme.backgroundColor,
+                color: this.colorScheme.textColor,
                 minWidth: this.width || '100px',
                 maxWidth: this.width || '370px',
                 minHeight: this.height || '250px',
@@ -204,18 +201,18 @@ export default {
         },
         mainTextStyles: function () {
             return {
-                color: this.textColor,
+                color: this.colorScheme.textColor,
             }
         },
         buttonStyles: function () {
             return {
-                color: this.buttonTextColor,
-                backgroundColor: this.buttonBackgroundColor,
+                color: this.colorScheme.buttonTextColor,
+                backgroundColor: this.colorScheme.buttonBackgroundColor,
             }
         },
         closeStyles: function () {
             return {
-                color: this.textColor,
+                color: this.colorScheme.textColor,
             }
         },
         isVisible: function () {

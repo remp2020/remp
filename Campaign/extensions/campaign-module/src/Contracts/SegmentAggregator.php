@@ -173,10 +173,12 @@ class SegmentAggregator implements SegmentContract
         $dimensionMap = app(\Remp\CampaignModule\Models\Dimension\Map::class);
         $positionsMap = app(\Remp\CampaignModule\Models\Position\Map::class);
         $alignmentsMap = app(\Remp\CampaignModule\Models\Alignment\Map::class);
+        $colorSchemesMap = app(\Remp\CampaignModule\Models\ColorScheme\Map::class);
 
         Redis::set(\Remp\CampaignModule\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY, $dimensionMap->dimensions()->toJson());
         Redis::set(\Remp\CampaignModule\Models\Position\Map::POSITIONS_MAP_REDIS_KEY, $positionsMap->positions()->toJson());
         Redis::set(\Remp\CampaignModule\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY, $alignmentsMap->alignments()->toJson());
+        Redis::set(\Remp\CampaignModule\Models\ColorScheme\Map::COLOR_SCHEMES_MAP_REDIS_KEY, $colorSchemesMap->colorSchemes()->toJson());
     }
 
     public static function unserializeFromRedis(Client|\Redis $redisClient): ?SegmentAggregator

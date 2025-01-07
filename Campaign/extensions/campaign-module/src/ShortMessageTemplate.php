@@ -11,8 +11,11 @@ class ShortMessageTemplate extends AbstractTemplate
 
     protected $fillable = [
         'text',
-        'background_color',
-        'text_color',
+        'color_scheme',
+    ];
+
+    protected $attributes = [
+        'color_scheme' => 'grey',
     ];
 
     protected static function newFactory(): ShortMessageTemplateFactory

@@ -12,12 +12,13 @@ class NewsletterRectangleTemplate extends AbstractTemplate
         'success',
         'failure',
         'terms',
-        'text_color',
-        'background_color',
-        'button_background_color',
-        'button_text_color',
         'width',
-        'height'
+        'height',
+        'color_scheme',
+    ];
+
+    protected $attributes = [
+        'color_scheme' => 'grey',
     ];
 
     public $banner_config = [];
