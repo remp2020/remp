@@ -41,9 +41,19 @@ trait DataRetentionTrait
             return null;
         }
 
+        $batchLimit = 5000;
+        $totalDeletedRows = 0;
+
         $threshold = (new \DateTime())->modify('-' . $this->retentionThreshold);
-        return $this->getTable()
-            ->where("{$this->getRetentionRemovingField()} < ?", $threshold)
-            ->delete();
+        do {
+            $deletedRows = $this->getTable()
+                ->where("{$this->getRetentionRemovingField()} < ?", $threshold)
+                ->limit($batchLimit)
+                ->delete();
+
+            $totalDeletedRows += $deletedRows;
+        } while ($deletedRows === $batchLimit);
+
+        return $totalDeletedRows;
     }
 }
