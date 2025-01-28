@@ -51,6 +51,7 @@ class UnsubscribeInactiveUsersCommand extends Command
             ->addOption('segment-provider', 'sp', InputOption::VALUE_REQUIRED, 'Segment provider code.', Crm::PROVIDER_ALIAS)
             ->addOption('segment', 's', InputOption::VALUE_REQUIRED, 'Crm segment with list of users to unsubscribe.', self::CRM_SEGMENT_NAME)
             ->addOption('days', 'd', InputOption::VALUE_REQUIRED, 'Days limit for check opened emails.', 45)
+            ->addOption('disable-apple-bot-check', 'dabc', InputOption::VALUE_NONE, 'Do not make distinction between Apple bot and real user, while checking opened/clicked.')
             ->addOption('email', 'e', InputOption::VALUE_REQUIRED, 'Email template code of notification email, sent after unsubscribing.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Run command without unsubscribing users and sending notifications.')
             ->addOption('omit-mail-type-code', 'o', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Omit mail type (code), from email delivered and opened check and unsubscribing.');
@@ -62,6 +63,7 @@ class UnsubscribeInactiveUsersCommand extends Command
         $segment = $input->getOption('segment');
         $dayLimit = $input->getOption('days');
         $dryRun = $input->getOption('dry-run');
+        $disableAppleBotCheck = $input->getOption('disable-apple-bot-check');
         $notificationEmailCode = $input->getOption('email');
         $omitMailTypeCodes = array_merge($this->omitMailTypeCodes, $input->getOption('omit-mail-type-code'));
 
@@ -93,7 +95,7 @@ class UnsubscribeInactiveUsersCommand extends Command
 
                 $logCount = count($logs);
                 if (count($logs) >= 5) {
-                    $isAppleBotOpenedEmail = $this->redis()->sismember(self::APPLE_BOT_EMAILS, $userEmail);
+                    $isAppleBotOpenedEmail = $disableAppleBotCheck ? false : $this->redis()->sismember(self::APPLE_BOT_EMAILS, $userEmail);
 
                     foreach ($logs as $log) {
                         if ($isAppleBotOpenedEmail && $log->clicked_at) {
