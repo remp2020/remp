@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed scopeMostReadByPageviews causing newsletter criterion use timespent sum instead of pageviews count.
+- Fixed default value configuration for public dashboard authentication.
 
 ### [Campaign]
 

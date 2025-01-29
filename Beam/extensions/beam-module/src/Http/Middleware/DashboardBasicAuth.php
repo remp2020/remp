@@ -23,6 +23,8 @@ class DashboardBasicAuth
             config('dashboard.username') => config('dashboard.password'),
             config('dashboard.username2') => config('dashboard.password2'),
         ];
+        unset($credentials[null]);
+        unset($credentials['']);
 
         if (array_key_exists($request->getUser(), $credentials)
             && $credentials[$request->getUser()] === $request->getPassword()) {
