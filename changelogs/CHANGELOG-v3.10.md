@@ -1,5 +1,8 @@
 ## [3.10] - 2024-10-25
 
+- [3.10.1][Beam]: Fixed default value configuration for public dashboard authentication.
+
+
 ### [Beam]
 
 - [Tracker] Fixed Tracker not publishing messages to pub/sub due to prematurely closed client. remp/remp#1384
