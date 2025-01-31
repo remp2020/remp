@@ -49,7 +49,7 @@
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
         "remp/remp-commons": "*",
-        "sentry/sentry-laravel": "^2.6",
+        "sentry/sentry-laravel": "^4.11",
         "simshaun/recurr": "^5.0",
         "spatie/laravel-searchable": "^1.9",
         "snowplow/referer-parser": "dev-master",

@@ -30,7 +30,7 @@
     "remp/laravel-sso": "*",
     "remp/laravel-widgets": "*",
     "remp/remp-commons": "*",
-    "sentry/sentry-laravel": "^2.5",
+    "sentry/sentry-laravel": "^4.11",
     "spatie/laravel-searchable": "^1.9",
     "symfony/psr-http-message-bridge": "^v2.1.2",
     "tightenco/ziggy": "^1.2",
