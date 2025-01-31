@@ -50,7 +50,7 @@
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
-        "sentry/sentry-laravel": "^2.5",
+        "sentry/sentry-laravel": "^4.11",
         "symfony/psr-http-message-bridge": "^v2.1.2",
         "tymon/jwt-auth": "^1.0",
         "ukfast/laravel-health-check": "^1.5",
@@ -102,6 +102,9 @@
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     }
 }
