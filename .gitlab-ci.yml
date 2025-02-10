@@ -249,7 +249,7 @@ tests:
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
       -F "variables[REF]=$CI_COMMIT_SHA"
-      -F "variables[STAGE]=preview/mailer"
+      -F "variables[STAGE]=respektcz/mailer"
       -F "variables[APP]=mailer"
       $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
@@ -269,7 +269,7 @@ tests:
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
       -F "variables[REF]=$CI_COMMIT_SHA"
-      -F "variables[STAGE]=preview/campaign"
+      -F "variables[STAGE]=respektcz/campaign"
       -F "variables[APP]=campaign"
       $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
@@ -289,7 +289,7 @@ tests:
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
       -F "variables[REF]=$CI_COMMIT_SHA"
-      -F "variables[STAGE]=preview/beam"
+      -F "variables[STAGE]=respektcz/beam"
       -F "variables[APP]=beam"
       $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
@@ -309,7 +309,7 @@ tests:
       -F "token=$CI_JOB_TOKEN"
       -F "ref=master"
       -F "variables[REF]=$CI_COMMIT_SHA"
-      -F "variables[STAGE]=preview/sso"
+      -F "variables[STAGE]=respektcz/sso"
       -F "variables[APP]=sso"
       $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
