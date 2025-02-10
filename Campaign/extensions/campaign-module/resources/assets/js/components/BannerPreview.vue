@@ -324,16 +324,35 @@
                 }
             }
 
+            let head = document.getElementsByTagName('head')[0]
+            let iframe = document.getElementById("iframe-preview");
+            if (iframe) {
+                head = iframe.contentDocument.head;
+            }
+
             let jsIncludes = (this.jsIncludes) ? this.jsIncludes.filter(jsInclude => jsInclude) : [];
             if (jsIncludes && jsIncludes.length > 0) {
                 let loadedScriptsCount = 0;
                 jsIncludes.forEach((jsInclude) => {
-                    lib.loadScript(this.injectSnippets(jsInclude), () => {
+                    let script = document.createElement('script');
+                    script.src = jsInclude;
+                    script.async = true;
+
+                    let callbackOnLoad = () => {
                         loadedScriptsCount += 1;
                         if (loadedScriptsCount === jsIncludes.length) {
                             this.runCustomJavascript(this.js);
                         }
-                    });
+                    };
+
+                    script.onreadystatechange = script.onload = function() {
+                        if (typeof callbackOnLoad !== 'undefined' && !callbackOnLoad.done && (!script.readyState || /loaded|complete/.test(script.readyState))) {
+                            callbackOnLoad.done = true;
+                            callbackOnLoad();
+                        }
+                    };
+
+                    head.appendChild(script);
                 });
             } else {
                 this.runCustomJavascript(this.injectSnippets(this.js));
@@ -526,8 +545,16 @@
                           // https://stackoverflow.com/questions/49125059/how-to-pass-parameters-to-an-eval-based-function-injavascript
                           let body = 'function(params) { ' + that.injectSnippets(js) + ' }';
                           let wrap = s => "{ return " + body + " };";
-                          let func = new Function(wrap(body));
-                          func.call(null).call(null, that.paramsForCustomJavascript());
+
+                          let contentWindow = window;
+                          let iframe = document.getElementById("iframe-preview");
+                          if (iframe) {
+                              contentWindow = iframe.contentWindow;
+                          }
+
+                          contentWindow.myFunction = new contentWindow.Function(wrap(body));
+                          const result = contentWindow.myFunction(that.paramsForCustomJavascript());
+                          result.call();
                       } catch(err) {
                           console.warn("unable to execute custom banner JS:", js);
                           console.warn(err);

@@ -29,11 +29,23 @@ export default {
         // create iframe body
         // preview does not display in Firefox only blinks and disappears without next lines of code
         iframe.contentWindow.document.open();
+
+        let html = iframe.contentWindow.document.createElement("html");
+        let head = iframe.contentWindow.document.createElement("head");
+        let body = iframe.contentWindow.document.createElement("body");
+
+        // Added div because VUE doesn't support mounting app on body or html tags
+        body.appendChild(iframe.contentWindow.document.createElement("div"));
+        html.appendChild(head);
+        html.appendChild(body);
+
+        iframe.contentWindow.document.appendChild(html);
+
         iframe.contentWindow.document.close();
 
         registerStripHtmlFilter(Vue);
         new Vue({
-            el: iframe.contentWindow.document.body,
+            el: iframe.contentWindow.document.body.firstChild,
             render: h => h(BannerPreview, {
                 props: this.$props,
             }),

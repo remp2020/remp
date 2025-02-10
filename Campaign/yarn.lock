@@ -7626,7 +7626,7 @@ fsevents@~2.3.2:
 
 "remp-campaign@file:extensions/campaign-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.0
-  resolution: "remp-campaign@file:extensions/campaign-module#extensions/campaign-module::hash=077d7f&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "remp-campaign@file:extensions/campaign-module#extensions/campaign-module::hash=87172d&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/core": ^7.0
     "@remp/js-commons": 2.3.1
@@ -7663,7 +7663,7 @@ fsevents@~2.3.2:
     vue-codemirror: 4.0.6
     vue-slide-up-down: ^1.7.2
     vue-template-compiler: ^2.7
-  checksum: be2ac351c7b7f3f93085da9064ace1a1bb01390803f7cf9fea1b9002080638f782f458f0338a4e388f035fbb007b47c44e1aa0880602e3c5c08ccdf8f774c68e
+  checksum: 5b47554546b77453948d7ce67a9700b0f3e8f321b7dbadddd677abb7184eea5592e59fc537893e85a1a67dc9f13817cd18b137cabc8a7eb5179b5d458647c1e1
   languageName: node
   linkType: hard
 

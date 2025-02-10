@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Changed banner preview components as now include and run custom JS inside of iframe. remp/crm#3353
 
 ## Archive
 
