@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Changed banner preview components as now include and run custom JS inside of iframe. remp/crm#3353
 
+### [Mailer]
+
+- Added the ability to select the 'Subscription welcome email' and 'Unsubscribe goodbye email' option for any email that belongs to the newsletter, in addition to system emails. remp/remp#1388
+
 ## Archive
 
 - [v3.11](./changelogs/CHANGELOG-v3.11.md)

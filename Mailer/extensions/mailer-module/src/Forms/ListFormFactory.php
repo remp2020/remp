@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\LinkGenerator;
 use Nette\Application\UI\Form;
+use Nette\Database\Table\ActiveRow;
 use Nette\Forms\Controls\BaseControl;
 use Nette\Forms\Controls\SelectBox;
 use Nette\SmartObject;
@@ -12,6 +13,7 @@ use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\Sender\MailerFactory;
 use Remp\MailerModule\Repositories\ListCategoriesRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\MailTypesRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
 class ListFormFactory
@@ -30,6 +32,7 @@ class ListFormFactory
         private readonly ListsRepository $listsRepository,
         private readonly ListCategoriesRepository $listCategoriesRepository,
         private readonly MailerFactory $mailerFactory,
+        private readonly MailTypesRepository $mailTypesRepository,
         private readonly TemplatesRepository $templatesRepository,
         private readonly LinkGenerator $linkGenerator
     ) {
@@ -69,21 +72,17 @@ class ListFormFactory
             $categoryPairs
         )->setRequired("Field 'Category' is required.");
 
-        $systemEmails = $this->templatesRepository
-            ->getByMailTypeCategoryCode('system')
-            ->select('mail_templates.id, mail_templates.name')
-            ->fetchPairs('id', 'name');
-
+        $subscriptionEligibleTemplates = $this->getSubscriptionEligibleTemplates($list);
         $form->addSelect(
             'subscribe_mail_template_id',
             'Subscription welcome email',
-            $systemEmails
+            $subscriptionEligibleTemplates
         )->setPrompt('None');
 
         $form->addSelect(
             'unsubscribe_mail_template_id',
             'Unsubscribe goodbye email',
-            $systemEmails
+            $subscriptionEligibleTemplates
         )->setPrompt('None');
 
         $form->addText('priority', 'Priority')
@@ -291,5 +290,37 @@ class ListFormFactory
         /** @var SelectBox $sortingAfter */
         $sortingAfter = $form[self::SORTING_AFTER];
         return $sortingAfter;
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    private function getSubscriptionEligibleTemplates(?ActiveRow $list): array
+    {
+        $items = [];
+
+        // System mails
+        $systemList = $this->mailTypesRepository->findBy('code', 'system');
+        if ($systemList !== null) {
+            $systemEmails = $this->templatesRepository
+                ->getByMailTypeIds([$systemList->id])
+                ->select('mail_templates.id, mail_templates.name')
+                ->fetchPairs('id', 'name');
+
+            $items[$systemList->title] = $systemEmails;
+        }
+
+        if ($list !== null && $list->id !== $systemList->id) {
+            $newsletterEmails = $this->templatesRepository
+                ->findByList($list->id)
+                ->select('mail_templates.id, mail_templates.name')
+                ->fetchPairs('id', 'name');
+
+            if (count($newsletterEmails) > 0) {
+                $items[$list->title] = $newsletterEmails;
+            }
+        }
+
+        return $items;
     }
 }
