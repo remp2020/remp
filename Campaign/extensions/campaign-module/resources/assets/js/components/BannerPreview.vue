@@ -553,8 +553,7 @@
                           }
 
                           contentWindow.myFunction = new contentWindow.Function(wrap(body));
-                          const result = contentWindow.myFunction(that.paramsForCustomJavascript());
-                          result.call();
+                          contentWindow.myFunction.call(null).call(null, that.paramsForCustomJavascript());
                       } catch(err) {
                           console.warn("unable to execute custom banner JS:", js);
                           console.warn(err);
