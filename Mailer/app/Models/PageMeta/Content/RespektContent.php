@@ -88,7 +88,10 @@ class RespektContent implements ContentInterface
         $fullContent = $this->getContentFromParts($article['content']['parts']);
 
         // get article cover image
-        $image = $this->getImageUrl($article['coverPhoto']['image']['url']);
+        $image = null;
+        if (isset($article['coverPhoto']['image']['url'])) {
+            $image = $this->getImageUrl($article['coverPhoto']['image']['url']);
+        }
 
         // get article authors
         $authors = [];

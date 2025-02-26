@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added the ability to select the 'Subscription welcome email' and 'Unsubscribe goodbye email' option for any email that belongs to the newsletter, in addition to system emails. remp/remp#1388
 - Fixed possible memory limit issues on list form factory. remp/remp#1404
+- (Respekt) Changed image in`RespektContent` to optional. remp/respekt#286, remp/respekt#386
 
 ## Archive
 
