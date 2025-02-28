@@ -106,19 +106,19 @@ SQL;
             $sql = <<<SQL
 SELECT mail_job_queue.id
 FROM mail_job_queue
-INNER JOIN mail_templates 
-    ON mail_job_queue.mail_template_id = mail_templates.id
-LEFT JOIN mail_user_subscriptions
-    ON mail_user_subscriptions.mail_type_id = mail_templates.mail_type_id
-    AND mail_user_subscriptions.subscribed = 1
-    AND mail_job_queue.email = mail_user_subscriptions.user_email
-WHERE mail_job_queue.mail_batch_id = $batch->id
-    AND  mail_job_queue.mail_template_id = $row->mail_template_id
-    AND mail_user_subscriptions.subscribed IS NULL
-LIMIT $limit;
+WHERE mail_job_queue.mail_batch_id = {$batch->id}
+    AND mail_job_queue.mail_template_id = {$row->mail_template_id}
+    AND mail_job_queue.email NOT IN (
+        SELECT user_email
+        FROM mail_user_subscriptions
+        WHERE mail_user_subscriptions.mail_type_id = {$row->mail_template->mail_type_id}
+           AND mail_user_subscriptions.subscribed = 1
+    )
 SQL;
-            while ($ids = $this->getDatabase()->query($sql)->fetchPairs(null, 'id')) {
-                $this->deleteAllByIds($ids);
+
+            $ids = $this->getDatabase()->query($sql)->fetchPairs(null, 'id');
+            foreach (array_chunk($ids, $limit, true) as $idsChunk) {
+                $this->deleteAllByIds($idsChunk);
             }
         }
     }
