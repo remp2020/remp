@@ -28,6 +28,7 @@ sniffer:
   tags:
     - docker
   script:
+    - make composer-audit
     - make composer-install
     - make sniff
 

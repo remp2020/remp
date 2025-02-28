@@ -45,6 +45,9 @@ latte-lint:
 composer-install-dev:
 	composer install
 
+composer-audit:
+	composer audit --locked --abandoned=report
+
 composer-install:
 	composer install --optimize-autoloader --no-dev
 

@@ -8,7 +8,7 @@ use Remp\MailerModule\Components\GeneratorWidgets\GeneratorWidgetsManager;
 
 class GeneratorFactory
 {
-    /** @var array(ExtensionInterface) */
+    /** @var IGenerator[] */
     private $generators = [];
 
     private $pairs = [];

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Api\v1\Handlers\Mailers;
 
-use Nette\Database\Table\ActiveRow;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\MailJobCreateApiHandler;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
+use Remp\MailerModule\Repositories\ActiveRow;
 use Tests\Feature\Api\BaseApiHandlerTestCase;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 

@@ -35,6 +35,9 @@ fixcs:
 syntax:
 	find ${PHP_FOLDERS} -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
 
+composer-audit:
+	composer audit --locked --abandoned=report
+
 composer-install-dev:
 	composer install
 
