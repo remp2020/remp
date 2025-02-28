@@ -176,6 +176,9 @@ class RespektContent implements ContentInterface
                                 $node = $child['children'][0]['text']; // TODO[respekt#192]: this can contain multiple children with formatting
                                 $node = "<a href='{$link}'>{$node}</a>";
                             }
+                        } elseif (isset($child['type']) && $child['type'] === 'anchor') {
+                            $node = $child['children'][0]['text'];
+                            $node = "<a href='{$child['href']}'>{$node}</a>";
                         }
 
                         $processedChildren .= $node;
