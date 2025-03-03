@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possible memory limit issues on list form factory. remp/remp#1404
 - Changed image in `RespektContent` to be optional. remp/respekt#286, remp/respekt#386
 - Fixed performance issue of batch processing in the "remove unsubscribed" steps. The altered query should perform better. remp/remp#1407
+- Added support for UTM parameters to mail link replace. remp/respekt#377
 
 ## Archive
 
