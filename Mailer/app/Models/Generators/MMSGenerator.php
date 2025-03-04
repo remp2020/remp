@@ -7,7 +7,7 @@ use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\MMSWidget\MMSWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Models\Generators\ArticleLocker;
+use Remp\MailerModule\Models\Generators\HtmlArticleLocker;
 use Remp\MailerModule\Models\Generators\EmbedParser;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
@@ -36,11 +36,11 @@ class MMSGenerator implements IGenerator
 
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
-        WordpressHelpers $helpers,
-        ContentInterface $content,
-        EmbedParser $embedParser,
-        ArticleLocker $articleLocker,
-        EngineFactory $engineFactory
+        WordpressHelpers          $helpers,
+        ContentInterface          $content,
+        EmbedParser               $embedParser,
+        HtmlArticleLocker         $articleLocker,
+        EngineFactory             $engineFactory
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
@@ -116,7 +116,7 @@ class MMSGenerator implements IGenerator
         $post = $imageHtml . $post;
         $lockedPost = $imageHtml . $lockedPost;
 
-        $lockedPost = $this->articleLocker->putLockedMessage($lockedPost);
+        $lockedPost = $this->articleLocker->injectLockedMessage($lockedPost);
 
         $text = str_replace("<br />", "\r\n", $post);
         $lockedText = str_replace("<br />", "\r\n", $lockedPost);

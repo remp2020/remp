@@ -9,7 +9,7 @@ use Nette\Utils\Strings;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\GrafdnaWidget\GrafdnaWidget;
 use Remp\Mailer\Models\WebClient;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Models\Generators\ArticleLocker;
+use Remp\MailerModule\Models\Generators\HtmlArticleLocker;
 use Remp\MailerModule\Models\Generators\EmbedParser;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
@@ -28,14 +28,14 @@ class GrafdnaGenerator implements IGenerator
 
     public function __construct(
         private SourceTemplatesRepository $mailSourceTemplateRepository,
-        private WordpressHelpers $helpers,
-        private ContentInterface $content,
-        private EmbedParser $embedParser,
-        private ArticleLocker $articleLocker,
-        private EngineFactory $engineFactory,
-        private WebClient $webClient,
-        private SnippetsRepository $snippetsRepository,
-        private TransportInterface $transport,
+        private WordpressHelpers          $helpers,
+        private ContentInterface          $content,
+        private EmbedParser               $embedParser,
+        private HtmlArticleLocker         $articleLocker,
+        private EngineFactory             $engineFactory,
+        private WebClient                 $webClient,
+        private SnippetsRepository        $snippetsRepository,
+        private TransportInterface        $transport,
     ) {
     }
 
@@ -159,7 +159,7 @@ HTML;
 
         [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:160%;margin: 16px 0 16px 0\">", [$post, $lockedPost]);
 
-        $lockedPost = $this->articleLocker->putLockedMessage($lockedPost);
+        $lockedPost = $this->articleLocker->injectLockedMessage($lockedPost);
 
         $economyPostsResponse = $this->webClient->getEconomyPostsLast24Hours();
         $excerpt = $economyPostsResponse['meta']['excerpt'];

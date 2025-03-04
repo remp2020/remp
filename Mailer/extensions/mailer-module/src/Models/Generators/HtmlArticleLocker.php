@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Generators;
 
-class ArticleLocker
+class HtmlArticleLocker implements ArticleLockerInterface
 {
     private $placeholder = '<!--[LOCKED_TEXT_PLACEHOLDER]-->';
     private $linkText;
@@ -25,7 +25,7 @@ class ArticleLocker
         return $parts[0] . $this->placeholder;
     }
 
-    public function putLockedMessage(string $post): string
+    public function injectLockedMessage(string $post): string
     {
         $lockedHtml = <<< HTML
 <h2 style="color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-weight:bold;text-align:left;margin-bottom:30px;Margin-bottom:30px;font-size:24px;">{$this->text}</h2>

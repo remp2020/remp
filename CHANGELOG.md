@@ -14,12 +14,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Renamed `Remp\MailerModule\Models\Generators\ArticleLocker` to `Remp\MailerModule\Models\Generators\HtmlArticleLocker`. remp/novydenik#1324
+  - If you work with the class directly, please update your includes.
+- **BREAKING**: Renamed DI service `articleLocker` to `htmlArticleLocker`. remp/novydenik#1324
+  - If you configure the service further, please update your `config.neon` file.
 - Updated dependencies to their latest major versions.
 - Added the ability to select the 'Subscription welcome email' and 'Unsubscribe goodbye email' option for any email that belongs to the newsletter, in addition to system emails. remp/remp#1388
 - Fixed possible memory limit issues on list form factory. remp/remp#1404
 - Changed image in `RespektContent` to be optional. remp/respekt#286, remp/respekt#386
 - Fixed performance issue of batch processing in the "remove unsubscribed" steps. The altered query should perform better. remp/remp#1407
 - Added support for UTM parameters to mail link replace. remp/respekt#377
+- Added SnippetArticleLocker which provides way for generators to define lock messages via snippets. remp/novydenik#1324
 
 ## Archive
 

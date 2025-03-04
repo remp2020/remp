@@ -7,7 +7,7 @@ use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\NewsfilterWidget\NewsfilterWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Models\Generators\ArticleLocker;
+use Remp\MailerModule\Models\Generators\HtmlArticleLocker;
 use Remp\MailerModule\Models\Generators\EmbedParser;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
@@ -37,11 +37,11 @@ class NewsfilterGenerator implements IGenerator
 
     public function __construct(
         SourceTemplatesRepository $mailSourceTemplateRepository,
-        WordpressHelpers $helpers,
-        ContentInterface $content,
-        EmbedParser $embedParser,
-        ArticleLocker $articleLocker,
-        EngineFactory $engineFactory
+        WordpressHelpers          $helpers,
+        ContentInterface          $content,
+        EmbedParser               $embedParser,
+        HtmlArticleLocker         $articleLocker,
+        EngineFactory             $engineFactory
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
         $this->helpers = $helpers;
@@ -104,7 +104,7 @@ class NewsfilterGenerator implements IGenerator
 
         [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:160%;margin: 16px 0 16px 0\">", [$post, $lockedPost]);
 
-        $lockedPost = $this->articleLocker->putLockedMessage($lockedPost);
+        $lockedPost = $this->articleLocker->injectLockedMessage($lockedPost);
 
         $params = [
             'title' => $values['title'],

@@ -7,10 +7,10 @@ use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\NovydenikNewsfilterWidget\NovydenikNewsfilterWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Models\Generators\ArticleLocker;
 use Remp\MailerModule\Models\Generators\EmbedParser;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
+use Remp\MailerModule\Models\Generators\SnippetArticleLocker;
 use Remp\MailerModule\Models\Generators\WordpressHelpers;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
@@ -39,7 +39,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
         WordpressHelpers $helpers,
         ContentInterface $content,
         EmbedParser $embedParser,
-        ArticleLocker $articleLocker,
+        SnippetArticleLocker $articleLocker,
         EngineFactory $engineFactory
     ) {
         $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
@@ -103,7 +103,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $post = str_replace('<p>', '<p style="font-weight: normal;">', $post);
         $lockedPost = str_replace('<p>', '<p style="font-weight: normal;">', $lockedPost);
 
-        $lockedPost = $this->articleLocker->putLockedMessage($lockedPost);
+        $lockedPost = $this->articleLocker->injectLockedMessage($lockedPost);
 
         $params = [
             'title' => $values['title'],

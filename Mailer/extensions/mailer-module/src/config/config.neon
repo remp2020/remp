@@ -289,9 +289,9 @@ services:
 	jobsRepository: Remp\MailerModule\Repositories\JobsRepository
 	jobQueueRepository: Remp\MailerModule\Repositories\JobQueueRepository
 	batchesRepository:
-	    factory: Remp\MailerModule\Repositories\BatchesRepository
-	    setup:
-	    	- setRetentionThreshold('1 day')
+		factory: Remp\MailerModule\Repositories\BatchesRepository
+		setup:
+			- setRetentionThreshold('1 day')
 	batchTemplatesRepository: Remp\MailerModule\Repositories\BatchTemplatesRepository
 
 	autologinTokensRepository:
@@ -345,7 +345,9 @@ services:
 		setup:
 			- setCurlSettings([cookies_path: %tempDir%/embed-cookies.txt])
 	articleLocker:
-		factory: Remp\MailerModule\Models\Generators\ArticleLocker
+		factory: Remp\MailerModule\Models\Generators\HtmlArticleLocker
+	snippetArticleLocker:
+		factory: Remp\MailerModule\Models\Generators\SnippetArticleLocker
 
 	# healtCheck - inject temp for storage check
 	- Remp\MailerModule\Presenters\HealthPresenter(%tempDir%)
