@@ -33,5 +33,6 @@ return [
     'azure_computer_vision' => [
         'endpoint' => env('AZURE_COMPUTER_VISION_ENDPOINT'),
         'api_key' => env('AZURE_COMPUTER_VISION_API_KEY'),
+        'api_version' => env('AZURE_COMPUTER_VISION_API_VERSION', '2024-02-01'),
     ],
 ];

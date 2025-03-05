@@ -55,7 +55,7 @@ class GenderBalance
         try {
             $response = $this->client->post('computervision/imageanalysis:analyze', [
                 'query' => [
-                    'api-version' => '2023-02-01-preview',
+                    'api-version' => config('services.azure_computer_vision.api_version'),
                     'gender-neutral-caption' => 'false',
                     'features' => 'people',
                 ],
@@ -96,7 +96,7 @@ class GenderBalance
         try {
             $response = $this->client->post('computervision/imageanalysis:analyze', [
                 'query' => [
-                    'api-version' => '2023-02-01-preview',
+                    'api-version' => config('services.azure_computer_vision.api_version'),
                     'gender-neutral-caption' => 'false',
                     'features' => 'caption,tags',
                 ],
