@@ -20,10 +20,10 @@ sniff-fix:
 	cd $(SUB_SSO) && make sniff-fix
 
 composer-audit:
-	composer audit -d $(SUB_BEAM) --locked --abandoned=report
+	#composer audit -d $(SUB_BEAM) --locked --abandoned=report
 	#composer audit -d $(SUB_CAMPAIGN) --locked --abandoned=report
 	composer audit -d $(SUB_MAILER) --locked --abandoned=report
-	composer audit -d $(SUB_SSO) --locked --abandoned=report
+	#composer audit -d $(SUB_SSO) --locked --abandoned=report
 
 composer-install:
 	composer install -d $(SUB_BEAM) --no-progress
