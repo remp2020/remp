@@ -4,15 +4,14 @@ namespace Remp\CampaignModule;
 
 use Database\Factories\CampaignBannerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Remp\CampaignModule\Banner;
-use Remp\CampaignModule\Campaign;
-use Ramsey\Uuid\Uuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Remp\CampaignModule\Concerns\HasCacheableRelation;
 
 class CampaignBanner extends Model
 {
     use HasFactory;
+    use HasCacheableRelation;
 
     use SoftDeletes;
     use IdentificationTrait;
@@ -28,6 +27,10 @@ class CampaignBanner extends Model
         'control_group',
         'proportion',
         'weight',
+    ];
+
+    protected $cacheableRelations = [
+        'banner' => Banner::class,
     ];
 
     protected static function newFactory(): CampaignBannerFactory

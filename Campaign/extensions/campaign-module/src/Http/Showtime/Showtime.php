@@ -175,7 +175,7 @@ class Showtime
         // prepare campaign IDs to fetch
         $dbCampaignIds = [];
         foreach ($campaignIds as $campaignId) {
-            $dbCampaignIds[] = Campaign::CAMPAIGN_TAG . ":{$campaignId}";
+            $dbCampaignIds[] = Campaign::CAMPAIGN_JSON_TAG . ":{$campaignId}";
         }
 
         // fetch all running campaigns at once
@@ -190,7 +190,8 @@ class Showtime
 
         foreach ($fetchedCampaigns as $fetchedCampaign) {
             /** @var Campaign $campaign */
-            $campaign = unserialize($fetchedCampaign, ['allowed_class' => Campaign::class]);
+            $campaign = new Campaign();
+            $campaign->hydrateFromCache(json_decode($fetchedCampaign, true));
             $campaigns[$campaign->id] = $campaign;
             if ($campaign->public_id === $debugCampaignPublicId) {
                 $debugCampaignId = $campaign->id;

@@ -8,18 +8,20 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Redis;
+use Remp\CampaignModule\Concerns\HasCacheableRelation;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
 class Campaign extends Model implements Searchable
 {
     use HasFactory;
-
+    use HasCacheableRelation;
     use PivotEventTrait;
     use IdentificationTrait;
 
     const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';
     const CAMPAIGN_TAG = 'campaign';
+    const CAMPAIGN_JSON_TAG = 'campaign_json';
 
     const PAGEVIEW_RULE_EVERY = 'every';
     const PAGEVIEW_RULE_SINCE = 'since';
@@ -86,6 +88,16 @@ class Campaign extends Model implements Searchable
     protected $appends = ['active'];
 
     protected $dateFormat = 'Y-m-d H:i:s';
+
+    protected $cacheableRelations = [
+        'segments' => CampaignSegment::class,
+        'countries' => Country::class,
+        'countriesWhitelist' => Country::class,
+        'countriesBlacklist' => Country::class,
+        'schedules' => Schedule::class,
+        'campaignBanners' => CampaignBanner::class,
+        'campaignBanners.banner' => Banner::class,
+    ];
 
     public function getSearchResult(): SearchResult
     {
@@ -290,21 +302,15 @@ class Campaign extends Model implements Searchable
 
         self::refreshActiveCampaignsCache();
 
-        $campaign = $this->where(['id' => $this->id])->with([
-            'segments',
-            'countries',
-            'countriesWhitelist',
-            'countriesBlacklist',
-            'schedules',
-            'campaignBanners',
-            'campaignBanners.banner',
-        ])->first();
+        $campaign = $this->where(['id' => $this->id])
+            ->with(array_keys($this->cacheableRelations))
+            ->first();
 
         foreach ($campaign->campaignBanners as $variant) {
             optional($variant->banner)->loadTemplate();
         }
 
-        Redis::set(self::CAMPAIGN_TAG . ":{$this->id}", serialize($campaign));
+        Redis::set(self::CAMPAIGN_JSON_TAG . ":{$this->id}", $campaign->toJson());
     }
 
     public static function refreshActiveCampaignsCache()

@@ -10,17 +10,20 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use Predis\ClientInterface;
 use Ramsey\Uuid\Uuid;
+use Remp\CampaignModule\Concerns\HasCacheableRelation;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
 class Banner extends Model implements Searchable
 {
     use HasFactory;
+    use HasCacheableRelation;
 
     use Notifiable;
     use IdentificationTrait;
 
     private const BANNER_TAG = 'banner';
+    private const BANNER_JSON_TAG = 'banner_json';
 
     public const POSITION_TOP_LEFT = 'top_left';
     public const POSITION_TOP_RIGHT = 'top_right';
@@ -68,6 +71,18 @@ class Banner extends Model implements Searchable
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s';
+    
+    protected $cacheableRelations = [
+        'htmlTemplate' => HtmlTemplate::class,
+        'mediumRectangleTemplate' => MediumRectangleTemplate::class,
+        'barTemplate' => BarTemplate::class,
+        'collapsibleBarTemplate' => CollapsibleBarTemplate::class,
+        'shortMessageTemplate' => ShortMessageTemplate::class,
+        'overlayRectangleTemplate' => OverlayRectangleTemplate::class,
+        'htmlOverlayTemplate' => HtmlOverlayTemplate::class,
+        'overlayTwoButtonsSignatureTemplate' => OverlayTwoButtonsSignatureTemplate::class,
+        'newsletterRectangleTemplate' => NewsletterRectangleTemplate::class,
+    ];
 
     protected static function newFactory(): BannerFactory
     {
@@ -251,7 +266,7 @@ class Banner extends Model implements Searchable
     public function cache()
     {
         $bannerTemplate = $this->loadTemplate();
-        Redis::set(self::BANNER_TAG . ":{$this->id}", serialize($bannerTemplate));
+        Redis::set(self::BANNER_JSON_TAG . ":{$this->id}", $bannerTemplate->toJson());
     }
 
     public static function loadCachedBanner(ClientInterface $redis, string $bannerId): ?Banner

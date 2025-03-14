@@ -13,6 +13,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed banner preview components as now include and run custom JS inside of iframe. remp/crm#3353
 - Added option to specify api version for gender balance in env. remp/helpdesk#3303 
 
+### [Campaign]
+
+- Refactored showtime caching to replace serialized objects with JSON cache. remp/remp#1401
+
 ### [Mailer]
 
 - **BREAKING**: Renamed `Remp\MailerModule\Models\Generators\ArticleLocker` to `Remp\MailerModule\Models\Generators\HtmlArticleLocker`. remp/novydenik#1324
