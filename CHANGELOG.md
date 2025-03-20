@@ -11,7 +11,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **IMPORTANT** Removed data of sections "Visitors" and "Google Analytics Reporting", which we removed in the previous version. remp/remp#1349
   - Migration removes tables `session_devices` and `session_referers`.
 - Changed banner preview components as now include and run custom JS inside of iframe. remp/crm#3353
-- Added option to specify api version for gender balance in env. remp/helpdesk#3303 
+- Added option to specify api version for gender balance in env. remp/helpdesk#3303
+- Fixed newsletter criteria not always selecting the desired number of articles. remp/respekt#378
 
 ### [Campaign]
 

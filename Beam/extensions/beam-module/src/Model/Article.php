@@ -330,13 +330,16 @@ SQL;
             ->select(['article_id', DB::raw("sum($getBy) as total_sum")])
             ->orderByDesc('total_sum');
 
+        $query = $query->joinSub($innerQuery, 't', function ($join) {
+                $join->on('articles.id', '=', 't.article_id');
+            })
+            ->orderByDesc('t.total_sum');
+
         if ($limit) {
-            $innerQuery->limit($limit);
+            $query = $query->limit($limit);
         }
 
-        return $query->joinSub($innerQuery, 't', function ($join) {
-            $join->on('articles.id', '=', 't.article_id');
-        })->orderByDesc('t.total_sum');
+        return $query;
     }
 
     public function scopeMostReadByAveragePaymentAmount(Builder $query, Carbon $start, ?int $limit = null): Builder
@@ -346,13 +349,15 @@ SQL;
             ->select(['article_id', DB::raw('avg(amount) as average')])
             ->orderByDesc('average');
 
-        if ($limit) {
-            $innerQuery->limit($limit);
-        }
-
-        return $query->joinSub($innerQuery, 'c', function ($join) {
+        $query = $query->joinSub($innerQuery, 'c', function ($join) {
             $join->on('articles.id', '=', 'c.article_id');
         })->orderByDesc('c.average');
+
+        if ($limit) {
+            $query = $query->limit($limit);
+        }
+
+        return $query;
     }
 
     public function scopeMostReadByTotalPaymentAmount(Builder $query, Carbon $start, ?int $limit = null): Builder
@@ -362,13 +367,15 @@ SQL;
             ->select(['article_id', DB::raw('sum(amount) as average')])
             ->orderByDesc('average');
 
-        if ($limit) {
-            $innerQuery->limit($limit);
-        }
-
-        return $query->joinSub($innerQuery, 'c', function ($join) {
+        $query = $query->joinSub($innerQuery, 'c', function ($join) {
             $join->on('articles.id', '=', 'c.article_id');
         })->orderByDesc('c.average');
+
+        if ($limit) {
+            $query = $query->limit($limit);
+        }
+
+        return $query;
     }
 
     public function scopeIgnoreAuthorIds(Builder $query, array $authorIds): Builder
