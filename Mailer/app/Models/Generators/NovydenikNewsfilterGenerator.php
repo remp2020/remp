@@ -108,6 +108,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $params = [
             'title' => $values['title'],
             'editor' => $values['editor'],
+            'gender' => $values['gender'] ?? null,
             'summary' => $values['summary'],
             'url' => $values['url'],
             'html' => $post,
@@ -116,6 +117,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $lockedParams = [
             'title' => $values['title'],
             'editor' => $values['editor'],
+            'gender' => $values['gender'] ?? null,
             'summary' => $values['summary'],
             'url' => $values['url'],
             'html' => $lockedPost,
@@ -226,6 +228,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
         $output->newsfilter_html = $data->post_content;
 
         $output->article_id = $data->ID;
+        $output->gender = $data->post_authors[0]->gender ?? null;
 
         return $output;
     }
