@@ -58,6 +58,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             (new PostInputParam('title'))->setRequired(),
             (new PostInputParam('editor'))->setRequired(),
             (new PostInputParam('summary')),
+            (new PostInputParam('gender')),
             (new PostInputParam('from'))->setRequired(),
         ];
     }
@@ -165,6 +166,13 @@ class NovydenikNewsfilterGenerator implements IGenerator
 
         $form->addText('editor', 'Editor')
             ->setRequired("Field 'Editor' is required.");
+
+        $form->addSelect('gender', 'Gender', [
+            '' => 'Please select',
+            'male' => 'Male',
+            'female' => 'Female',
+            'none' => 'None',
+        ]);
 
         $form->addTextArea('summary', 'Summary')
             ->setHtmlAttribute('rows', 3)
