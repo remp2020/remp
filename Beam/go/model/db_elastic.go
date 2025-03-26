@@ -939,3 +939,35 @@ func (eDB *ElasticDB) UnwrapAggregation(docCount int64, aggregations elastic.Agg
 
 	return nil
 }
+
+func (eDB *ElasticDB) CreateIndexIfNotExist(ctx context.Context, index string) (bool, error) {
+	index = eDB.resolveIndex(index)
+
+	exists, err := eDB.Client.IndexExists(index).Do(ctx)
+	if err != nil {
+		return false, errors.Wrap(err, fmt.Sprintf("unable check if index exists: %s", index))
+	}
+	if !exists {
+		result, err := eDB.Client.CreateIndex(index).Do(ctx)
+		if err != nil {
+			return false, errors.Wrap(err, fmt.Sprintf("unable to create index : %s", index))
+		}
+		if !result.Acknowledged {
+			return false, errors.New(fmt.Sprintf("unable to create index: %s, result not acknowledged", index))
+		}
+		return true, nil
+	}
+	return false, nil
+}
+
+func (eDB *ElasticDB) PushMapping(ctx context.Context, index string, mapping string) error {
+	index = eDB.resolveIndex(index)
+	result, err := eDB.Client.PutMapping().Index(index).BodyString(mapping).Do(ctx)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("unable to update field mappings for index: %s", index))
+	}
+	if !result.Acknowledged {
+		return errors.New(fmt.Sprintf("unable to update field mappings for index: %s, result not acknowledged", index))
+	}
+	return nil
+}

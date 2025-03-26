@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed banner preview components as now include and run custom JS inside of iframe. remp/crm#3353
 - Added option to specify api version for gender balance in env. remp/helpdesk#3303
 - Fixed newsletter criteria not always selecting the desired number of articles. remp/respekt#378
+- [Segments] Fixed missing mapping of some optional Elasticsearch fields (`subscribed`, `signed_in`, `revenue`). remp/remp#1394
+    - Mapping is now pushed explicitly during Segments service startup.
+    - Missed mapping may have caused problems when doing group by filter using untracked field.
 
 ### [Campaign]
 

@@ -76,7 +76,7 @@ func main() {
 	var commerceStorage model.CommerceStorage
 	var concurrentsStorage model.ConcurrentsStorage
 
-	eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initElasticEventStorages(ctx, c)
+	eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initElasticEventStorages(ctx, c, logger)
 	if err != nil {
 		logger.Fatalln(err)
 	}
@@ -208,7 +208,7 @@ func main() {
 	logger.Println("bye bye")
 }
 
-func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {
+func initElasticEventStorages(ctx context.Context, c Config, mainLog *log.Logger) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {
 	elasticAddrs := strings.Split(c.ElasticAddrs, ",")
 	eopts := []elastic.ClientOptionFunc{
 		elastic.SetBasicAuth(c.ElasticUser, c.ElasticPasswd),
@@ -241,6 +241,36 @@ func initElasticEventStorages(ctx context.Context, c Config) (model.EventStorage
 	}
 	concurrentsStorage := &model.ConcurrentElastic{
 		DB: elasticDB,
+	}
+
+	// create indexes (if not exist) and push explicit mapping
+
+	indexesAndMappings := [6][2]string{
+		{"pageviews", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
+		{"pageviews_time_spent", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
+		{"pageviews_progress", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
+		{"commerce", `{"properties": {"revenue": {"type": "double"}}}`},
+		{"events", ""},
+		{"concurrents_by_browser", ""},
+	}
+
+	for _, row := range indexesAndMappings {
+		index := row[0]
+		mapping := row[1]
+
+		created, err := elasticDB.CreateIndexIfNotExist(ctx, index)
+		if err != nil {
+			return nil, nil, nil, nil, err
+		}
+		if created {
+			mainLog.Printf("index created: %s", index)
+		}
+		if mapping != "" {
+			err = elasticDB.PushMapping(ctx, index, mapping)
+			if err != nil {
+				return nil, nil, nil, nil, err
+			}
+		}
 	}
 
 	return eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, nil
