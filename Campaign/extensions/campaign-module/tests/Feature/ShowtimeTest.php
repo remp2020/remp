@@ -3,6 +3,8 @@
 namespace Remp\CampaignModule\Tests\Feature;
 
 use Remp\CampaignModule\Database\Seeders\CountrySeeder;
+use Remp\CampaignModule\Http\Showtime\DeviceRulesEvaluator;
+use Remp\CampaignModule\Http\Showtime\LazyDeviceDetector;
 use Remp\CampaignModule\Http\Showtime\ShowtimeConfig;
 use Remp\CampaignModule\Http\Showtime\ShowtimeTestable;
 use Remp\CampaignModule\Banner;
@@ -10,7 +12,6 @@ use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;
 use Remp\CampaignModule\CampaignSegment;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
-use Remp\CampaignModule\Http\Showtime\LazyDeviceDetector;
 use Remp\CampaignModule\Http\Showtime\LazyGeoReader;
 use Remp\CampaignModule\Schedule;
 use Remp\CampaignModule\ShortMessageTemplate;
@@ -47,7 +48,8 @@ class ShowtimeTest extends TestCase
         $logger = Mockery::mock(Logger::class);
 
         $showtimeConfig = new ShowtimeConfig();
-        $showtime = new ShowtimeTestable($redis, $this->segmentAggregator, $geoReader, $showtimeConfig, resolve(LazyDeviceDetector::class), $logger);
+        $deviceDetectionRules = new DeviceRulesEvaluator($redis, resolve(LazyDeviceDetector::class));
+        $showtime = new ShowtimeTestable($redis, $this->segmentAggregator, $geoReader, $showtimeConfig, $deviceDetectionRules, $logger);
         $showtime->setDimensionMap(resolve(\Remp\CampaignModule\Models\Dimension\Map::class));
         $showtime->setAlignmentsMap(resolve(\Remp\CampaignModule\Models\Alignment\Map::class));
         $showtime->setPositionMap(resolve(\Remp\CampaignModule\Models\Position\Map::class));
@@ -393,6 +395,96 @@ class ShowtimeTest extends TestCase
 
         $userData = $this->getUserData(null, null, null, false);
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+    }
+
+    public function operatingSystemsDataProvider()
+    {
+        return [
+            [
+                [Campaign::OPERATING_SYSTEM_ANDROID],
+                [
+                    // Samsung Galaxy S22 5G
+                    'Mozilla/5.0 (Linux; Android 13; SM-S901B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36' => true,
+                    // iPhone 12
+                    'Mozilla/5.0 (iPhone13,2; U; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Version/10.0 Mobile/15E148 Safari/602.1' => false,
+                    // Edge on Win 10
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246' => false,
+                ],
+            ],
+            [
+                [Campaign::OPERATING_SYSTEM_IOS, Campaign::OPERATING_SYSTEM_WINDOWS],
+                [
+                    // iPhone 12
+                    'Mozilla/5.0 (iPhone13,2; U; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Version/10.0 Mobile/15E148 Safari/602.1' => true,
+                    // Edge on Win 10
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246' => true,
+                    // Samsung Galaxy S22 5G
+                    'Mozilla/5.0 (Linux; Android 13; SM-S901B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36' => false,
+                ],
+            ],
+            [
+                [Campaign::OPERATING_SYSTEM_MAC],
+                [
+                    // Safari on Mac OSX
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9' => true,
+                    // Edge on Win 10
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246' => false,
+                    // iPhone 12
+                    'Mozilla/5.0 (iPhone13,2; U; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Version/10.0 Mobile/15E148 Safari/602.1' => false,
+                ],
+            ],
+            [
+                [],
+                [
+                    // Safari on Mac OSX
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9' => true,
+                    // Edge on Win 10
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246' => true,
+                    // iPhone 12
+                    'Mozilla/5.0 (iPhone13,2; U; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Version/10.0 Mobile/15E148 Safari/602.1' => true,
+                ],
+            ],
+            [
+                [],
+                [
+                    null => true,
+                ],
+            ],
+            [
+                [Campaign::OPERATING_SYSTEM_MAC],
+                [
+                    null => false,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider operatingSystemsDataProvider
+     */
+    public function testOperatingSystemRules(array $operatingSystems, array $userAgents)
+    {
+        $this->scheduleCampaign();
+        $activeCampaignUuids = [];
+
+        $this->campaign->update([
+            'operating_systems' => empty($operatingSystems) ? null : $operatingSystems,
+        ]);
+
+        $userData = $this->getUserData(null, null, null, true);
+        foreach ($userAgents as $userAgent => $shouldMatch) {
+            if ($userAgent === null) {
+                unset($userData->userAgent);
+            } else {
+                $userData->userAgent = $userAgent;
+            }
+
+            if ($shouldMatch) {
+                $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+            } else {
+                $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+            }
+        }
     }
 
     public function testCountryRules()

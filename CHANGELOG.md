@@ -22,6 +22,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Refactored showtime caching to replace serialized objects with JSON cache. remp/remp#1401
 
+### [Campaign]
+
+- Added campaign targeting based on operating system. remp/remp#1403 
+- Refactored device and operating rules to their own class `DeviceRulesEvaluator`. remp/remp#1403
+
 ### [Mailer]
 
 - **BREAKING**: Renamed `Remp\MailerModule\Models\Generators\ArticleLocker` to `Remp\MailerModule\Models\Generators\HtmlArticleLocker`. remp/novydenik#1324

@@ -5,6 +5,7 @@ use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
+use Remp\CampaignModule\Http\Showtime\DeviceRulesEvaluator;
 use Remp\CampaignModule\Http\Showtime\LazyDeviceDetector;
 use Remp\CampaignModule\Http\Showtime\LazyGeoReader;
 use Remp\CampaignModule\Http\Showtime\Showtime;
@@ -475,6 +476,7 @@ try {
     }
 
     $deviceDetector = new LazyDeviceDetector($cachePool);
+    $deviceRulesEvaluator = new DeviceRulesEvaluator($redis, $deviceDetector);
 
     if (file_exists(env('MAXMIND_DATABASE'))) {
         $maxmindDbPath = env('MAXMIND_DATABASE');
@@ -491,7 +493,7 @@ try {
     $showtimeConfig->setPrioritizeBannerOnSamePosition($prioritizeBannerOnSamePosition);
     $showtimeConfig->setOneTimeBannerEnabled(env('ONE_TIME_BANNER_ENABLED', true));
 
-    $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $showtimeConfig, $deviceDetector, $logger);
+    $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $showtimeConfig, $deviceRulesEvaluator, $logger);
     $showtime->showtime($data, $callback, $showtimeResponse);
 } catch (\Exception $exception) {
     $logger->error($exception);

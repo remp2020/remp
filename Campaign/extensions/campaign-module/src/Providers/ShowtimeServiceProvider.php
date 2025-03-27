@@ -3,6 +3,7 @@
 namespace Remp\CampaignModule\Providers;
 
 use Remp\CampaignModule\Contracts\SegmentAggregator;
+use Remp\CampaignModule\Http\Showtime\DeviceRulesEvaluator;
 use Remp\CampaignModule\Http\Showtime\LazyDeviceDetector;
 use Remp\CampaignModule\Http\Showtime\LazyGeoReader;
 use Remp\CampaignModule\Http\Showtime\Showtime;
@@ -22,16 +23,21 @@ class ShowtimeServiceProvider extends ServiceProvider implements DeferrableProvi
     public function register()
     {
         $this->app->bind(Showtime::class, function ($app) {
-            $dd = new Showtime(
+            return new Showtime(
                 Redis::connection()->client(),
                 $this->app->get(SegmentAggregator::class),
                 $this->app->get(LazyGeoReader::class),
                 $this->app->get(ShowtimeConfig::class),
-                $this->app->get(LazyDeviceDetector::class),
+                $this->app->get(DeviceRulesEvaluator::class),
                 $this->app->get(LoggerInterface::class),
             );
+        });
 
-            return $dd;
+        $this->app->bind(DeviceRulesEvaluator::class, function ($app) {
+            return new DeviceRulesEvaluator(
+                Redis::connection()->client(),
+                $this->app->get(LazyDeviceDetector::class),
+            );
         });
     }
 

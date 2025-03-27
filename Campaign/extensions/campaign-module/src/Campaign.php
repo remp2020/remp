@@ -30,6 +30,13 @@ class Campaign extends Model implements Searchable
     const DEVICE_MOBILE = 'mobile';
     const DEVICE_DESKTOP = 'desktop';
 
+    const OPERATING_SYSTEM_ANDROID = 'android';
+    const OPERATING_SYSTEM_IOS = 'ios';
+    const OPERATING_SYSTEM_LINUX = 'linux';
+    const OPERATING_SYSTEM_WINDOWS = 'windows';
+    const OPERATING_SYSTEM_MAC = 'mac';
+    const OPERATING_SYSTEM_UNKNOWN = 'unknown';
+
     const URL_FILTER_EVERYWHERE = 'everywhere';
     const URL_FILTER_ONLY_AT = 'only_at';
     const URL_FILTER_EXCEPT_AT = 'except_at';
@@ -54,6 +61,7 @@ class Campaign extends Model implements Searchable
         'pageview_rules',
         'pageview_attributes',
         'devices',
+        'operating_systems',
         'languages',
         'using_adblock',
         'url_filter',
@@ -69,6 +77,7 @@ class Campaign extends Model implements Searchable
         'pageview_rules' => 'json',
         'pageview_attributes' => 'json',
         'devices' => 'json',
+        'operating_systems' => 'json',
         'languages' => 'json',
         'using_adblock' => 'boolean',
         'url_patterns' => 'json',
@@ -81,6 +90,7 @@ class Campaign extends Model implements Searchable
         'pageview_rules' => '[]',
         'pageview_attributes' => '[]',
         'devices' => "[\"desktop\", \"mobile\"]",
+        'operating_systems' => '[]',
         'url_filter' => self::URL_FILTER_EVERYWHERE,
         'source_filter' => self::SOURCE_FILTER_ALL,
     ];
@@ -230,6 +240,43 @@ class Campaign extends Model implements Searchable
     public function getAllDevices()
     {
         return [self::DEVICE_DESKTOP, self::DEVICE_MOBILE];
+    }
+
+    public function getAvailableOperatingSystems(): array
+    {
+        return [
+            [
+                'label' => 'Android',
+                'value' => self::OPERATING_SYSTEM_ANDROID,
+            ],
+            [
+                'label' => 'iOS',
+                'value' => self::OPERATING_SYSTEM_IOS,
+            ],
+            [
+                'label' => 'Linux',
+                'value' => self::OPERATING_SYSTEM_LINUX,
+            ],
+            [
+                'label' => 'Windows',
+                'value' => self::OPERATING_SYSTEM_WINDOWS,
+            ],
+            [
+                'label' => 'Mac',
+                'value' => self::OPERATING_SYSTEM_MAC,
+            ],
+        ];
+    }
+
+    public function getOperatingSystemsMapping(): array
+    {
+        return [
+            self::OPERATING_SYSTEM_ANDROID => ['AND'],
+            self::OPERATING_SYSTEM_IOS => ['IOS'],
+            self::OPERATING_SYSTEM_LINUX => ['LIN'],
+            self::OPERATING_SYSTEM_WINDOWS => ['WIN'],
+            self::OPERATING_SYSTEM_MAC => ['MAC'],
+        ];
     }
 
     public function supportsDevice($device)

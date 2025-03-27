@@ -17,8 +17,6 @@ class Showtime
 {
     private const BANNER_ONETIME_USER_KEY = 'banner_onetime_user';
     private const BANNER_ONETIME_BROWSER_KEY = 'banner_onetime_browser';
-    private const DEVICE_DETECTION_KEY = 'device_detection';
-    private const DEVICE_DETECTION_TTL = 86400;
     private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS = '=';
     private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS_NOT = '!=';
 
@@ -35,7 +33,7 @@ class Showtime
         private SegmentAggregator $segmentAggregator,
         private LazyGeoReader $geoReader,
         private ShowtimeConfig $showtimeConfig,
-        private LazyDeviceDetector $deviceDetector,
+        private DeviceRulesEvaluator $deviceRulesEvaluator,
         private LoggerInterface $logger
     ) {
     }
@@ -81,7 +79,7 @@ class Showtime
     public function flushLocalCache(): self
     {
         $this->localCache = [];
-
+        $this->deviceRulesEvaluator->flushLocalCache();
         return $this;
     }
 
@@ -524,9 +522,19 @@ class Showtime
             }
         }
 
-        // device rules
-        if ($this->isAcceptedByDeviceRules($userData, $campaign, $userId) === false) {
-            return "Campaign not shown because it's not accepted according to device rules";
+        // user agent specific rules
+        if (isset($userData->userAgent)) {
+            // device rules
+            if ($this->deviceRulesEvaluator->isAcceptedByDeviceRules($userData->userAgent, $campaign) === false) {
+                return "Campaign not shown because it's not accepted according to device rules";
+            }
+
+            // operating system rules
+            if ($this->deviceRulesEvaluator->isAcceptedByOperatingSystemRules($userData->userAgent, $campaign) === false) {
+                return "Campaign not shown because it's not accepted according to operating system rules";
+            }
+        } else {
+            $this->logger->error("Unable to load user agent for userId [{$userId}]");
         }
 
         // country rules
@@ -881,69 +889,5 @@ class Showtime
         $this->localCache[$cacheKey] = $belongsToSegment;
 
         return $belongsToSegment;
-    }
-
-    private function isAcceptedByDeviceRules($userData, Campaign $campaign, $userId): bool
-    {
-        if (!isset($userData->userAgent)) {
-            $this->logger->error("Unable to load user agent for userId [{$userId}]");
-
-            return true;
-        }
-
-        if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)
-            && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)
-        ) {
-            return true;
-        }
-
-        // check result of device detection in redis
-        $deviceKey = self::DEVICE_DETECTION_KEY.':'.md5($userData->userAgent);
-        if (isset($this->localCache[$deviceKey])) {
-            $deviceDetection = $this->localCache[$deviceKey];
-        } else {
-            $deviceDetection = $this->redis->get($deviceKey);
-            if ($deviceDetection) {
-                $this->localCache[$deviceKey] = $deviceDetection;
-            }
-        }
-
-        if ($deviceDetection) {
-            if ($deviceDetection === Campaign::DEVICE_MOBILE && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)) {
-                return false;
-            }
-            if ($deviceDetection === Campaign::DEVICE_DESKTOP && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)) {
-                return false;
-            }
-
-            return true;
-        }
-
-        // parse user agent
-        $deviceDetector = $this->deviceDetector->get($userData->userAgent);
-        $isMobile = $deviceDetector->isMobile();
-        $isDesktop = $deviceDetector->isDesktop();
-
-        if ($isMobile) {
-            $deviceDetectionValue = Campaign::DEVICE_MOBILE;
-        } else if ($isDesktop) {
-            $deviceDetectionValue = Campaign::DEVICE_DESKTOP;
-        } else {
-            $deviceDetectionValue = 'other';
-        }
-
-        // store result to redis to faster resolution on the next attempt
-        $this->localCache[$deviceKey] = $deviceDetectionValue;
-        $this->redis->setex($deviceKey, self::DEVICE_DETECTION_TTL, $deviceDetectionValue);
-
-        if ($isMobile && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)) {
-            return false;
-        }
-
-        if ($isDesktop && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)) {
-            return false;
-        }
-
-        return true;
     }
 }

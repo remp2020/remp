@@ -466,7 +466,7 @@
                         <div class="panel-heading" role="tab" id="headingDevicesTargeting">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseDevicesTargeting" aria-expanded="false" aria-controls="collapseDevicesTargeting" :class="{ green: highlightDevicesCollapse }">
-                                    Devices targeting (mobile/desktop)
+                                    Devices targeting
                                 </a>
                             </h4>
                         </div>
@@ -480,6 +480,27 @@
                                         <input :checked="deviceSelected(device)" :value="device" name="devices[]" type="checkbox" @change="handleToggleSelectDevice(device)">
                                         <i class="input-helper"></i>
                                     </label>
+                                    </div>
+                                </div>
+
+                                <div class="input-group m-t-20">
+                                    <span class="input-group-addon"><i class="zmdi zmdi-devices"></i></span>
+                                    <div>
+                                        <div class="row">
+                                            <div class="col-md-8 col-sm-12">
+                                                <label for="countries_blacklist" class="fg-label">Operating system</label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-12">
+                                                <v-select v-model="selectedOperatingSystems"
+                                                          id="operating_systems"
+                                                          :name="'operating_systems[]'"
+                                                          :value="selectedOperatingSystems"
+                                                          :options.sync="availableOperatingSystems"
+                                                          :multiple="true"
+                                                >
+                                                </v-select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -601,7 +622,9 @@
         "_languages",
         "_countriesBlacklist",
         "_allDevices",
+        "_availableOperatingSystems",
         "_selectedDevices",
+        "_selectedOperatingSystems",
         "_validateUrl",
         "_urlFilterTypes",
         "_sourceFilterTypes",
@@ -694,7 +717,9 @@
                 "addedCountry": null,
                 "countriesBlacklist": null,
                 "allDevices": null,
+                "availableOperatingSystems": null,
                 "selectedDevices": null,
+                "selectedOperatingSystems": null,
                 "validateUrl": null,
                 "submitAction": null,
                 "urlFilterTypes": null,
@@ -792,7 +817,7 @@
                 return (this.countries && this.countries.length);
             },
             highlightDevicesCollapse: function () {
-                return (this.selectedDevices.length < this.allDevices.length);
+                return (this.selectedDevices.length < this.allDevices.length) || this.selectedOperatingSystems.length > 0;
             },
             highlightABTestingCollapse: function () {
                 return (this.variants.length > 2);

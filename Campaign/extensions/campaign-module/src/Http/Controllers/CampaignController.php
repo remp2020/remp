@@ -589,6 +589,10 @@ class CampaignController extends Controller
 
     public function saveCampaign(Campaign $campaign, array $data, CampaignCollection $collection = null)
     {
+        if (empty($data['operating_systems'])) {
+            $data['operating_systems'] = null;
+        }
+
         $campaign->fill($data);
         $campaign->save();
 
