@@ -9,9 +9,6 @@ use Nette\Database\Conventions;
 use Nette\Database\Explorer;
 use Nette\Database\Table\Selection as NetteSelection;
 
-/**
- * @extends Nette\Database\Table\Selection<ActiveRow>
- */
 class Selection extends NetteSelection
 {
     use DateFieldsProcessorTrait;
