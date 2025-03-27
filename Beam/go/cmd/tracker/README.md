@@ -20,7 +20,7 @@ This tarball can be safely used within any Docker image, including `alpine` or `
 
 ### go
 
-If you have Go 1.22+ environment set up, you can run the build manually by running
+If you have Go 1.23+ environment set up, you can run the build manually by running
 
 ```bash
 make all

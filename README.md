@@ -211,22 +211,3 @@ To enforce `https` generation, you can use `FORCE_HTTPS` environment variable ch
 availability to debug also console scripts. However, if it can't connect to the host machine, it slows down the request
 because it waits for connection timeout. Therefore, is very important to have proper `XDEBUG_CONFIG` variables
 configured in your `docker-compose.override.yml`. 
-
-- Windows is pushing scripts to Docker with CRLF new lines which is causing issues described 
-[in this blog](http://willi.am/blog/2016/08/11/docker-for-windows-dealing-with-windows-line-endings).
-Clone your repository with extra ` --config core.autocrlf=input` parameter and set your IDE to save files with `LF` 
-line endings.
-
-- Telegraf gets stuck if requested topic doesn't exist yet. This has been reported and "hacked" with dockerize, 
-custom topic creation and waits. This is not 100% bulletproof and will be fixed when Telegraf 1.4 is released.
-
-- If you're using Docker Toolbox with VirtualBox and your workspace is outside your $HOME folder, you need to add
-shared folder to your appliance so the Docker containers are able to work with shared volumes properly.
-
-    ```
-    VBoxManage.exe sharedfolder add default --automount --name 'd/gospace' --hostpath '\\?\d:\gospace'
-    VBoxManage.exe sharedfolder add default --automount --name 'cygdrive/d/gospace' --hostpath '\\?\d:\gospace'
-    ```
-
-    The first command has to be run always. The second needs to be used only when you want to use CygWin instead 
-    of default MinGW.
