@@ -111,6 +111,11 @@ class Guard implements AuthGuard
         $this->user = $user;
     }
 
+    public function hasUser()
+    {
+        return !$this->guest();
+    }
+
     public function getTokenForRequest()
     {
         $token = $this->request->query($this->inputKey);
