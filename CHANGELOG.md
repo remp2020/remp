@@ -9,7 +9,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - **BREAKING**: Updated Laravel to v9. remp/remp#1409
+  - Please be aware that upgrade causes any assets published during Laravel's dependencies installation (`vendor:publish`) to have stricter rights by default (`0700` for directories, `0600` for files). You might need to update the rights of `public/vendor/` after the `composer install` call.
 - **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
+- **BREAKING**: Renamed Laravel's `FILESYSTEM_DRIVER` env variable to `FILESYSTEM_DISK`. remp/remp#1409
 - **BREAKING**: Changed minimum Go version for building Tracker API and Segments API to 1.23.
 - **IMPORTANT**: Removed data of sections "Visitors" and "Google Analytics Reporting", which we removed in the previous version. remp/remp#1349
   - Migration removes tables `session_devices` and `session_referers`.
@@ -23,11 +25,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - **BREAKING**: Updated Laravel to v9. remp/remp#1409
+- **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
+- **BREAKING**: Renamed Laravel's `FILESYSTEM_DRIVER` env variable to `FILESYSTEM_DISK`. remp/remp#1409
 - Refactored showtime caching to replace serialized objects with JSON cache. remp/remp#1401
-
-### [Campaign]
-
-- Added campaign targeting based on operating system. remp/remp#1403 
+- Added campaign targeting based on operating system. remp/remp#1403
 - Refactored device and operating rules to their own class `DeviceRulesEvaluator`. remp/remp#1403
 
 ### [Mailer]
@@ -48,6 +49,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **BREAKING**: Updated Laravel to v9. remp/remp#1409
 - **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
+- **BREAKING**: Renamed Laravel's `FILESYSTEM_DRIVER` env variable to `FILESYSTEM_DISK`. remp/remp#1409
 
 ## Archive
 
