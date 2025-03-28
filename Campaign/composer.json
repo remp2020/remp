@@ -31,14 +31,14 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
         "barryvdh/laravel-ide-helper": "^2.10",
-        "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^3.0",
         "josiasmontag/laravel-redis-mock": "~1.2",
+        "larastan/larastan": "^2.0",
         "laravel/tinker": "^2.0",
         "mockery/mockery": "^1.4.2",
-        "nunomaduro/collision": "^5.0",
         "phpunit/phpunit": "^9.3.3",
+        "spatie/laravel-ignition": "^1.0",
         "squizlabs/php_codesniffer": "^3.6"
     },
     "suggest": {

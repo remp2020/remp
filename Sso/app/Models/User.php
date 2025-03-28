@@ -14,7 +14,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property int $id
  * @property string|null $name
  * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\GoogleUser $googleUser
+ * @property-read \App\Models\GoogleUser $googleUser
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereId($value)
@@ -37,7 +37,7 @@ class User extends Authenticatable implements JWTSubject
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<string>
      */
     protected $fillable = [
         'name',

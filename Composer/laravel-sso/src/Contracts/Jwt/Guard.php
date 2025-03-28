@@ -98,6 +98,11 @@ class Guard implements AuthGuard
         $this->session->put(self::JWT_USER_SESSION, $sessionUser);
     }
 
+    public function hasUser()
+    {
+        return !$this->guest();
+    }
+
     /**
      * setToken stores JWT token to session.
      *

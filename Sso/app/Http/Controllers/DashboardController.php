@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+
 class DashboardController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        return view('welcome');
-    }
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 }

@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- **BREAKING**: Updated Laravel to v9. remp/remp#1409
+- **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
 - **BREAKING**: Changed minimum Go version for building Tracker API and Segments API to 1.23.
 - **IMPORTANT**: Removed data of sections "Visitors" and "Google Analytics Reporting", which we removed in the previous version. remp/remp#1349
   - Migration removes tables `session_devices` and `session_referers`.
@@ -20,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
+- **BREAKING**: Updated Laravel to v9. remp/remp#1409
 - Refactored showtime caching to replace serialized objects with JSON cache. remp/remp#1401
 
 ### [Campaign]
@@ -40,6 +43,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed performance issue of batch processing in the "remove unsubscribed" steps. The altered query should perform better. remp/remp#1407
 - Added support for UTM parameters to mail link replace. remp/respekt#377
 - Added SnippetArticleLocker which provides way for generators to define lock messages via snippets. remp/novydenik#1324
+
+### [Sso]
+
+- **BREAKING**: Updated Laravel to v9. remp/remp#1409
+- **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
 
 ## Archive
 

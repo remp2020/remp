@@ -20,6 +20,9 @@ js-watch:
 	yarn install
 	yarn watch
 
+phpstan:
+	php vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=1G
+
 sniff:
 	php vendor/bin/phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p
 

@@ -267,7 +267,7 @@ export default {
             throw new Error("REMPLIB: unable to display banner, configured extra parameter is missing: " + name);
         },
         _form: function (name){
-            if (typeof this.paramsTransposition == 'object' && this.paramsTransposition.hasOwnProperty(name)){
+            if (typeof this.paramsTransposition == 'object' && this.paramsTransposition !== null && this.paramsTransposition.hasOwnProperty(name)){
                 return this.paramsTransposition[name];
             }
             return name;

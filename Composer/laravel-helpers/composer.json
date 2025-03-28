@@ -11,9 +11,9 @@
   ],
   "require": {
     "php": "^8.0",
-    "illuminate/http": "^v8.76.2",
-    "illuminate/support": "^v8.76.2",
-    "illuminate/routing": "^v8.76.2"
+    "illuminate/http": "^v9.0",
+    "illuminate/support": "^v9.0",
+    "illuminate/routing": "^v9.0"
   },
   "require-dev": {
   },

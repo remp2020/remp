@@ -1,0 +1,13 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+
+parameters:
+    paths:
+        - app/
+    level: 3
+    excludePaths:
+        # These files caused unsolvable memory issues
+        - app/Http/Controllers/AuthController.php
+        - app/Http/Middleware/VerifyUserToken.php
+        - app/Console/Commands/ReconstructLoggedOutCache.php

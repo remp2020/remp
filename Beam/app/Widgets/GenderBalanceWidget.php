@@ -27,8 +27,8 @@ class GenderBalanceWidget extends AbstractWidget
             ->where('key', GenderBalanceJob::WOMEN_COUNT_KEY)
             ->first();
 
-        if (isset($menCountMeta, $womenCountMeta) && ($womenCountMeta->value + $menCountMeta->value) > 0) {
-            $womenPercentage = round(100 * $womenCountMeta->value / ($womenCountMeta->value + $menCountMeta->value), 2);
+        if (isset($menCountMeta, $womenCountMeta) && ((int) $womenCountMeta->value + (int) $menCountMeta->value) > 0) {
+            $womenPercentage = round(100 * (int) $womenCountMeta->value / ((int) $womenCountMeta->value + (int) $menCountMeta->value), 2);
         }
 
         return view('widgets.gender_balance', [

@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\UrlHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Two\GoogleProvider;
 use Symfony\Component\HttpFoundation\Response;
-use JWTAuth;
 use Socialite;
 use Session;
 use Tymon\JWTAuth\JWT;
@@ -35,7 +35,9 @@ class GoogleController extends Controller
         Session::put(self::SUCCESS_URL_KEY, $request->input(self::SUCCESS_URL_QUERY_PARAM, '/'));
         Session::put(self::ERROR_URL_KEY, $request->input(self::ERROR_URL_QUERY_PARAM, '/'));
 
-        return Socialite::driver(User::PROVIDER_GOOGLE)->stateless()->redirect();
+        /** @var GoogleProvider $driver */
+        $driver = Socialite::driver(User::PROVIDER_GOOGLE);
+        return $driver->stateless()->redirect();
     }
 
     /**
@@ -54,8 +56,11 @@ class GoogleController extends Controller
         $errorUrl = Session::get(self::ERROR_URL_KEY);
         Session::forget(self::ERROR_URL_KEY);
 
+        /** @var GoogleProvider $driver */
+        $driver = Socialite::driver(User::PROVIDER_GOOGLE);
         /** @var \Laravel\Socialite\Two\User $factoryUser */
-        $factoryUser = Socialite::driver(User::PROVIDER_GOOGLE)->stateless()->user();
+        $factoryUser = $driver->stateless()->user();
+
         if (!$whitelist->validate($factoryUser->getEmail())) {
             $errorUrl = $urlHelper->appendQueryParams($errorUrl, [
                 'error' => sprintf('email not whitelisted to log in: %s', $factoryUser->getEmail()),

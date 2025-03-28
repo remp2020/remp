@@ -3,9 +3,9 @@
 namespace Remp\BeamModule\Model;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Collection;
 use Remp\BeamModule\Database\Factories\ArticleFactory;
 use Remp\BeamModule\Helpers\Journal\JournalHelpers;
-use Remp\BeamModule\Helpers\Misc;
 use Remp\BeamModule\Model\Config\ConversionRateConfig;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;

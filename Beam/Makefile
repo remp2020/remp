@@ -60,6 +60,9 @@ docker-build:
 	@cd $(SUB_TRACKER) && make docker-build
 	@cd $(SUB_SEGMENTS) && make docker-build
 
+phpstan:
+	php vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=1G
+
 sniff:
 	php vendor/bin/phpcs --standard=PSR2 ${PHP_FOLDERS} -n -p
 
