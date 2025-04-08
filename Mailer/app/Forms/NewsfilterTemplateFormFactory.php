@@ -318,6 +318,12 @@ class NewsfilterTemplateFormFactory
                 'mail_type_code' => 'trumpov-svet',
                 'from' => 'Denník N <info@dennikn.sk>',
             ],
+            'poradna-o-tele' => [
+                'name' => 'Poradňa o tele ' . date('j.n.Y'),
+                'code' => 'poradna_o_tele_' . date('dmY'),
+                'mail_type_code' => 'poradna-o-tele',
+                'from' => 'Denník N <info@dennikn.sk>',
+            ],
             default => throw new \Exception("No default values found for source template code='{$sourceTemplate->code}'"),
         };
 
