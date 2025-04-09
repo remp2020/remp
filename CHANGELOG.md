@@ -30,6 +30,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Refactored showtime caching to replace serialized objects with JSON cache. remp/remp#1401
 - Added campaign targeting based on operating system. remp/remp#1403
 - Refactored device and operating rules to their own class `DeviceRulesEvaluator`. remp/remp#1403
+- Fixed inline banner selector. remp/remp#1406
+  - Fixed image assets links.
+  - Replaced old (not functional) unmaintained css selector finder library.
 
 ### [Mailer]
 

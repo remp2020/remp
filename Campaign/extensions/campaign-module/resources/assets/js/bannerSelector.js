@@ -1,4 +1,4 @@
-import { select } from 'optimal-select';
+import { finder } from '@medv/finder';
 
 (function(window, document, campaign, undefined) {
   // initialize variables for elements that are about to be injected
@@ -28,14 +28,14 @@ import { select } from 'optimal-select';
       </div>
       <div class="remp-toolbar" id="remp-toolbar">
         <a href="" class="remp-toolbar__logo-wrapper">
-          <img src="${campaign.url}/assets/img/bannerSelector/logo.svg" alt="REMP" class="remp-toolbar__logo"> </a>
+          <img src="${campaign.url}/vendor/campaign/assets/img/bannerSelector/logo.svg" alt="REMP" class="remp-toolbar__logo"> </a>
         <button class="remp-toolbar__selector-wrapper" id="generated-selector-wrapper">
           <span class="remp-toolbar__selector" id="generated-selector"></span>
           <input type="text" class="remp-toolbar__input-selector" id="selector-input">
           <span class="remp-toolbar__matching-elements" id="matching-elements-number">0</span>
         </button>
         <div class="remp-toolbar__show-parents-wrapper" id="toggle-parents-list">
-          <img src="${campaign.url}/assets/img/bannerSelector/parents.svg" class="remp-toolbar__show-parents" alt="Show Parents">
+          <img src="${campaign.url}/vendor/campaign/assets/img/bannerSelector/parents.svg" class="remp-toolbar__show-parents" alt="Show Parents">
           <div class="remp-toolbar__parents">
             <h5 class="remp-toolbar__parents__title">Parent elements</h5>
             <ul class="remp-toolbar__parents__list" id="parents-list">
@@ -479,7 +479,7 @@ import { select } from 'optimal-select';
 
   function handleSelectionOfElement(element, selector) {
     if (!selector) {
-      selector = select(element);
+      selector = finder(element);
     }
 
     if (document.querySelectorAll(selector).length > 1) {
@@ -573,7 +573,7 @@ import { select } from 'optimal-select';
   function getUniqueSelectorsForElementArray(elements) {
     var selectors = [];
     elements.forEach(function(currentElement) {
-      selectors.push(select(currentElement));
+      selectors.push(finder(currentElement));
     });
     return selectors;
   }

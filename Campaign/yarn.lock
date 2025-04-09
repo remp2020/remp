@@ -1423,6 +1423,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@medv/finder@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "@medv/finder@npm:4.0.2"
+  checksum: 831beede4a34400b564c17c3f18d2d3a971dbe1f0cf9dce186703379449e3ef65c68c444d4893786aa65f9311edf271351e2316780c5401d4198526465ad7f58
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -6559,13 +6566,6 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"optimal-select@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "optimal-select@npm:4.0.1"
-  checksum: 5d71ea3a51d8713b4810b0afed5e36d7d796714ca721d5b742299e8e443279ee1513f1d8633d43b6357eb364a16bc49f12edfa69a3e1d395aefd8ffac1b077a0
-  languageName: node
-  linkType: hard
-
 "os-browserify@npm:^0.3.0":
   version: 0.3.0
   resolution: "os-browserify@npm:0.3.0"
@@ -7626,9 +7626,10 @@ fsevents@~2.3.2:
 
 "remp-campaign@file:extensions/campaign-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.0
-  resolution: "remp-campaign@file:extensions/campaign-module#extensions/campaign-module::hash=ec5cff&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "remp-campaign@file:extensions/campaign-module#extensions/campaign-module::hash=510f90&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/core": ^7.0
+    "@medv/finder": ^4.0.2
     "@remp/js-commons": 2.3.1
     animate.css: ^3.7.0
     autosize: ^4.0.2
@@ -7656,14 +7657,13 @@ fsevents@~2.3.2:
     moment-timezone: ^0.4.0 || ^0.5.0
     node-waves: ^0.7.6
     nouislider: ^13.1.5
-    optimal-select: ^4.0.1
     rison: ^0.1.1
     salvattore: ^1.0.9
     vue: ^2.7
     vue-codemirror: 4.0.6
     vue-slide-up-down: ^1.7.2
     vue-template-compiler: ^2.7
-  checksum: 56cefaa43a30825929726bb08e91a50f1783c711e0b44225e1d0e46c5fdef99f2f576f1fb0f89450f147c9f3b6ceb0fce26707fc280959a37e73d6d3570d602b
+  checksum: e5e6f274a45b5a17d543b68affd1ea1fa96ea10b0b940762b66a1061c1abd7c1c4c3497400b33f147fa4edcfd85cfc9388d03f1ef08386fbcea36ea051093b83
   languageName: node
   linkType: hard
 
