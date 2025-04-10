@@ -1,0 +1,16 @@
+<script n:if="$form->getErrors()">
+  $(function() {
+    let index = 0;
+    {foreach $form->getErrors() as $error}
+    index += 250;
+    window.setTimeout(function() {
+      $.notify({
+        message: {$error}
+      }, {
+        allow_dismiss: false,
+        type: 'danger'
+      });
+    }, index);
+    {/foreach}
+  });
+</script>

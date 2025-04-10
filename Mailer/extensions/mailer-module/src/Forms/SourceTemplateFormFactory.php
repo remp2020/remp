@@ -3,28 +3,27 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Forms;
 
+use Exception;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\Utils\ArrayHash;
+use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\GeneratorFactory;
+use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
 class SourceTemplateFormFactory implements IFormFactory
 {
-    private $mailSourceTemplateRepository;
-
-    private $mailGeneratorFactory;
-
     public $onUpdate;
 
     public $onSave;
 
     public function __construct(
-        SourceTemplatesRepository $mailSourceTemplateRepository,
-        GeneratorFactory $mailGeneratorFactory
+        private readonly SourceTemplatesRepository $mailSourceTemplateRepository,
+        private readonly GeneratorFactory $mailGeneratorFactory,
+        private readonly EngineFactory $engineFactory,
+        private readonly SnippetsRepository $snippetsRepository,
     ) {
-        $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
-        $this->mailGeneratorFactory = $mailGeneratorFactory;
     }
 
     public function create(?int $id = null): Form
@@ -129,6 +128,13 @@ class SourceTemplateFormFactory implements IFormFactory
 
         $templatesSortingPairs = $this->mailSourceTemplateRepository->getSortingPairs();
 
+        try {
+            $this->attemptToRender($values['content_html'], 'html');
+            $this->attemptToRender($values['content_text'], 'text');
+        } catch (Exception $e) {
+            $form->addError($e->getMessage());
+            return;
+        }
 
         switch ($values['sorting']) {
             case 'begin':
@@ -187,5 +193,18 @@ class SourceTemplateFormFactory implements IFormFactory
 
             $this->onSave->__invoke($form, $template, $buttonSubmitted);
         }
+    }
+
+    /**
+     * @param string $template
+     * @param string $version
+     * @return void
+     * @throws Exception
+     */
+    private function attemptToRender(string $template, string $version): void
+    {
+        $engine = $this->engineFactory->engine();
+        $generatedTemplate = $engine->render(preg_replace('/{%[^%]+%}/m', '', $template));
+        $engine->render($generatedTemplate, ['snippets' => $this->snippetsRepository->all()->fetchPairs('code', $version)]);
     }
 }

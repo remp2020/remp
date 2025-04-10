@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use Exception;
 use Http\Discovery\Exception\NotFoundException;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Control;
@@ -306,10 +307,14 @@ final class TemplatePresenter extends BasePresenter
             throw new BadRequestException();
         }
 
-        $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template, [], null, $lang));
-        $this->template->content = ($type === 'html')
-            ? $mailContent->html()
-            : "<pre>{$mailContent->text()}</pre>";
+        try {
+            $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template, [], null, $lang));
+            $this->template->content = ($type === 'html')
+                ? $mailContent->html()
+                : "<pre>{$mailContent->text()}</pre>";
+        } catch (Exception $exception) {
+            $this->template->content = $exception->getMessage();
+        }
     }
 
     public function handleDuplicate($id): void

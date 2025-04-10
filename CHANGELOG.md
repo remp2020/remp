@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Added generator template validation. remp/remp#1398
+
 ## Archive
 
 - [v4.0](./changelogs/CHANGELOG-v4.0.md)
