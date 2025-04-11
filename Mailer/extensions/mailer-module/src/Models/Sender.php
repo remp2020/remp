@@ -379,6 +379,10 @@ class Sender
             }
         }
 
+        if ($this->locale !== null) {
+            $message->setHeader('Content-Language', str_replace('_', '-', $this->locale));
+        }
+
         $message->setHeader('X-Mailer-Variables', Json::encode([
             'template' => $this->template->code,
             'job_id' => $this->jobId,
