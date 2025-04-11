@@ -20,9 +20,9 @@ class SearchResource extends JsonResource
         $segments = $this->get('segments');
 
         return Arr::collapse([
-            $this->when($authors->isNotEmpty(), AuthorSearchResource::collection($authors)->toArray(app('response'))),
-            $this->when($articles->isNotEmpty(), ArticleSearchResource::collection($articles)->toArray(app('response'))),
-            $this->when($segments->isNotEmpty(), SegmentSearchResource::collection($segments)->toArray(app('response')))
+            $this->when($authors->isNotEmpty(), AuthorSearchResource::collection($authors)->toArray(app('request'))),
+            $this->when($articles->isNotEmpty(), ArticleSearchResource::collection($articles)->toArray(app('request'))),
+            $this->when($segments->isNotEmpty(), SegmentSearchResource::collection($segments)->toArray(app('request')))
         ]);
     }
 }

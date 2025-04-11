@@ -20,9 +20,9 @@ class SearchResource extends JsonResource
         $snippets = $this->get('snippets');
 
         return Arr::collapse([
-            $this->when($banners->isNotEmpty(), BannerSearchResource::collection($banners)->toArray(app('response'))),
-            $this->when($campaigns->isNotEmpty(), CampaignSearchResource::collection($campaigns)->toArray(app('response'))),
-            $this->when($snippets->isNotEmpty(), SnippetSearchResource::collection($snippets)->toArray(app('response'))),
+            $this->when($banners->isNotEmpty(), BannerSearchResource::collection($banners)->toArray(app('request'))),
+            $this->when($campaigns->isNotEmpty(), CampaignSearchResource::collection($campaigns)->toArray(app('request'))),
+            $this->when($snippets->isNotEmpty(), SnippetSearchResource::collection($snippets)->toArray(app('request'))),
         ]);
     }
 }
