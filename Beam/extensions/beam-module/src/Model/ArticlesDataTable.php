@@ -2,19 +2,12 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\Author;
-use Remp\BeamModule\Model\Conversion;
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\Rules\ValidCarbonDate;
-use Remp\BeamModule\Model\Tag;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use Html;
-use Remp\BeamModule\Model\Section;
-use Remp\BeamModule\Model\TagCategory;
-use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
+use Yajra\DataTables\DataTables;
+use Yajra\DataTables\QueryDataTable;
 
 class ArticlesDataTable
 {
@@ -156,13 +149,14 @@ class ArticlesDataTable
             if (!isset($conversionCount[$record->article_id])) {
                 $conversionCount[$record->article_id] = 0;
             }
-            $conversionCount[$record->article_id] += $record->count;
-            $conversionSum[$record->article_id][$record->currency] = $record->sum;
-            $conversionAvg[$record->article_id][$record->currency] = $record->avg;
+            $conversionCount[$record->article_id] += $record['count'];
+            $conversionSum[$record->article_id][$record->currency] = $record['sum'];
+            $conversionAvg[$record->article_id][$record->currency] = $record['avg'];
         }
 
-        // final datatable
-        return $datatables->of($articles)
+        /** @var QueryDataTable $datatable */
+        $datatable = $datatables->of($articles);
+        return $datatable
             ->addColumn('id', function (Article $article) {
                 return $article->id;
             })
@@ -184,7 +178,7 @@ class ArticlesDataTable
                     $c = round($c, 2);
                     $amounts[] = "{$c} {$currency}";
                 }
-                return $amounts ?? [0];
+                return $amounts ?: [0];
             })
             ->addColumn('conversions_avg', function (Article $article) use ($conversionAvg) {
                 if (!isset($conversionAvg[$article->id])) {
@@ -195,7 +189,7 @@ class ArticlesDataTable
                     $c = round($c, 2);
                     $amounts[] = "{$c} {$currency}";
                 }
-                return $amounts ?? [0];
+                return $amounts ?: [0];
             })
             ->filterColumn('title', function (Builder $query, $value) {
                 $query->where('articles.title', 'like', "%{$value}%");

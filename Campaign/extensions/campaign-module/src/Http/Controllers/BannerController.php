@@ -17,7 +17,8 @@ use HTML;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Yajra\Datatables\Datatables;
+use Yajra\DataTables\DataTables;
+use Yajra\DataTables\QueryDataTable;
 
 class BannerController extends Controller
 {
@@ -30,11 +31,6 @@ class BannerController extends Controller
     ) {
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $perPage = $request->get('perPage', 15);
@@ -50,7 +46,9 @@ class BannerController extends Controller
         $banners = Banner::select()
             ->with('campaigns');
 
-        return $dataTables->of($banners)
+        /** @var QueryDataTable $datatable */
+        $datatable = $dataTables->of($banners);
+        return $datatable
             ->addColumn('actions', function (Banner $banner) {
                 return [
                     'show' => route('banners.show', $banner),
@@ -83,12 +81,6 @@ class BannerController extends Controller
             ->make(true);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request)
     {
         $banner = new Banner;
@@ -142,24 +134,11 @@ class BannerController extends Controller
         ]);
     }
 
-    /**
-     * Ajax validate form method.
-     *
-     * @param BannerRequest|Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function validateForm(BannerRequest $request)
     {
         return response()->json(false);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param BannerRequest|Request $request
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     */
     public function store(BannerRequest $request)
     {
         $banner = new Banner();
@@ -182,13 +161,6 @@ class BannerController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \Remp\CampaignModule\Banner $banner
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     */
     public function show(Banner $banner)
     {
         return response()->format([
@@ -204,13 +176,6 @@ class BannerController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \Remp\CampaignModule\Banner $banner
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     */
     public function edit(Banner $banner)
     {
         $banner->loadTemplate();
@@ -226,14 +191,6 @@ class BannerController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param BannerRequest|Request $request
-     * @param  \Remp\CampaignModule\Banner $banner
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     */
     public function update(BannerRequest $request, Banner $banner)
     {
         $banner->update($request->all());
@@ -254,13 +211,6 @@ class BannerController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \Remp\CampaignModule\Banner $banner
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     */
     public function destroy(Banner $banner)
     {
         $banner->delete();

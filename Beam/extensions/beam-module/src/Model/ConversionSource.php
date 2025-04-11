@@ -2,7 +2,7 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\Conversion;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ConversionSource extends BaseModel
 {
@@ -20,12 +20,12 @@ class ConversionSource extends BaseModel
         'article_id',
     ];
 
-    protected $dates = [
-        'created_at',
-        'updated_at'
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    public function conversion()
+    public function conversion(): BelongsTo
     {
         return $this->belongsTo(Conversion::class);
     }

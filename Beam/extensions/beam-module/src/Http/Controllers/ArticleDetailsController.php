@@ -2,19 +2,19 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
-use Remp\BeamModule\Helpers\Misc;
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Helpers\Journal\JournalHelpers;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Remp\BeamModule\Helpers\Colors;
+use Remp\BeamModule\Helpers\Journal\JournalHelpers;
 use Remp\BeamModule\Helpers\Journal\JournalInterval;
+use Remp\BeamModule\Helpers\Misc;
 use Remp\BeamModule\Http\Requests\ArticlesListRequest;
 use Remp\BeamModule\Http\Resources\ArticleResource;
+use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Model\ConversionSource;
 use Remp\BeamModule\Model\Pageviews\PageviewsHelper;
 use Remp\BeamModule\Model\Rules\ValidCarbonDate;
 use Remp\BeamModule\Model\Snapshots\SnapshotHelpers;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
 
@@ -295,7 +295,7 @@ class ArticleDetailsController extends Controller
 
         $colors = Colors::assignColorsToGeneralTags(array_keys($tags));
         foreach ($events as $event) {
-            $eventItem->color = $colors[$event->title];
+            $event->color = $colors[$event->title];
         }
 
         return $events;
@@ -398,7 +398,7 @@ class ArticleDetailsController extends Controller
             $articles = Article::whereIn('id', $ids)->get();
         }
 
-        return response()->json(['articles' => $articles]);
+        return response()->json(['articles' => $articles ?? collect([])]);
     }
 
     public function show(Request $request, Article $article = null)
@@ -462,7 +462,7 @@ class ArticleDetailsController extends Controller
                 'externalEvents' => $externalEvents,
                 'averageTimeSpentSubscribers' => Misc::secondsIntoReadableTime($article->pageviews_subscribers ? round($article->timespent_subscribers / $article->pageviews_subscribers) : 0),
                 'averageTimeSpentSignedId' => Misc::secondsIntoReadableTime($article->pageviews_signed_in ? round($article->timespent_signed_in / $article->pageviews_signed_in) : 0),
-                'averageTimeSpentAll' => Misc::secondsIntoReadableTime( $article->pageviews_all ? round($article->timespent_all / $article->pageviews_all) : 0)
+                'averageTimeSpentAll' => Misc::secondsIntoReadableTime($article->pageviews_all ? round($article->timespent_all / $article->pageviews_all) : 0)
             ]),
             'json' => new ArticleResource($article),
         ]);

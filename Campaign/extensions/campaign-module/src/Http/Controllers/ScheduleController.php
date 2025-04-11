@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Remp\LaravelHelpers\Resources\JsonResource;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Yajra\Datatables\Datatables;
+use Yajra\DataTables\DataTables;
+use Yajra\DataTables\QueryDataTable;
 
 class ScheduleController extends Controller
 {
@@ -76,7 +77,9 @@ class ScheduleController extends Controller
             $scheduleSelect->limit($request->limit);
         }
 
-        return $dataTables->of($scheduleSelect)
+        /** @var QueryDataTable $datatable */
+        $datatable = $dataTables->of($scheduleSelect);
+        return $datatable
             ->addColumn('actions', function (Schedule $s) use ($collection) {
                 return [
                     'edit' => !$s->isStopped() ? route('schedule.edit', ['schedule' => $s, 'collection' => $collection]) : null,
@@ -125,9 +128,9 @@ class ScheduleController extends Controller
                     }
 
                     // handle variants with banner
-                    $link = link_to(
-                        route('banners.edit', $variant['banner_id']),
-                        $variant->banner->name
+                    $link = html()->a(
+                        href: route('banners.edit', $variant['banner_id']),
+                        contents: $variant->banner->name
                     );
 
                     $variants[] = "{$link}&nbsp;({$proportion}%)";
@@ -143,12 +146,14 @@ class ScheduleController extends Controller
                     ->where('campaign_banners.proportion', '>', 0);
                 $query->whereIn('schedules.id', $filterQuery);
             })
-            ->addColumn('action_methods', [
-                'start' => 'POST',
-                'pause' => 'POST',
-                'stop' => 'POST',
-                'destroy' => 'DELETE',
-            ])
+            ->addColumn('action_methods', function (Schedule $schedule) {
+                return [
+                    'start' => 'POST',
+                    'pause' => 'POST',
+                    'stop' => 'POST',
+                    'destroy' => 'DELETE',
+                ];
+            })
             ->addColumn('status', function (Schedule $schedule) {
                 if ($schedule->isRunning()) {
                     return [['class' => 'badge-success', 'text' => 'Running']];
@@ -181,12 +186,6 @@ class ScheduleController extends Controller
             ->make(true);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param ScheduleRequest|Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(ScheduleRequest $request)
     {
         $schedule = new Schedule();

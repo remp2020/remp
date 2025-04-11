@@ -2,11 +2,10 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\SectionFactory;
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Remp\BeamModule\Database\Factories\SectionFactory;
 use Remp\Journal\TokenProvider;
 
 class Section extends BaseModel
@@ -28,7 +27,7 @@ class Section extends BaseModel
         return SectionFactory::new();
     }
 
-    public function articles()
+    public function articles(): BelongsToMany
     {
         return $this->belongsToMany(Article::class);
     }
@@ -41,6 +40,7 @@ class Section extends BaseModel
         $propertyUuid = $tokenProvider->getToken();
         if ($propertyUuid) {
             $query->whereHas('articles', function (Builder $articlesQuery) {
+                /** @var Builder|Article $articlesQuery */
                 $articlesQuery->ofSelectedProperty();
             });
         }

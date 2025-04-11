@@ -2,21 +2,20 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Remp\BeamModule\Http\Resources\SectionResource;
 use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Model\ArticlesDataTable;
-use Remp\BeamModule\Model\ArticleSection;
 use Remp\BeamModule\Model\Author;
 use Remp\BeamModule\Model\Conversion;
-use Illuminate\Http\Request;
-use Remp\BeamModule\Http\Resources\SectionResource;
 use Remp\BeamModule\Model\Rules\ValidCarbonDate;
-use Remp\BeamModule\Model\Tag;
 use Remp\BeamModule\Model\Section;
-use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
+use Remp\BeamModule\Model\Tag;
 use Yajra\DataTables\DataTables;
-use Html;
+use Yajra\DataTables\QueryDataTable;
 
 class SectionController extends Controller
 {
@@ -168,14 +167,16 @@ class SectionController extends Controller
         $conversionAmounts = [];
         $conversionCounts = [];
         foreach ($conversionsQuery->get() as $record) {
-            $conversionAmounts[$record->section_id][$record->currency] = $record->sum;
-            if (!isset($conversionCounts[$record->section_id])) {
-                $conversionCounts[$record->section_id] = 0;
+            $conversionAmounts[$record['section_id']][$record->currency] = $record['sum'];
+            if (!isset($conversionCounts[$record['section_id']])) {
+                $conversionCounts[$record['section_id']] = 0;
             }
-            $conversionCounts[$record->section_id] += $record->count;
+            $conversionCounts[$record['section_id']] += $record['count'];
         }
 
-        return $datatables->of($sections)
+        /** @var QueryDataTable $datatable */
+        $datatable = $datatables->of($sections);
+        return $datatable
             ->addColumn('id', function (Section $section) {
                 return $section->id;
             })
@@ -209,7 +210,7 @@ class SectionController extends Controller
                     $c = round($c, 2);
                     $amounts[] = "{$c} {$currency}";
                 }
-                return $amounts ?? [0];
+                return $amounts ?: [0];
             })
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')

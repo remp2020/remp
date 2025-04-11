@@ -63,8 +63,7 @@ class CampaignServiceProvider extends ServiceProvider
             __DIR__ . '/../config/services.php' => config_path('services.remp.php'),
             __DIR__ . '/../config/newsletter_banners.php' => config_path('newsletter_banners.php'),
             __DIR__ . '/../config/search.php' => config_path('search.php'),
-        ], ['campaign-assets', 'laravel-assets']
-        );
+        ], ['campaign-assets', 'laravel-assets']);
 
         $this->registerCommands();
 

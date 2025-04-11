@@ -2,17 +2,16 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Remp\BeamModule\Contracts\Mailer\MailerContract;
 use Remp\BeamModule\Http\Requests\NewsletterRequest;
 use Remp\BeamModule\Http\Resources\NewsletterResource;
-use Remp\BeamModule\Model\NewsletterCriterion;
 use Remp\BeamModule\Model\Newsletter;
-use Carbon\Carbon;
-use Html;
+use Remp\BeamModule\Model\NewsletterCriterion;
 use Remp\LaravelHelpers\Resources\JsonResource;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Yajra\Datatables\Datatables;
-use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class NewsletterController extends Controller
 {
@@ -35,11 +34,13 @@ class NewsletterController extends Controller
                     'text' => $newsletter->name,
                 ];
             })
-            ->addColumn('action_methods', [
-                'start' => 'POST',
-                'pause' => 'POST',
-                'destroy' => 'DELETE',
-            ])
+            ->addColumn('action_methods', function (Newsletter $newsletter) {
+                return [
+                    'start' => 'POST',
+                    'pause' => 'POST',
+                    'destroy' => 'DELETE',
+                ];
+            })
             ->addColumn('actions', function (Newsletter $n) {
                 return [
                     'edit' => route('newsletters.edit', $n),

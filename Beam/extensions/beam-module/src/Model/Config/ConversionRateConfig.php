@@ -12,7 +12,8 @@ class ConversionRateConfig
      * @deprecated Use static method build() instead. This constructor will be marked as private in the next major release.
      */
     public function __construct()
-    { }
+    {
+    }
 
     public static function build(): self
     {

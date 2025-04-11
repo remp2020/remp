@@ -20,9 +20,9 @@
 
     @include('flash::message')
 
-    {!! Form::model($banner, ['route' => 'banners.store']) !!}
+    {{ html()->modelForm($banner)->route('banners.store')->open() }}
     @include('campaign::banners._form')
-    {!! Form::close() !!}
+    {{ html()->closeModelForm() }}
 
     @include('campaign::banners._template_modal')
 @endsection

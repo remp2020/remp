@@ -15,9 +15,9 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            {!! Form::model($segment, ['route' => 'segments.store']) !!}
+            {{ html()->modelForm($segment)->route('segments.store')->open() }}
             @include('beam::segments._form')
-            {!! Form::close() !!}
+            {{ html()->closeModelForm() }}
         </div>
     </div>
 

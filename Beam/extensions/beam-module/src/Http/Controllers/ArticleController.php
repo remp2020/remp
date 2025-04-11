@@ -2,22 +2,22 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\Author;
-use Remp\BeamModule\Http\Requests\ArticleRequest;
-use Remp\BeamModule\Http\Requests\ArticlesListRequest;
-use Remp\BeamModule\Http\Resources\ArticleResource;
-use Remp\BeamModule\Model\Config\ConversionRateConfig;
-use Remp\BeamModule\Model\Rules\ValidCarbonDate;
-use Remp\BeamModule\Model\Tag;
-use Remp\BeamModule\Model\Section;
-use Html;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Yajra\Datatables\Datatables;
+use Remp\BeamModule\Http\Requests\ArticleRequest;
+use Remp\BeamModule\Http\Requests\ArticlesListRequest;
+use Remp\BeamModule\Http\Resources\ArticleResource;
+use Remp\BeamModule\Model\Article;
+use Remp\BeamModule\Model\Author;
+use Remp\BeamModule\Model\Config\ConversionRateConfig;
+use Remp\BeamModule\Model\Rules\ValidCarbonDate;
+use Remp\BeamModule\Model\Section;
+use Remp\BeamModule\Model\Tag;
+use Yajra\DataTables\DataTables;
 use Yajra\DataTables\EloquentDataTable;
+use Yajra\DataTables\QueryDataTable;
 
 class ArticleController extends Controller
 {
@@ -182,7 +182,7 @@ class ArticleController extends Controller
                     $c = round($c, 2);
                     $amounts[] = "{$c} {$currency}";
                 }
-                return $amounts ?? [0];
+                return $amounts ?: [0];
             })
             ->addColumn('average', function (Article $article) use ($conversionAverages) {
                 if (!isset($conversionAverages[$article->id])) {
@@ -193,11 +193,11 @@ class ArticleController extends Controller
                     $c = round($c, 2);
                     $average[] = "{$c} {$currency}";
                 }
-                return $average ?? [0];
+                return $average ?: [0];
             })
             ->addColumn('authors', function (Article $article) {
                 $authors = $article->authors->map(function (Author $author) {
-                    return ['link' => Html::linkRoute('authors.show', $author->name, [$author])];
+                    return ['link' => html()->a(route('authors.show', $author), $author->name)];
                 });
                 return $authors->implode('link', '<br/>');
             })
@@ -274,7 +274,9 @@ class ArticleController extends Controller
             $articles->where('published_at', '<=', Carbon::parse($request->input('published_to'), $request->input('tz')));
         }
 
-        return $datatables->of($articles)
+        /** @var QueryDataTable $datatable */
+        $datatable = $datatables->of($articles);
+        return $datatable
             ->addColumn('id', function (Article $article) {
                 return $article->id;
             })
@@ -304,7 +306,7 @@ class ArticleController extends Controller
             })
             ->addColumn('authors', function (Article $article) {
                 $authors = $article->authors->map(function (Author $author) {
-                    return ['link' => Html::linkRoute('authors.show', $author->name, [$author])];
+                    return ['link' => html()->a(route('authors.show', $author), $author->name)];
                 });
                 return $authors->implode('link', '<br/>');
             })
@@ -347,12 +349,6 @@ class ArticleController extends Controller
             ->make(true);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param ArticleRequest|Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(ArticleRequest $request)
     {
         /** @var Article $article */

@@ -8,6 +8,7 @@ use Remp\CampaignModule\Http\Requests\CollectionRequest;
 use Remp\CampaignModule\Http\Resources\CollectionResource;
 use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\DataTables;
+use Yajra\DataTables\QueryDataTable;
 
 class CollectionController extends Controller
 {
@@ -106,7 +107,9 @@ class CollectionController extends Controller
             ->leftJoin('campaigns', 'campaigns.id', '=', 'campaign_collections.campaign_id')
             ->groupBy('collections.id');
 
-        return $dataTables->of($collections)
+        /** @var QueryDataTable $datatable */
+        $datatable = $dataTables->of($collections);
+        return $datatable
             ->addColumn('actions', function (CampaignCollection $collection) {
                 return [
                     'show' => route('campaigns.index', ['collection' => $collection]),
@@ -128,11 +131,10 @@ class CollectionController extends Controller
                 $campaigns = [];
 
                 foreach ($data as $campaign) {
-                    $campaigns[] = link_to(
-                        route('campaigns.edit', $campaign),
-                        $campaign->name,
-                        ['target' => '_blank']
-                    );
+                    $campaigns[] = html()->a(
+                        href: route('campaigns.edit', $campaign),
+                        contents: $campaign->name,
+                    )->attribute('target', '_blank');
                 }
 
                 return $campaigns;

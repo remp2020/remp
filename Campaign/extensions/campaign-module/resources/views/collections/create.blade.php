@@ -15,9 +15,9 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            {!! Form::model($collection, ['route' => 'collections.store', 'method' => 'POST', 'id' => 'collection-form-root']) !!}
+            {{ html()->modelForm($collection)->route('collections.store')->attribute('id', 'collection-form-root')->open() }}
                 @include('campaign::collections._form', ['action' => 'create'])
-            {!! Form::close() !!}
+            {{ html()->closeModelForm() }}
         </div>
     </div>
 @endsection

@@ -2,13 +2,13 @@
 
 namespace Remp\BeamModule\Console\Commands;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Remp\BeamModule\Console\Command;
 use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Model\ArticleAggregatedView;
 use Remp\BeamModule\Model\ViewsPerBrowserMv;
 use Remp\BeamModule\Model\ViewsPerUserMv;
-use Carbon\Carbon;
-use Remp\BeamModule\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
 
@@ -325,8 +325,8 @@ ON DUPLICATE KEY UPDATE $daysColumn = $daysColumn + VALUES(`$daysColumn`)", [$st
 
         foreach (array_chunk($items, 500) as $itemsChunk) {
             ArticleAggregatedView::insertOnDuplicateKey($itemsChunk, [
-                'pageviews' => DB::raw('pageviews + VALUES(pageviews)'),
-                'timespent' => DB::raw('timespent + VALUES(timespent)'),
+                'pageviews' => DB::raw('pageviews + VALUES(pageviews)')->getValue(DB::connection()->getQueryGrammar()),
+                'timespent' => DB::raw('timespent + VALUES(timespent)')->getValue(DB::connection()->getQueryGrammar()),
             ]);
         }
 

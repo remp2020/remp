@@ -15,9 +15,9 @@
 
         <div class="card-body card-padding">
             @include('flash::message')
-            {!! Form::model($newsletter, ['route' => 'newsletters.store']) !!}
+            {{ html()->modelForm($newsletter)->route('newsletters.store')->open() }}
             @include('beam::newsletters._form')
-            {!! Form::close() !!}
+            {{ html()->closeModelForm() }}
         </div>
 
     </div>

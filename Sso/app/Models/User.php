@@ -44,8 +44,8 @@ class User extends Authenticatable implements JWTSubject
         'email',
     ];
 
-    protected $dates = [
-        'last_logout_at',
+    protected $casts = [
+        'last_logout_at' => 'datetime',
     ];
 
     public function googleUser()

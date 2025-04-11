@@ -13,8 +13,8 @@
             <div class="col-md-6">
                 <h4>Filter by conversion date</h4>
                 <div id="smart-range-selector">
-                    {!! Form::hidden('conversion_from', $conversionFrom) !!}
-                    {!! Form::hidden('conversion_to', $conversionTo) !!}
+                    {{ html()->hidden('conversion_from', $conversionFrom) }}
+                    {{ html()->hidden('conversion_to', $conversionTo) }}
                     <smart-range-selector from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callback">
                     </smart-range-selector>
                 </div>

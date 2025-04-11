@@ -2,8 +2,9 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\SegmentUserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Remp\BeamModule\Database\Factories\SegmentUserFactory;
 
 class SegmentUser extends BaseModel
 {
@@ -21,7 +22,7 @@ class SegmentUser extends BaseModel
         return SegmentUserFactory::new();
     }
 
-    public function segment()
+    public function segment(): BelongsTo
     {
         return $this->belongsTo(Segment::class);
     }

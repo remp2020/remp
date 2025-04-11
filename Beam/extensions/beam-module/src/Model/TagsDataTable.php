@@ -3,17 +3,13 @@
 
 namespace Remp\BeamModule\Model;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\Conversion;
 use Remp\BeamModule\Model\Rules\ValidCarbonDate;
-use Remp\BeamModule\Model\Tag;
-use Illuminate\Database\Eloquent\Builder;
-use Html;
-use Remp\BeamModule\Model\TagCategory;
 use Yajra\DataTables\DataTables;
+use Yajra\DataTables\QueryDataTable;
 
 class TagsDataTable
 {
@@ -136,14 +132,16 @@ class TagsDataTable
         $conversionAmounts = [];
         $conversionCounts = [];
         foreach ($conversionsQuery->get() as $record) {
-            $conversionAmounts[$record->tag_id][$record->currency] = $record->sum;
-            if (!isset($conversionCounts[$record->tag_id])) {
-                $conversionCounts[$record->tag_id] = 0;
+            $conversionAmounts[$record['tag_id']][$record->currency] = $record['sum'];
+            if (!isset($conversionCounts[$record['tag_id']])) {
+                $conversionCounts[$record['tag_id']] = 0;
             }
-            $conversionCounts[$record->tag_id] += $record->count;
+            $conversionCounts[$record['tag_id']] += $record['count'];
         }
 
-        return $datatables->of($tags)
+        /** @var QueryDataTable $datatable */
+        $datatable = $datatables->of($tags);
+        return $datatable
             ->addColumn('id', function (Tag $tag) {
                 return $tag->id;
             })
@@ -177,7 +175,7 @@ class TagsDataTable
                     $c = round($c, 2);
                     $amounts[] = "{$c} {$currency}";
                 }
-                return $amounts ?? [0];
+                return $amounts ?: [0];
             })
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')

@@ -9,8 +9,8 @@
                 <div class="col-md-6">
                     <h4>Filter by date and time</h4>
                     <div id="smart-range-selector">
-                        {!! Form::hidden('from', $from) !!}
-                        {!! Form::hidden('to', $to) !!}
+                        {{ html()->hidden('from', $from) }}
+                        {{ html()->hidden('to', $to) }}
                         <smart-range-selector from="{{$from}}" to="{{$to}}" :callback="callback">
                         </smart-range-selector>
                     </div>

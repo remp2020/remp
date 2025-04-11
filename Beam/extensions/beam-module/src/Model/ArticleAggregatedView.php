@@ -2,6 +2,8 @@
 
 namespace Remp\BeamModule\Model;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Yadakhov\InsertOnDuplicateKey;
 
 class ArticleAggregatedView extends BaseModel
@@ -24,12 +26,12 @@ class ArticleAggregatedView extends BaseModel
         'timespent',
     ];
 
-    public function article()
+    public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }
 
-    public function articleAuthors()
+    public function articleAuthors(): HasMany
     {
         return $this->hasMany(ArticleAuthor::class, 'article_id', 'article_id');
     }

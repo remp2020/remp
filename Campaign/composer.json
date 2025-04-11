@@ -37,8 +37,8 @@
         "larastan/larastan": "^2.0",
         "laravel/tinker": "^2.0",
         "mockery/mockery": "^1.4.2",
-        "phpunit/phpunit": "^9.3.3",
-        "spatie/laravel-ignition": "^1.0",
+        "phpunit/phpunit": "^10.0",
+        "spatie/laravel-ignition": "^2.9",
         "squizlabs/php_codesniffer": "^3.6"
     },
     "suggest": {

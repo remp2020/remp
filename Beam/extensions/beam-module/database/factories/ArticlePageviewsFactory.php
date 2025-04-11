@@ -2,24 +2,14 @@
 
 namespace Remp\BeamModule\Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Remp\BeamModule\Model\ArticlePageviews;
 
 class ArticlePageviewsFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = ArticlePageviews::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
     public function definition()
     {
         $sum = $this->faker->numberBetween(5, 10);

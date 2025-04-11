@@ -28,9 +28,11 @@ class ApiTokenController extends Controller
                     'destroy' => route('api-tokens.destroy', $apiToken),
                 ];
             })
-            ->addColumn('action_methods', [
-                'destroy' => 'DELETE',
-            ])
+            ->addColumn('action_methods', function (ApiToken $apiToken) {
+                return [
+                    'destroy' => 'DELETE',
+                ];
+            })
             ->rawColumns(['actions', 'active'])
             ->setRowId('id')
             ->make(true);

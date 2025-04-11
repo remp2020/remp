@@ -2,10 +2,10 @@
 
 namespace Remp\BeamModule\Tests\Unit;
 
-use Remp\BeamModule\Model\ArticleViewsSnapshot;
-use Remp\BeamModule\Model\Snapshots\SnapshotHelpers;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
+use Remp\BeamModule\Model\ArticleViewsSnapshot;
+use Remp\BeamModule\Model\Snapshots\SnapshotHelpers;
 use Remp\BeamModule\Tests\TestCase;
 
 class SnapshotHelperTest extends TestCase
@@ -36,7 +36,7 @@ class SnapshotHelperTest extends TestCase
         $shouldBeExcluded[] = ArticleViewsSnapshot::factory()->create(['time' => (clone $start)->addMinutes(4)]);
 
         // Window 5-9 min
-        $shouldBeKept[] = ArticleViewsSnapshot::factory()->create(['time' => (clone $start)->addMinutes( 6)]);
+        $shouldBeKept[] = ArticleViewsSnapshot::factory()->create(['time' => (clone $start)->addMinutes(6)]);
         $shouldBeExcluded[] = ArticleViewsSnapshot::factory()->create(['time' => (clone $start)->addMinutes(7)]);
         $shouldBeExcluded[] = ArticleViewsSnapshot::factory()->create(['time' => (clone $start)->addMinutes(8)]);
 

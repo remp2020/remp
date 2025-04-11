@@ -15,8 +15,8 @@
                 <div class="col-md-6">
                     <h4>Filter by publish date</h4>
                     <div id="smart-range-selector">
-                        {!! Form::hidden('published_from', $publishedFrom) !!}
-                        {!! Form::hidden('published_to', $publishedTo) !!}
+                        {{ html()->hidden('published_from', $publishedFrom) }}
+                        {{ html()->hidden('published_to', $publishedTo) }}
                         <smart-range-selector from="{{$publishedFrom}}" to="{{$publishedTo}}" :callback="callback">
                         </smart-range-selector>
                     </div>

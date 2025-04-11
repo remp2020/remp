@@ -2,8 +2,7 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DashboardArticle extends BaseModel
 {
@@ -16,7 +15,7 @@ class DashboardArticle extends BaseModel
         'id',
     ];
 
-    public function article()
+    public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }

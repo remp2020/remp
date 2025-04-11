@@ -2,25 +2,25 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\Author;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Remp\Journal\TokenProvider;
 
 class ArticleAuthor extends BaseModel
 {
     protected $table = 'article_author';
 
-    public function author()
+    public function author(): BelongsTo
     {
         return $this->belongsTo(Author::class);
     }
 
-    public function article()
+    public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }
 
-    public function scopeOfSelectedProperty($query)
+    public function scopeOfSelectedProperty($query): Builder
     {
         $tokenProvider = resolve(TokenProvider::class);
         $propertyUuid = $tokenProvider->getToken();

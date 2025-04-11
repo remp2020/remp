@@ -10,8 +10,8 @@
     <div class="container">
         @include('flash::message')
 
-        {!! Form::model($entity, ['route' => ['entities.update', $entity], 'method' => 'PATCH', 'class' => 'entity-form']) !!}
+        {{ html()->modelForm($entity, 'PATCH')->route('entities.update', $entity)->attribute('class', 'entity-form')->open() }}
         @include('beam::entities._form')
-        {!! Form::close() !!}
+        {{ html()->closeModelForm() }}
     </div>
 @endsection

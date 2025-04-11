@@ -2,10 +2,9 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\SegmentRuleFactory;
-use Remp\BeamModule\Model\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Remp\BeamModule\Model\Segment;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Remp\BeamModule\Database\Factories\SegmentRuleFactory;
 
 class SegmentRule extends BaseModel
 {
@@ -39,7 +38,7 @@ class SegmentRule extends BaseModel
         return SegmentRuleFactory::new();
     }
 
-    public function segment()
+    public function segment(): BelongsTo
     {
         return $this->belongsTo(Segment::class);
     }

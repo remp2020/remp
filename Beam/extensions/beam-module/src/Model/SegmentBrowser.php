@@ -2,11 +2,9 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\SegmentBrowserFactory;
-use Remp\BeamModule\Model\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Remp\BeamModule\Model\Segment;
-use Remp\BeamModule\Model\TableName;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Remp\BeamModule\Database\Factories\SegmentBrowserFactory;
 
 class SegmentBrowser extends BaseModel
 {
@@ -24,7 +22,7 @@ class SegmentBrowser extends BaseModel
         return SegmentBrowserFactory::new();
     }
 
-    public function segment()
+    public function segment(): BelongsTo
     {
         return $this->belongsTo(Segment::class);
     }

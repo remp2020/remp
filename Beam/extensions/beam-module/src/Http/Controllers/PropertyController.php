@@ -2,13 +2,12 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
-use Remp\BeamModule\Model\Account;
-use Remp\BeamModule\Model\Property\SelectedProperty;
-use Remp\BeamModule\Model\Property;
-use Html;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
-use Yajra\Datatables\Datatables;
+use Remp\BeamModule\Model\Account;
+use Remp\BeamModule\Model\Property;
+use Remp\BeamModule\Model\Property\SelectedProperty;
+use Yajra\DataTables\DataTables;
 
 class PropertyController extends Controller
 {
@@ -19,13 +18,6 @@ class PropertyController extends Controller
         $this->selectedProperty = $selectedProperty;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Account $account
-     * @return \Illuminate\Http\Response
-     * @internal param $accountId
-     */
     public function index(Account $account)
     {
         return view('beam::properties.index', [
@@ -53,12 +45,6 @@ class PropertyController extends Controller
             ->make(true);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @param Account $account
-     * @return \Illuminate\Http\Response
-     */
     public function create(Account $account)
     {
         return view('beam::properties.create', [
@@ -99,13 +85,6 @@ class PropertyController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param Account $account
-     * @param  \App\Property $property
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Account $account, Property $property)
     {
         return view('beam::properties.edit', [
@@ -114,14 +93,6 @@ class PropertyController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \App\Property $property
-     * @param Account $account
-     * @return \Illuminate\Http\Response
-     */
     public function update(Account $account, Property $property, Request $request)
     {
         $this->validate($request, [
@@ -143,13 +114,6 @@ class PropertyController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Property $property
-     * @param Account $account
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Property $property, Account $account)
     {
         $property->delete();

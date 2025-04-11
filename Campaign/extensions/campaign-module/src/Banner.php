@@ -5,6 +5,8 @@ namespace Remp\CampaignModule;
 use Database\Factories\BannerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
@@ -152,52 +154,52 @@ class Banner extends Model implements Searchable
         return $this->load($this->getTemplateRelationName());
     }
 
-    public function campaigns()
+    public function campaigns(): BelongsToMany
     {
         return $this->belongsToMany(Campaign::class, 'campaign_banners')->whereNull('deleted_at');
     }
 
-    public function htmlTemplate()
+    public function htmlTemplate(): HasOne
     {
         return $this->hasOne(HtmlTemplate::class);
     }
 
-    public function mediumRectangleTemplate()
+    public function mediumRectangleTemplate(): HasOne
     {
         return $this->hasOne(MediumRectangleTemplate::class);
     }
 
-    public function overlayRectangleTemplate()
+    public function overlayRectangleTemplate(): HasOne
     {
         return $this->hasOne(OverlayRectangleTemplate::class);
     }
 
-    public function htmlOverlayTemplate()
+    public function htmlOverlayTemplate(): HasOne
     {
         return $this->hasOne(HtmlOverlayTemplate::class);
     }
 
-    public function overlayTwoButtonsSignatureTemplate()
+    public function overlayTwoButtonsSignatureTemplate(): HasOne
     {
         return $this->hasOne(OverlayTwoButtonsSignatureTemplate::class);
     }
 
-    public function barTemplate()
+    public function barTemplate(): HasOne
     {
         return $this->hasOne(BarTemplate::class);
     }
 
-    public function collapsibleBarTemplate()
+    public function collapsibleBarTemplate(): HasOne
     {
         return $this->hasOne(CollapsibleBarTemplate::class);
     }
 
-    public function shortMessageTemplate()
+    public function shortMessageTemplate(): HasOne
     {
         return $this->hasOne(ShortMessageTemplate::class);
     }
 
-    public function newsletterRectangleTemplate()
+    public function newsletterRectangleTemplate(): HasOne
     {
         return $this->hasOne(NewsletterRectangleTemplate::class);
     }

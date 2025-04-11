@@ -3,6 +3,7 @@
 namespace Remp\BeamModule\Model;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Remp\BeamModule\Database\Factories\AccountFactory;
 
 class Account extends BaseModel
@@ -16,7 +17,7 @@ class Account extends BaseModel
         return AccountFactory::new();
     }
 
-    public function properties()
+    public function properties(): HasMany
     {
         return $this->hasMany(Property::class);
     }

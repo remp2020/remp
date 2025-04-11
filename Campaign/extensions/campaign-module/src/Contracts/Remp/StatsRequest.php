@@ -26,10 +26,10 @@ class StatsRequest implements StatsContract
     /** @var array url arguments */
     private $args = [];
 
-    /** @var Carbon from date object */
+    /** @var string from date object */
     private $from;
 
-    /** @var Carbon to date object */
+    /** @var string to date object */
     private $to;
 
     /** @var array group by fields */

@@ -2,6 +2,7 @@
 
 namespace Remp\CampaignModule\Tests\Feature;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\CampaignModule\Database\Seeders\CountrySeeder;
 use Remp\CampaignModule\Http\Showtime\DeviceRulesEvaluator;
 use Remp\CampaignModule\Http\Showtime\LazyDeviceDetector;
@@ -397,7 +398,7 @@ class ShowtimeTest extends TestCase
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
     }
 
-    public function operatingSystemsDataProvider()
+    public static function operatingSystemsDataProvider()
     {
         return [
             [
@@ -459,9 +460,7 @@ class ShowtimeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider operatingSystemsDataProvider
-     */
+    #[DataProvider('operatingSystemsDataProvider')]
     public function testOperatingSystemRules(array $operatingSystems, array $userAgents)
     {
         $this->scheduleCampaign();

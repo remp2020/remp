@@ -22,7 +22,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Yajra\Datatables\Datatables;
+use Yajra\DataTables\DataTables;
+use Yajra\DataTables\QueryDataTable;
 
 class CampaignController extends Controller
 {
@@ -36,11 +37,6 @@ class CampaignController extends Controller
         $this->showtime = $showtime;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         $availableSegments = $this->getAllSegments($segmentAggregator)->pluck('name', 'code');
@@ -76,7 +72,9 @@ class CampaignController extends Controller
 
         $segments = $this->getAllSegments($segmentAggregator)->pluck('name', 'code');
 
-        return $dataTables->of($campaigns)
+        /** @var QueryDataTable $datatable */
+        $datatable = $dataTables->of($campaigns);
+        return $datatable
             ->addColumn('actions', function (Campaign $campaign) use ($collection) {
                 return [
                     'edit' => route('campaigns.edit', ['campaign' => $campaign, 'collection' => $collection]),
@@ -115,9 +113,9 @@ class CampaignController extends Controller
                     }
 
                     // handle variants with banner
-                    $link = link_to(
-                        route('banners.edit', $variant->banner_id),
-                        $variant->banner->name
+                    $link = html()->a(
+                        href: route('banners.edit', $variant->banner_id),
+                        contents: $variant->banner->name
                     );
 
                     $variants[] = "{$link}&nbsp;({$proportion}%)";
@@ -154,11 +152,10 @@ class CampaignController extends Controller
             ->addColumn('collections', function (Campaign $campaign) {
                 $collections = [];
                 foreach ($campaign->collections as $collection) {
-                    $collections[] = link_to(
-                        route('campaigns.index', ['collection' => $collection->id]),
-                        $collection->name,
-                        ['target' => '_blank']
-                    );
+                    $collections[] = html()->a(
+                        href: route('campaigns.index', ['collection' => $collection->id]),
+                        contents: $collection->name,
+                    )->attribute('target', '_blank');
                 }
 
                 return $collections;
@@ -207,12 +204,6 @@ class CampaignController extends Controller
             ->make(true);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @param SegmentAggregator $segmentAggregator
-     * @return \Illuminate\Http\Response
-     */
     public function create(SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         $campaign = new Campaign();
@@ -244,6 +235,7 @@ class CampaignController extends Controller
     public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         $sourceCampaign->load('banners', 'campaignBanners', 'segments', 'countries');
+        /** @var Campaign $campaign */
         $campaign = $sourceCampaign->replicate();
 
         flash(sprintf('Form has been pre-filled with data from campaign "%s"', $sourceCampaign->name))->info();
@@ -272,23 +264,11 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Ajax validate form method.
-     *
-     * @param CampaignRequest|Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function validateForm(CampaignRequest $request)
     {
         return response()->json(false);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param CampaignRequest|Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(CampaignRequest $request, CampaignCollection $collection = null)
     {
         $campaign = new Campaign();
@@ -324,12 +304,6 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \Remp\CampaignModule\Campaign  $campaign
-     * @return \Illuminate\Http\Response
-     */
     public function show(Campaign $campaign)
     {
         return response()->format([
@@ -340,13 +314,6 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \Remp\CampaignModule\Campaign $campaign
-     * @param SegmentAggregator $segmentAggregator
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         [
@@ -373,13 +340,6 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param CampaignRequest|Request $request
-     * @param  \Remp\CampaignModule\Campaign $campaign
-     * @return \Illuminate\Http\Response
-     */
     public function update(CampaignRequest $request, Campaign $campaign, CampaignCollection $collection = null)
     {
         $this->saveCampaign($campaign, $request->all(), $collection);
@@ -612,7 +572,6 @@ class CampaignController extends Controller
         $segments = $data['segments'] ?? [];
 
         foreach ($segments as $segment) {
-            /** @var CampaignSegment $campaignSegment */
             CampaignSegment::firstOrCreate([
                 'campaign_id' => $campaign->id,
                 'code' => $segment['code'],
@@ -710,6 +669,7 @@ class CampaignController extends Controller
         Campaign $campaign,
         Request $request
     ) {
+        /** @var CampaignBanner[] $variants */
         $variants = $campaign->campaignBanners()->withTrashed()->with("banner")->get();
         $from = $request->input('from', 'today - 30 days');
         $to = $request->input('to', 'now');
@@ -735,12 +695,6 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \Remp\CampaignModule\Campaign  $campaign
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Campaign $campaign)
     {
         //

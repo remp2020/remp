@@ -2,19 +2,13 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
-use Remp\BeamModule\Model\Account;
-use Html;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
-use Yajra\Datatables\Datatables;
+use Remp\BeamModule\Model\Account;
+use Yajra\DataTables\DataTables;
 
 class AccountController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return view('beam::accounts.index');
@@ -41,11 +35,6 @@ class AccountController extends Controller
             ->make(true);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         return view('beam::accounts.create', [
@@ -82,23 +71,11 @@ class AccountController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Account  $account
-     * @return \Illuminate\Http\Response
-     */
     public function show(Account $account)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Account  $account
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Account $account)
     {
         return view('beam::accounts.edit', [
@@ -106,13 +83,6 @@ class AccountController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Account  $account
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Account $account)
     {
         $this->validate($request, [
@@ -134,12 +104,6 @@ class AccountController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Account  $account
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Account $account)
     {
         $account->delete();

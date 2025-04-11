@@ -3,6 +3,7 @@
 namespace Remp\CampaignModule;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CampaignBannerStats extends Model
 {
@@ -25,7 +26,7 @@ class CampaignBannerStats extends Model
         'time_to',
     ];
 
-    public function campaignBanner()
+    public function campaignBanner(): BelongsTo
     {
         return $this->belongsTo(CampaignBanner::class);
     }

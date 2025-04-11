@@ -2,9 +2,10 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\TagCategoryFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Remp\BeamModule\Database\Factories\TagCategoryFactory;
 use Remp\Journal\TokenProvider;
 
 class TagCategory extends BaseModel
@@ -28,7 +29,7 @@ class TagCategory extends BaseModel
         return TagCategoryFactory::new();
     }
 
-    public function tags()
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
@@ -39,6 +40,7 @@ class TagCategory extends BaseModel
         $propertyUuid = $tokenProvider->getToken();
         if ($propertyUuid) {
             $query->whereHas('tags', function (Builder $tagsQuery) {
+                /** @var Builder|Tag $tagsQuery */
                 $tagsQuery->ofSelectedProperty();
             });
         }

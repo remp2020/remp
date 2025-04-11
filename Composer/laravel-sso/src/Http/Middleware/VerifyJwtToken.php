@@ -44,6 +44,7 @@ class VerifyJwtToken
             if ($token && $this->guard->guest()) {
                 $tokenInvalidated = $this->sso->invalidate($token);
                 $this->guard->setToken(null);
+
                 return redirect($tokenInvalidated['redirect']);
             }
 
@@ -68,6 +69,7 @@ class VerifyJwtToken
                     'successUrl' => $request->fullUrl(),
                     'errorUrl' => config('services.remp_sso.error_url') ?: route('sso.error'),
                 ])->getContent() ?: '';
+
                 return redirect($redirectUrl->withQuery($query)->__toString());
             }
         }
@@ -80,7 +82,6 @@ class VerifyJwtToken
      * call, stores them to Guard and returns RedirectResponse.
      *
      * @param \Illuminate\Http\Request $request
-     * @return RedirectResponse
      */
     private function handleCallback($request)
     {

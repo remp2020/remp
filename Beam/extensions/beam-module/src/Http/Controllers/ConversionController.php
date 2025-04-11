@@ -2,24 +2,25 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use Remp\BeamModule\Http\Requests\ConversionRequest;
+use Remp\BeamModule\Http\Requests\ConversionUpsertRequest;
+use Remp\BeamModule\Http\Resources\ConversionResource;
+use Remp\BeamModule\Jobs\ProcessConversionJob;
 use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Model\Author;
 use Remp\BeamModule\Model\Conversion;
 use Remp\BeamModule\Model\ConversionCommerceEvent;
 use Remp\BeamModule\Model\ConversionGeneralEvent;
 use Remp\BeamModule\Model\ConversionPageviewEvent;
-use Illuminate\Http\Request;
-use Remp\BeamModule\Http\Requests\ConversionRequest;
-use Remp\BeamModule\Http\Requests\ConversionUpsertRequest;
-use Remp\BeamModule\Http\Resources\ConversionResource;
-use Remp\BeamModule\Jobs\ProcessConversionJob;
 use Remp\BeamModule\Model\Rules\ValidCarbonDate;
-use Remp\BeamModule\Model\Tag;
 use Remp\BeamModule\Model\Section;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
-use Yajra\Datatables\Datatables;
+use Remp\BeamModule\Model\Tag;
+use Yajra\DataTables\DataTables;
+use Yajra\DataTables\QueryDataTable;
 
 class ConversionController extends Controller
 {
@@ -67,7 +68,9 @@ class ConversionController extends Controller
             $conversions->where('paid_at', '<=', Carbon::parse($request->input('conversion_to'), $request->input('tz')));
         }
 
-        return $datatables->of($conversions)
+        /** @var QueryDataTable $datatable */
+        $datatable = $datatables->of($conversions);
+        return $datatable
             ->addColumn('id', function (Conversion $conversion) {
                 return $conversion->id;
             })

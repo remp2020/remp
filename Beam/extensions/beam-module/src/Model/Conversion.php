@@ -2,17 +2,13 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\ConversionFactory;
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Remp\BeamModule\Model\ConversionCommerceEvent;
-use Remp\BeamModule\Model\ConversionGeneralEvent;
-use Remp\BeamModule\Model\ConversionPageviewEvent;
-use Remp\BeamModule\Model\ConversionSource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Remp\BeamModule\Database\Factories\ConversionFactory;
 use Remp\Journal\TokenProvider;
 
 class Conversion extends BaseModel
@@ -29,13 +25,10 @@ class Conversion extends BaseModel
         'events_aggregated',
     ];
 
-    protected $dates = [
-        'paid_at'
-    ];
-
     protected $casts = [
         'events_aggregated' => 'boolean',
         'source_processed' => 'boolean',
+        'paid_at' => 'datetime',
     ];
 
     protected static function newFactory(): ConversionFactory
@@ -43,27 +36,27 @@ class Conversion extends BaseModel
         return ConversionFactory::new();
     }
 
-    public function article()
+    public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }
     
-    public function commerceEvents()
+    public function commerceEvents(): HasMany
     {
         return $this->hasMany(ConversionCommerceEvent::class);
     }
 
-    public function pageviewEvents()
+    public function pageviewEvents(): HasMany
     {
         return $this->hasMany(ConversionPageviewEvent::class);
     }
 
-    public function generalEvents()
+    public function generalEvents(): HasMany
     {
         return $this->hasMany(ConversionGeneralEvent::class);
     }
 
-    public function conversionSources()
+    public function conversionSources(): HasMany
     {
         return $this->hasMany(ConversionSource::class);
     }

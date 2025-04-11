@@ -13,17 +13,14 @@ class Newsletter extends BaseModel
 
     protected $casts = [
         'personalized_content' => 'boolean',
+        'starts_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'last_sent_at' => 'datetime',
     ];
 
     protected $attributes = [
         'personalized_content' => false,
-    ];
-
-    protected $dates = [
-        'starts_at',
-        'created_at',
-        'updated_at',
-        'last_sent_at'
     ];
 
     protected $fillable = [

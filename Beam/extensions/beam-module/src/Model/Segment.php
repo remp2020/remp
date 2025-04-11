@@ -2,14 +2,10 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\SegmentFactory;
-use Remp\BeamModule\Model\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Remp\BeamModule\Model\TableName;
-use Remp\BeamModule\Model\SegmentBrowser;
-use Remp\BeamModule\Model\SegmentGroup;
-use Remp\BeamModule\Model\SegmentRule;
-use Remp\BeamModule\Model\SegmentUser;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Remp\BeamModule\Database\Factories\SegmentFactory;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
@@ -44,22 +40,22 @@ class Segment extends BaseModel implements Searchable
         return new SearchResult($this, $this->name);
     }
 
-    public function rules()
+    public function rules(): HasMany
     {
         return $this->hasMany(SegmentRule::class);
     }
 
-    public function users()
+    public function users(): HasMany
     {
         return $this->hasMany(SegmentUser::class);
     }
 
-    public function browsers()
+    public function browsers(): HasMany
     {
         return $this->hasMany(SegmentBrowser::class);
     }
 
-    public function segmentGroup()
+    public function segmentGroup(): BelongsTo
     {
         return $this->belongsTo(SegmentGroup::class);
     }

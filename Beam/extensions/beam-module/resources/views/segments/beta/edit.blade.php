@@ -14,9 +14,9 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            {!! Form::model($segment, ['route' => ['segments.update', $segment], 'method' => 'PATCH']) !!}
+            {{ html()->modelForm($segment, 'PATCH')->route('segments.update', $segment)->open() }}
             @include('beam::segments.beta._form')
-            {!! Form::close() !!}
+            {{ html()->closeModelForm() }}
         </div>
     </div>
 

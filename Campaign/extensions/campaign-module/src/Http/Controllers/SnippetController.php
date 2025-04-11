@@ -7,14 +7,10 @@ use Remp\CampaignModule\Http\Resources\SnippetResource;
 use Remp\CampaignModule\Snippet;
 use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\DataTables;
+use Yajra\DataTables\QueryDataTable;
 
 class SnippetController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return response()->format([
@@ -27,7 +23,9 @@ class SnippetController extends Controller
     {
         $snippets = Snippet::select();
 
-        return $dataTables->of($snippets)
+        /** @var QueryDataTable $datatable */
+        $datatable = $dataTables->of($snippets);
+        return $datatable
             ->addColumn('actions', function (Snippet $snippet) {
                 return [
                     'edit' => route('snippets.edit', $snippet),

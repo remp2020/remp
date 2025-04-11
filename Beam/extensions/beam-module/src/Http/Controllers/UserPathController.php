@@ -2,19 +2,19 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
-use Remp\BeamModule\Model\Author;
-use Remp\BeamModule\Model\Conversion;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Remp\BeamModule\Http\Requests\ConversionsSankeyRequest;
 use Remp\BeamModule\Http\Resources\ConversionsSankeyResource;
+use Remp\BeamModule\Model\Author;
 use Remp\BeamModule\Model\Charts\ConversionsSankeyDiagram;
+use Remp\BeamModule\Model\Conversion;
 use Remp\BeamModule\Model\ConversionCommerceEvent;
 use Remp\BeamModule\Model\ConversionGeneralEvent;
 use Remp\BeamModule\Model\ConversionPageviewEvent;
 use Remp\BeamModule\Model\ConversionSource;
 use Remp\BeamModule\Model\Section;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Remp\Journal\JournalContract;
 
 class UserPathController extends Controller
@@ -140,17 +140,17 @@ class UserPathController extends Controller
         foreach ($generalLastEventsQuery->get() as $event) {
             $absoluteCounts[] = [
                 'name' => $event->action . ':' . $event->category,
-                'count' => $event->group_count
+                'count' => $event['group_count']
             ];
-            $total += $event->group_count;
+            $total += $event['group_count'];
         }
 
         foreach ($commerceLastEventsQuery->get() as $event) {
             $absoluteCounts[] = [
                 'name' => $event->step,
-                'count' => $event->group_count
+                'count' => $event['group_count']
             ];
-            $total += $event->group_count;
+            $total += $event['group_count'];
         }
 
         return response()->json([

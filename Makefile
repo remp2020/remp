@@ -20,10 +20,10 @@ sniff-fix:
 	cd $(SUB_SSO) && make sniff-fix
 
 composer-audit:
-	#composer audit -d $(SUB_BEAM) --locked --abandoned=report
-	#composer audit -d $(SUB_CAMPAIGN) --locked --abandoned=report
+	composer audit -d $(SUB_BEAM) --locked --abandoned=report
+	composer audit -d $(SUB_CAMPAIGN) --locked --abandoned=report
 	composer audit -d $(SUB_MAILER) --locked --abandoned=report
-	#composer audit -d $(SUB_SSO) --locked --abandoned=report
+	composer audit -d $(SUB_SSO) --locked --abandoned=report
 
 composer-install:
 	composer install -d $(SUB_BEAM) --no-progress
@@ -36,8 +36,8 @@ phpunit:
 	cd $(SUB_MAILER) && php bin/command.php migrate:migrate -vvv
 	cd $(SUB_MAILER) && vendor/bin/phpunit
 	# Beam and Campaign DBs are migrated automatically when running tests
-	cd $(SUB_BEAM) && vendor/bin/phpunit -vvv
-	cd $(SUB_CAMPAIGN) && vendor/bin/phpunit --configuration=phpunit_gitlab.xml
+	cd $(SUB_BEAM) && vendor/bin/phpunit
+	cd $(SUB_CAMPAIGN) && vendor/bin/phpunit
 
 copy-env:
 	cd $(SUB_BEAM) && cp .env.example .env

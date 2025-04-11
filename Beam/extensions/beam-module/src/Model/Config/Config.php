@@ -2,10 +2,11 @@
 
 namespace Remp\BeamModule\Model\Config;
 
-use Remp\BeamModule\Model\BaseModel;
-use Remp\BeamModule\Model\Property\SelectedProperty;
-use Remp\BeamModule\Model\Property;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Remp\BeamModule\Model\BaseModel;
+use Remp\BeamModule\Model\Property;
+use Remp\BeamModule\Model\Property\SelectedProperty;
 
 class Config extends BaseModel
 {
@@ -32,12 +33,12 @@ class Config extends BaseModel
         $this->selectedProperty = resolve(SelectedProperty::class);
     }
 
-    public function configCategory()
+    public function configCategory(): BelongsTo
     {
         return $this->belongsTo(ConfigCategory::class);
     }
 
-    public function property()
+    public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class);
     }

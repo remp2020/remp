@@ -2,7 +2,7 @@
 
 SUB_TRACKER="go/cmd/tracker"
 SUB_SEGMENTS="go/cmd/segments"
-PHP_FOLDERS=app config
+PHP_FOLDERS=app config extensions/beam-module/config extensions/beam-module/src
 
 export TARGET_GOOS TARGET_GOARCH TARGET_SUFFIX
 

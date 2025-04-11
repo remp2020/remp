@@ -2,22 +2,20 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\BaseModel;
-use Remp\BeamModule\Model\Tag;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Remp\Journal\TokenProvider;
 
 class ArticleTag extends BaseModel
 {
     protected $table = 'article_tag';
 
-    public function tag()
+    public function tag(): BelongsTo
     {
         return $this->belongsTo(Tag::class);
     }
 
-    public function article()
+    public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }

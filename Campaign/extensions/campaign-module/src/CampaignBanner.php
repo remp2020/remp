@@ -5,6 +5,7 @@ namespace Remp\CampaignModule;
 use Database\Factories\CampaignBannerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Remp\CampaignModule\Concerns\HasCacheableRelation;
 
@@ -48,12 +49,12 @@ class CampaignBanner extends Model
         });
     }
 
-    public function banner()
+    public function banner(): BelongsTo
     {
         return $this->belongsTo(Banner::class);
     }
 
-    public function campaign()
+    public function campaign(): BelongsTo
     {
         return $this->belongsTo(Campaign::class);
     }

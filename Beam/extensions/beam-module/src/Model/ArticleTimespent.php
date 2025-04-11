@@ -2,11 +2,9 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\ArticleTimespentFactory;
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Remp\BeamModule\Model\Aggregable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Remp\BeamModule\Database\Factories\ArticleTimespentFactory;
 
 class ArticleTimespent extends BaseModel implements Aggregable
 {
@@ -38,18 +36,15 @@ class ArticleTimespent extends BaseModel implements Aggregable
         return ['article_id'];
     }
 
-    protected $dates = [
-        'time_from',
-        'time_to',
-    ];
-
     protected $casts = [
         'sum' => 'integer',
         'signed_in' => 'integer',
         'subscribers' => 'integer',
+        'time_from' => 'datetime',
+        'time_to' => 'datetime',
     ];
 
-    public function article()
+    public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }

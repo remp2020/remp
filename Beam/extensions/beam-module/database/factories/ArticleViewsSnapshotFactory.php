@@ -13,24 +13,14 @@
 
 namespace Remp\BeamModule\Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Remp\BeamModule\Model\ArticleViewsSnapshot;
 
 class ArticleViewsSnapshotFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = ArticleViewsSnapshot::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
     public function definition()
     {
         $refererMediums = ['external', 'internal', 'direct', 'email', 'social'];

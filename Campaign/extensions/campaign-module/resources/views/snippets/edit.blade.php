@@ -14,9 +14,9 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            {!! Form::model($snippet, ['route' => ['snippets.update', 'snippet' => $snippet], 'method' => 'PATCH']) !!}
+            {{ html()->modelForm($snippet, 'PATCH')->route('snippets.update', ['snippet' => $snippet])->open() }}
                 @include('campaign::snippets._form')
-            {!! Form::close() !!}
+            {{ html()->closeModelForm() }}
         </div>
     </div>
 

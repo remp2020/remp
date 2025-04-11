@@ -1,6 +1,6 @@
 #! /usr/bin/make
 
-PHP_FOLDERS=app config
+PHP_FOLDERS=app config extensions/campaign-module/config extensions/campaign-module/src
 
 js-link-remp:
 	yarn link "../Package/remp" --relative

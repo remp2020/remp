@@ -10,21 +10,21 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 use Remp\BeamModule\Console\Commands\AggregateArticlesViews;
 use Remp\BeamModule\Contracts\Mailer\Mailer;
 use Remp\BeamModule\Contracts\Mailer\MailerContract;
 use Remp\BeamModule\Http\Controllers\JournalProxyController;
 use Remp\BeamModule\Http\Middleware\DashboardBasicAuth;
 use Remp\BeamModule\Http\Resources\SearchResource;
-use Remp\BeamModule\Model\Property\SelectedProperty;
 use Remp\BeamModule\Model\Config\ConversionRateConfig;
-use Illuminate\Database\Connection;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\ServiceProvider;
+use Remp\BeamModule\Model\Property\SelectedProperty;
 use Remp\Journal\DummyTokenProvider;
 use Remp\Journal\Journal;
 use Remp\Journal\JournalContract;
@@ -70,7 +70,7 @@ class BeamServiceProvider extends ServiceProvider
 
         Route::group([
             'middleware' => 'web'
-        ], function() {
+        ], function () {
             $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
         });
 
@@ -81,8 +81,7 @@ class BeamServiceProvider extends ServiceProvider
             __DIR__ .'/../config/beam.php' => config_path('beam.php'),
             __DIR__ .'/../config/services.php' => config_path('services.remp.php'),
             __DIR__ .'/../config/system.php' => config_path('system.php'),
-        ], ['beam-assets', 'laravel-assets']
-        );
+        ], ['beam-assets', 'laravel-assets']);
 
         $this->registerCommands();
 
@@ -188,12 +187,6 @@ class BeamServiceProvider extends ServiceProvider
                 ],
             ]);
             return new Mailer($client);
-        });
-
-        // RefererParser - TODO: fix to some relative path
-        $this->app->bind(Parser::class, function ($app) {
-            $configReader = new YamlConfigReader(base_path("/vendor/snowplow/referer-parser/resources/referers.yml"));
-            return new Parser($configReader);
         });
     }
 

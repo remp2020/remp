@@ -21,8 +21,8 @@
         </div>
     </div>
 
-    {!! Form::model($banner, ['route' => ['banners.update', $banner], 'method' => 'PATCH']) !!}
+    {{ html()->modelForm($banner, 'PATCH')->route('banners.update', $banner)->open() }}
     @include('campaign::banners._form')
-    {!! Form::close() !!}
+    {{ html()->closeModelForm() }}
 
 @endsection

@@ -105,12 +105,12 @@ class StatsHelper
             if (!array_key_exists($stat->currency, $variantsData[$statCampaignBanner->uuid]['purchase_sums'])) {
                 $variantsData[$statCampaignBanner->uuid]['purchase_sums'][$stat->currency] = 0.0;
             }
-            $variantsData[$statCampaignBanner->uuid]['purchase_sums'][$stat->currency] += (double) $stat->purchase_sum;
+            $variantsData[$statCampaignBanner->uuid]['purchase_sums'][$stat->currency] += (double) $stat['purchase_sum'];
 
             if (!array_key_exists($stat->currency, $campaignData['purchase_sums'])) {
                 $campaignData['purchase_sums'][$stat->currency] = 0.0;
             }
-            $campaignData['purchase_sums'][$stat->currency] += (double) $stat->purchase_sum;
+            $campaignData['purchase_sums'][$stat->currency] += (double) $stat['purchase_sum'];
         }
 
         return [$campaignData, $variantsData];

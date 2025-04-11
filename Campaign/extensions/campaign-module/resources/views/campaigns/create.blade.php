@@ -11,9 +11,9 @@
     <div class="container">
         @include('flash::message')
 
-        {!! Form::model($campaign, ['route' => ['campaigns.store', ['collection' => $collection]], 'id' => 'campaign-form-root']) !!}
+        {{ html()->modelForm($campaign)->route('campaigns.store', ['collection' => $collection])->attribute('id', 'campaign-form-root')->open() }}
         @include('campaign::campaigns._form', ['action' => 'create'])
-        {!! Form::close() !!}
+        {{ html()->closeModelForm() }}
     </div>
 
 @endsection

@@ -2,14 +2,19 @@
 
 namespace Remp\BeamModule\Model;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Remp\BeamModule\Database\Factories\ArticleFactory;
 use Remp\BeamModule\Helpers\Journal\JournalHelpers;
 use Remp\BeamModule\Model\Config\ConversionRateConfig;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
 use Remp\Journal\TokenProvider;
@@ -53,10 +58,10 @@ class Article extends BaseModel implements Searchable
         'pageviews_subscribers',
     ];
 
-    protected $dates = [
-        'published_at',
-        'created_at',
-        'updated_at',
+    protected $casts = [
+        'published_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     protected static function newFactory(): ArticleFactory
@@ -69,52 +74,52 @@ class Article extends BaseModel implements Searchable
         return new SearchResult($this, $this->title);
     }
 
-    public function property()
+    public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class, 'property_uuid', 'uuid');
     }
 
-    public function authors()
+    public function authors(): BelongsToMany
     {
         return $this->belongsToMany(Author::class);
     }
 
-    public function sections()
+    public function sections(): BelongsToMany
     {
         return $this->belongsToMany(Section::class);
     }
 
-    public function tags()
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
 
-    public function conversions()
+    public function conversions(): HasMany
     {
         return $this->hasMany(Conversion::class);
     }
 
-    public function conversionSources()
+    public function conversionSources(): HasManyThrough
     {
         return $this->hasManyThrough(ConversionSource::class, Conversion::class);
     }
 
-    public function pageviews()
+    public function pageviews(): HasMany
     {
         return $this->hasMany(ArticlePageviews::class);
     }
 
-    public function timespent()
+    public function timespent(): HasMany
     {
         return $this->hasMany(ArticleTimespent::class);
     }
 
-    public function articleTitles()
+    public function articleTitles(): HasMany
     {
         return $this->hasMany(ArticleTitle::class);
     }
 
-    public function dashboardArticle()
+    public function dashboardArticle(): HasOne
     {
         return $this->hasOne(DashboardArticle::class);
     }
@@ -262,19 +267,11 @@ SQL;
         return DB::select($newSubscriptionsCountSql, [$this->id])[0]->subscriptions_count;
     }
 
-    /**
-     * has_image_variants
-     * @return int
-     */
     public function getHasImageVariantsAttribute(): bool
     {
         return count($this->variants_count['image']) > 1;
     }
 
-    /**
-     * has_title_variants
-     * @return bool
-     */
     public function getHasTitleVariantsAttribute(): bool
     {
         return count($this->variants_count['title']) > 1;
@@ -332,7 +329,7 @@ SQL;
 
         $query = $query->joinSub($innerQuery, 't', function ($join) {
                 $join->on('articles.id', '=', 't.article_id');
-            })
+        })
             ->orderByDesc('t.total_sum');
 
         if ($limit) {

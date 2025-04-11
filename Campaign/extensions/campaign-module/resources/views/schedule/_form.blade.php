@@ -1,18 +1,18 @@
 <div class="row">
     <div class="col-md-6 form-group">
-        {!! Form::hidden('campaign_id') !!}
+        {{ html()->hidden('campaign_id') }}
 
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
                 <div class="dtp-container fg-line">
-                    {!! Form::label('start_time_frontend', 'Start time', ['class' => 'fg-label']) !!}
-                    {!! Form::datetime('start_time_frontend', $schedule->start_time, array_filter([
+                    {{ html()->label('Start time', 'start_time_frontend')->attribute('fg-label') }}
+                    {{ html()->datetime('start_time_frontend', $schedule->start_time, false)->attributes([
                         'class' => 'form-control date-time-picker',
                         'disabled' => $schedule->id && !$schedule->isEditable() ? 'disabled' : null,
-                    ])) !!}
+                    ]) }}
                 </div>
-                {!! Form::hidden('start_time') !!}
+                {{ html()->hidden('start_time') }}
             </div>
         </div>
 
@@ -20,12 +20,12 @@
             <div class="input-group">
                 <span class="input-group-addon"><i class="zmdi zmdi-timer-off"></i></span>
                 <div class="dtp-container fg-line">
-                    {!! Form::label('end_time_frontend', 'End time', ['class' => 'fg-label']) !!}
-                    {!! Form::datetime('end_time_frontend', $schedule->end_time, array_filter([
+                    {{ html()->label('End time', 'end_time_frontend')->attribute('fg-label') }}
+                    {{ html()->datetime('end_time_frontend', $schedule->end_time, false)->attributes([
                         'class' => 'form-control date-time-picker',
-                    ])) !!}
+                    ]) }}
                 </div>
-                {!! Form::hidden('end_time') !!}
+                {{ html()->hidden('end_time') }}
             </div>
         </div>
 

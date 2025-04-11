@@ -14,9 +14,9 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            {!! Form::model($account, ['route' => ['accounts.update', $account], 'method' => 'PATCH']) !!}
+            {{ html()->modelForm($account, 'PATCH')->route('accounts.update', $account)->open() }}
             @include('beam::accounts._form')
-            {!! Form::close() !!}
+            {{ html()->closeModelForm() }}
         </div>
     </div>
 

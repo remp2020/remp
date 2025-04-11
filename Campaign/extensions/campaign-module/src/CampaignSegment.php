@@ -5,6 +5,7 @@ namespace Remp\CampaignModule;
 use Database\Factories\CampaignSegmentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CampaignSegment extends Model
 {
@@ -29,7 +30,7 @@ class CampaignSegment extends Model
         return CampaignSegmentFactory::new();
     }
 
-    public function campaign()
+    public function campaign(): BelongsTo
     {
         return $this->belongsTo(Campaign::class);
     }

@@ -2,8 +2,7 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\Conversion;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ConversionPageviewEvent extends BaseModel
 {
@@ -12,6 +11,9 @@ class ConversionPageviewEvent extends BaseModel
         'signed_in' => 'boolean',
         'minutes_to_conversion' => 'integer',
         'event_prior_conversion' => 'integer',
+        'time' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     protected $fillable = [
@@ -29,18 +31,12 @@ class ConversionPageviewEvent extends BaseModel
         'event_prior_conversion',
     ];
 
-    protected $dates = [
-        'time',
-        'created_at',
-        'updated_at',
-    ];
-
-    public function conversion()
+    public function conversion(): BelongsTo
     {
         return $this->belongsTo(Conversion::class);
     }
 
-    public function article()
+    public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }

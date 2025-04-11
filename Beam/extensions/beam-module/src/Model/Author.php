@@ -2,13 +2,11 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\AuthorFactory;
-use Remp\BeamModule\Model\Conversion;
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\ArticleAuthor;
-use Remp\BeamModule\Model\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Remp\BeamModule\Database\Factories\AuthorFactory;
 use Remp\Journal\TokenProvider;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
@@ -37,7 +35,7 @@ class Author extends BaseModel implements Searchable
         return new SearchResult($this, $this->name);
     }
 
-    public function articles()
+    public function articles(): BelongsToMany
     {
         return $this->belongsToMany(Article::class);
     }
@@ -47,7 +45,7 @@ class Author extends BaseModel implements Searchable
         return $this->articles()->orderBy('published_at', 'DESC')->take(1);
     }
 
-    public function conversions()
+    public function conversions(): HasManyThrough
     {
         return $this->hasManyThrough(Conversion::class, ArticleAuthor::class, 'article_author.author_id', 'conversions.article_id', 'id', 'article_id');
     }

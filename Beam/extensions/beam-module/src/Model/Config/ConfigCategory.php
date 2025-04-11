@@ -2,9 +2,10 @@
 
 namespace Remp\BeamModule\Model\Config;
 
-use Remp\BeamModule\Model\BaseModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Remp\BeamModule\Http\Requests\AuthorSegmentsConfigurationRequest;
+use Remp\BeamModule\Model\BaseModel;
 
 class ConfigCategory extends BaseModel
 {
@@ -17,7 +18,7 @@ class ConfigCategory extends BaseModel
         'display_name',
     ];
 
-    public function configs()
+    public function configs(): HasMany
     {
         return $this->hasMany(Config::class);
     }

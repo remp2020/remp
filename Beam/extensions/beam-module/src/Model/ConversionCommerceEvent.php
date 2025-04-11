@@ -3,6 +3,8 @@
 namespace Remp\BeamModule\Model;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Remp\BeamModule\Database\Factories\ConversionCommerceEventFactory;
 
 class ConversionCommerceEvent extends BaseModel
@@ -12,6 +14,9 @@ class ConversionCommerceEvent extends BaseModel
     protected $casts = [
         'minutes_to_conversion' => 'integer',
         'event_prior_conversion' => 'integer',
+        'time' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     protected $fillable = [
@@ -34,18 +39,12 @@ class ConversionCommerceEvent extends BaseModel
         return ConversionCommerceEventFactory::new();
     }
 
-    protected $dates = [
-        'time',
-        'created_at',
-        'updated_at',
-    ];
-
-    public function conversion()
+    public function conversion(): BelongsTo
     {
         return $this->belongsTo(Conversion::class);
     }
 
-    public function products()
+    public function products(): HasMany
     {
         return $this->hasMany(ConversionCommerceEventProduct::class);
     }

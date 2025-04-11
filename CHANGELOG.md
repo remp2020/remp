@@ -8,11 +8,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
-- **BREAKING**: Updated Laravel to v9. remp/remp#1409
+- **BREAKING**: Updated Laravel to v10. remp/remp#1409
   - Please be aware that upgrade causes any assets published during Laravel's dependencies installation (`vendor:publish`) to have stricter rights by default (`0700` for directories, `0600` for files). You might need to update the rights of `public/vendor/` after the `composer install` call.
 - **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
 - **BREAKING**: Renamed Laravel's `FILESYSTEM_DRIVER` env variable to `FILESYSTEM_DISK`. remp/remp#1409
 - **BREAKING**: Changed minimum Go version for building Tracker API and Segments API to 1.23.
+- **BREAKING**: Removed `snowplow/referer-parser` dependency from PHP application. Beam wasn't using this anymore after removal of device stats. remp/remp#1409
+- **BREAKING**: Replaced abandoned `laravelcollective/html` with `spatie/laravel-html`. remp/remp#1409
 - **IMPORTANT**: Removed data of sections "Visitors" and "Google Analytics Reporting", which we removed in the previous version. remp/remp#1349
   - Migration removes tables `session_devices` and `session_referers`.
 - Changed banner preview components as now include and run custom JS inside of iframe. remp/crm#3353
@@ -24,9 +26,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
-- **BREAKING**: Updated Laravel to v9. remp/remp#1409
+- **BREAKING**: Updated Laravel to v10. remp/remp#1409
 - **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
 - **BREAKING**: Renamed Laravel's `FILESYSTEM_DRIVER` env variable to `FILESYSTEM_DISK`. remp/remp#1409
+- **BREAKING**: Replaced abandoned `laravelcollective/html` with `spatie/laravel-html`. remp/remp#1409
 - Refactored showtime caching to replace serialized objects with JSON cache. remp/remp#1401
 - Added campaign targeting based on operating system. remp/remp#1403
 - Refactored device and operating rules to their own class `DeviceRulesEvaluator`. remp/remp#1403
@@ -51,7 +54,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Sso]
 
-- **BREAKING**: Updated Laravel to v9. remp/remp#1409
+- **BREAKING**: Updated Laravel to v10. remp/remp#1409
 - **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
 - **BREAKING**: Renamed Laravel's `FILESYSTEM_DRIVER` env variable to `FILESYSTEM_DISK`. remp/remp#1409
 

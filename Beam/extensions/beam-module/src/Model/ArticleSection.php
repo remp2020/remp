@@ -2,22 +2,20 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
-use Remp\BeamModule\Model\Section;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Remp\Journal\TokenProvider;
 
 class ArticleSection extends BaseModel
 {
     protected $table = 'article_section';
 
-    public function section()
+    public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class);
     }
 
-    public function article()
+    public function article(): BelongsTo
     {
         return $this->belongsTo(Article::class);
     }

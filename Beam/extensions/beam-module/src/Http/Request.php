@@ -4,7 +4,7 @@ namespace Remp\BeamModule\Http;
 
 class Request extends \Illuminate\Http\Request
 {
-    public function isSecure()
+    public function isSecure(): bool
     {
         $isSecure = parent::isSecure();
         if ($isSecure) {

@@ -1,13 +1,11 @@
 <?php
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\Author;
-use Remp\BeamModule\Helpers\Misc;
 use Cache;
 use Exception;
 use Illuminate\Support\Collection;
 use MabeEnum\Enum;
+use Remp\BeamModule\Helpers\Misc;
 
 class NewsletterCriterion extends Enum
 {
@@ -72,7 +70,7 @@ class NewsletterCriterion extends Enum
         // Do not consider older articles
         $query->publishedBetween($start);
 
-        $ignoreAuthorIds = Author::whereIn('name', $ignoreAuthors)->get()->pluck('id')->toArray();
+        $ignoreAuthorIds = Author::whereIn('name', $ignoreAuthors)->pluck('id')->toArray();
         return $query
             ->ignoreAuthorIds($ignoreAuthorIds)
             ->ignoreContentTypes($ignoreContentTypes)

@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
  */
 trait HasCacheableRelation
 {
-    public function hydrateFromCache($cachedData): void
+    public function hydrateFromCache(array $cachedData): void
     {
         $this->setRawAttributes($cachedData);
         $this->exists = true;
@@ -25,7 +25,7 @@ trait HasCacheableRelation
             $cachedRecord = $cachedData[$key];
             if (is_array($cachedRecord) && !isset($cachedRecord['id'])) {
                 $relationRecords = new Collection();
-                foreach($cachedRecord as $relationRecord) {
+                foreach ($cachedRecord as $relationRecord) {
                     $relatedModel = new $relatedModelClass();
 
                     if (method_exists($relatedModel, 'hydrateFromCache')) {

@@ -33,7 +33,7 @@
 
         <div class="radio m-b-15">
             <label>
-                {{ Form::radio('history', '30', true) }}
+                {{ html()->radio('history', true, '30') }}
                 <i class="input-helper"></i>
                 30 days
             </label>
@@ -41,7 +41,7 @@
 
         <div class="radio m-b-15">
             <label>
-                {{ Form::radio('history', '60', true) }}
+                {{ html()->radio('history', false, '60') }}
                 <i class="input-helper"></i>
                 60 days
             </label>
@@ -49,7 +49,7 @@
 
         <div class="radio m-b-15">
             <label>
-                {{ Form::radio('history', '90', true) }}
+                {{ html()->radio('history', false,  '90') }}
                 <i class="input-helper"></i>
                 90 days
             </label>

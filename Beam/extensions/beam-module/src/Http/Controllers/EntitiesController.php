@@ -2,21 +2,15 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
-use Remp\BeamModule\Model\EntityParam;
-use Html;
-use Remp\BeamModule\Model\Entity;
 use Illuminate\Http\Request;
-use Yajra\Datatables\Datatables;
 use Remp\BeamModule\Http\Requests\EntityRequest;
 use Remp\BeamModule\Http\Resources\EntityResource;
+use Remp\BeamModule\Model\Entity;
+use Remp\BeamModule\Model\EntityParam;
+use Yajra\DataTables\DataTables;
 
 class EntitiesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return view('beam::entities.index');
@@ -53,11 +47,6 @@ class EntitiesController extends Controller
             ->make(true);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         $entity = new Entity();
@@ -71,13 +60,6 @@ class EntitiesController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  EntityRequest  $request
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     */
     public function store(EntityRequest $request)
     {
         $entity = new Entity();
@@ -95,12 +77,6 @@ class EntitiesController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  Entity  $entity
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Entity $entity)
     {
         if ($entity->isRootEntity()) {
@@ -113,15 +89,6 @@ class EntitiesController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Remp\BeamModule\Model\Entity $entity
-     * @param  EntityRequest $request
-     *
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     */
     public function update(Entity $entity, EntityRequest $request)
     {
         $entity = $this->saveEntity($entity, $request);
@@ -138,13 +105,6 @@ class EntitiesController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  Entity  $entity
-     * @return \Illuminate\Http\Response
-     * @throws \Exception
-     */
     public function destroy(Entity $entity)
     {
         $entity->delete();
@@ -155,23 +115,11 @@ class EntitiesController extends Controller
         ]);
     }
 
-    /**
-     * Ajax validate form method.
-     *
-     * @param EntityRequest|Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function validateForm(EntityRequest $request, Entity $entity = null)
     {
         return response()->json(false);
     }
 
-    /**
-     * @param \Remp\BeamModule\Model\Entity $entity
-     * @param EntityRequest $request
-     * @return \Remp\BeamModule\Model\Entity
-     * @throws \Exception
-     */
     public function saveEntity(Entity $entity, EntityRequest $request)
     {
         $entity->fill($request->all());

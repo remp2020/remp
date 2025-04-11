@@ -7,18 +7,8 @@ use Remp\BeamModule\Model\SegmentBrowser;
 
 class SegmentBrowserFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = SegmentBrowser::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
     public function definition()
     {
         return [

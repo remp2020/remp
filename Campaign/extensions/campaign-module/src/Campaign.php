@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Redis;
 use Remp\CampaignModule\Concerns\HasCacheableRelation;
 use Spatie\Searchable\Searchable;
@@ -154,13 +155,13 @@ class Campaign extends Model implements Searchable
         return $this->campaignBanners()->withTrashed()->get()->pluck('uuid')->toArray();
     }
 
-    public function banners()
+    public function banners(): BelongsToMany
     {
         return $this->belongsToMany(Banner::class, 'campaign_banners')
             ->withPivot('proportion', 'control_group', 'weight');
     }
 
-    public function campaignBanners()
+    public function campaignBanners(): HasMany
     {
         return $this->hasMany(CampaignBanner::class)->orderBy('weight');
     }
@@ -195,7 +196,7 @@ class Campaign extends Model implements Searchable
         }
     }
 
-    public function countries()
+    public function countries(): BelongsToMany
     {
         return $this->belongsToMany(
             Country::class,
@@ -217,12 +218,12 @@ class Campaign extends Model implements Searchable
         return $this->countries()->wherePivot('blacklisted', '=', true);
     }
 
-    public function segments()
+    public function segments(): HasMany
     {
         return $this->hasMany(CampaignSegment::class);
     }
 
-    public function schedules()
+    public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);
     }

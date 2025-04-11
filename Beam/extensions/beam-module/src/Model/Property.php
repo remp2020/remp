@@ -2,8 +2,9 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Database\Factories\PropertyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Remp\BeamModule\Database\Factories\PropertyFactory;
 
 class Property extends BaseModel
 {
@@ -16,7 +17,7 @@ class Property extends BaseModel
         return PropertyFactory::new();
     }
 
-    public function account()
+    public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
     }

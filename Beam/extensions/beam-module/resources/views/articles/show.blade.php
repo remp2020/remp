@@ -234,8 +234,8 @@
                 <div class="card-header">
                     <h2>Referer stats <small></small></h2>
                     <div id="smart-range-selector">
-                        {!! Form::hidden('visited_from', $visitedFrom) !!}
-                        {!! Form::hidden('visited_to', $visitedTo) !!}
+                        {{ html()->hidden('visited_from', $visitedFrom) }}
+                        {{ html()->hidden('visited_to', $visitedTo) }}
                         <smart-range-selector from="{{$visitedFrom}}" to="{{$visitedTo}}" :callback="callback">
                         </smart-range-selector>
                     </div>

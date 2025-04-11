@@ -2,14 +2,14 @@
 
 namespace Remp\BeamModule\Model\Pageviews\Api\v2;
 
-use Remp\BeamModule\Http\Requests\Api\v2\TopArticlesSearchRequest;
-use Remp\BeamModule\Http\Requests\Api\v2\TopAuthorsSearchRequest;
-use Remp\BeamModule\Http\Requests\Api\v2\TopTagsSearchRequest;
 use Cache;
 use DB;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Carbon;
+use Remp\BeamModule\Http\Requests\Api\v2\TopArticlesSearchRequest;
+use Remp\BeamModule\Http\Requests\Api\v2\TopAuthorsSearchRequest;
+use Remp\BeamModule\Http\Requests\Api\v2\TopTagsSearchRequest;
 
 class TopSearch
 {
@@ -280,7 +280,6 @@ class TopSearch
             $data = DB::table('article_pageviews')
                 ->orderBy('time_from')
                 ->limit(1)
-                ->get()
                 ->first();
 
             if (!$data) {
@@ -318,7 +317,6 @@ class TopSearch
         $data = $query->where('article_pageviews.time_from', '>=', $timeFrom)
             ->limit(1)
             ->offset($limit - 1)
-            ->get()
             ->first();
 
         return $data ? $data->pageviews : 0;

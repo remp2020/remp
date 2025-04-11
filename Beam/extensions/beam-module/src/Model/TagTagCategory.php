@@ -2,32 +2,31 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\BaseModel;
-use Remp\BeamModule\Model\Tag;
 use Illuminate\Database\Eloquent\Builder;
-use Remp\BeamModule\Model\TagCategory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Remp\Journal\TokenProvider;
 
 class TagTagCategory extends BaseModel
 {
     protected $table = 'tag_tag_category';
 
-    public function tag()
+    public function tag(): BelongsTo
     {
         return $this->belongsTo(Tag::class);
     }
 
-    public function tagCategory()
+    public function tagCategory(): BelongsTo
     {
         return $this->belongsTo(TagCategory::class);
     }
 
-    public function scopeOfSelectedProperty($query)
+    public function scopeOfSelectedProperty($query): Builder
     {
         $tokenProvider = resolve(TokenProvider::class);
         $propertyUuid = $tokenProvider->getToken();
         if ($propertyUuid) {
             $query->whereHas('tag', function (Builder $tagQuery) {
+                /** @var Builder|Tag $tagQuery */
                 $tagQuery->ofSelectedProperty();
             });
         }

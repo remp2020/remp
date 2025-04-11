@@ -5,6 +5,7 @@ namespace Remp\CampaignModule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
@@ -37,7 +38,7 @@ class Schedule extends Model implements Searchable
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
-    public function campaign()
+    public function campaign(): BelongsTo
     {
         return $this->belongsTo(Campaign::class);
     }

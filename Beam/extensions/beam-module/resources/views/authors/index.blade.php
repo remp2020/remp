@@ -12,23 +12,23 @@
         <div id="smart-range-selectors" class="row">
             <div class="col-md-4">
                 <h4>Filter by publish date</h4>
-                {!! Form::hidden('published_from', $publishedFrom) !!}
-                {!! Form::hidden('published_to', $publishedTo) !!}
+                {{ html()->hidden('published_from', $publishedFrom) }}
+                {{ html()->hidden('published_to', $publishedTo) }}
                 <smart-range-selector from="{{$publishedFrom}}" to="{{$publishedTo}}" :callback="callbackPublished">
                 </smart-range-selector>
             </div>
 
             <div class="col-md-4">
                 <h4>Filter by conversion date</h4>
-                {!! Form::hidden('conversion_from', $conversionFrom) !!}
-                {!! Form::hidden('conversion_to', $conversionTo) !!}
+                {{ html()->hidden('conversion_from', $conversionFrom) }}
+                {{ html()->hidden('conversion_to', $conversionTo) }}
                 <smart-range-selector from="{{$conversionFrom}}" to="{{$conversionTo}}" :callback="callbackConversion">
                 </smart-range-selector>
             </div>
 
             <div class="col-md-2">
                 <h4>Filter by article content type</h4>
-                {!! Form::hidden('content_type', $contentType) !!}
+                {{ html()->hidden('content_type', $contentType) }}
 
                 <v-select
                         name="content_type_select"

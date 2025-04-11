@@ -2,8 +2,6 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\BaseModel;
-
 class SegmentGroup extends BaseModel
 {
     const CODE_AUTHORS_SEGMENTS = 'authors-segments';

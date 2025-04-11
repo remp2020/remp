@@ -13,9 +13,9 @@
         </div>
         <div class="card-body card-padding">
 
-            {!! Form::model($apiToken, ['route' => 'api-tokens.store']) !!}
+            {{ html()->modelForm($apiToken)->route('api-tokens.store')->open() }}
             @include('api_tokens._form')
-            {!! Form::close() !!}
+            {{ html()->closeModelForm() }}
 
         </div>
     </div>

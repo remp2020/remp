@@ -15,9 +15,9 @@
         <div class="card-body card-padding">
             @include('flash::message')
 
-            {!! Form::model($apiToken, ['route' => ['api-tokens.update', $apiToken], 'method' => 'PATCH']) !!}
+            {{ html()->modelForm($apiToken, 'PATCH')->route('api-tokens.update', $apiToken)->open() }}
             @include('api_tokens._form')
-            {!! Form::close() !!}
+            {{ html()->closeModelForm() }}
         </div>
     </div>
 

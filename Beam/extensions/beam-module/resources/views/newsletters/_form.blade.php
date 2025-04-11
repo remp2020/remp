@@ -1,5 +1,3 @@
-{!! Form::token() !!}
-
 <div id="newsletters-form">
 
     <form-validator url="{{route('newsletters.validateForm')}}"></form-validator>
@@ -9,8 +7,8 @@
             <div class="input-group fg-float m-t-10">
                 <span class="input-group-addon"><i class="zmdi zmdi-label"></i></span>
                 <div class="fg-line">
-                    {!! Form::label('Name', null, ['class' => 'fg-label']) !!}
-                    {!! Form::text('name', $newsletter->name, ['class' => 'form-control fg-input']) !!}
+                    {{ html()->label('Name')->attribute('class', 'fg-label') }}
+                    {{ html()->text('name', $newsletter->name)->attribute('class', 'form-control fg-input') }}
                 </div>
             </div>
 
@@ -19,18 +17,15 @@
                 <span class="input-group-addon"><i class="zmdi <?= $disabled ? 'zmdi-close-circle palette-Red text' : 'zmdi-wallpaper' ?>"></i></span>
                 <div class="row">
                     <div class="col-md-12 form-group">
-                        {!! Form::label('Segment', null, ['class' => 'fg-label']) !!}
-                        {!! Form::select(
-                            'segment',
-                            $segments,
-                            $newsletter->segment,
+                        {{ html()->label('Segment')->attribute('class', 'fg-label') }}
+                        {{ html()->select('segment', $segments, $newsletter->segment)->attributes(
                             [
                                 'class' => 'selectpicker',
                                 'data-live-search' => 'true',
                                 'placeholder' => !$disabled ? 'Please select...' : 'No segments are available on Mailer, please configure them first',
                                 'disabled' => $disabled
                             ]
-                       ) !!}
+                       ) }}
                     </div>
                 </div>
             </div>
@@ -40,18 +35,15 @@
                 <span class="input-group-addon"><i class="zmdi <?= $disabled ? 'zmdi-close-circle palette-Red text' : 'zmdi-settings' ?>"></i></span>
                 <div class="row">
                     <div class="col-md-12 form-group">
-                        {!! Form::label('Generator', null, ['class' => 'fg-label']) !!}
-                        {!! Form::select(
-                            'mailer_generator_id',
-                            $generators,
-                            $newsletter->mailer_generator_id,
+                        {{ html()->label('Generator')->attribute('class', 'fg-label') }}
+                        {{ html()->select('mailer_generator_id', $generators, $newsletter->mailer_generator_id)->attributes(
                             [
                                 'class' => 'selectpicker',
                                 'data-live-search' => 'true',
                                 'placeholder' => !$disabled ? 'Please select...' : 'No source templates using best_performing_articles generator were configured on Mailer',
                                 'disabled' => $disabled,
                            ]
-                       ) !!}
+                       ) }}
                     </div>
                 </div>
             </div>
@@ -61,18 +53,15 @@
                 <span class="input-group-addon"><i class="zmdi <?= $disabled ? 'zmdi-close-circle palette-Red text' : 'zmdi-settings' ?>"></i></span>
                 <div class="row">
                     <div class="col-md-12 form-group">
-                        {!! Form::label('Mail Type', null, ['class' => 'fg-label']) !!}
-                        {!! Form::select(
-                            'mail_type_code',
-                            $mailTypes,
-                            $newsletter->mail_type_code,
+                        {{ html()->label('Mail Type')->attribute('class', 'fg-label') }}
+                        {{ html()->select('mail_type_code', $mailTypes, $newsletter->mail_type_code)->attributes(
                             [
                                 'class' => 'selectpicker',
                                 'data-live-search' => 'true',
                                 'placeholder' => !$disabled ? 'Please select...' : 'No mail types are available on Mailer, please configure them first',
                                 'disabled' => $disabled,
                             ]
-                       ) !!}
+                       ) }}
                     </div>
                 </div>
             </div>
@@ -83,14 +72,11 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-key"></i></span>
                 <div class="row">
                     <div class="col-md-12 form-group">
-                        {!! Form::label('Criterion', null, ['class' => 'fg-label']) !!}
-                        {!! Form::select(
-                           'criteria',
-                           $criteria,
-                           $newsletter->criteria,
-                           ['class' => 'selectpicker',
-                           'placeholder' => 'Please select...']
-                       ) !!}
+                        {{ html()->label('Criterion')->attribute('class', 'fg-label') }}
+                        {{ html()->select('criteria', $criteria, $newsletter->criteria)->attributes([
+                           'class' => 'selectpicker',
+                           'placeholder' => 'Please select...',
+                        ]) }}
                     </div>
                 </div>
             </div>
@@ -99,24 +85,26 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-time-interval"></i></span>
                 <div class="fg-line">
                     <label class="fg-label">Criterion timespan (how old articles are included)</label>
-                    {!! Form::text('timespan',
-                    $newsletter->timespan,
-                    ['class' => 'form-control fg-input', 'placeholder' => "e.g. 3d 1h 4m", 'required' => 'required']) !!}
+                    {{ html()->text('timespan', $newsletter->timespan)->attributes([
+                        'class' => 'form-control fg-input',
+                        'placeholder' => "e.g. 3d 1h 4m",
+                        'required' => 'required',
+                    ]) }}
                 </div>
             </div>
 
             <div class="input-group m-t-15">
                 <span class="input-group-addon"><i class="zmdi zmdi-file-text"></i></span>
                 <div class="fg-line">
-                    {!! Form::label('How many articles', null, ['class' => 'fg-label']) !!}
-                    {!! Form::number('articles_count', $newsletter->articles_count, ['class' => 'form-control fg-input', 'min' => 1, 'max' => 100]) !!}
+                    {{ html()->label('How many articles')->attribute('class', 'fg-label') }}
+                    {{ html()->number('articles_count', $newsletter->articles_count, 1, 100)->attribute('class', 'form-control fg-input') }}
                 </div>
             </div>
 
             <div class="input-group m-t-30 checkbox large-tooltip">
                 <label class="m-l-15">
                     Personalized content
-                    {!! Form::checkbox('personalized_content', 1, $newsletter->personalized_content) !!} <i class="input-helper"></i>
+                    {{ html()->checkbox('personalized_content', $newsletter->personalized_content) }} <i class="input-helper"></i>
                     <span data-toggle="tooltip"
                           data-original-title="For each user, select only those articles he/she has not read yet."
                           class="glyphicon glyphicon-question-sign"></span>
@@ -128,16 +116,22 @@
             <div class="input-group m-t-20">
                 <span class="input-group-addon"><i class="zmdi zmdi-email"></i></span>
                 <div class="fg-line">
-                    {!! Form::label('Email subject', null, ['class' => 'fg-label']) !!}
-                    {!! Form::text('email_subject', $newsletter->email_subject, ['class' => 'form-control fg-input', 'placeholder' => 'e.g. "Top 10 articles this week"']) !!}
+                    {{ html()->label('Email subject')->attribute('class', 'fg-label') }}
+                    {{ html()->text('email_subject', $newsletter->email_subject)->attributes([
+                        'class' => 'form-control fg-input',
+                        'placeholder' => 'e.g. "Top 10 articles this week"',
+                    ]) }}
                 </div>
             </div>
 
             <div class="input-group m-t-10">
                 <span class="input-group-addon"><i class="zmdi zmdi-arrow-right"></i></span>
                 <div class="fg-line">
-                    {!! Form::label('Email from', null, ['class' => 'fg-label']) !!}
-                    {!! Form::text('email_from', $newsletter->email_from, ['class' => 'form-control fg-input', 'placeholder' => 'e.g. REMP <info@remp2020.com>']) !!}
+                    {{ html()->label('Email from')->attribute('class', 'fg-label') }}
+                    {{ html()->text('email_from', $newsletter->email_from)->attributes([
+                        'class' => 'form-control fg-input',
+                        'placeholder' => 'e.g. REMP <info@remp2020.com>',
+                    ]) }}
                 </div>
             </div>
         </div>
@@ -147,8 +141,8 @@
         <div class="col-md-6 form-group">
             <h5>Start date and recurrence</h5>
             <div class="m-t-20">
-                {!! Form::hidden('starts_at', $newsletter->starts_at) !!}
-                {!! Form::hidden('recurrence_rule', $newsletter->recurrence_rule_inline) !!}
+                {{ html()->hidden('starts_at', $newsletter->starts_at) }}
+                {{ html()->hidden('recurrence_rule', $newsletter->recurrence_rule_inline) }}
                 @php
                     $recurrence = old('recurrence_rule', $newsletter->recurrence_rule_inline);
                     $recurrence = $recurrence !== null ? "'{$recurrence}'" : 'null';

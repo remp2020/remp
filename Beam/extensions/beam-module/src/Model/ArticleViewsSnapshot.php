@@ -25,10 +25,7 @@ class ArticleViewsSnapshot extends BaseModel
 
     protected $casts = [
         'count' => 'integer',
-    ];
-
-    protected $dates = [
-        'time',
+        'time' => 'datetime',
     ];
 
     protected static function newFactory(): ArticleViewsSnapshotFactory

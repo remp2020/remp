@@ -2,14 +2,13 @@
 
 namespace Remp\BeamModule\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Remp\BeamModule\Http\Requests\SegmentRequest;
 use Remp\BeamModule\Model\Segment;
 use Remp\BeamModule\Model\SegmentGroup;
 use Remp\BeamModule\Model\SegmentRule;
-use Html;
 use Remp\Journal\JournalContract;
-use Yajra\Datatables\Datatables;
-use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 
 class SegmentController extends Controller
 {
@@ -20,11 +19,6 @@ class SegmentController extends Controller
         $this->journalContract = $journalContract;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return view('beam::segments.index');
@@ -53,11 +47,6 @@ class SegmentController extends Controller
             ->make(true);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         $segment = new Segment();
@@ -70,11 +59,6 @@ class SegmentController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource (beta version of new segment builder).
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function betaCreate()
     {
         $segment = new Segment();
@@ -102,12 +86,6 @@ class SegmentController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param SegmentRequest|Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(SegmentRequest $request)
     {
         $segment = new Segment();
@@ -126,23 +104,11 @@ class SegmentController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Segment  $segment
-     * @return \Illuminate\Http\Response
-     */
     public function show(Segment $segment)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Segment $segment
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Segment $segment)
     {
         list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
@@ -153,12 +119,6 @@ class SegmentController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource (beta version of new segment builder).
-     *
-     * @param  \App\Segment $segment
-     * @return \Illuminate\Http\Response
-     */
     public function betaEdit(Segment $segment)
     {
         list($segment, $categories) = $this->processOldSegment($segment, old(), $segment->rules->toArray());
@@ -169,13 +129,6 @@ class SegmentController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param SegmentRequest|Request $request
-     * @param  \App\Segment $segment
-     * @return \Illuminate\Http\Response
-     */
     public function update(SegmentRequest $request, Segment $segment)
     {
         $segment = $this->saveSegment($segment, $request->all(), $request->get('rules'));
@@ -192,12 +145,6 @@ class SegmentController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param \Remp\BeamModule\Model\Segment $segment
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Segment $segment)
     {
         $segment->delete();
@@ -253,8 +200,6 @@ class SegmentController extends Controller
 
         $segment->fill($data);
         $segment->save();
-
-        $rules = $rules ?? [];
 
         foreach ($rules as $rule) {
             $loadedRule = SegmentRule::findOrNew($rule['id']);

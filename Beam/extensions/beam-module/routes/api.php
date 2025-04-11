@@ -1,18 +1,18 @@
 <?php
 
-use Remp\BeamModule\Http\Controllers\Api\v1\PageviewController;
-use Remp\BeamModule\Http\Controllers\ArticleController;
 use Remp\BeamModule\Http\Controllers\Api\v1\ArticleController as ArticleControllerApiV1;
-use Remp\BeamModule\Http\Controllers\Api\v2\ArticleController as ArticleControllerApiV2;
-use Remp\BeamModule\Http\Controllers\ArticleDetailsController;
 use Remp\BeamModule\Http\Controllers\Api\v1\AuthorController as AuthorControllerApiV1;
+use Remp\BeamModule\Http\Controllers\Api\v1\JournalController;
+use Remp\BeamModule\Http\Controllers\Api\v1\PageviewController;
+use Remp\BeamModule\Http\Controllers\Api\v1\TagController as TagControllerApiV1;
+use Remp\BeamModule\Http\Controllers\Api\v2\ArticleController as ArticleControllerApiV2;
 use Remp\BeamModule\Http\Controllers\Api\v2\AuthorController as AuthorControllerApiV2;
+use Remp\BeamModule\Http\Controllers\Api\v2\TagController as TagControllerApiV2;
+use Remp\BeamModule\Http\Controllers\ArticleController;
+use Remp\BeamModule\Http\Controllers\ArticleDetailsController;
 use Remp\BeamModule\Http\Controllers\ConversionController;
 use Remp\BeamModule\Http\Controllers\DashboardController;
-use Remp\BeamModule\Http\Controllers\Api\v1\JournalController;
 use Remp\BeamModule\Http\Controllers\JournalProxyController;
-use Remp\BeamModule\Http\Controllers\Api\v1\TagController as TagControllerApiV1;
-use Remp\BeamModule\Http\Controllers\Api\v2\TagController as TagControllerApiV2;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +25,7 @@ use Remp\BeamModule\Http\Controllers\Api\v2\TagController as TagControllerApiV2;
 |
 */
 
-Route::middleware('auth:api')->group(function() {
+Route::middleware('auth:api')->group(function () {
     Route::apiResource('articles', ArticleController::class, [
         'only' => ['index', 'store'],
     ]);
@@ -56,7 +56,7 @@ Route::middleware('auth:api')->group(function() {
 
     Route::post('pageviews/histogram', [PageviewController::class, 'timeHistogram']);
 
-    Route::group(['prefix' => 'v2'], function() {
+    Route::group(['prefix' => 'v2'], function () {
         Route::post('articles/top', [ArticleControllerApiV2::class, 'topArticles'])->name('articles.top.v2');
         Route::post('authors/top', [AuthorControllerApiV2::class, 'topAuthors'])->name('authors.top.v2');
         Route::post('tags/top', [TagControllerApiV2::class, 'topTags'])->name('tags.top.v2');
@@ -71,7 +71,6 @@ Route::middleware('auth:api')->group(function() {
 Route::get('/journal/{group}/categories/{category}/actions', [JournalController::class, 'actions']);
 Route::get('/journal/flags', [JournalController::class, 'flags']);
 
-Route::middleware('cors')->group(function() {
+Route::middleware('cors')->group(function () {
     Route::get('/dashboard/options', [DashboardController::class, 'options'])->name('dashboard.options');
 });
-
