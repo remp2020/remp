@@ -51,6 +51,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for UTM parameters to mail link replace. remp/respekt#377
 - Added SnippetArticleLocker which provides way for generators to define lock messages via snippets. remp/novydenik#1324
 - Added set `Content-Language` header in `Sender` when locale is specified. remp/remp#1410
+- Fixed locale switch in template form. remp/remp#1400
 
 ### [Sso]
 
