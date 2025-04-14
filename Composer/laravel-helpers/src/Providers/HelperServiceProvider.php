@@ -2,18 +2,18 @@
 
 namespace Remp\LaravelHelpers\Providers;
 
-use Blade;
-use Request;
-use Response;
-use Schema;
-use Illuminate\Support\Carbon;
+use Carbon\FactoryImmutable;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class HelperServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        Carbon::setToStringFormat(DATE_RFC3339);
+        FactoryImmutable::getDefaultInstance()->setToStringFormat(DATE_RFC3339);
         Schema::defaultStringLength(191);
 
         $this->responseMacros();

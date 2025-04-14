@@ -37,11 +37,17 @@ class User implements Authenticatable, Arrayable
     }
 
     /**
-     * Get the password for the user.
-     * @return string
      * @throws SsoException
      */
     public function getAuthPassword()
+    {
+        throw new SsoException("jwt doesn't support password authentication");
+    }
+
+    /**
+     * @throws SsoException
+     */
+    public function getAuthPasswordName()
     {
         throw new SsoException("jwt doesn't support password authentication");
     }

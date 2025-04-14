@@ -11,12 +11,12 @@
   ],
   "require": {
     "php": "^8.2",
-    "league/uri": "^6.7",
-    "league/uri-components": "^2.4",
-    "illuminate/auth": "^v10.0",
-    "illuminate/contracts": "^v10.0",
-    "illuminate/http": "^v10.0",
-    "illuminate/support": "^v10.0",
+    "league/uri": "^7.5",
+    "league/uri-components": "^7.5",
+    "illuminate/auth": "^v11.0",
+    "illuminate/contracts": "^v11.0",
+    "illuminate/http": "^v11.0",
+    "illuminate/support": "^v11.0",
     "guzzlehttp/guzzle": "^7.0"
   },
   "require-dev": {

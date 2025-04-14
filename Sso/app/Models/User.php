@@ -3,25 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-/**
- * App\User
- *
- * @property \Carbon\Carbon|null $created_at
- * @property string $email
- * @property int $id
- * @property string|null $name
- * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\Models\GoogleUser $googleUser
- * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
- * @mixin \Eloquent
- */
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory;
@@ -32,13 +17,8 @@ class User extends Authenticatable implements JWTSubject
 
     const USER_LAST_LOGOUT_KEY = 'user_logout';
 
-    public $latestProvider;
+    public string $latestProvider;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -48,7 +28,7 @@ class User extends Authenticatable implements JWTSubject
         'last_logout_at' => 'datetime',
     ];
 
-    public function googleUser()
+    public function googleUser(): HasOne
     {
         return $this->hasOne(GoogleUser::class);
     }
@@ -70,11 +50,14 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getJWTCustomClaims()
     {
-        $name = null;
-        switch ($this->latestProvider) {
-            case self::PROVIDER_GOOGLE:
-                $name = $this->googleUser->name;
-        }
+        /** @var GoogleUser $googleUser */
+        $googleUser = $this->googleUser;
+
+        $name = match ($this->latestProvider) {
+            self::PROVIDER_GOOGLE => $googleUser->name,
+            default => null,
+        };
+
         return [
             'provider' => $this->latestProvider,
             'id' => $this->id,

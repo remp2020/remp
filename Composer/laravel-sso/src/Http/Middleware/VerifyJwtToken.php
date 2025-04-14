@@ -5,9 +5,11 @@ namespace Remp\LaravelSso\Http\Middleware;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use League\Uri\Components\Query;
 use League\Uri\Http;
 use League\Uri\QueryString;
+use League\Uri\Uri;
 use Remp\LaravelSso\Contracts\Jwt\Guard;
 use Remp\LaravelSso\Contracts\Jwt\User;
 use Remp\LaravelSso\Contracts\SsoContract;
@@ -25,13 +27,6 @@ class VerifyJwtToken
         $this->guard = $guard;
     }
 
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
     public function handle($request, Closure $next)
     {
         $token = $this->guard->getToken();
@@ -64,13 +59,14 @@ class VerifyJwtToken
                 $tokenResponse = $this->sso->refresh($token);
                 $this->guard->setToken($tokenResponse['token']);
             } catch (SsoExpiredException $refreshExpired) {
-                $redirectUrl = Http::createFromString($tokenExpired->redirect);
-                $query = Query::createFromParams([
-                    'successUrl' => $request->fullUrl(),
-                    'errorUrl' => config('services.remp_sso.error_url') ?: route('sso.error'),
-                ])->getContent() ?: '';
+                $redirectUrl = Uri::new($tokenExpired->redirect);
 
-                return redirect($redirectUrl->withQuery($query)->__toString());
+                $query = Query::new($redirectUrl->getQuery());
+                $query = $query
+                    ->appendTo('successUrl', $request->fullUrl())
+                    ->appendTo('errorUrl', config('services.remp_sso.error_url') ?: route('sso.error'));
+
+                return redirect($redirectUrl->withQuery($query->value()));
             }
         }
 
@@ -80,10 +76,8 @@ class VerifyJwtToken
     /**
      * handleCallback processes request when returning back from SSO with a token. It gets user data via introspect
      * call, stores them to Guard and returns RedirectResponse.
-     *
-     * @param \Illuminate\Http\Request $request
      */
-    private function handleCallback($request)
+    private function handleCallback(Request $request)
     {
         $token = $request->query('token');
         $userArr = $this->sso->introspect($token);
@@ -99,12 +93,11 @@ class VerifyJwtToken
 
         // now get rid of token param once handled
 
-        $fullUrl = Http::createFromString($request->fullUrl());
-        $url = Http::createFromString($request->url());
+        $url = Uri::new($request->url());
+        $query = Query::new($url->getQuery());
 
-        $queryPairs = QueryString::parse($fullUrl->getQuery());
-        $query = Query::createFromPairs($queryPairs)->withoutPair('token')->getContent() ?: '';
-
-        return redirect($url->withQuery($query)->__toString());
+        return redirect($url->withQuery(
+            query: $query->withoutPairByKey('token')
+        ));
     }
 }

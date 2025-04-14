@@ -1,3 +1,5 @@
+FROM mysql:8.0 AS mysql_client_stage
+
 FROM php:8.3.17-fpm
 
 # ADD NON-ROOT USER; IF THE VARIABLES ARE NOT SET, DOCKER COMPOSE DEFAULTS TO 1000:1000 "docker"
@@ -29,6 +31,8 @@ RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUN_DEPS} \
         -y --auto-remove \
         -o APT::AutoRemove::RecommendsImportant=false \
         ${BUILD_DEPS}
+
+COPY --from=mysql_client_stage /usr/bin/mysqldump /usr/bin/mysqldump
 
 # PHP
 

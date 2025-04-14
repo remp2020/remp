@@ -43,6 +43,14 @@ class User implements Authenticatable, Arrayable
     }
 
     /**
+     * @throws SsoException
+     */
+    public function getAuthPasswordName()
+    {
+        throw new SsoException("token doesn't support password authentication");
+    }
+
+    /**
      * Get the token value for the "remember me" session.
      * @return string
      * @throws SsoException

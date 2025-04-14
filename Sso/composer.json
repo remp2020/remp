@@ -38,11 +38,11 @@
         "ans-group/laravel-health-check": "^2.0",
         "arrilot/laravel-widgets": "3.13.1",
         "laracasts/flash": "^3.2",
-        "laravel/framework": "^10.0",
+        "laravel/framework": "^11.0",
         "laravel/socialite": "^5.2",
         "laminas/laminas-diactoros": "^2.5",
-        "league/uri": "^6.7",
-        "league/uri-components": "^2.4",
+        "league/uri": "^7.5",
+        "league/uri-components": "^7.5",
         "php-amqplib/php-amqplib": "^2.12",
         "predis/predis": "^1.1",
         "remp/laravel-helpers": "*",
@@ -50,23 +50,23 @@
         "remp/laravel-widgets": "*",
         "sentry/sentry-laravel": "^4.11",
         "spatie/laravel-html": "^3.12",
-        "symfony/psr-http-message-bridge": "^v2.1.2",
+        "symfony/psr-http-message-bridge": "^7.2",
         "tymon/jwt-auth": "^2.0",
-        "yajra/laravel-datatables-oracle": "^10.0",
+        "yajra/laravel-datatables-oracle": "^11.0",
         "laravel/tinker": "^2.5",
         "guzzlehttp/guzzle": "^7.0.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
-        "barryvdh/laravel-ide-helper": "^2.10",
-        "beyondcode/laravel-dump-server": "^1.7",
+        "barryvdh/laravel-ide-helper": "^3.5",
+        "beyondcode/laravel-dump-server": "^2.1",
         "fakerphp/faker": "^1.9.1",
         "filp/whoops": "^2.12",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "larastan/larastan": "^2.0",
+        "larastan/larastan": "^3.3",
         "mockery/mockery": "^1.4.2",
-        "nunomaduro/collision": "^7.0",
-        "phpunit/phpunit": "10.0",
+        "nunomaduro/collision": "^8.1",
+        "phpunit/phpunit": "11.0",
         "spatie/laravel-ignition": "^2.0",
         "squizlabs/php_codesniffer": "^3.6"
     },
@@ -94,7 +94,8 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover"
+            "@php artisan package:discover",
+            "@php artisan service:post-install"
         ]
     },
     "config": {

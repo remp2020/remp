@@ -36,7 +36,7 @@ class Sso implements SsoContract
         } catch (ClientException $e) {
             $response = $e->getResponse();
             $contents = $response->getBody()->getContents();
-            $body = \GuzzleHttp\json_decode($contents);
+            $body = \GuzzleHttp\Utils::jsonDecode($contents);
             switch ($response->getStatusCode()) {
                 case 400:
                 case 401:
@@ -48,7 +48,7 @@ class Sso implements SsoContract
             }
         }
 
-        $user = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+        $user = \GuzzleHttp\Utils::jsonDecode($response->getBody()->getContents(), true);
         return $user;
     }
 
@@ -63,7 +63,7 @@ class Sso implements SsoContract
         } catch (ClientException $e) {
             $response = $e->getResponse();
             $contents = $response->getBody()->getContents();
-            $body = \GuzzleHttp\json_decode($contents);
+            $body = \GuzzleHttp\Utils::jsonDecode($contents);
             switch ($response->getStatusCode()) {
                 case 400:
                 case 401:
@@ -75,7 +75,7 @@ class Sso implements SsoContract
             }
         }
 
-        $tokenResponse = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+        $tokenResponse = \GuzzleHttp\Utils::jsonDecode($response->getBody()->getContents(), true);
         return $tokenResponse;
     }
 
@@ -110,7 +110,7 @@ class Sso implements SsoContract
             throw new SsoException($contents);
         }
 
-        $tokenResponse = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+        $tokenResponse = \GuzzleHttp\Utils::jsonDecode($response->getBody()->getContents(), true);
         return $tokenResponse;
     }
 }

@@ -8,7 +8,7 @@ class SettingsController extends Controller
     {
         return response()->format([
             'html' => view('settings.jwtwhitelist', [
-                'jwtwhitelist' => env('JWT_EMAIL_PATTERN_WHITELIST')
+                'jwtwhitelist' => config('domain_whitelist')
             ])
         ]);
     }
