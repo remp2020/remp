@@ -2,14 +2,15 @@
 
 namespace Remp\BeamModule\Tests\Feature\DataTables;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Remp\BeamModule\Database\Seeders\ConfigSeeder;
 use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Model\Conversion;
-use Remp\BeamModule\Model\Property\SelectedProperty;
 use Remp\BeamModule\Model\Property;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Remp\BeamModule\Model\Property\SelectedProperty;
+use Remp\BeamModule\Tests\TestCase;
 use Remp\Journal\JournalContract;
 use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
-use Remp\BeamModule\Tests\TestCase;
 
 class ArticleConversionsDataTableTest extends TestCase
 {
@@ -22,6 +23,7 @@ class ArticleConversionsDataTableTest extends TestCase
     {
         parent::setUp();
 
+        $this->seed(ConfigSeeder::class);
         Article::unsetEventDispatcher();
 
         $this->withoutMiddleware([

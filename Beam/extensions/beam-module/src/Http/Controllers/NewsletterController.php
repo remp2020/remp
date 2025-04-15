@@ -8,7 +8,6 @@ use Remp\BeamModule\Contracts\Mailer\MailerContract;
 use Remp\BeamModule\Http\Requests\NewsletterRequest;
 use Remp\BeamModule\Http\Resources\NewsletterResource;
 use Remp\BeamModule\Model\Newsletter;
-use Remp\BeamModule\Model\NewsletterCriterion;
 use Remp\LaravelHelpers\Resources\JsonResource;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Yajra\DataTables\DataTables;
@@ -73,7 +72,7 @@ class NewsletterController extends Controller
         $criteria = $this->loadCriteria();
         $mailTypes = $this->loadMailTypes();
         $newsletter = new Newsletter();
-        $newsletter->starts_at = Carbon::now()->addHour(1);
+        $newsletter->starts_at = Carbon::now()->addHour();
         $newsletter->articles_count = 1;
         $newsletter->personalized_content = false;
 
@@ -126,20 +125,9 @@ class NewsletterController extends Controller
         ]);
     }
 
-
     private function loadCriteria()
     {
-        return [
-            NewsletterCriterion::BOOKMARKS => 'Bookmarks',
-            NewsletterCriterion::PAGEVIEWS_ALL => 'Pageviews all',
-            NewsletterCriterion::PAGEVIEWS_SIGNED_IN => 'Pageviews signed in',
-            NewsletterCriterion::PAGEVIEWS_SUBSCRIBERS => 'Pageviews subscribers',
-            NewsletterCriterion::TIMESPENT_ALL => 'Time spent all',
-            NewsletterCriterion::TIMESPENT_SIGNED_IN => 'Time spent signed in',
-            NewsletterCriterion::TIMESPENT_SUBSCRIBERS => 'Time spent subscribers',
-            NewsletterCriterion::CONVERSIONS => 'Conversions',
-            NewsletterCriterion::AVERAGE_PAYMENT => 'Average payment'
-        ];
+        return Newsletter\NewsletterCriterionEnum::getFriendlyList();
     }
 
     private function loadGenerators()

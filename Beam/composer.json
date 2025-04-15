@@ -30,13 +30,13 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
-        "barryvdh/laravel-ide-helper": "^2.10",
+        "barryvdh/laravel-ide-helper": "^3.5",
         "fakerphp/faker": "^v1.20.0",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "larastan/larastan": "^2.0",
+        "larastan/larastan": "^3.3",
         "laravel/tinker": "^2.5",
         "mockery/mockery": "^1.4.2",
-        "phpunit/phpunit": "^10.0",
+        "phpunit/phpunit": "^11.0",
         "spatie/laravel-ignition": "^2.0",
         "squizlabs/php_codesniffer": "^3.6"
     },
@@ -62,7 +62,8 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover",
-            "@php artisan vendor:publish --tag=beam-assets"
+            "@php artisan vendor:publish --tag=beam-assets --force",
+            "@php artisan service:post-install"
         ]
     },
     "config": {

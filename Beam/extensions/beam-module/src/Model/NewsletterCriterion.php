@@ -4,24 +4,18 @@ namespace Remp\BeamModule\Model;
 use Cache;
 use Exception;
 use Illuminate\Support\Collection;
-use MabeEnum\Enum;
 use Remp\BeamModule\Helpers\Misc;
+use Remp\BeamModule\Model\Newsletter\NewsletterCriterionEnum;
 
-class NewsletterCriterion extends Enum
+class NewsletterCriterion
 {
-    const AVERAGE_PAYMENT = 'average_payment';
-    const TIMESPENT_ALL = 'timespent_all';
-    const PAGEVIEWS_SIGNED_IN = 'pageviews_signed_in';
-    const PAGEVIEWS_SUBSCRIBERS = 'pageviews_subscribers';
-    const TIMESPENT_SUBSCRIBERS = 'timespent_subscribers';
-    const CONVERSIONS = 'conversions';
-    const TIMESPENT_SIGNED_IN = 'timespent_signed_in';
-    const PAGEVIEWS_ALL = 'pageviews_all';
-    const BOOKMARKS = 'bookmarks';
+    public function __construct(private NewsletterCriterionEnum $selectedCriterion)
+    {
+    }
 
     public static function allCriteriaConcatenated($glue = ',')
     {
-        return implode($glue, self::getValues());
+        return implode($glue, array_column(NewsletterCriterionEnum::cases(), 'value'));
     }
 
     public function getArticles(
@@ -34,37 +28,37 @@ class NewsletterCriterion extends Enum
 
         $query = Article::distinct();
 
-        switch ($this->getValue()) {
-            case self::TIMESPENT_ALL:
+        switch ($this->selectedCriterion) {
+            case NewsletterCriterionEnum::TimespentAll:
                 $query->mostReadByTimespent($start, 'sum', $articlesCount);
                 break;
-            case self::TIMESPENT_SUBSCRIBERS:
+            case NewsletterCriterionEnum::TimespentSubscribers:
                 $query->mostReadByTimespent($start, 'subscribers', $articlesCount);
                 break;
-            case self::TIMESPENT_SIGNED_IN:
+            case NewsletterCriterionEnum::TimespentSignedIn:
                 $query->mostReadByTimespent($start, 'signed_in', $articlesCount);
                 break;
 
-            case self::PAGEVIEWS_ALL:
+            case NewsletterCriterionEnum::PageViewsAll:
                 $query->mostReadByPageviews($start, 'sum', $articlesCount);
                 break;
-            case self::PAGEVIEWS_SUBSCRIBERS:
+            case NewsletterCriterionEnum::PageViewsSubscribers:
                 $query->mostReadByPageviews($start, 'subscribers', $articlesCount);
                 break;
-            case self::PAGEVIEWS_SIGNED_IN:
+            case NewsletterCriterionEnum::PageViewsSignedIn:
                 $query->mostReadByPageviews($start, 'signed_in', $articlesCount);
                 break;
 
-            case self::CONVERSIONS:
+            case NewsletterCriterionEnum::Conversions:
                 $query->mostReadByTotalPaymentAmount($start, $articlesCount);
                 break;
-            case self::AVERAGE_PAYMENT:
+            case NewsletterCriterionEnum::AveragePayment:
                 $query->mostReadByAveragePaymentAmount($start, $articlesCount);
                 break;
-            case self::BOOKMARKS:
+            case NewsletterCriterionEnum::Bookmarks:
                 throw new Exception('not implemented');
             default:
-                throw new Exception('unknown article criterion ' . $this->getValue());
+                throw new Exception('unknown article criterion ' . $this->selectedCriterion->value);
         }
 
         // Do not consider older articles
@@ -79,15 +73,15 @@ class NewsletterCriterion extends Enum
 
 
     /**
-     * @param string             $timespan
-     * @param array              $ignoreAuthors
+     * @param string $timespan
+     * @param array $ignoreAuthors
      *
      * @return array of articles (containing only external_id and url attributes)
      */
     public function getCachedArticles(string $timespan, array $ignoreAuthors = [], array $ignoreContentTypes = []): array
     {
         $tag = 'top_articles';
-        $key = $tag . '|' . $this->getValue() . '|' . $timespan;
+        $key = $tag . '|' . $this->selectedCriterion->value . '|' . $timespan;
 
         return Cache::tags($tag)->remember($key, 300, function () use ($timespan, $ignoreAuthors, $ignoreContentTypes) {
             return $this->getArticles($timespan, null, $ignoreAuthors, $ignoreContentTypes)->map(function ($article) {

@@ -18,7 +18,7 @@ RUN useradd -m -u ${UID} -g ${GID} -o -s /bin/bash ${UNAME}
 
 ENV BUILD_DEPS g++ build-essential libsasl2-dev libssl-dev
 
-ENV RUN_DEPS libzip-dev libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev libonig-dev
+ENV RUN_DEPS libzip-dev libicu-dev git wget vim curl less gnupg zlib1g-dev libpng-dev libjpeg-dev libonig-dev libncurses6
 
 # INIT (single command so the intermediates are not stored)
 
@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUN_DEPS} \
         ${BUILD_DEPS}
 
 COPY --from=mysql_client_stage /usr/bin/mysqldump /usr/bin/mysqldump
+COPY --from=mysql_client_stage /usr/bin/mysql /usr/bin/mysql
 
 # PHP
 

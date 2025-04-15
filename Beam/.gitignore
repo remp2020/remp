@@ -29,3 +29,5 @@ google_service_account_key.json
 yarn-error.log
 /config/beam.php
 /config/services.remp.php
+/config/system.php
+/database/schema/mysql-schema.sql

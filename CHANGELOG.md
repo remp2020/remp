@@ -8,8 +8,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
-- **BREAKING**: Updated Laravel to v10. remp/remp#1409
+- **BREAKING**: Updated Laravel to v11. remp/remp#1409
   - Please be aware that upgrade causes any assets published during Laravel's dependencies installation (`vendor:publish`) to have stricter rights by default (`0700` for directories, `0600` for files). You might need to update the rights of `public/vendor/` after the `composer install` call.
+- **BREAKING**: Laravel changed its caching prefixes not to include `:` character automatically.
+  - If you used `REDIS_PREFIX` env variable, we recommend to add `:` to your prefix to maintain consistency with the caching keys.
 - **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
 - **BREAKING**: Renamed Laravel's `FILESYSTEM_DRIVER` env variable to `FILESYSTEM_DISK`. remp/remp#1409
 - **BREAKING**: Changed minimum Go version for building Tracker API and Segments API to 1.23.

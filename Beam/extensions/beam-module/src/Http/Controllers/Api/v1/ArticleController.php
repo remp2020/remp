@@ -2,20 +2,21 @@
 
 namespace Remp\BeamModule\Http\Controllers\Api\v1;
 
-use Remp\BeamModule\Model\Article;
-use Remp\BeamModule\Model\Author;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Remp\BeamModule\Helpers\Misc;
 use Remp\BeamModule\Http\Requests\Api\v1\ArticleUpsertRequest;
 use Remp\BeamModule\Http\Requests\Api\v1\ReadArticlesRequest;
 use Remp\BeamModule\Http\Requests\Api\v1\TopArticlesSearchRequest;
 use Remp\BeamModule\Http\Requests\Api\v1\UnreadArticlesRequest;
 use Remp\BeamModule\Http\Resources\ArticleResource;
+use Remp\BeamModule\Model\Article;
+use Remp\BeamModule\Model\Author;
+use Remp\BeamModule\Model\Newsletter\NewsletterCriterionEnum;
 use Remp\BeamModule\Model\NewsletterCriterion;
 use Remp\BeamModule\Model\Pageviews\Api\v1\TopSearch;
-use Remp\BeamModule\Model\Tag;
 use Remp\BeamModule\Model\Section;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
+use Remp\BeamModule\Model\Tag;
 use Remp\Journal\AggregateRequest;
 use Remp\Journal\JournalContract;
 use Remp\Journal\ListRequest;
@@ -145,7 +146,7 @@ class ArticleController
         /** @var NewsletterCriterion[] $criteria */
         $criteria = [];
         foreach ($request->input('criteria') as $criteriaString) {
-            $criteria[] = NewsletterCriterion::get($criteriaString);
+            $criteria[] = new NewsletterCriterion(NewsletterCriterionEnum::from($criteriaString));
             $topArticlesPerCriterion[] = null;
         }
         $topArticlesPerUser = [];

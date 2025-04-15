@@ -91,3 +91,6 @@ update-prod: composer-install js
 	php artisan migrate --force
 	php artisan config:cache
 	php artisan route:cache
+
+schema-dump:
+	php artisan schema:dump --path=extensions/beam-module/database/schema/mysql-schema.sql

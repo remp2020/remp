@@ -1,11 +1,8 @@
 <?php
 
-use Remp\BeamModule\Model\Config\Config;
-use Remp\BeamModule\Model\Config\ConfigCategory;
-use Remp\BeamModule\Model\Config\ConfigNames;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateConfigCategoriesTable extends Migration
 {
@@ -34,26 +31,9 @@ class CreateConfigCategoriesTable extends Migration
             $table->foreign('config_category_id')->references('id')->on('config_categories');
         });
 
-        // Create dashboard categories
-
-        $dashboardCategory = ConfigCategory::firstOrCreate([
-            'code' => ConfigCategory::CODE_DASHBOARD,
-            'display_name' => 'Dashboard',
+        Artisan::call('db:seed', [
+            '--class' => \Remp\BeamModule\Database\Seeders\ConfigSeeder::class,
+            '--force' => true,
         ]);
-
-        $dashboardConfigs = [
-            ConfigNames::CONVERSION_RATE_MULTIPLIER,
-            ConfigNames::CONVERSION_RATE_DECIMAL_NUMBERS,
-            ConfigNames::CONVERSIONS_COUNT_THRESHOLD_LOW,
-            ConfigNames::CONVERSIONS_COUNT_THRESHOLD_MEDIUM,
-            ConfigNames::CONVERSIONS_COUNT_THRESHOLD_HIGH,
-            ConfigNames::CONVERSION_RATE_THRESHOLD_LOW,
-            ConfigNames::CONVERSION_RATE_THRESHOLD_MEDIUM,
-            ConfigNames::CONVERSION_RATE_THRESHOLD_HIGH,
-        ];
-
-        Config::whereIn('name', $dashboardConfigs)
-            ->update(['config_category_id' => $dashboardCategory->id]);
-
     }
 }

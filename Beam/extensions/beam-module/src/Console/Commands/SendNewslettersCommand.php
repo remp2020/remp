@@ -2,15 +2,15 @@
 
 namespace Remp\BeamModule\Console\Commands;
 
-use Remp\BeamModule\Contracts\Mailer\MailerContract;
-use Remp\BeamModule\Model\NewsletterCriterion;
-use Remp\BeamModule\Model\Newsletter;
 use Carbon\Carbon;
-use DB;
-use Remp\BeamModule\Console\Command;
 use Recurr\Transformer\ArrayTransformer;
 use Recurr\Transformer\ArrayTransformerConfig;
 use Recurr\Transformer\Constraint\AfterConstraint;
+use Remp\BeamModule\Console\Command;
+use Remp\BeamModule\Contracts\Mailer\MailerContract;
+use Remp\BeamModule\Model\Newsletter;
+use Remp\BeamModule\Model\Newsletter\NewsletterCriterionEnum;
+use Remp\BeamModule\Model\NewsletterCriterion;
 
 class SendNewslettersCommand extends Command
 {
@@ -101,11 +101,11 @@ class SendNewslettersCommand extends Command
 
     private function sendNewsletter(Newsletter $newsletter)
     {
-        $criterion = NewsletterCriterion::get($newsletter->criteria);
+        $criterion = new NewsletterCriterion(NewsletterCriterionEnum::from($newsletter->criteria));
         $articles = $newsletter->personalized_content ? [] :
             $criterion->getArticles(
-                $newsletter->timespan,
-                $newsletter->articles_count
+                timespan: $newsletter->timespan,
+                articlesCount: $newsletter->articles_count
             );
 
         if ($articles->count() === 0) {

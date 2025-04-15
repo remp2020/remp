@@ -2,22 +2,31 @@
 
 namespace Remp\BeamModule\Tests\Feature;
 
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Remp\BeamModule\Console\Commands\ComputeAuthorsSegments;
+use Remp\BeamModule\Database\Seeders\ConfigSeeder;
+use Remp\BeamModule\Database\Seeders\SegmentGroupSeeder;
 use Remp\BeamModule\Model\Account;
 use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Model\ArticleAggregatedView;
 use Remp\BeamModule\Model\Author;
-use Remp\BeamModule\Console\Commands\ComputeAuthorsSegments;
 use Remp\BeamModule\Model\Property;
 use Remp\BeamModule\Model\Segment;
 use Remp\BeamModule\Model\SegmentBrowser;
 use Remp\BeamModule\Model\SegmentUser;
-use Carbon\Carbon;
 use Remp\BeamModule\Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ComputeAuthorsSegmentsTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(ConfigSeeder::class);
+        $this->seed(SegmentGroupSeeder::class);
+    }
 
     public function testJob()
     {

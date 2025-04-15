@@ -32,8 +32,6 @@ use Remp\Journal\JournalException;
 use Remp\Journal\TokenProvider;
 use Remp\LaravelHelpers\Database\MySqlConnection;
 use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
-use Snowplow\RefererParser\Config\YamlConfigReader;
-use Snowplow\RefererParser\Parser;
 
 class BeamServiceProvider extends ServiceProvider
 {
@@ -81,6 +79,7 @@ class BeamServiceProvider extends ServiceProvider
             __DIR__ .'/../config/beam.php' => config_path('beam.php'),
             __DIR__ .'/../config/services.php' => config_path('services.remp.php'),
             __DIR__ .'/../config/system.php' => config_path('system.php'),
+            __DIR__ .'/../database/schema/mysql-schema.sql' => database_path('schema/mysql-schema.sql'),
         ], ['beam-assets', 'laravel-assets']);
 
         $this->registerCommands();
@@ -207,6 +206,7 @@ class BeamServiceProvider extends ServiceProvider
             Console\Commands\DeleteOldAggregations::class,
             Console\Commands\ElasticDataRetention::class,
             Console\Commands\ElasticWriteAliasRollover::class,
+            Console\Commands\PostInstallCommand::class,
             Console\Commands\ProcessConversionSources::class,
             Console\Commands\ProcessPageviewLoyalVisitors::class,
             Console\Commands\SendNewslettersCommand::class,
