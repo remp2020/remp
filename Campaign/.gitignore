@@ -30,3 +30,5 @@ npm-error.log
 /config/banners.php
 /config/banners.local.php
 /config/newsletter_banners.php
+/config/system.php
+/database/schema/mysql-schema.sql

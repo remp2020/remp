@@ -4,6 +4,7 @@ namespace Remp\CampaignModule;
 
 use Remp\CampaignModule\Console\Commands\AggregateCampaignStats;
 use Remp\CampaignModule\Console\Commands\CampaignsRefreshCache;
+use Remp\CampaignModule\Console\Commands\PostInstallCommand;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
 use Remp\CampaignModule\Http\Middleware\CollectionQueryString;
 use Remp\CampaignModule\Http\Resources\SearchResource;
@@ -63,6 +64,8 @@ class CampaignServiceProvider extends ServiceProvider
             __DIR__ . '/../config/services.php' => config_path('services.remp.php'),
             __DIR__ . '/../config/newsletter_banners.php' => config_path('newsletter_banners.php'),
             __DIR__ . '/../config/search.php' => config_path('search.php'),
+            __DIR__ . '/../config/system.php' => config_path('system.php'),
+            __DIR__ .'/../database/schema/mysql-schema.sql' => database_path('schema/mysql-schema.sql'),
         ], ['campaign-assets', 'laravel-assets']);
 
         $this->registerCommands();
@@ -144,7 +147,8 @@ class CampaignServiceProvider extends ServiceProvider
     {
         $this->commands([
             AggregateCampaignStats::class,
-            CampaignsRefreshCache::class
+            CampaignsRefreshCache::class,
+            PostInstallCommand::class,
         ]);
     }
 

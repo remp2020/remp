@@ -8,5 +8,5 @@ parameters:
     level: 3
     databaseMigrationsPath:
         - database/migrations/
-        - extensions/campaign-module/database/migrations
+        - extensions/campaign-module/database/migrations/
     excludePaths:
