@@ -245,7 +245,7 @@ class BannerController extends Controller
     {
         $userId = $request->get('user_id');
         $browserId = $request->get('browser_id');
-        $expiresInSeconds = Carbon::parse($request->get('expires_at'))->diffInSeconds(Carbon::now());
+        $expiresInSeconds = Carbon::now()->diffInSeconds(Carbon::parse($request->get('expires_at')));
 
         $banner->cache();
 

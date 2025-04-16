@@ -126,7 +126,7 @@ class JournalInterval
      */
     private static function getIntervalDependingOnArticlePublishedDate(Article $article): array
     {
-        $articleAgeInMins = Carbon::now()->diffInMinutes($article->published_at);
+        $articleAgeInMins = $article->published_at->diffInMinutes(Carbon::now());
 
         foreach (self::RETENTION_RULES as $rule) {
             $startMinute = $rule[0];

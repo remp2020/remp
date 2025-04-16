@@ -180,7 +180,7 @@ class StatsController extends Controller
 
     private function calcInterval(Carbon $from, Carbon $to): array
     {
-        $diff = $to->diffInSeconds($from);
+        $diff = $from->diffInSeconds($to);
 
         if ($diff > 31*24*3600) {
             return ['168h', 'week'];

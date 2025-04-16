@@ -222,7 +222,7 @@ class AggregateConversionEvents extends Command
 
                 if ($article) {
                     $time = Carbon::parse($item->system->time);
-                    $timeToConversion = $conversion->paid_at->diffInMinutes($time);
+                    $timeToConversion = $time->diffInMinutes($conversion->paid_at);
 
                     $toSave[] = [
                         'conversion_id' => $conversion->id,
@@ -265,7 +265,7 @@ class AggregateConversionEvents extends Command
                     $processedIds[$item->id] = true;
 
                     $time = Carbon::parse($item->system->time);
-                    $timeToConversion = $conversion->paid_at->diffInMinutes($time);
+                    $timeToConversion = $time->diffInMinutes($conversion->paid_at);
 
                     $step = $item->step;
 
@@ -321,7 +321,7 @@ class AggregateConversionEvents extends Command
                     $processedIds[$item->id] = true;
 
                     $time = Carbon::parse($item->system->time);
-                    $timeToConversion = $conversion->paid_at->diffInMinutes($time);
+                    $timeToConversion = $time->diffInMinutes($conversion->paid_at);
 
                     $toSave[] = [
                         'time' => $time,
