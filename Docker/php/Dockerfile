@@ -1,6 +1,6 @@
 FROM mysql:8.0 AS mysql_client_stage
 
-FROM php:8.3.17-fpm
+FROM php:8.3.20-fpm
 
 # ADD NON-ROOT USER; IF THE VARIABLES ARE NOT SET, DOCKER COMPOSE DEFAULTS TO 1000:1000 "docker"
 

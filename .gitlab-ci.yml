@@ -24,7 +24,7 @@ syntax:8.3:
 
 sniffer:
   stage: test
-  image: remp/php-ci:8.3.17
+  image: remp/php-ci:8.3.20
   tags:
     - docker
   script:
@@ -34,7 +34,7 @@ sniffer:
 
 phpstan:
   stage: test
-  image: remp/php-ci:8.3.17
+  image: remp/php-ci:8.3.20
   tags:
     - docker
   script:
@@ -43,7 +43,7 @@ phpstan:
 
 latte_lint:
   stage: test
-  image: remp/php-ci:8.3.17
+  image: remp/php-ci:8.3.20
   tags:
     - docker
   script:
@@ -52,7 +52,7 @@ latte_lint:
 
 tests:
   stage: test
-  image: remp/php-ci:8.3.17
+  image: remp/php-ci:8.3.20
   tags:
     - docker
   script:
@@ -62,6 +62,7 @@ tests:
   services:
     - name: mysql:8.0.29
       alias: mysql
+      command: ["--require_secure_transport=OFF", "--default-authentication-plugin=mysql_native_password"]
     - name: redis:6.2
       alias: redis
   variables:
