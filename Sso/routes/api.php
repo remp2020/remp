@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Middleware\VerifyUserToken;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +15,7 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::middleware('app.jwt.auth')->group(function() {
+Route::middleware(VerifyUserToken::class)->group(function() {
     Route::get('auth/introspect', [AuthController::class, 'introspect'])->name('auth.introspect');
 });
 

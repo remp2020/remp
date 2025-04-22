@@ -13,10 +13,10 @@
     "php": "^8.2",
     "league/uri": "^7.5",
     "league/uri-components": "^7.5",
-    "illuminate/auth": "^v11.0",
-    "illuminate/contracts": "^v11.0",
-    "illuminate/http": "^v11.0",
-    "illuminate/support": "^v11.0",
+    "illuminate/auth": "^v12.0",
+    "illuminate/contracts": "^v12.0",
+    "illuminate/http": "^v12.0",
+    "illuminate/support": "^v12.0",
     "guzzlehttp/guzzle": "^7.0"
   },
   "require-dev": {

@@ -47,6 +47,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - If you work with the class directly, please update your includes.
 - **BREAKING**: Renamed DI service `articleLocker` to `htmlArticleLocker`. remp/novydenik#1324
   - If you configure the service further, please update your `config.neon` file.
+- **BREAKING**: Removed code related to abandoned Pythia project. remp/remp#1409
 - Updated dependencies to their latest major versions.
 - Added the ability to select the 'Subscription welcome email' and 'Unsubscribe goodbye email' option for any email that belongs to the newsletter, in addition to system emails. remp/remp#1388
 - Fixed possible memory limit issues on list form factory. remp/remp#1404
@@ -59,7 +60,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Sso]
 
-- **BREAKING**: Updated Laravel to v11. remp/remp#1409
+- **BREAKING**: Updated Laravel to v12. remp/remp#1409
 - **BREAKING**: Laravel changed its caching prefixes not to include `:` character automatically.
   - If you used `REDIS_PREFIX` env variable, we recommend to add `:` to your prefix to maintain consistency with the caching keys.
 - **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409

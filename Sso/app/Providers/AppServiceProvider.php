@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Remp\LaravelHelpers\Database\MySqlConnection;
 
@@ -16,9 +17,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (class_exists('Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider')) {
-            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        if (config('app.force_https')) {
+            URL::forceScheme('https');
         }
+
         Paginator::useBootstrapThree();
     }
 

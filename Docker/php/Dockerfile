@@ -24,6 +24,7 @@ ENV RUN_DEPS libzip-dev libicu-dev git wget vim curl less gnupg zlib1g-dev libpn
 
 RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUN_DEPS} \
     && pecl install xdebug && docker-php-ext-enable xdebug \
+    && pecl install apcu && docker-php-ext-enable apcu \
     && docker-php-ext-configure intl \
     && docker-php-ext-configure gd --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) pdo_mysql bcmath mbstring zip intl sockets pcntl gd \

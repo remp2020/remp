@@ -7,7 +7,3 @@ parameters:
         - app/
     level: 3
     excludePaths:
-        # These files caused unsolvable memory issues
-        - app/Http/Controllers/AuthController.php
-        - app/Http/Middleware/VerifyUserToken.php
-        - app/Console/Commands/ReconstructLoggedOutCache.php

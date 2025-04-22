@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
-use Redis;
+use Illuminate\Support\Facades\Redis;
 
 class ReconstructLoggedOutCache extends Command
 {

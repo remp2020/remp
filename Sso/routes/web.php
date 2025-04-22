@@ -15,10 +15,12 @@ use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SettingsController;
+use Illuminate\Support\Facades\Route;
+use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
 Route::get('/error', [AuthController::class, 'error'])->name('sso.error');
 
-Route::middleware('auth.jwt')->group(function () {
+Route::middleware(VerifyJwtToken::class)->group(function () {
     Route::get('/', [ApiTokenController::class, 'index']);
     Route::get('api-tokens/json', [ApiTokenController::class, 'json'])->name('api-tokens.json');
     Route::resource('api-tokens', ApiTokenController::class);

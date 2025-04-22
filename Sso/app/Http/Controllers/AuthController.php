@@ -5,15 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\ApiToken;
 use App\UrlHelper;
 use App\Models\User;
-use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use JWTAuth;
 use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
