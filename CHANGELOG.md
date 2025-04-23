@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
-- **BREAKING**: Updated Laravel to v11. remp/remp#1409
+- **BREAKING**: Updated Laravel to v12. remp/remp#1409
   - Please be aware that upgrade causes any assets published during Laravel's dependencies installation (`vendor:publish`) to have stricter rights by default (`0700` for directories, `0600` for files). You might need to update the rights of `public/vendor/` after the `composer install` call.
 - **BREAKING**: Laravel changed its caching prefixes not to include `:` character automatically.
   - If you used `REDIS_PREFIX` env variable, we recommend to add `:` to your prefix to maintain consistency with the caching keys.

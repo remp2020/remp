@@ -50,7 +50,7 @@ class Author extends BaseModel implements Searchable
         return $this->hasManyThrough(Conversion::class, ArticleAuthor::class, 'article_author.author_id', 'conversions.article_id', 'id', 'article_id');
     }
     
-    public function scopeOfSelectedProperty($query)
+    public function scopeOfSelectedProperty(Builder $query): Builder
     {
         $tokenProvider = resolve(TokenProvider::class);
         $propertyUuid = $tokenProvider->getToken();

@@ -40,7 +40,7 @@ php artisan db:seed
 
 ### Dependencies
 
-- PHP ^8.1
+- PHP ^8.2
 - MySQL ^8.0
 - Redis ^6.2
 - Node.js >=18

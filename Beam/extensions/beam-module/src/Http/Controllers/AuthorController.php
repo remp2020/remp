@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 use Html;
+use Yajra\DataTables\QueryDataTable;
 
 class AuthorController extends Controller
 {
@@ -167,14 +168,16 @@ class AuthorController extends Controller
         $conversionAmounts = [];
         $conversionCounts = [];
         foreach ($conversionsQuery->get() as $record) {
-            $conversionAmounts[$record->author_id][$record->currency] = $record->sum;
-            if (!isset($conversionCounts[$record->author_id])) {
-                $conversionCounts[$record->author_id] = 0;
+            $conversionAmounts[$record['author_id']][$record->currency] = $record['sum'];
+            if (!isset($conversionCounts[$record['author_id']])) {
+                $conversionCounts[$record['author_id']] = 0;
             }
-            $conversionCounts[$record->author_id] += $record->count;
+            $conversionCounts[$record['author_id']] += $record['count'];
         }
 
-        return $datatables->of($authors)
+        /** @var QueryDataTable $datatable */
+        $datatable = $datatables->of($authors);
+        return $datatable
             ->addColumn('id', function (Author $author) {
                 return $author->id;
             })
@@ -208,7 +211,7 @@ class AuthorController extends Controller
                     $c = round($c, 2);
                     $amounts[] = "{$c} {$currency}";
                 }
-                return $amounts ?? [0];
+                return $amounts ?: [0];
             })
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')

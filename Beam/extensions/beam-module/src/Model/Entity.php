@@ -2,8 +2,7 @@
 
 namespace Remp\BeamModule\Model;
 
-use Remp\BeamModule\Model\EntityParam;
-use Remp\BeamModule\Model\BaseModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Entity extends BaseModel
 {
@@ -14,11 +13,11 @@ class Entity extends BaseModel
         'parent_id'
     ];
 
-    public function params()
+    public function params(): HasMany
     {
         return $this->hasMany(EntityParam::class)
-                    ->withTrashed()
-                    ->orderBy("id");
+            ->withTrashed()
+            ->orderBy("id");
     }
 
     public function isRootEntity()

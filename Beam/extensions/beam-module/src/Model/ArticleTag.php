@@ -20,7 +20,7 @@ class ArticleTag extends BaseModel
         return $this->belongsTo(Article::class);
     }
 
-    public function scopeOfSelectedProperty($query)
+    public function scopeOfSelectedProperty(Builder $query): Builder
     {
         $tokenProvider = resolve(TokenProvider::class);
         $propertyUuid = $tokenProvider->getToken();

@@ -30,12 +30,14 @@ use Remp\BeamModule\Http\Controllers\TagCategoryController;
 use Remp\BeamModule\Http\Controllers\TagController;
 use Remp\BeamModule\Http\Controllers\EntitiesController;
 use Remp\BeamModule\Http\Controllers\SettingsController;
+use Remp\BeamModule\Http\Middleware\DashboardBasicAuth;
+use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
 Route::get('/error', [AuthController::class, 'error'])->name('sso.error');
 
 // Temporarily use basic auth for public dashboard
 // TODO: remove once authentication layer is done
-Route::middleware('auth.basic.dashboard')->group(function () {
+Route::middleware(DashboardBasicAuth::class)->group(function () {
     Route::get('public', [DashboardController::class, 'public'])->name('dashboard.public');
     Route::post('public/articlesJson', [DashboardController::class, 'mostReadArticles'])->name('public.articles.json');
     Route::post('public/timeHistogramJson', [DashboardController::class, 'timeHistogram'])->name('public.timeHistogram.json');
@@ -45,7 +47,7 @@ Route::middleware('auth.basic.dashboard')->group(function () {
 // Public route for switching token, available from both public dashboard and authenticated section
 Route::post('/properties/switch', [PropertyController::class, 'switch'])->name('properties.switch');
 
-Route::middleware('auth.jwt')->group(function () {
+Route::middleware(VerifyJwtToken::class)->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::post('dashboard/articlesJson', [DashboardController::class, 'mostReadArticles'])->name('dashboard.articles.json');

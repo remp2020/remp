@@ -16,11 +16,10 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laminas/laminas-diactoros": "^3.5",
         "laracasts/flash": "^3.2",
-        "laravel/framework": "^11.0",
+        "laravel/framework": "^12.0",
         "league/uri": "^7.5",
         "matomo/searchengine-and-social-list": "^3.11",
-        "php-amqplib/php-amqplib": "^v2.12",
-        "predis/predis": "^1.1",
+        "predis/predis": "^2.3",
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",
@@ -31,9 +30,9 @@
         "spatie/laravel-searchable": "^1.9",
         "symfony/psr-http-message-bridge": "^v7.2",
         "symfony/yaml": "^7.2",
-        "tightenco/ziggy": "^1.2",
+        "tightenco/ziggy": "^2.5",
         "yadakhov/insert-on-duplicate-key": "^1.2",
-        "yajra/laravel-datatables-oracle": "^11.0"
+        "yajra/laravel-datatables-oracle": "^12.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
@@ -42,7 +41,7 @@
         "laravel/tinker": "^2.5",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^11.0"
+        "phpunit/phpunit": "^12.0"
     },
     "minimum-stability": "dev",
     "autoload": {

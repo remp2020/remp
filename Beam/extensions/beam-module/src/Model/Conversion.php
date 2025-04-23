@@ -63,7 +63,7 @@ class Conversion extends BaseModel
     
     // Scopes
     
-    public function scopeOfSelectedProperty($query)
+    public function scopeOfSelectedProperty(Builder $query): Builder
     {
         $tokenProvider = resolve(TokenProvider::class);
         $propertyUuid = $tokenProvider->getToken();

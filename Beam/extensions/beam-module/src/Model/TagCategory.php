@@ -34,7 +34,7 @@ class TagCategory extends BaseModel
         return $this->belongsToMany(Tag::class);
     }
 
-    public function scopeOfSelectedProperty($query)
+    public function scopeOfSelectedProperty(Builder $query): Builder
     {
         $tokenProvider = resolve(TokenProvider::class);
         $propertyUuid = $tokenProvider->getToken();

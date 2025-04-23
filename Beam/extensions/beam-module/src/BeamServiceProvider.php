@@ -13,15 +13,14 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Remp\BeamModule\Console\Commands\AggregateArticlesViews;
 use Remp\BeamModule\Contracts\Mailer\Mailer;
 use Remp\BeamModule\Contracts\Mailer\MailerContract;
 use Remp\BeamModule\Http\Controllers\JournalProxyController;
-use Remp\BeamModule\Http\Middleware\DashboardBasicAuth;
 use Remp\BeamModule\Http\Resources\SearchResource;
 use Remp\BeamModule\Model\Config\ConversionRateConfig;
 use Remp\BeamModule\Model\Property\SelectedProperty;
@@ -31,7 +30,6 @@ use Remp\Journal\JournalContract;
 use Remp\Journal\JournalException;
 use Remp\Journal\TokenProvider;
 use Remp\LaravelHelpers\Database\MySqlConnection;
-use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
 class BeamServiceProvider extends ServiceProvider
 {
@@ -42,9 +40,10 @@ class BeamServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (class_exists('Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider')) {
-            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        if (config('app.force_https')) {
+            URL::forceScheme('https');
         }
+
         Paginator::useBootstrapThree();
 
         // Global selector of current property token
@@ -83,12 +82,6 @@ class BeamServiceProvider extends ServiceProvider
         ], ['beam-assets', 'laravel-assets']);
 
         $this->registerCommands();
-
-        /** @var Router $router */
-        $router = $this->app['router'];
-
-        $router->aliasMiddleware('auth.jwt', VerifyJwtToken::class);
-        $router->aliasMiddleware('auth.basic.dashboard', DashboardBasicAuth::class);
 
         if ($this->app->runningInConsole()) {
             $this->app->booted(function () {

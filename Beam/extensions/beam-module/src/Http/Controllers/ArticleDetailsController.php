@@ -11,6 +11,7 @@ use Remp\BeamModule\Helpers\Misc;
 use Remp\BeamModule\Http\Requests\ArticlesListRequest;
 use Remp\BeamModule\Http\Resources\ArticleResource;
 use Remp\BeamModule\Model\Article;
+use Remp\BeamModule\Model\ArticleTitle;
 use Remp\BeamModule\Model\ConversionSource;
 use Remp\BeamModule\Model\Pageviews\PageviewsHelper;
 use Remp\BeamModule\Model\Rules\ValidCarbonDate;
@@ -73,6 +74,7 @@ class ArticleDetailsController extends Controller
 
         $data['events'] = [];
         $pageviewSums = [];
+
         foreach ($articleTitles as $variant => $variantTitles) {
             $variantTitle = $variantTitles[0];
 

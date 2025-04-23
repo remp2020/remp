@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Middleware\HandleCors;
 use Remp\BeamModule\Http\Controllers\Api\v1\ArticleController as ArticleControllerApiV1;
 use Remp\BeamModule\Http\Controllers\Api\v1\AuthorController as AuthorControllerApiV1;
 use Remp\BeamModule\Http\Controllers\Api\v1\JournalController;
@@ -71,6 +72,6 @@ Route::middleware('auth:api')->group(function () {
 Route::get('/journal/{group}/categories/{category}/actions', [JournalController::class, 'actions']);
 Route::get('/journal/flags', [JournalController::class, 'flags']);
 
-Route::middleware('cors')->group(function () {
+Route::middleware(HandleCors::class)->group(function () {
     Route::get('/dashboard/options', [DashboardController::class, 'options'])->name('dashboard.options');
 });
