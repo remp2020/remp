@@ -4,6 +4,7 @@ namespace Remp\CampaignModule;
 
 use Database\Factories\MediumRectangleTemplateFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MediumRectangleTemplate extends AbstractTemplate
 {
@@ -26,6 +27,14 @@ class MediumRectangleTemplate extends AbstractTemplate
     protected static function newFactory(): MediumRectangleTemplateFactory
     {
         return MediumRectangleTemplateFactory::new();
+    }
+
+    /**
+     * @return BelongsTo<Banner, $this>
+     */
+    public function banner(): BelongsTo
+    {
+        return $this->belongsTo(Banner::class);
     }
 
     /**

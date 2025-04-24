@@ -3,6 +3,7 @@
 namespace Remp\CampaignModule;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 abstract class AbstractTemplate extends Model
 {
@@ -12,7 +13,10 @@ abstract class AbstractTemplate extends Model
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
-    public function banner()
+    /**
+     * @return BelongsTo<Banner, $this>
+     */
+    public function banner(): BelongsTo
     {
         return $this->belongsTo(Banner::class);
     }

@@ -50,11 +50,17 @@ class CampaignBanner extends Model
         });
     }
 
+    /**
+     * @return BelongsTo<Banner, $this>
+     */
     public function banner(): BelongsTo
     {
         return $this->belongsTo(Banner::class);
     }
 
+    /**
+     * @return BelongsTo<Campaign, $this>
+     */
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(Campaign::class);

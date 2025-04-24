@@ -87,11 +87,6 @@
     </div>
 </template>
 
-<style type="text/css">
-</style>
-
-
-
 <script>
     import axios from 'axios'
     import Loader from '@remp/js-commons/js/components/Loader'

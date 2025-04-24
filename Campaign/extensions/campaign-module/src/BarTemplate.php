@@ -4,6 +4,7 @@ namespace Remp\CampaignModule;
 
 use Database\Factories\BarTemplateFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BarTemplate extends AbstractTemplate
 {
@@ -23,6 +24,14 @@ class BarTemplate extends AbstractTemplate
     protected static function newFactory(): BarTemplateFactory
     {
         return BarTemplateFactory::new();
+    }
+
+    /**
+     * @return BelongsTo<Banner, $this>
+     */
+    public function banner(): BelongsTo
+    {
+        return $this->belongsTo(Banner::class);
     }
 
     /**

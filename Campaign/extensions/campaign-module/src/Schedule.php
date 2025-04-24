@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
-class Schedule extends Model implements Searchable
+class Schedule extends Model
 {
     const STATUS_READY = 'ready';
     const STATUS_EXECUTED = 'executed';
@@ -38,6 +38,9 @@ class Schedule extends Model implements Searchable
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
+    /**
+     * @return BelongsTo<Campaign, $this>
+     */
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(Campaign::class);
@@ -138,10 +141,5 @@ class Schedule extends Model implements Searchable
                         ->orWhere('end_time', '>=', Carbon::now());
                 }
             );
-    }
-
-    public function getSearchResult(): SearchResult
-    {
-        return new SearchResult($this, $this->name);
     }
 }

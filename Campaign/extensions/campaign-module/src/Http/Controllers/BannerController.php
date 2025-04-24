@@ -221,26 +221,6 @@ class BannerController extends Controller
         ]);
     }
 
-    public function preview($uuid)
-    {
-        $banner = Banner::whereUuid($uuid)->first();
-        if (!$banner) {
-            throw new ResourceNotFoundException("banner [{$uuid}] was not found");
-        }
-        $positions = $this->positionMap->positions();
-        $dimensions = $this->dimensionMap->dimensions();
-        $alignments = $this->alignmentMap->alignments();
-
-        return response()
-            ->view('campaign::banners.preview', [
-                'banner' => $banner,
-                'positions' => [$banner->position => $positions[$banner->position]],
-                'dimensions' => [$banner->dimensions => $dimensions[$banner->dimensions]],
-                'alignments' => [$banner->text_align => $alignments[$banner->text_align]],
-            ])
-            ->header('Content-Type', 'application/x-javascript');
-    }
-
     public function oneTimeDisplay(BannerOneTimeDisplayRequest $request, Banner $banner)
     {
         $userId = $request->get('user_id');

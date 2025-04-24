@@ -14,9 +14,9 @@ class AddCustomJsAndIncludesColumnsToBanners extends Migration
     public function up()
     {
         Schema::table('banners', function (Blueprint $table) {
-            $table->text('js')->nullable(true);
-            $table->json('js_includes')->nullable(true);
-            $table->json('css_includes')->nullable(true);
+            $table->text('js')->nullable()->after('close_text');
+            $table->json('js_includes')->nullable()->after('js');
+            $table->json('css_includes')->nullable()->after('js_includes');
         });
     }
 
@@ -28,9 +28,7 @@ class AddCustomJsAndIncludesColumnsToBanners extends Migration
     public function down()
     {
         Schema::table('banners', function (Blueprint $table) {
-            $table->dropColumn('js');
-            $table->dropColumn('js_includes')->nullable(true);
-            $table->dropColumn('css_includes')->nullable(true);
+            $table->dropColumn(['js', 'js_includes', 'css_includes']);
         });
     }
 }

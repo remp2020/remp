@@ -28,7 +28,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
-- **BREAKING**: Updated Laravel to v11. remp/remp#1409
+- **BREAKING**: Updated Laravel to v12. remp/remp#1409
+  - If you encounter issues with Showtime requests caused by `AbstractParser` of the device detector library, please purge the Redis cache with this command: `redis-cli -h REDIS-HOST -p REDIS-PORT -n REDIS-DEFAULT-DB keys 'Device*' | xargs redis-cli -h REDIS-HOST -p REDIS-PORT -n REDIS-DEFAULT-DB del`.
 - **BREAKING**: Laravel changed its caching prefixes not to include `:` character automatically.
   - If you used `REDIS_PREFIX` env variable, we recommend to add `:` to your prefix to maintain consistency with the caching keys.
 - **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409

@@ -2,6 +2,8 @@
 
 namespace Remp\CampaignModule;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class CollapsibleBarTemplate extends AbstractTemplate
 {
     protected $fillable = [
@@ -26,5 +28,13 @@ class CollapsibleBarTemplate extends AbstractTemplate
     public function text()
     {
         return strip_tags("{$this->main_text} -- {$this->button_text}");
+    }
+
+    /**
+     * @return BelongsTo<Banner, $this>
+     */
+    public function banner(): BelongsTo
+    {
+        return $this->belongsTo(Banner::class);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Remp\CampaignModule;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class HtmlOverlayTemplate extends AbstractTemplate
 {
     protected $fillable = [
@@ -16,5 +18,13 @@ class HtmlOverlayTemplate extends AbstractTemplate
     public function text()
     {
         return strip_tags($this->text);
+    }
+
+    /**
+     * @return BelongsTo<Banner, $this>
+     */
+    public function banner(): BelongsTo
+    {
+        return $this->belongsTo(Banner::class);
     }
 }

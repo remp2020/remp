@@ -1,23 +1,15 @@
 <?php
+
 namespace Database\Factories;
+
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Remp\CampaignModule\Campaign;
 
 /** @extends Factory<Campaign> */
 class CampaignFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = \Remp\CampaignModule\Campaign::class;
+    protected $model = Campaign::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
     public function definition()
     {
         return [

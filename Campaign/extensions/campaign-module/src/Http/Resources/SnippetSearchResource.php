@@ -2,17 +2,16 @@
 
 namespace Remp\CampaignModule\Http\Resources;
 
+use Illuminate\Http\Request;
+use Remp\CampaignModule\Snippet;
 use Remp\LaravelHelpers\Resources\JsonResource;
 
+/**
+ * @mixin Snippet
+ */
 class SnippetSearchResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray(Request $request)
     {
         return [
             'type' => 'snippet',

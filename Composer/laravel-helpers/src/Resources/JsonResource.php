@@ -3,11 +3,12 @@
 namespace Remp\LaravelHelpers\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource as LaravelJsonResource;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class JsonResource extends LaravelJsonResource
 {
-    public function toArray($request)
+    public function toArray(Request $request)
     {
         if ($this->resource instanceof \Exception) {
             return [

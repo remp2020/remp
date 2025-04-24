@@ -31,10 +31,11 @@ class CampaignsComparisonController extends Controller
             if (in_array($campaign->id, $campaignIds)) {
                 [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign);
 
-                $campaign->stats = $campaignData;
-                $campaigns->push($campaign);
+                $record = $campaign->toArray();
+                $record['stats'] = $campaignData;
+                $campaigns->push($record);
             } else {
-                $campaignsNotCompared->push($campaign);
+                $campaignsNotCompared->push($campaign->toArray());
             }
         }
 

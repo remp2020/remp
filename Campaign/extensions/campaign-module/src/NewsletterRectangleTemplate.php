@@ -2,6 +2,8 @@
 
 namespace Remp\CampaignModule;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class NewsletterRectangleTemplate extends AbstractTemplate
 {
     protected $fillable = [
@@ -66,6 +68,14 @@ class NewsletterRectangleTemplate extends AbstractTemplate
     public function getRempMailerAddrAttribute()
     {
         return $this->attributes['remp_mailer_addr'] ?? $this->getConfig('remp_mailer_addr');
+    }
+
+    /**
+     * @return BelongsTo<Banner, $this>
+     */
+    public function banner(): BelongsTo
+    {
+        return $this->belongsTo(Banner::class);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Remp\CampaignModule;
 
 use Database\Factories\ShortMessageTemplateFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ShortMessageTemplate extends AbstractTemplate
 {
@@ -31,5 +32,13 @@ class ShortMessageTemplate extends AbstractTemplate
     public function text()
     {
         return strip_tags($this->text);
+    }
+
+    /**
+     * @return BelongsTo<Banner, $this>
+     */
+    public function banner(): BelongsTo
+    {
+        return $this->belongsTo(Banner::class);
     }
 }

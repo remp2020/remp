@@ -26,7 +26,6 @@ use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
 Route::get('/error', [AuthController::class, 'error'])->name('sso.error');
 
-Route::get('banners/preview/{uuid}', [BannerController::class, 'preview'])->name('banners.preview');
 Route::get('campaigns/showtime', [CampaignController::class, 'showtime'])->name('campaigns.showtime');
 
 Route::middleware([VerifyJwtToken::class, CollectionQueryString::class])->group(function () {

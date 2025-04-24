@@ -139,7 +139,7 @@ class Campaign extends Model implements Searchable
                 ->selectRaw('COUNT(*) as count, campaign_id')
                 ->get()
                 ->mapWithKeys(function ($row) {
-                    return [$row->campaign_id => $row->count];
+                    return [$row->campaign_id => $row['count']];
                 });
         }
 
@@ -153,7 +153,7 @@ class Campaign extends Model implements Searchable
      */
     public function getVariantsUuidsAttribute()
     {
-        return $this->campaignBanners()->withTrashed()->get()->pluck('uuid')->toArray();
+        return $this->campaignBanners()->withTrashed()->pluck('uuid')->toArray();
     }
 
     public function banners(): BelongsToMany
@@ -162,6 +162,9 @@ class Campaign extends Model implements Searchable
             ->withPivot('proportion', 'control_group', 'weight');
     }
 
+    /**
+     * @return HasMany<CampaignBanner, $this>
+     */
     public function campaignBanners(): HasMany
     {
         return $this->hasMany(CampaignBanner::class)->orderBy('weight');
@@ -197,6 +200,9 @@ class Campaign extends Model implements Searchable
         }
     }
 
+    /**
+     * @return BelongsToMany<Country, $this>
+     */
     public function countries(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -209,26 +215,41 @@ class Campaign extends Model implements Searchable
         )->withPivot('blacklisted');
     }
 
-    public function countriesWhitelist()
+    /**
+     * @return BelongsToMany<Country, $this>
+     */
+    public function countriesWhitelist(): BelongsToMany
     {
         return $this->countries()->wherePivot('blacklisted', '=', false);
     }
 
-    public function countriesBlacklist()
+    /**
+     * @return BelongsToMany<Country, $this>
+     */
+    public function countriesBlacklist(): BelongsToMany
     {
         return $this->countries()->wherePivot('blacklisted', '=', true);
     }
 
+    /**
+     * @return HasMany<CampaignSegment, $this>
+     */
     public function segments(): HasMany
     {
         return $this->hasMany(CampaignSegment::class);
     }
 
+    /**
+     * @return HasMany<Schedule, $this>
+     */
     public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);
     }
 
+    /**
+     * @return BelongsToMany<CampaignCollection, $this>
+     */
     public function collections(): BelongsToMany
     {
         return $this->belongsToMany(

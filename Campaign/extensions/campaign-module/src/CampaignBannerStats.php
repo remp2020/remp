@@ -26,6 +26,9 @@ class CampaignBannerStats extends Model
         'time_to',
     ];
 
+    /**
+     * @return BelongsTo<CampaignBanner, $this>
+     */
     public function campaignBanner(): BelongsTo
     {
         return $this->belongsTo(CampaignBanner::class);

@@ -155,63 +155,86 @@ class Banner extends Model implements Searchable
         return $this->load($this->getTemplateRelationName());
     }
 
-    /** @return BelongsToMany<Campaign, $this> */
+    /**
+     * @return BelongsToMany<Campaign, $this>
+     */
     public function campaigns(): BelongsToMany
     {
         return $this->belongsToMany(Campaign::class, 'campaign_banners')->whereNull('deleted_at');
     }
 
+    /**
+     * @return HasOne<HtmlTemplate, $this>
+     */
     public function htmlTemplate(): HasOne
     {
         return $this->hasOne(HtmlTemplate::class);
     }
 
+    /**
+     * @return HasOne<MediumRectangleTemplate, $this>
+     */
     public function mediumRectangleTemplate(): HasOne
     {
         return $this->hasOne(MediumRectangleTemplate::class);
     }
 
+    /**
+     * @return HasOne<OverlayRectangleTemplate, $this>
+     */
     public function overlayRectangleTemplate(): HasOne
     {
         return $this->hasOne(OverlayRectangleTemplate::class);
     }
 
+    /**
+     * @return HasOne<HtmlOverlayTemplate, $this>
+     */
     public function htmlOverlayTemplate(): HasOne
     {
         return $this->hasOne(HtmlOverlayTemplate::class);
     }
 
+    /**
+     * @return HasOne<OverlayTwoButtonsSignatureTemplate, $this>
+     */
     public function overlayTwoButtonsSignatureTemplate(): HasOne
     {
         return $this->hasOne(OverlayTwoButtonsSignatureTemplate::class);
     }
 
+    /**
+     * @return HasOne<BarTemplate, $this>
+     */
     public function barTemplate(): HasOne
     {
         return $this->hasOne(BarTemplate::class);
     }
 
+    /**
+     * @return HasOne<CollapsibleBarTemplate, $this>
+     */
     public function collapsibleBarTemplate(): HasOne
     {
         return $this->hasOne(CollapsibleBarTemplate::class);
     }
 
+    /**
+     * @return HasOne<ShortMessageTemplate, $this>
+     */
     public function shortMessageTemplate(): HasOne
     {
         return $this->hasOne(ShortMessageTemplate::class);
     }
 
+    /**
+     * @return HasOne<NewsletterRectangleTemplate, $this>
+     */
     public function newsletterRectangleTemplate(): HasOne
     {
         return $this->hasOne(NewsletterRectangleTemplate::class);
     }
 
-    /**
-     * Returns name of the banner to template relation
-     *
-     * @return string $relationName
-     * @throws \Exception
-     */
     public function getTemplateRelationName()
     {
         switch ($this->template) {
@@ -245,10 +268,10 @@ class Banner extends Model implements Searchable
      * to return template relation.
      *
      * @param string $relationName
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      * @throws \Exception
      */
-    public function getTemplateRelation($relationName = null)
+    public function getTemplateRelation($relationName = null): HasOne
     {
         if ($relationName === null) {
             $relationName = $this->getTemplateRelationName();
@@ -256,13 +279,7 @@ class Banner extends Model implements Searchable
         return $this->$relationName();
     }
 
-    /**
-     * Returns banner template object
-     *
-     * @return Model
-     * @throws \Exception
-     */
-    public function getTemplate()
+    public function getTemplate(): AbstractTemplate
     {
         return $this->getRelationValue($this->getTemplateRelationName());
     }

@@ -37,7 +37,7 @@ class CollectionController extends Controller
 
         return view('campaign::collections.edit', [
             'collection' => $collection->load('campaigns'),
-            'selectedCampaigns' => $collection->campaigns()->get()->pluck('id'),
+            'selectedCampaigns' => $collection->campaigns()->pluck('id'),
             'campaigns' => Campaign::orderBy('created_at', 'DESC')->get(),
         ]);
     }
@@ -127,10 +127,9 @@ class CollectionController extends Controller
                 $query->where('collections.name', 'like', "%{$value}%");
             })
             ->addColumn('campaigns', function (CampaignCollection $collection) {
-                $data = $collection->campaigns()->get();
                 $campaigns = [];
 
-                foreach ($data as $campaign) {
+                foreach ($collection->campaigns as $campaign) {
                     $campaigns[] = html()->a(
                         href: route('campaigns.edit', $campaign),
                         contents: $campaign->name,

@@ -41,18 +41,6 @@ class BannerTemplates extends Migration
             $table->timestamps();
         });
 
-        foreach (Banner::all() as $banner) {
-            $htmlTemplate = new HtmlTemplate;
-            $htmlTemplate->banner_id = $banner->id;
-            $htmlTemplate->dimensions = $banner->dimensions;
-            $htmlTemplate->text_align = $banner->text_align;
-            $htmlTemplate->text_color = $banner->text_color;
-            $htmlTemplate->font_size = $banner->font_size;
-            $htmlTemplate->background_color = $banner->background_color;
-            $htmlTemplate->text = $banner->text;
-            $htmlTemplate->save();
-        }
-
         Schema::table('banners', function (Blueprint $table) {
             $table->dropColumn('text');
             $table->dropColumn('dimensions');

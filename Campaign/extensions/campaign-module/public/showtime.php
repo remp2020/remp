@@ -1,6 +1,6 @@
 <?php
 
-use Airbrake\MonologHandler;
+use Monolog\Formatter\NormalizerFormatter;
 use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;
@@ -376,26 +376,12 @@ $dotenv->load();
 $logger = new Logger('showtime');
 $streamHandler = new \Monolog\Handler\StreamHandler(__DIR__ . '/../../../storage/logs/laravel.log');
 $formatter = $streamHandler->getFormatter();
-$formatter->setDateFormat('Y-m-d H:i:s');
-$streamHandler->setFormatter($formatter);
-$logger->pushHandler($streamHandler);
-try {
-    $enabledAirbrake = env('AIRBRAKE_ENABLED', false);
-    if ($enabledAirbrake) {
-        $airbrake = new \Airbrake\Notifier([
-            'enabled' => true,
-            'projectId' => '_',
-            'projectKey' => env('AIRBRAKE_API_KEY', ''),
-            'host' => env('AIRBRAKE_API_HOST', 'api.airbrake.io'),
-            'environment' => env('APP_ENV', 'production'),
-        ]);
-
-        $logHandler = new MonologHandler($airbrake, Logger::WARNING);
-        $logger->pushHandler($logHandler);
-    }
-} catch (\Exception $e) {
-    $logger->warning('unable to register airbrake notifier: ' . $e->getMessage());
+if ($formatter instanceof NormalizerFormatter) {
+    $formatter->setDateFormat('Y-m-d H:i:s');
+    $streamHandler->setFormatter($formatter);
 }
+$logger->pushHandler($streamHandler);
+
 try {
     $sentryDSN = env('SENTRY_DSN');
     if (!empty($sentryDSN)) {

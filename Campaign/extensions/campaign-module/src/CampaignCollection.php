@@ -22,6 +22,9 @@ class CampaignCollection extends Model
         'name' => 'string',
     ];
 
+    /**
+     * @return BelongsToMany<Campaign, $this>
+     */
     public function campaigns(): BelongsToMany
     {
         return $this->belongsToMany(
