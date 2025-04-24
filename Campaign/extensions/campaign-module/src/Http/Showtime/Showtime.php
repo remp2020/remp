@@ -160,7 +160,14 @@ class Showtime
                 $banner = $this->loadOneTimeBrowserBanner($browserId);
             }
             if ($banner) {
-                $displayData[] = $showtimeResponse->renderBanner($banner, $alignments, $dimensions, $positions, $snippets);
+                $displayData[] = $showtimeResponse->renderBanner(
+                    banner: $banner,
+                    alignments: $alignments,
+                    dimensions: $dimensions,
+                    positions: $positions,
+                    colorSchemes: $colorSchemes,
+                    snippets: $snippets,
+                );
                 return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData(), []);
             }
         }
@@ -254,7 +261,7 @@ class Showtime
             if (isset($bannersOnPosition[$position])) {
                 /** @var CampaignBanner $bannerOnPosition */
                 $bannerOnPosition = $bannersOnPosition[$position];
-                /** @var Campaign $campaignOfBannerOnPosition */
+                /** @var Campaign $currentCampaign */
                 $currentCampaign = $campaigns[$bannerOnPosition->campaign_id];
                 /** @var Campaign $newCampaign */
                 $newCampaign = $campaigns[$campaignBanner->campaign_id];
@@ -391,9 +398,10 @@ class Showtime
             }
         }
 
-        /** @var CampaignBanner $seenVariant */
         // unset seen variant if it was deleted
-        if (!($seenVariant = $campaignBanners->get($variantUuid))) {
+        /** @var CampaignBanner $seenVariant */
+        $seenVariant = $campaignBanners->get($variantUuid);
+        if (!$seenVariant) {
             $variantUuid = null;
         }
 

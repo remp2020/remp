@@ -76,7 +76,7 @@ class CampaignsComparisonController extends Controller
     public function addAll()
     {
         session([
-            self::SESSION_KEY_COMPARED_CAMPAIGNS => Campaign::all()->pluck('id')->toArray()
+            self::SESSION_KEY_COMPARED_CAMPAIGNS => Campaign::query()->pluck('id')->toArray()
         ]);
         return response()->json();
     }

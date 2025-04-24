@@ -453,8 +453,6 @@ try {
         $redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_NONE);
         $redis->select((int) env('REDIS_DEFAULT_DATABASE', 0));
 
-        $cachePool = new \Cache\Adapter\Redis\RedisCachePool($redis);
-
     } else {
         $redis = new \Predis\Client([
             'scheme' => 'tcp',
@@ -466,7 +464,6 @@ try {
         ], [
             'prefix' => env('REDIS_PREFIX') ?: '',
         ]);
-        $cachePool = new \Cache\Adapter\Predis\PredisCachePool($redis);
     }
 
     $segmentAggregator = SegmentAggregator::unserializeFromRedis($redis);
@@ -475,7 +472,19 @@ try {
         $showtimeResponse->error($callback, 500, ['Internal error, application might not have been correctly initialized.']);
     }
 
-    $deviceDetector = new LazyDeviceDetector($cachePool);
+    if (extension_loaded('apcu')) {
+        $cache = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
+            new \MatthiasMullie\Scrapbook\Adapters\Apc(),
+        );
+    } elseif (env('REDIS_CLIENT', 'predis') === 'phpredis') {
+        $cache = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
+            new \MatthiasMullie\Scrapbook\Adapters\Redis($redis),
+        );
+    } else {
+        $cache = new \Kodus\PredisSimpleCache\PredisSimpleCache($redis, 60*60*24);
+    }
+
+    $deviceDetector = new LazyDeviceDetector($cache);
     $deviceRulesEvaluator = new DeviceRulesEvaluator($redis, $deviceDetector);
 
     if (file_exists(env('MAXMIND_DATABASE'))) {

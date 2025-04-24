@@ -103,7 +103,7 @@ class BannerController extends Controller
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
             'colorSchemes' => $this->colorSchemeMap->colorSchemes(),
-            'snippets' => Snippet::all()->pluck('value', 'name'),
+            'snippets' => Snippet::query()->pluck('value', 'name'),
         ]);
     }
 
@@ -130,7 +130,7 @@ class BannerController extends Controller
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
             'colorSchemes' => $this->colorSchemeMap->colorSchemes(),
-            'snippets' => Snippet::all()->pluck('value', 'name'),
+            'snippets' => Snippet::query()->pluck('value', 'name'),
         ]);
     }
 
@@ -170,7 +170,7 @@ class BannerController extends Controller
                 'dimensions' => $this->dimensionMap->dimensions(),
                 'alignments' => $this->alignmentMap->alignments(),
                 'colorSchemes' => $this->colorSchemeMap->colorSchemes(),
-                'snippets' => Snippet::all()->pluck('value', 'name'),
+                'snippets' => Snippet::query()->pluck('value', 'name'),
             ]),
             'json' => new BannerResource($banner),
         ]);
@@ -187,7 +187,7 @@ class BannerController extends Controller
             'dimensions' => $this->dimensionMap->dimensions(),
             'alignments' => $this->alignmentMap->alignments(),
             'colorSchemes' => $this->colorSchemeMap->colorSchemes(),
-            'snippets' => Snippet::all()->pluck('value', 'name'),
+            'snippets' => Snippet::query()->pluck('value', 'name'),
         ]);
     }
 

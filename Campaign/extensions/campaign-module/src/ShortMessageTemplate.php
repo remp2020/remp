@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ShortMessageTemplate extends AbstractTemplate
 {
+    /** @use HasFactory<ShortMessageTemplateFactory> */
     use HasFactory;
 
     protected $fillable = [

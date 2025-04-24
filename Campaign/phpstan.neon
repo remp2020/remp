@@ -5,6 +5,7 @@ includes:
 parameters:
     paths:
         - app/
+#        - extensions/campaign-module/src/
     level: 3
     databaseMigrationsPath:
         - database/migrations/

@@ -2,6 +2,7 @@
 
 namespace Remp\CampaignModule;
 
+use Illuminate\Support\Facades\URL;
 use Remp\CampaignModule\Console\Commands\AggregateCampaignStats;
 use Remp\CampaignModule\Console\Commands\CampaignsRefreshCache;
 use Remp\CampaignModule\Console\Commands\PostInstallCommand;
@@ -16,13 +17,11 @@ use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Predis\ClientInterface;
 use Remp\LaravelHelpers\Database\MySqlConnection;
-use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
 class CampaignServiceProvider extends ServiceProvider
 {
@@ -70,12 +69,6 @@ class CampaignServiceProvider extends ServiceProvider
 
         $this->registerCommands();
 
-        /** @var Router $router */
-        $router = $this->app['router'];
-
-        $router->aliasMiddleware('auth.jwt', VerifyJwtToken::class);
-        $router->aliasMiddleware('collectionQueryString', CollectionQueryString::class);
-
         if ($this->app->runningInConsole()) {
             $this->app->booted(function () {
                 $schedule = $this->app->make(Schedule::class);
@@ -95,6 +88,10 @@ class CampaignServiceProvider extends ServiceProvider
             // Use local resolver to control DateTimeInterface bindings.
             return new MySqlConnection($connection, $database, $prefix, $config);
         });
+
+        if (config('app.force_https')) {
+            URL::forceScheme('https');
+        }
 
         $dimensionMap = new \Remp\CampaignModule\Models\Dimension\Map(config('banners.dimensions', []));
         $positionsMap = new \Remp\CampaignModule\Models\Position\Map(config('banners.positions', []));
@@ -133,13 +130,19 @@ class CampaignServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(LazyDeviceDetector::class, function () {
-            if (config("database.redis.client") === 'phpredis') {
-                $cachePool = new \Cache\Adapter\Redis\RedisCachePool(Redis::connection()->client());
+            if (extension_loaded('apcu')) {
+                $cache = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
+                    new \MatthiasMullie\Scrapbook\Adapters\Apc(),
+                );
+            } elseif (config("database.redis.client") === 'phpredis') {
+                $cache = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
+                    new \MatthiasMullie\Scrapbook\Adapters\Redis(Redis::connection()->client()),
+                );
             } else {
-                $cachePool = new \Cache\Adapter\Predis\PredisCachePool(Redis::connection()->client());
+                $cache = new \Kodus\PredisSimpleCache\PredisSimpleCache(Redis::connection()->client(), 60*60*24);
             }
 
-            return (new LazyDeviceDetector($cachePool));
+            return new LazyDeviceDetector($cache);
         });
     }
 

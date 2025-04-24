@@ -402,7 +402,7 @@ Both endpoints return response `404 Not found` if segment is not actively used b
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| `segment_provider` | string | yes | Segment's provider returned by `SegmentContract->provider()`.<br> _Eg. out of box contracts: `crm_segment/pythia_segment/remp_segment`._ |
+| `segment_provider` | string | yes | Segment's provider returned by `SegmentContract->provider()`.<br> _Eg. out of box contracts: `crm_segment/remp_segment`._ |
 | `segment_code` | string | yes | Code which identifies segment _(stored in `campaign_segments.code`)_. |
 
 ##### _Body:_

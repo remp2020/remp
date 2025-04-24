@@ -11,6 +11,7 @@ use Remp\CampaignModule\Concerns\HasCacheableRelation;
 
 class CampaignBanner extends Model
 {
+    /** @use HasFactory<CampaignBannerFactory> */
     use HasFactory;
     use HasCacheableRelation;
 

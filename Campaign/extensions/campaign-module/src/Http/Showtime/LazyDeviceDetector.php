@@ -2,15 +2,15 @@
 
 namespace Remp\CampaignModule\Http\Showtime;
 
-use DeviceDetector\Cache\PSR6Bridge;
-use Psr\Cache\CacheItemPoolInterface;
+use DeviceDetector\Cache\PSR16Bridge;
+use Psr\SimpleCache\CacheInterface;
 
 class LazyDeviceDetector
 {
     private $detector;
 
     public function __construct(
-        private CacheItemPoolInterface $cachePool,
+        private CacheInterface $cache,
     ) {
     }
 
@@ -18,11 +18,7 @@ class LazyDeviceDetector
     {
         if (!$this->detector) {
             $this->detector = new \DeviceDetector\DeviceDetector();
-            $this->detector->setCache(
-                new PSR6Bridge(
-                    $this->cachePool
-                )
-            );
+            $this->detector->setCache(new Psr16Bridge($this->cache));
         }
 
         $this->detector->setUserAgent($userAgent);

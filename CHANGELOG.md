@@ -34,6 +34,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Removed support for Airbrake/Errbit without replacement. The app still supports Sentry for error handling by default. remp/remp#1409
 - **BREAKING**: Renamed Laravel's `FILESYSTEM_DRIVER` env variable to `FILESYSTEM_DISK`. remp/remp#1409
 - **BREAKING**: Replaced abandoned `laravelcollective/html` with `spatie/laravel-html`. remp/remp#1409
+- **BREAKING**: Removed code related to abandoned Pythia project. remp/remp#1409
+- Added support for partial APCu caching, used when the PHP extension is installed and enabled. remp/remp#1409
+  - Caching is now used only by device detection library and only if the extension is enabled. The idea is to ease on Redis cache.
 - Refactored showtime caching to replace serialized objects with JSON cache. remp/remp#1401
 - Added campaign targeting based on operating system. remp/remp#1403
 - Refactored device and operating rules to their own class `DeviceRulesEvaluator`. remp/remp#1403

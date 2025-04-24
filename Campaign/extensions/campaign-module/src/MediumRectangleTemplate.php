@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class MediumRectangleTemplate extends AbstractTemplate
 {
+    /** @use HasFactory<MediumRectangleTemplateFactory> */
     use HasFactory;
 
     protected $fillable = [

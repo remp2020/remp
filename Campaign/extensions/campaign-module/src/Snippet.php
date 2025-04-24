@@ -18,7 +18,7 @@ class Snippet extends Model implements Searchable
 
     public static function refreshSnippetsCache()
     {
-        $snippets = Snippet::all()->pluck('value', 'name');
+        $snippets = Snippet::query()->pluck('value', 'name');
         Redis::set(self::REDIS_CACHE_KEY, json_encode($snippets));
     }
 

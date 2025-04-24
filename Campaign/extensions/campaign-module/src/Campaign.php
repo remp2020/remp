@@ -15,6 +15,7 @@ use Spatie\Searchable\SearchResult;
 
 class Campaign extends Model implements Searchable
 {
+    /** @use HasFactory<CampaignFactory> */
     use HasFactory;
     use HasCacheableRelation;
     use PivotEventTrait;

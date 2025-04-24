@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BarTemplate extends AbstractTemplate
 {
+    /** @use HasFactory<BarTemplateFactory> */
     use HasFactory;
 
     protected $fillable = [

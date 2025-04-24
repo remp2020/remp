@@ -18,6 +18,7 @@ use Spatie\Searchable\SearchResult;
 
 class Banner extends Model implements Searchable
 {
+    /** @use HasFactory<BannerFactory> */
     use HasFactory;
     use HasCacheableRelation;
 
@@ -154,6 +155,7 @@ class Banner extends Model implements Searchable
         return $this->load($this->getTemplateRelationName());
     }
 
+    /** @return BelongsToMany<Campaign, $this> */
     public function campaigns(): BelongsToMany
     {
         return $this->belongsToMany(Campaign::class, 'campaign_banners')->whereNull('deleted_at');

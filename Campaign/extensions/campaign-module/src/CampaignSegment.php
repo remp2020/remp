@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CampaignSegment extends Model
 {
+    /** @use HasFactory<CampaignSegmentFactory> */
     use HasFactory;
 
     protected $appends = ['name', 'group'];

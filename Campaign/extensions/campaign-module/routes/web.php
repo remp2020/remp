@@ -21,13 +21,15 @@ use Remp\CampaignModule\Http\Controllers\SnippetController;
 use Remp\CampaignModule\Http\Controllers\CampaignsComparisonController;
 use Remp\CampaignModule\Http\Controllers\StatsController;
 use Remp\CampaignModule\Http\Controllers\SearchController;
+use Remp\CampaignModule\Http\Middleware\CollectionQueryString;
+use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
 Route::get('/error', [AuthController::class, 'error'])->name('sso.error');
 
 Route::get('banners/preview/{uuid}', [BannerController::class, 'preview'])->name('banners.preview');
 Route::get('campaigns/showtime', [CampaignController::class, 'showtime'])->name('campaigns.showtime');
 
-Route::middleware(['auth.jwt', 'collectionQueryString'])->group(function () {
+Route::middleware([VerifyJwtToken::class, CollectionQueryString::class])->group(function () {
     Route::get('/', [DashboardController::class, 'index']);
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('banners/json', [BannerController::class, 'json'])->name('banners.json');
