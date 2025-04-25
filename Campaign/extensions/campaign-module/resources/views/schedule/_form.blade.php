@@ -7,7 +7,7 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-timer"></i></span>
                 <div class="dtp-container fg-line">
                     {{ html()->label('Start time', 'start_time_frontend')->attribute('fg-label') }}
-                    {{ html()->datetime('start_time_frontend', $schedule->start_time, false)->attributes([
+                    {{ html()->text('start_time_frontend', $schedule->start_time)->attributes([
                         'class' => 'form-control date-time-picker',
                         'disabled' => $schedule->id && !$schedule->isEditable() ? 'disabled' : null,
                     ]) }}
@@ -21,7 +21,7 @@
                 <span class="input-group-addon"><i class="zmdi zmdi-timer-off"></i></span>
                 <div class="dtp-container fg-line">
                     {{ html()->label('End time', 'end_time_frontend')->attribute('fg-label') }}
-                    {{ html()->datetime('end_time_frontend', $schedule->end_time, false)->attributes([
+                    {{ html()->text('end_time_frontend', $schedule->end_time)->attributes([
                         'class' => 'form-control date-time-picker',
                     ]) }}
                 </div>
