@@ -44,6 +44,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed inline banner selector. remp/remp#1406
   - Fixed image assets links.
   - Replaced old (not functional) unmaintained css selector finder library.
+- Fixed bug that broke snippet (edit) form when backtick (``) character was stored within snippet content. remp/remp#1405
 
 ### [Mailer]
 
