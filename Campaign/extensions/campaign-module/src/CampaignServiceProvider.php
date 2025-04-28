@@ -2,6 +2,7 @@
 
 namespace Remp\CampaignModule;
 
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\URL;
 use Remp\CampaignModule\Console\Commands\AggregateCampaignStats;
 use Remp\CampaignModule\Console\Commands\CampaignsRefreshCache;
@@ -57,19 +58,28 @@ class CampaignServiceProvider extends ServiceProvider
 
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'campaign');
 
-        $this->publishes([
-            __DIR__ . '/../public/' => public_path('vendor/campaign'),
-            __DIR__ . '/../config/banners.php' => config_path('banners.php'),
-            __DIR__ . '/../config/services.php' => config_path('services.remp.php'),
-            __DIR__ . '/../config/newsletter_banners.php' => config_path('newsletter_banners.php'),
-            __DIR__ . '/../config/search.php' => config_path('search.php'),
-            __DIR__ . '/../config/system.php' => config_path('system.php'),
-            __DIR__ .'/../database/schema/mysql-schema.sql' => database_path('schema/mysql-schema.sql'),
-        ], ['campaign-assets', 'laravel-assets']);
-
         $this->registerCommands();
 
         if ($this->app->runningInConsole()) {
+            $publishPaths = [
+                __DIR__ . '/../public/' => public_path('vendor/campaign'),
+                __DIR__ . '/../config/banners.php' => config_path('banners.php'),
+                __DIR__ . '/../config/services.php' => config_path('services.remp.php'),
+                __DIR__ . '/../config/newsletter_banners.php' => config_path('newsletter_banners.php'),
+                __DIR__ . '/../config/search.php' => config_path('search.php'),
+                __DIR__ . '/../config/system.php' => config_path('system.php'),
+            ];
+
+            // MySqlSchemaState::load uses hard-coded "mysql" command as well, this might change in the future because
+            // of the mariadb executable moving away.
+            $checkCommand = (PHP_OS_FAMILY === 'Windows') ? 'where' : 'which';
+            $mysqlClientCheck = Process::run("$checkCommand mysql");
+            if ($mysqlClientCheck->successful()) {
+                $publishPaths[__DIR__ .'/../database/schema/mysql-schema.sql'] = database_path('schema/mysql-schema.sql');
+            }
+
+            $this->publishes($publishPaths, ['campaign-assets', 'laravel-assets']);
+
             $this->app->booted(function () {
                 $schedule = $this->app->make(Schedule::class);
                 (new Scheduler())->schedule($schedule);

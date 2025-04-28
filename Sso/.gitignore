@@ -22,3 +22,4 @@ _ide_helper_models.php
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+/database/schema/mysql-schema.sql

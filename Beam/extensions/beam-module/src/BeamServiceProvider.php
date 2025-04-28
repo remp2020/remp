@@ -13,6 +13,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
@@ -73,17 +74,26 @@ class BeamServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'beam');
 
-        $this->publishes([
-            __DIR__ . '/../public/' => public_path('vendor/beam'),
-            __DIR__ .'/../config/beam.php' => config_path('beam.php'),
-            __DIR__ .'/../config/services.php' => config_path('services.remp.php'),
-            __DIR__ .'/../config/system.php' => config_path('system.php'),
-            __DIR__ .'/../database/schema/mysql-schema.sql' => database_path('schema/mysql-schema.sql'),
-        ], ['beam-assets', 'laravel-assets']);
-
         $this->registerCommands();
 
         if ($this->app->runningInConsole()) {
+            $publishPaths = [
+                __DIR__ . '/../public/' => public_path('vendor/beam'),
+                __DIR__ .'/../config/beam.php' => config_path('beam.php'),
+                __DIR__ .'/../config/services.php' => config_path('services.remp.php'),
+                __DIR__ .'/../config/system.php' => config_path('system.php'),
+            ];
+
+            // MySqlSchemaState::load uses hard-coded "mysql" command as well, this might change in the future because
+            // of the mariadb executable moving away.
+            $checkCommand = (PHP_OS_FAMILY === 'Windows') ? 'where' : 'which';
+            $mysqlClientCheck = Process::run("$checkCommand mysql");
+            if ($mysqlClientCheck->successful()) {
+                $publishPaths[__DIR__ .'/../database/schema/mysql-schema.sql'] = database_path('schema/mysql-schema.sql');
+            }
+
+            $this->publishes($publishPaths, ['beam-assets', 'laravel-assets']);
+
             $this->app->booted(function () {
                 $schedule = $this->app->make(Schedule::class);
                 (new Scheduler())->schedule($schedule);
