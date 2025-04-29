@@ -23,6 +23,10 @@ class CreateSegmentGroupsTable extends Migration
         });
 
         Schema::table('segments', function(Blueprint $table) {
+            $table->integer('segment_group_id')->unsigned();
+        });
+
+        Schema::table('segments', function(Blueprint $table) {
             $table->foreign('segment_group_id')->references('id')->on('segment_groups');
         });
 

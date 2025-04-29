@@ -14,7 +14,7 @@ class ArticleProlongImageUrl extends Migration
     public function up()
     {
         Schema::table('articles', function (Blueprint $table) {
-            $table->string('image_url', 768)->change();
+            $table->string('image_url', 768)->nullable()->change();
             $table->string('url', 768)->change();
         });
     }

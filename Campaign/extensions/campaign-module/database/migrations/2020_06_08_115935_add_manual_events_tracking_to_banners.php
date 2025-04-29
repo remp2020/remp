@@ -9,7 +9,7 @@ class AddManualEventsTrackingToBanners extends Migration
     public function up()
     {
         Schema::table('banners', function (Blueprint $table) {
-            $table->boolean('manual_events_tracking')->nullable(true)->default(false);
+            $table->boolean('manual_events_tracking')->nullable()->default(false);
         });
 
         DB::statement('UPDATE banners SET manual_events_tracking = :value', [
@@ -17,7 +17,7 @@ class AddManualEventsTrackingToBanners extends Migration
         ]);
 
         Schema::table('banners', function (Blueprint $table) {
-            $table->boolean('manual_events_tracking')->nullable(false)->change();
+            $table->boolean('manual_events_tracking')->nullable(false)->default(false)->change();
         });
     }
 
