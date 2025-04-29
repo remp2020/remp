@@ -1,11 +1,9 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.3
+FROM docker.elastic.co/elasticsearch/elasticsearch:8.6.1
 
-ADD create-indexes.sh .
-RUN chmod +x create-indexes.sh
+COPY --chmod=777 create-indexes.sh .
 
-ADD elastic-start.sh .
-RUN chmod +x elastic-start.sh
+COPY --chmod=777 elastic-start.sh .
 
-ADD elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+COPY elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
 
 CMD ["./elastic-start.sh"]
