@@ -55,6 +55,23 @@ class CampaignRequest extends FormRequest
         ];
     }
 
+    /**
+     * Prepare inputs for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'signed_in' => $this->signed_in !== null
+                ? filter_var($this->signed_in, FILTER_VALIDATE_BOOLEAN)
+                : null,
+            'using_adblock' => $this->using_adblock !== null
+                ? filter_var($this->using_adblock, FILTER_VALIDATE_BOOLEAN)
+                : null,
+        ]);
+    }
+
     public function all($keys = null)
     {
         $data = parent::all($keys);
