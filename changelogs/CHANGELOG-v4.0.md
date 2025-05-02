@@ -38,6 +38,7 @@
 - Fixed partially broken inline banner selector. remp/remp#1406
   - Fixed image assets links and replaced old (not functional) unmaintained css selector finder library.
 - Fixed bug that broke snippet (edit) form when backtick (``) character was stored within snippet content. remp/remp#1405
+- Fixed cast string to boolean in form inputs before validation in `CampaignRequest::prepareForValidation`. remp/crm#3472
 
 ### [Mailer]
 
