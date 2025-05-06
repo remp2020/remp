@@ -32,7 +32,9 @@ class CampaignRequest extends FormRequest
             'signed_in' => 'boolean|nullable',
             'using_adblock' => 'boolean|nullable',
             'once_per_session' => 'boolean|required',
-            'segments' => 'array',
+            'segments.*.provider' => 'required|string',
+            'segments.*.code' => 'required|string',
+            'segments.*.inclusive' => 'required|boolean',
             'pageview_rules.display_banner' => 'required|string',
             'pageview_rules.display_banner_every' => 'required|integer',
             'pageview_rules.display_times' => 'required',
@@ -63,13 +65,23 @@ class CampaignRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            'signed_in' => $this->signed_in !== null
-                ? filter_var($this->signed_in, FILTER_VALIDATE_BOOLEAN)
-                : null,
-            'using_adblock' => $this->using_adblock !== null
-                ? filter_var($this->using_adblock, FILTER_VALIDATE_BOOLEAN)
-                : null,
+            'signed_in' => $this->boolean('signed_in'),
+            'using_adblock' => $this->boolean('using_adblock'),
         ]);
+
+        $segments = $this->input('segments');
+        if (is_array($segments)) {
+            $processedSegments = [];
+            foreach ($segments as $key => $segment) {
+                if (isset($segment['inclusive'])) {
+                    $segment['inclusive'] = $this->boolean("segments.{$key}.inclusive");
+                }
+                $processedSegments[$key] = $segment;
+            }
+            $this->merge([
+                'segments' => $processedSegments,
+            ]);
+        }
     }
 
     public function all($keys = null)
