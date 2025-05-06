@@ -213,8 +213,15 @@ class AuthorController extends Controller
                 }
                 return $amounts ?: [0];
             })
+            ->orderColumn('articles_count', 'articles_count $1')
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')
+            ->orderColumn('pageviews_all', 'pageviews_all $1')
+            ->orderColumn('pageviews_signed_in', 'pageviews_signed_in $1')
+            ->orderColumn('pageviews_subscribers', 'pageviews_subscribers $1')
+            ->orderColumn('avg_timespent_all', 'avg_timespent_all $1')
+            ->orderColumn('avg_timespent_signed_in', 'avg_timespent_signed_in $1')
+            ->orderColumn('avg_timespent_subscribers', 'avg_timespent_subscribers $1')
             ->orderColumn('id', 'authors.id $1')
             ->setTotalRecords(PHP_INT_MAX)
             ->setFilteredRecords(PHP_INT_MAX)

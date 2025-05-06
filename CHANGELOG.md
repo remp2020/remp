@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed sorting issues in datatables. remp/remp#1409
+
 ### [Campaign]
 
 - Fixed cast string to boolean in form inputs before validation in `CampaignRequest::prepareForValidation`. remp/crm#3472

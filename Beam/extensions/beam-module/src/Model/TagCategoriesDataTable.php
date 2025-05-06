@@ -200,6 +200,14 @@ class TagCategoriesDataTable
             })
             ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_amount', 'conversions_amount $1')
+            ->orderColumn('tags_count', 'tags_count $1')
+            ->orderColumn('articles_count', 'articles_count $1')
+            ->orderColumn('pageviews_all', 'pageviews_all $1')
+            ->orderColumn('pageviews_not_subscribed', 'pageviews_not_subscribed $1')
+            ->orderColumn('pageviews_subscribers', 'pageviews_subscribers $1')
+            ->orderColumn('avg_timespent_all', 'avg_timespent_all $1')
+            ->orderColumn('avg_timespent_not_subscribed', 'avg_timespent_not_subscribed $1')
+            ->orderColumn('avg_timespent_subscribers', 'avg_timespent_subscribers $1')
             ->orderColumn('id', 'tag_categories.id $1')
             ->make(true);
     }
