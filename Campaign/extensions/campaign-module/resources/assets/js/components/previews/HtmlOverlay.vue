@@ -142,6 +142,7 @@ a.html-overlay-rectangle-preview-close::after {
                         role="button"
                         tabindex="0"
                         v-if="isVisible"
+                        v-bind:data-href="this.$parent.url"
                         v-bind:class="{ closeable: closeable }"
                         v-on:click.stop="click"
                         v-on:keydown.enter.space="click"

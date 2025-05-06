@@ -67,6 +67,7 @@ a.html-preview-close::after {
             <div class="html-preview-box sans-serif"
                  role="button"
                  tabindex="0"
+                 v-bind:data-href="this.$parent.url"
                  v-on:click="click"
                  v-on:keydown.enter.space="click"
                  v-bind:style="[
