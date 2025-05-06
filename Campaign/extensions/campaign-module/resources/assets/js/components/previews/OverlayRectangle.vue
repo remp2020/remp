@@ -172,8 +172,12 @@ a.overlay-rectangle-preview-close::after {
                            v-on:keydown.enter.space.stop="$parent.closed"
                         ><small>{{ closeText }}</small></a>
 
-                        <div v-on:click="click" class="overlay-rectangle-preview-link"
-                            v-bind:style="[linkStyles]">
+                        <div
+                            v-on:click="click"
+                            class="overlay-rectangle-preview-link"
+                            v-bind:data-href="this.$parent.url"
+                            v-bind:style="[linkStyles]"
+                        >
                             <div class="overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
                                 <div v-if="imageLink"
                                      class="overlay-rectangle-image">
