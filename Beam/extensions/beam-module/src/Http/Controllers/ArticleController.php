@@ -203,6 +203,7 @@ class ArticleController extends Controller
             })
             ->orderColumn('amount', 'conversions_sum $1')
             ->orderColumn('average', 'conversions_avg $1')
+            ->orderColumn('conversions_count', 'conversions_count $1')
             ->orderColumn('conversions_rate', 'conversions_rate $1')
             ->orderColumn('id', 'articles.id $1')
             ->filterColumn('title', function (Builder $query, $value) {
@@ -344,6 +345,7 @@ class ArticleController extends Controller
             ->orderColumn('avg_sum_all', 'timespent_all / pageviews_all $1')
             ->orderColumn('avg_sum_signed_in', 'timespent_signed_in / pageviews_signed_in $1')
             ->orderColumn('avg_sum_subscribers', 'timespent_subscribers / pageviews_subscribers $1')
+            ->orderColumn('pageviews_subscribers_ratio', 'pageviews_subscribers_ratio $1')
             ->orderColumn('id', 'articles.id $1')
             ->rawColumns(['authors'])
             ->make(true);

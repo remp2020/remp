@@ -220,6 +220,8 @@ class ArticlesDataTable
                 $query->whereIn('articles.id', $filterQuery);
             })
             ->orderColumn('avg_sum', 'timespent_sum / pageviews_all $1')
+            ->orderColumn('avg_timespent_signed_in', 'avg_timespent_signed_in $1')
+            ->orderColumn('avg_timespent_all', 'avg_timespent_all $1')
             ->orderColumn('pageviews_all', 'pageviews_all $1')
             ->orderColumn('timespent_sum', 'timespent_sum $1')
             ->orderColumn('conversions_count', 'conversions_count $1')
