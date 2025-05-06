@@ -65,8 +65,8 @@ class CampaignRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            'signed_in' => $this->boolean('signed_in'),
-            'using_adblock' => $this->boolean('using_adblock'),
+            'signed_in' => $this->input('signed_in') !== null ? $this->boolean('signed_in') : null,
+            'using_adblock' => $this->input('using_adblock') !== null ? $this->boolean('using_adblock') : null,
         ]);
 
         $segments = $this->input('segments');
