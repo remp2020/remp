@@ -205,7 +205,7 @@ export default {
             return {}
         },
         isVisible: function () {
-            return this.show && this.visible;
+            return this.show && this.visible && this.dimensions !== 'hidden';
         },
     },
     methods: {
