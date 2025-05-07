@@ -37,7 +37,7 @@ class CollectionController extends Controller
 
         return view('campaign::collections.edit', [
             'collection' => $collection->load('campaigns'),
-            'selectedCampaigns' => $collection->campaigns()->pluck('id'),
+            'selectedCampaigns' => $collection->campaigns()->pluck('campaigns.id'),
             'campaigns' => Campaign::orderBy('created_at', 'DESC')->get(),
         ]);
     }
