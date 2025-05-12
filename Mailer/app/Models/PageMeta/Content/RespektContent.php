@@ -72,13 +72,13 @@ class RespektContent implements ContentInterface
         // get article subtitle
         $subtitle = $this->getContentFromParts(
             parts: $article['subtitle']['parts'] ?? [],
-            firstParagraphOnly: true,
+            countOfParagraphs: 1,
         );
 
         // get first paragraph
         $firstContentParagraph = $this->getContentFromParts(
             parts: $article['content']['parts'],
-            firstParagraphOnly: true,
+            countOfParagraphs: 1,
         );
 
         // get first content part type
@@ -86,6 +86,7 @@ class RespektContent implements ContentInterface
         $firstContentPartType = $firstPart['children'][0]['type'];
 
         $fullContent = $this->getContentFromParts($article['content']['parts']);
+        $unLockedContent = $this->getContentFromParts($article['content']['parts'], 3);
 
         // get article cover image
         $image = null;
@@ -118,11 +119,13 @@ class RespektContent implements ContentInterface
             firstParagraph: $firstContentParagraph,
             firstContentPartType: $firstContentPartType,
             fullContent: $fullContent,
+            unlockedContent: $unLockedContent,
         );
     }
 
-    private function getContentFromParts(array $parts, bool $firstParagraphOnly = false): ?string
+    private function getContentFromParts(array $parts, int $countOfParagraphs = null): ?string
     {
+        $paragraphCount = 0;
         $processedContent = null;
         $references = [];
 
@@ -190,9 +193,10 @@ class RespektContent implements ContentInterface
                             $processedPart .= '</strong>';
                         }
                         $processedContent .= $processedPart . '</p>';
+                        $paragraphCount++;
                     }
 
-                    if ($firstParagraphOnly) {
+                    if ($countOfParagraphs && $countOfParagraphs === $paragraphCount) {
                         break 2;
                     }
                 }

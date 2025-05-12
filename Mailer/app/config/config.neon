@@ -9,6 +9,7 @@ services:
 	dailyMinuteTemplateFormFactory: Remp\Mailer\Forms\DailyMinuteTemplateFormFactory('minuta-daily-digest')
 	articleUrlParserTemplateFormFactory: Remp\Mailer\Forms\ArticleUrlParserTemplateFormFactory()
 	respektUrlParserTemplateFormFactory: Remp\Mailer\Forms\RespektUrlParserTemplateFormFactory
+	respektArticleParserTemplateFormFactory: Remp\Mailer\Forms\RespektArticleParserTemplateFormFactory
 
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\NewsfilterWidget\NewsfilterWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\NovydenikNewsfilterWidget\NovydenikNewsfilterWidget
@@ -20,6 +21,7 @@ services:
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\GrafdnaWidget\GrafdnaWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\DailyMinuteWidget\DailyMinuteWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\RespektUrlParserWidget\RespektUrlParserWidget
+	- Remp\Mailer\Components\GeneratorWidgets\Widgets\RespektArticleParserWidget\RespektArticleParserWidget
 
 	- Remp\Mailer\Models\WebClient(@environmentConfig::get('WEB_ADDR'))
 

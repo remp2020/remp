@@ -14,7 +14,7 @@ class SnippetArticleLocker implements ArticleLockerInterface
     {
     }
 
-    private string $placeholder = '<!--[LOCKED_TEXT_PLACEHOLDER]-->';
+    public const LOCKED_TEXT_PLACEHOLDER = '<!--[LOCKED_TEXT_PLACEHOLDER]-->';
 
     public function getLockedPost(string $post): string
     {
@@ -28,23 +28,23 @@ class SnippetArticleLocker implements ArticleLockerInterface
         }
 
         $parts = explode($lock, $post);
-        return $parts[0] . $this->placeholder;
+        return $parts[0] . self::LOCKED_TEXT_PLACEHOLDER;
     }
 
     public function injectLockedMessage(string $post): string
     {
         if (!isset($this->lockSnippetCode)) {
             Debugger::log("Unable to inject lock message to the generated email, snippet for SnippetArticleLocker was not configured.", ILogger::ERROR);
-            return str_replace($this->placeholder, '', $post);
+            return str_replace(self::LOCKED_TEXT_PLACEHOLDER, '', $post);
         }
 
         $lockSnippet = $this->snippetsRepository->findByCodeAndMailType($this->lockSnippetCode, null);
         if (!$lockSnippet) {
             Debugger::log("Unable to inject lock message to the generated email, snippet '{$this->lockSnippetCode}' doesn't exist.", ILogger::ERROR);
-            return str_replace($this->placeholder, '', $post);
+            return str_replace(self::LOCKED_TEXT_PLACEHOLDER, '', $post);
         }
 
-        return str_replace($this->placeholder, $lockSnippet->html, $post);
+        return str_replace(self::LOCKED_TEXT_PLACEHOLDER, $lockSnippet->html, $post);
     }
 
     public function setLockSnippetCode(string $lockSnippetCode): void
