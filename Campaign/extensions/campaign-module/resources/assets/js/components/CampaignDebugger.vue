@@ -116,7 +116,7 @@ export default {
       this.errors = [];
       this.messages = [];
       if (response.evaluationMessages && response.evaluationMessages.length > 0) {
-        this.errors = response.evaluationMessages;
+        this.messages = response.evaluationMessages;
         return;
       }
 

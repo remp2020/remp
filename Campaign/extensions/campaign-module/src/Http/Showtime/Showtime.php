@@ -118,8 +118,10 @@ class Showtime
         // debugger
         $evaluationMessages = [];
         $debugCampaignPublicId = null;
+        $debug = false;
         if (isset($data->debug->key)) {
             if ($data->debug->key === $this->showtimeConfig->getDebugKey()) {
+                $debug = true;
                 $debugCampaignPublicId = $data->debug->campaignPublicId ?? null;
 
                 if (isset($data->debug->userId)) {
@@ -168,13 +170,27 @@ class Showtime
                     colorSchemes: $colorSchemes,
                     snippets: $snippets,
                 );
-                return $showtimeResponse->success($callback, $displayData, [], $segmentAggregator->getProviderData(), []);
+                return $showtimeResponse->success(
+                    callback: $callback,
+                    data: $displayData,
+                    activeCampaigns: [],
+                    providerData: $segmentAggregator->getProviderData(),
+                    suppressedBanners: [],
+                    evaluationMessages: $evaluationMessages,
+                );
             }
         }
 
         $campaignIds = json_decode($this->redis->get(Campaign::ACTIVE_CAMPAIGN_IDS) ?? '[]') ?? [];
         if (count($campaignIds) === 0) {
-            return $showtimeResponse->success($callback, [], [], $segmentAggregator->getProviderData(), []);
+            return $showtimeResponse->success(
+                callback: $callback,
+                data: [],
+                activeCampaigns: [],
+                providerData: $segmentAggregator->getProviderData(),
+                suppressedBanners: [],
+                evaluationMessages: $evaluationMessages,
+            );
         }
 
         // prepare campaign IDs to fetch
@@ -209,7 +225,7 @@ class Showtime
             );
             if ($result instanceof CampaignBanner) {
                 $campaignBanners[] = $result;
-            } else if ($campaign->id === $debugCampaignId) {
+            } else if ($debug && $campaign->id === $debugCampaignId) {
                 $evaluationMessages[] = $result;
             }
         }
@@ -223,6 +239,12 @@ class Showtime
             if ($debugCampaignPublicId && $campaignBanner->campaign_id !== $debugCampaignId) {
                 // when debugging specific campaign, do not render other campaigns
                 continue;
+            }
+
+            $c = $campaigns[$campaignBanner->campaign_id];
+
+            if ($debug) {
+                $evaluationMessages[] = "Displaying campaign [{$c->public_id}] (variant [$campaignBanner->public_id], banner [{$campaignBanner->banner->public_id}])";
             }
 
             $displayData[] = $showtimeResponse->renderCampaign(
