@@ -110,6 +110,11 @@ class Showtime
             return $showtimeResponse->error($callback, 400, ['browserId is required and missing']);
         }
 
+        if (!property_exists($data, 'referer')) {
+            // see https://github.com/remp2020/remp/blob/ae5196826988a7df2d9a0b5ca64d1823c9f236d7/Campaign/extensions/campaign-module/resources/assets/js/remplib.js#L46
+            return $showtimeResponse->error($callback, 400, ['referer is required and missing (null is acceptable)']);
+        }
+
         // language
         if ($this->showtimeConfig->getAcceptLanguage()) {
             $data->language = $this->showtimeConfig->getAcceptLanguage();
