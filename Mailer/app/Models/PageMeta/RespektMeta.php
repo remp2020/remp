@@ -17,6 +17,8 @@ class RespektMeta extends Meta
         public readonly ?string $firstContentPartType = null,
         public readonly ?string $fullContent = null,
         public readonly ?string $unlockedContent = null,
+        public readonly ?string $imageTitle = null,
+        public readonly ?string $subject = null,
     ) {
         parent::__construct(
             title: $title,

@@ -71,6 +71,7 @@ class RespektArticleGenerator implements IGenerator
                 'errors' => $output['errors'],
                 'lockedHtmlContent' => $output['lockedHtmlContent'],
                 'lockedTextContent' => $output['lockedTextContent'],
+                'subject' => $output['subject'],
             ];
 
             $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);
@@ -123,7 +124,9 @@ class RespektArticleGenerator implements IGenerator
                 subtitle: $article->subtitle,
                 firstParagraph: $article->firstParagraph,
                 firstContentPartType: $article->firstContentPartType,
-                fullContent:$unlockedContent
+                fullContent:$unlockedContent,
+                imageTitle: $article->imageTitle,
+                subject: $article->subject,
             );
 
             $lockedParams['article'] = $lockedArticle;
@@ -137,6 +140,7 @@ class RespektArticleGenerator implements IGenerator
             'lockedHtmlContent' => $engine->render($sourceTemplate->content_html, $lockedParams),
             'lockedTextContent' => strip_tags($engine->render($sourceTemplate->content_text, $lockedParams)),
             'errors' => $errors,
+            'subject' => $article->subject ?? null,
         ];
     }
 

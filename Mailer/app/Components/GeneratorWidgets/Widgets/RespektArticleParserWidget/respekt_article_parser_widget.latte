@@ -157,6 +157,7 @@
 
 <script type="application/javascript">
     let lists = {$lists};
+    let subject = {$subject};
 
     $('#mail-type-id').on('changed.bs.select', function (e) {
         let selectedTypeId = $(e.target).val();
@@ -164,4 +165,8 @@
 
         fromInput.val(lists[selectedTypeId].mail_from);
     });
+
+    if (subject) {
+        $('#' + {$control["templateForm"]['subject']->htmlId})[0].value = subject;
+    }
 </script>

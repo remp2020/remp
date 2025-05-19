@@ -17,6 +17,7 @@ use Tracy\ILogger;
 class RespektContent implements ContentInterface
 {
     private const RESPEKT_IMAGE_URL = 'https://i.respekt.cz/';
+    private const RESPEKT_PAGE_URL = 'https://respekt.cz/';
 
     private array $categoryArticleTypeMap = [
         '63d5958a-cb51-4aee-b6a2-81f560ce4f6d' => 'podcast',
@@ -93,6 +94,11 @@ class RespektContent implements ContentInterface
         if (isset($article['coverPhoto']['image']['url'])) {
             $image = $this->getImageUrl($article['coverPhoto']['image']['url']);
         }
+        $imageTitle = $article['coverPhoto']['title'] ?? $article['coverPhoto']['image']['title'];
+        $imageAuthor = $article['coverPhoto']['image']['author']['name'] ?? null;
+        if ($imageAuthor) {
+            $imageTitle .= " &bull; Autor: {$imageAuthor}";
+        }
 
         // get article authors
         $authors = [];
@@ -110,6 +116,12 @@ class RespektContent implements ContentInterface
             }
         }
 
+        // get newsletter subject
+        $subject = null;
+        if (isset($article['newsletterSubject'])) {
+            $subject = $article['newsletterSubject'];
+        }
+
         return new RespektMeta(
             title: $title,
             image: $image,
@@ -120,6 +132,8 @@ class RespektContent implements ContentInterface
             firstContentPartType: $firstContentPartType,
             fullContent: $fullContent,
             unlockedContent: $unLockedContent,
+            imageTitle: $imageTitle,
+            subject: $subject,
         );
     }
 
@@ -172,12 +186,16 @@ class RespektContent implements ContentInterface
                             if (isset($child['isItalic']) && $child['isItalic'] === true) {
                                 $node = "<em>{$node}</em>";
                             }
+                            if (isset($child['isStruckThrough']) && $child['isStruckThrough'] === true) {
+                                $node = "<s>{$node}</s>";
+                            }
                         } elseif (isset($child['type']) && $child['type'] === 'link') {
                             $linkTarget = $references[$child['referenceId']]['target'];
                             $link = ($linkTarget['externalTarget'] ?? $linkTarget['internalTarget']) ?? null;
                             if ($link !== null) {
                                 $node = $child['children'][0]['text']; // TODO[respekt#192]: this can contain multiple children with formatting
-                                $node = "<a href='{$link}'>{$node}</a>";
+
+                                $node = is_array($link) ? "<a href='{$this->getAbsoluteUrl($link['url'])}'>{$node}</a>" : "<a href='{$this->getAbsoluteUrl($link)}'>{$node}</a>";
                             }
                         } elseif (isset($child['type']) && $child['type'] === 'anchor') {
                             $node = $child['children'][0]['text'];
@@ -204,17 +222,60 @@ class RespektContent implements ContentInterface
                 if ($contentPartChild['type'] === 'reference' && isset($references[$contentPartChild['referenceId']])) {
                     $reference = $references[$contentPartChild['referenceId']];
                     if ($reference['type'] === 'image' && $reference['image']['image']['url']) {
-                        $caption = $reference['image']['image']['title'];
-                        if (!$caption && isset($reference['image']['image']['author']['name'])) {
-                            $caption = 'Autor: ' . $reference['image']['image']['author']['name'];
+                        $title = $reference['image']['image']['title'];
+                        if (isset($reference['image']['title'])) {
+                            $title = $reference['image']['title'];
+                        }
+                        $author = null;
+                        if (isset($reference['image']['image']['author']['name'])) {
+                            $author = 'Autor: ' . $reference['image']['image']['author']['name'];
                         }
                         $processedContent .= sprintf(
-                            '<figure><img src="%s" alt="%s"><figcaption style="font-size: 0.8rem; color: #6b6b6b">%s</figcaption></figure>',
+                            '<figure><img src="%s" alt="%s"><figcaption style="font-size: 0.8rem; color: #6b6b6b; font-style: italic;">%s</figcaption></figure><p></p>',
                             $this->getImageUrl($reference['image']['image']['url']),
-                            $reference['image']['image']['author']['name'] ?? null,
-                            $caption,
+                            $author,
+                            isset($title, $author) ? "{$title} &bull; {$author}" : "",
                         );
                     }
+
+                    if ($reference['type'] === 'block_link' && isset($reference['target']['internalTarget']['article']['title'])) {
+                        $processedContent .= "<p><strong>Mohlo by vás zaujmout:</strong> <a href='{$this->getAbsoluteUrl($reference['target']['internalTarget']['url'])}'>{$reference['target']['internalTarget']['article']['title']}</a></p>";
+                    }
+
+                    if ($reference['type'] === 'horizontal_divider') {
+                        $processedContent .= '<hr>';
+                    }
+                }
+
+                if ($contentPartChild['type'] === 'question' && isset($contentPartChild['children'][0]['text'])) {
+                    $processedContent .= "<p><strong>{$contentPartChild['children'][0]['text']}</strong></p>";
+                }
+
+                if ($contentPartChild['type'] === 'heading') {
+                    $level = $contentPartChild['level'];
+                    $fontSize = match ($level) {
+                        1 => 32,
+                        2 => 24,
+                        3 => 18,
+                        default => 20
+                    };
+                    $processedContent .= "<h{$level} style='font-size: {$fontSize}px;'>{$contentPartChild['children'][0]['text']}</h{$level}>";
+                }
+
+                if ($contentPartChild['type'] === 'unorderedList') {
+                    $processedContent .= "<ul>";
+                    foreach ($contentPartChild['children'] as $listItem) {
+                        $processedContent .= "<li>{$listItem['children'][0]['text']}</li>";
+                    }
+                    $processedContent .= "</ul>";
+                }
+
+                if ($contentPartChild['type'] === 'orderedList') {
+                    $processedContent .= "<ol>";
+                    foreach ($contentPartChild['children'] as $listItem) {
+                        $processedContent .= "<li>{$listItem['children'][0]['text']}</li>";
+                    }
+                    $processedContent .= "</ol>";
                 }
             }
         }
@@ -225,5 +286,13 @@ class RespektContent implements ContentInterface
     {
         $image = preg_replace('#^https://#', '', $sourceUrl);
         return self::RESPEKT_IMAGE_URL . $image . '?width=500&fit=crop';
+    }
+
+    private function getAbsoluteUrl(string $sourceUrl): string
+    {
+        if (str_starts_with('https://', $sourceUrl)) {
+            return $sourceUrl;
+        }
+        return self::RESPEKT_PAGE_URL . $sourceUrl;
     }
 }

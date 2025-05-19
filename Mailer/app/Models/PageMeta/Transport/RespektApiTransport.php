@@ -32,15 +32,16 @@ query GetArticleForMailer($articleUrl: String) {
   getArticle(by: { url: { url: $articleUrl } }) {
     title
     authors {author {name}}
-    coverPhoto {image {url width height}}
+    coverPhoto {image {url width height title author {name}} title}
     categories {category {id name}}
     publishAt
     subtitle {parts {json order}}
+    newsletterSubject
     content {
       parts {
         json
         order
-        references {id type target {type externalTarget internalTarget {url}} image { image { url title author {name} } }}
+        references {id type target {type externalTarget internalTarget {url article {title}}} image { title image { url title author {name} } }}
       }
     }
   }

@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added generator template validation. remp/remp#1398
+- Added support for the processing of additional elements in `RespektContent`. remp/respekt#388
 
 ## Archive
 
