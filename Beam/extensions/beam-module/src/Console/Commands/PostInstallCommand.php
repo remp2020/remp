@@ -20,7 +20,7 @@ class PostInstallCommand extends Command
             ]);
 
             Artisan::call('db:seed', [
-                '--class' => \Remp\BeamModule\Database\Seeders\ConfigSeeder::class,
+                '--class' => \Remp\BeamModule\Database\Seeders\SegmentGroupSeeder::class,
                 '--force' => true,
             ]);
         } catch (\Exception $e) {
