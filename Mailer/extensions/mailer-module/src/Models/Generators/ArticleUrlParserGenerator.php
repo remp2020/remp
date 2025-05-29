@@ -14,42 +14,33 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class ArticleUrlParserGenerator implements IGenerator
 {
-    protected $sourceTemplatesRepository;
-
-    protected $content;
-
     public $onSubmit;
 
-    private $engineFactory;
-
     public function __construct(
-        SourceTemplatesRepository $sourceTemplatesRepository,
-        ContentInterface $content,
-        EngineFactory $engineFactory
+        protected SourceTemplatesRepository $sourceTemplatesRepository,
+        protected ContentInterface $content,
+        private EngineFactory $engineFactory
     ) {
-        $this->sourceTemplatesRepository = $sourceTemplatesRepository;
-        $this->content = $content;
-        $this->engineFactory = $engineFactory;
     }
 
     public function generateForm(Form $form): void
     {
         $form->addTextArea('intro', 'Intro text')
             ->setHtmlAttribute('rows', 4)
-            ->getControlPrototype()
-            ->setHtmlAttribute('class', 'form-control html-editor');
+            ->setHtmlAttribute('class', 'form-control trumbowyg-editor')
+            ->getControlPrototype();
 
         $form->addTextArea('articles', 'Article')
             ->setHtmlAttribute('rows', 7)
+            ->setHtmlAttribute('class', 'form-control')
             ->setOption('description', 'Paste article URLs. Each on separate line.')
             ->setRequired(true)
-            ->getControlPrototype()
-            ->setHtmlAttribute('class', 'form-control html-editor');
+            ->getControlPrototype();
 
         $form->addTextArea('footer', 'Footer text')
             ->setHtmlAttribute('rows', 6)
-            ->getControlPrototype()
-            ->setHtmlAttribute('class', 'form-control html-editor');
+            ->setHtmlAttribute('class', 'form-control trumbowyg-editor')
+            ->getControlPrototype();
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
@@ -88,6 +79,10 @@ class ArticleUrlParserGenerator implements IGenerator
     public function process(array $values): array
     {
         $sourceTemplate = $this->sourceTemplatesRepository->find($values['source_template_id']);
+
+        if (!$sourceTemplate) {
+            throw new \RuntimeException("Unable to find source template with ID [{$values['source_template_id']}]");
+        }
 
         $items = [];
         $errors = [];

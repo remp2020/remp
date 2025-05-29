@@ -10,6 +10,13 @@
         <p>You have to create source template for generator.</p>
     </div>
 {/if}
+<script>
+    $.nette.ext('loadGenerator', {
+        success: function () {
+            $('.trumbowyg-editor').trumbowyg();
+        }
+    });
+</script>
 
 {define onChangeCallback}
     <script>

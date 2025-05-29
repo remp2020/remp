@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added generator template validation. remp/remp#1398
 - Added support for the processing of additional elements in `RespektContent`. remp/respekt#388
+- Added HTML WYSIWYG editor for URL Parser email generator intro and footer inputs. remp/remp#1416
 
 ## Archive
 
