@@ -290,7 +290,7 @@ class RespektContent implements ContentInterface
 
     private function getAbsoluteUrl(string $sourceUrl): string
     {
-        if (str_starts_with('https://', $sourceUrl)) {
+        if (str_starts_with($sourceUrl, 'https://')) {
             return $sourceUrl;
         }
         return self::RESPEKT_PAGE_URL . $sourceUrl;
