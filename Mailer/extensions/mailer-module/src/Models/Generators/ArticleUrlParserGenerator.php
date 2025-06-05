@@ -27,7 +27,7 @@ class ArticleUrlParserGenerator implements IGenerator
     {
         $form->addTextArea('intro', 'Intro text')
             ->setHtmlAttribute('rows', 4)
-            ->setHtmlAttribute('class', 'form-control trumbowyg-editor')
+            ->setHtmlAttribute('class', 'form-control wysiwyg-editor')
             ->getControlPrototype();
 
         $form->addTextArea('articles', 'Article')
@@ -39,7 +39,7 @@ class ArticleUrlParserGenerator implements IGenerator
 
         $form->addTextArea('footer', 'Footer text')
             ->setHtmlAttribute('rows', 6)
-            ->setHtmlAttribute('class', 'form-control trumbowyg-editor')
+            ->setHtmlAttribute('class', 'form-control wysiwyg-editor')
             ->getControlPrototype();
 
         $form->onSuccess[] = [$this, 'formSucceeded'];
