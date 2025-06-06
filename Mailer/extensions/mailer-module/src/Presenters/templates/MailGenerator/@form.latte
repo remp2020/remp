@@ -13,7 +13,10 @@
 <script>
     $.nette.ext('loadGenerator', {
         success: function () {
-            $('.wysiwyg-editor').trumbowyg();
+            $('.wysiwyg-editor').trumbowyg({
+                tagsToKeep: ['i', 'b', 'ul', 'li', 'ol', 'a', 'em', 'img', 'hr'],
+                autogrow: true
+            });
         }
     });
 </script>
