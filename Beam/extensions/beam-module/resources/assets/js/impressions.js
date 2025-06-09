@@ -92,7 +92,7 @@ export default function(config) {
             }
             // the reliable way of sending analytics data when the page is hidden/closed/tab is switched
             const blobPayload = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-            navigator.sendBeacon(reportUrl + "?beacon=1", blobPayload);
+            navigator.sendBeacon(reportUrl, blobPayload);
         }
     });
 
