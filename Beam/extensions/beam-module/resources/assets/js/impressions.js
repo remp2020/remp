@@ -1,5 +1,7 @@
 import {dispatchBeamEvent} from "./remplib";
 export default function(config) {
+    let watched  = {};
+
     const functionInterface =  {
         reset
     }
@@ -11,7 +13,6 @@ export default function(config) {
 
     let reportUrl = config.tracker.url + "/track/impressions";
     let globalItemMinVisibleDurationMs = config.tracker.impressions.itemMinVisibleDuration || 2000;
-    let watched  = {};
 
     const createIntersectionObserver =  (impressionConfig) => {
         const watchedKey = getWatchedKey(impressionConfig)
@@ -139,11 +140,13 @@ export default function(config) {
     }
 
     function reset() {
-        for (const [watchedKey, watchedData] of Object.entries(watched)) {
-            watchedData.intersectionObserver.disconnect();
-            watchedData.mutationObserver.disconnect();
+        if (watched) {
+            for (const [watchedKey, watchedData] of Object.entries(watched)) {
+                watchedData.intersectionObserver.disconnect();
+                watchedData.mutationObserver.disconnect();
+            }
+            watched = {};
         }
-        watched = {};
     }
 
     return functionInterface;
