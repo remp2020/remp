@@ -405,8 +405,13 @@ class Tracker {
 
     _reset() {
         remplib.resetRempPageviewID();
+        try {
+            remplib.impressions.reset();
+        } catch (e) {
+            console.error("REMP - error resetting impressions settings", e);
+        }
+
         this.trackPageview();
-        remplib.impressions.reset();
     }
 
     trackEvent(category, action, tags, fields, source, value) {
