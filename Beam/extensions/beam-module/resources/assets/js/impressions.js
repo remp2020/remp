@@ -1,18 +1,22 @@
 import {dispatchBeamEvent} from "./remplib";
 export default function(config) {
-    if (!config.tracker.impressions || !config.tracker.impressions.enabled) {
-        return;
+    const functionInterface =  {
+        reset
     }
 
-    this.config = config;
-    this.reportUrl = this.config.tracker.url + "/track/impressions";
-    this.globalItemMinVisibleDurationMs = config.tracker.impressions.itemMinVisibleDuration || 2000;
-    this.watched  = {};
+    if (!config.tracker.impressions || !config.tracker.impressions.enabled) {
+        // do nothing
+        return functionInterface;
+    }
+
+    let reportUrl = config.tracker.url + "/track/impressions";
+    let globalItemMinVisibleDurationMs = config.tracker.impressions.itemMinVisibleDuration || 2000;
+    let watched  = {};
 
     const createIntersectionObserver =  (impressionConfig) => {
         const watchedKey = getWatchedKey(impressionConfig)
 
-        let minVisibleDurationMs = this.globalItemMinVisibleDurationMs;
+        let minVisibleDurationMs = globalItemMinVisibleDurationMs;
         if (impressionConfig.itemMinVisibleDuration) {
             minVisibleDurationMs = impressionConfig.itemMinVisibleDuration;
         }
@@ -26,18 +30,18 @@ export default function(config) {
                 entries.forEach((entry) => {
                     const postId = itemElementIdFn(entry.target);
                     if (entry.isIntersecting) {
-                        if (!this.watched[watchedKey].seen.has(postId) && !this.watched[watchedKey].seenTimers.has(postId)) {
+                        if (!watched[watchedKey].seen.has(postId) && !watched[watchedKey].seenTimers.has(postId)) {
                             const timerId = setTimeout(() => {
-                                this.watched[watchedKey].seenTimers.delete(postId);
-                                this.watched[watchedKey].seen.add(postId);
+                                watched[watchedKey].seenTimers.delete(postId);
+                                watched[watchedKey].seen.add(postId);
                                 observer.unobserve(entry.target);
                             }, minVisibleDurationMs);
-                            this.watched[watchedKey].seenTimers.set(postId, timerId);
+                            watched[watchedKey].seenTimers.set(postId, timerId);
                         }
                     } else {
-                        if (this.watched[watchedKey].seenTimers.has(postId)) {
-                            clearTimeout(this.watched[watchedKey].seenTimers.get(postId));
-                            this.watched[watchedKey].seenTimers.delete(postId);
+                        if (watched[watchedKey].seenTimers.has(postId)) {
+                            clearTimeout(watched[watchedKey].seenTimers.get(postId));
+                            watched[watchedKey].seenTimers.delete(postId);
                         }
                     }
                 });
@@ -54,7 +58,7 @@ export default function(config) {
         const intersectionObserver = createIntersectionObserver(impressionConfig);
         const observed = new Set();
 
-        this.watched[getWatchedKey(impressionConfig)] = {
+        watched[getWatchedKey(impressionConfig)] = {
             seen: new Set(), // items confirmed as seen
             seenTimers: new Map(), // items waiting to be confirmed as seen
             lastSeenSize: 0,
@@ -73,31 +77,31 @@ export default function(config) {
 
     // first report after 2.5s, later after 5s
     setTimeout(async () => {
-        await this.sendPayload(this.preparePayload());
+        await sendPayload(preparePayload());
         setInterval(() => {
-            this.sendPayload(this.preparePayload());
+            sendPayload(preparePayload());
         }, 5000);
     }, 2500);
 
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "hidden") {
-            const payload = this.preparePayload();
+            const payload = preparePayload();
             if (payload.d.length === 0) {
                 return;
             }
             // the reliable way of sending analytics data when the page is hidden/closed/tab is switched
             const blobPayload = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-            navigator.sendBeacon(this.reportUrl + "?beacon=1", blobPayload);
+            navigator.sendBeacon(reportUrl + "?beacon=1", blobPayload);
         }
     });
 
-    this.preparePayload = () => {
+    function preparePayload() {
         const payload = {
             d: [],
             rpid: remplib.getRempPageviewID(),
         };
 
-        for (const [_, watchedData] of Object.entries(this.watched)) {
+        for (const [_, watchedData] of Object.entries(watched)) {
             if (watchedData.seen.size !== watchedData.lastSeenSize) {
                 watchedData.lastSeenSize = watchedData.seen.size;
                 const seenToReport = setDifference(watchedData.seen, watchedData.sent);
@@ -112,14 +116,14 @@ export default function(config) {
         }
 
         return payload;
-    };
+    }
 
-    this.sendPayload = async (payload) => {
+    async function sendPayload(payload) {
         if (payload.d.length === 0) {
             return; // no need to report
         }
 
-        const response = await fetch(this.reportUrl, {
+        const response = await fetch(reportUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -134,13 +138,15 @@ export default function(config) {
         dispatchBeamEvent(payload);
     }
 
-    this.reset = function () {
-        for (const [watchedKey, watchedData] of Object.entries(this.watched)) {
+    function reset() {
+        for (const [watchedKey, watchedData] of Object.entries(watched)) {
             watchedData.intersectionObserver.disconnect();
             watchedData.mutationObserver.disconnect();
         }
-        this.watched = {};
+        watched = {};
     }
+
+    return functionInterface;
 }
 
 function getWatchedKey(impressionConfig) {
