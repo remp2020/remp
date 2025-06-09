@@ -249,7 +249,7 @@ func initElasticEventStorages(ctx context.Context, c Config, mainLog *log.Logger
 		{"pageviews", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
 		{"pageviews_time_spent", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
 		{"pageviews_progress", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
-		{"commerce", `{"properties": {"revenue": {"type": "double"}}}`},
+		{"commerce", `{"properties": {"revenue": {"type": "float"}}}`},
 		{"events", ""},
 		{"concurrents_by_browser", ""},
 		{"impressions", ""},
