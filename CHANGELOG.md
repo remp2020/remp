@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed sorting issues in datatables. remp/remp#1409
+- Fixed commerce explicit mapping causing type-related issue (temporarily disabling). remp/remp#1419
 
 ### [Campaign]
 
