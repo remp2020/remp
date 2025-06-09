@@ -1,6 +1,7 @@
 import Remplib from '@remp/js-commons/js/remplib'
 import Hash from 'fnv1a'
 import { throttle } from 'lodash';
+import Impressions from "./impressions";
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
@@ -105,6 +106,8 @@ class Tracker {
         if (typeof config.tracker.utmBackwardCompatibilityEnabled === 'boolean') {
             this.utmBackwardCompatibilityEnabled = config.tracker.utmBackwardCompatibilityEnabled;
         }
+
+        remplib.impressions = new Impressions(config);
 
         // configure beam-based internal storage keys
         if (this.utmBackwardCompatibilityEnabled === true) {
@@ -403,6 +406,7 @@ class Tracker {
     _reset() {
         remplib.resetRempPageviewID();
         this.trackPageview();
+        remplib.impressions.reset();
     }
 
     trackEvent(category, action, tags, fields, source, value) {
@@ -423,7 +427,7 @@ class Tracker {
         }
 
         this.post(this.url + "/track/event", params);
-        this.dispatchEvent(category, action, params);
+        this.dispatchEvent(params, category, action);
     }
 
     trackPageview() {
@@ -433,7 +437,7 @@ class Tracker {
         };
         params = this.addSystemUserParams(params);
         this.post(this.url + "/track/pageview", params);
-        this.dispatchEvent("pageview", "load", params);
+        this.dispatchEvent(params, "pageview", "load");
     }
 
     trackTimespent(closed = false) {
@@ -452,7 +456,7 @@ class Tracker {
         params = this.timespentParamsCleanup(params);
 
         this.post(this.url + "/track/pageview", params);
-        this.dispatchEvent("pageview", "timespent", params);
+        this.dispatchEvent(params, "pageview", "timespent");
     }
 
     trackCheckout(funnelId, includeStorageParams = false) {
@@ -467,7 +471,7 @@ class Tracker {
         };
         params = this.addSystemUserParams(params, includeStorageParams);
         this.post(this.url + "/track/commerce", params);
-        this.dispatchEvent("commerce", "checkout", params);
+        this.dispatchEvent(params, "commerce", "checkout");
     }
 
     trackCheckoutWithSource(funnelId, article, source)
@@ -488,7 +492,7 @@ class Tracker {
         params = this.addSystemUserParams(params);
         params["user"]["source"] = source;
         this.post(this.url + "/track/commerce", params);
-        this.dispatchEvent("commerce", "checkout", params);
+        this.dispatchEvent(params, "commerce", "checkout");
     }
 
     trackPayment(transactionId, amount, currency, productIds, funnelId) {
@@ -513,7 +517,7 @@ class Tracker {
 
         params = this.addSystemUserParams(params);
         this.post(this.url + "/track/commerce", params);
-        this.dispatchEvent("commerce", "payment", params);
+        this.dispatchEvent(params, "commerce", "payment");
     }
 
     trackPaymentWithSource(transactionId, amount, currency, productIds, article, source, funnelId) {
@@ -542,7 +546,7 @@ class Tracker {
         params = this.addSystemUserParams(params);
         params["user"]["source"] = source;
         this.post(this.url + "/track/commerce", params);
-        this.dispatchEvent("commerce", "payment", params);
+        this.dispatchEvent(params, "commerce", "payment");
     }
 
     trackPurchase(transactionId, amount, currency, productIds, funnelId) {
@@ -567,7 +571,7 @@ class Tracker {
 
         params = this.addSystemUserParams(params);
         this.post(this.url + "/track/commerce", params);
-        this.dispatchEvent("commerce", "purchase", params);
+        this.dispatchEvent(params, "commerce", "purchase");
     }
 
     trackPurchaseWithSource(transactionId, amount, currency, productIds, article, source, funnelId) {
@@ -596,7 +600,7 @@ class Tracker {
         params = this.addSystemUserParams(params);
         params["user"]["source"] = source;
         this.post(this.url + "/track/commerce", params);
-        this.dispatchEvent("commerce", "purchase", params);
+        this.dispatchEvent(params, "commerce", "purchase");
     }
 
     trackRefund(transactionId, amount, currency, productIds) {
@@ -616,7 +620,7 @@ class Tracker {
         };
         params = this.addSystemUserParams(params);
         this.post(this.url + "/track/commerce", params);
-        this.dispatchEvent("commerce", "refund", params);
+        this.dispatchEvent(params, "commerce", "refund");
     }
 
     trackRefundWithSource(transactionId, amount, currency, productIds, article, source) {
@@ -640,16 +644,12 @@ class Tracker {
         params = this.addSystemUserParams(params);
         params["user"]["source"] = source;
         this.post(this.url + "/track/commerce", params);
-        this.dispatchEvent("commerce", "refund", params);
+        this.dispatchEvent(params, "commerce", "refund" );
     }
 
-    dispatchEvent(category, action, params) {
-        params["_category"] = category;
-        params["_action"] = action;
-        let event = new CustomEvent("beam_event", {
-            detail: params,
-        });
-        window.dispatchEvent(event);
+    dispatchEvent(params, category, action) {
+        // just forward call
+        dispatchBeamEvent(params, category, action);
     }
 
     post(path, params) {
@@ -985,7 +985,6 @@ class Tracker {
 }
 
 (function(mocklib) {
-
     'use strict';
 
     let prodlib = Remplib;
@@ -996,3 +995,16 @@ class Tracker {
     remplib.bootstrap(remplib.tracker);
 
 })(remplib);
+
+export function dispatchBeamEvent(params, category, action) {
+    if (action) {
+        params["_category"] = category;
+    }
+    if (category) {
+        params["_action"] = action;
+    }
+    let event = new CustomEvent("beam_event", {
+        detail: params,
+    });
+    window.dispatchEvent(event);
+ }

@@ -270,6 +270,27 @@ var rempConfig = {
         tags: [String, String, String], // optional, any tags associated with the article
         elementFn: Function // callback returning DOM element containing article content
     },
+  
+    // optional, tracking of impressions of selected items within single page
+    // "impression" is counted when given item/element is visible on a page for given minimal amount of time
+    // impressions tracking works for dynamically added elements too
+    // this feature is useful e.g. for tracking seen article titles on index page 
+    impressions: {
+      enabled: Boolean, // required
+      itemMinVisibleDuration: Number, // optional, number of milliseconds required for items to be counted as seen (by default 2000 ms) 
+      watched: [ // required, list of specific configurations for impression tracking
+        {
+          type: String, // required, type under which items are being tracked (e.g. "article"). This can be arbitrary string, it's used for labeling of stored data.
+          block: String, // required, block under which items are being tracked (e.g. "main-feed" or "sidebar"). This can be arbitrary string, it's used for labeling of stored data.
+          itemsQuerySelector: String, // required, JS selector of single item/element, (e.g. '.article')
+          
+          containerQuerySelector: String, // optional, JS selector of container where items are stored. This is used for detection of dynamically added items. It's recommended to specify this, because it makes detection more efficient (otherwise whole document is being watched).  
+          itemElementIdFn: Function, // optional, function to return item unique id - by default element ID, is used  ('el => el.id')
+          itemMinVisibleDuration: Number, // optional, overriding main 'itemMinVisibleDuration' for specific element 
+        },
+        // more configuration blocks can be specified here...
+      ],
+    },    
 
     // required, Tracker API specific options
     tracker: {
@@ -331,6 +352,50 @@ Reading progress period is configurable and defaults to update to server every 5
 is 1 second, but it's safe to raise it to more than 5 seconds as *unload* event tracks the progress anyway.
 
 You can enable the tracking by setting `rempConfig.tracker.readingProgress = { enabled: true }`
+
+##### Impressions tracking
+
+Optionally, you can also enable impressions tracking feature. 
+
+In our context, "impression" is equivalent of pageview of a single element within a page. Impression is counted when given item/element is visible (at least 50% of it) to user for given minimal amount of time. 
+
+Impression tracking is useful e.g. for tracking dynamically added elements on a page, such as article titles or news feed.
+
+Example:
+
+Let's have HTML similar to this, where article titles are dynamically added to articles feed:
+
+```html
+<div id="articles-feed">
+  <div id="article-1" class="article">Some title</div>
+  <div id="article-2" class="article">Other title</div>
+  <!--  more articles ... -->
+</div>
+```
+
+
+To enable impression tracking for this articles feed, configure Beam JS tracker like this:
+```js
+var rempConfig = {
+    // .. rest of the configuration  
+  
+    impressions: {
+        enabled: true,
+        watched: [
+        {
+          type: "article",
+          block: "articles-feed", 
+          itemsQuerySelector: ".article",
+          containerQuerySelector: "#articles-feed",
+          itemElementIdFn: el => el.id,
+        },
+      ]
+    }
+}
+```
+
+
+  
 
 ##### Single-page applications
 

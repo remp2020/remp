@@ -245,13 +245,14 @@ func initElasticEventStorages(ctx context.Context, c Config, mainLog *log.Logger
 
 	// create indexes (if not exist) and push explicit mapping
 
-	indexesAndMappings := [6][2]string{
+	indexesAndMappings := [7][2]string{
 		{"pageviews", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
 		{"pageviews_time_spent", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
 		{"pageviews_progress", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
 		{"commerce", `{"properties": {"revenue": {"type": "double"}}}`},
 		{"events", ""},
 		{"concurrents_by_browser", ""},
+		{"impressions", ""},
 	}
 
 	for _, row := range indexesAndMappings {

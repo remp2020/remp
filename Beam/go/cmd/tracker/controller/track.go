@@ -7,12 +7,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/avct/uasurfer"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/avct/uasurfer"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 // TrackController implements the track resource.
@@ -43,14 +44,23 @@ func NewTrackController(ep EventProducer, ps model.PropertyStorage, ess model.En
 	}
 }
 
-// Commerce runs the commerce action.
-func (c *TrackController) Commerce(ctx context.Context, p *track.Commerce2) (err error) {
-	_, ok, err := c.PropertyStorage.Get(p.System.PropertyToken)
+func (c *TrackController) checkPropertyToken(s *track.System) (err error) {
+	_, ok, err := c.PropertyStorage.Get(s.PropertyToken)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		return track.MakeNotFound(errors.New(fmt.Sprintf("unable to find property: %s", p.System.PropertyToken)))
+		return track.MakeNotFound(errors.New(fmt.Sprintf("unable to find property: %s", s.PropertyToken)))
+	}
+
+	return nil
+}
+
+// Commerce runs the commerce action.
+func (c *TrackController) Commerce(ctx context.Context, p *track.Commerce2) (err error) {
+	err = c.checkPropertyToken(p.System)
+	if err != nil {
+		return err
 	}
 
 	tags := map[string]string{
@@ -122,12 +132,9 @@ func (c *TrackController) Commerce(ctx context.Context, p *track.Commerce2) (err
 
 // Event runs the event action.
 func (c *TrackController) Event(ctx context.Context, p *track.Event2) (err error) {
-	_, ok, err := c.PropertyStorage.Get(p.System.PropertyToken)
+	err = c.checkPropertyToken(p.System)
 	if err != nil {
 		return err
-	}
-	if !ok {
-		return track.MakeNotFound(errors.New(fmt.Sprintf("unable to find property: %s", p.System.PropertyToken)))
 	}
 
 	tags := map[string]string{}
@@ -170,12 +177,9 @@ func (c *TrackController) Event(ctx context.Context, p *track.Event2) (err error
 
 // Pageview runs the pageview action.
 func (c *TrackController) Pageview(ctx context.Context, p *track.Pageview2) (err error) {
-	_, ok, err := c.PropertyStorage.Get(p.System.PropertyToken)
+	err = c.checkPropertyToken(p.System)
 	if err != nil {
 		return err
-	}
-	if !ok {
-		return track.MakeNotFound(errors.New(fmt.Sprintf("unable to find property: %s", p.System.PropertyToken)))
 	}
 
 	tags := map[string]string{}
@@ -246,12 +250,9 @@ func (c *TrackController) Pageview(ctx context.Context, p *track.Pageview2) (err
 
 // Entity runs the entity action.
 func (c *TrackController) Entity(ctx context.Context, p *track.Entity2) (err error) {
-	_, ok, err := c.PropertyStorage.Get(p.System.PropertyToken)
+	err = c.checkPropertyToken(p.System)
 	if err != nil {
 		return err
-	}
-	if !ok {
-		return track.MakeNotFound(errors.New(fmt.Sprintf("unable to find property: %s", p.System.PropertyToken)))
 	}
 
 	// try to get entity schema
@@ -279,6 +280,39 @@ func (c *TrackController) Entity(ctx context.Context, p *track.Entity2) (err err
 
 	if err = c.pushInternal(ctx, model.TableEntities, t, nil, fields); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// Impressions runs the impressions action.
+func (c *TrackController) Impressions(ctx context.Context, p *track.Impressions2) (err error) {
+	var t time.Time
+	if p.T == nil {
+		t = time.Now()
+	} else {
+		t, err = time.Parse(time.RFC3339, *p.T)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, impressionData := range p.D {
+		tags := map[string]string{}
+		fields := map[string]interface{}{}
+
+		// Add impression-specific data
+		tags["block"] = impressionData.Bl
+		tags["type"] = impressionData.Tp
+		tags["remp_pageview_id"] = p.Rpid
+		fields["element_ids"] = impressionData.Eid
+
+		// Add concatenated tag, serving as ID
+		tags["remp_pageview_id_block_type"] = fmt.Sprintf("%s_%s_%s", p.Rpid, impressionData.Bl, impressionData.Tp)
+
+		if err = c.pushInternal(ctx, model.TableImpressions, t, tags, fields); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -321,6 +355,7 @@ func articleValues(article *track.Article) (map[string]string, map[string]interf
 
 func (c *TrackController) payloadToTagsFields(system *track.System, user *track.User,
 	tags map[string]string, fields map[string]interface{}) (map[string]string, map[string]interface{}) {
+
 	fields["token"] = system.PropertyToken
 
 	if user != nil {

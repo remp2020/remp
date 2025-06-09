@@ -15,6 +15,7 @@ const (
 	TablePageviews          = "pageviews"
 	TableTimespent          = "pageviews_time_spent"
 	TableProgress           = "pageviews_progress"
+	TableImpressions        = "impressions"
 	FlagArticle             = "is_article"
 )
 

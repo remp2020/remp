@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed sorting issues in datatables. remp/remp#1409
+- Added impression tracking feature. remp/remp#1228
 
 ### [Campaign]
 

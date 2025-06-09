@@ -21,6 +21,7 @@ var _ = API("tracker", func() {
 		cors.Methods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 		cors.Headers("Content-Type")
 		cors.MaxAge(3600)
+		cors.Credentials()
 	})
 
 	Server("tracker_server", func() {

@@ -180,3 +180,21 @@ var Entity = Type("Entity", func() {
 	Attribute("system", System)
 	Required("entity_def", "system")
 })
+
+var ImpressionData = Type("ImpressionData", func() {
+	Description("ImpressionData represents a single impression event with block, type and element identifiers")
+	Attribute("bl", String, "Block identifier")
+	Attribute("tp", String, "Type identifier")
+	Attribute("eid", ArrayOf(String), "Element identifiers")
+	Required("bl", "tp", "eid")
+})
+
+var Impressions = Type("Impressions", func() {
+	Description("Impressions is the payload for tracking impression events")
+	Attribute("rpid", String, "REMP pageview ID")
+	Attribute("d", ArrayOf(ImpressionData), "Tracked impression data")
+	Attribute("t", String, "Time of occurrence", func() {
+		Format(FormatDateTime)
+	})
+	Required("d", "rpid")
+})

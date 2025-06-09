@@ -77,4 +77,19 @@ var _ = Service("track", func() {
 			Description("Returned when property_token was not found")
 		})
 	})
+
+	Method("impressions", func() {
+		Description("Track impressions")
+		Payload(Impressions)
+		HTTP(func() {
+			POST("/impressions")
+			Response(StatusAccepted)
+		})
+		Error("bad_request", func() {
+			Description("Returned when request does not comply with Swagger specification")
+		})
+		Error("not_found", func() {
+			Description("Returned when property_token was not found")
+		})
+	})
 })
