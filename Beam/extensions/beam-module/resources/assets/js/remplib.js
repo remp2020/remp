@@ -107,7 +107,12 @@ class Tracker {
             this.utmBackwardCompatibilityEnabled = config.tracker.utmBackwardCompatibilityEnabled;
         }
 
-        remplib.impressions = new Impressions(config);
+        try {
+            remplib.impressions = new Impressions(config);
+        } catch (e) {
+            console.log("REMP - error initializing impressions", e);
+        }
+
 
         // configure beam-based internal storage keys
         if (this.utmBackwardCompatibilityEnabled === true) {

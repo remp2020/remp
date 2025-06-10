@@ -78,9 +78,17 @@ export default function(config) {
 
     // first report after 2.5s, later after 5s
     setTimeout(async () => {
-        await sendPayload(preparePayload());
+        try {
+            await sendPayload(preparePayload());
+        } catch (e) {
+            console.log("REMP - error while preparing and sending impressions payload", e);
+        }
         setInterval(() => {
-            sendPayload(preparePayload());
+            try {
+                sendPayload(preparePayload());
+            } catch (e) {
+                console.log("REMP - error while preparing and sending impressions payload", e);
+            }
         }, 5000);
     }, 2500);
 
