@@ -28,6 +28,10 @@ export default function(config) {
 
         return new IntersectionObserver(
             (entries, observer) => {
+                if (!watched[watchedKey]) {
+                    return;
+                }
+
                 entries.forEach((entry) => {
                     const postId = itemElementIdFn(entry.target);
                     if (entry.isIntersecting) {
@@ -56,8 +60,18 @@ export default function(config) {
     }
 
     for (const impressionConfig of config.tracker.impressions.watched) {
-        const intersectionObserver = createIntersectionObserver(impressionConfig);
         const observed = new Set();
+        const intersectionObserver = createIntersectionObserver(impressionConfig);
+        const mutationObserver = createMutationObserver(
+            intersectionObserver,
+            impressionConfig,
+            observed,
+        );
+        if (!mutationObserver) {
+            // if mutation observer is not created, do not track
+            console.debug("mutation observer couldn't be created");
+            continue;
+        }
 
         watched[getWatchedKey(impressionConfig)] = {
             seen: new Set(), // items confirmed as seen
@@ -68,11 +82,7 @@ export default function(config) {
             type: impressionConfig.type,
             block: impressionConfig.block,
             intersectionObserver: intersectionObserver,
-            mutationObserver: createMutationObserver(
-                intersectionObserver,
-                impressionConfig,
-                observed,
-            ),
+            mutationObserver: mutationObserver,
         }
     }
 
@@ -182,6 +192,10 @@ function createMutationObserver(intersectionObserver, impressionConfig, observed
     let container = document.body;
     if (impressionConfig.containerQuerySelector) {
         container = document.querySelector(impressionConfig.containerQuerySelector);
+    }
+    if (!container) {
+        // if container is not present, do not return observer
+        return null;
     }
 
     mutationObserver.observe(container, { childList: true, subtree: true });
