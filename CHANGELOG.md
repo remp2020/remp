@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed HTML banner rendering for JS-based banners; the HTML is not being rendered anymore to avoid accessibility warnings.
 - Added information about which campaigns (including variants and banners) were displayed to the Campaign Debugger. remp/helpdesk#3591
 - Added referal property check into Showtime. remp/remp#1290
+- Updated chart library to the latest version. remp/remp#1287
 
 ### [Mailer]
 
