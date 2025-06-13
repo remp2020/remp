@@ -1416,6 +1416,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kurkle/color@npm:^0.3.0":
+  version: 0.3.4
+  resolution: "@kurkle/color@npm:0.3.4"
+  checksum: 148c01ecab77b45caad1b6579a54e23784553e146c87c7a8a97bcb7e5a055a6d8fad2105e9cb187edd8d0fe6bf5df70dc922297bc8853398adc586795c5a21db
+  languageName: node
+  linkType: hard
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -2814,6 +2821,15 @@ __metadata:
     chartjs-color: ^2.1.0
     moment: ^2.10.2
   checksum: 4551932943bc5e42d25ae5632d91878fb89e22937095a2742e23c4d0d0bde405bed6be2cb8480694ba599d6dbb9882c8bce6bac1e4667c820eb24c38416380aa
+  languageName: node
+  linkType: hard
+
+"chart.js@npm:^4.4":
+  version: 4.4.9
+  resolution: "chart.js@npm:4.4.9"
+  dependencies:
+    "@kurkle/color": ^0.3.0
+  checksum: 91378e965a2c86c16f36dafd97c64025d01495e11c33ed21d9f194c5c4d6caf793e8bbd7c1e8e5305323e817173011b4baadf85b20260f0ab41bf7b82f09e285
   languageName: node
   linkType: hard
 
@@ -7626,18 +7642,18 @@ fsevents@~2.3.2:
 
 "remp-campaign@file:extensions/campaign-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.0
-  resolution: "remp-campaign@file:extensions/campaign-module#extensions/campaign-module::hash=e7c4b8&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "remp-campaign@file:extensions/campaign-module#extensions/campaign-module::hash=913d74&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/core": ^7.0
     "@medv/finder": ^4.0.2
-    "@remp/js-commons": 2.3.1
+    "@remp/js-commons": ^2.4
     animate.css: ^3.7.0
     autosize: ^4.0.2
     bootstrap: ^3.4.1
     bootstrap-notify: ^3.1.3
     bootstrap-select: ^1.13.9
     bootstrap-sweetalert: ^1.0.1
-    chart.js: ^2.9.3
+    chart.js: ^4.4
     core-js: ^3.8.1
     datatables.net: ^1.10.25
     datatables.net-responsive: ^2.2.9
@@ -7663,7 +7679,7 @@ fsevents@~2.3.2:
     vue-codemirror: 4.0.6
     vue-slide-up-down: ^1.7.2
     vue-template-compiler: ^2.7
-  checksum: e8e58526187fd30b1fed43dc9f7ef001f0594a532ad7c5aab61afc96ff1805524f3c3be84f705ca935895de272ea2c6b16db616d527305be46d05bbf2d9b4ee3
+  checksum: a9d8f604af95d0d257cf70982ccbd0eb6f7f9d84386a8ab9c6ecd89615bd335c8e5861e67cdc7e505800abbf9f7be35a817b8095f2e7fbac12df70963bfea0ae
   languageName: node
   linkType: hard
 

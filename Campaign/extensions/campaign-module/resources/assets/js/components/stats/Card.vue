@@ -89,8 +89,6 @@
             init(dataSets) {
                 var ctx = document.getElementById(this.name).getContext('2d');
 
-                console.log('init graph')
-
                 var myLineChart = new Chart(ctx, {
                     type: "line",
                     data: dataSets,
@@ -105,19 +103,7 @@
                             padding: -20
                         },
                         scales: {
-                            yAxes: [{
-                                ticks: {
-                                    display: false,
-                                    beginAtZero: true
-                                },
-                                gridLines: {
-                                    display: false,
-                                    // color: "rgba(255, 255, 255, 1)",
-                                    color: "rgba(0, 0, 0, 0)",
-                                    lineWidth: 0
-                                }
-                            }],
-                            xAxes: [{
+                            x: {
                                 ticks: {
                                     display: false
                                 },
@@ -126,8 +112,19 @@
                                     // color: "rgba(255, 255, 255, 1)",
                                     color: "rgba(0, 0, 0, 0)",
                                     lineWidth: 0
-                                }
-                            }]
+                                },
+                            },
+                            y: {
+                                ticks: {
+                                    display: false,
+                                },
+                                gridLines: {
+                                    display: false,
+                                    // color: "rgba(255, 255, 255, 1)",
+                                    color: "rgba(0, 0, 0, 0)",
+                                    lineWidth: 0
+                                },
+                            },
                         },
                         legend: {
                             display: false

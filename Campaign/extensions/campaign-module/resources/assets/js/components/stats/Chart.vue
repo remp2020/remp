@@ -131,12 +131,7 @@
                             }
                         },
                         scales: {
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero: true,
-                                }
-                            }],
-                            xAxes: [{
+                            x: {
                                 type: 'time',
                                 distribution: 'series',
                                 time: {
@@ -144,13 +139,19 @@
                                     displayFormats: {
                                         minute: 'HH:mm',
                                         hour: 'HH:mm',
-                                    }
+                                    },
+                                    tooltipFormat: "LL",
                                 },
                                 ticks: {
                                     maxRotation: 0,
                                     minRotation: 0,
-                                }
-                            }]
+                                },
+                            },
+                            y: {
+                                ticks: {
+                                    beginAtZero: true,
+                                },
+                            },
                         },
                         tooltips: {
                             callbacks: {
