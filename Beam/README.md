@@ -278,13 +278,22 @@ var rempConfig = {
     impressions: {
       enabled: Boolean, // required
       itemMinVisibleDuration: Number, // optional, number of milliseconds required for items to be counted as seen (by default 2000 ms) 
-      watched: [ // required, list of specific configurations for impression tracking
+      observe: [ // required, list of configurations, each config object specifies what to observe and how to track it
         {
-          type: String, // required, type under which items are being tracked (e.g. "article"). This can be arbitrary string, it's used for labeling of stored data.
-          block: String, // required, block under which items are being tracked (e.g. "main-feed" or "sidebar"). This can be arbitrary string, it's used for labeling of stored data.
-          itemsQuerySelector: String, // required, JS selector of single item/element, (e.g. '.article')
+          // either 'type' or 'itemElementTypeFn' is required
+          type: String, // type under which items are being tracked (e.g. "article"). This can be arbitrary string, it's used for labeling of stored data.
+          itemElementTypeFn: Function, // type can also be retrieved using fn on observed item element
+
+          // either or 'block' or 'blockFn' is required
+          block: String, // block under which items are being tracked (e.g. "main-feed" or "sidebar"). This can be arbitrary string, it's used for labeling of stored data.
+          blockFn: String, // block can be also retrieved using fn - it receives a single parameter, this "observe" configuration
+
+          // optional, JS selector of container where items are stored. 
+          // This is used for detection of dynamically added items. 
+          // It's recommended to specify this, because it makes detection more efficient (otherwise whole document is being observed). 
+          // If container is not found, tracking of its items is disabled.
+          containerQuerySelector: String,
           
-          containerQuerySelector: String, // optional, JS selector of container where items are stored. This is used for detection of dynamically added items. It's recommended to specify this, because it makes detection more efficient (otherwise whole document is being watched).  
           itemElementIdFn: Function, // optional, function to return item unique id - by default element ID, is used  ('el => el.id')
           itemMinVisibleDuration: Number, // optional, overriding main 'itemMinVisibleDuration' for specific element 
         },
@@ -381,7 +390,7 @@ var rempConfig = {
   
     impressions: {
         enabled: true,
-        watched: [
+        observe: [
         {
           type: "article",
           block: "articles-feed", 

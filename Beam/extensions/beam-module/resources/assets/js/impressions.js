@@ -1,7 +1,8 @@
 import {dispatchBeamEvent} from "./remplib";
 export default function(config) {
-    let watched  = {};
+    const observed  = [];
 
+    // return public methods
     const functionInterface =  {
         reset
     }
@@ -11,79 +12,39 @@ export default function(config) {
         return functionInterface;
     }
 
-    let reportUrl = config.tracker.url + "/track/impressions";
-    let globalItemMinVisibleDurationMs = config.tracker.impressions.itemMinVisibleDuration || 2000;
+    const reportUrl = config.tracker.url + "/track/impressions";
+    const globalItemMinVisibleDurationMs = config.tracker.impressions.itemMinVisibleDuration || 2000;
 
-    const createIntersectionObserver =  (impressionConfig) => {
-        const watchedKey = getWatchedKey(impressionConfig)
-
-        let minVisibleDurationMs = globalItemMinVisibleDurationMs;
-        if (impressionConfig.itemMinVisibleDuration) {
-            minVisibleDurationMs = impressionConfig.itemMinVisibleDuration;
+    for (const observeConfig of config.tracker.impressions.observe) {
+        if (!observeConfig.type && !observeConfig.itemElementTypeFn) {
+            throw new Error("Impressions - invalid configuration, either 'type' or 'itemElementTypeFn' attribute has to be specified for observed block", observeConfig);
+        }
+        if (!observeConfig.block && !observeConfig.blockFn) {
+            throw new Error("Impressions - invalid configuration, either 'block' or 'blockFn' attribute has to be specified for observed block", observeConfig);
         }
 
-        const itemElementIdFn = !!impressionConfig.itemElementIdFn ?
-            impressionConfig.itemElementIdFn :
-            (el) => el.id;
+        const observerData = {
+            config: observeConfig,
+            seenIds: new Set(), // items confirmed as seen
+            seenTimers: new Map(), // items waiting to be confirmed as seen
+            seenIdTypes: new Map(),
+            lastSeenIdsSize: 0,
+            sentIds: new Set(),
+            observedIds: new Set(),
+        };
+        const intersectionObserver = createIntersectionObserver(observerData);
+        const mutationObserver = createMutationObserver(intersectionObserver, observerData);
 
-        return new IntersectionObserver(
-            (entries, observer) => {
-                if (!watched[watchedKey]) {
-                    return;
-                }
-
-                entries.forEach((entry) => {
-                    const postId = itemElementIdFn(entry.target);
-                    if (entry.isIntersecting) {
-                        if (!watched[watchedKey].seen.has(postId) && !watched[watchedKey].seenTimers.has(postId)) {
-                            const timerId = setTimeout(() => {
-                                watched[watchedKey].seenTimers.delete(postId);
-                                watched[watchedKey].seen.add(postId);
-                                observer.unobserve(entry.target);
-                            }, minVisibleDurationMs);
-                            watched[watchedKey].seenTimers.set(postId, timerId);
-                        }
-                    } else {
-                        if (watched[watchedKey].seenTimers.has(postId)) {
-                            clearTimeout(watched[watchedKey].seenTimers.get(postId));
-                            watched[watchedKey].seenTimers.delete(postId);
-                        }
-                    }
-                });
-            },
-            {
-                root: null, // null means the viewport
-                rootMargin: "0px",
-                threshold: 0.5, // Trigger when 50% of the element is visible
-            }
-        );
-    }
-
-    for (const impressionConfig of config.tracker.impressions.watched) {
-        const observed = new Set();
-        const intersectionObserver = createIntersectionObserver(impressionConfig);
-        const mutationObserver = createMutationObserver(
-            intersectionObserver,
-            impressionConfig,
-            observed,
-        );
         if (!mutationObserver) {
-            // if mutation observer is not created, do not track
-            console.debug("mutation observer couldn't be created");
+            // if mutation observer is not created (e.g. container doesn't exist), do not track
             continue;
         }
 
-        watched[getWatchedKey(impressionConfig)] = {
-            seen: new Set(), // items confirmed as seen
-            seenTimers: new Map(), // items waiting to be confirmed as seen
-            lastSeenSize: 0,
-            sent: new Set(),
-            observed: observed,
-            type: impressionConfig.type,
-            block: impressionConfig.block,
-            intersectionObserver: intersectionObserver,
-            mutationObserver: mutationObserver,
-        }
+        observed.push({
+            intersectionObserver,
+            mutationObserver,
+            ...observerData
+        });
     }
 
     // first report after 2.5s, later after 5s
@@ -114,23 +75,115 @@ export default function(config) {
         }
     });
 
+    function createIntersectionObserver(observerData) {
+        let minVisibleDurationMs = globalItemMinVisibleDurationMs;
+        if (observerData.config.itemMinVisibleDuration) {
+            minVisibleDurationMs = observerData.config.itemMinVisibleDuration;
+        }
+
+        const itemElementIdFn = !!observerData.config.itemElementIdFn ?
+            observerData.config.itemElementIdFn :
+            (el) => el.id;
+
+        const observedType = observerData.config.type;
+
+        return new IntersectionObserver(
+            (entries, observer) => {
+                entries.forEach((entry) => {
+                    const itemId = itemElementIdFn(entry.target);
+                    const itemType = !!observerData.config.itemElementTypeFn ?
+                        observerData.config.itemElementTypeFn(entry.target) :
+                        observedType;
+
+                    if (entry.isIntersecting) {
+                        if (!observerData.seenIds.has(itemId) && !observerData.seenTimers.has(itemId)) {
+                            const timerId = setTimeout(() => {
+                                observerData.seenTimers.delete(itemId);
+                                observerData.seenIds.add(itemId);
+                                observerData.seenIdTypes.set(itemId, itemType);
+                                observer.unobserve(entry.target);
+                            }, minVisibleDurationMs);
+                            observerData.seenTimers.set(itemId, timerId);
+                        }
+                    } else {
+                        if (observerData.seenTimers.has(itemId)) {
+                            clearTimeout(observerData.seenTimers.get(itemId));
+                            observerData.seenTimers.delete(itemId);
+                        }
+                    }
+                });
+            },
+            {
+                root: null, // null means the viewport
+                rootMargin: "0px",
+                threshold: 0.5, // Trigger when 50% of the element is visible
+            }
+        );
+    }
+
+    function createMutationObserver(intersectionObserver, observerData) {
+        const observeNewItems = () => {
+            document.querySelectorAll(observerData.config.itemsQuerySelector).forEach((post) => {
+                const elId = observerData.config.itemElementIdFn(post);
+                if (!observerData.observedIds.has(elId)) {
+                    observerData.observedIds.add(elId);
+                    intersectionObserver.observe(post);
+                }
+            });
+        };
+
+        observeNewItems();
+        const mutationObserver = new MutationObserver(() => {
+            observeNewItems();
+        });
+        let container = document.body;
+        if (observerData.config.containerQuerySelector) {
+            container = document.querySelector(observerData.config.containerQuerySelector);
+        }
+        if (!container) {
+            // if container is not present, do not return observer
+            return null;
+        }
+
+        mutationObserver.observe(container, { childList: true, subtree: true });
+        return mutationObserver;
+    }
+
     function preparePayload() {
         const payload = {
             d: [],
             rpid: remplib.getRempPageviewID(),
         };
 
-        for (const [_, watchedData] of Object.entries(watched)) {
-            if (watchedData.seen.size !== watchedData.lastSeenSize) {
-                watchedData.lastSeenSize = watchedData.seen.size;
-                const seenToReport = setDifference(watchedData.seen, watchedData.sent);
+        for (const observerData of observed) {
+            if (observerData.seenIds.size !== observerData.lastSeenIdsSize) {
+                observerData.lastSeenIdsSize = observerData.seenIds.size;
+                const seenToReport = setDifference(observerData.seenIds, observerData.sentIds);
 
-                payload.d.push({
-                    bl: watchedData.block,
-                    tp: watchedData.type,
-                    eid: Array.from(seenToReport),
-                })
-                watchedData.sent = new Set(watchedData.seen);
+                // compute block
+                const observedBlock = !!observerData.config.blockFn ?
+                    observerData.config.blockFn(observerData.config) :
+                    observerData.config.block;
+
+                // sort eids to type buckets
+                const payloadTypes = new Map();
+                for (const itemId of seenToReport) {
+                    const itemType = observerData.seenIdTypes.get(itemId);
+                    if (!payloadTypes.has(itemType)) {
+                        payloadTypes.set(itemType, []);
+                    }
+                    payloadTypes.get(itemType).push(itemId);
+                }
+
+                for (const [type, ids] of payloadTypes.entries()) {
+                    payload.d.push({
+                        bl: observedBlock,
+                        tp: type,
+                        eid: ids,
+                    })
+                }
+
+                observerData.sentIds = new Set(observerData.seenIds);
             }
         }
 
@@ -158,48 +211,19 @@ export default function(config) {
     }
 
     function reset() {
-        if (watched) {
-            for (const [watchedKey, watchedData] of Object.entries(watched)) {
-                watchedData.intersectionObserver.disconnect();
-                watchedData.mutationObserver.disconnect();
+        if (observed) {
+            for (const o of observed) {
+                o.intersectionObserver.disconnect();
+                o.mutationObserver.disconnect();
             }
-            watched = {};
+            // remove all elements
+            while(observed.length > 0) {
+                observed.pop();
+            }
         }
     }
 
     return functionInterface;
-}
-
-function getWatchedKey(impressionConfig) {
-    return impressionConfig.block + "_" + impressionConfig.type;
-}
-
-function createMutationObserver(intersectionObserver, impressionConfig, observed) {
-    const observeNewItems = () => {
-        document.querySelectorAll(impressionConfig.itemsQuerySelector).forEach((post) => {
-            const elId = impressionConfig.itemElementIdFn(post);
-            if (!observed.has(elId)) {
-                observed.add(elId);
-                intersectionObserver.observe(post);
-            }
-        });
-    };
-
-    observeNewItems();
-    const mutationObserver = new MutationObserver(() => {
-        observeNewItems();
-    });
-    let container = document.body;
-    if (impressionConfig.containerQuerySelector) {
-        container = document.querySelector(impressionConfig.containerQuerySelector);
-    }
-    if (!container) {
-        // if container is not present, do not return observer
-        return null;
-    }
-
-    mutationObserver.observe(container, { childList: true, subtree: true });
-    return mutationObserver;
 }
 
 function setDifference(setA, setB) {
