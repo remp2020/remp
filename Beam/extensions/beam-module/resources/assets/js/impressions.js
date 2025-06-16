@@ -47,13 +47,8 @@ export default function(config) {
         });
     }
 
-    // first report after 2.5s, later after 5s
-    setTimeout(async () => {
-        try {
-            await sendPayload(preparePayload());
-        } catch (e) {
-            console.log("REMP - error while preparing and sending impressions payload", e);
-        }
+    document.addEventListener("DOMContentLoaded", (event) => {
+        // plan sending impression data every 5 seconds
         setInterval(() => {
             try {
                 sendPayload(preparePayload());
@@ -61,8 +56,9 @@ export default function(config) {
                 console.log("REMP - error while preparing and sending impressions payload", e);
             }
         }, 5000);
-    }, 2500);
+    });
 
+    // or send impression data using Beacon
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "hidden") {
             const payload = preparePayload();
