@@ -319,6 +319,8 @@ class ListFormFactory
             $newsletterEmails = $this->templatesRepository
                 ->findByList($list->id)
                 ->select('mail_templates.id, mail_templates.name')
+                ->order('mail_templates.id DESC')
+                ->limit(1000)
                 ->fetchPairs('id', 'name');
 
             if (count($newsletterEmails) > 0) {

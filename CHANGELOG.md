@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added HTML WYSIWYG editor for URL Parser email generator intro and footer inputs. remp/remp#1416
 - Added extra index to improve performance of dashboard loading. remp/remp#1418
 - Added setup method for `EmbedParser` to preprocessing of thumbnail image. remp/remp#1411
+- Fixed memory limit issue when editing newsletter list with many emails. remp/remp#1420
 
 ## Archive
 
