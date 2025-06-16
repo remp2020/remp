@@ -5,6 +5,16 @@ services:
     ports:
       - "8000:80"
 
+  beam_tracker:
+    environment:
+      # see other ENV variables to override in Tracker's .env.example file
+      TRACKER_DEBUG: false
+
+  beam_segments:
+    environment:
+      # see other ENV variables to override in Segments' .env.example file
+      SEGMENTS_DEBUG: false
+
   campaign:
     environment:
       XDEBUG_CONFIG: "client_host=host.docker.internal"
