@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added information about which campaigns (including variants and banners) were displayed to the Campaign Debugger. remp/helpdesk#3591
 - Added referal property check into Showtime. remp/remp#1290
 - Updated chart library to the latest version. remp/remp#1287
+- Reverted fix for backtick's issue in snippets. Fix causes loss of HTML tags in JS variables in snippets. remp/remp#1405
+  - Issue with backticks (``) stays unsolved. Do not use them in snippets for now.
 
 ### [Mailer]
 
