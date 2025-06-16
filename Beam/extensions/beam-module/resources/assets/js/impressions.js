@@ -71,10 +71,18 @@ export default function(config) {
 
     function getItemUniqueId(el, config) {
         const id = !!config.itemElementIdFn ? config.itemElementIdFn(el) : el.id;
+        if (!id) {
+            console.warn("Impressions - unable to return element ID", el, config);
+            return null;
+        }
         if (id.includes(typeIdSeparator)) {
             throw new Error(`Impression tracking cannot function properly, element ID ${id} contains type-id separator ${typeIdSeparator}. Please define custom separator`);
         }
         const type = !!config.itemElementTypeFn ? config.itemElementTypeFn(el) : config.type;
+        if (!type) {
+            console.warn("Impressions - unable to return element type", el, config);
+            return null;
+        }
         if (type.includes(typeIdSeparator)) {
             throw new Error(`Impression tracking cannot function properly, element type ${type} contains type-id separator ${typeIdSeparator}. Please define custom separator`);
         }
@@ -97,6 +105,9 @@ export default function(config) {
             (entries, intersectionObserver) => {
                 entries.forEach((entry) => {
                     const itemUniqueId = getItemUniqueId(entry.target, observerData.config);
+                    if (!itemUniqueId) {
+                        return;
+                    }
 
                     if (entry.isIntersecting) {
                         if (!observerData.seenIds.has(itemUniqueId) && !observerData.seenTimers.has(itemUniqueId)) {
