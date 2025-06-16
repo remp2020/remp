@@ -1,5 +1,6 @@
 import {dispatchBeamEvent} from "./remplib";
 export default function(config) {
+    const typeIdSeparator = "_=_=_=_"; // something that should not be present in BEAM element ID or type
     const observed  = [];
 
     // return public methods
@@ -27,7 +28,6 @@ export default function(config) {
             config: observeConfig,
             seenIds: new Set(), // items confirmed as seen
             seenTimers: new Map(), // items waiting to be confirmed as seen
-            seenIdTypes: new Map(),
             lastSeenIdsSize: 0,
             sentIds: new Set(),
             observedIds: new Set(),
@@ -47,16 +47,14 @@ export default function(config) {
         });
     }
 
-    document.addEventListener("DOMContentLoaded", (event) => {
-        // plan sending impression data every 5 seconds
-        setInterval(() => {
-            try {
-                sendPayload(preparePayload());
-            } catch (e) {
-                console.log("REMP - error while preparing and sending impressions payload", e);
-            }
-        }, 5000);
-    });
+    // plan sending impression data every 5 seconds
+    setInterval(() => {
+        try {
+            sendPayload(preparePayload());
+        } catch (e) {
+            console.log("REMP - error while preparing and sending impressions payload", e);
+        }
+    }, 5000);
 
     // or send impression data using Beacon
     document.addEventListener("visibilitychange", () => {
@@ -71,40 +69,48 @@ export default function(config) {
         }
     });
 
+    function getItemUniqueId(el, config) {
+        const id = !!config.itemElementIdFn ? config.itemElementIdFn(el) : el.id;
+        if (id.includes(typeIdSeparator)) {
+            throw new Error(`Impression tracking cannot function properly, element ID ${id} contains type-id separator ${typeIdSeparator}. Please define custom separator`);
+        }
+        const type = !!config.itemElementTypeFn ? config.itemElementTypeFn(el) : config.type;
+        if (type.includes(typeIdSeparator)) {
+            throw new Error(`Impression tracking cannot function properly, element type ${type} contains type-id separator ${typeIdSeparator}. Please define custom separator`);
+        }
+
+        // we join item ID and type here to create unique ID (ID should be unique per type)
+        return type + typeIdSeparator + id;
+    }
+
+    function retrieveItemTypeAndId(uniqueId) {
+        return uniqueId.split(typeIdSeparator);
+    }
+
     function createIntersectionObserver(observerData) {
         let minVisibleDurationMs = globalItemMinVisibleDurationMs;
         if (observerData.config.itemMinVisibleDuration) {
             minVisibleDurationMs = observerData.config.itemMinVisibleDuration;
         }
 
-        const itemElementIdFn = !!observerData.config.itemElementIdFn ?
-            observerData.config.itemElementIdFn :
-            (el) => el.id;
-
-        const observedType = observerData.config.type;
-
         return new IntersectionObserver(
-            (entries, observer) => {
+            (entries, intersectionObserver) => {
                 entries.forEach((entry) => {
-                    const itemId = itemElementIdFn(entry.target);
-                    const itemType = !!observerData.config.itemElementTypeFn ?
-                        observerData.config.itemElementTypeFn(entry.target) :
-                        observedType;
+                    const itemUniqueId = getItemUniqueId(entry.target, observerData.config);
 
                     if (entry.isIntersecting) {
-                        if (!observerData.seenIds.has(itemId) && !observerData.seenTimers.has(itemId)) {
+                        if (!observerData.seenIds.has(itemUniqueId) && !observerData.seenTimers.has(itemUniqueId)) {
                             const timerId = setTimeout(() => {
-                                observerData.seenTimers.delete(itemId);
-                                observerData.seenIds.add(itemId);
-                                observerData.seenIdTypes.set(itemId, itemType);
-                                observer.unobserve(entry.target);
+                                observerData.seenTimers.delete(itemUniqueId);
+                                observerData.seenIds.add(itemUniqueId);
+                                intersectionObserver.unobserve(entry.target);
                             }, minVisibleDurationMs);
-                            observerData.seenTimers.set(itemId, timerId);
+                            observerData.seenTimers.set(itemUniqueId, timerId);
                         }
                     } else {
-                        if (observerData.seenTimers.has(itemId)) {
-                            clearTimeout(observerData.seenTimers.get(itemId));
-                            observerData.seenTimers.delete(itemId);
+                        if (observerData.seenTimers.has(itemUniqueId)) {
+                            clearTimeout(observerData.seenTimers.get(itemUniqueId));
+                            observerData.seenTimers.delete(itemUniqueId);
                         }
                     }
                 });
@@ -120,9 +126,10 @@ export default function(config) {
     function createMutationObserver(intersectionObserver, observerData) {
         const observeNewItems = () => {
             document.querySelectorAll(observerData.config.itemsQuerySelector).forEach((post) => {
-                const elId = observerData.config.itemElementIdFn(post);
-                if (!observerData.observedIds.has(elId)) {
-                    observerData.observedIds.add(elId);
+                const itemUniqueId = getItemUniqueId(post, observerData.config)
+
+                if (!observerData.observedIds.has(itemUniqueId)) {
+                    observerData.observedIds.add(itemUniqueId);
                     intersectionObserver.observe(post);
                 }
             });
@@ -154,7 +161,7 @@ export default function(config) {
         for (const observerData of observed) {
             if (observerData.seenIds.size !== observerData.lastSeenIdsSize) {
                 observerData.lastSeenIdsSize = observerData.seenIds.size;
-                const seenToReport = setDifference(observerData.seenIds, observerData.sentIds);
+                const seenIdsToReport = setDifference(observerData.seenIds, observerData.sentIds);
 
                 // compute block
                 const observedBlock = !!observerData.config.blockFn ?
@@ -163,19 +170,19 @@ export default function(config) {
 
                 // sort eids to type buckets
                 const payloadTypes = new Map();
-                for (const itemId of seenToReport) {
-                    const itemType = observerData.seenIdTypes.get(itemId);
+                for (const itemUniqueId of seenIdsToReport) {
+                    const [itemType, itemId] = retrieveItemTypeAndId(itemUniqueId);
                     if (!payloadTypes.has(itemType)) {
                         payloadTypes.set(itemType, []);
                     }
                     payloadTypes.get(itemType).push(itemId);
                 }
 
-                for (const [type, ids] of payloadTypes.entries()) {
+                for (const [type, itemIds] of payloadTypes.entries()) {
                     payload.d.push({
                         bl: observedBlock,
                         tp: type,
-                        eid: ids,
+                        eid: itemIds,
                     })
                 }
 
