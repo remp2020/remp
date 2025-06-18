@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed cast string to boolean in form inputs before validation in `CampaignRequest::prepareForValidation`. remp/crm#3472
 - Added `data-href` attribute with target URL of banner to banners which lost this attribute during accessibility-related changes.
+- Fixed snippet editor removing HTML content of JS strings. remp/remp#1405
 
 ## Archive
 
