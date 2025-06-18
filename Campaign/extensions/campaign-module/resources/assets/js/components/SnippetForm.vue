@@ -88,7 +88,7 @@ export default {
     props: props,
     data() {
         return {
-            value: new DOMParser().parseFromString(this._value || '', "text/html").documentElement.textContent,
+            value: this._value,
             name: this._name,
             validateUrl: this._validateUrl,
             errors: [],

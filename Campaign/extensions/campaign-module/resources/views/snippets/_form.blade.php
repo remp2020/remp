@@ -6,7 +6,7 @@
     <script type="text/javascript">
         var snippet = {
             "name": '{!! $snippet->name !!}' || null,
-            "value": `{{ $snippet->value }}` || null,
+            "value": {!! json_encode($snippet->value) !!} || null,
             "validateUrl": {!! @json(route('snippets.validateForm', ['snippet' => $snippet])) !!},
         }
 
