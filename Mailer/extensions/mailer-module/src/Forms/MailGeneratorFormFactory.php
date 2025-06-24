@@ -40,7 +40,8 @@ class MailGeneratorFormFactory
         $form->addSelect('source_template_id', 'Generator', $pairs)
             ->setRequired("Field 'Generator' is required.")
             ->setHtmlAttribute('class', 'form-control selectpicker')
-            ->setHtmlAttribute('data-live-search', 'true');
+            ->setHtmlAttribute('data-live-search', 'true')
+            ->setHtmlAttribute('data-live-search-normalize', 'true');
 
         $generator = $template = null;
         if ($sourceTemplateId) {
