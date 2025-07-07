@@ -89,7 +89,7 @@ class NewsletterRectangleTemplate extends AbstractTemplate
 
     private function getConfig($key)
     {
-        if (!isset($this->banner_config)) {
+        if (empty($this->banner_config)) {
             $this->banner_config = [
                 'endpoint' => config('newsletter_banners.endpoint'),
                 'use_xhr' => config('newsletter_banners.use_xhr'),

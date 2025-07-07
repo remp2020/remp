@@ -24,7 +24,14 @@
 - Added setup method for `EmbedParser` to preprocessing of thumbnail image. remp/remp#1411
 - Fixed memory limit issue when editing newsletter list with many emails. remp/remp#1420
 
+## [4.1.1] - 2025-07-07
+
+### [Campaign]
+
+- Fixed condition in `NewsletterRectangleTemplate#getConfig()` that checks if `banner_config` is set. Property is initialized as empty array so `isset()` is not enough. remp/remp#1423
+
 [4.1.0]: https://github.com/remp2020/remp/compare/4.0.0...4.1.0
+[4.1.1]: https://github.com/remp2020/remp/compare/4.1.0...4.1.1
 
 [Beam]: https://github.com/remp2020/remp/tree/master/Beam
 [Campaign]: https://github.com/remp2020/remp/tree/master/Campaign
