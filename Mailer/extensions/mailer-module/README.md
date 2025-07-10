@@ -240,6 +240,7 @@ All the other options are related to the *batch* that is created with the *job*.
   Distribution of variants will be uniform between all variants.
 * *Number of emails.* Limits number of emails to be sent within the batch.
 * *Start date.* Specifies when the batch should be sent (now or in the future).
+* *Context.* Specifies identifier related to the job. Used to prevent duplicate sending of emails.
 
 When the *job*/*batch* is created, you need to either push *"Start sending"* or *"Prepare queue" button*.
 After pressing both buttons, the background processor will receive necessary information about target group of users and prepare metadata for sending daemon.
@@ -247,6 +248,11 @@ After pressing both buttons, the background processor will receive necessary inf
 Once the metadata is ready, when pressed *"Start sending"* button, the batch will be picked up by sending daemon and
 actual emails will be sent via preconfigured Mailer (SMTP, Mailgun, ...). When "Prepare queue" button was pressed, the *batch*
 is in the *processed* state, all the metadata is prepared and the *number of emails* that will be actually sent is available.
+
+There are two mechanisms that prevent duplicate sending of newsletters:
+
+- Jobs will never send the same email (mail template) to the same email address.
+- If the job has configured context, it will not send an email to addresses which already received email with the same context (even if it was different email from different job).
 
 You can create and execute *jobs*/*batches* programmatically by using provided API endpoints.
 
