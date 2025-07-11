@@ -24,6 +24,7 @@ class Campaign extends Model implements Searchable
     const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';
     const CAMPAIGN_TAG = 'campaign';
     const CAMPAIGN_JSON_TAG = 'campaign_json';
+    const CAMPAIGN_SNIPPET_CODES_JSON_TAG = 'campaign_snippet_codes_json';
 
     const PAGEVIEW_RULE_EVERY = 'every';
     const PAGEVIEW_RULE_SINCE = 'since';
@@ -343,6 +344,16 @@ class Campaign extends Model implements Searchable
         ];
     }
 
+    public function getUsedSnippetCodes(): array
+    {
+        $usedSnippetCodes = [];
+        /** @var CampaignBanner $campaignBanner */
+        foreach ($this->campaignBanners as $campaignBanner) {
+            $usedSnippetCodes[$campaignBanner->public_id] = $campaignBanner->banner?->getUsedSnippetCodes() ?? [];
+        }
+        return $usedSnippetCodes;
+    }
+
     /**
      * This method overrides Laravel's default replicate method
      * it loads CampaignBanner (variant) replicas to relation
@@ -372,6 +383,7 @@ class Campaign extends Model implements Searchable
 
         self::refreshActiveCampaignsCache();
 
+        /** @var Campaign $campaign */
         $campaign = $this->where(['id' => $this->id])
             ->with(array_keys($this->cacheableRelations))
             ->first();
@@ -381,6 +393,7 @@ class Campaign extends Model implements Searchable
         }
 
         Redis::set(self::CAMPAIGN_JSON_TAG . ":{$this->id}", $campaign->toJson());
+        Redis::set(self::CAMPAIGN_SNIPPET_CODES_JSON_TAG . ":{$this->id}", json_encode($campaign->getUsedSnippetCodes()));
     }
 
     public static function refreshActiveCampaignsCache()

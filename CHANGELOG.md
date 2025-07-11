@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Optimized size of `showtime.php` response by trimming unused snippets where possible. remp/remp#1428
 
 ## Archive
 

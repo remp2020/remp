@@ -298,4 +298,16 @@ class Banner extends Model implements Searchable
         }
         return null;
     }
+
+    public function getUsedSnippetCodes(): array
+    {
+        $matches = [];
+        $matched = preg_match_all('/{{\s+(.*?)\s}}/', $this->js, $matches, PREG_PATTERN_ORDER);
+
+        if (is_int($matched) && $matched > 0) {
+            return $matches[1];
+        }
+
+        return [];
+    }
 }

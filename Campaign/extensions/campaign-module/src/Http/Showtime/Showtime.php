@@ -25,7 +25,7 @@ class Showtime
     private $dimensionMap;
     private $alignmentsMap;
     private $colorSchemesMap;
-    private $snippets;
+    private array $snippets = [];
     private array $localCache = [];
 
     public function __construct(
@@ -199,13 +199,25 @@ class Showtime
         }
 
         // prepare campaign IDs to fetch
-        $dbCampaignIds = [];
+        $cachedCampaignKeys = [];
+        $cachedCampaignSnippetCodesKeys = [];
         foreach ($campaignIds as $campaignId) {
-            $dbCampaignIds[] = Campaign::CAMPAIGN_JSON_TAG . ":{$campaignId}";
+            $cachedCampaignKeys[] = Campaign::CAMPAIGN_JSON_TAG . ":{$campaignId}";
+            $cachedCampaignSnippetCodesKeys[] = Campaign::CAMPAIGN_SNIPPET_CODES_JSON_TAG . ":{$campaignId}";
         }
 
         // fetch all running campaigns at once
-        $fetchedCampaigns = $this->redis->mget($dbCampaignIds);
+        $fetchedCampaigns = $this->redis->mget($cachedCampaignKeys);
+
+        // fetch all possibly active snippets
+        $fetchedCampaignSnippets = $this->redis->mget($cachedCampaignSnippetCodesKeys);
+        $campaignBannerSnippets = [];
+        foreach ($fetchedCampaignSnippets as $fetchedCampaignSnippet) {
+            $campaignBannerSnippets = array_merge(
+                $campaignBannerSnippets,
+                json_decode($fetchedCampaignSnippet, associative: true),
+            );
+        }
 
         $activeCampaigns = [];
         $campaigns = [];
@@ -251,6 +263,10 @@ class Showtime
             if ($debug) {
                 $evaluationMessages[] = "Displaying campaign [{$c->public_id}] (variant [$campaignBanner->public_id], banner [{$campaignBanner->banner->public_id}])";
             }
+            $matchedSnippets = array_intersect_key(
+                $this->snippets,
+                array_flip($campaignBannerSnippets[$campaignBanner->public_id]),
+            );
 
             $displayData[] = $showtimeResponse->renderCampaign(
                 variant: $campaignBanner,
@@ -259,7 +275,7 @@ class Showtime
                 dimensions: $dimensions,
                 positions: $positions,
                 colorSchemes: $colorSchemes,
-                snippets: $snippets,
+                snippets: $matchedSnippets,
                 userData: $data,
             );
         }
@@ -800,7 +816,10 @@ class Showtime
                     $this->colorSchemesMap = json_decode($map, true) ?? [];
                     break;
                 case \Remp\CampaignModule\Snippet::REDIS_CACHE_KEY:
-                    $this->snippets = json_decode($map, true) ?? [];
+                    $snippets = json_decode($map, true) ?? [];
+                    foreach ($snippets as $code => $snippet) {
+                        $this->snippets[$code] = $snippet;
+                    }
                     break;
             }
             next($keys);
