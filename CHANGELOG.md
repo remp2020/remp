@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Optimized size of `showtime.php` response by trimming unused snippets where possible. remp/remp#1428
 
+### [Mailer]
+
+- Fixed mail resend when Mailgun throws RuntimeException. remp/remp#1427
+
 ## Archive
 
 - [v4.1](./changelogs/CHANGELOG-v4.1.md)

@@ -18,9 +18,12 @@ use Remp\MailerModule\Models\Mailer\Mailer;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
 use Remp\MailerModule\Models\Sender\MailerFactory;
 use Remp\MailerModule\Models\Sender\MailerNotExistsException;
+use Remp\MailerModule\Models\Sender\MailerRuntimeException;
 use Remp\MailerModule\Models\ServiceParams\ServiceParamsProviderInterface;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 class Sender
 {
@@ -185,7 +188,18 @@ class Sender
             $subscription->user_id ?? null
         );
 
-        $mailer->send($message);
+        try {
+            $mailer->send($message);
+        } catch (MailerRuntimeException $exception) {
+            $this->logsRepository->getTable()->where([
+                'mail_sender_id' => $senderId,
+                'email' => $recipient['email'],
+                'context' => $this->context,
+            ])->delete();
+
+            throw new MailerRuntimeException($exception->getMessage());
+        }
+
         $this->reset();
 
         return 1;
@@ -334,7 +348,18 @@ class Sender
             $logger->info("Sender - mail logs stored for {$this->batchId}");
         }
 
-        $mailer->send($message);
+        try {
+            $mailer->send($message);
+        } catch (MailerRuntimeException $exception) {
+            $deleteLogsData = array_map(function ($item) {
+                return [$item['email'], $item['mail_sender_id']];
+            }, $insertLogsData);
+
+            $this->logsRepository->getDatabase()->query("DELETE FROM $logsTableName WHERE (email, mail_sender_id) IN ?", $deleteLogsData);
+
+            throw new MailerRuntimeException($exception->getMessage());
+        }
+
         $this->reset();
 
         return count($subscribedEmails);

@@ -13,6 +13,8 @@ use Nette\Mail\Message;
 use Nette\Utils\Json;
 use Psr\Log\LoggerInterface;
 use Remp\MailerModule\Models\Sender\MailerBatchException;
+use Remp\MailerModule\Models\Sender\MailerRuntimeException;
+use RuntimeException;
 
 class MailgunMailer extends Mailer
 {
@@ -161,7 +163,11 @@ class MailgunMailer extends Mailer
             $data["v:".$key] = (string) $val;
         }
 
-        $mailer->messages()->send($this->option('domain'), $data);
+        try {
+            $mailer->messages()->send($this->option('domain'), $data);
+        } catch (RuntimeException $exception) {
+            throw new MailerRuntimeException($exception->getMessage());
+        }
     }
 
     /**
