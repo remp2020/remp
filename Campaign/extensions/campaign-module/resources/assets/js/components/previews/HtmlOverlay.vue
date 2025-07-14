@@ -135,13 +135,12 @@ a.html-overlay-rectangle-preview-close::after {
            v-on:keydown.enter.space="$parent.closed"
            v-if="isVisible && !closeable && adminPreview">CLOSE BANNER</a>
         <transition appear name="fade">
-            <div class="html-overlay-rectangle-overlay sans-serif">
+            <div v-if="isVisible" class="html-overlay-rectangle-overlay sans-serif">
                 <transition appear v-bind:name="transition">
                     <div
                         class="html-overlay-rectangle-wrap"
                         role="button"
                         tabindex="0"
-                        v-if="isVisible"
                         v-bind:data-href="this.$parent.url"
                         v-bind:class="{ closeable: closeable }"
                         v-on:click.stop="click"
