@@ -243,14 +243,12 @@ func initElasticEventStorages(ctx context.Context, c Config, mainLog *log.Logger
 		DB: elasticDB,
 	}
 
-	// create indexes (if not exist) and push explicit mapping
-
-	indexesAndMappings := [7][2]string{
+	// push explicit mapping to existing indices
+	indexesAndMappings := [][]string{
 		{"pageviews", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
 		{"pageviews_time_spent", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
 		{"pageviews_progress", `{"properties": {"subscriber": {"type": "boolean"},"signed_in": {"type": "boolean"}}}`},
-		// {"commerce", `{"properties": {"revenue": {"type": "float"}}}`}, // temporarily disable explicit mapping of `revenue` field, see remp/remp#1419
-		{"commerce", ""},
+		{"commerce", ""}, // no explicit mapping of `revenue` field here (see remp/remp#1419), preferably use ILM
 		{"events", ""},
 		{"concurrents_by_browser", ""},
 		{"impressions", ""},
@@ -260,14 +258,15 @@ func initElasticEventStorages(ctx context.Context, c Config, mainLog *log.Logger
 		index := row[0]
 		mapping := row[1]
 
-		created, err := elasticDB.CreateIndexIfNotExist(ctx, index)
+		exists, err := elasticDB.IndexOrAliasExists(ctx, index)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
-		if created {
-			mainLog.Printf("index created: %s", index)
-		}
-		if mapping != "" {
+
+		// Pushing mapping only to existing index. This might seem counter-intuitive, but we want to give
+		// init script (or people) space to setup the index correctly via Index Lifecycle Management (ILM).
+		// https://github.com/remp2020/remp/blob/master/Docker/elasticsearch/create-indexes.sh
+		if exists && mapping != "" {
 			err = elasticDB.PushMapping(ctx, index, mapping)
 			if err != nil {
 				return nil, nil, nil, nil, err

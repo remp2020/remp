@@ -248,7 +248,7 @@ services:
     restart: "unless-stopped"
 
   kibana:
-    image: "docker.elastic.co/kibana/kibana:7.17.3"
+    image: "docker.elastic.co/kibana/kibana:8.6.1"
     restart: "unless-stopped"
 
   beam_tracker:

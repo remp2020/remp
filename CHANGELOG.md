@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- **DEPRECATED**: Commands for rollovers and data retention are being sunset in favor of Elasticsearch's ILM. remp/remp#1419
+    - Configure your indices to use ILM policies, see base init script for Docker image [here](https://github.com/remp2020/remp/blob/master/Docker/elasticsearch/create-indexes.sh).
+- Updated init script for Elasticsearch Docker image to use Index Lifecycle Management (ILM). remp/remp#1419
+
 ### [Campaign]
 
 - Optimized size of `showtime.php` response by trimming unused snippets where possible. remp/remp#1428
