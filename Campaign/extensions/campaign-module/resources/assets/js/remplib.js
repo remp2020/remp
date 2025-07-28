@@ -455,8 +455,8 @@ class Campaign {
 
         const now = new Date();
 
-        if (!campaignsSession) {
-            campaignsSession = {};
+        if (!campaignsSession.hasOwnProperty(campaignPublicId)) {
+            campaignsSession[campaignPublicId] = {};
         }
 
         campaignsSession[campaignPublicId].updatedAt = now;
