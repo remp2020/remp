@@ -327,7 +327,7 @@ class NewsfilterTemplateFormFactory
             'vikend-bez-politiky' => [
                 'name' => 'Víkend bez politiky ' . date('j.n.Y'),
                 'code' => 'vikend_bez_politiky_' . date('dmY'),
-                'mail_type_code' => 'vikend-bez-politiky',
+                'mail_type_code' => 'bez-politiky',
                 'from' => 'Denník N <info@dennikn.sk>',
             ],
             default => throw new \Exception("No default values found for source template code='{$sourceTemplate->code}'"),
