@@ -1029,7 +1029,10 @@ You can combine multiple filters for each filter category. Filters in and betwee
 
 ```json5
 {
-	"from": "2020-08-10T08:09:18+00:00", // RFC3339-based start time from which to take pageviews to this today 
+	"from": "2020-08-10T08:09:18+00:00", // RFC3339-based start time from which to take pageviews
+	"to": "2020-08-17T08:09:18+00:00", // RFC3339-based end time to which to take pageviews (if missing, today is used)
+	"published_from": "2020-07-01T00:00:00+00:00", // RFC3339-based start time after which should article included in results be published
+	"published_to": "2020-07-31T23:59:59+00:00", // RFC3339-based end time to which should article included in results be published (if missing, today is used)
 	"limit": 3, // limit how many top articles this endpoint returns
 	"content_type": "article", // String; OPTIONAL; filters articles by content_type
 	"sections": [ // OPTIONAL; filters from which sections take articles (use either external_id or name arrays, not both); filters joined with AND
@@ -1063,6 +1066,9 @@ curl --location --request POST 'http://beam.remp.press/api/v2/articles/top' \
 --header 'Authorization: Bearer XXX' \
 --data-raw '{
 	"from": "2020-08-10T08:09:18+00:00",
+	"to": "2020-08-17T08:09:18+00:00",
+	"published_from": "2020-07-01T00:00:00+00:00",
+	"published_to": "2020-07-31T23:59:59+00:00",
 	"limit": 3,
 	"content_type": "article",
 	"sections": [
@@ -1088,7 +1094,12 @@ curl --location --request POST 'http://beam.remp.press/api/v2/articles/top' \
 
 ```php
 $payload = [
+	// pageviews from single week
 	"from" => "2020-08-10T08:09:18+00:00",
+	"to" => "2020-08-17T08:09:18+00:00",
+	// of articles published previous month
+	"published_from" => "2020-07-01T00:00:00+00:00",
+	"published_to" => "2020-07-31T23:59:59+00:00",
 	"limit" => 3,
 	"content_type" => "article",
 	"sections" => [

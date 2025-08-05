@@ -19,7 +19,9 @@ class TopSearch
     {
         $limit = $request->json('limit');
         $timeFrom = Carbon::parse($request->json('from'));
+        $timeTo = $request->json('to') ? Carbon::parse($request->json('to')) : null;
         $publishedFrom = $request->json('published_from');
+        $publishedTo = $request->json('published_to');
 
         $useArticlesTableAsDataSource = $this->shouldUseArticlesTableAsDataSource($timeFrom, $publishedFrom);
 
@@ -58,14 +60,20 @@ class TopSearch
         if ($publishedFrom) {
             $this->addPublishedFromCondition($baseQuery, Carbon::parse($publishedFrom), $useArticlesTableAsDataSource);
         }
+        if ($publishedTo) {
+            $this->addPublishedToCondition($baseQuery, Carbon::parse($publishedTo), $useArticlesTableAsDataSource);
+        }
 
         if (!$useArticlesTableAsDataSource) {
-            $now = Carbon::now();
-            $diffInDays = $timeFrom->diffInDays($now);
+            if ($timeTo === null) {
+                $timeTo = Carbon::now();
+            }
+
+            $diffInDays = $timeFrom->diffInDays($timeTo);
 
             // for longer time periods irrelevant low pageviews data will be cut off
             if ($diffInDays > self::THRESHOLD_DIFF_DAYS) {
-                $thresholdPageviews = $this->getPageviewsThreshold(clone $baseQuery, $limit);
+                $thresholdPageviews = $this->getPageviewsThreshold(clone $baseQuery, $timeTo, $limit);
 
                 if (!$this->hasAlreadyJoinedArticlesTable($baseQuery)) {
                     $baseQuery->join('articles', 'article_pageviews.article_id', '=', 'articles.id');
@@ -75,6 +83,9 @@ class TopSearch
             }
 
             $baseQuery->where('article_pageviews.time_from', '>=', $timeFrom);
+            if ($timeTo !== null) {
+                $baseQuery->where('article_pageviews.time_to', '<', $timeTo);
+            }
 
             $data = DB::table('articles')
                 ->joinSub($baseQuery, 'top_articles_by_pageviews', function ($join) {
@@ -265,6 +276,15 @@ class TopSearch
         $articlePageviewsQuery->where('articles.published_at', '>=', $publishedFrom);
     }
 
+    private function addPublishedToCondition(Builder $articlePageviewsQuery, Carbon $publishedTo, bool $isArticlesTable): void
+    {
+        if (!$isArticlesTable && !$this->hasAlreadyJoinedArticlesTable($articlePageviewsQuery)) {
+            $articlePageviewsQuery->join('articles', 'article_pageviews.article_id', '=', 'articles.id');
+        }
+
+        $articlePageviewsQuery->where('articles.published_at', '<', $publishedTo);
+    }
+
     private function shouldUseArticlesTableAsDataSource(Carbon $timeFrom, ?string $publishedFrom = null): bool
     {
         if ($publishedFrom) {
@@ -310,9 +330,9 @@ class TopSearch
     }
 
 
-    private function getPageviewsThreshold(Builder $query, int $limit): int
+    private function getPageviewsThreshold(Builder $query, Carbon $timeTo, int $limit): int
     {
-        $timeFrom = Carbon::now()->subDays(3);
+        $timeFrom = (clone $timeTo)->subDays(3);
 
         $data = $query->where('article_pageviews.time_from', '>=', $timeFrom)
             ->limit(1)

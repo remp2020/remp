@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **DEPRECATED**: Commands for rollovers and data retention are being sunset in favor of Elasticsearch's ILM. remp/remp#1419
     - Configure your indices to use ILM policies, see base init script for Docker image [here](https://github.com/remp2020/remp/blob/master/Docker/elasticsearch/create-indexes.sh).
 - Updated init script for Elasticsearch Docker image to use Index Lifecycle Management (ILM). remp/remp#1419
+- Added parameters `published_from` and `published_to` into API call `/api/v2/articles/top` to filter returned articles by `published_at` datetime. remp/respekt#441
 
 ### [Campaign]
 
