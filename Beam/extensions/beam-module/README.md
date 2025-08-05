@@ -1924,8 +1924,10 @@ Returns list of conversions.
 ##### *Parameters:*
 | Name | Value | Required | Description |
 | --- |---| --- | --- |
-| conversion_from | String | no | RFC3339 datetime from which will be items filtered. |
-| conversion_to | String | no | RFC3339 datetime to which will be items filtered. |
+| conversion_from | String | no | RFC3339 datetime from which will be conversions filtered. |
+| conversion_to | String | no | RFC3339 datetime to which will be conversions filtered. |
+| article_published_from | String | no | RFC3339 datetime of from which will be articles of conversions filtered. |
+| article_published_to | String | no | RFC3339 datetime to which will be articles of conversions filtered. |
 | per_page | Integer | no |  Number of items displayed per page. |
 
 ##### *Examples:*
@@ -1935,7 +1937,7 @@ Returns list of conversions.
 
 ```shell
 curl -X GET \
-  http://beam.remp.press/api/conversions?conversion_from=2018-06-05T06:03:05Z \
+  http://beam.remp.press/api/conversions?conversion_from=2018-06-05T06:03:05Z&article_published_from=2018-01-01T00:00:00Z \
   -H 'Accept: application/json' \
   -H 'Authorization: Bearer XXX' \
 ```
@@ -1954,7 +1956,7 @@ $context = stream_context_create([
         ]
     ]
 );
-$response = file_get_contents("http://beam.remp.press/api/conversions?conversion_from=2018-06-05T06:03:05Z", false, $context);
+$response = file_get_contents("http://beam.remp.press/api/conversions?conversion_from=2018-06-05T06:03:05Z&article_published_from=2018-01-01T00:00:00Z", false, $context);
 // process response (raw JSON string)
 ```
 

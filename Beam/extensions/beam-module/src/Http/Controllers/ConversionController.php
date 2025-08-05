@@ -26,7 +26,9 @@ class ConversionController extends Controller
 {
     public function index(Request $request)
     {
-        $conversions = new Conversion();
+        $conversions = Conversion::select('conversions.*')
+            ->join('articles', 'articles.id', '=', 'conversions.article_id');
+
         $conversionFrom = $request->get('conversion_from');
         if ($conversionFrom) {
             $conversions = $conversions->where('paid_at', '>=', Carbon::parse($conversionFrom));
@@ -34,6 +36,15 @@ class ConversionController extends Controller
         $conversionTo = $request->get('conversion_to');
         if ($conversionTo) {
             $conversions = $conversions->where('paid_at', '<=', Carbon::parse($conversionTo));
+        }
+
+        $articlePublishedFrom = $request->get('article_published_from');
+        if ($articlePublishedFrom) {
+            $conversions = $conversions->where('articles.published_at', '>=', Carbon::parse($articlePublishedFrom));
+        }
+        $articlePublishedTo = $request->get('article_published_to');
+        if ($articlePublishedTo) {
+            $conversions = $conversions->where('articles.published_at', '<=', Carbon::parse($articlePublishedTo));
         }
 
         return response()->format([
@@ -54,18 +65,27 @@ class ConversionController extends Controller
         $request->validate([
             'conversion_from' => ['sometimes', new ValidCarbonDate],
             'conversion_to' => ['sometimes', new ValidCarbonDate],
+            'article_published_from' => ['sometimes', new ValidCarbonDate],
+            'article_published_to' => ['sometimes', new ValidCarbonDate],
         ]);
 
         $conversions = Conversion::select('conversions.*', 'articles.content_type')
             ->with(['article', 'article.authors', 'article.sections', 'article.tags'])
             ->ofSelectedProperty()
             ->join('articles', 'articles.id', '=', 'conversions.article_id');
-        
+
         if ($request->input('conversion_from')) {
             $conversions->where('paid_at', '>=', Carbon::parse($request->input('conversion_from'), $request->input('tz')));
         }
         if ($request->input('conversion_to')) {
             $conversions->where('paid_at', '<=', Carbon::parse($request->input('conversion_to'), $request->input('tz')));
+        }
+
+        if ($request->input('article_published_from')) {
+            $conversions->where('articles.published_at', '>=', Carbon::parse($request->input('article_published_from'), $request->input('tz')));
+        }
+        if ($request->input('article_published_to')) {
+            $conversions->where('articles.published_at', '<=', Carbon::parse($request->input('article_published_to'), $request->input('tz')));
         }
 
         /** @var QueryDataTable $datatable */

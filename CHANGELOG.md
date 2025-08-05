@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - Configure your indices to use ILM policies, see base init script for Docker image [here](https://github.com/remp2020/remp/blob/master/Docker/elasticsearch/create-indexes.sh).
 - Updated init script for Elasticsearch Docker image to use Index Lifecycle Management (ILM). remp/remp#1419
 - Added parameters `published_from` and `published_to` into API call `/api/v2/articles/top` to filter returned articles by `published_at` datetime. remp/respekt#441
+- Added parameters `article_published_from` and `article_published_to` into API call `/api/conversions` to filter returned conversions by article's `published_at` datetime. remp/respekt#441
 
 ### [Campaign]
 
