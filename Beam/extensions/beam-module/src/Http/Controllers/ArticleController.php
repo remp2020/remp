@@ -44,6 +44,16 @@ class ArticleController extends Controller
         }
 
         if (!$articles) {
+            if ($request->input('published_from')) {
+                $articlesBuilder = $articlesBuilder->whereDate('published_at', '>=', $request->input('published_from'));
+            }
+            if ($request->input('published_to')) {
+                $articlesBuilder = $articlesBuilder->whereDate('published_at', '<', $request->input('published_to'));
+            }
+            $articles = $articlesBuilder->get();
+        }
+
+        if (!$articles) {
             $articles = $articlesBuilder->paginate($request->get('per_page', 15));
         }
 

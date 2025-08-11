@@ -1776,6 +1776,8 @@ Returns list of articles specified by ids or external ids.
 | ids | String | no | Article's IDs separated by comma. |
 | external_ids | String | no | Article's external IDs separated by comma. |
 | per_page | Integer | no |  Number of items displayed per page. |
+| published_from | String | RFC3339 datetime used to filter articles by published_at property. |
+| published_to | String | RFC3339 datetime used to filter articles by published_at property. |
 
 ##### *Examples:*
 
@@ -1786,7 +1788,16 @@ Returns list of articles specified by ids or external ids.
 curl -X GET \
   http://beam.remp.press/api/articles?external_ids=123,231 \
   -H 'Accept: application/json' \
-  -H 'Authorization: Bearer XXX' \
+  -H 'Authorization: Bearer XXX'
+```
+
+or filter by `publishet_from` & `published_to`:
+
+```shell
+curl -X GET \
+  http://beam.remp.press/api/articles?published_from=2018-01-01T00:00:00Z&published_to=2018-02-01T00:00:00Z \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer XXX'
 ```
 
 </details>
