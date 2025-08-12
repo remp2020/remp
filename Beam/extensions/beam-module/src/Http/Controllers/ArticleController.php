@@ -97,6 +97,18 @@ class ArticleController extends Controller
             ->groupBy(['articles.id', 'articles.title', 'articles.url', 'articles.published_at'])
             ->ofSelectedProperty();
 
+        $conversionsQuery = \DB::table('conversions')
+            ->select([
+                DB::raw('count(*) as count'),
+                DB::raw('sum(amount) as sum'),
+                DB::raw('avg(amount) as avg'),
+                'currency',
+                'article_id',
+                'articles.external_id',
+            ])
+            ->join('articles', 'articles.id', '=', 'conversions.article_id')
+            ->groupBy(['conversions.article_id', 'articles.external_id', 'conversions.currency']);
+
         if ($request->input('published_from')) {
             $publishedFrom = Carbon::parse($request->input('published_from'), $request->input('tz'));
             $articlesQuery->where('published_at', '>=', $publishedFrom);
@@ -108,10 +120,12 @@ class ArticleController extends Controller
         if ($request->input('conversion_from')) {
             $conversionFrom = Carbon::parse($request->input('conversion_from'), $request->input('tz'));
             $articlesQuery->where('paid_at', '>=', $conversionFrom);
+            $conversionsQuery->where('paid_at', '>=', $conversionFrom);
         }
         if ($request->input('conversion_to')) {
             $conversionTo = Carbon::parse($request->input('conversion_to'), $request->input('tz'));
             $articlesQuery->where('paid_at', '<=', $conversionTo);
+            $conversionsQuery->where('paid_at', '<=', $conversionTo);
         }
 
         $columns = $request->input('columns');
@@ -134,18 +148,7 @@ class ArticleController extends Controller
                 ->whereIn('article_tag.tag_id', $values);
         }
 
-        $conversionsQuery = \DB::table('conversions')
-            ->select([
-                DB::raw('count(*) as count'),
-                DB::raw('sum(amount) as sum'),
-                DB::raw('avg(amount) as avg'),
-                'currency',
-                'article_id',
-                'articles.external_id',
-            ])
-            ->join('articles', 'articles.id', '=', 'conversions.article_id')
-            ->whereIntegerInRaw('article_id', $articlesQuery->pluck('id'))
-            ->groupBy(['conversions.article_id', 'articles.external_id', 'conversions.currency']);
+        $conversionsQuery->whereIntegerInRaw('article_id', $articlesQuery->pluck('id'));
 
         $conversionSums = [];
         $conversionAverages = [];

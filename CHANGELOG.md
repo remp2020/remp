@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Updated init script for Elasticsearch Docker image to use Index Lifecycle Management (ILM). remp/remp#1419
 - Added parameters `published_from` and `published_to` into API call `/api/v2/articles/top` to filter returned articles by `published_at` datetime. remp/respekt#441
 - Added parameters `article_published_from` and `article_published_to` into API call `/api/conversions` to filter returned conversions by article's `published_at` datetime. remp/respekt#441
+- Fixed conversion filtering in the Articles - Conversions section; the sum and average fields always worked with all article conversions and ignored the time-based filter. remp/remp#1431
 
 ### [Campaign]
 
