@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Console\MigrateMakeCommand;
 use App\Console\ProcessGenderBalanceCommand;
+use App\Console\UploadPageviewsToGorse;
 use App\Observers\GenderBalanceObserver;
 use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;
@@ -42,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->commands([
             ProcessGenderBalanceCommand::class,
+            UploadPageviewsToGorse::class,
         ]);
 
         if (config('internal.gender_balance_enabled')) {

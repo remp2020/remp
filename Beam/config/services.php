@@ -35,4 +35,10 @@ return [
         'api_key' => env('AZURE_COMPUTER_VISION_API_KEY'),
         'api_version' => env('AZURE_COMPUTER_VISION_API_VERSION', '2024-02-01'),
     ],
+
+    'gorse_recommendation' => [
+        'endpoint' => env('GORSE_RECOMMENDATION_ENDPOINT'),
+        'api_key' => env('GORSE_RECOMMENDATION_API_KEY'),
+        'url_filter' => env('GORSE_RECOMMENDATION_URL_FILER'),
+    ],
 ];
