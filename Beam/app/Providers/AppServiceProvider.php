@@ -45,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         if (config('internal.gender_balance_enabled')) {
-            Article::observe(GenderBalanceObserver::class);return;
+            Article::observe(GenderBalanceObserver::class);
         }
     }
 
