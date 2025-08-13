@@ -13,7 +13,7 @@ class ArticlesListRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->replace([
+        $this->merge([
             'external_ids' => array_filter(explode(',', $this->get('external_ids'))),
             'ids' => array_filter(explode(',', $this->get('ids'))),
         ]);
@@ -28,6 +28,8 @@ class ArticlesListRequest extends FormRequest
             'external_ids.*' => 'string',
             'ids' => 'array',
             'ids.*' => 'integer',
+            'published_from' => 'date',
+            'published_to' => 'date',
             'per_page' => 'integer'
         ];
     }

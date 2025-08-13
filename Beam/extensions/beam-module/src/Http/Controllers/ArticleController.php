@@ -43,7 +43,10 @@ class ArticleController extends Controller
             }
         }
 
-        if (!$articles) {
+        $publishedFrom = $request->input('published_from');
+        $publishedTo = $request->input('published_to');
+
+        if (!$articles && ($publishedFrom || $publishedTo)) {
             if ($request->input('published_from')) {
                 $articlesBuilder = $articlesBuilder->whereDate('published_at', '>=', $request->input('published_from'));
             }
