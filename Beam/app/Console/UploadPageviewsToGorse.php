@@ -25,6 +25,9 @@ class UploadPageviewsToGorse extends Command
         $timeAfter = (clone $timeBefore)->subMinutes(10);
         $urlFilter = explode(',', config('services.gorse_recommendation.url_filter'));
 
+        $this->line('');
+        $this->line(sprintf("Fetching pageviews and timespent data from <info>%s</info> to <info>%s</info>.", $timeAfter, $timeBefore));
+
         $r = ListRequest::from('pageviews')
             ->setTimeAfter($timeAfter)
             ->setTimeBefore($timeBefore)
