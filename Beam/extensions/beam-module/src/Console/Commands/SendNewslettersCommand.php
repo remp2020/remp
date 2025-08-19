@@ -56,16 +56,16 @@ class SendNewslettersCommand extends Command
             }
 
             if ($nextSending) {
-                $this->line(Carbon::now() . ":     * sending");
+                $this->line(Carbon::now() . ":     Sending...");
                 $this->sendNewsletter($newsletter);
-                $this->line(Carbon::now() . ":     * sent");
+                $this->line(Carbon::now() . ":     Sent.");
                 $newsletter->last_sent_at = Carbon::now();
 
                 if (!$hasMore) {
                     $newsletter->state = Newsletter::STATE_FINISHED;
                 }
             } elseif (!$hasMore) {
-                $this->line(Carbon::now() . ":     * marking as finished");
+                $this->line(Carbon::now() . ":     Marking as finished.");
                 $newsletter->state = Newsletter::STATE_FINISHED;
             }
 
@@ -109,7 +109,7 @@ class SendNewslettersCommand extends Command
             );
 
         if ($articles->count() === 0) {
-            $this->line('  <comment>WARNING:</comment> No articles found for selected timespan, nothing is sent');
+            $this->line(Carbon::now() . ':     <comment>WARNING:</comment> No articles found for selected timespan, nothing is sent');
             return;
         }
 
@@ -123,7 +123,7 @@ class SendNewslettersCommand extends Command
     private function createJob($newsletter, $templateId)
     {
         $jobId = $this->mailer->createJob($newsletter->segment_code, $newsletter->segment_provider, $templateId);
-        $this->line(sprintf('  Mailer job successfully created (id: %s)', $jobId));
+        $this->line(sprintf(Carbon::now() . ':     Mailer job successfully created (id: %s)', $jobId));
     }
 
     private function createTemplate($newsletter, $htmlContent, $textContent): int
@@ -162,7 +162,11 @@ class SendNewslettersCommand extends Command
             $params['dynamic'] = true;
             $params['articles_count'] = $newsletter->articles_count;
         } else {
-            $params['articles']=  implode("\n", $articles->pluck('url')->toArray());
+            $articles = $articles->pluck('url')->toArray();
+            $params['articles']=  implode("\n", $articles);
+            foreach ($articles as $article) {
+                $this->line(sprintf(Carbon::now() . ':     ' . $article));
+            }
         }
 
         $output = $this->mailer->generateEmail($newsletter->mailer_generator_id, $params);
