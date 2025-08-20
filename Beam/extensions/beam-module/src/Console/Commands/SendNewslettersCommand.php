@@ -16,7 +16,10 @@ class SendNewslettersCommand extends Command
 {
     const COMMAND = 'newsletters:send';
 
-    protected $signature = self::COMMAND;
+    protected $signature = self::COMMAND . '
+        {--ignore-content-type=* : Content type to be excluded }
+        {--ignore-author=* : Author ID to be excluded }
+    ';
 
     protected $description = 'Process newsletters data and generate Mailer jobs.';
 
@@ -35,6 +38,9 @@ class SendNewslettersCommand extends Command
 
     public function handle()
     {
+        $ignoreAuthors = $this->input->getOption('ignore-author') ?: config('beam.newsletter_ignored_authors');
+        $ignoreContentTypes = $this->input->getOption('ignore-content-type') ?: config('beam.newsletter_ignored_content_types');
+
         $this->line(Carbon::now() . ': Processing newsletters');
 
         $newsletters = Newsletter::where('state', Newsletter::STATE_STARTED)
@@ -57,7 +63,11 @@ class SendNewslettersCommand extends Command
 
             if ($nextSending) {
                 $this->line(Carbon::now() . ":     Sending...");
-                $this->sendNewsletter($newsletter);
+                $this->sendNewsletter(
+                    newsletter: $newsletter,
+                    ignoreAuthors: $ignoreAuthors,
+                    ignoreContentTypes: $ignoreContentTypes,
+                );
                 $this->line(Carbon::now() . ":     Sent.");
                 $newsletter->last_sent_at = Carbon::now();
 
@@ -99,13 +109,15 @@ class SendNewslettersCommand extends Command
         return [$nextSending, $hasMore];
     }
 
-    private function sendNewsletter(Newsletter $newsletter)
+    private function sendNewsletter(Newsletter $newsletter, array $ignoreAuthors, array $ignoreContentTypes)
     {
         $criterion = new NewsletterCriterion(NewsletterCriterionEnum::from($newsletter->criteria));
         $articles = $newsletter->personalized_content ? [] :
             $criterion->getArticles(
                 timespan: $newsletter->timespan,
-                articlesCount: $newsletter->articles_count
+                articlesCount: $newsletter->articles_count,
+                ignoreAuthors: $ignoreAuthors,
+                ignoreContentTypes: $ignoreContentTypes,
             );
 
         if ($articles->count() === 0) {

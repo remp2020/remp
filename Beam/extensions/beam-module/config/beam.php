@@ -48,4 +48,17 @@ return [
      */
     'article_traffic_graph_show_interval_7d' => env('ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_7D', true),
     'article_traffic_graph_show_interval_30d' => env('ARTICLE_TRAFFIC_GRAPH_SHOW_INTERVAL_30D', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Newsletter sending configuration
+    |--------------------------------------------------------------------------
+     */
+    'newsletter_ignored_content_types' => env('NEWSLETTER_IGNORED_CONTENT_TYPES')
+        ? explode(",", env('NEWSLETTER_IGNORED_CONTENT_TYPES'))
+        : [],
+
+    'newsletter_ignored_authors' => env('NEWSLETTER_IGNORED_AUTHORS')
+        ? explode(",", env('NEWSLETTER_IGNORED_AUTHORS'))
+        : [],
 ];
