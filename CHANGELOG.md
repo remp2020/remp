@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed conversion filtering in the Articles - Conversions section; the sum and average fields always worked with all article conversions and ignored the time-based filter. remp/remp#1431
 - Added parameters `published_from` and `published_to` into API call `/api/articles` to filter articles by `published_at` property. remp/respekt#442
 - Added option to ignore content types and authors from Beam's newsletters (either via command options or env). remp/respekt#378
+- Added parameter `content_type` to `/api/articles` and `article_content_type` to `/api/conversions` (filters response by `articles.content_type`). remp/respekt#441
 
 ### [Campaign]
 

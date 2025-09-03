@@ -1776,8 +1776,9 @@ Returns list of articles specified by ids or external ids.
 | ids | String | no | Article's IDs separated by comma. |
 | external_ids | String | no | Article's external IDs separated by comma. |
 | per_page | Integer | no |  Number of items displayed per page. |
-| published_from | String | RFC3339 datetime used to filter articles by published_at property. |
-| published_to | String | RFC3339 datetime used to filter articles by published_at property. |
+| published_from | String | no | RFC3339 datetime used to filter articles by published_at property. |
+| published_to | String | no | RFC3339 datetime used to filter articles by published_at property. |
+| content_type | String | no | Content type of article (eg. article, blog; set by caller when upserting article) |
 
 ##### *Examples:*
 
@@ -1939,6 +1940,7 @@ Returns list of conversions.
 | conversion_to | String | no | RFC3339 datetime to which will be conversions filtered. |
 | article_published_from | String | no | RFC3339 datetime of from which will be articles of conversions filtered. |
 | article_published_to | String | no | RFC3339 datetime to which will be articles of conversions filtered. |
+| article_content_type | String | no | Content type of article (eg. article, blog; set by caller when upserting article) |
 | per_page | Integer | no |  Number of items displayed per page. |
 
 ##### *Examples:*

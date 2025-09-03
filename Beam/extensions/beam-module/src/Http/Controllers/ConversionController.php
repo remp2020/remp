@@ -46,6 +46,10 @@ class ConversionController extends Controller
         if ($articlePublishedTo) {
             $conversions = $conversions->where('articles.published_at', '<=', Carbon::parse($articlePublishedTo));
         }
+        $articleContentType = $request->get('article_content_type');
+        if ($articleContentType) {
+            $conversions = $conversions->where('articles.content_type', '=', $articleContentType);
+        }
 
         return response()->format([
             'html' => view('beam::conversions.index', [
