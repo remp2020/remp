@@ -20,10 +20,10 @@ class TopSearch
         $limit = $request->json('limit');
         $timeFrom = Carbon::parse($request->json('from'));
         $timeTo = $request->json('to') ? Carbon::parse($request->json('to')) : null;
-        $publishedFrom = $request->json('published_from');
-        $publishedTo = $request->json('published_to');
+        $publishedFrom = $request->json('published_from') ? Carbon::parse($request->json('published_from')) : null;
+        $publishedTo = $request->json('published_to') ? Carbon::parse($request->json('published_to')) : null;
 
-        $useArticlesTableAsDataSource = $this->shouldUseArticlesTableAsDataSource($timeFrom, $publishedFrom);
+        $useArticlesTableAsDataSource = $this->shouldUseArticlesTableAsDataSource($timeFrom, $publishedFrom, $timeTo);
 
         if ($useArticlesTableAsDataSource) {
             $baseQuery = DB::table('articles')
@@ -58,10 +58,10 @@ class TopSearch
         }
 
         if ($publishedFrom) {
-            $this->addPublishedFromCondition($baseQuery, Carbon::parse($publishedFrom), $useArticlesTableAsDataSource);
+            $this->addPublishedFromCondition($baseQuery, $publishedFrom, $useArticlesTableAsDataSource);
         }
         if ($publishedTo) {
-            $this->addPublishedToCondition($baseQuery, Carbon::parse($publishedTo), $useArticlesTableAsDataSource);
+            $this->addPublishedToCondition($baseQuery, $publishedTo, $useArticlesTableAsDataSource);
         }
 
         if (!$useArticlesTableAsDataSource) {
@@ -285,8 +285,12 @@ class TopSearch
         $articlePageviewsQuery->where('articles.published_at', '<', $publishedTo);
     }
 
-    private function shouldUseArticlesTableAsDataSource(Carbon $timeFrom, ?string $publishedFrom = null): bool
+    private function shouldUseArticlesTableAsDataSource(Carbon $timeFrom, ?Carbon $publishedFrom = null, ?Carbon $timeTo = null): bool
     {
+        if ($timeTo && $timeTo < Carbon::now()) {
+            return false;
+        }
+
         if ($publishedFrom) {
             $publishedFrom = Carbon::parse($publishedFrom);
             if ($publishedFrom >= $timeFrom) {
