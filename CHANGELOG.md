@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed mail resend when Mailgun throws RuntimeException. remp/remp#1427
 - Added option to use external metadata processors for external domains to `ArticleUrlParserGenerator`. remp/novydenik#1457
+- Changed wordpress article link design in newsletters `TemplatesTrait::getArticleLinkTemplateFunction`. remp/remp#1433
 
 ## Archive
 
