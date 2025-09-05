@@ -19,12 +19,12 @@
                     <div class="col-md-12 form-group">
                         {{ html()->label('Segment')->attribute('class', 'fg-label') }}
                         {{ html()->select('segment', $segments, $newsletter->segment)->attributes(
-                            [
+                            array_filter([
                                 'class' => 'selectpicker',
                                 'data-live-search' => 'true',
                                 'placeholder' => !$disabled ? 'Please select...' : 'No segments are available on Mailer, please configure them first',
-                                'disabled' => $disabled
-                            ]
+                                'disabled' => $disabled ? 'disabled' : null
+                            ])
                        ) }}
                     </div>
                 </div>
@@ -37,12 +37,12 @@
                     <div class="col-md-12 form-group">
                         {{ html()->label('Generator')->attribute('class', 'fg-label') }}
                         {{ html()->select('mailer_generator_id', $generators, $newsletter->mailer_generator_id)->attributes(
-                            [
+                            array_filter([
                                 'class' => 'selectpicker',
                                 'data-live-search' => 'true',
                                 'placeholder' => !$disabled ? 'Please select...' : 'No source templates using best_performing_articles generator were configured on Mailer',
-                                'disabled' => $disabled,
-                           ]
+                                'disabled' => $disabled ? 'disabled' : null,
+                           ])
                        ) }}
                     </div>
                 </div>
@@ -55,12 +55,12 @@
                     <div class="col-md-12 form-group">
                         {{ html()->label('Mail Type')->attribute('class', 'fg-label') }}
                         {{ html()->select('mail_type_code', $mailTypes, $newsletter->mail_type_code)->attributes(
-                            [
+                            array_filter([
                                 'class' => 'selectpicker',
                                 'data-live-search' => 'true',
                                 'placeholder' => !$disabled ? 'Please select...' : 'No mail types are available on Mailer, please configure them first',
-                                'disabled' => $disabled,
-                            ]
+                                'disabled' => $disabled ? 'disabled' : null,
+                            ])
                        ) }}
                     </div>
                 </div>
