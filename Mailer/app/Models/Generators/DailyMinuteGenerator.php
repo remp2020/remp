@@ -11,6 +11,7 @@ use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\InvalidUrlException;
 use Remp\MailerModule\Models\Generators\PreprocessException;
+use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\PostInputParam;
 
@@ -25,7 +26,8 @@ class DailyMinuteGenerator implements IGenerator
     public function __construct(
         private WordpressBlockParser $wordpressBlockParser,
         private SourceTemplatesRepository $sourceTemplatesRepository,
-        private EngineFactory $engineFactory
+        private EngineFactory $engineFactory,
+        private SnippetsRepository $snippetsRepository,
     ) {
     }
 
@@ -104,11 +106,19 @@ class DailyMinuteGenerator implements IGenerator
     {
         [$html, $text] = $this->wordpressBlockParser->parseJson($values['blocks_json']);
 
+        $adSnippet = $this->snippetsRepository->all()->where([
+            'code' => 'r5m-advertisement',
+            'html <> ?' => '',
+            'mail_type_id' => null,
+        ])->fetch();
+
         $now = new DateTime();
         $additionalParams = [
             'date' => $now,
             'nameDay' => $this->getNameDayNamesForDate($now),
             'url' => $values['url'],
+            'adSnippetHtml' => $adSnippet?->html,
+            'adSnippetText' => $adSnippet?->text,
         ];
 
         $engine = $this->engineFactory->engine();
