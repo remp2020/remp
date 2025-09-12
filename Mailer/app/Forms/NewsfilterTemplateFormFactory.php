@@ -330,6 +330,18 @@ class NewsfilterTemplateFormFactory
                 'mail_type_code' => 'bez-politiky',
                 'from' => 'Denník N <info@dennikn.sk>',
             ],
+            'predvolebne-madarsko' => [
+                'name' => 'Predvolebné Maďarsko ' . date('j.n.Y'),
+                'code' => 'predvolebne_madarsko_' . date('dmY'),
+                'mail_type_code' => 'predvolebne-madarsko',
+                'from' => 'Denník N <posta@dennikn.sk>',
+            ],
+            'valaszt-a-magyar' => [
+                'name' => 'Választ a magyar ' . date('Y. n. j.'),
+                'code' => 'valaszt_a_magyar_' . date('dmY'),
+                'mail_type_code' => 'valaszt-a-magyar',
+                'from' => 'Napunk <napunk@dennikn.sk>',
+            ],
             default => throw new \Exception("No default values found for source template code='{$sourceTemplate->code}'"),
         };
 
