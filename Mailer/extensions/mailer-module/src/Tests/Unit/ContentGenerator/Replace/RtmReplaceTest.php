@@ -119,12 +119,15 @@ class RtmReplaceTest extends TestCase
 
     public function testMultilineAnchorDefinition(): void
     {
-        $content = $this->rtmReplace->replace('
+        $content = $this->rtmReplace->replace(
+            '
             <a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=apple&amp;feira=terca&modelo=1%3Fa%3D1&b=2" target="blank" style="color:#ffffff;
                 display:inline-block;"
             />',
-            $this->generatorInput);
-        $this->assertEquals('
+            $this->generatorInput
+        );
+        $this->assertEquals(
+            '
             <a href="https://expresso.pt/html/que-nao-entrou-em-acao?rtm_content=&amp;feira=terca&modelo=1%3Fa%3D1&b=2&rtm_source=demo-weekly-newsletter&rtm_medium=email&rtm_campaign=impresa_mail_20190903103350" target="blank" style="color:#ffffff;
                 display:inline-block;"
             />',
