@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Changed `AnchorRtmReplace` to support multiline line anchor definition. remp/helpdesk#3937 
+
 
 ## Archive
 

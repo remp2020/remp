@@ -21,7 +21,7 @@ class AnchorRtmReplace implements IReplace
     public function replace(string $content, GeneratorInput $generatorInput, array $context = null): string
     {
         $matches = [];
-        preg_match_all('/<a(.*?)href="([^"]*?)"(.*?)>/i', $content, $matches);
+        preg_match_all('/<a(.*?)href="([^"]*?)"(.*?)>/is', $content, $matches);
 
         if (count($matches) > 0) {
             foreach ($matches[2] as $idx => $hrefUrl) {
