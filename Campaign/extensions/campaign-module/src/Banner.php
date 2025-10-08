@@ -301,8 +301,47 @@ class Banner extends Model implements Searchable
 
     public function getUsedSnippetCodes(): array
     {
+        $allSnippets = [];
+        $processedSnippets = [];
+
+        if (!$this->js) {
+            return [];
+        }
+
+        $snippetsToProcess = $this->extractSnippetCodes($this->js);
+
+        // Check if snippets use another snippets
+        while (!empty($snippetsToProcess)) {
+            $currentSnippet = array_shift($snippetsToProcess);
+            if (in_array($currentSnippet, $processedSnippets, true)) {
+                continue;
+            }
+
+            $processedSnippets[] = $currentSnippet;
+            $allSnippets[] = $currentSnippet;
+
+            $snippet = Snippet::where('name', $currentSnippet)->first();
+
+            if ($snippet && $snippet->value) {
+                // Extract nested snippets from this snippet's value
+                $nestedSnippets = $this->extractSnippetCodes($snippet->value);
+
+                // Add new nested snippets to processing queue
+                foreach ($nestedSnippets as $nestedSnippet) {
+                    if (!in_array($nestedSnippet, $processedSnippets, true)) {
+                        $snippetsToProcess[] = $nestedSnippet;
+                    }
+                }
+            }
+        }
+
+        return $allSnippets;
+    }
+
+    private function extractSnippetCodes(string $content): array
+    {
         $matches = [];
-        $matched = preg_match_all('/{{\s+(.*?)\s}}/', $this->js, $matches, PREG_PATTERN_ORDER);
+        $matched = preg_match_all('/{{\s?(.*?)\s?}}/', $content, $matches, PREG_PATTERN_ORDER);
 
         if (is_int($matched) && $matched > 0) {
             return $matches[1];

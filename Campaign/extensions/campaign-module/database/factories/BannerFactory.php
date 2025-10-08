@@ -25,6 +25,7 @@ class BannerFactory extends Factory
             'closeable' => $this->faker->boolean,
             'target_selector' => '#test',
             'manual_events_tracking' => 0,
+            'template' => Banner::TEMPLATE_HTML,
         ];
     }
 }
