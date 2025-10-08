@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Fixed broken use of snippets within snippets, introduced in `4.2.0`. remp/remp#1441
+
 ### [Mailer]
 
 - Changed `AnchorRtmReplace` to support multiline line anchor definition. remp/helpdesk#3937 
