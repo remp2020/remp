@@ -5,6 +5,8 @@ namespace Remp\CampaignModule\Tests\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\CampaignModule\Banner;
+use Remp\CampaignModule\HtmlTemplate;
+use Remp\CampaignModule\BarTemplate;
 use Remp\CampaignModule\Snippet;
 use Remp\CampaignModule\Tests\TestCase;
 
@@ -103,5 +105,163 @@ class BannerTest extends TestCase
         foreach ($expectedSnippets as $expectedSnippet) {
             $this->assertContains($expectedSnippet, $snippets);
         }
+    }
+
+    public function testGetUsedSnippetCodesFromHtmlTemplateText()
+    {
+        $banner = Banner::factory()->create([
+            'template' => Banner::TEMPLATE_HTML,
+            'js' => null,
+        ]);
+
+        // Delete factory's default template
+        HtmlTemplate::where('banner_id', $banner->id)->delete();
+
+        $template = new HtmlTemplate([
+            'text' => '<p>Hello {{ userName }}, welcome to {{ siteName }}!</p>',
+            'css' => '.banner { color: red; }',
+            'dimensions' => 'medium',
+            'text_align' => 'left',
+            'text_color' => '#000',
+            'font_size' => '14',
+            'background_color' => '#fff',
+        ]);
+        $template->banner_id = $banner->id;
+        $template->save();
+
+        Snippet::create(['name' => 'userName', 'value' => 'John']);
+        Snippet::create(['name' => 'siteName', 'value' => 'Example.com']);
+
+        $snippets = $banner->fresh()->getUsedSnippetCodes();
+
+        $this->assertCount(2, $snippets);
+        $this->assertContains('userName', $snippets);
+        $this->assertContains('siteName', $snippets);
+    }
+
+    public function testGetUsedSnippetCodesFromHtmlTemplateCss()
+    {
+        $banner = Banner::factory()->create([
+            'template' => Banner::TEMPLATE_HTML,
+            'js' => null,
+        ]);
+
+        // Delete factory's default template
+        HtmlTemplate::where('banner_id', $banner->id)->delete();
+
+        $template = new HtmlTemplate([
+            'text' => '<p>Simple text</p>',
+            'css' => '.banner { background-image: url("{{ backgroundUrl }}"); color: {{ textColor }}; }',
+            'dimensions' => 'medium',
+            'text_align' => 'left',
+            'text_color' => '#000',
+            'font_size' => '14',
+            'background_color' => '#fff',
+        ]);
+        $template->banner_id = $banner->id;
+        $template->save();
+
+        Snippet::create(['name' => 'backgroundUrl', 'value' => 'https://example.com/bg.jpg']);
+        Snippet::create(['name' => 'textColor', 'value' => '#333']);
+
+        $snippets = $banner->fresh()->getUsedSnippetCodes();
+
+        $this->assertCount(2, $snippets);
+        $this->assertContains('backgroundUrl', $snippets);
+        $this->assertContains('textColor', $snippets);
+    }
+
+    public function testGetUsedSnippetCodesFromBarTemplate()
+    {
+        $banner = Banner::factory()->create([
+            'template' => Banner::TEMPLATE_BAR,
+            'js' => null,
+        ]);
+
+        $template = new BarTemplate([
+            'main_text' => 'Check out {{ offerName }}!',
+            'button_text' => '{{ ctaText }}',
+        ]);
+        $template->banner_id = $banner->id;
+        $template->save();
+
+        Snippet::create(['name' => 'offerName', 'value' => 'Special Offer']);
+        Snippet::create(['name' => 'ctaText', 'value' => 'Click Here']);
+
+        $snippets = $banner->fresh()->getUsedSnippetCodes();
+
+        $this->assertCount(2, $snippets);
+        $this->assertContains('offerName', $snippets);
+        $this->assertContains('ctaText', $snippets);
+    }
+
+    public function testGetUsedSnippetCodesFromTemplateWithNestedSnippets()
+    {
+        $banner = Banner::factory()->create([
+            'template' => Banner::TEMPLATE_HTML,
+            'js' => null,
+        ]);
+
+        // Delete factory's default template
+        HtmlTemplate::where('banner_id', $banner->id)->delete();
+
+        $template = new HtmlTemplate([
+            'text' => '<p>{{ greeting }}</p>',
+            'css' => '.banner { color: {{ primaryColor }}; }',
+            'dimensions' => 'medium',
+            'text_align' => 'left',
+            'text_color' => '#000',
+            'font_size' => '14',
+            'background_color' => '#fff',
+        ]);
+        $template->banner_id = $banner->id;
+        $template->save();
+
+        Snippet::create(['name' => 'greeting', 'value' => 'Hello {{ userName }}']);
+        Snippet::create(['name' => 'userName', 'value' => 'John']);
+        Snippet::create(['name' => 'primaryColor', 'value' => '{{ brandColor }}']);
+        Snippet::create(['name' => 'brandColor', 'value' => '#ff0000']);
+
+        $snippets = $banner->fresh()->getUsedSnippetCodes();
+
+        $this->assertCount(4, $snippets);
+        $this->assertContains('greeting', $snippets);
+        $this->assertContains('userName', $snippets);
+        $this->assertContains('primaryColor', $snippets);
+        $this->assertContains('brandColor', $snippets);
+    }
+
+    public function testGetUsedSnippetCodesFromBothJsAndTemplate()
+    {
+        $banner = Banner::factory()->create([
+            'template' => Banner::TEMPLATE_HTML,
+            'js' => 'console.log("{{ jsSnippet }}");',
+        ]);
+
+        // Delete factory's default template
+        HtmlTemplate::where('banner_id', $banner->id)->delete();
+
+        $template = new HtmlTemplate([
+            'text' => '<p>{{ textSnippet }}</p>',
+            'css' => '.banner { color: {{ cssSnippet }}; }',
+            'dimensions' => 'medium',
+            'text_align' => 'left',
+            'text_color' => '#000',
+            'font_size' => '14',
+            'background_color' => '#fff',
+        ]);
+        $template->banner_id = $banner->id;
+        $template->save();
+
+        Snippet::create(['name' => 'jsSnippet', 'value' => 'JS Value']);
+        Snippet::create(['name' => 'textSnippet', 'value' => 'Text Value']);
+        Snippet::create(['name' => 'cssSnippet', 'value' => 'red']);
+
+        $snippets = $banner->fresh()->getUsedSnippetCodes();
+
+        $this->assertCount(3, $snippets);
+        $this->assertContains('jsSnippet', $snippets);
+        $this->assertContains('textSnippet', $snippets);
+        $this->assertContains('cssSnippet', $snippets);
     }
 }

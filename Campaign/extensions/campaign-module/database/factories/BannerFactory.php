@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Remp\CampaignModule\Banner;
+use Remp\CampaignModule\HtmlTemplate;
 
 /** @extends Factory<Banner> */
 class BannerFactory extends Factory
@@ -27,5 +28,31 @@ class BannerFactory extends Factory
             'manual_events_tracking' => 0,
             'template' => Banner::TEMPLATE_HTML,
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (Banner $banner) {
+            // Every banner must have a template - create default if none exists
+            if ($banner->template === Banner::TEMPLATE_HTML) {
+                $existingTemplate = HtmlTemplate::where('banner_id', $banner->id)->first();
+                if (!$existingTemplate) {
+                    $template = new HtmlTemplate([
+                        'text' => 'Default text',
+                        'css' => '',
+                        'dimensions' => 'medium',
+                        'text_align' => 'left',
+                        'text_color' => '#000000',
+                        'font_size' => '14',
+                        'background_color' => '#ffffff',
+                    ]);
+                    $template->banner_id = $banner->id;
+                    $template->save();
+
+                    // Clear relationship cache so fresh() will load the new template
+                    $banner->unsetRelation('htmlTemplate');
+                }
+            }
+        });
     }
 }

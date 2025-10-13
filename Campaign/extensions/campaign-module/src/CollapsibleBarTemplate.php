@@ -21,6 +21,11 @@ class CollapsibleBarTemplate extends AbstractTemplate
         'color_scheme' => 'grey',
     ];
 
+    protected $snippetFields = [
+        'main_text',
+        'button_text',
+    ];
+
     /**
      * Text should return textual representation of the banner's main text in the cleanest possible form.
      * @return mixed

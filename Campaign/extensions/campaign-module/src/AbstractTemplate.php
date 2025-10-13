@@ -14,6 +14,16 @@ abstract class AbstractTemplate extends Model
     protected $dateFormat = 'Y-m-d H:i:s';
 
     /**
+     * @var array<string>
+     */
+    protected $snippetFields = [];
+
+    public function getSnippetFields(): array
+    {
+        return $this->snippetFields;
+    }
+
+    /**
      * @return BelongsTo<Banner, $this>
      */
     public function banner(): BelongsTo

@@ -304,11 +304,15 @@ class Banner extends Model implements Searchable
         $allSnippets = [];
         $processedSnippets = [];
 
-        if (!$this->js) {
-            return [];
+        $snippetsToProcess = [];
+
+        // Extract snippets from banner's JS
+        if ($this->js) {
+            $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetCodes($this->js));
         }
 
-        $snippetsToProcess = $this->extractSnippetCodes($this->js);
+        // Extract snippets from template text and CSS fields
+        $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetsFromTemplate());
 
         // Check if snippets use another snippets
         while (!empty($snippetsToProcess)) {
@@ -348,5 +352,19 @@ class Banner extends Model implements Searchable
         }
 
         return [];
+    }
+
+    private function extractSnippetsFromTemplate(): array
+    {
+        $snippets = [];
+        $template = $this->getTemplate();
+
+        foreach ($template->getSnippetFields() as $field) {
+            if (isset($template->$field)) {
+                $snippets = array_merge($snippets, $this->extractSnippetCodes($template->$field));
+            }
+        }
+
+        return $snippets;
     }
 }

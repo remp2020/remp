@@ -20,6 +20,12 @@ class OverlayRectangleTemplate extends AbstractTemplate
         'color_scheme' => 'grey',
     ];
 
+    protected $snippetFields = [
+        'header_text',
+        'main_text',
+        'button_text',
+    ];
+
     public function text()
     {
         return strip_tags("{$this->main_text}");

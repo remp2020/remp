@@ -23,6 +23,11 @@ class NewsletterRectangleTemplate extends AbstractTemplate
         'color_scheme' => 'grey',
     ];
 
+    protected $snippetFields = [
+        'title',
+        'text',
+    ];
+
     public $banner_config = [];
 
     protected $appends = [

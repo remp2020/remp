@@ -192,7 +192,6 @@ export default {
     props: [
         "headerText",
         "mainText",
-        "headerText",
         "collapseText",
         "expandText",
         "buttonText",

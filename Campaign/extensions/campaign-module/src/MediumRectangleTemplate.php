@@ -24,6 +24,12 @@ class MediumRectangleTemplate extends AbstractTemplate
         'color_scheme' => 'grey',
     ];
 
+    protected $snippetFields = [
+        'header_text',
+        'main_text',
+        'button_text',
+    ];
+
     protected static function newFactory(): MediumRectangleTemplateFactory
     {
         return MediumRectangleTemplateFactory::new();

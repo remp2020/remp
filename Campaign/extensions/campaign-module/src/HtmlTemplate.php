@@ -14,6 +14,11 @@ class HtmlTemplate extends AbstractTemplate
         'background_color',
     ];
 
+    protected $snippetFields = [
+        'text',
+        'css',
+    ];
+
     /**
      * Text should return textual representation of the banner's main text in the cleanest possible form.
      * @return mixed

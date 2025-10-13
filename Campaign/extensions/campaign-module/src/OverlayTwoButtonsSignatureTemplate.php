@@ -16,6 +16,16 @@ class OverlayTwoButtonsSignatureTemplate extends AbstractTemplate
         'text_signature'
     ];
 
+    protected $snippetFields = [
+        'text_before',
+        'text_after',
+        'text_btn_primary',
+        'text_btn_primary_minor',
+        'text_btn_secondary',
+        'text_btn_secondary_minor',
+        'text_signature'
+    ];
+
     public function text()
     {
         return strip_tags($this->text_before);

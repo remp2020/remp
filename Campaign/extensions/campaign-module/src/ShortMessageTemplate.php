@@ -20,6 +20,10 @@ class ShortMessageTemplate extends AbstractTemplate
         'color_scheme' => 'grey',
     ];
 
+    protected $snippetFields = [
+        'text',
+    ];
+
     protected static function newFactory(): ShortMessageTemplateFactory
     {
         return ShortMessageTemplateFactory::new();
