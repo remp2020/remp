@@ -21,6 +21,11 @@ class BarTemplate extends AbstractTemplate
         'color_scheme' => 'grey',
     ];
 
+    protected $snippetFields = [
+        'main_text',
+        'button_text',
+    ];
+
     protected static function newFactory(): BarTemplateFactory
     {
         return BarTemplateFactory::new();

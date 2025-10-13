@@ -15,6 +15,11 @@ class HtmlOverlayTemplate extends AbstractTemplate
         'background_color',
     ];
 
+    protected $snippetFields = [
+        'text',
+        'css',
+    ];
+
     public function text()
     {
         return strip_tags($this->text);
