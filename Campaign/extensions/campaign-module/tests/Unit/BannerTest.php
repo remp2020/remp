@@ -264,4 +264,42 @@ class BannerTest extends TestCase
         $this->assertContains('textSnippet', $snippets);
         $this->assertContains('cssSnippet', $snippets);
     }
+
+    public function testGetUsedSnippetCodesFromJsIncludes()
+    {
+        $banner = Banner::factory()->create([
+            'template' => Banner::TEMPLATE_HTML,
+            'js_includes' => ['{{ cdn_domain }}/main.js', '{{ cdn_domain }}{{ theme }}.js'],
+        ]);
+
+        Snippet::create(['name' => 'cdn_domain', 'value' => '{{ protocol}}://remp.press']);
+        Snippet::create(['name' => 'theme', 'value' => 'dark']);
+        Snippet::create(['name' => 'protocol', 'value' => 'https']);
+
+        $snippets = $banner->fresh()->getUsedSnippetCodes();
+
+        $this->assertCount(3, $snippets);
+        $this->assertContains('cdn_domain', $snippets);
+        $this->assertContains('theme', $snippets);
+        $this->assertContains('protocol', $snippets);
+    }
+
+    public function testGetUsedSnippetCodesFromCssIncludes()
+    {
+        $banner = Banner::factory()->create([
+            'template' => Banner::TEMPLATE_HTML,
+            'css_includes' => ['{{ cdn_domain }}/main.css', '{{ cdn_domain }}{{ theme }}.css'],
+        ]);
+
+        Snippet::create(['name' => 'cdn_domain', 'value' => '{{ protocol}}://remp.press']);
+        Snippet::create(['name' => 'theme', 'value' => 'dark']);
+        Snippet::create(['name' => 'protocol', 'value' => 'https']);
+
+        $snippets = $banner->fresh()->getUsedSnippetCodes();
+
+        $this->assertCount(3, $snippets);
+        $this->assertContains('cdn_domain', $snippets);
+        $this->assertContains('theme', $snippets);
+        $this->assertContains('protocol', $snippets);
+    }
 }
