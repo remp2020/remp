@@ -310,15 +310,14 @@ class Banner extends Model implements Searchable
         if ($this->js) {
             $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetCodes($this->js));
         }
-        if ($this->js_includes) {
-            foreach ($this->js_includes as $jsInclude) {
-                $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetCodes($jsInclude));
-            }
+
+        $jsIncludes = array_filter($this->js_includes ?? []);
+        foreach ($jsIncludes as $jsInclude) {
+            $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetCodes($jsInclude));
         }
-        if ($this->css_includes) {
-            foreach ($this->css_includes as $cssInclude) {
-                $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetCodes($cssInclude));
-            }
+        $cssIncludes = array_filter($this->css_includes ?? []);
+        foreach ($cssIncludes as $cssInclude) {
+            $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetCodes($cssInclude));
         }
 
         // Extract snippets from template text and CSS fields
