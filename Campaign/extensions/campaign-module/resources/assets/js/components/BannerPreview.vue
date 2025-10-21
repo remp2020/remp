@@ -335,7 +335,7 @@
                 let loadedScriptsCount = 0;
                 jsIncludes.forEach((jsInclude) => {
                     let script = document.createElement('script');
-                    script.src = jsInclude;
+                    script.src = this.injectSnippets(jsInclude);
                     script.async = true;
 
                     let callbackOnLoad = () => {
