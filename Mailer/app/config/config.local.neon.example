@@ -58,10 +58,11 @@ services:
 
             # Notifications to CRM that users' newsletter subscription was updated.
             # Note: Requires crmClient (search this config).
-            #- add('user-subscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
-            #- add('user-unsubscribed', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
-            #- add('user-subscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
-            #- add('user-unsubscribed-variant', Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            #- add(user-subscribed, Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            #- add(user-unsubscribed, Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            #- add(user-subscribed-variant, Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            #- add(user-unsubscribed-variant, Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
+            #- add(batch-status-change, Remp\Mailer\Hermes\BatchSendingFinishedSlackHandler(http://mailer.remp.press, 'REMP', https://hooks.slack.com/services/dummy))
 
     #crmClient:
     #    factory: Remp\MailerModule\Models\Crm\Client(%crm.addr%, %crm.api_token%)

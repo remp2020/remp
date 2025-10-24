@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed `AnchorRtmReplace` to support multiline line anchor definition. remp/helpdesk#3937
 - Added index to `mail_types.deleted_at` to speed up dashboard realtime calculations.
 - Fixed tracking of `first_email_sent_at` when batch actually starts sending emails.
+- Added handler notifying finished batches to Slack.
 
 ## Archive
 
