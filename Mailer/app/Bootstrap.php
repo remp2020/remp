@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Remp\Mailer;
 
 use Dotenv\Dotenv;
-use Nette\Configurator;
+use Nette\Bootstrap\Configurator;
 
 final class Bootstrap
 {
