@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added index to `mail_types.deleted_at` to speed up dashboard realtime calculations.
 - Fixed tracking of `first_email_sent_at` when batch actually starts sending emails.
 - Added handler notifying finished batches to Slack.
+- Fixed possibly duplicated emission of `batch-status-change` by parallel hermes workers.
 
 ## Archive
 

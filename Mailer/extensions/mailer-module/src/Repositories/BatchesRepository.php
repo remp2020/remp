@@ -82,9 +82,11 @@ class BatchesRepository extends Repository implements DataRetentionInterface
 
     public function updateStatus(ActiveRow $batch, $status): bool
     {
-        $result = $this->update($batch, [
+        // Two-step update ensures, that we check if the status was actually change or not.
+        $batchUpdated = parent::update($batch, [
             'status' => $status,
         ]);
+        $this->update($batch, []); // empty update to trigger updated_at refresh
 
         if (in_array($status, self::SENDING_STATUSES, true)) {
             $priority = $this->getBatchPriority($batch);
@@ -95,13 +97,15 @@ class BatchesRepository extends Repository implements DataRetentionInterface
             $this->mailCache->removeQueue($batch->id);
         }
 
-        $this->emitter->emit(new HermesMessage('batch-status-change', [
-            'mail_job_batch_id' => $batch->id,
-            'time' => time(),
-            'status' => $status
-        ]), RedisDriver::PRIORITY_LOW);
+        if ($batchUpdated) {
+            $this->emitter->emit(new HermesMessage('batch-status-change', [
+                'mail_job_batch_id' => $batch->id,
+                'time' => time(),
+                'status' => $status
+            ]), RedisDriver::PRIORITY_LOW);
+        }
 
-        return $result;
+        return $batchUpdated;
     }
 
     public function addTemplate(ActiveRow $batch, ActiveRow $template, int $weight = 100): ActiveRow

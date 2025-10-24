@@ -72,15 +72,6 @@ class BatchSendingFinishedSlackHandler implements HandlerInterface
             $duration = "{$durationDiff->h}h $duration";
         }
 
-        $message = sprintf(
-            '*%s*\nNewsletter %s was just sent in %s (_[%d emails sent](%s)_).',
-            $this->environment,
-            $mailType->title,
-            $duration,
-            $jobBatch->sent_emails,
-            $targetUrl,
-        );
-
         // https://docs.slack.dev/block-kit/formatting-with-rich-text
         $payload = [
             'blocks' => [
@@ -110,7 +101,7 @@ class BatchSendingFinishedSlackHandler implements HandlerInterface
                                     'type' => 'text',
                                     'text' => $mailType->title,
                                     'style' => [
-                                        'bold' => true,
+                                        'italic' => true,
                                     ],
                                 ],
                                 [
