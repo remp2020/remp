@@ -314,7 +314,7 @@ class MailWorkerCommand extends Command
                         sleep(10);
                     }
 
-                    $first_email = $batch->first_email_sent_at ? new DateTime($batch->first_email_sent_at) : null;
+                    $first_email = $batch->first_email_sent_at ?: new DateTime();
                     $now = new DateTime();
 
                     // update stats
