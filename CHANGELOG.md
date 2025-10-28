@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed broken use of snippets within snippets, introduced in `4.2.0`. remp/remp#1441
 - Added support for use of snippets in JS includes. remp/remp#1441
+- Fixed possible routing conflict between web and API routes. remp/remp#1447
 
 ### [Mailer]
 

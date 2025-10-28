@@ -44,6 +44,7 @@ class CampaignServiceProvider extends ServiceProvider
         Route::group([
             'prefix' => 'api',
             'middleware' => 'api',
+            'as' => 'api.',
         ], function () {
             $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
         });

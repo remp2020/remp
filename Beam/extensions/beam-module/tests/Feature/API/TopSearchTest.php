@@ -114,6 +114,6 @@ class TopSearchTest extends TestCase
 
     private function request(array $parameters = [])
     {
-        return $this->postJson(route('articles.top.v2'), $parameters);
+        return $this->postJson(route('api.articles.top.v2'), $parameters);
     }
 }
