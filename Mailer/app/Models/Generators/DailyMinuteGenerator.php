@@ -107,7 +107,7 @@ class DailyMinuteGenerator implements IGenerator
         [$html, $text] = $this->wordpressBlockParser->parseJson($values['blocks_json']);
 
         $adSnippet = $this->snippetsRepository->all()->where([
-            'code' => 'r5m-advertisement',
+            'code' => 'r5m-advertisement-end',
             'html <> ?' => '',
             'mail_type_id' => null,
         ])->fetch();
