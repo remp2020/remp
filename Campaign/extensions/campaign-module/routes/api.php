@@ -20,18 +20,18 @@ use Remp\CampaignModule\Http\Controllers\ScheduleController;
 
 Route::middleware('auth:api')->group(function() {
     Route::prefix('schedule')->group(function() {
-        Route::post('{schedule}/start', [ScheduleController::class, 'start'])->name('api.schedule.start');
-        Route::post('{schedule}/pause', [ScheduleController::class, 'pause'])->name('api.schedule.pause');
-        Route::post('{schedule}/stop', [ScheduleController::class, 'stop'])->name('api.schedule.stop');
+        Route::post('{schedule}/start', [ScheduleController::class, 'start'])->name('schedule.start');
+        Route::post('{schedule}/pause', [ScheduleController::class, 'pause'])->name('schedule.pause');
+        Route::post('{schedule}/stop', [ScheduleController::class, 'stop'])->name('schedule.stop');
     });
 
-    Route::post('banners/{banner}/one-time-display', [BannerController::class, 'oneTimeDisplay'])->name('api.banners.one_time_display');
+    Route::post('banners/{banner}/one-time-display', [BannerController::class, 'oneTimeDisplay'])->name('banners.one_time_display');
 
-    Route::apiResource('campaigns', CampaignController::class)->names('api.campaigns');
-    Route::apiResource('banners', BannerController::class)->names('api.banners');
-    Route::apiResource('schedule', ScheduleController::class)->names('api.schedule');
+    Route::apiResource('campaigns', CampaignController::class)->names('campaigns');
+    Route::apiResource('banners', BannerController::class)->names('banners');
+    Route::apiResource('schedule', ScheduleController::class)->names('schedule');
 
-    Route::post('campaigns/toggle-active/{campaign}', [CampaignController::class, 'toggleActive'])->name('api.campaigns.toggle_active');
+    Route::post('campaigns/toggle-active/{campaign}', [CampaignController::class, 'toggleActive'])->name('campaigns.toggle_active');
 
     Route::post(
         'segment-cache/provider/{segment_provider}/code/{segment_code}/add-user',
