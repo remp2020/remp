@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
+- Added `campaign:seed-events` command for generating realistic banner tracking events for testing. remp/remp#1440
 - Fixed broken use of snippets within snippets, introduced in `4.2.0`. remp/remp#1441
 - Added support for use of snippets in JS includes. remp/remp#1441
 - Fixed possible routing conflict between web and API routes. remp/remp#1447

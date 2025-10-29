@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\URL;
 use Remp\CampaignModule\Console\Commands\AggregateCampaignStats;
 use Remp\CampaignModule\Console\Commands\CampaignsRefreshCache;
 use Remp\CampaignModule\Console\Commands\PostInstallCommand;
+use Remp\CampaignModule\Console\Commands\CampaignEventsPopulatorCommand;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
-use Remp\CampaignModule\Http\Middleware\CollectionQueryString;
 use Remp\CampaignModule\Http\Resources\SearchResource;
 use Remp\CampaignModule\Http\Showtime\LazyDeviceDetector;
 use Remp\CampaignModule\Http\Showtime\LazyGeoReader;
@@ -163,6 +163,7 @@ class CampaignServiceProvider extends ServiceProvider
             AggregateCampaignStats::class,
             CampaignsRefreshCache::class,
             PostInstallCommand::class,
+            CampaignEventsPopulatorCommand::class,
         ]);
     }
 
