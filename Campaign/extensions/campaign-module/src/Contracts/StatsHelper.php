@@ -6,6 +6,8 @@ use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;
 use Remp\CampaignModule\CampaignBannerPurchaseStats;
 use Remp\CampaignModule\CampaignBannerStats;
+use Remp\CampaignModule\Models\Interval\Interval;
+use Remp\CampaignModule\Models\Interval\IntervalModeEnum;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -215,5 +217,28 @@ class StatsHelper
         }
 
         return $r->get();
+    }
+
+    /**
+     * Calculate Elasticsearch interval based on date range
+     */
+    public function calcInterval(Carbon $from, Carbon $to, IntervalModeEnum $intervalMode = IntervalModeEnum::Auto): Interval
+    {
+        if ($intervalMode !== IntervalModeEnum::Auto) {
+            return $intervalMode->toInterval();
+        }
+
+        // Automatic interval selection based on time range
+        $diff = $from->diffInSeconds($to);
+
+        return match (true) {
+            $diff > IntervalModeEnum::Year->minRangeSeconds() => IntervalModeEnum::Year->toInterval(),
+            $diff > IntervalModeEnum::Month->minRangeSeconds() => IntervalModeEnum::Month->toInterval(),
+            $diff > IntervalModeEnum::Week->minRangeSeconds() => IntervalModeEnum::Week->toInterval(),
+            $diff > IntervalModeEnum::Day->minRangeSeconds() => IntervalModeEnum::Day->toInterval(),
+            $diff > IntervalModeEnum::Hour->minRangeSeconds() => IntervalModeEnum::Hour->toInterval(),
+            $diff >= IntervalModeEnum::Min15->minRangeSeconds() => IntervalModeEnum::Min15->toInterval(),
+            default => IntervalModeEnum::Min5->toInterval(),
+        };
     }
 }

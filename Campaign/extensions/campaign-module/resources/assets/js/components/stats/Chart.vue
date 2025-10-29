@@ -57,7 +57,6 @@
         props: props,
         watch: {
             chartData(newChartData) {
-
                 let labels = newChartData.labels;
                 let dataSets = newChartData.dataSets;
 
@@ -86,23 +85,24 @@
                     }
                 }
 
-                this.setChartData(dataSets, labels, newChartData.timeUnit)
+                this.setChartData(dataSets, labels, newChartData.timeUnit, newChartData.stepSize)
             }
         },
         mounted() {
             if (this.chartData.hasOwnProperty("dataSets")) {
-                this.setChartData(this.chartData.dataSets, this.chartData.labels, this.chartData.timeUnit)
+                this.setChartData(this.chartData.dataSets, this.chartData.labels, this.chartData.timeUnit, this.chartData.stepSize)
             }
         },
         methods: {
-            setChartData(dataSets, labels, timeUnit) {
+            setChartData(dataSets, labels, timeUnit, stepSize) {
                 if (this.chart != null) {
                     this.chart.config.data = {
                         labels: labels,
                         datasets: dataSets,
                         timeUnit: timeUnit,
                     };
-                    this.chart.config.options.scales.xAxes[0].time.unit = timeUnit;
+                    this.chart.config.options.scales.x.time.unit = timeUnit;
+                    this.chart.config.options.scales.x.time.stepSize = stepSize;
                     this.chart.update();
                     return;
                 }
@@ -136,6 +136,7 @@
                                 distribution: 'series',
                                 time: {
                                     unit: timeUnit,
+                                    stepSize: stepSize,
                                     displayFormats: {
                                         minute: 'HH:mm',
                                         hour: 'HH:mm',
@@ -143,6 +144,7 @@
                                     tooltipFormat: "LL",
                                 },
                                 ticks: {
+                                    source: 'labels',
                                     maxRotation: 0,
                                     minRotation: 0,
                                 },

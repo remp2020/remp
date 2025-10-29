@@ -3,14 +3,13 @@
 namespace Remp\CampaignModule\Http\Controllers;
 
 use Remp\CampaignModule\Campaign;
-use Remp\CampaignModule\CampaignBanner;
-use Remp\CampaignModule\CampaignBannerStats;
 use Remp\CampaignModule\Contracts\StatsContract;
 use Remp\CampaignModule\Contracts\StatsHelper;
+use Remp\CampaignModule\Models\Interval\IntervalModeEnum;
 use Remp\CampaignModule\Rules\ValidCarbonDate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Remp\MultiArmedBandit\Lever;
 use Remp\MultiArmedBandit\Machine;
 
@@ -46,9 +45,11 @@ class StatsController extends Controller
         $request->validate([
             'from' => ['sometimes', new ValidCarbonDate],
             'to' => ['sometimes', new ValidCarbonDate],
+            'interval_mode' => ['sometimes', Rule::enum(IntervalModeEnum::class)],
         ]);
 
         $tz = $request->input('tz');
+        $intervalMode = IntervalModeEnum::from($request->input('interval_mode', 'auto'));
 
         $from = Carbon::parse($request->get('from'), $tz);
         $to = Carbon::parse($request->get('to'), $tz);
@@ -63,10 +64,10 @@ class StatsController extends Controller
         }
 
         [$campaignData, $variantsData] = $this->statsHelper->cachedCampaignAndVariantsStats($campaign, $from, $to);
-        $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $tz);
+        $campaignData['histogram'] = $this->getHistogramData($campaign->variants_uuids, $from, $to, $tz, $intervalMode);
 
         foreach ($variantsData as $uuid => $variantData) {
-            $variantsData[$uuid]['histogram'] = $this->getHistogramData([$uuid], $from, $to, $tz);
+            $variantsData[$uuid]['histogram'] = $this->getHistogramData([$uuid], $from, $to, $tz, $intervalMode);
         }
 
         // a/b test evaluation data
@@ -84,19 +85,19 @@ class StatsController extends Controller
         ];
     }
 
-    private function getHistogramData(array $variantUuids, Carbon $from, Carbon $to, string $tz)
+    private function getHistogramData(array $variantUuids, Carbon $from, Carbon $to, string $tz, IntervalModeEnum $intervalMode = IntervalModeEnum::Auto)
     {
         $parsedData = [];
         $labels = [];
 
-        [$interval, $chartJsTimeUnit] = $this->calcInterval($from, $to);
+        $intervalConfig = $this->statsHelper->calcInterval($from, $to, $intervalMode);
 
         foreach ($this->statTypes as $type => $typeData) {
             $parsedData[$type] = [];
 
             $data = $this->stats->count()
                 ->forVariants($variantUuids)
-                ->timeHistogram($interval, $tz)
+                ->timeHistogram($intervalConfig->interval, $tz)
                 ->from($from)
                 ->to($to);
 
@@ -128,7 +129,8 @@ class StatsController extends Controller
         return [
             'dataSets' => $dataSets,
             'labels' => $formattedLabels,
-            'timeUnit' => $chartJsTimeUnit
+            'timeUnit' => $intervalConfig->timeUnit,
+            'stepSize' => $intervalConfig->stepSize
         ];
     }
 
@@ -176,24 +178,5 @@ class StatsController extends Controller
             $dataSets,
             $labels,
         ];
-    }
-
-    private function calcInterval(Carbon $from, Carbon $to): array
-    {
-        $diff = $from->diffInSeconds($to);
-
-        if ($diff > 31*24*3600) {
-            return ['168h', 'week'];
-        }
-        if ($diff > 4*24*3600) {
-            return ['24h', 'day'];
-        }
-        if ($diff > 6*3600) {
-            return ['3600s', 'hour'];
-        }
-        if ($diff > 1800) {
-            return ['900s', 'minute'];
-        }
-        return ['300s', 'minute'];
     }
 }

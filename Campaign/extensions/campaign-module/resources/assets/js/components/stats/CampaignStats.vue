@@ -2,6 +2,21 @@
     <div class="well">
         <div class="row">
             <div class="col-md-10">
+                <div class="interval-mode-selector">
+                    <label>Interval:</label>
+                    <div class="btn-group btn-group-sm">
+                        <button
+                            v-for="mode in intervalModes"
+                            :key="mode.value"
+                            type="button"
+                            class="btn"
+                            :class="intervalMode === mode.value ? 'btn-info' : 'btn-default'"
+                            @click="setIntervalMode(mode.value)"
+                        >
+                            {{ mode.label }}
+                        </button>
+                    </div>
+                </div>
                 <chart
                     :name="'campaign-stats-chart'"
                     :title="name"
@@ -103,6 +118,10 @@
                 type: String,
                 required: true,
                 default: ""
+            },
+            intervalMode: {
+                type: String,
+                required: true
             }
         },
         data() {
@@ -114,13 +133,29 @@
                 histogramData: {},
                 ctr: 0,
                 conversions: 0,
+                intervalModes: [
+                    { value: 'auto', label: 'Auto' },
+                    { value: 'year', label: 'Year' },
+                    { value: 'month', label: 'Month' },
+                    { value: 'week', label: 'Week' },
+                    { value: 'day', label: 'Day' },
+                    { value: 'hour', label: 'Hour' },
+                    { value: '15min', label: '15min' },
+                    { value: '5min', label: '5min' },
+                ],
+            }
+        },
+        methods: {
+            setIntervalMode(mode) {
+                this.$emit('interval-mode-changed', mode);
             }
         },
         watch: {
-            data(data) {
-                this.clickCount = data.click_count;
-                this.startedPayments = data.payment_count;
-                this.finishedPayments = data.purchase_count;
+            data: {
+                handler(data) {
+                    this.clickCount = data.click_count;
+                    this.startedPayments = data.payment_count;
+                    this.finishedPayments = data.purchase_count;
 
                 let values = [];
                 for (const currency of Object.keys(data.purchase_sums)) {
@@ -135,7 +170,28 @@
                 this.histogramData = data.histogram;
                 this.ctr = data.ctr;
                 this.conversions = data.conversions;
+                },
+                deep: true,
+                immediate: false
             }
         }
     }
 </script>
+
+<style scoped>
+    .interval-mode-selector {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .interval-mode-selector label {
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .btn-group .btn {
+        cursor: pointer;
+    }
+</style>

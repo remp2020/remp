@@ -8,6 +8,8 @@
                 :data="campaignData"
                 :error="error"
                 :loading="loading"
+                :interval-mode="intervalMode"
+                @interval-mode-changed="onIntervalModeChanged"
             ></campaign-stats>
 
             <campaign-stats-results
@@ -108,7 +110,8 @@
                 variantsData: {},
                 loading: true,
                 loaded: false,
-                error: ""
+                error: "",
+                intervalMode: "auto"
             }
         },
         mounted() {
@@ -139,6 +142,10 @@
                     resolve();
                 });
             },
+            onIntervalModeChanged(mode) {
+                this.intervalMode = mode;
+                this.loadData();
+            },
             loadData() {
                 let vm = this;
                 vm.error = "";
@@ -151,6 +158,7 @@
                         from: vm.from,
                         to: vm.to,
                         tz: vm.timezone,
+                        interval_mode: vm.intervalMode,
                         _token: document.head.querySelector("[name=csrf-token]").content
                     },
                     dataType: 'JSON',

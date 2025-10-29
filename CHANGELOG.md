@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed broken use of snippets within snippets, introduced in `4.2.0`. remp/remp#1441
 - Added support for use of snippets in JS includes. remp/remp#1441
 - Fixed possible routing conflict between web and API routes. remp/remp#1447
+- Added configurable time intervals for campaign statistics graphs with auto-selection based on date range. remp/remp#1440
+  - Supports year, month, week, day, hour, 15min, and 5min intervals.
 
 ### [Mailer]
 
