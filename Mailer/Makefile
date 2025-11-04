@@ -26,6 +26,9 @@ js-watch:
 	yarn install
 	yarn watch
 
+vitest:
+	yarn test
+
 sniff:
 	php vendor/bin/phpcs --standard=.phpcs_ruleset.xml ${PHP_FOLDERS} -n -p
 

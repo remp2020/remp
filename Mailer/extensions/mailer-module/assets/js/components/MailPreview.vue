@@ -5,17 +5,42 @@
 <script>
     export default {
         name: 'mail-preview',
+        props: {
+            htmlContent: {
+                type: String,
+                required: true
+            },
+            htmlLayout: {
+                type: String,
+                default: null
+            },
+            textLayout: {
+                type: String,
+                default: null
+            }
+        },
         data() {
             return {
                 iframe: null,
+            }
+        },
+        watch: {
+            htmlContent() {
+                this.rerenderIframe();
+            },
+            htmlLayout() {
+                this.rerenderIframe();
+            },
+            textLayout() {
+                this.rerenderIframe();
             }
         },
         methods: {
             rerenderIframe: function (textLayout = false) {
                 this.showHtmlPreview = !textLayout;
                 let finalContent = "";
-                let layout = textLayout ? this.$parent.textLayout : this.$parent.htmlLayout;
-                let content = this.$parent.htmlContent.replace(new RegExp('\{%.*?%\}', 'g'), '').replace("{{ content|raw }}", '');
+                let layout = textLayout ? this.textLayout : this.htmlLayout;
+                let content = this.htmlContent.replace(new RegExp('\{%.*?%\}', 'g'), '').replace("{{ content|raw }}", '');
 
                 if (!layout) {
                     finalContent += content;

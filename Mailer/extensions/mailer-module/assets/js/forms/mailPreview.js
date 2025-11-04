@@ -101,7 +101,15 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                         "textLayout": getLayoutTemplate().layout_text,
                     }
                 },
-                render: h => h(MailPreview),
+                render: function(h) {
+                    return h(MailPreview, {
+                        props: {
+                            htmlContent: this.htmlContent,
+                            htmlLayout: this.htmlLayout,
+                            textLayout: this.textLayout
+                        }
+                    });
+                },
             });
             mailLayoutSelect.addEventListener('change', function(e) {
                 vue.htmlLayout = getLayoutTemplate().layout_html;

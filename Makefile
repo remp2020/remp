@@ -39,6 +39,9 @@ phpunit:
 	cd $(SUB_BEAM) && vendor/bin/phpunit
 	cd $(SUB_CAMPAIGN) && vendor/bin/phpunit
 
+vitest:
+	cd $(SUB_MAILER) && make vitest
+
 copy-env:
 	cd $(SUB_BEAM) && cp .env.example .env
 	cd $(SUB_CAMPAIGN) && cp .env.example .env
