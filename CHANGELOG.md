@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed tracking of `first_email_sent_at` when batch actually starts sending emails.
 - Added handler notifying finished batches to Slack.
 - Fixed possibly duplicated emission of `batch-status-change` by parallel hermes workers.
+- Updated Vue to v3. remp/remp#1449
 
 ## Archive
 

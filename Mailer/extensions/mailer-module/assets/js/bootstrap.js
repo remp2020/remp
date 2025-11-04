@@ -1,6 +1,6 @@
 const global = require('global');
 
-import Vue from 'vue';
+import * as Vue from 'vue';
 global.Vue = Vue;
 
 global.$ = global.jQuery = require('jquery');

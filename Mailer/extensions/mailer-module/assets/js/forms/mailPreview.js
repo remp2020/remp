@@ -1,3 +1,4 @@
+import { createApp, h } from 'vue';
 import MailPreview from '../components/MailPreview.vue';
 import icons from "trumbowyg/dist/ui/icons.svg";
 import "trumbowyg/dist/ui/trumbowyg.css";
@@ -89,35 +90,35 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
         editorChoice: () => {
             return $('.js-editor-choice:checked').val();
         },
-        previewInit: (element, mailLayoutSelect, layoutsHtmlTemplates, initialContent) => {
+        previewInit: (element, mailLayoutSelect, layoutsHtmlTemplates, initialHtmlContent, initialTextContent) => {
             const getLayoutValue = () => mailLayoutSelect[mailLayoutSelect.selectedIndex].value;
             const getLayoutTemplate = () => layoutsHtmlTemplates[getLayoutValue()];
-            const vue = new Vue({
-                el: element,
-                data: function() {
+            const app = createApp({
+                data() {
                     return {
-                        "htmlContent": initialContent,
-                        "htmlLayout": getLayoutTemplate().layout_html,
-                        "textLayout": getLayoutTemplate().layout_text,
+                        htmlContent: initialHtmlContent,
+                        textContent: initialTextContent,
+                        htmlLayout: getLayoutTemplate().layout_html,
+                        textLayout: getLayoutTemplate().layout_text,
                     }
                 },
-                render: function(h) {
+                render() {
                     return h(MailPreview, {
-                        props: {
-                            htmlContent: this.htmlContent,
-                            htmlLayout: this.htmlLayout,
-                            textLayout: this.textLayout
-                        }
+                        htmlContent: this.htmlContent,
+                        textContent: this.textContent,
+                        htmlLayout: this.htmlLayout,
+                        textLayout: this.textLayout
                     });
                 },
             });
+            const vm = app.mount(element);
             mailLayoutSelect.addEventListener('change', function(e) {
-                vue.htmlLayout = getLayoutTemplate().layout_html;
-                vue.textLayout = getLayoutTemplate().layout_text;
+                vm.htmlLayout = getLayoutTemplate().layout_html;
+                vm.textLayout = getLayoutTemplate().layout_text;
                 $('body').trigger('preview:change');
             });
 
-            return vue;
+            return vm;
         },
         showTrumbowyg: (codeMirror, trumbowyg) => {
             trumbowyg.data('trumbowyg').$box.show();
@@ -162,6 +163,7 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
                 $('[name="mail_layout_id"]')[0],
                 $('.js-mail-layouts-templates').data('mail-layouts'),
                 $('.js-mail-body-html-input').val(),
+                $('.js-mail-body-text-input').val(),
             );
 
             remplib.templateForm.displayedMailContent = $(remplib.templateForm.textareaSelector).val();
@@ -238,7 +240,7 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
         },
         syncTextareaWithPreview: (vue, textarea) => {
             const syncWithPreview = () => {
-                vue.htmlContent = textarea.val();
+                vue.textContent = textarea.val();
                 $('body').trigger('preview:change', { textarea: true });
             }
 
