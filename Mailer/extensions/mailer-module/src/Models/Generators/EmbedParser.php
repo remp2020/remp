@@ -92,7 +92,7 @@ class EmbedParser
         $html .= "<a href='{$link}' target='_blank' style='color:#181818;padding:0;margin:0;line-height:1.3;text-decoration:none;text-align: center; display: block;'>";
 
         if (!is_null($image) && !is_null($title)) {
-            $html .= "<img src='{$image}' alt='{$title}' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:inline;'>";
+            $html .= "<img src='{$image}' alt='{$title}' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:inline;' width='660'>";
         } else {
             $html .= "<span style='text-decoration: underline; color: #1F3F83;'>" . $link . "</span>";
         }
