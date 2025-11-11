@@ -87,7 +87,7 @@ export default {
                 if (textLayout) {
                     this.iframe.style.height = (frameHeight) + 'px';
                 } else {
-                    this.iframe.style.height = (frameHeight + 150) + 'px';
+                    this.iframe.style.height = (frameHeight + 100) + 'px';
                 }
             });
         }
