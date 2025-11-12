@@ -9,6 +9,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - **BREAKING**: Dropped `remplib.js` support for IE11 to make built JS library smaller.
+- **BREAKING**: Removed tracking of events that depend on browser `unload` event. remp/remp#1104
+  - This event has proven unreliable, because of existence of `bfcache` and possibility that even after sending unload event we keep actively tracking user.
+- **BREAKING**: Removed tracking of `websockets` and `cookies` support for users. remp/remp#1104
+  - Both are now widely supported by browsers and tracking them is unnecessary, as they consume disk space/bandwidth without benefit.
 - Fixed unnecessary inclusion of JS library to make built JS library smaller.
 
 ### [Campaign]

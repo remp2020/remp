@@ -37,10 +37,6 @@ class Tracker {
 
     timeSpentInterval = 5; // seconds
 
-    cookiesEnabled = null;
-
-    websocketsSupported = null;
-
     totalTimeSpent = 0;
 
     timeSpentActive = false;
@@ -125,10 +121,6 @@ class Tracker {
 
         this.parseUriParams();
 
-        this.checkCookiesEnabled();
-
-        this.checkWebsocketsSupport();
-
         // deprecated, kept for legacy implementations
         if (typeof config.tracker.timeSpentEnabled === 'boolean') {
             this.timeSpentEnabled = config.tracker.timeSpentEnabled;
@@ -168,8 +160,10 @@ class Tracker {
                 window.addEventListener("scroll", this.throttledScrollProgressEvent);
                 window.addEventListener("resize", this.throttledScrollProgressEvent);
                 window.addEventListener("scroll_progress", this.trackProgress);
-                window.addEventListener("beforeunload", function() {
-                    remplib.tracker.sendTrackedProgress(true)
+                window.addEventListener("visibilitychange", () => {
+                    if (document.visibilityState === "hidden") {
+                        remplib.tracker.sendTrackedProgress(true);
+                    }
                 });
             }
         }
@@ -450,22 +444,18 @@ class Tracker {
         this.dispatchEvent(params, "pageview", "load");
     }
 
-    trackTimespent(closed = false) {
-        // PRE ES2015 safeguard
-        closed = (typeof closed === 'boolean') ? closed : false;
-
+    trackTimespent(useBeacon = false) {
         let params = {
             "article": this.article,
             "action": "timespent",
             "timespent": {
                 "seconds": this.totalTimeSpent,
-                "unload": closed,
             }
         };
         params = this.addSystemUserParams(params);
         params = this.timespentParamsCleanup(params);
 
-        this.post(this.url + "/track/pageview", params);
+        this.post(this.url + "/track/pageview", params, useBeacon);
         this.dispatchEvent(params, "pageview", "timespent");
     }
 
@@ -662,31 +652,31 @@ class Tracker {
         dispatchBeamEvent(params, category, action);
     }
 
-    post(path, params) {
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("POST", path);
-        xmlhttp.onreadystatechange = function(oEvent) {
-            if (xmlhttp.readyState !== 4) {
-                return;
+    async post(url, params, useBeacon = false) {
+        if (useBeacon) { {
+            const blob = new Blob([JSON.stringify(params)], { type: 'application/json' });
+            const success = navigator.sendBeacon(url, blob);
+
+            if (!success) {
+                console.warn("remplib: sendBeacon failed, request may not have been queued");
             }
-            if (xmlhttp.status >= 400) {
-                console.error("remplib", JSON.parse(xmlhttp.responseText));
-            }
-        };
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        xmlhttp.send(JSON.stringify(params));
+
+            return;
+        }}
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(params)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Unable to send request to Tracker: HTTP error, status: ${response.status} ${response.statusText}`);
+        }
     }
 
-    checkCookiesEnabled() {
-        document.cookie = "cookietest=1; SameSite=Lax";
-        remplib.tracker.cookiesEnabled = document.cookie.indexOf("cookietest=") != -1;
-
-        document.cookie = "cookietest=1; SameSite=Lax; expires=Thu, 01-Jan-1970 00:00:01 GMT";
-    }
-
-    checkWebsocketsSupport() {
-        remplib.tracker.websocketsSupported = 'WebSocket' in window || false;
-    }
     addSystemUserParams(params, includeStorageParams = false) {
         const d = new Date();
         params["system"] = {"property_token": this.beamToken, "time": d.toISOString()};
@@ -734,8 +724,6 @@ class Tracker {
             "adblock": remplib.usingAdblock,
             "window_height": window.outerHeight || document.documentElement.clientHeight,
             "window_width": window.outerWidth || document.documentElement.clientWidth,
-            "cookies": remplib.tracker.cookiesEnabled,
-            "websockets": remplib.tracker.websocketsSupported,
             "source": source
         };
         params["user"][remplib.rempSessionIDKey] = remplib.getRempSessionID();
@@ -864,38 +852,17 @@ class Tracker {
         });
 
         this.bindPageVisibilityEvents();
-
-        // send data when leaving page
-        window.addEventListener("beforeunload", function() {
-            remplib.tracker.trackTimespent(true);
-        });
     }
 
     bindPageVisibilityEvents() {
-        // Switch to visibilityState after we decide to drop IE10- support
-        // - https://caniuse.com/#search=visibilityState
-
-        // Source: https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API
-        // Set the name of the hidden property and the change event for visibility
-        let hidden, visibilityChange;
-        if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
-            hidden = "hidden";
-            visibilityChange = "visibilitychange";
-        } else if (typeof document.msHidden !== "undefined") {
-            hidden = "msHidden";
-            visibilityChange = "msvisibilitychange";
-        } else if (typeof document.webkitHidden !== "undefined") {
-            hidden = "webkitHidden";
-            visibilityChange = "webkitvisibilitychange";
-        }
-
-        document.addEventListener(visibilityChange, function() {
-            if (document[hidden]) {
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden") {
                 remplib.tracker.tickStop();
+                remplib.tracker.trackTimespent(true);
             } else {
                 remplib.tracker.tickStart();
             }
-        }, false);
+        });
     }
 
     scheduledSend() {
@@ -968,9 +935,8 @@ class Tracker {
         remplib.tracker.trackedProgress.push(currentEvent);
     }
 
-    sendTrackedProgress(isUnloading = false) {
+    sendTrackedProgress(useBeacon = false) {
         const lastPosition = remplib.tracker.trackedProgress[remplib.tracker.trackedProgress.length - 1];
-
         if (!lastPosition) {
             return;
         }
@@ -979,8 +945,7 @@ class Tracker {
             "action": "progress",
             "article": remplib.tracker.article,
             "progress": {
-                "page_ratio": lastPosition.detail.pageScrollRatio,
-                "unload": isUnloading
+                "page_ratio": lastPosition.detail.pageScrollRatio
             }
         };
 
@@ -989,7 +954,7 @@ class Tracker {
         }
 
         params = this.addSystemUserParams(params);
-        remplib.tracker.post(this.url + "/track/pageview", params);
+        remplib.tracker.post(this.url + "/track/pageview", params, useBeacon);
         remplib.tracker.trackedProgress = [];
     }
 }
