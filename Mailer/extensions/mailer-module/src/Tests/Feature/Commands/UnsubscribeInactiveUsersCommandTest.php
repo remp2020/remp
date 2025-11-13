@@ -9,7 +9,6 @@ use Remp\MailerModule\Commands\UnsubscribeInactiveUsersCommand;
 use Remp\MailerModule\Models\RedisClientFactory;
 use Remp\MailerModule\Models\RedisClientTrait;
 use Remp\MailerModule\Models\Segment\Aggregator;
-use Remp\MailerModule\Models\Segment\ISegment;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Tests\Feature\BaseFeatureTestCase;
@@ -19,7 +18,7 @@ class UnsubscribeInactiveUsersCommandTest extends BaseFeatureTestCase
 {
     use RedisClientTrait;
 
-    protected ISegment $testSegmentProvider;
+    protected TestSegmentProvider $testSegmentProvider;
 
     protected Aggregator $segmentAggregator;
 
