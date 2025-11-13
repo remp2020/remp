@@ -2,7 +2,7 @@
 
 namespace Remp\BeamModule\Tests\Unit;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Remp\BeamModule\Model\ArticleViewsSnapshot;
 use Remp\BeamModule\Model\Snapshots\SnapshotHelpers;
@@ -10,7 +10,7 @@ use Remp\BeamModule\Tests\TestCase;
 
 class SnapshotHelperTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     /** @var SnapshotHelpers */
     private $snapshotHelpers;
