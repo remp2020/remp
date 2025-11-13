@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\CrmApi;
 use App\GorseApi;
 use Carbon\Carbon;
 use Remp\BeamModule\Console\Command;
@@ -17,7 +18,7 @@ class UploadPageviewsToGorse extends Command
 
     protected $description = 'Upload pageviews to Gorse Recommendation Engine';
 
-    public function handle(JournalContract $journalContract, GorseApi $gorseApi)
+    public function handle(JournalContract $journalContract, GorseApi $gorseApi, CrmApi $crmApi)
     {
         $now = $this->option('now') ? \Illuminate\Support\Carbon::parse($this->option('now')) : Carbon::now();
 
@@ -39,13 +40,24 @@ class UploadPageviewsToGorse extends Command
             return isset($event->article);
         });
 
+        $uniqueUserIds = $filtered->map(function ($source) {
+            return $source->user->id ?? null;
+        })->filter()->unique()->values()->all();
+
+        $userIdToUuidMap = $this->getUserIdToUuidMapping($crmApi, $uniqueUserIds);
+
         $feedback = [];
         foreach ($filtered as $source) {
+            // if there is no mapping to uuid, use browser_id as user_id
+            $userId = isset($source->user->id)
+                ? ($userIdToUuidMap[$source->user->id] ?? $source->user->browser_id)
+                : $source->user->browser_id;
+
             $feedback[] = [
                 'FeedbackType' => 'read',
                 'ItemId' => $source->article->id,
                 'Timestamp' => $source->system->time,
-                'UserId' => $source->user->id ?? $source->user->browser_id,
+                'UserId' => $userId,
             ];
 
             if (isset($source->user->timespent) && $source->user->timespent >= self::ARTICLE_TIMESPENT_THRESHOLD) {
@@ -53,7 +65,7 @@ class UploadPageviewsToGorse extends Command
                     'FeedbackType' => 'timespent',
                     'ItemId' => $source->article->id,
                     'Timestamp' => $source->system->time,
-                    'UserId' => $source->user->id ?? $source->user->browser_id,
+                    'UserId' => $userId,
                 ];
             }
         }
@@ -62,5 +74,25 @@ class UploadPageviewsToGorse extends Command
 
         $this->output->writeln('DONE.');
         $this->output->writeln('RowAffected: ' . $gorseResponse->RowAffected);
+    }
+
+    private function getUserIdToUuidMapping(CrmApi $crmApi, array $userIds): array
+    {
+        if (empty($userIds)) {
+            return [];
+        }
+
+        $mapping = [];
+        $page = 1;
+
+        do {
+            $response = $crmApi->getUsersList($userIds, $page);
+
+            foreach ($response->users ?? [] as $user) {
+                $mapping[$user->id] = $user->uuid;
+            }
+        } while (($response->totalPages ?? 0) > $page++);
+
+        return $mapping;
     }
 }

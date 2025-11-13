@@ -41,4 +41,9 @@ return [
         'api_key' => env('GORSE_RECOMMENDATION_API_KEY'),
         'url_filter' => env('GORSE_RECOMMENDATION_URL_FILER'),
     ],
+
+    'crm' => [
+        'addr' => env('CRM_ADDR'),
+        'api_key' => env('CRM_API_KEY'),
+    ],
 ];
