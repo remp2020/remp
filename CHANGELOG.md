@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed possible routing conflict between web and API routes. remp/remp#1447
 - Added configurable time intervals for campaign statistics graphs with auto-selection based on date range. remp/remp#1440
   - Supports year, month, week, day, hour, 15min, and 5min intervals.
+- Changed `target_url` length in `banners` table to 768 characters. remp/helpdesk#4131
 
 ### [Mailer]
 
