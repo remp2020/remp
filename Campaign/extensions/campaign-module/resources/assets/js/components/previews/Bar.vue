@@ -135,7 +135,8 @@
   <div class="bar-wrap"
        role="alert"
        v-bind:style="[linkStyles, _position, boxStyles]"
-       v-if="isVisible">
+       v-if="isVisible"
+       :class="safeAreaInsetClass">
     <div class="bar-header sans-serif"
          v-if="closeable"
          v-bind:class="{'bar-close-text-filled-bar': closeText}">
@@ -287,6 +288,21 @@ export default {
         isVisible: function () {
             return this.show && this.visible;
         },
+        safeAreaInsetClass: function () {
+            if (this.displayType !== 'overlay') {
+                return "";
+            }
+
+            if (this.position === "top_right" || this.position === "top_left") {
+                return "banner-safe-area-inset-top";
+            }
+
+            if (this.position === "bottom_right" || this.position === "bottom_left") {
+                return "banner-safe-area-inset-bottom";
+            }
+
+            return "";
+        }
     },
     methods: {
         click: function () {

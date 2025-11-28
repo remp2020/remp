@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added configurable time intervals for campaign statistics graphs with auto-selection based on date range. remp/remp#1440
   - Supports year, month, week, day, hour, 15min, and 5min intervals.
 - Changed `target_url` length in `banners` table to 768 characters. remp/helpdesk#4131
+- Added device safe area top and bottom inset for Bar and CollapsibleBar banners. remp/remp#1432
 
 ### [Mailer]
 

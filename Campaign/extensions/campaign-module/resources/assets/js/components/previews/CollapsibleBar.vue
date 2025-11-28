@@ -6,6 +6,7 @@
     left: 0;
     width: 100%;
     overflow: hidden;
+    background-color: #fff;
 }
 
 #banner-preview .collapsible-bar-wrap {
@@ -127,7 +128,8 @@
 <template>
     <div class="collapsible-bar-wrap"
          role="alert"
-         v-bind:style="[containerStyles]">
+         v-bind:style="[containerStyles]"
+         :class="safeAreaInsetClass">
         <div class="collapsible-bar-header sans-serif">
             <span class="collapsible-bar-title">
                 {{ headerText }}
@@ -269,6 +271,12 @@ export default {
                 position: position,
                 zIndex: zIndex,
             }
+        },
+        safeAreaInsetClass: function () {
+            if (this.displayType !== 'overlay') {
+                return "";
+            }
+            return "banner-safe-area-inset-bottom";
         }
     },
     methods: {
