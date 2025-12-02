@@ -8365,10 +8365,10 @@ fsevents@~2.3.2:
 
 "remp-beam@file:extensions/beam-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 1.0.0
-  resolution: "remp-beam@file:extensions/beam-module#extensions/beam-module::hash=97dae9&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "remp-beam@file:extensions/beam-module#extensions/beam-module::hash=3cc132&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/core": ^7.0
-    "@remp/js-commons": ^1.3
+    "@remp/js-commons": ^2.3.1
     "@tweenjs/tween.js": ^17.4.0
     animate.css: ^3.7.2
     autosize: ^4.0.2
@@ -8405,7 +8405,7 @@ fsevents@~2.3.2:
     vue2-filters: ^0.6.0
     vuex: ^3.1.0
     vuex-persistedstate: ^2.5.4
-  checksum: 4d9c03da1fb5c01bd308ad04739f3cbf96ef63bedf8349b7b05be42f81255552f0115a64491c6b8c155b78d23b0a9450b70c987a7b14cc7f3169f4feba17b780
+  checksum: 3c40ffa34f374659dae343b88d88f5fd2593ca382a09e194cb83c1ac17deb70f9f55b6d75962fe3c849db6dcfa446e0db8b88112d5111c2f16b1d3fe91798a77
   languageName: node
   linkType: hard
 

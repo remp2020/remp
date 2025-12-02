@@ -1,6 +1,6 @@
 import Remplib from '@remp/js-commons/js/remplib'
 import Hash from 'fnv1a'
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import Impressions from "./impressions";
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;

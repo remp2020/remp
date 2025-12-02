@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- **BREAKING**: Dropped `remplib.js` support for IE11 to make built JS library smaller.
+- Fixed unnecessary inclusion of JS library to make built JS library smaller.
+
 ### [Campaign]
 
 - Added `campaign:seed-events` command for generating realistic banner tracking events for testing. remp/remp#1440

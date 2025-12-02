@@ -40,7 +40,7 @@ if (process.env.REMP_TARGET === 'iota') {
         .polyfill({
             enabled: true,
             useBuiltIns: "usage",
-            targets: {"ie": 11},
+            targets: false,
             debug: false,
         });
 
