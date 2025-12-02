@@ -250,8 +250,7 @@
         }
 
         // bind smart range selector
-        new Vue({
-            el: "#smart-range-selector",
+        const srsVueApp = Vue.createApp({
             components: {
                 'smart-range-selector': SmartRangeSelector
             },
@@ -264,6 +263,7 @@
                 }
             }
         });
+        srsVueApp.mount("#smart-range-selector");
 
         // bind group by
         $('.group-by-trigger').on('click', function () {
