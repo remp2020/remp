@@ -12,6 +12,8 @@ use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Models\PageMeta\Meta;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 class NovydenikContent implements ContentInterface
 {
@@ -40,7 +42,8 @@ class NovydenikContent implements ContentInterface
                 return null;
             }
         } catch (RequestException $e) {
-            throw new InvalidUrlException("Invalid URL: {$url}", 0, $e);
+            Debugger::log("Invalid URL: {$url}", ILogger::EXCEPTION);
+            return null;
         }
         return $meta;
     }

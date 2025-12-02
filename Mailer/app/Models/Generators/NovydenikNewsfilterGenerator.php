@@ -81,7 +81,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
             '/\[articlelink.*?id="?(\d+)"?.*?\]/is' => function ($matches) {
                 $url = "https://denikn.cz/{$matches[1]}";
                 $meta = $this->content->fetchUrlMeta($url);
-                return '<a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>';
+                return $meta ? '<a href="' . $url . '" style="padding:0;margin:0;line-height:1.3;color:#F26755;text-decoration:none;">' . $meta->getTitle() . '</a>' : '';
             },
             '/<a\s[^>]*href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="padding:0;margin:0;line-height:1.3;color:#b00c28;text-decoration:none;">$2</a>',
             '/<p.*?>(.*?)<\/p>/is' => "<p style=\"font-weight: normal;\">$1</p>",
