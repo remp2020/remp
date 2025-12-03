@@ -3,9 +3,19 @@ import * as Sentry from "@sentry/browser";
 // Initialize Sentry for error logging.
 Sentry.init({
     dsn: "https://8585a814422708fc1ac4207161ef7889@sentry.bonet.sk/26",
-    debug: true,
     release: "remplib@1.0.0",
-    tracesSampleRate: 1.0,
+    tracesSampleRate: 0.1,
+
+    // Disable all automatic error capturing
+    defaultIntegrations: false,
+    integrations: [],
+
+    // Turn off global handlers
+    autoSessionTracking: false,
+    sendDefaultPii: false,
+
+    // IMPORTANT: these stop Sentry from catching window.onerror and unhandled promises
+    attachStacktrace: false,
 });
 
 import Remplib from '@remp/js-commons/js/remplib'
