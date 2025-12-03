@@ -1,4 +1,5 @@
 import {dispatchBeamEvent} from "./remplib";
+
 export default function(config) {
     const typeIdSeparator = "_=_=_=_"; // something that should not be present in BEAM element ID or type
     const observed  = [];
@@ -129,7 +130,7 @@ export default function(config) {
             {
                 root: null, // null means the viewport
                 rootMargin: "0px",
-                threshold: 0.5, // Trigger when 50% of the element is visible
+                threshold: observerData.config.visibilityThreshold ?? 0.5, // Trigger when 50% of the element is visible
             }
         );
     }

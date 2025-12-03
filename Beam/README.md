@@ -397,6 +397,7 @@ var rempConfig = {
           itemsQuerySelector: ".article",
           containerQuerySelector: "#articles-feed",
           itemElementIdFn: el => el.id,
+          visibilityThreshold: 0.5, // optional
         },
       ]
     }

@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Removed tracking of `websockets` and `cookies` support for users. remp/remp#1104
   - Both are now widely supported by browsers and tracking them is unnecessary, as they consume disk space/bandwidth without benefit.
 - Fixed unnecessary inclusion of JS library to make built JS library smaller.
+- Added configurable intersection observer threshold in impressions tracking. remp/web#2934
 
 ### [Campaign]
 
