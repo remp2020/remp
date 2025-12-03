@@ -1,3 +1,13 @@
+import * as Sentry from "@sentry/browser";
+
+// Initialize Sentry for error logging.
+Sentry.init({
+    dsn: "https://8585a814422708fc1ac4207161ef7889@sentry.bonet.sk/26",
+    debug: true,
+    release: "remplib@1.0.0",
+    tracesSampleRate: 1.0,
+});
+
 import Remplib from '@remp/js-commons/js/remplib'
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;
@@ -323,6 +333,7 @@ class Campaign {
         try {
             campaigns = this.unminifyStoredData(remplib.getFromStorage(this.campaignsStorageKey)) || {};
         } catch (e) {
+            Sentry.captureException(e, { extra: { raw_data: remplib.getFromStorage(this.campaignsStorageKey)} });
             return campaigns;
         }
 
@@ -335,6 +346,7 @@ class Campaign {
                 campaigns = JSON.parse(campaigns)['values'];
             } catch (e) {
                 console.warn("REMPLIB:", "unexpected type of campaigns:", typeof campaigns, campaigns);
+                Sentry.captureException(e, { extra: { campaigns: campaigns } });
             }
         }
 
@@ -501,7 +513,14 @@ class Campaign {
     }
 
     getCampaignsSession() {
-        let campaignsSession = this.unminifyStoredData(remplib.getFromStorage(this.campaignsSessionStorageKey)) || {};
+        let campaignsSession = {};
+        try {
+            campaignsSession = this.unminifyStoredData(remplib.getFromStorage(this.campaignsSessionStorageKey)) || {};
+        } catch(e) {
+            console.error("remplib: could not get campaign session from storage", e);
+            Sentry.captureException(e, { extra: { raw_data: remplib.getFromStorage(this.campaignsSessionStorageKey) } });
+            return campaignsSession;
+        }
 
         // migrations on campaigns values
         for (let campaignId in campaignsSession) {
