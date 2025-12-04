@@ -25,7 +25,7 @@ clean:
 
 gen:
 	set -e
-	go install goa.design/goa/v3/cmd/goa@v3
+	go install goa.design/goa/v3/cmd/goa@$$(go list -m -f '{{.Version}}' goa.design/goa/v3)
 	goa gen $(DESIGN_PKG) --output .
 
 build-static: gen

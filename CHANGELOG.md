@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Both are now widely supported by browsers and tracking them is unnecessary, as they consume disk space/bandwidth without benefit.
 - Fixed unnecessary inclusion of JS library to make built JS library smaller.
 - Added configurable intersection observer threshold in impressions tracking. remp/web#2934
+- Fixed Go apps build process which could use different version of Goa for building than the one listed in the `go.mod` file. remp/remp#1104
 
 ### [Campaign]
 
