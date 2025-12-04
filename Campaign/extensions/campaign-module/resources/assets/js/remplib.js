@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/browser";
 Sentry.init({
     dsn: "https://8585a814422708fc1ac4207161ef7889@sentry.bonet.sk/26",
     release: "remplib@1.0.0",
-    tracesSampleRate: 0.1,
+    tracesSampleRate: 1,
 
     // Disable all automatic error capturing
     defaultIntegrations: false,
