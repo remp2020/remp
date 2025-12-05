@@ -199,10 +199,6 @@ func (c *TrackController) Pageview(ctx context.Context, p *track.Pageview2) (err
 			if c.TimespentLimit > 0 && p.Timespent.Seconds > c.TimespentLimit {
 				fields["timespent"] = c.TimespentLimit
 			}
-			fields["unload"] = false
-			if p.Timespent.Unload != nil && *p.Timespent.Unload {
-				fields["unload"] = true
-			}
 		}
 	case model.ActionPageviewProgress:
 		tags["action"] = model.ActionPageviewProgress
@@ -211,10 +207,6 @@ func (c *TrackController) Pageview(ctx context.Context, p *track.Pageview2) (err
 			fields["page_progress"] = p.Progress.PageRatio
 			if p.Progress.ArticleRatio != nil {
 				fields["article_progress"] = *p.Progress.ArticleRatio
-			}
-			fields["unload"] = false
-			if p.Progress.Unload != nil && *p.Progress.Unload {
-				fields["unload"] = true
 			}
 		}
 	default:
@@ -471,12 +463,6 @@ func (c *TrackController) payloadToTagsFields(system *track.System, user *track.
 		}
 		if user.WindowWidth != nil {
 			fields["window_width"] = *user.WindowWidth
-		}
-		if user.Cookies != nil {
-			fields["cookies"] = *user.Cookies
-		}
-		if user.Websockets != nil {
-			fields["websockets"] = *user.Websockets
 		}
 		if user.ID != nil {
 			tags["user_id"] = *user.ID

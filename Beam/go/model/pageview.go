@@ -60,7 +60,6 @@ type Pageview struct {
 	BrowserID       string    `json:"browser_id"`
 	SessionID       string    `json:"remp_session_id"`
 	Referer         string    `json:"referer"`
-	Cookies         bool      `json:"cookies"`
 	SignedIn        bool      `json:"signed_in"`
 	Subscriber      bool      `json:"subscriber"`
 	SubscriptionIDs []string  `json:"subscription_ids"`

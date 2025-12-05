@@ -18,8 +18,6 @@ var User = Type("User", func() {
 	Attribute("adblock", Boolean, "Flag whether user has adblock enabled")
 	Attribute("window_height", Int, "Height of the users browser window")
 	Attribute("window_width", Int, "Width of the users browser window")
-	Attribute("cookies", Boolean, "Flag whether user has cookies enabled")
-	Attribute("websockets", Boolean, "Flag whether user has websockets supported browser")
 	Attribute("user_agent", String, "User agent of client")
 	Attribute("ip_address", String, "IP address of client", func() {
 		Format("ip")
@@ -109,7 +107,6 @@ var TimeSpent = Type("TimeSpent", func() {
 	Description("Update time spent on page")
 
 	Attribute("seconds", Int, "Number of seconds from previous update of time spent on page")
-	Attribute("unload", Boolean, "Flag to indicate last update of time spent on page before unload event")
 
 	Required("seconds")
 })
@@ -125,7 +122,6 @@ var Progress = Type("Progress", func() {
 		Minimum(0)
 		Maximum(1)
 	})
-	Attribute("unload", Boolean, "Flag to indicate last update of progress on page before unload event")
 
 	Required("page_ratio")
 })
