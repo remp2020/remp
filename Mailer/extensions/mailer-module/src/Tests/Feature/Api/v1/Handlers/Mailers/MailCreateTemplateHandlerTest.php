@@ -13,6 +13,9 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
     /** @var MailCreateTemplateHandler */
     private $handler;
 
+    const ADMIN_MAIL_FROM = 'ADMIN <admin@example.com>';
+    const USER_MAIL_FROM = 'USER <user@example.com>';
+
     public function setUp(): void
     {
         parent::setUp();
@@ -122,12 +125,43 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals(0, $template->click_tracking);
     }
 
-    private function getDefaultParams($params)
+    public function testGetMailFromMailTypeMailFrom()
+    {
+        $params = $this->getDefaultParams([
+            'from' => null,
+        ], self::USER_MAIL_FROM);
+
+        /** @var JsonApiResponse $response */
+        $response =  $this->handler->handle($params);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertEquals(200, $response->getCode());
+
+        $template = $this->templatesRepository->findBy('code', $response->getPayload()['code']);
+        $this->assertEquals(self::USER_MAIL_FROM, $template->from);
+    }
+
+    public function testGetMailFromEmptyInputAndNotFilledMailTypeMailFrom()
+    {
+        $params = $this->getDefaultParams([
+            'from' => null,
+        ]);
+
+        /** @var JsonApiResponse $response */
+        $response = $this->handler->handle($params);
+        $this->assertInstanceOf(JsonApiResponse::class, $response);
+        $this->assertEquals(400, $response->getCode());
+
+        $responsePayload = $response->getPayload();
+        $this->assertEquals('from_parameter_not_resolvable', $responsePayload['code']);
+    }
+
+    private function getDefaultParams($params, string $mailTypeMailFrom = null)
     {
         $mailType = $this->createMailTypeWithCategory(
-            "category1",
-            "code1",
-            "name1"
+            categoryName: "category1",
+            typeCode: "code1",
+            typeName: "name1",
+            mailFrom: $mailTypeMailFrom,
         );
         $mailLayout = $this->createMailLayout();
 
@@ -137,10 +171,10 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
             'description' => 'test_description',
             'mail_layout_id' => $mailLayout->id,
             'mail_type_code' => $mailType->code,
-            'from' => 'ADMIN <admin@example.com>',
             'subject' => 'Test email subject',
             'template_text' => 'email content',
             'template_html' => '<strong>email content</strong>',
+            'from' => self::ADMIN_MAIL_FROM,
         ], $params);
     }
 }

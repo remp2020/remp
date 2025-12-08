@@ -44,7 +44,7 @@ class MailCreateTemplateHandler extends BaseHandler
             (new PostInputParam('mail_layout_id')),
             (new PostInputParam('mail_layout_code')),
             (new PostInputParam('mail_type_code'))->setRequired(),
-            (new PostInputParam('from'))->setRequired(),
+            (new PostInputParam('from')),
             (new PostInputParam('subject'))->setRequired(),
             (new PostInputParam('template_text'))->setRequired(),
             (new PostInputParam('template_html'))->setRequired(),
@@ -112,11 +112,26 @@ class MailCreateTemplateHandler extends BaseHandler
             ]);
         }
 
+        $from = null;
+        if (isset($params['from'])) {
+            $from = $params['from'];
+        }
+        if ($from === null) {
+            $from = $mailType->mail_from;
+        }
+        if ($from === null) {
+            return new JsonApiResponse(IResponse::S400_BadRequest, [
+                'status' => 'error',
+                'code' => "from_parameter_not_resolvable",
+                'message' => "Parameter 'from' not resolvable. You either need to provide it explicitly, or it needs to be set at a mail type level.",
+            ]);
+        }
+
         $template = $this->templatesRepository->add(
             $params['name'],
             $this->templatesRepository->getUniqueTemplateCode($params['code']),
             $params['description'],
-            $params['from'],
+            $from,
             $params['subject'],
             $params['template_text'],
             $params['template_html'],

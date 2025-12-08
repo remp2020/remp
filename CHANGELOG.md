@@ -36,6 +36,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added handler notifying finished batches to Slack.
 - Fixed possibly duplicated emission of `batch-status-change` by parallel hermes workers.
 - Updated Vue to v3. remp/remp#1449
+- Changed way of determining mail `from` in `MailCreateTemplateHandler`. remp/respekt#451
+  - Changed `from` parameter in `MailCreateTemplateHandler` api handler to optional.
 
 ## Archive
 

@@ -155,6 +155,7 @@ class BaseFeatureTestCase extends TestCase
         bool $publicListing = true,
         bool $isMultiVariant = false,
         int $defaultVariantId = null,
+        string $mailFrom = null,
     ) {
         $listCategory = $this->createMailTypeCategory($categoryName);
 
@@ -168,6 +169,7 @@ class BaseFeatureTestCase extends TestCase
             isLocked: false,
             description: 'XXX',
             publicListing: $publicListing,
+            mailFrom: $mailFrom,
             isMultiVariant: $isMultiVariant,
             defaultVariantId: $defaultVariantId,
         );
