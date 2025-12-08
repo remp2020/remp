@@ -334,8 +334,20 @@ class Campaign {
 
     // store persistent and session campaign details, called from banner view (when banner is shown)
     handleBannerDisplayed(campaignId, bannerId, variantId, campaignPublicId, bannerPublicId, variantPublicId) {
-        this.storePersistentCampaignData(campaignId, bannerId, variantId, campaignPublicId, bannerPublicId, variantPublicId);
-        this.storeSessionCampaignData(campaignId, campaignPublicId);
+        try {
+            this.storePersistentCampaignData(campaignId, bannerId, variantId, campaignPublicId, bannerPublicId, variantPublicId);
+            this.storeSessionCampaignData(campaignId, campaignPublicId);
+        } catch (e) {
+            Sentry.captureException(e, {
+                extra: {
+                    raw_data: {
+                        campaignId: campaignId,
+                        bannerId: bannerId,
+                        variantId: variantId,
+                    }
+                }
+            });
+        }
     }
 
     getCampaigns() {
