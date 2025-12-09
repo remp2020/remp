@@ -1494,64 +1494,6 @@ __metadata:
   languageName: node
   linkType: soft
 
-"@sentry-internal/browser-utils@npm:10.27.0":
-  version: 10.27.0
-  resolution: "@sentry-internal/browser-utils@npm:10.27.0"
-  dependencies:
-    "@sentry/core": 10.27.0
-  checksum: 626a367ca01fdccee842b0e9c76adf62e2156fc3eb49b7dd4666b6bafb52ae037c79c4b2f04aefc2a3725bb3f36874a5eb728668dac482788cd3d9f32ec574f8
-  languageName: node
-  linkType: hard
-
-"@sentry-internal/feedback@npm:10.27.0":
-  version: 10.27.0
-  resolution: "@sentry-internal/feedback@npm:10.27.0"
-  dependencies:
-    "@sentry/core": 10.27.0
-  checksum: 88dd6c6146f316a248c396ac98f3dd85662592162adffe46d630be43001cc6e22cd00144ebbeb58bb7f1db697f6eeddb1e8d69eae0c3825f0c34298bd278c0a8
-  languageName: node
-  linkType: hard
-
-"@sentry-internal/replay-canvas@npm:10.27.0":
-  version: 10.27.0
-  resolution: "@sentry-internal/replay-canvas@npm:10.27.0"
-  dependencies:
-    "@sentry-internal/replay": 10.27.0
-    "@sentry/core": 10.27.0
-  checksum: 632f4a9e12e1aa5d7c9540fb35762c1286df3f438c7933400f2b637f2a74ed2d2204ac9e9d09984af1516d77b77ae78023a7e305d3f5ec7c0cc9868acdee80ca
-  languageName: node
-  linkType: hard
-
-"@sentry-internal/replay@npm:10.27.0":
-  version: 10.27.0
-  resolution: "@sentry-internal/replay@npm:10.27.0"
-  dependencies:
-    "@sentry-internal/browser-utils": 10.27.0
-    "@sentry/core": 10.27.0
-  checksum: 3037d8fa55faf4ac71c79e9eac56e205b1ac9f0a37a2220a9607de67136cc91fa5303894975d05eba0dde032168f09f9aa14edc52cded90509f81d61e67664a9
-  languageName: node
-  linkType: hard
-
-"@sentry/browser@npm:^10.27.0":
-  version: 10.27.0
-  resolution: "@sentry/browser@npm:10.27.0"
-  dependencies:
-    "@sentry-internal/browser-utils": 10.27.0
-    "@sentry-internal/feedback": 10.27.0
-    "@sentry-internal/replay": 10.27.0
-    "@sentry-internal/replay-canvas": 10.27.0
-    "@sentry/core": 10.27.0
-  checksum: d3a87cc3f86245b0485debfebd4ca24fefd7a26b42b11a9dc0b1a0fa2c3ed301c3bbcba0b100422fd1f40124852d00111e0254c5228ab334a03c75f077789d15
-  languageName: node
-  linkType: hard
-
-"@sentry/core@npm:10.27.0":
-  version: 10.27.0
-  resolution: "@sentry/core@npm:10.27.0"
-  checksum: 95d4b6af3ca52d9361a9652b259b430106ad920a89fa68bd12fcbeeac2c24ba6d0e4f211bf3035be3be0e0df3e87c61412d218f49f02c8036599af1d09b46a08
-  languageName: node
-  linkType: hard
-
 "@tootallnate/once@npm:2":
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
@@ -7700,7 +7642,7 @@ fsevents@~2.3.2:
 
 "remp-campaign@file:extensions/campaign-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.0
-  resolution: "remp-campaign@file:extensions/campaign-module#extensions/campaign-module::hash=113b04&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "remp-campaign@file:extensions/campaign-module#extensions/campaign-module::hash=ef3e6c&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/core": ^7.0
     "@medv/finder": ^4.0.2
@@ -7737,7 +7679,7 @@ fsevents@~2.3.2:
     vue-codemirror: 4.0.6
     vue-slide-up-down: ^1.7.2
     vue-template-compiler: ^2.7
-  checksum: 1db22834a3574baf1fbefe9fa188c0b27c9d1d6796219ba62f910616a5493ef5b4148d1f09daeeb49b7c752b324f9374ab72c94ae3ace8ad5fa2e472b54d8f0c
+  checksum: c56646781310288cf03c4d13d0897e40a8fe5f22d23caa53d1ebdb42d996d10070ad037adccdee7d7554362e153338a3bb6d8c321359a3a710c534dd6f74bde3
   languageName: node
   linkType: hard
 
@@ -7904,7 +7846,6 @@ resolve@^1.10.0:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
-    "@sentry/browser": ^10.27.0
     axios: ^0.21.1
     cross-env: ^7.0
     css-loader: ^6.0

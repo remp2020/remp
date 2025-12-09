@@ -25,7 +25,6 @@
     },
     "packageManager": "yarn@2.4.3",
     "dependencies": {
-        "@sentry/browser": "^10.27.0",
         "remp-campaign": "file:extensions/campaign-module"
     },
     "devDependencies": {
