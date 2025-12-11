@@ -192,7 +192,6 @@
                                 <div v-if="jsIncludes">
                                     <input v-for="jsInclude in jsIncludes" type="hidden" name="js_includes[]" :value="jsInclude">
                                 </div>
-                                <input v-else type="hidden" name="js_includes[]">
                             </div><!-- .input-group -->
 
                             <div class="input-group fg-float m-t-30">
@@ -207,7 +206,6 @@
                                 <div v-if="cssIncludes">
                                     <input v-for="cssInclude in cssIncludes" type="hidden" name="css_includes[]" :value="cssInclude">
                                 </div>
-                                <input v-else type="hidden" name="css_includes[]">
                             </div><!-- .input-group -->
 
                             <div class="input-group fg-float checkbox">

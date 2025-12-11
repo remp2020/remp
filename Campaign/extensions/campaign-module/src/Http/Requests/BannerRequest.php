@@ -149,16 +149,13 @@ class BannerRequest extends FormRequest
     public function all($keys = null)
     {
         $result = parent::all($keys);
-        if (!isset($result['manual_events_tracking'])) {
-            $result['manual_events_tracking'] = false;
-        }
-        if (!isset($result['closeable'])) {
-            $result['closeable'] = false;
-        }
 
-        if (!isset($result['force_initial_state'])) {
-            $result['force_initial_state'] = false;
-        }
+        $result['js_includes'] ??= [];
+        $result['css_includes'] ??= [];
+        $result['manual_events_tracking'] ??= false;
+        $result['closeable'] ??= false;
+        $result['force_initial_state'] ??= false;
+
         return $result;
     }
 }
