@@ -40,15 +40,18 @@ class VerifyUserToken
 
         try {
             $user = $this->auth->parseToken()->authenticate();
+            if (!$user) {
+                return $this->respond('user_not_found', 'user extracted from token was not found', 401);
+            }
+            if ($user->trashed()) {
+                return $this->respond('user_deleted', 'user has been deleted', 401);
+            }
+
             $payload = $this->auth->payload();
         } catch (TokenExpiredException $e) {
             return $this->respond('token_expired', 'provided token has already expired: ' . $e->getMessage(), 401);
         } catch (JWTException $e) {
             return $this->respond('token_invalid', 'provided token is invalid: ' . $e->getMessage(), 401);
-        }
-
-        if (!$user) {
-            return $this->respond('user_not_found', 'user extracted from token was not found', 404);
         }
 
         $lastLogout = Redis::hget(User::USER_LAST_LOGOUT_KEY, $payload->get('id'));

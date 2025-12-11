@@ -69,12 +69,17 @@ class GoogleController extends Controller
         }
 
         /** @var User $user */
-        $user = User::firstOrCreate([
+        $user = User::withTrashed()->firstOrCreate([
             'email' => $factoryUser->getEmail(),
         ], [
             'email' => $factoryUser->getEmail(),
             'name' => $factoryUser->getName(),
         ]);
+
+        if ($user->trashed()) {
+            // previously trashed user was allowed access again, just restore
+            $user->restore();
+        }
 
         /** @var GoogleUser $googleUser */
         $googleUser = $user->googleUser()->firstOrNew([

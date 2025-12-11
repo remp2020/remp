@@ -76,6 +76,9 @@
             <li {!! route_active(['api-tokens.index']) !!}>
                 <a href="{{ route('api-tokens.index') }}"><i class="zmdi zmdi-key"></i> API Tokens</a>
             </li>
+            <li {!! route_active(['users.index']) !!}>
+                <a href="{{ route('users.index') }}"><i class="zmdi zmdi-accounts"></i> Users</a>
+            </li>
         </ul>
     </aside>
 

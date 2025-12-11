@@ -40,6 +40,7 @@ class Sso implements SsoContract
             switch ($response->getStatusCode()) {
                 case 400:
                 case 401:
+                case 404:
                     $e = new SsoExpiredException();
                     $e->redirect = $body->redirect;
                     throw $e;
@@ -67,6 +68,7 @@ class Sso implements SsoContract
             switch ($response->getStatusCode()) {
                 case 400:
                 case 401:
+                case 404:
                     $e = new SsoExpiredException();
                     $e->redirect = $body->redirect;
                     throw $e;

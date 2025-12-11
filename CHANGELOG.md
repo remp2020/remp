@@ -39,6 +39,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed way of determining mail `from` in `MailCreateTemplateHandler`. remp/respekt#451
   - Changed `from` parameter in `MailCreateTemplateHandler` api handler to optional.
 
+### [Sso]
+
+- Added simple user management with user removal feature and base invalidation after user deletion. remp/remp#1452
+
 ## Archive
 
 - [v4.2](./changelogs/CHANGELOG-v4.2.md)

@@ -37,6 +37,14 @@ class AuthController extends Controller
             }
 
             try {
+                $userCheck = User::withTrashed()->where('id', $user->id)->first();
+                if (!$userCheck) {
+                    throw new JWTException("User #{$user->id} ({$user->email}) not found in the database");
+                }
+                if ($userCheck->trashed()) {
+                    throw new JWTException("User #{$user->id} ({$user->email}) has been deleted");
+                }
+
                 $token = $auth->fromSubject($user);
                 $redirectUrl = $urlHelper->appendQueryParams($successUrl, [
                     'token' => $token,
@@ -105,10 +113,29 @@ class AuthController extends Controller
     {
         try {
             $token = $auth->setRequest($request)->parseToken();
+            $userId = $token->payload()->get('id');
 
-            $lastLogout = Redis::hget(User::USER_LAST_LOGOUT_KEY, $token->payload()->get('id'));
+            $lastLogout = Redis::hget(User::USER_LAST_LOGOUT_KEY, $userId);
             if ($lastLogout && $lastLogout > $token->getClaim('iat')) {
                 throw new TokenExpiredException();
+            }
+
+            $userCheck = User::withTrashed()->where('id', $userId)->first();
+            if (!$userCheck) {
+                session()->forget(User::USER_SUBJECT_SESSION_KEY);
+                return response()->json([
+                    'code' => 'user_not_found',
+                    'detail' => 'user extracted from token was not found',
+                    'redirect' => route('auth.login'),
+                ])->setStatusCode(401);
+            }
+            if ($userCheck->trashed()) {
+                session()->forget(User::USER_SUBJECT_SESSION_KEY);
+                return response()->json([
+                    'code' => 'user_deleted',
+                    'detail' => 'user has been deleted',
+                    'redirect' => route('auth.login'),
+                ])->setStatusCode(401);
             }
 
             $refreshedToken = $token->refresh();
@@ -116,6 +143,7 @@ class AuthController extends Controller
                 'token' => $refreshedToken,
             ]);
         } catch (TokenExpiredException $e) {
+            session()->forget(User::USER_SUBJECT_SESSION_KEY);
             return response()->json([
                 'code' => 'token_expired',
                 'detail' => 'token is expired: refresh timeout hit',

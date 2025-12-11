@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Redis;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     const PROVIDER_GOOGLE = 'google';
 
@@ -27,6 +30,16 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'last_logout_at' => 'datetime',
     ];
+
+    public function delete()
+    {
+        $this->last_logout_at = Carbon::now();
+        $this->save();
+
+        Redis::hset(User::USER_LAST_LOGOUT_KEY, $this->id, time());
+
+        return parent::delete();
+    }
 
     public function googleUser(): HasOne
     {

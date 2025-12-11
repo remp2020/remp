@@ -15,6 +15,7 @@ use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
@@ -24,6 +25,9 @@ Route::middleware(VerifyJwtToken::class)->group(function () {
     Route::get('/', [ApiTokenController::class, 'index']);
     Route::get('api-tokens/json', [ApiTokenController::class, 'json'])->name('api-tokens.json');
     Route::resource('api-tokens', ApiTokenController::class);
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('users/json', [UserController::class, 'json'])->name('users.json');
+    Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     Route::get('auth/logout-web', [AuthController::class, 'logoutWeb'])->name('auth.logout-web');
     Route::get('settings/jwtwhitelist', [SettingsController::class, 'jwtwhitelist'])->name('settings.jwtwhitelist');
 });
