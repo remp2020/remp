@@ -1,0 +1,47 @@
+## [4.3.0] - 2025-12-12
+
+### [Beam]
+
+- **BREAKING**: Dropped `remplib.js` support for IE11 to make built JS library smaller.
+- **BREAKING**: Removed tracking of events that depend on browser `unload` event. remp/remp#1104
+  - This event has proven unreliable, because of existence of `bfcache` and possibility that even after sending unload event we keep actively tracking user.
+- **BREAKING**: Removed tracking of `websockets` and `cookies` support for users. remp/remp#1104
+  - Both are now widely supported by browsers and tracking them is unnecessary, as they consume disk space/bandwidth without benefit.
+- Fixed unnecessary inclusion of JS library to make built JS library smaller.
+- Added configurable intersection observer threshold in impressions tracking. remp/web#2934
+- Fixed Go apps build process which could use different version of Goa for building than the one listed in the `go.mod` file. remp/remp#1104
+
+### [Campaign]
+
+- Added `campaign:seed-events` command for generating realistic banner tracking events for testing. remp/remp#1440
+- Fixed broken use of snippets within snippets, introduced in `4.2.0`. remp/remp#1441
+- Added support for use of snippets in JS includes. remp/remp#1441
+- Fixed possible routing conflict between web and API routes. remp/remp#1447
+- Added configurable time intervals for campaign statistics graphs with auto-selection based on date range. remp/remp#1440
+  - Supports year, month, week, day, hour, 15min, and 5min intervals.
+- Changed `target_url` length in `banners` table to 768 characters. remp/helpdesk#4131
+- Added device safe area top and bottom inset for Bar and CollapsibleBar banners. remp/remp#1432
+
+### [Mailer]
+
+- Changed `AnchorRtmReplace` to support multiline line anchor definition. remp/helpdesk#3937
+- Added index to `mail_types.deleted_at` to speed up dashboard realtime calculations.
+- Fixed tracking of `first_email_sent_at` when batch actually starts sending emails.
+- Added handler notifying finished batches to Slack.
+- Fixed possibly duplicated emission of `batch-status-change` by parallel hermes workers.
+- Updated Vue to v3. remp/remp#1449
+- Changed way of determining mail `from` in `MailCreateTemplateHandler`. remp/respekt#451
+  - Changed `from` parameter in `MailCreateTemplateHandler` api handler to optional.
+
+### [Sso]
+
+- Added simple user management with user removal feature and base invalidation after user deletion. remp/remp#1452
+
+[4.3.0]: https://github.com/remp2020/remp/compare/4.2.0...4.3.0
+
+[Beam]: https://github.com/remp2020/remp/tree/master/Beam
+[Campaign]: https://github.com/remp2020/remp/tree/master/Campaign
+[Mailer]: https://github.com/remp2020/remp/tree/master/Mailer
+[Sso]: https://github.com/remp2020/remp/tree/master/Sso
+[Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
+[Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
