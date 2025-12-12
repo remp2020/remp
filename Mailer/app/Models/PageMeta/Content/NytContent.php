@@ -40,7 +40,7 @@ class NytContent implements ContentInterface
         } catch (ClientException $e) {
             throw new InvalidUrlException("Invalid URL: {$url}", $e->getCode(), $e);
         } catch (ServerException|ConnectException $e) {
-            Debugger::log('Unable to request NYT API: ' . $e->getMessage(), $e->getCode(), ILogger::EXCEPTION);
+            Debugger::log('Unable to request NYT API: ' . $e->getMessage(), ILogger::EXCEPTION);
             return null;
         }
 
