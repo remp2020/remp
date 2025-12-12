@@ -6,6 +6,7 @@ namespace Remp\Mailer\Models\PageMeta\Content;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use Nette\Utils\Json;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
@@ -39,7 +40,7 @@ class NytContent implements ContentInterface
             }
         } catch (ClientException $e) {
             throw new InvalidUrlException("Invalid URL: {$url}", $e->getCode(), $e);
-        } catch (ServerException|ConnectException $e) {
+        } catch (ServerException|ConnectException|RequestException $e) {
             Debugger::log('Unable to request NYT API: ' . $e->getMessage(), ILogger::EXCEPTION);
             return null;
         }
