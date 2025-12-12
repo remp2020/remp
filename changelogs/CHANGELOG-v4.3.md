@@ -24,6 +24,15 @@
 
 ### [Mailer]
 
+- **BREAKING**: Use of `FilterLoader` to register Latte filters is not available anymore due to changes Latte 3.1.
+  - To register custom Latte filters, register them directly into Latte:
+    ```latte
+    services:
+        nette.latteFactory:
+            setup:
+                - addFilter('your_filter', [Crm\YourModule\Helpers\YourFilter(), process])
+    ```
+    Signature of `addFilter` function is the same as previously used `FilterLoader::register`. Class `FilterLoader` is now removed.
 - Changed `AnchorRtmReplace` to support multiline line anchor definition. remp/helpdesk#3937
 - Added index to `mail_types.deleted_at` to speed up dashboard realtime calculations.
 - Fixed tracking of `first_email_sent_at` when batch actually starts sending emails.
