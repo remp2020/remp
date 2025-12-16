@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
 
+- Added index to `mail_job_batch.status` to improve Mailer's workers batch checking performance.
 
 ## Archive
 
