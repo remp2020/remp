@@ -3,6 +3,7 @@
 namespace Remp\CampaignModule\Http\Requests;
 
 use Remp\CampaignModule\Banner;
+use Remp\CampaignModule\Rules\ContainsHtmlLink;
 use Illuminate\Foundation\Http\FormRequest;
 use Validator;
 
@@ -135,7 +136,7 @@ class BannerRequest extends FormRequest
                         'text' => 'string|nullable',
                         'success' => 'string|nullable',
                         'failure' => 'string|nullable',
-                        'terms' => 'string|nullable',
+                        'terms' => ['required', 'string', new ContainsHtmlLink()],
                     ]);
                     break;
                 default:

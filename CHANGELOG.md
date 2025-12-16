@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- **IMPORTANT**: Scheduled `newsletter_rectangle_templates.terms` database column to become NOT NULL in next major version. remp/remp#1445
+    - Ensure all Newsletter Rectangle banners have terms with at least one HTML link before upgrading.
+- Changed Newsletter Rectangle banner template to require `terms` field with at least one HTML link. remp/remp#1445
+    - Existing banners with empty terms or terms without links will fail validation on save.
+
 ### [Mailer]
 
 - Added index to `mail_job_batch.status` to improve Mailer's workers batch checking performance.

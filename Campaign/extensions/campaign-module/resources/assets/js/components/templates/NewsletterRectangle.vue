@@ -87,8 +87,8 @@
                                 <textarea v-model="terms" class="form-control fg-input remp-banner-text-input"
                                           rows="2" name="terms" cols="50" id="terms"></textarea>
                             </div>
-                            <div class="has-warning" v-if="!termsHasLink()">
-                                <small class="help-block"><i class="zmdi zmdi-alert-triangle"></i> HTML does not contain any links</small>
+                            <div class="has-error" v-if="!termsHasLink()">
+                                <small class="help-block"><i class="zmdi zmdi-alert-circle"></i> Terms must contain at least one HTML link</small>
                             </div>
                         </div><!-- .input-group -->
 
@@ -183,7 +183,7 @@ export default {
             this.text = 'Lorem Ipsum...';
             this.success = 'Subscription successful';
             this.failure = 'Subscription failed';
-            this.terms = 'By clicking <em>Subscribe</em>, you agree with Terms & Conditions';
+            this.terms = 'By clicking <em>Subscribe</em>, you agree with <a href="#">Terms & Conditions</a>';
         }
 
         this.dimensions = this.dimensionsByWidthHeight(this._width, this._height) || this.dimensions;
