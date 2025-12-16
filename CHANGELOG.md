@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Mailer]
 
 - Added index to `mail_job_batch.status` to improve Mailer's workers batch checking performance.
+- Added index to `mail_template_stats` to improve Mailer's dashboard aggregation performance.
 
 ## Archive
 
