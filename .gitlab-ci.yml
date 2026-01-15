@@ -241,7 +241,7 @@ tests:
     - master
   dependencies: []
 
-# PREVIEW
+# RESPEKT.CZ
 
 "mailer/🗞️":
   stage: deploy
@@ -312,6 +312,88 @@ tests:
       -F "ref=master"
       -F "variables[REF]=$CI_COMMIT_SHA"
       -F "variables[STAGE]=respektcz/sso"
+      -F "variables[APP]=sso"
+      $DEPLOY_TRIGGER_PIPELINE_URL
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
+  only:
+    - master
+  dependencies: []
+
+# INTERIM
+
+"mailer/⏳️️":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=interim/mailer"
+      -F "variables[APP]=mailer"
+      $DEPLOY_TRIGGER_PIPELINE_URL
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
+  only:
+    - master
+  dependencies: []
+
+"campaign/⏳️":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=interim/campaign"
+      -F "variables[APP]=campaign"
+      $DEPLOY_TRIGGER_PIPELINE_URL
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
+  only:
+    - master
+  dependencies: []
+
+"beam/⏳️":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=interim/beam"
+      -F "variables[APP]=beam"
+      $DEPLOY_TRIGGER_PIPELINE_URL
+  when: manual
+  tags:
+    - remp2020
+    - deploy
+    - php8
+  only:
+    - master
+  dependencies: []
+
+"sso/⏳️":
+  stage: deploy
+  script:
+    - >
+      curl -X POST
+      -F "token=$CI_JOB_TOKEN"
+      -F "ref=master"
+      -F "variables[REF]=$CI_COMMIT_SHA"
+      -F "variables[STAGE]=interim/sso"
       -F "variables[APP]=sso"
       $DEPLOY_TRIGGER_PIPELINE_URL
   when: manual
