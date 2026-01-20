@@ -26,6 +26,7 @@ services:
 	- Remp\Mailer\Models\WebClient(@environmentConfig::get('WEB_ADDR'))
 
 	- Remp\Mailer\Models\Generators\WordpressBlockParser
+	- Remp\Mailer\Models\Generators\InterimWordpressBlockParser
 
 	embedParser:
 		factory: Remp\Mailer\Models\Generators\EmbedParser

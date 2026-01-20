@@ -1,0 +1,7 @@
+<!-- core/image -->
+{% if href %}<a href="{{ href }}" target="_blank" style="display: block; border: none; margin: 0; padding: 0; text-decoration: none;">{% endif %}
+    <img src="{{ url }}" width="570" style="width: 100%; max-width: 570px; height: auto; display: block; border-radius: 10px;"
+         {% if alt %}alt="{{ alt }}"{% endif %}
+    >
+{% if href %}</a>{% endif %}
+<!-- end core/image -->
