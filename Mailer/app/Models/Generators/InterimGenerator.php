@@ -15,6 +15,8 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class InterimGenerator implements IGenerator
 {
+    private string $from;
+
     public $onSubmit;
 
     public function __construct(
@@ -22,6 +24,11 @@ class InterimGenerator implements IGenerator
         private EngineFactory $engineFactory,
         private InterimWordpressBlockParser $wordpressBlockParser,
     ) {
+    }
+
+    public function setFrom(string $from): void
+    {
+        $this->from = $from;
     }
 
     public function generateForm(Form $form): void
