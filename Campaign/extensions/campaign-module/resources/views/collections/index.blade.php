@@ -25,7 +25,18 @@
                 'campaigns' => [
                     'priority' => 2,
                     'render' => 'array',
-                ]
+                    'orderable' => false,
+                ],
+                'created_at' => [
+                    'header' => 'Created at',
+                    'priority' => 3,
+                    'render' => 'date',
+                ],
+                'updated_at' => [
+                    'header' => 'Updated at',
+                    'priority' => 3,
+                    'render' => 'date',
+                ],
             ],
             'dataSource' => route('collections.json'),
             'rowActions' => [
@@ -33,7 +44,7 @@
                 ['name' => 'edit', 'class' => 'zmdi-palette-Cyan zmdi-edit', 'title' => 'Edit collection'],
                 ['name' => 'destroy', 'class' => 'zmdi-palette-Cyan zmdi-delete confirm', 'title' => 'Remove collection', 'onclick' => 'return confirm(\'Are you sure you want to delete this collection?\')'],
             ],
-            'order' => [1, 'desc']
+            'order' => [2, 'desc']
         ]) !!}
     </div>
 @endsection

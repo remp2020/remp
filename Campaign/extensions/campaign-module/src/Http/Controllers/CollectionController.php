@@ -123,6 +123,15 @@ class CollectionController extends Controller
                     'text' => $collection->name,
                 ];
             })
+            ->orderColumn('name', function (Builder $query, $order) {
+                $query->orderBy('collections.name', $order);
+            })
+            ->orderColumn('created_at', function (Builder $query, $order) {
+                $query->orderBy('collections.created_at', $order);
+            })
+            ->orderColumn('updated_at', function (Builder $query, $order) {
+                $query->orderBy('collections.updated_at', $order);
+            })
             ->filterColumn('name', function (Builder $query, $value) {
                 $query->where('collections.name', 'like', "%{$value}%");
             })

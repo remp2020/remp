@@ -10,8 +10,6 @@ class CampaignCollection extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-
     public $table = 'collections';
 
     protected $fillable = [

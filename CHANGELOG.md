@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed Newsletter Rectangle banner template to require `terms` field with at least one HTML link. remp/remp#1445
     - Existing banners with empty terms or terms without links will fail validation on save.
 - Fixed banner `js_includes` and `css_includes` fields saving `[null]` instead of empty array when no includes are specified. remp/remp#1446
+- Added timestamps support to collections with sorting in admin listing. remp/remp#1443
 
 ### [Mailer]
 
