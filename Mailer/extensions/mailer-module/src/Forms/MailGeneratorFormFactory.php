@@ -5,25 +5,27 @@ namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\InvalidStateException;
-use Nette\SmartObject;
 use Remp\MailerModule\Models\FormRenderer\MaterialRenderer;
 use Remp\MailerModule\Models\Generators\GeneratorFactory;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
 class MailGeneratorFormFactory
 {
-    use SmartObject;
-
-    private $sourceTemplatesRepository;
-
-    private $mailGeneratorFactory;
+    private bool $allowCrossOrigin = false;
 
     public function __construct(
-        SourceTemplatesRepository $sourceTemplatesRepository,
-        GeneratorFactory $mailGeneratorFactory
+        private readonly SourceTemplatesRepository $sourceTemplatesRepository,
+        private readonly GeneratorFactory $mailGeneratorFactory
     ) {
-        $this->sourceTemplatesRepository = $sourceTemplatesRepository;
-        $this->mailGeneratorFactory = $mailGeneratorFactory;
+    }
+
+    /**
+     * You could theoretically use external system (CMS) to generate the data and let people submit this form.
+     * If CMS is running on separate domain, cross-origin check would block this submission if it's not allowed.
+     */
+    public function allowCrossOrigin(): void
+    {
+        $this->allowCrossOrigin = true;
     }
 
     public function create($sourceTemplateId, callable $onSubmit, callable $link = null)
@@ -31,6 +33,10 @@ class MailGeneratorFormFactory
         $form = new Form;
         $form->setRenderer(new MaterialRenderer());
         $form->addProtection();
+
+        if ($this->allowCrossOrigin) {
+            $form->allowCrossOrigin();
+        }
 
         $keys = $this->mailGeneratorFactory->keys();
         $pairs = $this->sourceTemplatesRepository->all()

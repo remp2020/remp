@@ -317,21 +317,21 @@ services:
 	- Remp\MailerModule\Components\GeneratorWidgets\GeneratorWidgetsManager
 
 	# Forms
-	- Remp\MailerModule\Forms\SignInFormFactory
-	- Remp\MailerModule\Forms\ConfigFormFactory
-	- Remp\MailerModule\Forms\ListFormFactory
-	- Remp\MailerModule\Forms\DuplicateListFormFactory
-	- Remp\MailerModule\Forms\ListCategoryFormFactory
-	- Remp\MailerModule\Forms\LayoutFormFactory
-	- Remp\MailerModule\Forms\SnippetFormFactory
-	- Remp\MailerModule\Forms\TemplateFormFactory
-	- Remp\MailerModule\Forms\TemplateTestFormFactory
-	- Remp\MailerModule\Forms\JobFormFactory
-	- Remp\MailerModule\Forms\NewBatchFormFactory
-	- Remp\MailerModule\Forms\EditBatchFormFactory
-	- Remp\MailerModule\Forms\NewTemplateFormFactory
-	- Remp\MailerModule\Forms\SourceTemplateFormFactory
-	- Remp\MailerModule\Forms\MailGeneratorFormFactory
+	signInFormFactory: Remp\MailerModule\Forms\SignInFormFactory
+	configFormFactory: Remp\MailerModule\Forms\ConfigFormFactory
+	listFormFactory: Remp\MailerModule\Forms\ListFormFactory
+	duplicateListFormFactory: Remp\MailerModule\Forms\DuplicateListFormFactory
+	listCategoryFormFactory: Remp\MailerModule\Forms\ListCategoryFormFactory
+	layoutFormFactory: Remp\MailerModule\Forms\LayoutFormFactory
+	snippetFormFactory: Remp\MailerModule\Forms\SnippetFormFactory
+	templateFormFactory: Remp\MailerModule\Forms\TemplateFormFactory
+	templateTestFormFactory: Remp\MailerModule\Forms\TemplateTestFormFactory
+	jobFormFactory: Remp\MailerModule\Forms\JobFormFactory
+	newBatchFormFactory: Remp\MailerModule\Forms\NewBatchFormFactory
+	editBatchFormFactory: Remp\MailerModule\Forms\EditBatchFormFactory
+	newTemplateFormFactory: Remp\MailerModule\Forms\NewTemplateFormFactory
+	sourceTemplateFormFactory: Remp\MailerModule\Forms\SourceTemplateFormFactory
+	mailGeneratorFormFactory: Remp\MailerModule\Forms\MailGeneratorFormFactory
 
 	# Helpers
 	- Remp\MailerModule\Models\Generators\WordpressHelpers
