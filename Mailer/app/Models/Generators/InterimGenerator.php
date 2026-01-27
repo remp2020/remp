@@ -5,7 +5,7 @@ namespace Remp\Mailer\Models\Generators;
 
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
-use Remp\Mailer\Components\GeneratorWidgets\Widgets\DailyMinuteWidget\DailyMinuteWidget;
+use Remp\Mailer\Components\GeneratorWidgets\Widgets\InterimWidget\InterimWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\InvalidUrlException;
@@ -79,7 +79,7 @@ class InterimGenerator implements IGenerator
 
     public function getWidgets(): array
     {
-        return [DailyMinuteWidget::class];
+        return [InterimWidget::class];
     }
 
     public function apiParams(): array
