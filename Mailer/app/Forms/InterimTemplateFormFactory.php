@@ -104,12 +104,15 @@ class InterimTemplateFormFactory
         $form->addHidden('html_content');
         $form->addHidden('text_content');
 
+        $tomorrowMorning = new \DateTime('tomorrow 7:30AM');
+
         $form->setDefaults([
-            'name' => 'Daily minute ' . date('j.n.Y'),
-            'code' => 'daily_minute_' . date('dmY'),
+            'name' => 'Daily minute ' . $tomorrowMorning->format('j.n.Y'),
+            'code' => 'daily_minute_' . $tomorrowMorning->format('dmy'),
             'mail_layout_id' => $mailLayout->id,
             'mail_type_id' => $mailType->id,
             'from' => $this->from,
+            'send_at' => $tomorrowMorning->format('m/d/Y H:i A'),
         ]);
 
         if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
