@@ -98,6 +98,10 @@ class ProcessConversionStatsCommand extends Command
         $batchTemplatesConversions = $this->conversionsRepository
             ->getBatchTemplatesConversionsSince(DateTime::from($input->getOption('since')));
 
+        if (!count($batchTemplatesConversions)) {
+            return;
+        }
+
         $progressBar = new ProgressBar($output, count($batchTemplatesConversions));
         $progressBar->setFormat('processStats');
         $progressBar->start();
@@ -164,6 +168,10 @@ class ProcessConversionStatsCommand extends Command
     {
         $nonBatchTemplatesConversions = $this->conversionsRepository
             ->getNonBatchTemplatesConversionsSince(DateTime::from($input->getOption('since')));
+
+        if (!count($nonBatchTemplatesConversions)) {
+            return;
+        }
 
         $progressBar = new ProgressBar($output, count($nonBatchTemplatesConversions));
         $progressBar->setFormat('processStats');

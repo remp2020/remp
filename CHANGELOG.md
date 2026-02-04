@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added index to `mail_job_batch.status` to improve Mailer's workers batch checking performance.
 - Added index to `mail_template_stats` to improve Mailer's dashboard aggregation performance.
 - Allowed cross-origin requests in MailGeneratorFormFactory (opt-in) to support cross-domain submissions if necessary.
+- Fixed issues with `mail:conversion-stats` if there were no conversions in the database. remp/remp#1454
 
 ## Archive
 
