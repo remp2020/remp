@@ -84,7 +84,11 @@ class InterimWordpressBlockParser
 
         if ($block->name === self::BLOCK_CORE_HEADING) {
             $data['level'] = $block->attributes->level;
-            $data['fontSize'] = $data['level'] === 1 ? '20px' : '16px';
+            $data['fontSize'] = match ($data['level']) {
+                1 => '20px',
+                2 => '24px',
+                default => '16px',
+            };
             $data['color'] = $data['level'] === 2 ? '#f0523c' : '#32353a';
         }
 
