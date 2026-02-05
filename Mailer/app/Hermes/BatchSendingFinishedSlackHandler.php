@@ -49,6 +49,10 @@ class BatchSendingFinishedSlackHandler implements HandlerInterface
             return false;
         }
 
+        if ($jobBatch->sent_emails === 0) {
+            return true;
+        }
+
         $mailTemplate = $jobBatch->related('mail_job_batch_templates')->limit(1)->fetch();
         $mailType = $mailTemplate->mail_template->mail_type;
         if (array_key_exists($mailType->mail_type_category->code, $this->ignoredCategories)) {
