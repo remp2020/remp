@@ -147,6 +147,7 @@ class RespektContent implements ContentInterface
             'paragraph' => true,
             'interTitle' => true,
         ];
+        $aStyle = "style='color: #ce0b24'";
 
         foreach ($parts as $contentPart) {
             try {
@@ -195,11 +196,11 @@ class RespektContent implements ContentInterface
                             if ($link !== null) {
                                 $node = $child['children'][0]['text']; // TODO[respekt#192]: this can contain multiple children with formatting
 
-                                $node = is_array($link) ? "<a href='{$this->getAbsoluteUrl($link['url'])}'>{$node}</a>" : "<a href='{$this->getAbsoluteUrl($link)}'>{$node}</a>";
+                                $node = is_array($link) ? "<a {$aStyle} href='{$this->getAbsoluteUrl($link['url'])}'>{$node}</a>" : "<a {$aStyle} href='{$this->getAbsoluteUrl($link)}'>{$node}</a>";
                             }
                         } elseif (isset($child['type']) && $child['type'] === 'anchor') {
                             $node = $child['children'][0]['text'];
-                            $node = "<a href='{$child['href']}'>{$node}</a>";
+                            $node = "<a {$aStyle} href='{$child['href']}'>{$node}</a>";
                         }
 
                         $processedChildren .= $node;
@@ -239,7 +240,7 @@ class RespektContent implements ContentInterface
                     }
 
                     if ($reference['type'] === 'block_link' && isset($reference['target']['internalTarget']['article']['title'])) {
-                        $processedContent .= "<p><strong>Mohlo by vás zaujmout:</strong> <a href='{$this->getAbsoluteUrl($reference['target']['internalTarget']['url'])}'>{$reference['target']['internalTarget']['article']['title']}</a></p>";
+                        $processedContent .= "<p><strong>Mohlo by vás zaujmout:</strong> <a {$aStyle} href='{$this->getAbsoluteUrl($reference['target']['internalTarget']['url'])}'>{$reference['target']['internalTarget']['article']['title']}</a></p>";
                     }
 
                     if ($reference['type'] === 'horizontal_divider') {
