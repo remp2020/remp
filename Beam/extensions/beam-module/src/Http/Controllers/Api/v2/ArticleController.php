@@ -33,29 +33,30 @@ class ArticleController
                 $a
             );
 
-            $article->sections()->detach();
+            $sectionIds = [];
             foreach ($a['sections'] ?? [] as $section) {
-                $sectionObj = $this->upsertSection($section);
-                $article->sections()->attach($sectionObj);
+                $sectionIds[] = $this->upsertSection($section)->id;
             }
+            $article->sections()->sync($sectionIds);
 
-            $article->tags()->detach();
+            $tagIds = [];
             foreach ($a['tags'] ?? [] as $tag) {
                 $tagObj = $this->upsertTag($tag);
-                $article->tags()->attach($tagObj);
+                $tagIds[] = $tagObj->id;
 
-                $tagObj->tagCategories()->detach();
+                $categoryIds = [];
                 foreach ($tag['categories'] ?? [] as $tagCategory) {
-                    $tagCategoryObj = $this->upsertTagCategory($tagCategory);
-                    $tagObj->tagCategories()->attach($tagCategoryObj);
+                    $categoryIds[] = $this->upsertTagCategory($tagCategory)->id;
                 }
+                $tagObj->tagCategories()->sync($categoryIds);
             }
+            $article->tags()->sync($tagIds);
 
-            $article->authors()->detach();
+            $authorIds = [];
             foreach ($a['authors'] ?? [] as $author) {
-                $authorObj = $this->upsertAuthor($author);
-                $article->authors()->attach($authorObj);
+                $authorIds[] = $this->upsertAuthor($author)->id;
             }
+            $article->authors()->sync($authorIds);
 
             if (isset($a['titles']) && is_array($a['titles'])) {
                 // Load existing titles
@@ -120,76 +121,58 @@ class ArticleController
         ]);
     }
 
-    private function upsertSection($section): Section
+    private function upsertSection(array $section): Section
     {
-        $sectionObj = Section::where('external_id', $section['external_id'])->first();
-        if ($sectionObj) {
-            $sectionObj->update($section);
-            return $sectionObj;
+        $model = Section::where('external_id', $section['external_id'])->first();
+        $model ??= Section::where('name', $section['name'])->whereNull('external_id')->first();
+
+        if ($model) {
+            $model->update($section);
+            return $model;
         }
 
-        $sectionObj = Section::where('name', $section['name'])->first();
-        if ($sectionObj && $sectionObj->external_id === null) {
-            $sectionObj->update($section);
-            return $sectionObj;
-        }
-
-        return Section::firstOrCreate($section);
+        return Section::create($section);
     }
 
-    private function upsertTag($tag): Tag
+    private function upsertTag(array $tag): Tag
     {
-        $tagObj = Tag::where('external_id', $tag['external_id'])->first();
-        if ($tagObj) {
-            $tagObj->name = $tag['name'];
-            $tagObj->save();
-            return $tagObj;
+        $model = Tag::where('external_id', $tag['external_id'])->first();
+        $model ??= Tag::where('name', $tag['name'])->whereNull('external_id')->first();
+
+        if ($model) {
+            $model->update($tag);
+            return $model;
         }
 
-        $tagObj = Tag::where('name', $tag['name'])->first();
-        if ($tagObj && $tagObj->external_id === null) {
-            $tagObj->external_id = $tag['external_id'];
-            $tagObj->save();
-            return $tagObj;
-        }
-
-        return Tag::firstOrCreate([
+        return Tag::create([
             'name' => $tag['name'],
             'external_id' => $tag['external_id'],
         ]);
     }
 
-    private function upsertTagCategory($tagCategory): TagCategory
+    private function upsertTagCategory(array $tagCategory): TagCategory
     {
-        $tagCategoryObj = TagCategory::where('external_id', $tagCategory['external_id'])->first();
-        if ($tagCategoryObj) {
-            $tagCategoryObj->update($tagCategory);
-            return $tagCategoryObj;
+        $model = TagCategory::where('external_id', $tagCategory['external_id'])->first();
+        $model ??= TagCategory::where('name', $tagCategory['name'])->whereNull('external_id')->first();
+
+        if ($model) {
+            $model->update($tagCategory);
+            return $model;
         }
 
-        $tagCategoryObj = TagCategory::where('name', $tagCategory['name'])->first();
-        if ($tagCategoryObj && $tagCategoryObj->external_id === null) {
-            $tagCategoryObj->update($tagCategory);
-            return $tagCategoryObj;
-        }
-
-        return TagCategory::firstOrCreate($tagCategory);
+        return TagCategory::create($tagCategory);
     }
 
-    private function upsertAuthor($author): Author
+    private function upsertAuthor(array $author): Author
     {
-        $authorObj = Author::where('external_id', $author['external_id'])->first();
-        if ($authorObj) {
-            $authorObj->update($author);
-            return $authorObj;
+        $model = Author::where('external_id', $author['external_id'])->first();
+        $model ??= Author::where('name', $author['name'])->whereNull('external_id')->first();
+
+        if ($model) {
+            $model->update($author);
+            return $model;
         }
 
-        $authorObj = Author::where('name', $author['name'])->first();
-        if ($authorObj && $authorObj->external_id === null) {
-            $authorObj->update($author);
-            return $authorObj;
-        }
-
-        return Author::firstOrCreate($author);
+        return Author::create($author);
     }
 }

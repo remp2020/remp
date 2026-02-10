@@ -636,24 +636,18 @@ $response = file_get_contents("http://beam.remp.press/api/v2/articles/upsert ", 
                 {
                     "external_id": "1",
                     "name": "Jon Snow",
-                    "created_at": "2019-05-17 11:43:04",
-                    "updated_at": "2019-05-17 11:43:04"
                 }
             ],
             "sections": [
                 {
                     "external_id": "1",
                     "name": "Opinions",
-                    "created_at": "2019-05-17 11:43:04",
-                    "updated_at": "2019-05-17 11:43:04"
                 }
             ],
             "tags": [
                 {
                     "external_id": "1",
                     "name": "Elections 2020",
-                    "created_at": "2019-05-17 11:43:04",
-                    "updated_at": "2019-05-17 11:43:04",
                     "tag_categories": [
                         {
                             "external_id": "1",

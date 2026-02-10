@@ -381,29 +381,29 @@ class ArticleController extends Controller
         $article->fill($request->all());
         $article->save();
 
-        $article->sections()->detach();
+        $sectionIds = [];
         foreach ($request->get('sections', []) as $sectionName) {
-            $section = Section::firstOrCreate([
+            $sectionIds[] = Section::firstOrCreate([
                 'name' => $sectionName,
-            ]);
-            $article->sections()->attach($section);
+            ])->id;
         }
+        $article->sections()->sync($sectionIds);
 
-        $article->tags()->detach();
+        $tagIds = [];
         foreach ($request->get('tags', []) as $tagName) {
-            $tag = Tag::firstOrCreate([
+            $tagIds[] = Tag::firstOrCreate([
                 'name' => $tagName,
-            ]);
-            $article->tags()->attach($tag);
+            ])->id;
         }
+        $article->tags()->sync($tagIds);
 
-        $article->authors()->detach();
+        $authorIds = [];
         foreach ($request->get('authors', []) as $authorName) {
-            $section = Author::firstOrCreate([
+            $authorIds[] = Author::firstOrCreate([
                 'name' => $authorName,
-            ]);
-            $article->authors()->attach($section);
+            ])->id;
         }
+        $article->authors()->sync($authorIds);
 
         $article->load(['authors', 'sections', 'tags']);
 

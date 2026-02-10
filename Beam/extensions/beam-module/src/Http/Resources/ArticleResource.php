@@ -23,26 +23,24 @@ class ArticleResource extends JsonResource
     {
         $values = parent::toArray($request);
 
-        foreach ($this->authors as $author) {
-            $values['authors'][] = [
-                'id' => $author->id,
-                'external_id' => $author->external_id,
-            ];
-        }
+        $values['authors'] = $this->authors->map(fn($author) => [
+            'external_id' => $author->external_id,
+            'name' => $author->name,
+        ])->all();
 
-        foreach ($this->tags as $tag) {
-            $values['tags'][] = [
-                'id' => $tag->id,
-                'external_id' => $tag->external_id,
-            ];
-        }
+        $values['tags'] = $this->tags->map(fn($tag) => [
+            'external_id' => $tag->external_id,
+            'name' => $tag->name,
+            'tag_categories' => $tag->tagCategories->map(fn($category) => [
+                'external_id' => $category->external_id,
+                'name' => $category->name,
+            ])->all(),
+        ])->all();
 
-        foreach ($this->sections as $section) {
-            $values['sections'][] = [
-                'id' => $section->id,
-                'external_id' => $section->external_id,
-            ];
-        }
+        $values['sections'] = $this->sections->map(fn($section) => [
+            'external_id' => $section->external_id,
+            'name' => $section->name,
+        ])->all();
 
         $extended = (bool) $request->input('extended', false);
         if ($extended) {

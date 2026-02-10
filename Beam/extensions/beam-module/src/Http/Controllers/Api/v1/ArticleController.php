@@ -43,29 +43,29 @@ class ArticleController
                 $a
             );
 
-            $article->sections()->detach();
+            $sectionIds = [];
             foreach ($a['sections'] ?? [] as $sectionName) {
-                $section = Section::firstOrCreate([
+                $sectionIds[] = Section::firstOrCreate([
                     'name' => $sectionName,
-                ]);
-                $article->sections()->attach($section);
+                ])->id;
             }
+            $article->sections()->sync($sectionIds);
 
-            $article->tags()->detach();
+            $tagIds = [];
             foreach ($a['tags'] ?? [] as $tagName) {
-                $tag = Tag::firstOrCreate([
+                $tagIds[] = Tag::firstOrCreate([
                     'name' => $tagName,
-                ]);
-                $article->tags()->attach($tag);
+                ])->id;
             }
+            $article->tags()->sync($tagIds);
 
-            $article->authors()->detach();
+            $authorIds = [];
             foreach ($a['authors'] as $authorName) {
-                $section = Author::firstOrCreate([
+                $authorIds[] = Author::firstOrCreate([
                     'name' => $authorName,
-                ]);
-                $article->authors()->attach($section);
+                ])->id;
             }
+            $article->authors()->sync($authorIds);
 
             // Load existing titles
             $existingArticleTitles = $article->articleTitles()

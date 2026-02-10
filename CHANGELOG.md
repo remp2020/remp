@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Fixed performance issues during mass article upsert caused by DB locking and unnecessary DB updates. remp/remp#1457
+
 ### [Campaign]
 
 - **IMPORTANT**: Scheduled `newsletter_rectangle_templates.terms` database column to become NOT NULL in next major version. remp/remp#1445
