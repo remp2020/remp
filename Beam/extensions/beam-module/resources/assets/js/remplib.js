@@ -467,7 +467,7 @@ class Tracker {
                 "funnel_id": funnelId
             },
             "remp_commerce_id": remplib.uuidv4(),
-            "commerce_session_id": remplib.generateCommerceSessionID(),
+            "commerce_session_id": remplib.ensureCommerceSessionID(),
         };
         params = this.addSystemUserParams(params, includeStorageParams);
         this.post(this.url + "/track/commerce", params);
@@ -486,7 +486,7 @@ class Tracker {
                 "source": source
             },
             "remp_commerce_id": remplib.uuidv4(),
-            "commerce_session_id": remplib.generateCommerceSessionID(),
+            "commerce_session_id": remplib.ensureCommerceSessionID(),
         };
 
         params = this.addSystemUserParams(params);

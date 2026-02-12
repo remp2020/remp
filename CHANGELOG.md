@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed performance issues during mass article upsert caused by DB locking and unnecessary DB updates. remp/remp#1457
+- Added support for preserving `commerce_session_id` across page reloads. remp/analytika#242
+    - Added new `preserveCommerceSessionID()` method to mark commerce session for preservation.
+    - Added new `ensureCommerceSessionID()` method that either reuses preserved session ID or generates a new one.
+    - Changed `Tracker.trackCheckout()` and `Tracker.trackPurchase()` to use `ensureCommerceSessionID()` instead of `generateCommerceSessionID()`.
+    - Method throws an error if `commerce_session_id` was marked for preservation but not found in storage.
 
 ### [Campaign]
 

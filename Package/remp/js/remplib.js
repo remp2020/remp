@@ -18,6 +18,8 @@ export default {
 
     commerceSessionIDKey: "commerce_session_id",
 
+    preserveCommerceSessionIDKey: "preserve_commerce_session_id",
+
     storage: "local_storage", // "cookie", "local_storage"
 
     internalStorageKeys: null,
@@ -90,6 +92,7 @@ export default {
         remplib.internalStorageKeys[remplib.rempSessionIDKey] = true;
         remplib.internalStorageKeys[remplib.rempPageviewIDKey] = true;
         remplib.internalStorageKeys[remplib.commerceSessionIDKey] = true;
+        remplib.internalStorageKeys[remplib.preserveCommerceSessionIDKey] = true;
         remplib.internalStorageKeys[remplib.rempSessionRefererKey] = true;
         remplib.internalStorageKeys["rtm_source"] = true;
         remplib.internalStorageKeys["rtm_medium"] = true;
@@ -181,6 +184,25 @@ export default {
         this.setToStorage(this.commerceSessionIDKey, commerceSessionIDKey);
 
         return commerceSessionIDKey;
+    },
+
+    preserveCommerceSessionID: function() {
+        this.setToStorage(this.preserveCommerceSessionIDKey, "true");
+    },
+
+    ensureCommerceSessionID: function() {
+        let isPreserved = this.getFromStorage(this.preserveCommerceSessionIDKey);
+        this.removeFromStorage(this.preserveCommerceSessionIDKey);
+
+        if (isPreserved === "true") {
+            let existingCommerceSessionID = this.getFromStorage(this.commerceSessionIDKey);
+            if (existingCommerceSessionID) {
+                return existingCommerceSessionID;
+            }
+            throw "remplib: commerce_session_id was marked for preservation but not found in storage.";
+        }
+
+        return this.generateCommerceSessionID();
     },
 
     uuidv4: function() {
