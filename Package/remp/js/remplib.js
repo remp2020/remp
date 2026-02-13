@@ -392,8 +392,9 @@ export default {
 
     removeCookie: function(name) {
         document.cookie = [
-            name, '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; domain=; SameSite=Lax',
-            this.cookieDomain
+            name, '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/',
+            '; domain=', this.cookieDomain,
+            '; SameSite=Lax'
         ].join('');
     },
 

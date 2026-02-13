@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Fixed performance issues during mass article upsert caused by DB locking and unnecessary DB updates. remp/remp#1457
+- Fixed `remplib.removeFromStorage()` not properly deleting cookies due to incorrect domain parameter formatting. remp/analytika#242
+    - Changed cookie string composition to match the format used in `storeCookie()` function.
 - Added support for preserving `commerce_session_id` across page reloads. remp/analytika#242
     - Added new `preserveCommerceSessionID()` method to mark commerce session for preservation.
     - Added new `ensureCommerceSessionID()` method that either reuses preserved session ID or generates a new one.
