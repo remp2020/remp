@@ -232,8 +232,9 @@ class WordpressHelpers
 
     public function wpParseArticleLinks(string $post, string $host, callable $callback, ?array &$errors = null)
     {
-        return preg_replace_callback('/\[articlelink.*?id="?(\d+)"?.*?\]/is', function ($matches) use ($host, $callback, &$errors) {
-            $url = $host . $matches[1];
+        return preg_replace_callback('/\[articlelink.*?id="?([\d\s]+)"?.*?\]/is', function ($matches) use ($host, $callback, &$errors) {
+            $articleId = preg_replace('/\s+/', '', $matches[1]);
+            $url = $host . $articleId;
             try {
                 $meta = $this->content->fetchUrlMeta($url);
             } catch (InvalidUrlException $e) {

@@ -35,6 +35,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Allowed cross-origin requests in MailGeneratorFormFactory (opt-in) to support cross-domain submissions if necessary.
 - Fixed issues with `mail:conversion-stats` if there were no conversions in the database. remp/remp#1454
 - Fixed issue with images breaking layout in Outlook clients for NewsfilterGenerator. remp/helpdesk#4399 
+- Changed `WordpressHelpers::wpParseArticleLinks` wordpress article links parser regex, to allow and strip spaces from article id. remp/helpdesk#4406
 
 ## Archive
 
