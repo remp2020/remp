@@ -305,7 +305,7 @@ HTML;
 HTML;
 
         $imageTemplate = <<< HTML
-        <img src="$1" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;">
+        <img src="$1" alt="" width="564" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width: 100%;max-width:100%;clear:both;display:block;margin-bottom:20px;">
 HTML;
 
         return [
