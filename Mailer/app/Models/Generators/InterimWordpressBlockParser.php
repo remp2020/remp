@@ -17,6 +17,7 @@ class InterimWordpressBlockParser
     public const BLOCK_CORE_IMAGE = 'core/image';
 
     public const BLOCK_EO_POST = 'eo/post';
+    public const BLOCK_EO_ADVERT = 'eo/advert';
 
     /** @var TwigEngine $twig */
     private IEngine $twig;
@@ -82,6 +83,11 @@ class InterimWordpressBlockParser
             };
         }
 
+        if ($block->name === self::BLOCK_CORE_PARAGRAPH) {
+            $data['textAlign'] = $block->attributes->align ?? null;
+            $data['textColor'] = $block->attributes->textColor ?? null;
+        }
+
         if ($block->name === self::BLOCK_CORE_HEADING) {
             $data['level'] = $block->attributes->level;
             $data['fontSize'] = match ($data['level']) {
@@ -105,6 +111,7 @@ class InterimWordpressBlockParser
             self::BLOCK_CORE_LIST => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-list.twig',
             self::BLOCK_CORE_LIST_ITEM => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-list-item.twig',
             self::BLOCK_EO_POST => __DIR__ . '/resources/templates/InterimWordpressBlockParser/eo-post.twig',
+            self::BLOCK_EO_ADVERT => __DIR__ . '/resources/templates/InterimWordpressBlockParser/eo-advert.twig',
 
             default => throw new \Exception("not existing block template: '{$blockName}'"),
         };
