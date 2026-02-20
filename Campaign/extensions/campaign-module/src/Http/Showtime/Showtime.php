@@ -137,6 +137,9 @@ class Showtime
                 if (isset($data->debug->referer)) {
                     $data->referer = $data->debug->referer;
                 }
+                if (isset($data->debug->sessionReferer)) {
+                    $data->sessionReferer = $data->debug->sessionReferer;
+                }
             } else {
                 $evaluationMessages[] = 'Invalid debug key';
             }

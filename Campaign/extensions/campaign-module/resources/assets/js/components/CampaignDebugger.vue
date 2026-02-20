@@ -26,6 +26,7 @@
       <input v-model="form.campaignPublicId" placeholder="Campaign public ID">
       <input v-model="form.userId" placeholder="User ID">
       <input v-model="form.referer" placeholder="Referer">
+      <input v-model="form.sessionReferer" placeholder="Session referer">
       <button @click="setAndReload">Set and reload campaigns</button>
     </div>
     <div class="ri-settings__group" style="padding-top: 0" v-if="(errors.length + messages.length) > 0 ">
@@ -106,6 +107,7 @@ export default {
         userId: null,
         campaignPublicId: null,
         referer: null,
+        sessionReferer: null,
       },
       errors: [],
       messages: [],
