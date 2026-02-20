@@ -2,6 +2,14 @@ import Remplib from '@remp/js-commons/js/remplib'
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
+function isCampaignDebugEnabled() {
+    // Checks if 'campaign_debug=1' or 'campaignDebug=1' exists in the cookie string
+    const cookieDebug = /(^|;\s*)(campaign_debug|campaignDebug)=1(;\s*|$)/.test(document.cookie);
+    const hashDebug = window.location.hash === '#campaignDebug' || window.location.hash === '#campaign_debug';
+    console.log("isCampaignDebugEnabled", cookieDebug, hashDebug);
+    return cookieDebug || hashDebug;
+}
+
 class Campaign {
 
     static initialized = false;
@@ -53,7 +61,7 @@ class Campaign {
                 "pageviewAttributes": remplib.campaign.pageviewAttributes,
             };
 
-            if (window.location.hash === '#campaignDebug' && remplib.campaign.debug && remplib.campaign.debug.key) {
+            if (isCampaignDebugEnabled() && remplib.campaign.debug && remplib.campaign.debug.key) {
                 data["debug"] = remplib.campaign.debug;
             }
 
@@ -166,7 +174,7 @@ class Campaign {
             remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
         }
 
-        if (window.location.hash === '#campaignDebug') {
+        if (isCampaignDebugEnabled()) {
             remplib.loadScript(this.url + '/assets/lib/js/campaignDebug.js');
         }
 
