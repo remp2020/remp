@@ -2,14 +2,6 @@ import Remplib from '@remp/js-commons/js/remplib'
 
 remplib = typeof(remplib) === 'undefined' ? {} : remplib;
 
-function isCampaignDebugEnabled() {
-    // Checks if 'campaign_debug=1' or 'campaignDebug=1' exists in the cookie string
-    const cookieDebug = /(^|;\s*)(campaign_debug|campaignDebug)=1(;\s*|$)/.test(document.cookie);
-    const hashDebug = window.location.hash === '#campaignDebug' || window.location.hash === '#campaign_debug';
-    console.log("isCampaignDebugEnabled", cookieDebug, hashDebug);
-    return cookieDebug || hashDebug;
-}
-
 class Campaign {
 
     static initialized = false;
@@ -44,7 +36,7 @@ class Campaign {
             return "campaigns/showtime";
         },
         jsonpParameter: "data",
-        prepareData: function() {
+        prepareData() {
             const data = {
                 "version": 1,
                 "userId": remplib.getUserId(),
@@ -61,14 +53,14 @@ class Campaign {
                 "pageviewAttributes": remplib.campaign.pageviewAttributes,
             };
 
-            if (isCampaignDebugEnabled() && remplib.campaign.debug && remplib.campaign.debug.key) {
+            if (remplib.campaign.isCampaignDebugEnabled() && remplib.campaign.debug && remplib.campaign.debug.key) {
                 data["debug"] = remplib.campaign.debug;
             }
 
             return data;
         },
-        processResponse: function(result) {
-            if (!result["success"]) {
+        processResponse: function(response, requestData) {
+            if (!response["success"]) {
                 window.dispatchEvent(
                     new CustomEvent("remp:showtimeReady")
                 );
@@ -77,14 +69,14 @@ class Campaign {
 
             // deprecated
             window.dispatchEvent(new CustomEvent("campaign_showtime", {
-                detail: result.providerData,
+                detail: response.providerData,
             }));
             window.dispatchEvent(new CustomEvent("campaign_showtime_response", {
-                detail: result,
+                detail: { response, requestData }
             }));
 
             let promises = [];
-            for (let exec = result.data || [], c = 0; c < exec.length; c++) {
+            for (let exec = response.data || [], c = 0; c < exec.length; c++) {
                 let fn = new Function('resolve', exec[c]);
                 promises.push(
                     new Promise(function (resolve, reject) {
@@ -108,8 +100,8 @@ class Campaign {
                 );
             });
 
-            remplib.campaign.incrementPageviewCountForCampaigns(result.activeCampaigns);
-            remplib.campaign.printSuppressedBanners(result);
+            remplib.campaign.incrementPageviewCountForCampaigns(response.activeCampaigns);
+            remplib.campaign.printSuppressedBanners(response);
         },
     };
 
@@ -174,7 +166,7 @@ class Campaign {
             remplib.loadScript(this.url + '/assets/lib/js/bannerSelector.js');
         }
 
-        if (isCampaignDebugEnabled()) {
+        if (this.isCampaignDebugEnabled()) {
             remplib.loadScript(this.url + '/assets/lib/js/campaignDebug.js');
         }
 
@@ -267,10 +259,11 @@ class Campaign {
 
     request(def) {
         let params = {};
-        params[def.jsonpParameter] = JSON.stringify(def.prepareData());
+        const requestData = JSON.stringify(def.prepareData());
+        params[def.jsonpParameter] = requestData;
 
-        this.get(this.url + "/" + def.name(), params, function (data) {
-            def.processResponse && def.processResponse(data);
+        this.get(this.url + "/" + def.name(), params, function (response) {
+            def.processResponse && def.processResponse(response, requestData);
         }, function() {
             def.processError && def.processError();
         });
@@ -600,6 +593,36 @@ class Campaign {
             }
             console.groupEnd();
         }
+    }
+
+    isCampaignDebugEnabled() {
+        // Checks if 'campaign_debug=1' or 'campaignDebug=1' exists in the cookie string
+        const cookieDebug = /(^|;\s*)(campaign_debug|campaignDebug)=1(;\s*|$)/.test(document.cookie);
+        const hashDebug = window.location.hash === '#campaignDebug' || window.location.hash === '#campaign_debug';
+        if (hashDebug) {
+            // enable cookie for future requests
+            document.cookie = "campaign_debug=1; path=/";
+        }
+        return cookieDebug || hashDebug;
+    }
+
+    disableDebug() {
+        // Remove cookies
+        const targets = ["campaign_debug", "campaignDebug"];
+        targets.forEach(name => {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        });
+        const currentHash = window.location.hash.substring(1);
+
+        // Remove hash
+        if (!targets.includes(currentHash)) {
+            return;
+        }
+        history.replaceState(
+            null,
+            document.title,
+            window.location.pathname + window.location.search
+        );
     }
 }
 

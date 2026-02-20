@@ -1,7 +1,7 @@
 <template>
-  <div class="ri-settings" id="campaign-debugger" ref="debugger">
+  <div class="ri-settings" id="campaign-debugger" ref="debugger" v-if="!closed">
     <div class="ri-settings__header">
-      <svg viewBox="0 0 71.61 70.88">
+      <svg class="ri-settings__logo" viewBox="0 0 71.61 70.88">
         <polygon
           fill="white"
           points="35.8 2.74 16.91 13.65 23.2 17.29 35.8 10.02 54.7 20.93 35.8 31.84 35.8 31.84 10.61 17.29 10.61 53.59 16.91 57.23 16.91 28.2 35.8 39.11 35.8 39.11 35.8 39.11 35.8 39.11 61 24.57 61 17.29 35.8 2.74"
@@ -16,32 +16,48 @@
         />
       </svg>
       Campaign debugger
+      <button class="ri-settings__close" @click="close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
     </div>
-    <div class="form ri-settings__group" style="padding-top: 0" ref="debuggerForm">
-      <p class="ri-settings__group__title">
-        Debug parameters
-        <HelpIconWithTooltip text="Specify which campaign to debug. If campaign public ID is set, only this campaign will be display." />
-      </p>
-      <input v-model="form.key" type="text" placeholder="Debug key">
-      <input v-model="form.campaignPublicId" placeholder="Campaign public ID">
-      <input v-model="form.userId" placeholder="User ID">
-      <input v-model="form.referer" placeholder="Referer">
-      <input v-model="form.sessionReferer" placeholder="Session referer">
-      <button @click="setAndReload">Set and reload campaigns</button>
-    </div>
-    <div class="ri-settings__group" style="padding-top: 0" v-if="(errors.length + messages.length) > 0 ">
-      <p class="ri-settings__group__title">
-        Showtime result
-      </p>
-      <div v-if="errors.length > 0">
-        <ul>
-          <li style="color:red" v-for="error in errors">{{ error }}</li>
-        </ul>
+    <div class="ri-settings__body">
+      <div class="form ri-settings__group" style="padding-top: 0" ref="debuggerForm">
+        <p class="ri-settings__group__title">
+          Debug parameters<br />
+          <HelpIconWithTooltip text="Specify which campaign to debug. If campaign public ID is set, only this campaign will be display." />
+        </p>
+        <input v-model="form.key" type="text" placeholder="Debug key">
+        <input v-model="form.campaignPublicId" placeholder="Campaign public ID">
+        <input v-model="form.userId" placeholder="User ID">
+        <input v-model="form.referer" placeholder="Referer">
+        <input v-model="form.sessionReferer" placeholder="Session referer">
+        <button @click="setAndReload">Set and reload campaigns</button>
       </div>
-      <div v-if="messages.length > 0">
-        <ul>
-          <li style="color:green" v-for="msg in messages">{{ msg }}</li>
-        </ul>
+      <div class="ri-settings__group" style="padding-top: 0" v-if="requestData">
+        <p class="ri-settings__group__title">
+          Showtime data
+        </p>
+        <div>
+          {{ requestData }}
+        </div>
+      </div>
+      <div class="ri-settings__group" style="padding-top: 0" v-if="(errors.length + messages.length) > 0 ">
+        <p class="ri-settings__group__title">
+          Showtime result
+        </p>
+        <div v-if="errors.length > 0">
+          <ul>
+            <li style="color:red" v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
+        <div v-if="messages.length > 0">
+          <ul>
+            <li style="color:green" v-for="msg in messages">{{ msg }}</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -74,13 +90,22 @@ export default {
     }
 
     window.addEventListener("campaign_showtime_response", (e) => {
-      this.processShowtimeResponse(e.detail);
+      this.processShowtimeResponse(e.detail.response, e.detail.requestData);
     });
 
     this.$refs.debugger.style.transform =
       `translate(${debuggerPosition.x}px, ${debuggerPosition.y}px)`;
 
     interact(this.$refs.debugger).draggable({
+      // keep the element within the area of it's parent
+      modifiers: [
+        interact.modifiers.restrictRect({
+          restriction: 'parent',
+          endOnly: true
+        })
+      ],
+      // enable autoScroll
+      autoScroll: true,
       allowFrom: '.ri-settings__header',
       // keep the element within the area of it's parent
 
@@ -102,6 +127,7 @@ export default {
   },
   data() {
     return {
+      closed: false,
       form: {
         key: null,
         userId: null,
@@ -111,15 +137,21 @@ export default {
       },
       errors: [],
       messages: [],
+      requestData: {},
     };
   },
   methods: {
-    processShowtimeResponse(response) {
+    processShowtimeResponse(response, requestData) {
       this.errors = [];
       this.messages = [];
+      this.requestData = {};
       if (response.evaluationMessages && response.evaluationMessages.length > 0) {
         this.messages = response.evaluationMessages;
         return;
+      }
+
+      if (requestData) {
+        this.requestData = requestData;
       }
 
       if (this.form.key && this.form.campaignPublicId) {
@@ -140,6 +172,10 @@ export default {
       let rempConfig = window.remplib.getConfig();
       rempConfig.campaign.debug = this.form;
       remplib.campaign.init(rempConfig);
+    },
+    close() {
+      remplib.campaign.disableDebug();
+      this.closed = true;
     }
   },
 }
@@ -152,11 +188,18 @@ export default {
   background-color: white;
   box-shadow: 5px 9px 30px 0 rgba(168, 173, 187, 0.6);
   border-radius: 5px;
-  width: 260px;
+  width: 320px;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 99999999;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  &__body {
+    overflow-y: auto;
+  }
 
   &__header {
     display: flex;
@@ -165,10 +208,37 @@ export default {
     background: #3874d0;
     color: white;
     font-size: 15px;
+    justify-content: space-between; // This pushes the X to the far right
 
-    svg {
+    // Target the logo specifically so it doesn't fight with the close button
+    .ri-settings__logo {
       width: 17px;
       margin-right: 10px;
+    }
+
+    // Styles for the new Close Button
+    .ri-settings__close {
+      background: transparent;
+      border: none;
+      padding: 0;
+      width: auto; // Override your global button width: 100%
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s;
+      line-height: normal; // Reset global button line-height
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      svg {
+        width: 18px;
+        height: 18px;
+        margin-right: 0; // Reset logo margin
+        stroke: white;
+      }
     }
   }
 
