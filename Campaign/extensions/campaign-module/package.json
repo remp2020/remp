@@ -26,6 +26,7 @@
   "packageManager": "yarn@2.4.3",
   "dependencies": {
     "@babel/core": "^7.0",
+    "@medv/finder": "^4.0.2",
     "@remp/js-commons": "^2.4",
     "animate.css": "^3.7.0",
     "autosize": "^4.0.2",
@@ -53,11 +54,11 @@
     "moment-timezone": "^0.4.0 || ^0.5.0",
     "node-waves": "^0.7.6",
     "nouislider": "^13.1.5",
-    "@medv/finder": "^4.0.2",
     "rison": "^0.1.1",
     "salvattore": "^1.0.9",
     "vue": "^2.7",
     "vue-codemirror": "4.0.6",
+    "vue-json-pretty": "^1.9.5",
     "vue-slide-up-down": "^1.7.2",
     "vue-template-compiler": "^2.7"
   },

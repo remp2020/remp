@@ -26,7 +26,7 @@
     <div class="ri-settings__body">
       <div class="form ri-settings__group" style="padding-top: 0" ref="debuggerForm">
         <p class="ri-settings__group__title">
-          Debug parameters<br />
+          Debug parameters
           <HelpIconWithTooltip text="Specify which campaign to debug. If campaign public ID is set, only this campaign will be display." />
         </p>
         <input v-model="form.key" type="text" placeholder="Debug key">
@@ -35,14 +35,6 @@
         <input v-model="form.referer" placeholder="Referer">
         <input v-model="form.sessionReferer" placeholder="Session referer">
         <button @click="setAndReload">Set and reload campaigns</button>
-      </div>
-      <div class="ri-settings__group" style="padding-top: 0" v-if="requestData">
-        <p class="ri-settings__group__title">
-          Showtime data
-        </p>
-        <div>
-          {{ requestData }}
-        </div>
       </div>
       <div class="ri-settings__group" style="padding-top: 0" v-if="(errors.length + messages.length) > 0 ">
         <p class="ri-settings__group__title">
@@ -59,6 +51,15 @@
           </ul>
         </div>
       </div>
+      <div class="ri-settings__group" style="padding-top: 0" v-if="requestData">
+        <p class="ri-settings__group__title">
+          Showtime request data
+        </p>
+        <div>
+          <vue-json-pretty :data="requestData" :deep="0">
+          </vue-json-pretty>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -67,11 +68,13 @@
 
 import interact from 'interactjs';
 import HelpIconWithTooltip from "./HelpIconWithTooltip";
+import VueJsonPretty from 'vue-json-pretty';
+import 'vue-json-pretty/lib/styles.css';
 
 let debuggerPosition = {x: 0, y: 0}
 
 export default {
-  components: {HelpIconWithTooltip},
+  components: {HelpIconWithTooltip, VueJsonPretty},
   created() {
     const debuggerKey = localStorage.getItem('campaign-debugger-key');
     if (debuggerKey) {
@@ -137,26 +140,24 @@ export default {
       },
       errors: [],
       messages: [],
-      requestData: {},
+      requestData: null,
     };
   },
   methods: {
     processShowtimeResponse(response, requestData) {
       this.errors = [];
       this.messages = [];
-      this.requestData = {};
+      if (requestData) {
+        this.requestData = JSON.parse(requestData);
+      }
       if (response.evaluationMessages && response.evaluationMessages.length > 0) {
         this.messages = response.evaluationMessages;
         return;
       }
 
-      if (requestData) {
-        this.requestData = requestData;
-      }
-
       if (this.form.key && this.form.campaignPublicId) {
         if (response.data.length > 0) {
-          this.messages.push("Campaign [" + this.form.campaignPublicId + "] successfully displayed");
+          this.messages.push("Campaign [" + this.form.campaignPublicId + "] was shown");
         } else if (response.suppressedBanners.length > 0) {
           for (const b of response.suppressedBanners) {
             this.errors.push("Campaign [" + b.campaign_public_id +
@@ -164,6 +165,10 @@ export default {
           }
         } else {
           this.errors.push("Campaign [" + this.form.campaignPublicId + "] returned no data");
+        }
+      } else {
+        for (const activeCampaigns of response.activeCampaigns) {
+          this.messages.push("Campaign [" + activeCampaigns.public_id + "] was shown");
         }
       }
     },
@@ -396,6 +401,5 @@ export default {
   input::placeholder {
     opacity: 0.7;
   }
-
 }
 </style>

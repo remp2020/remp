@@ -264,7 +264,7 @@ class Showtime
             $c = $campaigns[$campaignBanner->campaign_id];
 
             if ($debug) {
-                $evaluationMessages[] = "Displaying campaign [{$c->public_id}] (variant [$campaignBanner->public_id], banner [{$campaignBanner->banner->public_id}])";
+                $evaluationMessages[] = "Campaign [{$c->public_id}] (variant [$campaignBanner->public_id], banner [{$campaignBanner->banner->public_id}]) was shown";
             }
             $matchedSnippets = array_intersect_key(
                 $this->snippets,
