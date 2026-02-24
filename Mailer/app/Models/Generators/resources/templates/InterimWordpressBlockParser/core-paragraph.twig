@@ -1,1 +1,1 @@
-<p{% if textAlign or textColor %} style="{% if textAlign %}text-align: {{ textAlign }};{% endif %}{% if textColor %} color: {{ textColor }};{% endif %}"{% endif %}>{{ content|raw }}</p>
+<p style="{% if textAlign %}text-align: {{ textAlign }};{% endif %}{% if textColor %} color: {{ textColor }};{% endif %}">{{ content|raw }}</p>
