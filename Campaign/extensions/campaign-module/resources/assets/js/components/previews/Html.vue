@@ -31,29 +31,29 @@
 
 .html-preview-close {
     position: absolute;
-    display: block;
+    display: flex;
     top: 0;
     right: 0;
     text-decoration: none;
     font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
-    min-width: 40px;
-    height: 40px;
+    height: 44px;
     letter-spacing: 0.05em;
-    line-height: 40px;
-    padding-right: 3px;
-    text-align: right;
+    text-align: center;
     cursor: pointer;
+    min-width: 44px;
+    line-height: 44px;
+    flex-direction: row;
 }
 
-a.html-preview-close::after {
-    content: "\00a0\00d7\00a0";
-    font-size: 24px;
-    vertical-align: sub;
-    font-weight: normal;
-    line-height: 40px;
-    display: inline-block;
+.html-preview-close span {
+    flex-grow: 1;
+}
+
+.html-preview-close span:nth-child(2) {
+    padding-right: 15px;
+    padding-left: 5px;
 }
 </style>
 
@@ -83,7 +83,8 @@ a.html-preview-close::after {
                    v-bind:style="closeStyles"
                    v-on:click.stop="$parent.closed"
                    v-on:keydown.enter.space.stop="$parent.closed">
-                    <small>{{ closeText }}</small>
+
+                    <span v-if="closeText">{{ closeText }}</span><span style="font-size: 20px;">&#215;</span>
                 </a>
 
                 <div v-html="$parent.injectSnippets(text)"

@@ -2,14 +2,26 @@
 @import url('../../../sass/transitions.scss');
 
 .bar-preview-close {
+    display: flex;
     order: 2;
     align-self: flex-start;
     white-space: nowrap;
     text-transform: uppercase;
     font-size: 14px;
-    margin: 0 5px;
     text-decoration: none;
     cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    text-align: center;
+    line-height: 44px;
+}
+
+.bar-preview-close span {
+    flex-grow: 1;
+}
+
+.bar-preview-close span:nth-child(2) {
+    padding-left: 5px;
 }
 
 .bar-preview-close.hidden {
@@ -41,6 +53,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 44px;
+    line-height: 44px;
+    min-width: 44px;
+    text-align: center;
+}
+
+.bar-close span {
+    flex-grow: 1;
+}
+
+.bar-close span:nth-child(2) {
+    padding-left: 5px;
 }
 
 .bar-preview-link {
@@ -145,13 +169,7 @@
            v-bind:style="closeStyles"
            v-bind:title="closeText || 'Close banner'"
            v-bind:aria-label="closeText || 'Close banner'"
-      >
-          <div>
-              {{ closeText }}
-              <span style="font-size: 18px">&#215;</span>
-          </div>
-
-      </div>
+      ><span v-if="closeText">{{ closeText }}</span><span style="font-size: 22px;">&#215;</span></div>
     </div>
 
     <div v-on:click="click" class="bar-preview-link">
@@ -165,9 +183,7 @@
                    v-bind:style="closeStyles"
                    v-bind:title="closeText || 'Close banner'"
                    v-bind:aria-label="closeText || 'Close banner'"
-                >
-                    <span>{{ closeText }} <span style="font-size: 18px">&#215;</span></span>
-                </a>
+                ><span v-if="closeText">{{ closeText }}</span><span style="font-size: 22px;">&#215;</span></a>
 
                 <a class="bar-main"
                    ref="mainLink"

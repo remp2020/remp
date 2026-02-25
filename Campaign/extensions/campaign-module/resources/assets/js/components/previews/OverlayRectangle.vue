@@ -3,29 +3,29 @@
 
 .overlay-rectangle-preview-close {
     position: absolute;
-    display: block;
+    display: flex;
     top: 0;
     right: 0;
     text-decoration: none;
     font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
-    min-width: 40px;
-    height: 40px;
+    min-width: 44px;
+    height: 44px;
     letter-spacing: 0.05em;
-    line-height: 40px;
+    line-height: 44px;
     padding-right: 3px;
-    text-align: right;
+    text-align: center;
     cursor: pointer;
 }
 
-a.overlay-rectangle-preview-close::after {
-    content: "\00a0\00d7\00a0";
-    font-size: 24px;
-    vertical-align: sub;
-    font-weight: normal;
-    line-height: 40px;
-    display: inline-block;
+.overlay-rectangle-preview-close span {
+    flex-grow: 1;
+    line-height: 44px;
+}
+
+.overlay-rectangle-preview-close span:nth-child(2) {
+    padding-left: 5px;
 }
 
 .preview-admin-close {
@@ -145,7 +145,7 @@ a.overlay-rectangle-preview-close::after {
 }
 
 .overlay-rectangle-wrap.closeable {
-    padding-top: 40px;
+    padding-top: 44px;
 }
 </style>
 
@@ -170,7 +170,7 @@ a.overlay-rectangle-preview-close::after {
                            v-bind:aria-label="closeText || 'Close banner'"
                            v-on:click.stop="$parent.closed"
                            v-on:keydown.enter.space.stop="$parent.closed"
-                        ><small>{{ closeText }}</small></a>
+                        ><span v-if="closeText">{{ closeText }}</span><span style="font-size: 20px;">&#215;</span></a>
 
                         <div
                             v-on:click="click"

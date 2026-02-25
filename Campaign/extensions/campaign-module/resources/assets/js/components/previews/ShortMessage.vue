@@ -7,24 +7,18 @@
 
 .short-message-preview-close {
     position: absolute;
-    display: block;
-    top: 0px;
-    right: 0px;
-    width: 40px;
-    height: 40px;
+    display: flex;
+    top: 0;
+    right: 0;
+    width: 44px;
+    height: 44px;
     text-decoration: none;
+    text-align: center;
     cursor: pointer;
 }
 
-a.short-message-preview-close::after {
-    content: "\00d7";
-    font-size: 24px;
-    font-weight: normal;
-    display: block;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
+.short-message-preview-close span {
+    flex-grow: 1;
 }
 
 .short-message-preview-close.hidden {
@@ -57,7 +51,7 @@ a.short-message-preview-close::after {
 }
 
 .short-message-preview-box.short-message-closable {
-    padding-right: 40px;
+    padding-right: 44px;
 }
 
 </style>
@@ -83,7 +77,7 @@ a.short-message-preview-close::after {
                    v-bind:title="closeText || 'Close banner'"
                    v-bind:style="closeStyles"
                    v-on:click.stop="$parent.closed"
-                   v-on:keydown.enter.space="$parent.closed"></a>
+                   v-on:keydown.enter.space="$parent.closed"><span style="font-size: 24px;">&#215;</span></a>
 
                 <a class="short-message-main"
                    ref="mainLink"

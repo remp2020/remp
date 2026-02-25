@@ -3,29 +3,28 @@
 
 .medium-rectangle-preview-close {
     position: absolute;
-    display: block;
+    display: flex;
     top: 0;
     right: 0;
     text-decoration: none;
     font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
-    min-width: 40px;
-    height: 40px;
+    min-width: 44px;
+    height: 44px;
     letter-spacing: 0.05em;
-    line-height: 40px;
-    padding-right: 3px;
-    text-align: right;
+    line-height: 44px;
+    padding-right: 5px;
+    text-align: center;
     cursor: pointer;
 }
 
-a.medium-rectangle-preview-close::after {
-    content: "\00a0\00d7\00a0";
-    font-size: 24px;
-    vertical-align: sub;
-    font-weight: normal;
-    line-height: 40px;
-    display: inline-block;
+.medium-rectangle-preview-close span {
+    flex-grow: 1;
+}
+
+.medium-rectangle-preview-close span:nth-child(2) {
+    padding-left: 5px;
 }
 
 .medium-rectangle-preview-close.hidden {
@@ -90,7 +89,7 @@ a.medium-rectangle-preview-close::after {
                    v-bind:aria-label="closeText || 'Close banner'"
                    v-on:click.stop="$parent.closed"
                    v-on:keydown.enter.space="$parent.closed"
-                ><span>{{ closeText }}</span></a>
+                ><span v-if="closeText">{{ closeText }}</span><span style="font-size: 20px;">&#215;</span></a>
 
                 <div class="medium-rectangle-header" v-html="$parent.injectSnippets(headerText)"></div>
 
