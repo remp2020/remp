@@ -30,7 +30,7 @@ class MailTranslator
     public function translateTemplate(ActiveRow $templateRow, string $locale = null): MailTemplate
     {
         if ($templateRow->getTable()->getName() === ActiveRowFactory::TABLE_NAME_DATAROW || !$this->localizationConfig->isTranslatable($locale)) {
-            return new MailTemplate($templateRow->from, $templateRow->subject, $templateRow->mail_body_text, $templateRow->mail_body_html);
+            return new MailTemplate($templateRow->from, $templateRow->subject, $templateRow->mail_body_text, $templateRow->mail_body_html, $templateRow->preheader);
         }
 
         $templateRow = $this->templatesRepository->getByCode($templateRow->code);
@@ -40,10 +40,10 @@ class MailTranslator
             ->fetch();
 
         if ($translatedTemplate) {
-            return new MailTemplate($translatedTemplate->from, $translatedTemplate->subject, $translatedTemplate->mail_body_text, $translatedTemplate->mail_body_html);
+            return new MailTemplate($translatedTemplate->from, $translatedTemplate->subject, $translatedTemplate->mail_body_text, $translatedTemplate->mail_body_html, $translatedTemplate->preheader);
         }
 
-        return new MailTemplate($templateRow->from, $templateRow->subject, $templateRow->mail_body_text, $templateRow->mail_body_html);
+        return new MailTemplate($templateRow->from, $templateRow->subject, $templateRow->mail_body_text, $templateRow->mail_body_html, $templateRow->preheader);
     }
 
     public function translateLayout(ActiveRow $layoutRow, string $locale = null): MailLayout

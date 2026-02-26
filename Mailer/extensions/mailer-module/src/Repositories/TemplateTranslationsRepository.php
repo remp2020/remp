@@ -13,13 +13,15 @@ class TemplateTranslationsRepository extends Repository
         string $from,
         string $subject,
         string $mailBodyText,
-        string $mailBodyHtml
+        string $mailBodyHtml,
+        ?string $preheader = null
     ) {
         $data = [
             'mail_template_id' => $mailTemplate->id,
             'locale' => $locale,
             'from' => $from,
             'subject' => $subject,
+            'preheader' => $preheader,
             'mail_body_text' => $mailBodyText,
             'mail_body_html' => $mailBodyHtml,
         ];
@@ -45,6 +47,7 @@ class TemplateTranslationsRepository extends Repository
                 'locale' => $templateTranslation->locale,
                 'from' => $templateTranslation->from,
                 'subject' => $templateTranslation->subject,
+                'preheader' => $templateTranslation->preheader,
                 'mail_body_text' => $templateTranslation->mail_body_text,
                 'mail_body_html' => $templateTranslation->mail_body_html,
             ]);

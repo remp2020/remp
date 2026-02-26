@@ -9,6 +9,8 @@ class MailTemplate
 
     private string $subject;
 
+    private ?string $preheader;
+
     private string $textBody;
 
     private string $htmlBody;
@@ -17,12 +19,14 @@ class MailTemplate
         string $from,
         string $subject,
         string $textBody,
-        string $htmlBody
+        string $htmlBody,
+        ?string $preheader = null
     ) {
         $this->from = $from;
         $this->subject = $subject;
         $this->textBody = $textBody;
         $this->htmlBody = $htmlBody;
+        $this->preheader = $preheader;
     }
 
     public function getFrom(): string
@@ -33,6 +37,11 @@ class MailTemplate
     public function getSubject(): string
     {
         return $this->subject;
+    }
+
+    public function getPreheader(): ?string
+    {
+        return $this->preheader;
     }
 
     public function getTextBody(): string

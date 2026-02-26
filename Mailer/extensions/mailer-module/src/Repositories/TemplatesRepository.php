@@ -97,7 +97,8 @@ class TemplatesRepository extends Repository
         ?bool $clickTracking = null,
         ?string $extrasJson = null,
         ?string $paramsJson = null,
-        bool $attachmentsEnabled = true
+        bool $attachmentsEnabled = true,
+        ?string $preheader = null,
     ): ActiveRow {
         if ($this->exists($code)) {
             throw new TemplatesCodeNotUniqueException("Template code [$code] is already used.");
@@ -110,6 +111,7 @@ class TemplatesRepository extends Repository
             'from' => $from,
             'autologin' => true,
             'subject' => $subject,
+            'preheader' => $preheader,
             'click_tracking' => $clickTracking,
             'mail_body_text' => $templateText,
             'mail_body_html' => $templateHtml,
@@ -148,6 +150,7 @@ class TemplatesRepository extends Repository
             'description' => $template->description,
             'from' => $template->from,
             'subject' => $template->subject,
+            'preheader' => $template->preheader,
             'mail_body_text' => $template->mail_body_text,
             'mail_body_html' => $template->mail_body_html,
             'mail_layout_id' => $template->mail_layout_id,

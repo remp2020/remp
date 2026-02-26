@@ -18,21 +18,12 @@ class MailCreateTemplateHandler extends BaseHandler
 {
     public const NAME_MAX_LENGTH = 768;
 
-    private $templatesRepository;
-
-    private $listsRepository;
-
-    private $layoutsRepository;
-
     public function __construct(
-        ListsRepository $listsRepository,
-        TemplatesRepository $templatesRepository,
-        LayoutsRepository $layoutsRepository
+        private readonly ListsRepository $listsRepository,
+        private readonly TemplatesRepository $templatesRepository,
+        private readonly LayoutsRepository $layoutsRepository
     ) {
         parent::__construct();
-        $this->templatesRepository = $templatesRepository;
-        $this->listsRepository = $listsRepository;
-        $this->layoutsRepository = $layoutsRepository;
     }
 
     public function params(): array
@@ -46,6 +37,7 @@ class MailCreateTemplateHandler extends BaseHandler
             (new PostInputParam('mail_type_code'))->setRequired(),
             (new PostInputParam('from')),
             (new PostInputParam('subject'))->setRequired(),
+            (new PostInputParam('preheader')),
             (new PostInputParam('template_text'))->setRequired(),
             (new PostInputParam('template_html'))->setRequired(),
             (new PostInputParam('click_tracking')),
@@ -128,17 +120,18 @@ class MailCreateTemplateHandler extends BaseHandler
         }
 
         $template = $this->templatesRepository->add(
-            $params['name'],
-            $this->templatesRepository->getUniqueTemplateCode($params['code']),
-            $params['description'],
-            $from,
-            $params['subject'],
-            $params['template_text'],
-            $params['template_html'],
-            $mailLayout->id,
-            $mailType->id,
-            $clickTracking,
-            $extras
+            name: $params['name'],
+            code: $this->templatesRepository->getUniqueTemplateCode($params['code']),
+            description: $params['description'],
+            from: $from,
+            subject: $params['subject'],
+            templateText: $params['template_text'],
+            templateHtml: $params['template_html'],
+            layoutId: $mailLayout->id,
+            typeId: $mailType->id,
+            clickTracking: $clickTracking,
+            extrasJson: $extras,
+            preheader: $params['preheader'] ?? null
         );
 
         return new JsonApiResponse(IResponse::S200_OK, [
@@ -148,11 +141,11 @@ class MailCreateTemplateHandler extends BaseHandler
         ]);
     }
 
-    private function isJson($string)
+    private function isJson($string): bool
     {
         try {
             Json::decode($string);
-        } catch (JsonException $exception) {
+        } catch (JsonException) {
             return false;
         }
         return true;

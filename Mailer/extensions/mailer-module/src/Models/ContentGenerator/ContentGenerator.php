@@ -38,6 +38,12 @@ class ContentGenerator
         $htmlBody = $this->generate($template->getHtmlBody(), $params);
         $html = $this->wrapLayout($template->getSubject(), $htmlBody, $layout->getHtml(), $params);
 
+        // Inject preheader after <body> tag if provided
+        $preheaderText = $template->getPreheader();
+        if ($preheaderText) {
+            $html = $this->injectPreheader($html, $this->generate($preheaderText, $params));
+        }
+
         // replace HTML snippets with their text versions
         if (isset($params['snippets']) && isset($params['snippets_text'])) {
             $params['snippets'] = $this->mailTranslator->translateSnippets($params['snippets_text'], $generatorInput->locale());
@@ -94,5 +100,20 @@ class ContentGenerator
         ];
         $params = array_merge($layoutParams, $params);
         return $this->engineFactory->engine()->render($layoutContent, $params);
+    }
+
+    private function injectPreheader(string $html, string $preheader): string
+    {
+        $preheaderHtml = sprintf(
+            '<div style="display:none;font-size:1px;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">%s %s</div>',
+            htmlspecialchars($preheader, ENT_QUOTES, 'UTF-8'),
+            str_repeat('&zwnj;&nbsp;', 150)
+        );
+
+        if (preg_match('/(<body[^>]*>)/i', $html)) {
+            return preg_replace('/(<body[^>]*>)/i', '$1' . $preheaderHtml, $html, 1);
+        }
+
+        return $preheaderHtml . $html;
     }
 }

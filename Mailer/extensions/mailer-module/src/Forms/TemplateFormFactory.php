@@ -78,6 +78,7 @@ class TemplateFormFactory implements IFormFactory
 
                 $defaults['from'] = $templateTranslation->from ?? '';
                 $defaults['subject'] = $templateTranslation->subject ?? '';
+                $defaults['preheader'] = $templateTranslation->preheader ?? '';
                 $defaults['mail_body_text'] = $templateTranslation->mail_body_text ?? '';
                 $defaults['mail_body_html'] = $templateTranslation->mail_body_html ?? '';
             }
@@ -128,6 +129,9 @@ class TemplateFormFactory implements IFormFactory
 
         $form->addText('subject', 'Subject')
             ->setRequired("Field 'Subject' is required.");
+
+        $form->addText('preheader', 'Preheader')
+            ->setNullable();
 
         $form->addSelect('click_tracking', 'Click tracking', [
             null => 'Default mailer settings (depends on your provider configuration)',
@@ -192,10 +196,11 @@ class TemplateFormFactory implements IFormFactory
                         $values['from'],
                         $values['subject'],
                         $values['mail_body_text'],
-                        $values['mail_body_html']
+                        $values['mail_body_html'],
+                        $values['preheader']
                     );
 
-                    unset($values['from'], $values['subject'], $values['mail_body_text'], $values['mail_body_html']);
+                    unset($values['from'], $values['subject'], $values['preheader'], $values['mail_body_text'], $values['mail_body_html']);
                 }
 
                 $this->templatesRepository->update($row, (array) $values);
@@ -203,16 +208,17 @@ class TemplateFormFactory implements IFormFactory
                 $callback = $this->onUpdate;
             } else {
                 $row = $this->templatesRepository->add(
-                    $values['name'],
-                    $values['code'],
-                    $values['description'],
-                    $values['from'],
-                    $values['subject'],
-                    $values['mail_body_text'],
-                    $values['mail_body_html'],
-                    $values['mail_layout_id'],
-                    $values['mail_type_id'],
-                    $values['click_tracking']
+                    name: $values['name'],
+                    code: $values['code'],
+                    description: $values['description'],
+                    from: $values['from'],
+                    subject: $values['subject'],
+                    templateText: $values['mail_body_text'],
+                    templateHtml: $values['mail_body_html'],
+                    layoutId: $values['mail_layout_id'],
+                    typeId: $values['mail_type_id'],
+                    clickTracking: $values['click_tracking'],
+                    preheader: $values['preheader']
                 );
                 $callback = $this->onCreate;
             }
