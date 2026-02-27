@@ -81,6 +81,7 @@ class ArticleUrlParserWidget extends BaseControl implements IGeneratorWidget
                 'from' => $request->getPost('from'),
                 'autologin' => true,
                 'subject' => $request->getPost('subject'),
+                'preheader' => null,
                 'mail_body_text' => $textContent,
                 'mail_body_html' => $htmlContent,
                 'mail_layout_id' => $mailLayout->id,
