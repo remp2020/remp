@@ -28,16 +28,21 @@ class InterimWordpressBlockParser
         $this->twig = $engineFactory->engine('twig');
     }
 
-    public function parseJson(string $json): array
+    public function parseJson(string $blocksJson, string $settingsJson): array
     {
-        $data = preg_replace('/[[:cntrl:]]/', '', $json);
-        $data = json_decode($data);
+        $blocksData = preg_replace('/[[:cntrl:]]/', '', $blocksJson);
+        $blocksData = json_decode($blocksData);
+
+        $settings = preg_replace('/[[:cntrl:]]/', '', $settingsJson);
+        $settings = json_decode($settings);
+
+        $colorPalette = $this->extractColorPalette($settings);
 
         $htmlResult = '';
         $textResult = '';
 
-        foreach ($data as $block) {
-            $parsedBlock = $this->parseBlock($block);
+        foreach ($blocksData as $block) {
+            $parsedBlock = $this->parseBlock($block, $colorPalette);
             $htmlResult .= $parsedBlock;
 
             $textBlock = html_entity_decode(strip_tags($parsedBlock));
@@ -51,21 +56,21 @@ class InterimWordpressBlockParser
         return [$htmlResult, $textResult];
     }
 
-    public function parseBlock(object $block, array $innerBlockParams = []): string
+    public function parseBlock(object $block, array $colorPalette): string
     {
         $params['contents'] = '';
-        $params += $this->getBlockTemplateData($block, $innerBlockParams);
+        $params += $this->getBlockTemplateData($block, $colorPalette);
 
         $template = $this->getTemplate($block->name);
-        if (isset($block->innerBlocks) && !empty($block->innerBlocks)) {
+        if (!empty($block->innerBlocks)) {
             foreach ($block->innerBlocks as $innerBlock) {
-                $params['contents'] .= $this->parseBlock($innerBlock);
+                $params['contents'] .= $this->parseBlock($innerBlock, $colorPalette);
             }
         }
         return $this->twig->render($template, $params);
     }
 
-    public function getBlockTemplateData(object $block, array $innerBlockParams = []): array
+    public function getBlockTemplateData(object $block, array $colorPalette): array
     {
         $data = [
             'originalContent' => $block->originalContent ?? null,
@@ -76,16 +81,14 @@ class InterimWordpressBlockParser
         ];
 
         if ($block->name === self::BLOCK_CORE_GROUP) {
-            $data['backgroundColor'] = match ($block->attributes->backgroundColor ?? null) {
-                'grey-2' => '#f9f9f9',
-                'orange-fade' => '#fbddd9',
-                default => '#ffffff',
-            };
+            $backgroundColor = $block->attributes->backgroundColor ?? null;
+            $data['backgroundColor'] = $colorPalette[$backgroundColor] ?? $backgroundColor ?? '#ffffff';
         }
 
         if ($block->name === self::BLOCK_CORE_PARAGRAPH) {
             $data['textAlign'] = $block->attributes->align ?? null;
-            $data['textColor'] = $block->attributes->textColor ?? null;
+            $textColor = $block->attributes->textColor ?? null;
+            $data['textColor'] = $colorPalette[$textColor] ?? $textColor;
         }
 
         if ($block->name === self::BLOCK_CORE_HEADING) {
@@ -99,6 +102,18 @@ class InterimWordpressBlockParser
         }
 
         return $data;
+    }
+
+    private function extractColorPalette(object $settings): array
+    {
+        $palette = [];
+        foreach ($settings->color->palette->default ?? [] as $entry) {
+            $palette[$entry->slug] = $entry->color;
+        }
+        foreach ($settings->color->palette->theme ?? [] as $entry) {
+            $palette[$entry->slug] = $entry->color;
+        }
+        return $palette;
     }
 
     public function getTemplate(string $blockName): string

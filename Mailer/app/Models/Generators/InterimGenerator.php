@@ -51,6 +51,11 @@ class InterimGenerator implements IGenerator
             ->setHtmlAttribute('class', 'form-control')
             ->setRequired();
 
+        $form->addTextArea('settings_json', 'Settings JSON')
+            ->setHtmlAttribute('rows', 8)
+            ->setHtmlAttribute('class', 'form-control')
+            ->setRequired();
+
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
@@ -88,13 +93,14 @@ class InterimGenerator implements IGenerator
             (new PostInputParam('url'))->setRequired(),
             (new PostInputParam('subject'))->setRequired(),
             (new PostInputParam('blocks_json'))->setRequired(),
+            (new PostInputParam('settings_json'))->setRequired(),
             (new PostInputParam('from')),
         ];
     }
 
     public function process(array $values): array
     {
-        [$html, $text] = $this->wordpressBlockParser->parseJson($values['blocks_json']);
+        [$html, $text] = $this->wordpressBlockParser->parseJson($values['blocks_json'], $values['settings_json']);
 
         $engine = $this->engineFactory->engine();
         $sourceTemplate = $this->sourceTemplatesRepository->find($values['source_template_id']);
@@ -116,6 +122,10 @@ class InterimGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'blocks'");
         }
 
+        if (!isset($data->settings)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'settings'");
+        }
+
         if (!isset($data->subject)) {
             throw new PreprocessException("WP json object does not contain required attribute 'subject'");
         }
@@ -126,6 +136,7 @@ class InterimGenerator implements IGenerator
 
         $output->from = $this->from;
         $output->blocks_json = $data->blocks;
+        $output->settings_json = $data->settings;
         $output->subject = $data->subject;
         $output->url = $data->url;
 
