@@ -2,10 +2,10 @@
 @import url('../../../sass/transitions.scss');
 
 .bar-preview-close {
+    position: relative;
     display: flex;
     order: 2;
     align-self: flex-start;
-    white-space: nowrap;
     text-transform: uppercase;
     font-size: 14px;
     text-decoration: none;
@@ -14,6 +14,8 @@
     min-height: 44px;
     text-align: center;
     line-height: 44px;
+    justify-content: center;
+    align-items: center;
 }
 
 .bar-preview-close span {
@@ -22,6 +24,7 @@
 
 .bar-preview-close span:nth-child(2) {
     padding-left: 5px;
+    padding-right: 5px;
 }
 
 .bar-preview-close.hidden {
@@ -112,6 +115,11 @@
 }
 
 @media (max-width: 640px) {
+    .bar-preview-close {
+        top: -9px;
+        right: -20px;
+    }
+
     .bar-preview-box {
         flex-wrap: wrap;
         padding: 9px 20px;
