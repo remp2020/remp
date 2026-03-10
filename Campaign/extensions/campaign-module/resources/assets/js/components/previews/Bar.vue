@@ -95,6 +95,7 @@
     padding-right: 5px;
     margin-top: 5px;
     margin-bottom: 5px;
+    max-width: 100%;
 }
 
 .bar-button {
@@ -160,6 +161,10 @@
     .bar-main {
         padding: 0;
     }
+
+    .bar-main-closeable {
+        max-width: 86%;
+    }
 }
 </style>
 
@@ -196,6 +201,7 @@
                 <a class="bar-main"
                    ref="mainLink"
                    v-html="$parent.injectSnippets(mainText)"
+                   v-bind:class="{'bar-main-closeable': closeable}"
                    v-bind:href="$parent.url"
                    v-bind:style="[mainTextStyles]"
                    v-bind:aria-label="$parent.injectSnippets(mainText) + (buttonText.length > 0 ? ', ' + $parent.injectSnippets(buttonText) : '') | strip_html"
