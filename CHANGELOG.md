@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - Existing banners with empty terms or terms without links will fail validation on save.
 - Fixed banner `js_includes` and `css_includes` fields saving `[null]` instead of empty array when no includes are specified. remp/remp#1446
 - Added timestamps support to collections with sorting in admin listing. remp/remp#1443
+- Added support for session referer debug parameter in CampaignDebugger, improved output and usability. remp/remp#1459
 - Added support for session debug parameter in CampaignDebugger, improved output. remp/remp#1459
 - Changed banner close button clickable targets according to WCAG recommendation. remp/remp#1458
 

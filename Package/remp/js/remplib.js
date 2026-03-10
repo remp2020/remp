@@ -146,7 +146,7 @@ export default {
         this.setToStorage(storageKey, rempSessionID);
 
         // store referer for this session
-        this.setToStorage(this.rempSessionRefererKey, document.referrer)
+        this.setToStorage(this.rempSessionRefererKey, document.referrer);
 
         return rempSessionID;
     },

@@ -239,19 +239,19 @@ class ShowtimeTest extends TestCase
 
         $this->scheduleCampaign();
 
-        $activeCampaignUuids = [];
+        $activeCampaigns = [];
         $userData = $this->getUserData();
-        $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids);
+        $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaigns);
         $this->assertNotNull($bannerVariant);
         $this->assertEquals($this->campaignBanner->id, $bannerVariant->id);
-        $this->assertCount(1, $activeCampaignUuids);
-        $this->assertEquals($this->campaign->uuid, $activeCampaignUuids[0]['uuid']);
+        $this->assertCount(1, $activeCampaigns);
+        $this->assertEquals($this->campaign->uuid, $activeCampaigns[$this->campaign->id]->uuid);
 
-        $activeCampaignUuids = [];
+        $activeCampaigns = [];
         $campaignsSession = [$this->campaign->uuid => ['seen' => 1]];
         $userData = $this->getUserData(null, null, null, true, null, null, $campaignsSession);
-        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
-        $this->assertEmpty($activeCampaignUuids);
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaigns));
+        $this->assertEmpty($activeCampaigns);
     }
 
     public function testCampaignSignedInUser()
@@ -841,8 +841,8 @@ class ShowtimeTest extends TestCase
 
         $campaignBanners = [$campaignBanner1, $campaignBanner2];
         $activeCampaigns = [
-            ['uuid' => $campaign1->uuid, 'public_id' => $campaign1->public_id],
-            ['uuid' => $campaign2->uuid, 'public_id' => $campaign2->public_id],
+            $campaign1->id => ['uuid' => $campaign1->uuid, 'public_id' => $campaign1->public_id],
+            $campaign2->id => ['uuid' => $campaign2->uuid, 'public_id' => $campaign2->public_id],
         ];
         $suppressedBanners = [];
 
@@ -868,8 +868,8 @@ class ShowtimeTest extends TestCase
         $campaigns = [$campaign1->id => $campaign1, $campaign2->id => $campaign2];
 
         $activeCampaigns = [
-            ['uuid' => $campaign1->uuid, 'public_id' => $campaign1->public_id],
-            ['uuid' => $campaign2->uuid, 'public_id' => $campaign2->public_id],
+            $campaign1->id => ['uuid' => $campaign1->uuid, 'public_id' => $campaign1->public_id],
+            $campaign2->id => ['uuid' => $campaign2->uuid, 'public_id' => $campaign2->public_id],
         ];
         $suppressedBanners = [];
         $result = $this->showtime->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns, $suppressedBanners);

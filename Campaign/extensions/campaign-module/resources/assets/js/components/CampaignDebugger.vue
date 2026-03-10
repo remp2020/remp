@@ -16,14 +16,22 @@
         />
       </svg>
       Campaign debugger
-      <button class="ri-settings__close" @click="close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+      <div class="ri-settings__header__actions">
+        <button class="ri-settings__minimize" @click="minimized = !minimized">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line v-if="minimized" x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        <button class="ri-settings__close" @click="close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
     </div>
-    <div class="ri-settings__body">
+    <div class="ri-settings__body" v-show="!minimized">
       <div class="form ri-settings__group" style="padding-top: 0" ref="debuggerForm">
         <p class="ri-settings__group__title">
           Debug parameters
@@ -36,7 +44,7 @@
         <input v-model="form.sessionReferer" placeholder="Session referer">
         <button @click="setAndReload">Set and reload campaigns</button>
       </div>
-      <div class="ri-settings__group" style="padding-top: 0" v-if="(errors.length + messages.length) > 0 ">
+      <div class="ri-settings__group" style="padding-top: 0" v-if="(errors.length + messages.length + renderedCampaigns.length) > 0 ">
         <p class="ri-settings__group__title">
           Showtime result
         </p>
@@ -48,6 +56,14 @@
         <div v-if="messages.length > 0">
           <ul>
             <li style="color:green" v-for="msg in messages">{{ msg }}</li>
+          </ul>
+        </div>
+        <div v-if="renderedCampaigns.length > 0">
+          <ul>
+            <li style="color:green" v-for="campaign in renderedCampaigns">
+              Campaign [<a :href="campaignUrl(campaign.public_id)" target="_blank">{{ campaign.public_id }}</a>],
+              banner [<a :href="bannerUrl(campaign.banner_public_id)" target="_blank">{{ campaign.banner_public_id }}</a>] executed
+            </li>
           </ul>
         </div>
       </div>
@@ -83,7 +99,11 @@ export default {
 
     const storedPosition = localStorage.getItem("campaign-debugger-position");
     if (storedPosition) {
-      debuggerPosition = JSON.parse(storedPosition);
+      const parsed = JSON.parse(storedPosition);
+      debuggerPosition = {
+        x: Math.max(0, parsed.x),
+        y: Math.max(0, parsed.y),
+      };
     }
   },
   mounted() {
@@ -100,23 +120,12 @@ export default {
       `translate(${debuggerPosition.x}px, ${debuggerPosition.y}px)`;
 
     interact(this.$refs.debugger).draggable({
-      // keep the element within the area of it's parent
-      modifiers: [
-        interact.modifiers.restrictRect({
-          restriction: 'parent',
-          endOnly: true
-        })
-      ],
-      // enable autoScroll
       autoScroll: true,
       allowFrom: '.ri-settings__header',
-      // keep the element within the area of it's parent
-
       listeners: {
         move(event) {
-          debuggerPosition.x += event.dx;
-          debuggerPosition.y += event.dy;
-
+          debuggerPosition.x = Math.max(0, debuggerPosition.x + event.dx);
+          debuggerPosition.y = Math.max(0, debuggerPosition.y + event.dy);
           event.target.style.transform =
             `translate(${debuggerPosition.x}px, ${debuggerPosition.y}px)`;
 
@@ -131,6 +140,7 @@ export default {
   data() {
     return {
       closed: false,
+      minimized: localStorage.getItem("campaign-debugger-minimized") === "true",
       form: {
         key: null,
         userId: null,
@@ -140,35 +150,53 @@ export default {
       },
       errors: [],
       messages: [],
+      activeCampaigns: [],
       requestData: null,
     };
   },
+  computed: {
+    baseUrl() {
+      const url = remplib.campaign.url;
+      return url.replace(/\/+$/, '');
+    },
+    renderedCampaigns() {
+      return this.activeCampaigns.filter(c => c.banner_public_id);
+    },
+  },
+  watch: {
+    minimized(value) {
+      localStorage.setItem("campaign-debugger-minimized", value);
+    },
+  },
   methods: {
+    campaignUrl(publicId) {
+      return `${this.baseUrl}/campaigns/public/${publicId}`;
+    },
+    bannerUrl(publicId) {
+      return `${this.baseUrl}/banners/public/${publicId}`;
+    },
     processShowtimeResponse(response, requestData) {
       this.errors = [];
       this.messages = [];
+      this.activeCampaigns = [];
       if (requestData) {
         this.requestData = JSON.parse(requestData);
       }
       if (response.evaluationMessages && response.evaluationMessages.length > 0) {
         this.messages = response.evaluationMessages;
-        return;
+      }
+      if (response.activeCampaigns && response.activeCampaigns.length > 0) {
+        this.activeCampaigns = response.activeCampaigns;
       }
 
       if (this.form.key && this.form.campaignPublicId) {
-        if (response.data.length > 0) {
-          this.messages.push("Campaign [" + this.form.campaignPublicId + "] was shown");
-        } else if (response.suppressedBanners.length > 0) {
+        if (response.suppressedBanners.length > 0) {
           for (const b of response.suppressedBanners) {
             this.errors.push("Campaign [" + b.campaign_public_id +
               "] was suppressed by campaign [" + b.suppressed_by_campaign_public_id + "], because they occupy the same position");
           }
-        } else {
+        } else if (response.data.length === 0) {
           this.errors.push("Campaign [" + this.form.campaignPublicId + "] returned no data");
-        }
-      } else {
-        for (const activeCampaigns of response.activeCampaigns) {
-          this.messages.push("Campaign [" + activeCampaigns.public_id + "] was shown");
         }
       }
     },
@@ -193,7 +221,7 @@ export default {
   background-color: white;
   box-shadow: 5px 9px 30px 0 rgba(168, 173, 187, 0.6);
   border-radius: 5px;
-  width: 320px;
+  width: 340px;
   position: fixed;
   top: 0;
   left: 0;
@@ -221,7 +249,14 @@ export default {
       margin-right: 10px;
     }
 
+    .ri-settings__header__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     // Styles for the new Close Button
+    .ri-settings__minimize,
     .ri-settings__close {
       background: transparent;
       border: none;
@@ -386,6 +421,10 @@ export default {
   }
   ul li {
     font-size: 0.8rem;
+
+    a {
+      color: inherit;
+    }
   }
 
   input {

@@ -32,9 +32,17 @@ Route::middleware([VerifyJwtToken::class, CollectionQueryString::class])->group(
     Route::get('/', [DashboardController::class, 'index']);
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('banners/json', [BannerController::class, 'json'])->name('banners.json');
+    Route::get('banners/public/{publicId}', function (string $publicId) {
+        $banner = \Remp\CampaignModule\Banner::where('public_id', $publicId)->firstOrFail();
+        return redirect()->route('banners.show', $banner);
+    })->name('banners.public');
     Route::get('snippets/json', [SnippetController::class, 'json'])->name('snippets.json');
     Route::get('banners/{sourceBanner}/copy', [BannerController::class, 'copy'])->name('banners.copy');
     Route::get('campaigns/json', [CampaignController::class, 'json'])->name('campaigns.json');
+    Route::get('campaigns/public/{publicId}', function (string $publicId) {
+        $campaign = \Remp\CampaignModule\Campaign::where('public_id', $publicId)->firstOrFail();
+        return redirect()->route('campaigns.show', $campaign);
+    })->name('campaigns.public');
     Route::get('campaigns/{sourceCampaign}/copy', [CampaignController::class, 'copy'])->name('campaigns.copy');
     Route::get('campaigns/{campaign}/schedule/json', [ScheduleController::class, 'json'])->name('campaign.schedule.json');
     Route::get('schedule/json', [ScheduleController::class, 'json'])->name('schedule.json');
