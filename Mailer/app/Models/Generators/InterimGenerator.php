@@ -15,8 +15,6 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class InterimGenerator implements IGenerator
 {
-    private string $from;
-
     public $onSubmit;
 
     public function __construct(
@@ -24,11 +22,6 @@ class InterimGenerator implements IGenerator
         private EngineFactory $engineFactory,
         private InterimWordpressBlockParser $wordpressBlockParser,
     ) {
-    }
-
-    public function setFrom(string $from): void
-    {
-        $this->from = $from;
     }
 
     public function generateForm(Form $form): void
@@ -134,7 +127,6 @@ class InterimGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'url'");
         }
 
-        $output->from = $this->from;
         $output->blocks_json = $data->blocks;
         $output->settings_json = $data->settings;
         $output->subject = $data->subject;
