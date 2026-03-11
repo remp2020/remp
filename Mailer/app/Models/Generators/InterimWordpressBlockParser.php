@@ -118,10 +118,6 @@ class InterimWordpressBlockParser
                 2 => '24px',
                 default => '16px',
             };
-            $data['marginTop'] = match ($data['level']) {
-                3 => '0px',
-                default => null,
-            };
             $data['color'] = $data['level'] === 2 ? '#f0523c' : '#32353a';
             $data['textAlign'] = $block->attributes->align ?? null;
         }
