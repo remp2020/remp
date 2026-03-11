@@ -70,13 +70,13 @@ class InterimTemplateFormFactory
         $form->addText('subject', 'Subject')
             ->setRequired("Field 'Subject' is required.");
 
-        $form->addText('send_at', 'Send at')
-            ->setRequired("Field 'Send at' is required.");
+        $form->addText('send_at', 'Send at')->setNullable();
 
         $form->addHidden('html_content');
         $form->addHidden('text_content');
 
         $sourceTemplate = $this->sourceTemplatesRepository->find((int) $this->request->getPost('source_template_id'));
+        $form->addHidden('source_template_id', $sourceTemplate->id);
 
         $defaults = array_filter($this->getDefaults($sourceTemplate->code));
         $form->setDefaults($defaults);
