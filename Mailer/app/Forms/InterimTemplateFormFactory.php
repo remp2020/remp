@@ -58,7 +58,7 @@ class InterimTemplateFormFactory
 
         $form->addSelect('mail_layout_id', 'Template', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
 
-        $mailTypes = $this->listsRepository->all()->where(['public_listing' => true])->fetchPairs('id', 'code');
+        $mailTypes = $this->listsRepository->all()->where(['public_listing' => true])->fetchPairs('id', 'title');
 
         $form->addSelect('mail_type_id', 'Type', $mailTypes)
             ->setRequired("Field 'Type' is required.");
@@ -146,7 +146,7 @@ class InterimTemplateFormFactory
         $now = new \DateTime();
 
         $defaults =  match ($sourceTemplateCode) {
-            'euobserver_daily_generator' => [
+            'euobserver_daily' => [
                 'name' => 'Daily minute ' . $tomorrowMorning->format('j.n.Y'),
                 'code' => 'daily_minute_' . $tomorrowMorning->format('dmy'),
                 'mail_layout_code' => 'empty-layout',
