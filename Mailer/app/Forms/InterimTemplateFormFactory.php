@@ -5,15 +5,16 @@ namespace Remp\Mailer\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
+use Nette\Http\Request;
 use Nette\Security\User;
 use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
-use Remp\MailerModule\Models\Segment\Crm;
 use Remp\MailerModule\Models\Segment\Mailer;
 use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
 class InterimTemplateFormFactory
@@ -25,12 +26,6 @@ class InterimTemplateFormFactory
 
     public $onSave;
 
-    private string $layoutCode;
-
-    private string $typeCode;
-
-    private string $from;
-
     public function __construct(
         private string $segment,
         private TemplatesRepository $templatesRepository,
@@ -39,23 +34,10 @@ class InterimTemplateFormFactory
         private JobsRepository $jobsRepository,
         private BatchesRepository $batchesRepository,
         private PermissionManager $permissionManager,
-        private User $user
+        private User $user,
+        private Request $request,
+        private SourceTemplatesRepository $sourceTemplatesRepository,
     ) {
-    }
-
-    public function setLayoutCode(string $layoutCode): void
-    {
-        $this->layoutCode = $layoutCode;
-    }
-
-    public function setTypeCode(string $typeCode): void
-    {
-        $this->typeCode = $typeCode;
-    }
-
-    public function setFrom(string $from): void
-    {
-        $this->from = $from;
     }
 
     public function overrideSegment(string $segment): void
@@ -65,16 +47,6 @@ class InterimTemplateFormFactory
 
     public function create(): Form
     {
-        $mailLayout = $this->layoutsRepository->findBy('code', $this->layoutCode);
-        if (!$mailLayout) {
-            throw new \Exception("No mail layout found with code: '{$this->layoutCode}'");
-        }
-
-        $mailType = $this->listsRepository->findByCode($this->typeCode)->fetch();
-        if (!$mailType) {
-            throw new \Exception("No mail type found with code: '{$this->typeCode}'");
-        }
-
         $form = new Form;
         $form->addProtection();
 
@@ -104,16 +76,10 @@ class InterimTemplateFormFactory
         $form->addHidden('html_content');
         $form->addHidden('text_content');
 
-        $tomorrowMorning = new \DateTime('tomorrow 7:30AM');
+        $sourceTemplate = $this->sourceTemplatesRepository->find((int) $this->request->getPost('source_template_id'));
 
-        $form->setDefaults([
-            'name' => 'Daily minute ' . $tomorrowMorning->format('j.n.Y'),
-            'code' => 'daily_minute_' . $tomorrowMorning->format('dmy'),
-            'mail_layout_id' => $mailLayout->id,
-            'mail_type_id' => $mailType->id,
-            'from' => $this->from,
-            'send_at' => $tomorrowMorning->format('m/d/Y H:i A'),
-        ]);
+        $defaults = array_filter($this->getDefaults($sourceTemplate->code));
+        $form->setDefaults($defaults);
 
         if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
             $withJobs = $form->addSubmit(self::FORM_ACTION_WITH_JOBS_STARTED);
@@ -172,5 +138,43 @@ class InterimTemplateFormFactory
         );
 
         $this->onSave->__invoke();
+    }
+
+    private function getDefaults(string $sourceTemplateCode): array
+    {
+        $tomorrowMorning = new \DateTime('tomorrow 7:30AM');
+        $now = new \DateTime();
+
+        $defaults =  match ($sourceTemplateCode) {
+            'euobserver_daily_generator' => [
+                'name' => 'Daily minute ' . $tomorrowMorning->format('j.n.Y'),
+                'code' => 'daily_minute_' . $tomorrowMorning->format('dmy'),
+                'mail_layout_code' => 'empty-layout',
+                'mail_type_code' => 'euobserver-daily',
+                'from' => 'EUobserver daily news <noreply@euobserver.com>',
+                'send_at' => $tomorrowMorning->format('m/d/Y H:i A'),
+            ],
+            'friday_five' => [
+                'name' => 'Friday Five ' . $now->format('j.n.Y'),
+                'code' => 'friday_five_' . $now->format('dmy'),
+                'mail_layout_code' => 'default',
+                'mail_type_code' => 'the-friday-five',
+                'from' => 'The Friday Five <noreply@euobserver.com>',
+            ]
+        };
+
+        $mailLayout = $this->layoutsRepository->findBy('code', $defaults['mail_layout_code']);
+        if (!$mailLayout) {
+            throw new \Exception("No mail layout found with code: '{$defaults['mail_layout_code']}'");
+        }
+        $defaults['mail_layout_id'] = $mailLayout->id;
+
+        $mailType = $this->listsRepository->findByCode($defaults['mail_type_code'])->fetch();
+        if (!$mailType) {
+            throw new \Exception("No mail type found with code: '{$defaults['mail_type_code']}'");
+        }
+        $defaults['mail_type_id'] = $mailType->id;
+
+        return $defaults;
     }
 }

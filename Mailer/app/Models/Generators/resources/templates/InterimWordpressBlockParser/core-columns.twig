@@ -1,0 +1,11 @@
+<!-- core/columns -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%;">
+    <tr>
+        {% for column in columns %}
+        <td {% if column.width %}width="{{ column.width|replace({'px': ''}) }}" {% endif %}style="vertical-align: top;{% if column.width %} width: {{ column.width }};{% endif %}{% if columnGap %} padding-right: {{ columnGap }};{% endif %}">
+            {{ column.contents|raw }}
+        </td>
+        {% endfor %}
+    </tr>
+</table>
+<!-- end core/columns -->

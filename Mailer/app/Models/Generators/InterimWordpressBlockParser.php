@@ -15,6 +15,8 @@ class InterimWordpressBlockParser
     public const BLOCK_CORE_LIST = 'core/list';
     public const BLOCK_CORE_LIST_ITEM = 'core/list-item';
     public const BLOCK_CORE_IMAGE = 'core/image';
+    public const BLOCK_CORE_COLUMNS = 'core/columns';
+    public const BLOCK_CORE_COLUMN = 'core/column';
 
     public const BLOCK_EO_POST = 'eo/post';
     public const BLOCK_EO_ADVERT = 'eo/advert';
@@ -37,12 +39,13 @@ class InterimWordpressBlockParser
         $settings = json_decode($settings);
 
         $colorPalette = $this->extractColorPalette($settings);
+        $spacingPalette = $this->extractSpacingPalette($settings);
 
         $htmlResult = '';
         $textResult = '';
 
         foreach ($blocksData as $block) {
-            $parsedBlock = $this->parseBlock($block, $colorPalette);
+            $parsedBlock = $this->parseBlock($block, $colorPalette, $spacingPalette);
             $htmlResult .= $parsedBlock;
 
             $textBlock = html_entity_decode(strip_tags($parsedBlock));
@@ -56,21 +59,38 @@ class InterimWordpressBlockParser
         return [$htmlResult, $textResult];
     }
 
-    public function parseBlock(object $block, array $colorPalette): string
+    public function parseBlock(object $block, array $colorPalette, array $spacingPalette): string
     {
-        $params['contents'] = '';
-        $params += $this->getBlockTemplateData($block, $colorPalette);
+        $params = ['contents' => ''];
+        $params += $this->getBlockTemplateData($block, $colorPalette, $spacingPalette);
 
         $template = $this->getTemplate($block->name);
         if (!empty($block->innerBlocks)) {
-            foreach ($block->innerBlocks as $innerBlock) {
-                $params['contents'] .= $this->parseBlock($innerBlock, $colorPalette);
+            if ($block->name === self::BLOCK_CORE_COLUMNS) {
+                $columns = [];
+                foreach ($block->innerBlocks as $column) {
+                    $columnData = $this->getBlockTemplateData($column, $colorPalette, $spacingPalette);
+                    $contents = '';
+                    $rowGap = $columnData['rowGap'] ?? null;
+                    foreach ($column->innerBlocks ?? [] as $child) {
+                        $childHtml = $this->parseBlock($child, $colorPalette, $spacingPalette);
+                        $contents .= $rowGap !== null
+                            ? "<div style=\"margin-bottom: {$rowGap}\">{$childHtml}</div>"
+                            : $childHtml;
+                    }
+                    $columns[] = ['width' => $columnData['width'] ?? null, 'contents' => $contents];
+                }
+                $params['columns'] = $columns;
+            } else {
+                foreach ($block->innerBlocks as $innerBlock) {
+                    $params['contents'] .= $this->parseBlock($innerBlock, $colorPalette, $spacingPalette);
+                }
             }
         }
         return $this->twig->render($template, $params);
     }
 
-    public function getBlockTemplateData(object $block, array $colorPalette): array
+    public function getBlockTemplateData(object $block, array $colorPalette, array $spacingPalette): array
     {
         $data = [
             'originalContent' => $block->originalContent ?? null,
@@ -98,7 +118,28 @@ class InterimWordpressBlockParser
                 2 => '24px',
                 default => '16px',
             };
+            $data['marginTop'] = match ($data['level']) {
+                3 => '0px',
+                default => null,
+            };
             $data['color'] = $data['level'] === 2 ? '#f0523c' : '#32353a';
+            $data['textAlign'] = $block->attributes->align ?? null;
+        }
+
+        if ($block->name === self::BLOCK_CORE_IMAGE) {
+            $data['imageWidth'] = $block->attributes->width ?? '570px';
+            $data['imageAlign'] = $block->attributes->align ?? null;
+        }
+
+        if ($block->name === self::BLOCK_CORE_COLUMNS) {
+            $blockGap = $block->attributes->style->spacing->blockGap ?? null;
+            $data['columnGap'] = $blockGap ? $this->resolveSpacingValue($blockGap, $spacingPalette) : null;
+        }
+
+        if ($block->name === self::BLOCK_CORE_COLUMN) {
+            $data['width'] = $block->attributes->width ?? null;
+            $blockGap = $block->attributes->style->spacing->blockGap ?? null;
+            $data['rowGap'] = $blockGap ? $this->resolveSpacingValue($blockGap, $spacingPalette) : null;
         }
 
         return $data;
@@ -116,6 +157,28 @@ class InterimWordpressBlockParser
         return $palette;
     }
 
+    private function extractSpacingPalette(object $settings): array
+    {
+        $palette = [];
+        foreach ($settings->spacing->spacingSizes->default ?? [] as $entry) {
+            $palette[$entry->slug] = $entry->size;
+        }
+        foreach ($settings->spacing->spacingSizes->theme ?? [] as $entry) {
+            $palette[$entry->slug] = $entry->size;
+        }
+        return $palette;
+    }
+
+    private function resolveSpacingValue(string $value, array $spacingPalette): string
+    {
+        // Try to extract something like "var:preset|spacing|40" out of settings JSON. Palette contains px value for
+        // alias "40". If we don't match it, we return original value.
+        if (preg_match('/^var:preset\|spacing\|(.+)$/', $value, $matches)) {
+            return $spacingPalette[$matches[1]] ?? $value;
+        }
+        return $value;
+    }
+
     public function getTemplate(string $blockName): string
     {
         $templateFile = match ($blockName) {
@@ -125,6 +188,7 @@ class InterimWordpressBlockParser
             self::BLOCK_CORE_IMAGE => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-image.twig',
             self::BLOCK_CORE_LIST => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-list.twig',
             self::BLOCK_CORE_LIST_ITEM => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-list-item.twig',
+            self::BLOCK_CORE_COLUMNS => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-columns.twig',
             self::BLOCK_EO_POST => __DIR__ . '/resources/templates/InterimWordpressBlockParser/eo-post.twig',
             self::BLOCK_EO_ADVERT => __DIR__ . '/resources/templates/InterimWordpressBlockParser/eo-advert.twig',
 
