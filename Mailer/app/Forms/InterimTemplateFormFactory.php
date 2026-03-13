@@ -39,11 +39,6 @@ class InterimTemplateFormFactory
     ) {
     }
 
-    public function overrideSegment(string $segment): void
-    {
-        $this->segment = $segment;
-    }
-
     public function create(): Form
     {
         $form = new Form;
