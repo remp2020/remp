@@ -27,7 +27,6 @@ class InterimTemplateFormFactory
     public $onSave;
 
     public function __construct(
-        private string $segment,
         private TemplatesRepository $templatesRepository,
         private LayoutsRepository $layoutsRepository,
         private ListsRepository $listsRepository,
@@ -112,9 +111,11 @@ class InterimTemplateFormFactory
                 $values['mail_type_id']
             );
 
-            // Temporary disable contenxt for CZ testing purposes
-            // $jobContext = 'daily_minute.' . date('Ymd');
-            $jobContext = null;
+            if (!$segmentCode) {
+                $segmentCode = Mailer::mailTypeSegment($mailTemplate->mail_type->code);
+            }
+            $jobContext = $mailTemplate->mail_type->code . '.' . date('Ymd');
+
             $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, Mailer::PROVIDER_ALIAS), $jobContext);
             $batch = $this->batchesRepository->add($mailJob->id, null, $values['send_at'], BatchesRepository::METHOD_RANDOM);
             $this->batchesRepository->addTemplate($batch, $mailTemplate);
@@ -134,7 +135,7 @@ class InterimTemplateFormFactory
             $values['html_content'],
             $values['text_content'],
             $values['mail_layout_id'],
-            $this->segment
+            $values['segment_code'] ?? null,
         );
 
         $this->onSave->__invoke();
