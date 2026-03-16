@@ -147,7 +147,6 @@ class InterimTemplateFormFactory
                 'code' => 'daily_minute_' . $tomorrowMorning->format('dmy'),
                 'mail_layout_code' => 'empty-layout',
                 'mail_type_code' => 'euobserver-daily',
-                'from' => 'EUobserver daily news <noreply@euobserver.com>',
                 'send_at' => $tomorrowMorning->format('m/d/Y H:i A'),
             ],
             'friday_five' => [
@@ -155,9 +154,15 @@ class InterimTemplateFormFactory
                 'code' => 'friday_five_' . $now->format('dmy'),
                 'mail_layout_code' => 'default',
                 'mail_type_code' => 'the-friday-five',
-                'from' => 'The Friday Five <noreply@euobserver.com>',
             ]
         };
+
+        if (isset($defaults['mail_type_code']) && !isset($defaults['from'])) {
+            $mailType = $this->listsRepository->findByCode($defaults['mail_type_code'])->fetch();
+            if ($mailType->mail_from) {
+                $defaults['from'] = $mailType->mail_from;
+            }
+        }
 
         $mailLayout = $this->layoutsRepository->findBy('code', $defaults['mail_layout_code']);
         if (!$mailLayout) {
