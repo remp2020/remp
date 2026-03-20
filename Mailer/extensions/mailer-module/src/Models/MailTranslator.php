@@ -27,7 +27,7 @@ class MailTranslator
         $this->localizationConfig = $localizationConfig;
     }
 
-    public function translateTemplate(ActiveRow $templateRow, string $locale = null): MailTemplate
+    public function translateTemplate(ActiveRow $templateRow, ?string $locale = null): MailTemplate
     {
         if ($templateRow->getTable()->getName() === ActiveRowFactory::TABLE_NAME_DATAROW || !$this->localizationConfig->isTranslatable($locale)) {
             return new MailTemplate($templateRow->from, $templateRow->subject, $templateRow->mail_body_text, $templateRow->mail_body_html, $templateRow->preheader);
@@ -46,7 +46,7 @@ class MailTranslator
         return new MailTemplate($templateRow->from, $templateRow->subject, $templateRow->mail_body_text, $templateRow->mail_body_html, $templateRow->preheader);
     }
 
-    public function translateLayout(ActiveRow $layoutRow, string $locale = null): MailLayout
+    public function translateLayout(ActiveRow $layoutRow, ?string $locale = null): MailLayout
     {
         if (!$this->localizationConfig->isTranslatable($locale)) {
             return new MailLayout($layoutRow->layout_text, $layoutRow->layout_html);
@@ -63,7 +63,7 @@ class MailTranslator
         return new MailLayout($layoutRow->layout_text, $layoutRow->layout_html);
     }
 
-    public function translateSnippets(array $snippetsToTranslate, string $locale = null): array
+    public function translateSnippets(array $snippetsToTranslate, ?string $locale = null): array
     {
         if (!$this->localizationConfig->isTranslatable($locale)) {
             return $snippetsToTranslate;

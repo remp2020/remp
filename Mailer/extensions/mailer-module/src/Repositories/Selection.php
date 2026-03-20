@@ -20,12 +20,12 @@ class Selection extends NetteSelection
         Explorer $explorer,
         Conventions $conventions,
         string $tableName,
-        Storage $cacheStorage = null
+        ?Storage $cacheStorage = null
     ) {
         parent::__construct($explorer, $conventions, $tableName, $cacheStorage);
     }
 
-    public function createSelectionInstance(string $table = null): NetteSelection
+    public function createSelectionInstance(?string $table = null): NetteSelection
     {
         return new self(
             $this->context,

@@ -28,7 +28,7 @@ class MailCache
      * @param string|null $message
      * @return mixed
      */
-    public function ping(string $message = null)
+    public function ping(?string $message = null)
     {
         return $this->redis()->ping($message);
     }

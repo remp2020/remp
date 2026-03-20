@@ -34,7 +34,7 @@ class LocalizationConfig
         return array_merge([$this->getDefaultLocale()], $this->getSecondaryLocales());
     }
 
-    public function isTranslatable(string $locale = null): bool
+    public function isTranslatable(?string $locale = null): bool
     {
         if (!$locale) {
             return false;

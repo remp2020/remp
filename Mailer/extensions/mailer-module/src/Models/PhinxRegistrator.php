@@ -37,7 +37,7 @@ class PhinxRegistrator
     public function __construct(
         Application $application,
         EnvironmentConfig $environmentConfig,
-        string $appRootDir = null
+        ?string $appRootDir = null
     ) {
 
         if (is_null($appRootDir)) {

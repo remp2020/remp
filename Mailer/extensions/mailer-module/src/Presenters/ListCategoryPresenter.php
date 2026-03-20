@@ -45,7 +45,7 @@ final class ListCategoryPresenter extends BasePresenter
         return $form;
     }
 
-    protected function redirectBasedOnButtonSubmitted(string $buttonSubmitted, int $itemID = null): void
+    protected function redirectBasedOnButtonSubmitted(string $buttonSubmitted, ?int $itemID = null): void
     {
         if ($buttonSubmitted === IFormFactory::FORM_ACTION_SAVE_CLOSE || is_null($itemID)) {
             $this->redirect('List:Default');

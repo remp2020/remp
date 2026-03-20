@@ -51,12 +51,12 @@ class BatchesRepository extends Repository implements DataRetentionInterface
         protected MailCache $mailCache,
         protected BatchTemplatesRepository $batchTemplatesRepository,
         protected JobQueueRepository $jobQueueRepository,
-        Storage $cacheStorage = null
+        ?Storage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
     }
 
-    public function add(int $jobId, int $emailCount = null, string $startAt = null, string $method = 'random'): ActiveRow
+    public function add(int $jobId, ?int $emailCount = null, ?string $startAt = null, string $method = 'random'): ActiveRow
     {
         $result = $this->insert([
             'mail_job_id' => $jobId,

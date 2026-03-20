@@ -11,7 +11,7 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
 
     protected ?string $salt = '';
 
-    public function setTwitterLinkText(string $twitterLinkText = null): void
+    public function setTwitterLinkText(?string $twitterLinkText = null): void
     {
         $this->twitterLinkText = $twitterLinkText;
     }

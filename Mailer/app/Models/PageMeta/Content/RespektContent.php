@@ -137,7 +137,7 @@ class RespektContent implements ContentInterface
         );
     }
 
-    private function getContentFromParts(array $parts, int $countOfParagraphs = null): ?string
+    private function getContentFromParts(array $parts, ?int $countOfParagraphs = null): ?string
     {
         $paragraphCount = 0;
         $processedContent = null;

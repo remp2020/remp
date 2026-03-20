@@ -74,7 +74,7 @@ class MaterialRenderer extends DefaultFormRenderer
      * @param string|null $mode 'begin', 'errors', 'ownerrors', 'body', 'end' or empty to render all
      * @return string
      */
-    public function render(Form $form, string $mode = null): string
+    public function render(Form $form, ?string $mode = null): string
     {
         foreach ($form->getControls() as $control) {
             if ($control instanceof Button) {

@@ -51,7 +51,7 @@ abstract class BasePresenter extends Presenter
      *                         (if null, redirected to Default view ignoring button)
      * @throws \Nette\Application\AbortException
      */
-    protected function redirectBasedOnButtonSubmitted(string $buttonSubmitted, int $itemID = null): void
+    protected function redirectBasedOnButtonSubmitted(string $buttonSubmitted, ?int $itemID = null): void
     {
         if ($buttonSubmitted === IFormFactory::FORM_ACTION_SAVE_CLOSE || is_null($itemID)) {
             $this->redirect('Default');

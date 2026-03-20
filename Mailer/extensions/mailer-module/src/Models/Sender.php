@@ -49,7 +49,7 @@ class Sender
     ) {
     }
 
-    public function addRecipient(string $email, string $name = null, array $params = []): self
+    public function addRecipient(string $email, ?string $name = null, array $params = []): self
     {
         $this->recipients[] = [
             'email' => $email,
@@ -102,7 +102,7 @@ class Sender
         return $this;
     }
 
-    public function setLocale(string $locale = null): self
+    public function setLocale(?string $locale = null): self
     {
         $this->locale = $locale;
 
@@ -205,7 +205,7 @@ class Sender
         return 1;
     }
 
-    public function sendBatch(LoggerInterface $logger = null): int
+    public function sendBatch(?LoggerInterface $logger = null): int
     {
         $mailer = $this->getMailer();
         if (!$mailer->supportsBatch()) {

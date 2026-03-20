@@ -24,7 +24,7 @@ class ContentGenerator
         $this->replaceList[] = $replace;
     }
 
-    public function render(GeneratorInput $generatorInput, array $context = null): MailContent
+    public function render(GeneratorInput $generatorInput, ?array $context = null): MailContent
     {
         $params = $generatorInput->params();
 
@@ -62,7 +62,7 @@ class ContentGenerator
         return new MailContent($html, $text, $subject, $template->getFrom());
     }
 
-    public function getEmailParams(GeneratorInput $generatorInput, array $emailParams, array $context = null): array
+    public function getEmailParams(GeneratorInput $generatorInput, array $emailParams, ?array $context = null): array
     {
         $outputParams = [];
 

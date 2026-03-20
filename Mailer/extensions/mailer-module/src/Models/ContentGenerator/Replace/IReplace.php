@@ -12,5 +12,5 @@ interface IReplace
      * @param array|null $context random array with additional information for replacers
      * @return string
      */
-    public function replace(string $content, GeneratorInput $generatorInput, array $context = null): string;
+    public function replace(string $content, GeneratorInput $generatorInput, ?array $context = null): string;
 }

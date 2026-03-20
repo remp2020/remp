@@ -22,7 +22,7 @@ class UserSubscriptionsRepository extends Repository
         private UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository,
         private ListVariantsRepository $listVariantsRepository,
         private Emitter $emitter,
-        Storage $cacheStorage = null
+        ?Storage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
     }
@@ -165,7 +165,7 @@ class UserSubscriptionsRepository extends Repository
         ActiveRow $mailType,
         int $userId,
         string $email,
-        int $variantId = null,
+        ?int $variantId = null,
         bool $sendWelcomeEmail = true,
         array $rtmParams = [],
         bool $forceNoVariantSubscription = false,

@@ -7,7 +7,7 @@ use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
 class AnchorRtmClickReplace extends RtmClickReplace
 {
-    public function replace(string $content, GeneratorInput $generatorInput, array $context = null): string
+    public function replace(string $content, GeneratorInput $generatorInput, ?array $context = null): string
     {
         $template = $generatorInput->template();
 

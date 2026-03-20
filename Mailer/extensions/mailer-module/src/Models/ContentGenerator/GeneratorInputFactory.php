@@ -18,7 +18,7 @@ class GeneratorInputFactory
         ActiveRow $mailTemplate,
         array $params = [],
         ?int $batchId = null,
-        string $locale = null
+        ?string $locale = null
     ): GeneratorInput {
         return new GeneratorInput(
             $this->snippetsRepository,

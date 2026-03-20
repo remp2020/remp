@@ -84,7 +84,7 @@ class SendEmailHandlerTest extends BaseApiHandlerTestCase
     }
 
     #[DataProvider('dataProvider')]
-    public function testSendEmailHandler(array $params, int $emitted, int $httpCode, callable $beforeTest = null)
+    public function testSendEmailHandler(array $params, int $emitted, int $httpCode, ?callable $beforeTest = null)
     {
         if ($beforeTest) {
             $beforeTest($this);

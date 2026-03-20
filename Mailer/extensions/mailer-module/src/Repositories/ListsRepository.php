@@ -34,10 +34,10 @@ class ListsRepository extends Repository
         ?string $imageUrl = null,
         bool $publicListing = true,
         ?string $mailFrom = null,
-        int $subscribeEmailTemplateId = null,
-        int $unSubscribeEmailTemplateId = null,
+        ?int $subscribeEmailTemplateId = null,
+        ?int $unSubscribeEmailTemplateId = null,
         bool $isMultiVariant = false,
-        int $defaultVariantId = null,
+        ?int $defaultVariantId = null,
     ): ActiveRow {
         $result = $this->insert([
             'mail_type_category_id' => $categoryId,

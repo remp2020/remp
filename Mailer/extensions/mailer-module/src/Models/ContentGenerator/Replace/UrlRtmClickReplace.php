@@ -6,7 +6,7 @@ use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
 
 class UrlRtmClickReplace extends RtmClickReplace
 {
-    public function replace(string $content, GeneratorInput $generatorInput, array $context = null): string
+    public function replace(string $content, GeneratorInput $generatorInput, ?array $context = null): string
     {
         $template = $generatorInput->template();
 

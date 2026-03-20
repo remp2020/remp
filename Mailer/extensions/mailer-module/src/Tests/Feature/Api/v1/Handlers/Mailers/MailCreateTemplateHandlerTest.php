@@ -155,7 +155,7 @@ class MailCreateTemplateHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals('from_parameter_not_resolvable', $responsePayload['code']);
     }
 
-    private function getDefaultParams($params, string $mailTypeMailFrom = null)
+    private function getDefaultParams($params, ?string $mailTypeMailFrom = null)
     {
         $mailType = $this->createMailTypeWithCategory(
             categoryName: "category1",

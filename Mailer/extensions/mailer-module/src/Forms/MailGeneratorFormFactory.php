@@ -28,7 +28,7 @@ class MailGeneratorFormFactory
         $this->allowCrossOrigin = true;
     }
 
-    public function create($sourceTemplateId, callable $onSubmit, callable $link = null)
+    public function create($sourceTemplateId, callable $onSubmit, ?callable $link = null)
     {
         $form = new Form;
         $form->setRenderer(new MaterialRenderer());

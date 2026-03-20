@@ -154,8 +154,8 @@ class BaseFeatureTestCase extends TestCase
         string $typeName = 'name',
         bool $publicListing = true,
         bool $isMultiVariant = false,
-        int $defaultVariantId = null,
-        string $mailFrom = null,
+        ?int $defaultVariantId = null,
+        ?string $mailFrom = null,
     ) {
         $listCategory = $this->createMailTypeCategory($categoryName);
 
@@ -207,7 +207,7 @@ SET FOREIGN_KEY_CHECKS=1;
         return $variant;
     }
 
-    protected function createMailUserSubscription($mailType, int $userID = 123, string $email = 'example@example.com', int $variantID = null)
+    protected function createMailUserSubscription($mailType, int $userID = 123, string $email = 'example@example.com', ?int $variantID = null)
     {
         $this->userSubscriptionsRepository->subscribeUser($mailType, $userID, $email, $variantID);
     }

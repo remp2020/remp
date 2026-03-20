@@ -9,7 +9,7 @@ class InvalidApiInputParamException extends Exception
 {
     private ?string $errorCode;
 
-    public function __construct(string $message = "", int $httpCode = 0, string $errorCode = null)
+    public function __construct(string $message = "", int $httpCode = 0, ?string $errorCode = null)
     {
         parent::__construct($message, $httpCode);
         $this->errorCode = $errorCode;

@@ -11,7 +11,7 @@ class ListVariantsRepository extends Repository
 
     protected $dataTableSearchable = ['code', 'title'];
 
-    public function add(ActiveRow $mailType, string $title, string $code, int $sorting = null)
+    public function add(ActiveRow $mailType, string $title, string $code, ?int $sorting = null)
     {
         if (!isset($sorting)) {
             $sorting = $this->getNextSorting($mailType);

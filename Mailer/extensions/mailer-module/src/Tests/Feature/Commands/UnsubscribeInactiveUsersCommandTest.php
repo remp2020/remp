@@ -243,7 +243,7 @@ class UnsubscribeInactiveUsersCommandTest extends BaseFeatureTestCase
     }
 
     #[DataProvider('dataProvider')]
-    public function testUnsubscribeInactive(array $subscribe, array $logs, bool $isAppleBotOpenedEmail, array $result, array $omit = [], bool $dryRun = false, int $days = null)
+    public function testUnsubscribeInactive(array $subscribe, array $logs, bool $isAppleBotOpenedEmail, array $result, array $omit = [], bool $dryRun = false, ?int $days = null)
     {
         foreach ($subscribe as $mailTypeCode) {
             $this->susbcribeUser($this->user, $mailTypeCode);

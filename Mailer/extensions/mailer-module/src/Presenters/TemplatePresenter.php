@@ -272,7 +272,7 @@ final class TemplatePresenter extends BasePresenter
         $this->template->editedLocale = null;
     }
 
-    public function renderEdit($id, string $editedLocale = null): void
+    public function renderEdit($id, ?string $editedLocale = null): void
     {
         $template = $this->templatesRepository->find($id);
         if (!$template) {
@@ -381,7 +381,7 @@ final class TemplatePresenter extends BasePresenter
         return $this->mailLinkStats->create($template);
     }
 
-    protected function redirectBasedOnButtonSubmitted(string $buttonSubmitted, int $itemID = null): void
+    protected function redirectBasedOnButtonSubmitted(string $buttonSubmitted, ?int $itemID = null): void
     {
         if ($buttonSubmitted === IFormFactory::FORM_ACTION_SAVE_CLOSE || is_null($itemID)) {
             $this->redirect('Default');

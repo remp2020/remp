@@ -15,7 +15,7 @@ class BeamConversionsRepository extends Repository implements IConversionsReposi
     public function __construct(
         Explorer $database,
         JournalFactory $journalFactory,
-        Storage $cacheStorage = null
+        ?Storage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
         $this->journal = $journalFactory->getClient();
