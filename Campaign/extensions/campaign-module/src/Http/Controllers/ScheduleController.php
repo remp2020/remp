@@ -44,12 +44,12 @@ class ScheduleController extends Controller
      *   * `active` - (bool) display only active (running or planned) schedules.
      *   * `limit`  - (int) count of results will be limited to that number.
      *
-     * @param Datatables $dataTables
+     * @param DataTables $dataTables
      * @param Campaign|null $campaign
      * @return mixed
      * @throws \Exception
      */
-    public function json(Request $request, Datatables $dataTables, Campaign $campaign = null, CampaignCollection $collection = null)
+    public function json(Request $request, DataTables $dataTables, Campaign $campaign = null, CampaignCollection $collection = null)
     {
         $scheduleSelect = Schedule::select('schedules.*')
             ->join('campaigns', 'schedules.campaign_id', '=', 'campaigns.id')

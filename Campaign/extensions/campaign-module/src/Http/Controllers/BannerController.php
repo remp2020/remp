@@ -41,7 +41,7 @@ class BannerController extends Controller
         ]);
     }
 
-    public function json(Datatables $dataTables)
+    public function json(DataTables $dataTables)
     {
         $banners = Banner::select()
             ->with('campaigns');

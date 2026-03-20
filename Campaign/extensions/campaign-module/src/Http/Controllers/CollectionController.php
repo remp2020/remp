@@ -100,7 +100,7 @@ class CollectionController extends Controller
         ]);
     }
 
-    public function json(Datatables $dataTables)
+    public function json(DataTables $dataTables)
     {
         $collections = CampaignCollection::select('collections.*')
             ->leftJoin('campaign_collections', 'campaign_collections.collection_id', '=', 'collections.id')

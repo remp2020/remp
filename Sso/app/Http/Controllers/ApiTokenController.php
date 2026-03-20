@@ -17,7 +17,7 @@ class ApiTokenController extends Controller
         ]);
     }
 
-    public function json(Datatables $dataTables)
+    public function json(DataTables $dataTables)
     {
         $apiTokens = ApiToken::select()->get();
 

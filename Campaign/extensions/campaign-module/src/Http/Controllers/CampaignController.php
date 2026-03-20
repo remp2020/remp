@@ -59,7 +59,7 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function json(Datatables $dataTables, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
+    public function json(DataTables $dataTables, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
     {
         $campaigns = Campaign::select('campaigns.*')
             ->with(['segments', 'countries', 'collections', 'campaignBanners', 'campaignBanners.banner', 'schedules']);

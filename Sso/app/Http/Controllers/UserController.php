@@ -15,7 +15,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function json(Datatables $dataTables)
+    public function json(DataTables $dataTables)
     {
         $users = User::select(['id', 'email', 'name', 'created_at', 'updated_at'])->get();
 
