@@ -4304,7 +4304,7 @@
             "dist": {
                 "type": "path",
                 "url": "extensions/mailer-module",
-                "reference": "d17596f9a152ac5fde25da0943d82f4ff86a455b"
+                "reference": "2e956f093e98d18c5a8ef8b617eb99394d552fb2"
             },
             "require": {
                 "contributte/webpack": "^2.2",
@@ -4337,7 +4337,7 @@
                 "rootpd/nette-sentry": "^2.0",
                 "symfony/console": "^6.4",
                 "symfony/http-client": "^6.4",
-                "tomaj/hermes": "^4.0",
+                "tomaj/hermes": "^5.0",
                 "tomaj/nette-api": "^2.1",
                 "tomaj/nette-bootstrap-form": "^2.1",
                 "tracy/tracy": "^2.6",
@@ -6006,21 +6006,21 @@
         },
         {
             "name": "tomaj/hermes",
-            "version": "4.2.0",
+            "version": "5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tomaj/hermes.git",
-                "reference": "09bf3df5d3637a2f8583c719820828daba1636b8"
+                "reference": "ca91b4a89054821f719d996ccdc26d55df71b4b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tomaj/hermes/zipball/09bf3df5d3637a2f8583c719820828daba1636b8",
-                "reference": "09bf3df5d3637a2f8583c719820828daba1636b8",
+                "url": "https://api.github.com/repos/tomaj/hermes/zipball/ca91b4a89054821f719d996ccdc26d55df71b4b2",
+                "reference": "ca91b4a89054821f719d996ccdc26d55df71b4b2",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": ">= 7.2.0",
+                "php": "^7.4 || ^8.0",
                 "psr/log": "^1 || ^2 || ^3",
                 "ramsey/uuid": "^3 || ^4",
                 "tracy/tracy": "^2.0"
@@ -6031,6 +6031,7 @@
                 "pepakriz/phpstan-exception-rules": "^0.11.3",
                 "php-amqplib/php-amqplib": "^2.6.3",
                 "phpstan/phpstan": "^0.12.65",
+                "phpstan/phpstan-strict-rules": "^0.12",
                 "phpunit/phpunit": "^8 || ^9",
                 "predis/predis": "^1.1",
                 "scrutinizer/ocular": "^1.6.0",
@@ -6071,7 +6072,7 @@
                 "issues": "https://github.com/tomaj/hermes/issues",
                 "source": "https://github.com/tomaj/hermes"
             },
-            "time": "2024-04-29T12:22:42+00:00"
+            "time": "2025-11-19T13:26:02+00:00"
         },
         {
             "name": "tomaj/nette-api",

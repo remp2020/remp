@@ -35,7 +35,7 @@
     "rootpd/nette-sentry": "^2.0",
     "symfony/console": "^6.4",
     "symfony/http-client": "^6.4",
-    "tomaj/hermes": "^4.0",
+    "tomaj/hermes": "^5.0",
     "tomaj/nette-api": "^2.1",
     "tomaj/nette-bootstrap-form": "^2.1",
     "tracy/tracy": "^2.6",
