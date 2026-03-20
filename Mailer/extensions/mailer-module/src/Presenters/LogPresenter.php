@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
-use Crm\ApplicationModule\Repository\AuditLogRepository;
 use Nette\Application\UI\Form;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
