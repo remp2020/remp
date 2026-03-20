@@ -6,14 +6,6 @@ cache:
   paths:
     - bin/
 
-syntax:8.2:
-  stage: test
-  image: php:8.2-cli
-  tags:
-    - docker
-  script:
-    - make syntax
-
 syntax:8.3:
   stage: test
   image: php:8.3-cli
@@ -22,9 +14,17 @@ syntax:8.3:
   script:
     - make syntax
 
+syntax:8.4:
+  stage: test
+  image: php:8.4-cli
+  tags:
+    - docker
+  script:
+    - make syntax
+
 sniffer:
   stage: test
-  image: remp/php-ci:8.3.20
+  image: remp/php-ci:8.4.19
   tags:
     - docker
   script:
@@ -34,7 +34,7 @@ sniffer:
 
 phpstan:
   stage: test
-  image: remp/php-ci:8.3.20
+  image: remp/php-ci:8.4.19
   tags:
     - docker
   script:
@@ -43,7 +43,7 @@ phpstan:
 
 latte_lint:
   stage: test
-  image: remp/php-ci:8.3.20
+  image: remp/php-ci:8.4.19
   tags:
     - docker
   script:
@@ -52,7 +52,7 @@ latte_lint:
 
 tests:
   stage: test
-  image: remp/php-ci:8.3.20
+  image: remp/php-ci:8.4.19
   tags:
     - docker
   script:
