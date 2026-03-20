@@ -18,7 +18,7 @@ use Yajra\DataTables\QueryDataTable;
 
 class ScheduleController extends Controller
 {
-    public function index(CampaignCollection $collection = null)
+    public function index(?CampaignCollection $collection = null)
     {
         $variants = CampaignBanner::with('banner')
             ->whereNotNull('banner_id')
@@ -49,7 +49,7 @@ class ScheduleController extends Controller
      * @return mixed
      * @throws \Exception
      */
-    public function json(Request $request, DataTables $dataTables, Campaign $campaign = null, CampaignCollection $collection = null)
+    public function json(Request $request, DataTables $dataTables, ?Campaign $campaign = null, ?CampaignCollection $collection = null)
     {
         $scheduleSelect = Schedule::select('schedules.*')
             ->join('campaigns', 'schedules.campaign_id', '=', 'campaigns.id')
@@ -203,7 +203,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function edit(Schedule $schedule, CampaignCollection $collection = null)
+    public function edit(Schedule $schedule, ?CampaignCollection $collection = null)
     {
         $schedule->fill(old());
 
@@ -213,7 +213,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function update(ScheduleRequest $request, Schedule $schedule, CampaignCollection $collection = null)
+    public function update(ScheduleRequest $request, Schedule $schedule, ?CampaignCollection $collection = null)
     {
         $schedule->fill($request->all());
         $schedule->save();
@@ -229,7 +229,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function destroy(Schedule $schedule, CampaignCollection $collection = null)
+    public function destroy(Schedule $schedule, ?CampaignCollection $collection = null)
     {
         $schedule->delete();
 

@@ -913,7 +913,7 @@ class ShowtimeTest extends TestCase
     private function prepareBanner(
         string $position = Banner::POSITION_BOTTOM_LEFT,
         string $displayType = Banner::DISPLAY_TYPE_INLINE,
-        string $targetSelector = null
+        ?string $targetSelector = null
     ): Banner
     {
         $banner = Banner::factory()->create([

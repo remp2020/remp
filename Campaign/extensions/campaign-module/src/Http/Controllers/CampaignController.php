@@ -37,7 +37,7 @@ class CampaignController extends Controller
         $this->showtime = $showtime;
     }
 
-    public function index(SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
+    public function index(SegmentAggregator $segmentAggregator, ?CampaignCollection $collection = null)
     {
         $availableSegments = $this->getAllSegments($segmentAggregator)->pluck('name', 'code');
         $segments = CampaignSegment::get()->mapWithKeys(function ($item) use ($availableSegments) {
@@ -59,7 +59,7 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function json(DataTables $dataTables, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
+    public function json(DataTables $dataTables, SegmentAggregator $segmentAggregator, ?CampaignCollection $collection = null)
     {
         $campaigns = Campaign::select('campaigns.*')
             ->with(['segments', 'countries', 'collections', 'campaignBanners', 'campaignBanners.banner', 'schedules']);
@@ -204,7 +204,7 @@ class CampaignController extends Controller
             ->make(true);
     }
 
-    public function create(SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
+    public function create(SegmentAggregator $segmentAggregator, ?CampaignCollection $collection = null)
     {
         $campaign = new Campaign();
 
@@ -232,7 +232,7 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
+    public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator, ?CampaignCollection $collection = null)
     {
         $sourceCampaign->load('banners', 'campaignBanners', 'segments', 'countries');
         /** @var Campaign $campaign */
@@ -269,7 +269,7 @@ class CampaignController extends Controller
         return response()->json(false);
     }
 
-    public function store(CampaignRequest $request, CampaignCollection $collection = null)
+    public function store(CampaignRequest $request, ?CampaignCollection $collection = null)
     {
         $campaign = new Campaign();
         $requestData = $request->all();
@@ -314,7 +314,7 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator, CampaignCollection $collection = null)
+    public function edit(Campaign $campaign, SegmentAggregator $segmentAggregator, ?CampaignCollection $collection = null)
     {
         [
             $campaign,
@@ -340,7 +340,7 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function update(CampaignRequest $request, Campaign $campaign, CampaignCollection $collection = null)
+    public function update(CampaignRequest $request, Campaign $campaign, ?CampaignCollection $collection = null)
     {
         $this->saveCampaign($campaign, $request->all(), $collection);
 
@@ -547,7 +547,7 @@ class CampaignController extends Controller
         return $showtime->showtime($data, $callback, $controllerShowtimeResponse);
     }
 
-    public function saveCampaign(Campaign $campaign, array $data, CampaignCollection $collection = null)
+    public function saveCampaign(Campaign $campaign, array $data, ?CampaignCollection $collection = null)
     {
         if (empty($data['operating_systems'])) {
             $data['operating_systems'] = null;

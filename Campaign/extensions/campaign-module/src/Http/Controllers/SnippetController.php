@@ -58,7 +58,7 @@ class SnippetController extends Controller
         ]);
     }
 
-    public function validateForm(SnippetRequest $request, Snippet $snippet = null)
+    public function validateForm(SnippetRequest $request, ?Snippet $snippet = null)
     {
         return response()->json(false);
     }

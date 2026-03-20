@@ -73,7 +73,7 @@ class CampaignBanner extends Model
      * @param array|null $except
      * @return CampaignBanner
      */
-    public function replicate(array $except = null)
+    public function replicate(?array $except = null)
     {
         $replica = parent::replicate($except);
 

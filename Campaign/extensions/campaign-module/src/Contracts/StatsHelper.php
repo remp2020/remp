@@ -29,7 +29,7 @@ class StatsHelper
      *
      * @return array [$campaignStats, $variantsStats]
      */
-    public function cachedCampaignAndVariantsStats(Campaign $campaign, Carbon $from = null, Carbon $to = null): array
+    public function cachedCampaignAndVariantsStats(Campaign $campaign, ?Carbon $from = null, ?Carbon $to = null): array
     {
         /** @var Collection $campaignBanners */
         $campaignBanners = $campaign->campaignBanners()->withTrashed()->get();
@@ -125,7 +125,7 @@ class StatsHelper
      *
      * @return array
      */
-    public function campaignStats(Campaign $campaign, Carbon $from = null, Carbon $to = null)
+    public function campaignStats(Campaign $campaign, ?Carbon $from = null, ?Carbon $to = null)
     {
         return $this->variantsStats($campaign->variants_uuids, $from, $to);
     }
@@ -137,7 +137,7 @@ class StatsHelper
      *
      * @return array
      */
-    public function variantStats(CampaignBanner $variant, Carbon $from = null, Carbon $to = null)
+    public function variantStats(CampaignBanner $variant, ?Carbon $from = null, ?Carbon $to = null)
     {
         return $this->variantsStats([$variant->uuid], $from, $to);
     }
@@ -157,7 +157,7 @@ class StatsHelper
         return $data;
     }
 
-    private function variantsStats($variantUuids, Carbon $from = null, Carbon $to = null)
+    private function variantsStats($variantUuids, ?Carbon $from = null, ?Carbon $to = null)
     {
         $data = [
             'click_count' => $this->campaignStatsCount($variantUuids, 'click', $from, $to),
@@ -170,7 +170,7 @@ class StatsHelper
         return $data;
     }
 
-    private function campaignStatsCount($variantUuids, $type, Carbon $from = null, Carbon $to = null)
+    private function campaignStatsCount($variantUuids, $type, ?Carbon $from = null, ?Carbon $to = null)
     {
         $r = $this->stats->count()
             ->events('banner', $type)
@@ -186,7 +186,7 @@ class StatsHelper
         return $r->get()[0];
     }
 
-    private function campaignPaymentStatsCount($variantUuids, $step, Carbon $from = null, Carbon $to = null)
+    private function campaignPaymentStatsCount($variantUuids, $step, ?Carbon $from = null, ?Carbon $to = null)
     {
         $r = $this->stats->count()
             ->commerce($step)
@@ -202,7 +202,7 @@ class StatsHelper
         return $r->get()[0];
     }
 
-    private function campaignPaymentStatsSum($variantUuids, $step, Carbon $from = null, Carbon $to = null)
+    private function campaignPaymentStatsSum($variantUuids, $step, ?Carbon $from = null, ?Carbon $to = null)
     {
         $r = $this->stats->sum()
             ->commerce($step)

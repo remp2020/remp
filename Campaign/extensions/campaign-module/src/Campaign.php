@@ -361,7 +361,7 @@ class Campaign extends Model implements Searchable
      * @param array|null $except
      * @return Model
      */
-    public function replicate(array $except = null)
+    public function replicate(?array $except = null)
     {
         $replica = parent::replicate($except);
 
