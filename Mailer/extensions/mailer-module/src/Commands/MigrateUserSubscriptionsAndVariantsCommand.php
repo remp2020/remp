@@ -56,7 +56,7 @@ class MigrateUserSubscriptionsAndVariantsCommand extends Command
         if ($this->redis()->exists(self::USER_SUBSCRIPTIONS_AND_VARIANTS_MIGRATION_IS_RUNNING)) {
             $migrationStartTime = new DateTime($this->redis()->get(self::USER_SUBSCRIPTIONS_AND_VARIANTS_MIGRATION_IS_RUNNING));
         } else {
-            $this->redis()->set(self::USER_SUBSCRIPTIONS_AND_VARIANTS_MIGRATION_IS_RUNNING, $migrationStartTime);
+            $this->redis()->set(self::USER_SUBSCRIPTIONS_AND_VARIANTS_MIGRATION_IS_RUNNING, $migrationStartTime->format(DATE_ATOM));
         }
 
         $this->database->query("

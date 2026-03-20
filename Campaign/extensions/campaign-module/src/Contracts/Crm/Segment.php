@@ -143,6 +143,9 @@ class Segment implements SegmentContract, RedisAwareInterface
 
     public function removeUserFromCache(CampaignSegment $campaignSegment, string $userId): bool
     {
-        return $this->redis->srem(SegmentAggregator::cacheKey($campaignSegment), $userId) ?: false;
+        return $this->redis->srem(
+            SegmentAggregator::cacheKey($campaignSegment),
+            $this->redis instanceof \Redis ? $userId : [$userId]
+        ) ?: false;
     }
 }

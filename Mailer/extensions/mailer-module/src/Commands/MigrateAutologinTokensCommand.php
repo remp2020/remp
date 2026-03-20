@@ -51,7 +51,7 @@ class MigrateAutologinTokensCommand extends Command
         if ($this->redis()->exists(self::AUTOLOGIN_TOKENS_MIGRATION_IS_RUNNING)) {
             $migrationStartTime = new DateTime($this->redis()->get(self::AUTOLOGIN_TOKENS_MIGRATION_IS_RUNNING));
         } else {
-            $this->redis()->set(self::AUTOLOGIN_TOKENS_MIGRATION_IS_RUNNING, $migrationStartTime);
+            $this->redis()->set(self::AUTOLOGIN_TOKENS_MIGRATION_IS_RUNNING, $migrationStartTime->format(DATE_ATOM));
         }
 
         $this->database->query("

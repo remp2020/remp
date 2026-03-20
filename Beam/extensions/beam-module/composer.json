@@ -19,7 +19,7 @@
         "laravel/framework": "^12.0",
         "league/uri": "^7.5",
         "matomo/searchengine-and-social-list": "^3.11",
-        "predis/predis": "^2.3",
+        "predis/predis": "^3.0",
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",

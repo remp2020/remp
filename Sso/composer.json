@@ -43,7 +43,7 @@
         "laminas/laminas-diactoros": "^3.5",
         "league/uri": "^7.5",
         "league/uri-components": "^7.5",
-        "predis/predis": "^2.3",
+        "predis/predis": "^3.0",
         "remp/laravel-helpers": "*",
         "remp/laravel-sso": "*",
         "remp/laravel-widgets": "*",

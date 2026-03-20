@@ -29,7 +29,7 @@
     "nette/security": "^3.1",
     "nette/utils": "^4.0",
     "contributte/webpack": "^2.2",
-    "predis/predis": "^1.1",
+    "predis/predis": "^3.0",
     "remp/remp-commons": "@dev|^0.32",
     "robmorgan/phinx": "^0.15",
     "rootpd/nette-sentry": "^2.0",

@@ -25,11 +25,8 @@ class HermesTasksQueue
 
     public function getTask(string $key): ?array
     {
-        $task = $this->redis()->zrangebyscore($key, 0, time(), [
-            'LIMIT' => [
-                'OFFSET' => 0,
-                'COUNT' => 1,
-            ]
+        $task = $this->redis()->zrangebyscore($key, '0', (string) time(), [
+            'limit' => [0, 1],
         ]);
 
         if (!empty($task)) {

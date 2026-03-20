@@ -16,6 +16,10 @@ use Remp\CampaignModule\Models\Snippet\SnippetUsages;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
+/**
+ * @property bool $usageDirect Set by SnippetUsages::inBanners() — true when the banner directly references a snippet.
+ * @property Snippet|null $usageVia Set by SnippetUsages::inBanners() — the intermediate Snippet for transitive references.
+ */
 class Banner extends Model implements Searchable
 {
     /** @use HasFactory<BannerFactory> */
@@ -92,7 +96,7 @@ class Banner extends Model implements Searchable
      */
     public static function templateClasses(): array
     {
-        return array_values((new static)->cacheableRelations);
+        return array_values((new self)->cacheableRelations);
     }
 
     protected static function newFactory(): BannerFactory
@@ -279,7 +283,7 @@ class Banner extends Model implements Searchable
      * @return HasOne
      * @throws Exception
      */
-    public function getTemplateRelation(string $relationName = null): HasOne
+    public function getTemplateRelation(?string $relationName = null): HasOne
     {
         if ($relationName === null) {
             $relationName = $this->getTemplateRelationName();

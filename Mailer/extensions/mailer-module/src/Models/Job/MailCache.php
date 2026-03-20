@@ -95,23 +95,23 @@ class MailCache
     public function removeQueue(int $queueId): bool
     {
         $res1 = $this->redis()->del([static::REDIS_KEY . $queueId]);
-        $res2 = $this->redis()->zrem(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
+        $res2 = $this->redis()->zrem(static::REDIS_PRIORITY_QUEUES_KEY, (string) $queueId);
         return $res1 && $res2;
     }
 
     public function pauseQueue(int $queueId): int
     {
-        return $this->redis()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [$queueId => 0]);
+        return $this->redis()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [(string) $queueId => 0]);
     }
 
     public function restartQueue(int $queueId, int $priority): int
     {
-        return $this->redis()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [$queueId => $priority]);
+        return $this->redis()->zadd(static::REDIS_PRIORITY_QUEUES_KEY, [(string) $queueId => $priority]);
     }
 
     public function isQueueActive(int $queueId): bool
     {
-        return $this->redis()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId) > 0;
+        return $this->redis()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, (string) $queueId) > 0;
     }
 
     /**
@@ -119,7 +119,12 @@ class MailCache
      */
     public function getTopPriorityQueues(int $count = 1)
     {
-        // TODO: change to zrange with "byscore" and "rev" options once we upgrade to Predis 2.0
+        // We attempted to use ZRANGE with "byscore" and "rev" after upgrade to Predis v3, however Predis was unable
+        // to pass all arguments correctly and was causing "ERR value is not an integer or out of range" error.
+        // It was possible to pass all arguments as a flat list (not an array), but it just didn't feel right and
+        // PHPstan reported issue with that too. Since ZREVRANGEBYSCORE is only deprecated and not marked for removal
+        // anytime soon, let's keep that for now.
+
         return $this->redis()->zrevrangebyscore(
             static::REDIS_PRIORITY_QUEUES_KEY,
             '+inf',
@@ -137,7 +142,7 @@ class MailCache
     public function isQueueTopPriority(int $queueId): bool
     {
         $topPriorityQueue = $this->getTopPriorityQueues();
-        $selectedQueueScore = $this->redis()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, $queueId);
+        $selectedQueueScore = $this->redis()->zscore(static::REDIS_PRIORITY_QUEUES_KEY, (string) $queueId);
 
         return isset($topPriorityQueue[$queueId]) || // topPriorityQueue is requested queue
             reset($topPriorityQueue) == $selectedQueueScore; // or requested queue has same priority as topPriorityQueue

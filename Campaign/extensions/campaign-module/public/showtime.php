@@ -467,7 +467,9 @@ try {
             new \MatthiasMullie\Scrapbook\Adapters\Redis($redis),
         );
     } else {
-        $cache = new \Kodus\PredisSimpleCache\PredisSimpleCache($redis, 60*60*24);
+        $cache = new \Symfony\Component\Cache\Psr16Cache(
+            new \Symfony\Component\Cache\Adapter\RedisAdapter($redis, '', 60*60*24)
+        );
     }
 
     $deviceDetector = new LazyDeviceDetector($cache);

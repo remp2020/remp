@@ -45,7 +45,7 @@ class NotifyCrmSubscribeUnsubscribeHandler implements HandlerInterface
             return true;
         }
 
-        $this->redis()->setex($key, 10, 1);
+        $this->redis()->set($key, '1', 'EX', 10);
 
         $this->client->userTouch($payload['user_id']);
 

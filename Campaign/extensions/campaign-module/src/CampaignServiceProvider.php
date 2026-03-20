@@ -150,7 +150,9 @@ class CampaignServiceProvider extends ServiceProvider
                     new \MatthiasMullie\Scrapbook\Adapters\Redis(Redis::connection()->client()),
                 );
             } else {
-                $cache = new \Kodus\PredisSimpleCache\PredisSimpleCache(Redis::connection()->client(), 60*60*24);
+                $cache = new \Symfony\Component\Cache\Psr16Cache(
+                    new \Symfony\Component\Cache\Adapter\RedisAdapter(Redis::connection()->client(), defaultLifetime: 60*60*24)
+                );
             }
 
             return new LazyDeviceDetector($cache);
