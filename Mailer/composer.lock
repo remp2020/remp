@@ -4304,7 +4304,7 @@
             "dist": {
                 "type": "path",
                 "url": "extensions/mailer-module",
-                "reference": "2e956f093e98d18c5a8ef8b617eb99394d552fb2"
+                "reference": "5dfb9282cae9bb91b07c3aa59927a7eaf5adab2e"
             },
             "require": {
                 "contributte/webpack": "^2.2",
@@ -4330,7 +4330,7 @@
                 "nette/robot-loader": "^4.0",
                 "nette/security": "^3.1",
                 "nette/utils": "^4.0",
-                "php": "^8.1",
+                "php": "^8.3",
                 "predis/predis": "^1.1",
                 "remp/remp-commons": "@dev|^0.32",
                 "robmorgan/phinx": "^0.15",
@@ -4338,7 +4338,7 @@
                 "symfony/console": "^6.4",
                 "symfony/http-client": "^6.4",
                 "tomaj/hermes": "^5.0",
-                "tomaj/nette-api": "^2.1",
+                "tomaj/nette-api": "^3.3",
                 "tomaj/nette-bootstrap-form": "^2.1",
                 "tracy/tracy": "^2.6",
                 "twig/intl-extra": "^3.3",
@@ -6076,16 +6076,16 @@
         },
         {
             "name": "tomaj/nette-api",
-            "version": "2.13.0",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tomaj/nette-api.git",
-                "reference": "ccc131b8c02fae3f8ad72e8725dac967e166d2a4"
+                "reference": "f040a9a69e87b1a0045135c30380fbeb454693e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tomaj/nette-api/zipball/ccc131b8c02fae3f8ad72e8725dac967e166d2a4",
-                "reference": "ccc131b8c02fae3f8ad72e8725dac967e166d2a4",
+                "url": "https://api.github.com/repos/tomaj/nette-api/zipball/f040a9a69e87b1a0045135c30380fbeb454693e3",
+                "reference": "f040a9a69e87b1a0045135c30380fbeb454693e3",
                 "shasum": ""
             },
             "require": {
@@ -6094,16 +6094,17 @@
                 "ext-json": "*",
                 "ext-session": "*",
                 "justinrainbow/json-schema": "^5.2|^6.6",
-                "league/fractal": "~0.17",
+                "latte/latte": "^3.0",
+                "league/fractal": "~0.20",
                 "nette/application": "^3.0",
                 "nette/http": "^3.0",
-                "php": ">= 7.1.0",
+                "php": ">= 8.3",
                 "tomaj/nette-bootstrap-form": "^2.0",
                 "tracy/tracy": "^2.6"
             },
             "require-dev": {
-                "latte/latte": "^2.4 | ^3.0",
                 "nette/di": "^3.0",
+                "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": ">7.0 <10.0",
                 "squizlabs/php_codesniffer": "^3.2",
                 "symfony/yaml": "^4.4|^5.0|^6.0"
@@ -6132,9 +6133,9 @@
             ],
             "support": {
                 "issues": "https://github.com/tomaj/nette-api/issues",
-                "source": "https://github.com/tomaj/nette-api/tree/2.13.0"
+                "source": "https://github.com/tomaj/nette-api/tree/3.3.0"
             },
-            "time": "2026-01-04T11:51:16+00:00"
+            "time": "2026-02-10T10:52:19+00:00"
         },
         {
             "name": "tomaj/nette-bootstrap-form",

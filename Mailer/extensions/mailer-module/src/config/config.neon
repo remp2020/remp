@@ -186,6 +186,8 @@ services:
 	# API
 	- Tomaj\NetteApi\Link\ApiLink
 	- Tomaj\NetteApi\Misc\IpDetector
+	netteApiConfigurator: Tomaj\NetteApi\Output\Configurator\DebuggerConfigurator
+	netteApiErrorHandler: Tomaj\NetteApi\Error\DefaultErrorHandler
 
 	apiDecider:
 		factory: Tomaj\NetteApi\ApiDecider

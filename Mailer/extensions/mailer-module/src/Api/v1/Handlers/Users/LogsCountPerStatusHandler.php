@@ -7,7 +7,6 @@ use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\Traits\ParseLogFilterConditionsTrait;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;

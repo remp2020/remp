@@ -8,7 +8,6 @@ use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\PostInputParam;
 
 class GenericBestPerformingArticlesGenerator implements IGenerator

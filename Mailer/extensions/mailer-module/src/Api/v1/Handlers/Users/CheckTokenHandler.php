@@ -8,7 +8,6 @@ use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Remp\MailerModule\Models\Auth\AutoLogin;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\RawInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;

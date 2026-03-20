@@ -9,7 +9,6 @@ use Remp\MailerModule\Models\Mailer\MailgunMailer;
 use Remp\MailerModule\Models\Sender;
 use Tomaj\Hermes\Emitter;
 use Tomaj\NetteApi\Handlers\BaseHandler;
-use Tomaj\NetteApi\Params\InputParam;
 use Tomaj\NetteApi\Params\PostInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
 use Tomaj\NetteApi\Response\ResponseInterface;
