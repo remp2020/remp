@@ -3,16 +3,16 @@
 namespace Remp\CampaignModule;
 
 use Database\Factories\BannerFactory;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Str;
 use Predis\ClientInterface;
-use Ramsey\Uuid\Uuid;
 use Remp\CampaignModule\Concerns\HasCacheableRelation;
+use Remp\CampaignModule\Models\Snippet\SnippetUsages;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
@@ -87,6 +87,14 @@ class Banner extends Model implements Searchable
         'newsletterRectangleTemplate' => NewsletterRectangleTemplate::class,
     ];
 
+    /**
+     * @return array<class-string<AbstractTemplate>>
+     */
+    public static function templateClasses(): array
+    {
+        return array_values((new static)->cacheableRelations);
+    }
+
     protected static function newFactory(): BannerFactory
     {
         return BannerFactory::new();
@@ -97,7 +105,7 @@ class Banner extends Model implements Searchable
         return new SearchResult($this, $this->name);
     }
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
@@ -117,15 +125,15 @@ class Banner extends Model implements Searchable
     /**
      * Fill banner's template relation
      *
-     * If template relation doesn't exists it's using:
+     * If template relation doesn't exist it's using:
      * string $this->getTemplateRelationName()
      * to initialize relation.
      *
      * @param array $attributes
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    public function fillTemplate(array $attributes)
+    public function fillTemplate(array $attributes): self
     {
         $relationName = $this->getTemplateRelationName();
 
@@ -148,9 +156,9 @@ class Banner extends Model implements Searchable
      * load template
      *
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    public function loadTemplate()
+    public function loadTemplate(): self
     {
         return $this->load($this->getTemplateRelationName());
     }
@@ -235,7 +243,7 @@ class Banner extends Model implements Searchable
         return $this->hasOne(NewsletterRectangleTemplate::class);
     }
 
-    public function getTemplateRelationName()
+    public function getTemplateRelationName(): string
     {
         switch ($this->template) {
             case self::TEMPLATE_HTML:
@@ -257,7 +265,7 @@ class Banner extends Model implements Searchable
             case self::TEMPLATE_NEWSLETTER_RECTANGLE:
                 return 'newsletterRectangleTemplate';
             default:
-                throw new \Exception('Unhandled banner template access: ' . $this->template);
+                throw new Exception('Unhandled banner template access: ' . $this->template);
         }
     }
 
@@ -267,11 +275,11 @@ class Banner extends Model implements Searchable
      * Using $this->getTemplateRelationName()
      * to return template relation.
      *
-     * @param string $relationName
+     * @param string|null $relationName
      * @return HasOne
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getTemplateRelation($relationName = null): HasOne
+    public function getTemplateRelation(string $relationName = null): HasOne
     {
         if ($relationName === null) {
             $relationName = $this->getTemplateRelationName();
@@ -279,12 +287,12 @@ class Banner extends Model implements Searchable
         return $this->$relationName();
     }
 
-    public function getTemplate(): AbstractTemplate
+    public function getTemplate(): ?AbstractTemplate
     {
         return $this->getRelationValue($this->getTemplateRelationName());
     }
 
-    public function cache()
+    public function cache(): void
     {
         $bannerTemplate = $this->loadTemplate();
         Redis::set(self::BANNER_JSON_TAG . ":{$this->id}", $bannerTemplate->toJson());
@@ -299,29 +307,37 @@ class Banner extends Model implements Searchable
         return null;
     }
 
+    public function getDirectSnippetCodes(): array
+    {
+        $codes = [];
+
+        if ($this->js) {
+            $codes = array_merge($codes, SnippetUsages::extractSnippetCodes($this->js));
+        }
+
+        foreach (['js_includes', 'css_includes'] as $field) {
+            foreach (array_filter($this->$field ?? []) as $item) {
+                $codes = array_merge($codes, SnippetUsages::extractSnippetCodes($item));
+            }
+        }
+
+        $template = $this->getTemplate();
+        if ($template !== null) {
+            foreach ($template->getSnippetFields() as $field) {
+                if (isset($template->$field)) {
+                    $codes = array_merge($codes, SnippetUsages::extractSnippetCodes($template->$field));
+                }
+            }
+        }
+
+        return $codes;
+    }
+
     public function getUsedSnippetCodes(): array
     {
         $allSnippets = [];
         $processedSnippets = [];
-
-        $snippetsToProcess = [];
-
-        // Extract snippets from banner's JS
-        if ($this->js) {
-            $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetCodes($this->js));
-        }
-
-        $jsIncludes = array_filter($this->js_includes ?? []);
-        foreach ($jsIncludes as $jsInclude) {
-            $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetCodes($jsInclude));
-        }
-        $cssIncludes = array_filter($this->css_includes ?? []);
-        foreach ($cssIncludes as $cssInclude) {
-            $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetCodes($cssInclude));
-        }
-
-        // Extract snippets from template text and CSS fields
-        $snippetsToProcess = array_merge($snippetsToProcess, $this->extractSnippetsFromTemplate());
+        $snippetsToProcess = $this->getDirectSnippetCodes();
 
         // Check if snippets use another snippets
         while (!empty($snippetsToProcess)) {
@@ -337,7 +353,7 @@ class Banner extends Model implements Searchable
 
             if ($snippet && $snippet->value) {
                 // Extract nested snippets from this snippet's value
-                $nestedSnippets = $this->extractSnippetCodes($snippet->value);
+                $nestedSnippets = SnippetUsages::extractSnippetCodes($snippet->value);
 
                 // Add new nested snippets to processing queue
                 foreach ($nestedSnippets as $nestedSnippet) {
@@ -349,31 +365,5 @@ class Banner extends Model implements Searchable
         }
 
         return $allSnippets;
-    }
-
-    private function extractSnippetCodes(string $content): array
-    {
-        $matches = [];
-        $matched = preg_match_all('/{{\s?(.*?)\s?}}/', $content, $matches, PREG_PATTERN_ORDER);
-
-        if (is_int($matched) && $matched > 0) {
-            return $matches[1];
-        }
-
-        return [];
-    }
-
-    private function extractSnippetsFromTemplate(): array
-    {
-        $snippets = [];
-        $template = $this->getTemplate();
-
-        foreach ($template->getSnippetFields() as $field) {
-            if (isset($template->$field)) {
-                $snippets = array_merge($snippets, $this->extractSnippetCodes($template->$field));
-            }
-        }
-
-        return $snippets;
     }
 }

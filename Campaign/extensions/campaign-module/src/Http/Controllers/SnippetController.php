@@ -4,6 +4,7 @@ namespace Remp\CampaignModule\Http\Controllers;
 
 use Remp\CampaignModule\Http\Requests\SnippetRequest;
 use Remp\CampaignModule\Http\Resources\SnippetResource;
+use Remp\CampaignModule\Models\Snippet\SnippetUsages;
 use Remp\CampaignModule\Snippet;
 use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\DataTables;
@@ -53,8 +54,12 @@ class SnippetController extends Controller
 
     public function edit(Snippet $snippet)
     {
+        $usages = SnippetUsages::for($snippet);
+
         return view('campaign::snippets.edit', [
             'snippet' => $snippet,
+            'usedInBanners' => $usages->inBanners(),
+            'usedInSnippets' => $usages->inSnippets(),
         ]);
     }
 

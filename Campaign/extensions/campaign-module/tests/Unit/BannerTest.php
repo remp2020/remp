@@ -87,6 +87,13 @@ class BannerTest extends TestCase
                 ],
                 'expectedSnippets' => ['foobar', 'bazBar', 'qux'],
             ],
+            'multipleSpacesWhitespace' => [
+                'bannerJs' => 'var foo = "{{  foobar  }}";',
+                'snippetsData' => [
+                    ['name' => 'foobar', 'value' => 'test value'],
+                ],
+                'expectedSnippets' => ['foobar'],
+            ],
         ];
     }
 
