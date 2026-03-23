@@ -43,7 +43,7 @@ class EntitiesController extends Controller
                     'edit' => route('entities.edit', $entity)
                 ];
             })
-            ->rawColumns(['actions'])
+            ->rawColumns(['actions', 'name.text'])
             ->make(true);
     }
 

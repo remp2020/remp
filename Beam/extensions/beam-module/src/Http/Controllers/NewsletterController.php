@@ -48,7 +48,7 @@ class NewsletterController extends Controller
                     'destroy' => route('newsletters.destroy', $n),
                 ];
             })
-            ->rawColumns(['actions', 'action_methods', 'newsletter'])
+            ->rawColumns(['actions', 'action_methods', 'newsletter', 'newsletter.text'])
             ->make(true);
     }
 

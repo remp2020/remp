@@ -76,7 +76,7 @@ class BannerController extends Controller
                 }
                 return false;
             })
-            ->rawColumns(['actions', 'name', 'active'])
+            ->rawColumns(['actions', 'name', 'name.text', 'active'])
             ->setRowId('id')
             ->make(true);
     }

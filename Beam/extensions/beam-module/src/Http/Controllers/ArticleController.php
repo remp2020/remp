@@ -258,7 +258,7 @@ class ArticleController extends Controller
                     ->whereIn('article_tag.tag_id', $values);
                 $query->whereIn('articles.id', $filterQuery);
             })
-            ->rawColumns(['authors'])
+            ->rawColumns(['authors', 'title.text'])
             ->make();
     }
 
@@ -368,7 +368,7 @@ class ArticleController extends Controller
             ->orderColumn('avg_sum_subscribers', 'timespent_subscribers / pageviews_subscribers $1')
             ->orderColumn('pageviews_subscribers_ratio', 'pageviews_subscribers_ratio $1')
             ->orderColumn('id', 'articles.id $1')
-            ->rawColumns(['authors'])
+            ->rawColumns(['authors', 'title.text'])
             ->make(true);
     }
 

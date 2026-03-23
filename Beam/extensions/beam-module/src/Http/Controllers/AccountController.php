@@ -31,7 +31,7 @@ class AccountController extends Controller
                     'text' => $account->name,
                 ];
             })
-            ->rawColumns(['actions'])
+            ->rawColumns(['actions', 'name.text'])
             ->make(true);
     }
 

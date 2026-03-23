@@ -41,6 +41,7 @@ class SnippetController extends Controller
             ->filterColumn('name', function (Builder $query, $value) {
                 $query->where('snippets.name', 'like', "%{$value}%");
             })
+            ->rawColumns(['actions', 'name.text'])
             ->setRowId('id')
             ->make(true);
     }

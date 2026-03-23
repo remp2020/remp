@@ -141,7 +141,7 @@ class ConversionController extends Controller
                 $query->whereIn('articles.id', $filterQuery);
             })
             ->orderColumn('id', 'conversions.id $1')
-            ->rawColumns(['actions'])
+            ->rawColumns(['actions', 'article.title.text'])
             ->make(true);
     }
 

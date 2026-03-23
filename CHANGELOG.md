@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - Added new `ensureCommerceSessionID()` method that either reuses preserved session ID or generates a new one.
     - Changed `Tracker.trackCheckout()` and `Tracker.trackPurchase()` to use `ensureCommerceSessionID()` instead of `generateCommerceSessionID()`.
     - Method throws an error if `commerce_session_id` was marked for preservation but not found in storage.
+- Fixed datatable listing double encoding column values if those were used in links. remp/euobserver#153
 
 ### [Campaign]
 

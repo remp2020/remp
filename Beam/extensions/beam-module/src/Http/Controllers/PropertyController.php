@@ -40,7 +40,7 @@ class PropertyController extends Controller
                     'text' => $property->name,
                 ];
             })
-            ->rawColumns(['actions'])
+            ->rawColumns(['actions', 'name.text'])
             ->setRowId('id')
             ->make(true);
     }
