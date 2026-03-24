@@ -46,10 +46,10 @@ TEMPLATE;
             "content_text" => $textContent
         ];
 
-        $this->sourceTemplateRepository = $this->createConfiguredMock(SourceTemplatesRepository::class, [
+        $this->sourceTemplateRepository = $this->createConfiguredStub(SourceTemplatesRepository::class, [
             'find' => new ActiveRow(
                 $mailSourceTemplate,
-                $this->createMock(Selection::class)
+                $this->createStub(Selection::class)
             )
         ]);
 

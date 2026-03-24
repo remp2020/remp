@@ -26,20 +26,20 @@
         }
     ],
     "require": {
+        "php": "^8.3",
         "remp/campaign-module": "@dev"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.7",
+        "barryvdh/laravel-debugbar": "^4.0",
         "barryvdh/laravel-ide-helper": "^3.5",
         "fakerphp/faker": "^1.9.1",
-        "friendsofphp/php-cs-fixer": "^3.0",
         "josiasmontag/laravel-redis-mock": "~1.2",
         "larastan/larastan": "^3.3",
-        "laravel/tinker": "^2.0",
+        "laravel/tinker": "^3.0",
         "mockery/mockery": "^1.4.2",
         "phpunit/phpunit": "^12.0",
         "spatie/laravel-ignition": "^2.9",
-        "squizlabs/php_codesniffer": "^3.6"
+        "squizlabs/php_codesniffer": "^4.0"
     },
     "suggest": {
         "ext-redis": "The extension required for better performance."

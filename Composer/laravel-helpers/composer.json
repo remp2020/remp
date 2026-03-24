@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "php": "^8.2",
+    "php": "^8.3",
     "illuminate/http": "^v12.0",
     "illuminate/support": "^v12.0",
     "illuminate/routing": "^v12.0"

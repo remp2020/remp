@@ -6,7 +6,7 @@
     "license": "MIT",
     "prefer-stable": true,
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-json": "*",
         "ext-pcntl": "*",
         "ans-group/laravel-health-check": "^2.0",
@@ -35,7 +35,7 @@
         "yajra/laravel-datatables-oracle": "^12.0"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.7",
+        "barryvdh/laravel-debugbar": "^4.0",
         "barryvdh/laravel-ide-helper": "^3.5",
         "fakerphp/faker": "^v1.20.0",
         "laravel/tinker": "^2.5",

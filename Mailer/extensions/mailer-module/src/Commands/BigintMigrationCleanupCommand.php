@@ -30,7 +30,7 @@ class BigintMigrationCleanupCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $migratedTable = $input->getArgument('table');
 

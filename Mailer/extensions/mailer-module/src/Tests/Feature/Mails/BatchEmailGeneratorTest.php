@@ -61,7 +61,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $userList2 = $this->generateUsers(50, 101);
         $userList = array_merge($userList1, $userList2);
 
-        $userProvider = $this->createMock(IUser::class);
+        $userProvider = $this->createStub(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
             if ($page === 1) {
                 return array_intersect_key($userList, $ids);
@@ -70,7 +70,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             return [];
         });
 
-        $aggregator = $this->createMock(Aggregator::class);
+        $aggregator = $this->createStub(Aggregator::class);
         $map = [
             [['provider' => 'p', 'code' => 's1'], array_map(static fn($i) => $i['id'], $userList1)],
             [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $userList2)]
@@ -108,7 +108,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $userList2 = $this->generateUsers(50, 20);
         $userList = array_merge($userList1, $userList2);
 
-        $userProvider = $this->createMock(IUser::class);
+        $userProvider = $this->createStub(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
             if ($page === 1) {
                 return array_intersect_key($userList, $ids);
@@ -121,7 +121,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             [['provider' => 'p', 'code' => 's1'], array_map(static fn($i) => $i['id'], $userList1)],
             [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $userList2)]
         ];
-        $aggregator = $this->createMock(Aggregator::class);
+        $aggregator = $this->createStub(Aggregator::class);
         $aggregator->method('users')->willReturnMap($map);
 
         $this->subscribeUsers($mailType, $userList);
@@ -161,7 +161,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $userList = array_merge($includeUserList1, $includeUserList2);
 
-        $userProvider = $this->createMock(IUser::class);
+        $userProvider = $this->createStub(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
             if ($page === 1) {
                 return array_intersect_key($userList, $ids);
@@ -176,7 +176,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             [['provider' => 'p', 'code' => 's3'], array_map(static fn($i) => $i['id'], $excludeUserList3)],
             [['provider' => 'p', 'code' => 's4'], array_map(static fn($i) => $i['id'], $excludeUserList4)]
         ];
-        $aggregator = $this->createMock(Aggregator::class);
+        $aggregator = $this->createStub(Aggregator::class);
         $aggregator->method('users')->willReturnMap($map);
 
         $this->subscribeUsers($mailType, array_merge($includeUserList1, $includeUserList2));
@@ -207,7 +207,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $userList = $this->generateUsers(100);
 
-        $userProvider = $this->createMock(IUser::class);
+        $userProvider = $this->createStub(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
             if ($page === 1) {
                 return array_intersect_key($userList, array_flip($ids));
@@ -216,7 +216,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             return [];
         });
 
-        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+        $aggregator = $this->createConfiguredStub(Aggregator::class, [
             'users' => array_keys($userList)
         ]);
 
@@ -254,7 +254,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $userList = $this->generateUsers(100);
 
-        $userProvider = $this->createMock(IUser::class);
+        $userProvider = $this->createStub(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
             if ($page === 1) {
                 return array_intersect_key($userList, array_flip($ids));
@@ -263,7 +263,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             return [];
         });
 
-        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+        $aggregator = $this->createConfiguredStub(Aggregator::class, [
             'users' => array_keys($userList)
         ]);
 
@@ -312,7 +312,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $userList = $this->generateUsers(100);
 
-        $userProvider = $this->createMock(IUser::class);
+        $userProvider = $this->createStub(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
             if ($page === 1) {
                 return array_intersect_key($userList, array_flip($ids));
@@ -321,7 +321,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             return [];
         });
 
-        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+        $aggregator = $this->createConfiguredStub(Aggregator::class, [
             'users' => array_keys($userList)
         ]);
 
@@ -382,7 +382,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $userList = $this->generateUsers(100);
 
-        $userProvider = $this->createMock(IUser::class);
+        $userProvider = $this->createStub(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
             if ($page === 1) {
                 return array_intersect_key($userList, array_flip($ids));
@@ -391,7 +391,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             return [];
         });
 
-        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+        $aggregator = $this->createConfiguredStub(Aggregator::class, [
             'users' => array_keys($userList)
         ]);
 
@@ -438,7 +438,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $userList = $this->generateUsers(100);
 
-        $userProvider = $this->createMock(IUser::class);
+        $userProvider = $this->createStub(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
             if ($page === 1) {
                 return array_intersect_key($userList, array_flip($ids));
@@ -447,7 +447,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             return [];
         });
 
-        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+        $aggregator = $this->createConfiguredStub(Aggregator::class, [
             'users' => array_keys($userList)
         ]);
 
@@ -490,7 +490,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $userList = $this->generateUsers(50000);
 
-        $userProvider = $this->createMock(IUser::class);
+        $userProvider = $this->createStub(IUser::class);
         $userProvider->method('list')->willReturnCallback(function ($ids, $page) use ($userList) {
             if ($page === 1) {
                 return array_intersect_key($userList, array_flip($ids));
@@ -499,7 +499,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             return [];
         });
 
-        $aggregator = $this->createConfiguredMock(Aggregator::class, [
+        $aggregator = $this->createConfiguredStub(Aggregator::class, [
             'users' => array_keys($userList)
         ]);
 
@@ -528,10 +528,10 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $users1 = array_slice($allUsersList, 0, $halfUsersCount, true);
         $users2 = array_slice($allUsersList, $halfUsersCount, null, true);
 
-        $aggregator1 = $this->createConfiguredMock(Aggregator::class, [
+        $aggregator1 = $this->createConfiguredStub(Aggregator::class, [
             'users' => array_keys($users1)
         ]);
-        $aggregator2 = $this->createConfiguredMock(Aggregator::class, [
+        $aggregator2 = $this->createConfiguredStub(Aggregator::class, [
             'users' => array_keys($users2)
         ]);
         $layout = $this->createMailLayout();

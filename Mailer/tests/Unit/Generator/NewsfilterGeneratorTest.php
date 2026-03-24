@@ -21,11 +21,11 @@ class NewsfilterGeneratorTest extends TestCase
         $engineFactory = $GLOBALS['container']->getByType(EngineFactory::class);
 
         $this->generator = new NewsfilterGenerator(
-            $this->createMock(SourceTemplatesRepository::class),
-            $this->createMock(WordpressHelpers::class),
-            $this->createMock(ContentInterface::class),
-            $this->createMock(EmbedParser::class),
-            $this->createMock(HtmlArticleLocker::class),
+            $this->createStub(SourceTemplatesRepository::class),
+            $this->createStub(WordpressHelpers::class),
+            $this->createStub(ContentInterface::class),
+            $this->createStub(EmbedParser::class),
+            $this->createStub(HtmlArticleLocker::class),
             $engineFactory
         );
     }

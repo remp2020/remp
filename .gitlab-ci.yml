@@ -24,7 +24,7 @@ syntax:8.4:
 
 sniffer:
   stage: test
-  image: remp/php-ci:8.3.20
+  image: remp/php-ci:8.4.19
   tags:
     - docker
   script:
@@ -34,7 +34,7 @@ sniffer:
 
 phpstan:
   stage: test
-  image: remp/php-ci:8.3.20
+  image: remp/php-ci:8.4.19
   tags:
     - docker
   script:
@@ -43,7 +43,7 @@ phpstan:
 
 latte_lint:
   stage: test
-  image: remp/php-ci:8.3.20
+  image: remp/php-ci:8.4.19
   tags:
     - docker
   script:
@@ -52,7 +52,7 @@ latte_lint:
 
 tests:
   stage: test
-  image: remp/php-ci:8.3.20
+  image: remp/php-ci:8.4.19
   tags:
     - docker
   script:

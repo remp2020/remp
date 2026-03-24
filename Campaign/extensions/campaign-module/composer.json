@@ -6,7 +6,7 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": "^8.2",
+    "php": "^8.3",
     "ext-intl": "*",
     "ext-json": "*",
     "doctrine/dbal": "^3.1",
@@ -34,11 +34,10 @@
     "yajra/laravel-datatables-oracle": "^12.0"
   },
   "require-dev": {
-    "barryvdh/laravel-debugbar": "^3.7",
+    "barryvdh/laravel-debugbar": "^4.0",
     "barryvdh/laravel-ide-helper": "^3.5",
     "facade/ignition": "^2.5",
     "fakerphp/faker": "^1.9.1",
-    "friendsofphp/php-cs-fixer": "^3.0",
     "josiasmontag/laravel-redis-mock": "~1.2",
     "laravel/tinker": "^2.0",
     "mockery/mockery": "^1.4.2",

@@ -22,7 +22,7 @@ class CleanupCommand extends Command
             ->setDescription('Cleanup old data based on configured retention rules');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln(sprintf('%s: <info>DATA RETENTION</info>', new DateTime()));
 

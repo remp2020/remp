@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "php": "^8.0",
+    "php": "^8.3",
     "guzzlehttp/guzzle": "^7.0",
     "gburtini/distributions": "^0.0.2"
   },

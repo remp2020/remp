@@ -47,8 +47,8 @@ TEMPLATE;
             "content_text" => $textContent
         ];
 
-        $this->sourceTemplateRepository = $this->createConfiguredMock(SourceTemplatesRepository::class, [
-            'find' => new ActiveRow($mailSourceTemplate, $this->createMock(Selection::class))
+        $this->sourceTemplateRepository = $this->createConfiguredStub(SourceTemplatesRepository::class, [
+            'find' => new ActiveRow($mailSourceTemplate, $this->createStub(Selection::class))
         ]);
 
         $this->engineFactory = $GLOBALS['container']->getByType(EngineFactory::class);

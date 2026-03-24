@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "php": "^8.2",
+    "php": "^8.3",
     "league/uri": "^7.5",
     "league/uri-components": "^7.5",
     "illuminate/auth": "^v12.0",
