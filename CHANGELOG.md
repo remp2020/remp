@@ -35,6 +35,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Added `IEngine::markSafe()` method to flag content for generator as HTML-safe. remp/remp#1422
+    - This only affects you if you have your own implementation of `IEngine`. If you do, add new method to your class. You can use `TwigEngine` for reference.
 - **BREAKING**: Updated `nette/security` package removing `IUserStorage` interface.
     - If you implemented this interface, use `UserStorage` instead.
 - Added index to `mail_job_batch.status` to improve Mailer's workers batch checking performance.

@@ -75,7 +75,7 @@ class DennikeGenerator implements IGenerator
     public function process(array $values): array
     {
         $this->articleLocker->setLockText('Predplaťte si Denník E a tento newsletter dostanete každé ráno celý.');
-        $this->articleLocker->setupLockLink('Pridajte sa k predplatiteľom', 'https://predplatne.dennikn.sk/ecko');
+        $this->articleLocker->setLockLink('Pridajte sa k predplatiteľom', 'https://predplatne.dennikn.sk/ecko');
 
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values['source_template_id']);
 

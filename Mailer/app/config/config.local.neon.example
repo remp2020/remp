@@ -39,7 +39,7 @@ services:
     articleLocker:
         setup:
             - setLockText("Exclusive content")
-            - setupLockLink("Registration", "https://www.demosite.com/registration")
+            - setLockLink("Registration", "https://www.demosite.com/registration")
 
     unsubscribeDroppedHandler:
         factory: Remp\MailerModule\Hermes\UnsubscribeDroppedHandler

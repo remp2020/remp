@@ -7,13 +7,11 @@ use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\NewsfilterWidget\NewsfilterWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Models\Generators\HtmlArticleLocker;
 use Remp\MailerModule\Models\Generators\EmbedParser;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
 use Remp\MailerModule\Models\Generators\WordpressHelpers;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
-use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\PostInputParam;
 
@@ -23,32 +21,14 @@ class NewsfilterGenerator implements IGenerator
 
     public $onSubmit;
 
-    private $mailSourceTemplateRepository;
-
-    private $helpers;
-
-    private $content;
-
-    private $embedParser;
-
-    protected $articleLocker;
-
-    private $engineFactory;
-
     public function __construct(
-        SourceTemplatesRepository $mailSourceTemplateRepository,
-        WordpressHelpers          $helpers,
-        ContentInterface          $content,
-        EmbedParser               $embedParser,
-        HtmlArticleLocker         $articleLocker,
-        EngineFactory             $engineFactory
+        protected readonly SourceTemplatesRepository $mailSourceTemplateRepository,
+        protected readonly WordpressHelpers $helpers,
+        protected readonly ContentInterface $content,
+        protected readonly EmbedParser $embedParser,
+        protected readonly N3ArticleLocker $n3ArticleLocker,
+        protected readonly EngineFactory $engineFactory,
     ) {
-        $this->mailSourceTemplateRepository = $mailSourceTemplateRepository;
-        $this->helpers = $helpers;
-        $this->content = $content;
-        $this->embedParser = $embedParser;
-        $this->articleLocker = $articleLocker;
-        $this->engineFactory = $engineFactory;
     }
 
     public function apiParams(): array
@@ -75,7 +55,7 @@ class NewsfilterGenerator implements IGenerator
         $post = $values['newsfilter_html'];
         $post = $this->parseOls($post);
 
-        $lockedPost = $this->articleLocker->getLockedPost($post);
+        $lockedPost = $this->n3ArticleLocker->getLockedPost($post);
         $errors = [];
 
         $generatorRules = [
@@ -104,7 +84,7 @@ class NewsfilterGenerator implements IGenerator
 
         [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:160%;margin: 16px 0 16px 0\">", [$post, $lockedPost]);
 
-        $lockedPost = $this->articleLocker->injectLockedMessage($lockedPost);
+        $lockedPost = $this->n3ArticleLocker->injectLockedMessage($lockedPost);
 
         $params = [
             'title' => $values['title'],
@@ -126,6 +106,12 @@ class NewsfilterGenerator implements IGenerator
         ];
 
         $engine = $this->engineFactory->engine();
+
+        $params['html'] = $engine->markSafe($params['html']);
+        $params['text'] = $engine->markSafe($params['text']);
+        $lockedParams['html'] = $engine->markSafe($lockedParams['html']);
+        $lockedParams['text'] = $engine->markSafe($lockedParams['text']);
+
         return [
             'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
             'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),

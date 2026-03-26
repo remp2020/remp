@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Generator;
 
 use PHPUnit\Framework\TestCase;
+use Remp\Mailer\Models\Generators\N3ArticleLocker;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\HtmlArticleLocker;
 use Remp\MailerModule\Models\Generators\EmbedParser;
@@ -25,7 +26,7 @@ class NewsfilterGeneratorTest extends TestCase
             $this->createStub(WordpressHelpers::class),
             $this->createStub(ContentInterface::class),
             $this->createStub(EmbedParser::class),
-            $this->createStub(HtmlArticleLocker::class),
+            $this->createStub(N3ArticleLocker::class),
             $engineFactory
         );
     }

@@ -55,7 +55,7 @@ HTML;
         return str_replace($this->placeholder, $lockedHtml, $post);
     }
 
-    public function setupLockLink(string $linkText, string $linkUrl): self
+    public function setLockLink(string $linkText, string $linkUrl): self
     {
         $this->linkText = $linkText;
         $this->linkUrl = $linkUrl;

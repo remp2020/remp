@@ -29,6 +29,7 @@ services:
 
 	- Remp\Mailer\Models\Generators\WordpressBlockParser
 	- Remp\Mailer\Models\Generators\InterimWordpressBlockParser
+	n3ArticleLocker: Remp\Mailer\Models\Generators\N3ArticleLocker
 
 	embedParser:
 		factory: Remp\Mailer\Models\Generators\EmbedParser

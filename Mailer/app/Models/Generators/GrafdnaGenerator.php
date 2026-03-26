@@ -96,7 +96,7 @@ class GrafdnaGenerator implements IGenerator
     public function process(array $values): array
     {
         $this->articleLocker->setLockText('Predplaťte si Denník E a tento newsletter dostanete celý.');
-        $this->articleLocker->setupLockLink('Pridajte sa k predplatiteľom', 'https://predplatne.dennikn.sk/ecko');
+        $this->articleLocker->setLockLink('Pridajte sa k predplatiteľom', 'https://predplatne.dennikn.sk/ecko');
 
         $errors = [];
 
