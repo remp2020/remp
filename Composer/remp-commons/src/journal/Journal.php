@@ -41,7 +41,7 @@ class Journal implements JournalContract
 
     private $tokenProvider;
 
-    public function __construct(Client $client, \Predis\Client $redis, TokenProvider $tokenProvider = null)
+    public function __construct(Client $client, \Predis\Client $redis, ?TokenProvider $tokenProvider = null)
     {
         $this->client = $client;
         $this->redis = $redis;
