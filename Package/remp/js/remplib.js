@@ -371,7 +371,7 @@ export default {
     },
 
     getCookie: function(name) {
-        let result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+        let result = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
         if (!result) {
             return null;
         }
