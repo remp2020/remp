@@ -424,6 +424,20 @@ class Campaign extends Model implements Searchable
         return $this->signedInOptions()[$this->signed_in];
     }
 
+    public function usingAdblockOptions(): array
+    {
+        return [
+            null => 'Everyone',
+            true => 'Only with adblock',
+            false => 'Only without adblock',
+        ];
+    }
+
+    public function usingAdblockLabel(): string
+    {
+        return $this->usingAdblockOptions()[$this->using_adblock];
+    }
+
     public static function getAvailableLanguages()
     {
         $locales = \ResourceBundle::getLocales(null);

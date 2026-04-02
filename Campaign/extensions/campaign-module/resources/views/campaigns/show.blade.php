@@ -57,22 +57,44 @@
 
                     <li class="list-group-item">
                         <strong>User signed-in state:</strong>
-                        @if($campaign->signed_in === null)
-                            Everyone
-                        @elseif($campaign->signed_in === true)
-                            Only signed in
-                        @elseif ($campaign->signed_in === false)
-                            Only anonymous
-                        @endif
+                        {{ $campaign->signedInLabel() }}
                     </li>
 
                     <li class="list-group-item">
-                        <strong>Segments: </strong>
+                        <strong>User ad-blocking state:</strong>
+                        {{ $campaign->usingAdblockLabel() }}
+                    </li>
+
+                    @if(!empty($campaign->pageview_attributes))
+                    <li class="list-group-item">
+                        <strong>Pageview attributes:</strong>
                         <ul>
-                        @foreach($campaign->segments as $segment)
-                            <li>{{ $segment->code }}</li>
+                        @php $opLabels = ['=' => 'is', '!=' => 'is not']; @endphp
+                        @foreach($campaign->pageview_attributes as $attribute)
+                            <li><code>{{ $attribute['name'] }}</code> {{ $opLabels[$attribute['operator']] ?? $attribute['operator'] }} <code>{{ $attribute['value'] }}</code></li>
                         @endforeach
                         </ul>
+                    </li>
+                    @endif
+
+                    <li class="list-group-item">
+                        <strong>Segments: </strong>
+                        @if($campaign->segments->isEmpty())
+                            None
+                        @else
+                            <ul>
+                            @foreach($campaign->segments as $segment)
+                                <li>
+                                    @if($segment->inclusive)
+                                        <i class="zmdi zmdi-eye" style="color: #009688" title="User needs to be member of segment to see the campaign."></i>
+                                    @else
+                                        <i class="zmdi zmdi-eye-off" style="color: #f44336" title="User must not be member of segment to see the campaign."></i>
+                                    @endif
+                                    {{ $segment->code }}
+                                </li>
+                            @endforeach
+                            </ul>
+                        @endif
                     </li>
 
                     <li class="list-group-item">
@@ -80,10 +102,7 @@
                         <ul>
                             <li>
                                 URL:
-                                @if ($campaign->url_filter === 'everywhere') Everywhere
-                                @elseif($campaign->url_filter === 'only_at') Only at
-                                @elseif($campaign->url_filter === 'except_at') Except at
-                                @endif
+                                {{ $campaign->getAllUrlFilterTypes()[$campaign->url_filter] ?? $campaign->url_filter }}
 
                                 @if($campaign->url_filter !== 'everywhere')
                                 <ul>
@@ -94,11 +113,8 @@
                                 @endif
                             </li>
                             <li>
-                                Referer:
-                                @if ($campaign->source_filter === 'everywhere') Everywhere
-                                @elseif($campaign->source_filter === 'only_at') Only at
-                                @elseif($campaign->source_filter === 'except_at') Except at
-                                @endif
+                                Traffic source:
+                                {{ $campaign->getAllSourceFilterTypes()[$campaign->source_filter] ?? $campaign->source_filter }}
 
                                 @if($campaign->source_filter !== 'everywhere')
                                     <ul>
@@ -123,6 +139,22 @@
                                 Display to user {{ $campaign->pageview_rules['display_n_times'] }} times, then stop.
                             </li>
                             @endif
+                            @foreach([
+                                ['key' => 'after_banner_closed_display', 'label' => 'After banner closed', 'hours_key' => 'after_closed_hours'],
+                                ['key' => 'after_banner_clicked_display', 'label' => 'After banner clicked', 'hours_key' => 'after_clicked_hours'],
+                            ] as $rule)
+                                @if(!empty($campaign->pageview_rules[$rule['key']]))
+                                <li>
+                                    {{ $rule['label'] }}:
+                                    @php $val = $campaign->pageview_rules[$rule['key']]; @endphp
+                                    @if($val === 'always') Always show
+                                    @elseif($val === 'never') Never show it again
+                                    @elseif($val === 'never_in_session') Don't show within current session
+                                    @elseif($val === 'close_for_hours') Don't show for the next {{ $campaign->pageview_rules[$rule['hours_key']] }} hours
+                                    @endif
+                                </li>
+                                @endif
+                            @endforeach
                         </ul>
                     </li>
                     @endif
@@ -152,12 +184,56 @@
                         </li>
                     @endif
 
+                    @if(!empty($campaign->languages))
+                        <li class="list-group-item">
+                            <strong>Languages:</strong>
+                            <ul>
+                            @foreach($campaign->languages as $language)
+                                <li>{{ \Locale::getDisplayLanguage($language) }}</li>
+                            @endforeach
+                            </ul>
+                        </li>
+                    @endif
+
                     @foreach(['desktop', 'mobile'] as $device)
                         <li class="list-group-item">
                             <strong>Show on {{ ucfirst($device) }}:</strong>
                             {{ @yesno(in_array($device, $campaign->devices)) }}
                         </li>
                     @endforeach
+
+                    @if(!empty($campaign->operating_systems))
+                        @php
+                            $osLabels = collect($campaign->getAvailableOperatingSystems())->pluck('label', 'value');
+                        @endphp
+                        <li class="list-group-item">
+                            <strong>Operating systems:</strong>
+                            <ul>
+                            @foreach($campaign->operating_systems as $os)
+                                <li>{{ $osLabels[$os] ?? $os }}</li>
+                            @endforeach
+                            </ul>
+                        </li>
+                    @endif
+
+                    @php
+                        $activeSchedules = $campaign->schedules->filter(fn($s) => !$s->isStopped() && !$s->isPaused());
+                    @endphp
+                    @if($activeSchedules->isNotEmpty())
+                        <li class="list-group-item">
+                            <strong>Schedules:</strong>
+                            <ul>
+                            @foreach($activeSchedules as $schedule)
+                                <li>
+                                    {{ $schedule->start_time->format('Y-m-d H:i') }}
+                                    &mdash;
+                                    {{ $schedule->end_time ? $schedule->end_time->format('Y-m-d H:i') : 'open-ended' }}
+                                    ({{ $schedule->status }})
+                                </li>
+                            @endforeach
+                            </ul>
+                        </li>
+                    @endif
 
                     <li class="list-group-item">
                         <strong>Active: </strong>{{ @yesno($campaign->active) }}

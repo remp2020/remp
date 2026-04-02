@@ -33,6 +33,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed banner close button clickable targets according to WCAG recommendation. remp/remp#1458
 - Added snippet usage information to the snippet edit page, showing which banners and other snippets reference the snippet (including direct vs transitive usage). remp/remp#1453
 - Fixed `getCookie` function - may find different cookie with same suffix. remp/remp#1438
+- Fixed campaign show page not reflecting all settings from the edit form. remp/remp#1460
+    - Fixed segments display to distinguish inclusive and exclusive segments with eye/eye-off icons.
+    - Added missing settings: ad-blocking state, pageview attributes, after banner closed/clicked rules, languages, operating systems, and schedules.
+    - Fixed source filter display to handle all filter types and renamed label from "Referer" to "Traffic source".
 
 ### [Mailer]
 
