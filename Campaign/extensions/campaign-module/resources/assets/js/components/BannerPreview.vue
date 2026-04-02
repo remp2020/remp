@@ -494,6 +494,9 @@
                 this.closeTracked = true;
             },
             clicked: function(event, hideBanner = false) {
+                if (typeof remplib.campaign === 'undefined') {
+                    return;
+                }
                 remplib.campaign.storeCampaignClicked(this.campaignPublicId);
 
                 if (this.manualEventsTracking || this.clickTracked) {
