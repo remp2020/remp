@@ -6,55 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-### [Beam]
-
-- Fixed performance issues during mass article upsert caused by DB locking and unnecessary DB updates. remp/remp#1457
-- Fixed `remplib.removeFromStorage()` not properly deleting cookies due to incorrect domain parameter formatting. remp/analytika#242
-    - Changed cookie string composition to match the format used in `storeCookie()` function.
-- Added support for preserving `commerce_session_id` across page reloads. remp/analytika#242
-    - Added new `preserveCommerceSessionID()` method to mark commerce session for preservation.
-    - Added new `ensureCommerceSessionID()` method that either reuses preserved session ID or generates a new one.
-    - Changed `Tracker.trackCheckout()` and `Tracker.trackPurchase()` to use `ensureCommerceSessionID()` instead of `generateCommerceSessionID()`.
-    - Method throws an error if `commerce_session_id` was marked for preservation but not found in storage.
-- Fixed datatable listing double encoding column values if those were used in links. remp/euobserver#153
-
-### [Campaign]
-
-- **IMPORTANT**: Scheduled `newsletter_rectangle_templates.terms` database column to become NOT NULL in next major version. remp/remp#1445
-    - Ensure all Newsletter Rectangle banners have terms with at least one HTML link before upgrading.
-- **IMPORTANT**: Changed `newsletter_rectangle_templates.terms` database column to NOT NULL. remp/remp#1445
-    - Migration automatically sets a default value for any existing NULL or empty terms.
-- Changed Newsletter Rectangle banner template to require `terms` field with at least one HTML link. remp/remp#1445
-    - Existing banners with empty terms or terms without links will fail validation on save.
-- Fixed banner `js_includes` and `css_includes` fields saving `[null]` instead of empty array when no includes are specified. remp/remp#1446
-- Added timestamps support to collections with sorting in admin listing. remp/remp#1443
-- Added support for session referer debug parameter in CampaignDebugger, improved output and usability. remp/remp#1459
-- Added support for session debug parameter in CampaignDebugger, improved output. remp/remp#1459
-- Changed banner close button clickable targets according to WCAG recommendation. remp/remp#1458
-- Added snippet usage information to the snippet edit page, showing which banners and other snippets reference the snippet (including direct vs transitive usage). remp/remp#1453
-- Fixed `getCookie` function - may find different cookie with same suffix. remp/remp#1438
-- Fixed campaign show page not reflecting all settings from the edit form. remp/remp#1460
-    - Fixed segments display to distinguish inclusive and exclusive segments with eye/eye-off icons.
-    - Added missing settings: ad-blocking state, pageview attributes, after banner closed/clicked rules, languages, operating systems, and schedules.
-    - Fixed source filter display to handle all filter types and renamed label from "Referer" to "Traffic source".
-
-### [Mailer]
-
-- **BREAKING**: Added `IEngine::markSafe()` method to flag content for generator as HTML-safe. remp/remp#1422
-    - This only affects you if you have your own implementation of `IEngine`. If you do, add new method to your class. You can use `TwigEngine` for reference.
-- **BREAKING**: Updated `nette/security` package removing `IUserStorage` interface.
-    - If you implemented this interface, use `UserStorage` instead.
-- Added index to `mail_job_batch.status` to improve Mailer's workers batch checking performance.
-- Added index to `mail_template_stats` to improve Mailer's dashboard aggregation performance.
-- Allowed cross-origin requests in MailGeneratorFormFactory (opt-in) to support cross-domain submissions if necessary.
-- Fixed issues with `mail:conversion-stats` if there were no conversions in the database. remp/remp#1454
-- Fixed issue with images breaking layout in Outlook clients for NewsfilterGenerator. remp/helpdesk#4399 
-- Changed `WordpressHelpers::wpParseArticleLinks` wordpress article links parser regex, to allow and strip spaces from article id. remp/helpdesk#4406
-- Added email preheader support allowing preview text to be displayed in email client inboxes. remp/remp#1451
-    - New optional `preheader` parameter in `POST /api/v1/mailers/templates` API endpoint.
 
 ## Archive
 
+- [v5.0](./changelogs/CHANGELOG-v5.0.md)
 - [v4.3](./changelogs/CHANGELOG-v4.3.md)
 - [v4.2](./changelogs/CHANGELOG-v4.2.md)
 - [v4.1](./changelogs/CHANGELOG-v4.1.md)
@@ -88,4 +43,4 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 [Segments]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/segments
 [Tracker]: https://github.com/remp2020/remp/tree/master/Beam/go/cmd/tracker
 
-[Unreleased]: https://github.com/remp2020/remp/compare/4.2.0...master
+[Unreleased]: https://github.com/remp2020/remp/compare/4.3.0...master
