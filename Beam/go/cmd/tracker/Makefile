@@ -27,7 +27,7 @@ gen:
 	set -e
 	go install goa.design/goa/v3/cmd/goa@$$(go list -m -f '{{.Version}}' goa.design/goa/v3)
 	goa gen $(DESIGN_PKG) --output .
-	go install github.com/go-bindata/go-bindata/go-bindata
+	go install github.com/go-bindata/go-bindata/go-bindata@latest
 	go-bindata -pkg=data -o=./data/bindata.go -ignore=bindata.go data/
 
 build: gen
