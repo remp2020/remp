@@ -39,3 +39,7 @@ services:
 			- add('user-subscribed', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())
 			- add('user-subscribed-variant', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())
 			- add('user-unsubscribed', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())
+
+	generator:
+		setup:
+			- registerGenerator('hub_notification', 'Hub notification generator', Remp\Mailer\Models\Generators\HubNotificationGenerator())

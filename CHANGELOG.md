@@ -6,7 +6,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-
 ## Archive
 
 - [v5.0](./changelogs/CHANGELOG-v5.0.md)
