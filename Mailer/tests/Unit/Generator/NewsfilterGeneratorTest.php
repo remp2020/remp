@@ -42,7 +42,8 @@ class NewsfilterGeneratorTest extends TestCase
             "ID": "663",
             "user_nicename": "ria-gehrerova",
             "user_email": "ria.gehrerova@gmail.com",
-            "display_name": "Ria Gehrerová"
+            "display_name": "Ria Gehrerová",
+            "avatar_url": "https://placehold.net/avatar.png"
         }
     ],
     "post_url": "http:\/\/localhost\/dnwp\/wordpress\/1084435\/matej-sajfa-cifra-mladi-dnes-chcu-byt-za-pol-roka-slavni-mna-si-v-radiu-prve-styri-roky-ani-nevsimli\/",
