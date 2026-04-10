@@ -44,19 +44,24 @@ class HubNotificationGenerator implements IGenerator
     {
         return [
             (new PostInputParam('source_template_code'))->setRequired(),
-            (new PostInputParam('params_json')),
+            (new PostInputParam('post_json'))->setRequired(),
+            (new PostInputParam('author_json')),
+            (new PostInputParam('tag_json')),
+            (new PostInputParam('category_json')),
         ];
     }
 
     public function process(array $input): array
     {
-        $params = [];
-        if (isset($input['params_json'])) {
-            $params = Json::decode($input['params_json'], forceArrays: true);
-        }
-
         $engine = $this->engineFactory->engine();
-        $sourceTemplate = $this->sourceTemplatesRepository->find($input['source_template_id']);
+        $sourceTemplate = $this->sourceTemplatesRepository->findBy('code', $input['source_template_code']);
+
+        $params = array_filter([
+            'post' => Json::decode($input['post_json']),
+            'author' => Json::decode($input['author_json'] ?? 'null'),
+            'tag' => Json::decode($input['tag_json'] ?? 'null'),
+            'category' => Json::decode($input['category_json'] ?? 'null'),
+        ]);
 
         return [
             'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
@@ -68,16 +73,16 @@ class HubNotificationGenerator implements IGenerator
     {
         $output = new ArrayHash();
 
-        $output->post = $data->post;
+        $output->post_json = Json::encode($data->post);
 
         if (isset($data->author)) {
-            $output->author = $data->author;
+            $output->author_json = Json::encode($data->author);
         }
         if (isset($data->tag)) {
-            $output->tag = $data->tag;
+            $output->tag_json = Json::encode($data->tag);
         }
         if (isset($data->category)) {
-            $output->category = $data->category;
+            $output->category_json = Json::encode($data->category);
         }
 
         return $output;
