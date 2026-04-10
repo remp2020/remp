@@ -191,6 +191,7 @@ class NewsfilterGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'post_authors.0.display_name'");
         }
         $output->editor = $data->post_authors[0]->display_name;
+        $output->editor_avatar_url = $data->post_authors[0]->avatar_url;
 
         if (isset($data->sender_email) && $data->sender_email) {
             $output->from = $data->sender_email;
