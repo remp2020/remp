@@ -4,8 +4,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Mails;
 
 use Nette\Utils\DateTime;
-use Remp\MailerModule\Models\Beam\UnreadArticlesResolver;
-use Remp\MailerModule\Models\Job\MailCache;
+use Psr\Log\NullLogger;
 use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Models\Users\IUser;
 use Tests\Feature\BaseFeatureTestCase;
@@ -13,26 +12,13 @@ use Tests\Feature\TestUserProvider;
 
 class BatchEmailGeneratorTest extends BaseFeatureTestCase
 {
-    private $mailCache;
-
-    private $unreadArticlesGenerator;
-
-    protected function setUp(): void
+    private function getGenerator($aggregator, $userProvider): BatchEmailGeneratorTestWrapper
     {
-        parent::setUp();
-        $this->mailCache = $this->inject(MailCache::class);
-        $this->unreadArticlesGenerator = $this->inject(UnreadArticlesResolver::class);
-    }
-
-    private function getGenerator($aggregator, $userProvider)
-    {
-        return new BatchEmailGeneratorWrapper(
-            $this->jobQueueRepository,
-            $aggregator,
-            $userProvider,
-            $this->mailCache,
-            $this->unreadArticlesGenerator,
-        );
+        return $this->createInstance(BatchEmailGeneratorTestWrapper::class, [
+            'segmentAggregator' => $aggregator,
+            'userProvider' => $userProvider,
+            'logger' => new NullLogger(),
+        ]);
     }
 
     private function generateUsers(int $count, int $startFromId = 1): array
@@ -41,7 +27,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         for ($i=$startFromId; $i < $startFromId + $count; $i++) {
             $userList[$i] = [
                 'id' => $i,
-                'email' => "email{$i}@example.com"
+                'email' => "email{$i}@example.com",
             ];
         }
         return $userList;
@@ -73,7 +59,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $aggregator = $this->createStub(Aggregator::class);
         $map = [
             [['provider' => 'p', 'code' => 's1'], array_map(static fn($i) => $i['id'], $userList1)],
-            [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $userList2)]
+            [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $userList2)],
         ];
         $aggregator->method('users')->willReturnMap($map);
 
@@ -119,7 +105,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
 
         $map = [
             [['provider' => 'p', 'code' => 's1'], array_map(static fn($i) => $i['id'], $userList1)],
-            [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $userList2)]
+            [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $userList2)],
         ];
         $aggregator = $this->createStub(Aggregator::class);
         $aggregator->method('users')->willReturnMap($map);
@@ -174,7 +160,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
             [['provider' => 'p', 'code' => 's1'], array_map(static fn($i) => $i['id'], $includeUserList1)],
             [['provider' => 'p', 'code' => 's2'], array_map(static fn($i) => $i['id'], $includeUserList2)],
             [['provider' => 'p', 'code' => 's3'], array_map(static fn($i) => $i['id'], $excludeUserList3)],
-            [['provider' => 'p', 'code' => 's4'], array_map(static fn($i) => $i['id'], $excludeUserList4)]
+            [['provider' => 'p', 'code' => 's4'], array_map(static fn($i) => $i['id'], $excludeUserList4)],
         ];
         $aggregator = $this->createStub(Aggregator::class);
         $aggregator->method('users')->willReturnMap($map);
@@ -217,7 +203,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         });
 
         $aggregator = $this->createConfiguredStub(Aggregator::class, [
-            'users' => array_keys($userList)
+            'users' => array_keys($userList),
         ]);
 
         $subscribedUserKeys = array_rand($userList, 6);
@@ -264,7 +250,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         });
 
         $aggregator = $this->createConfiguredStub(Aggregator::class, [
-            'users' => array_keys($userList)
+            'users' => array_keys($userList),
         ]);
 
         $mailVariantUserKeys = [];
@@ -322,7 +308,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         });
 
         $aggregator = $this->createConfiguredStub(Aggregator::class, [
-            'users' => array_keys($userList)
+            'users' => array_keys($userList),
         ]);
 
         $generator = $this->getGenerator($aggregator, $userProvider);
@@ -392,7 +378,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         });
 
         $aggregator = $this->createConfiguredStub(Aggregator::class, [
-            'users' => array_keys($userList)
+            'users' => array_keys($userList),
         ]);
 
         // subscribe users
@@ -448,7 +434,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         });
 
         $aggregator = $this->createConfiguredStub(Aggregator::class, [
-            'users' => array_keys($userList)
+            'users' => array_keys($userList),
         ]);
 
         $generator = $this->getGenerator($aggregator, $userProvider);
@@ -500,7 +486,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         });
 
         $aggregator = $this->createConfiguredStub(Aggregator::class, [
-            'users' => array_keys($userList)
+            'users' => array_keys($userList),
         ]);
 
         $generator = $this->getGenerator($aggregator, $userProvider);
@@ -529,10 +515,10 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $users2 = array_slice($allUsersList, $halfUsersCount, null, true);
 
         $aggregator1 = $this->createConfiguredStub(Aggregator::class, [
-            'users' => array_keys($users1)
+            'users' => array_keys($users1),
         ]);
         $aggregator2 = $this->createConfiguredStub(Aggregator::class, [
-            'users' => array_keys($users2)
+            'users' => array_keys($users2),
         ]);
         $layout = $this->createMailLayout();
         $mailType = $this->createMailTypeWithCategory();
@@ -645,6 +631,137 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         }
 
         return $result;
+    }
+
+    public function testExternalMailTypeProcessedWithoutSegments()
+    {
+        // Create external mail type
+        $mailType = $this->createMailTypeWithCategory();
+        $this->listsRepository->update($mailType, ['is_external' => true]);
+        $mailType = $this->listsRepository->find($mailType->id); // refresh
+
+        $mailTypeVariant = $this->listVariantsRepository->add($mailType, 'variant1', 'v1', 100);
+        $mailTypeVariant2 = $this->listVariantsRepository->add($mailType, 'variant2', 'v2', 100);
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+
+        $now = new DateTime();
+
+        // Subscribe users to the external mail type with the variant
+        $subscribedUsers = $this->generateUsers(10);
+        foreach ($subscribedUsers as $user) {
+            $this->userSubscriptionsRepository->subscribeUser(
+                $mailType,
+                null,
+                $user['email'],
+                $mailTypeVariant->id
+            );
+        }
+        $subscribedUsers2 = $this->generateUsers(2, 11);
+        foreach ($subscribedUsers2 as $user) {
+            $this->userSubscriptionsRepository->subscribeUser(
+                $mailType,
+                null,
+                $user['email'],
+                $mailTypeVariant2->id
+            );
+        }
+
+        // Also subscribe some users that should NOT be included (unsubscribed)
+        $unsubscribedUsers = $this->generateUsers(5, 13);
+        foreach ($unsubscribedUsers as $user) {
+            $this->userSubscriptionsRepository->subscribeUser(
+                $mailType,
+                null,
+                $user['email'],
+                $mailTypeVariant->id
+            );
+            $this->userSubscriptionsRepository->unsubscribeUser($mailType, null, $user['email']);
+        }
+
+        // Create job without segments (external mail types don't need them)
+        $job = $this->jobsRepository->insert([
+            'segments' => json_encode(['include' => [], 'exclude' => []]),
+            'context' => null,
+            'status' => 'new',
+            'created_at' => $now,
+            'updated_at' => $now,
+            'mail_type_variant_id' => $mailTypeVariant->id,
+        ]);
+        $batch = $this->createBatch($job, $template);
+
+
+        // No segment aggregator or user provider needed for external mail types
+        $aggregator = $this->createStub(Aggregator::class);
+        $userProvider = $this->createStub(IUser::class);
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        $userMap = [];
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        // Only subscribed users should be in the queue
+        $this->assertEquals(10, $this->jobQueueCount($batch, $template));
+
+        $expectedUsers = array_map(fn($user) => $user['email'], $subscribedUsers);
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing($expectedUsers, $actualUsers);
+    }
+
+    public function testExternalMailTypeProcessedWithoutSegmentsAndWithoutVariant()
+    {
+        // Create external mail type
+        $mailType = $this->createMailTypeWithCategory();
+        $this->listsRepository->update($mailType, ['is_external' => true]);
+        $mailType = $this->listsRepository->find($mailType->id); // refresh
+
+        $layout = $this->createMailLayout();
+        $template = $this->createTemplate($layout, $mailType);
+
+        $now = new DateTime();
+
+        // Create job without segments and without mail type variant
+        $job = $this->jobsRepository->insert([
+            'segments' => json_encode(['include' => [], 'exclude' => []]),
+            'context' => null,
+            'status' => 'new',
+            'created_at' => $now,
+            'updated_at' => $now,
+            'mail_type_variant_id' => null,
+        ]);
+        $batch = $this->createBatch($job, $template);
+
+        // Subscribe users to the external mail type (without variant)
+        $subscribedUsers = $this->generateUsers(5);
+        $this->subscribeUsers($mailType, $subscribedUsers);
+
+        // Also subscribe some users that should NOT be included (unsubscribed)
+        $unsubscribedUsers = $this->generateUsers(10, 6);
+        foreach ($unsubscribedUsers as $user) {
+            $this->userSubscriptionsRepository->subscribeUser(
+                $mailType,
+                $user['id'],
+                $user['email'],
+            );
+            $this->userSubscriptionsRepository->unsubscribeUser($mailType, $user['id'], $user['email']);
+        }
+
+        // No segment aggregator or user provider needed for external mail types
+        $aggregator = $this->createStub(Aggregator::class);
+        $userProvider = $this->createStub(IUser::class);
+        $generator = $this->getGenerator($aggregator, $userProvider);
+
+        $userMap = [];
+        $generator->insertUsersIntoJobQueue($batch, $userMap);
+        $generator->filterQueue($batch);
+
+        // Only subscribed users should be in the queue
+        $this->assertEquals(5, $this->jobQueueCount($batch, $template));
+
+        $expectedUsers = array_map(fn($user) => $user['email'], $subscribedUsers);
+        $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
+        $this->assertEqualsCanonicalizing($expectedUsers, $actualUsers);
     }
 
     private function getUserEmailsByIds($users, $ids): array

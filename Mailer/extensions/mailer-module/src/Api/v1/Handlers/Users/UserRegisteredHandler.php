@@ -6,7 +6,6 @@ namespace Remp\MailerModule\Api\v1\Handlers\Users;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
-use Remp\MailerModule\Models\Users\IUser;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\PostInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -14,21 +13,11 @@ use Tomaj\NetteApi\Response\ResponseInterface;
 
 class UserRegisteredHandler extends BaseHandler
 {
-    private $userSubscriptionsRepository;
-
-    private $userProvider;
-
-    private $listsRepository;
-
     public function __construct(
-        UserSubscriptionsRepository $userSubscriptionsRepository,
-        ListsRepository $listsRepository,
-        IUser $userProvider
+        private UserSubscriptionsRepository $userSubscriptionsRepository,
+        private ListsRepository $listsRepository,
     ) {
         parent::__construct();
-        $this->userSubscriptionsRepository = $userSubscriptionsRepository;
-        $this->userProvider = $userProvider;
-        $this->listsRepository = $listsRepository;
     }
 
     public function params(): array

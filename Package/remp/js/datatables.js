@@ -251,7 +251,13 @@ $.fn.dataTables = {
         },
         link: function () {
             return function(data) {
-                return '<a href="' + window.encodeURI(data.url) + '">' + $.fn.dataTable.render.text().display(data.text) + '</a>';
+                var html = '<a class="m-r-5" href="' + window.encodeURI(data.url) + '">' + $.fn.dataTable.render.text().display(data.text) + '</a>';
+                if (data.badges) {
+                    $.each(data.badges, function (index, badge) {
+                        html += ' <span class="badge badge-default m-r-5' + (badge.class ? ' ' + badge.class : '') + '">' + $.fn.dataTable.render.text().display(badge.text) + '</span>';
+                    });
+                }
+                return html;
             }
         },
         code: function () {

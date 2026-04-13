@@ -91,21 +91,22 @@ class DuplicateListFormFactory
         );
 
         $newList = $this->listsRepository->add(
-            $sourceList->mail_type_category_id,
-            $sourceList->priority,
-            $values['code'],
-            $values['title'],
-            $sourceList->sorting + 1,
-            (bool)$values['auto_subscribe'],
-            (bool)$sourceList->locked,
-            $sourceList->description,
-            $sourceList->preview_url,
-            $sourceList->page_url,
-            $sourceList->image_url,
-            (bool)$sourceList->public_listing,
-            $sourceList->mail_from,
-            $sourceList->subscribe_mail_template_id,
-            $sourceList->unsubscribe_mail_template_id
+            categoryId: $sourceList->mail_type_category_id,
+            priority: $sourceList->priority,
+            code: $values['code'],
+            name: $values['title'],
+            sorting: $sourceList->sorting + 1,
+            isAutoSubscribe: (bool)$values['auto_subscribe'],
+            isLocked: (bool)$sourceList->locked,
+            description: $sourceList->description,
+            previewUrl: $sourceList->preview_url,
+            pageUrl: $sourceList->page_url,
+            imageUrl: $sourceList->image_url,
+            publicListing: (bool)$sourceList->public_listing,
+            mailFrom: $sourceList->mail_from,
+            subscribeEmailTemplateId: $sourceList->subscribe_mail_template_id,
+            unSubscribeEmailTemplateId: $sourceList->unsubscribe_mail_template_id,
+            isExternal: $sourceList->is_external,
         );
 
         ($this->onCreate)($newList, $sourceList, $values['copy_subscribers'] ?? false);

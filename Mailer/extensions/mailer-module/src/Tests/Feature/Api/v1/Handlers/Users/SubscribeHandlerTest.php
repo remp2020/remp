@@ -323,9 +323,8 @@ class SubscribeHandlerTest extends BaseApiHandlerTestCase
         $this->assertInstanceOf(JsonApiResponse::class, $response);
         $this->assertEquals(IResponse::S200_OK, $response->getCode());
 
-        $userSubscription = $this->userSubscriptionsRepository->getUserSubscription(
+        $userSubscription = $this->userSubscriptionsRepository->getEmailSubscription(
             mailType: $mailType,
-            userId: $payload['user_id'],
             email: $payload['email']
         );
         $this->assertTrue((bool) $userSubscription->subscribed);

@@ -34,6 +34,11 @@ class Remp implements ITracker
 
     public function trackEvent(DateTime $dateTime, string $category, string $action, EventOptions $options)
     {
+        if (empty($options->getUser()->getId())) {
+            // not tracking users without ID (e.g. externally subscribed users)
+            return;
+        }
+
         $payload = array_filter([
             'system' => [
                 'property_token' => $this->token,

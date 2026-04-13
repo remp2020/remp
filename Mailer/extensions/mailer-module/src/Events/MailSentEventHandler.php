@@ -13,19 +13,18 @@ class MailSentEventHandler
 {
     use LoggerAwareTrait;
 
-    private $tracker;
-
-    public function __construct(ITracker $tracker)
+    public function __construct(private ITracker $tracker)
     {
-        $this->tracker = $tracker;
     }
 
     public function __invoke(MailSentEvent $event)
     {
         $options = new EventOptions();
-        $options->setUser(new User([
-            'id' => $event->getUserId(),
-        ]));
+        $options->setUser(new User(
+            id: $event->getUserId(),
+            email: $event->getEmail(),
+        ));
+
         $options->setFields([
             'email' => $event->getEmail(),
             'template_code' => $event->getTemplateCode(),

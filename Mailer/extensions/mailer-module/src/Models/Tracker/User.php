@@ -3,30 +3,30 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Tracker;
 
-class User
+readonly class User
 {
-    private $id;
+    public function __construct(
+        private string|int|null $id = null,
+        private ?string $email = null,
+        private ?string $ipAddress = null,
+        private ?string $url = null,
+        private ?string $userAgent = null,
+    ) {
+    }
 
-    private $ip_address;
-
-    private $url;
-
-    private $user_agent;
-
-    public function __construct(array $options = [])
+    public function getId(): int|string|null
     {
-        foreach ($options as $key => $val) {
-            $this->{$key} = (string)$val;
-        }
+        return $this->id;
     }
 
     public function toArray(): array
     {
         return [
             'id' => $this->id,
-            'ip_address' => $this->ip_address,
+            'email' => $this->email,
+            'ip_address' => $this->ipAddress,
             'url' => $this->url,
-            'user_agent' => $this->user_agent,
+            'user_agent' => $this->userAgent,
         ];
     }
 }

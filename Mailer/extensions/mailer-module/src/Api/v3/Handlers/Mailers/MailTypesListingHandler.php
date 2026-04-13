@@ -70,6 +70,7 @@ class MailTypesListingHandler extends BaseHandler
                 ->order('sorting')
                 ->select('code,title,id,sorting')
                 ->fetchAssoc('id->'); // maps id to object containing selected columns
+            $item->is_external = (bool) $row->is_external;
             $output[] = $item;
         }
 

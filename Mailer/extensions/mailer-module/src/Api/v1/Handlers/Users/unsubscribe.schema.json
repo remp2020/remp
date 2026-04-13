@@ -5,7 +5,6 @@
   "$id": "POST /api/v1/users/un-subscribe",
   "title": "Unsubscribe",
   "examples": [{
-    "user_id": 1,
     "email": "test@test.com",
     "list_id": 1,
     "variant_id": 1,
@@ -20,8 +19,7 @@
     "send_accompanying_emails": true
   }],
   "required": [
-    "email",
-    "user_id"
+    "email"
   ],
   "anyOf": [
     {"required": ["list_id"]},

@@ -20,10 +20,10 @@ final class MailLogsSubjectEncoding extends AbstractMigration
         // rename old column, should be instant
         $this->execute('
             ALTER TABLE mail_logs
-            CHANGE COLUMN subject subject_old varchar(255) DEFAULT NULL,
+            CHANGE COLUMN subject subject_old varchar(255) NULL,
             ALGORITHM=INPLACE,
-            LOCK=NONE'
-        );
+            LOCK=NONE
+        ');
 
         // rename new column, should be instant
         $this->execute('

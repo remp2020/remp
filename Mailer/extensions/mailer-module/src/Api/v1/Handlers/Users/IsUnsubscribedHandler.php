@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
 use Nette\Http\IResponse;
 use Remp\MailerModule\Api\JsonValidationTrait;
+use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\RawInputParam;
@@ -16,6 +17,7 @@ class IsUnsubscribedHandler extends BaseHandler
     use JsonValidationTrait;
 
     public function __construct(
+        private ListsRepository $listsRepository,
         private UserSubscriptionsRepository $userSubscriptionsRepository
     ) {
         parent::__construct();
@@ -36,10 +38,25 @@ class IsUnsubscribedHandler extends BaseHandler
             return $this->getErrorResponse();
         }
 
-        $userUnsubscribed = $this->userSubscriptionsRepository->isUserUnsubscribed($payload['user_id'], $payload['list_id']);
-        $emailUnsubscribed = $this->userSubscriptionsRepository->isEmailUnsubscribed($payload['email'], $payload['list_id']);
+        $mailType = $this->listsRepository->find($payload['list_id']);
+        if (!$mailType->is_external && !isset($payload['user_id'])) {
+            return new JsonApiResponse(400, [
+                'status' => 'error',
+                'message' => 'For given non-external mail type, user_id parameter is required.',
+            ]);
+        }
+
+        if (isset($payload['user_id'])) {
+            $isUnsubscribed = $this->userSubscriptionsRepository->isUserAndEmailUnsubscribed(
+                userId: $payload['user_id'],
+                email: $payload['email'],
+                mailTypeId: $payload['list_id'],
+            );
+        } else {
+            $isUnsubscribed = $this->userSubscriptionsRepository->isEmailUnsubscribed($payload['email'], $payload['list_id']);
+        }
         return new JsonApiResponse(IResponse::S200_OK, [
-            'is_unsubscribed' => $userUnsubscribed && $emailUnsubscribed,
+            'is_unsubscribed' => $isUnsubscribed,
         ]);
     }
 }

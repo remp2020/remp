@@ -47,7 +47,7 @@ class Mailer implements ISegment
     public function users(array $segment): array
     {
         if ($segment['code'] === self::SEGMENT_EVERYONE) {
-            return $this->userSubscriptionsRepository->allSubscribers();
+            return $this->userSubscriptionsRepository->allSubscribersWithUserId();
         }
 
         $code = preg_replace('/^subscribers-/', '', $segment['code']);

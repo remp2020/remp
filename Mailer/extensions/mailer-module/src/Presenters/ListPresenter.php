@@ -124,6 +124,7 @@ final class ListPresenter extends BasePresenter
                 [
                     'url' => $showUrl,
                     'text' => $list->title,
+                    'badges' => $list->is_external ? [['text' => 'External']] : [],
                 ],
                 $list->code,
                 $list->related('mail_user_subscriptions')->where(['subscribed' => true])->count('*'),

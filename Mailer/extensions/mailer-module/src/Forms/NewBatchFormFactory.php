@@ -9,6 +9,7 @@ use Nette\Forms\Controls\SubmitButton;
 use Nette\Security\User;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Json;
 use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Models\Segment\Aggregator;
@@ -47,6 +48,16 @@ class NewBatchFormFactory
         $form = new Form;
         $form->addProtection();
 
+        $externalMailTypeIds = array_values(
+            $this->listsRepository->allExternal()
+                ->fetchPairs('id', 'id')
+        );
+
+        $listPairs = $this->listsRepository->all()->fetchPairs('id', 'title');
+        $mailTypeField = $form->addSelect('mail_type_id', 'Newsletter list', $listPairs)
+            ->setPrompt('Select newsletter list')
+            ->setHtmlAttribute('data-external-mail-type-ids', Json::encode($externalMailTypeIds));
+
         if ($jobId === null) {
             $segments = [];
             $segmentList = $this->segmentAggregator->list();
@@ -59,6 +70,7 @@ class NewBatchFormFactory
             }
 
             $form->addMultiSelect('include_segment_codes', 'Include segments', $segments)
+                ->addConditionOn($mailTypeField, Form::IsNotIn, $externalMailTypeIds)
                 ->setRequired("You have to include at least one segment.");
 
             $form->addMultiSelect('exclude_segment_codes', 'Exclude segments', $segments);
@@ -69,11 +81,6 @@ class NewBatchFormFactory
             'sequential' => 'Sequential',
         ];
         $form->addSelect('method', 'Method', $methods);
-
-        $listPairs = $this->listsRepository->all()->fetchPairs('id', 'title');
-
-        $mailTypeField = $form->addSelect('mail_type_id', 'Newsletter list', $listPairs)
-            ->setPrompt('Select newsletter list');
 
         if (isset($_POST['mail_type_id'])) {
             $variantsList = $this->getMailTypeVariants((int) $_POST['mail_type_id']);

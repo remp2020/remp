@@ -50,8 +50,17 @@ class LogsRepository extends Repository
         );
     }
 
-    public function getInsertData(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null, ?int $userId = null): array
-    {
+    public function getInsertData(
+        string $email,
+        string $subject,
+        int $templateId,
+        ?int $jobId = null,
+        ?int $batchId = null,
+        ?string $mailSenderId = null,
+        ?int $attachmentSize = null,
+        ?string $context = null,
+        ?int $userId = null
+    ): array {
         return [
             'email' => $email,
             'user_id' => $userId,

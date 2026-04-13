@@ -62,12 +62,19 @@ class SubscribeHandler extends BaseHandler
 
     protected function processUserSubscription($payload): array
     {
-        $list = $this->getList($payload);
-        $variantID = $this->getVariantID($payload, $list);
+        $mailType = $this->getList($payload);
+        $variantID = $this->getVariantID($payload, $mailType);
+
+        if (!$mailType->is_external && !isset($payload['user_id'])) {
+            throw new InvalidApiInputParamException(
+                "Missing 'user_id', it's required when subscribing for given mail_type",
+                400
+            );
+        }
 
         $userListSubscription = $this->userSubscriptionsRepository->subscribeUser(
-            mailType: $list,
-            userId: $payload['user_id'],
+            mailType: $mailType,
+            userId: $payload['user_id'] ?? null,
             email: $payload['email'],
             variantId: $variantID,
             sendWelcomeEmail: $payload['send_accompanying_emails'] ?? true,

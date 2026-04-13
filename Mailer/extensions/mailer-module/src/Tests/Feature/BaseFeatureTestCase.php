@@ -92,7 +92,12 @@ class BaseFeatureTestCase extends TestCase
         \Mockery::close();
     }
 
-    protected function inject($className)
+    protected function createInstance($className, array $args): object
+    {
+        return $this->container->createInstance($className, $args);
+    }
+
+    protected function inject($className): ?object
     {
         return $this->container->getByType($className);
     }

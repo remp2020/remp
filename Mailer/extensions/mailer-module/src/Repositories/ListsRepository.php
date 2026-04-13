@@ -20,6 +20,14 @@ class ListsRepository extends Repository
             ->order('sorting ASC');
     }
 
+    public function allExternal(): Selection
+    {
+        return $this->getTable()
+            ->where('deleted_at', null)
+            ->where('is_external', 1)
+            ->order('sorting ASC');
+    }
+
     public function add(
         int $categoryId,
         int $priority,
@@ -38,6 +46,7 @@ class ListsRepository extends Repository
         ?int $unSubscribeEmailTemplateId = null,
         bool $isMultiVariant = false,
         ?int $defaultVariantId = null,
+        bool $isExternal = false,
     ): ActiveRow {
         $result = $this->insert([
             'mail_type_category_id' => $categoryId,
@@ -59,6 +68,7 @@ class ListsRepository extends Repository
             'updated_at' => new DateTime(),
             'is_multi_variant' => $isMultiVariant,
             'default_variant_id' => $defaultVariantId,
+            'is_external' => $isExternal,
         ]);
 
         if (is_numeric($result)) {

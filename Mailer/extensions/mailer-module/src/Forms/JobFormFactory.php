@@ -10,6 +10,7 @@ use Remp\MailerModule\Models\FormRenderer\MaterialRenderer;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
 use Remp\MailerModule\Models\Segment\Aggregator;
 use Remp\MailerModule\Repositories\BatchesRepository;
+use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Tracy\Debugger;
 
@@ -17,23 +18,15 @@ class JobFormFactory
 {
     use SmartObject;
 
-    private $jobsRepository;
-
-    private $batchesRepository;
-
-    private $segmentAggregator;
-
     public $onSuccess;
     public $onError;
 
     public function __construct(
-        JobsRepository $jobsRepository,
-        BatchesRepository $batchesRepository,
-        Aggregator $segmentAggregator
+        private readonly JobsRepository $jobsRepository,
+        private readonly BatchesRepository $batchesRepository,
+        private readonly BatchTemplatesRepository $batchTemplatesRepository,
+        private readonly Aggregator $segmentAggregator,
     ) {
-        $this->jobsRepository = $jobsRepository;
-        $this->batchesRepository = $batchesRepository;
-        $this->segmentAggregator = $segmentAggregator;
     }
 
     public function create(int $jobId): Form
@@ -52,6 +45,18 @@ class JobFormFactory
             $form->addError("Job can't be updated. One or more Mail Job Batches were already started.");
         }
 
+        // retrieve a random batch, just to get mail_type
+        $isExternal = false;
+        $batch = $this->batchesRepository->findByJob($job);
+        if ($batch) {
+            $batchTemplate = $this->batchTemplatesRepository->findByBatchId($batch->id)->fetch();
+            if (!$batchTemplate) {
+                throw new \RuntimeException("Unable to find mail batch template for batch [$batch->id]");
+            }
+            $isExternal = $batchTemplate->mail_template->mail_type->is_external;
+        }
+
+        $jobSegmentsManager = new JobSegmentsManager($job);
         $segments = [];
         $segmentList = $this->segmentAggregator->list();
         array_walk($segmentList, function ($segment) use (&$segments) {
@@ -62,28 +67,33 @@ class JobFormFactory
             Debugger::log($this->segmentAggregator->getErrors()[0], Debugger::WARNING);
         }
 
-        $jobSegmentsManager = new JobSegmentsManager($job);
-
-        $includeSegmentsDefault = array_map(static function (array $includeSegment) {
-            return $includeSegment['provider'] . '::' . $includeSegment['code'];
-        }, $jobSegmentsManager->getIncludeSegments());
-
-        $form->addMultiSelect('include_segment_codes', 'Include segments', $segments)
-            ->setRequired("You have to include at least one segment.")
+        $includeSegmentInput = $form->addMultiSelect('include_segment_codes', 'Include segments', $segments)
             ->setHtmlAttribute('class', 'selectpicker')
             ->setHtmlAttribute('data-live-search', 'true')
-            ->setHtmlAttribute('data-live-search-normalize', 'true')
-            ->setDefaultValue($includeSegmentsDefault);
+            ->setHtmlAttribute('data-live-search-normalize', 'true');
 
-        $excludeSegmentsDefault = array_map(static function (array $excludeSegment) {
-            return $excludeSegment['provider'] . '::' . $excludeSegment['code'];
-        }, $jobSegmentsManager->getExcludeSegments());
+        if ($isExternal) {
+            $includeSegmentInput->setDisabled();
+        } else {
+            $includeSegmentsDefault = array_map(static function (array $includeSegment) {
+                return $includeSegment['provider'] . '::' . $includeSegment['code'];
+            }, $jobSegmentsManager->getIncludeSegments());
+            $includeSegmentInput->setRequired("You have to include at least one segment.");
+            $includeSegmentInput->setDefaultValue($includeSegmentsDefault);
+        }
 
-        $form->addMultiSelect('exclude_segment_codes', 'Exclude segments', $segments)
+        $excludeSegmentInput = $form->addMultiSelect('exclude_segment_codes', 'Exclude segments', $segments)
             ->setHtmlAttribute('class', 'selectpicker')
             ->setHtmlAttribute('data-live-search', 'true')
-            ->setHtmlAttribute('data-live-search-normalize', 'true')
-            ->setDefaultValue($excludeSegmentsDefault);
+            ->setHtmlAttribute('data-live-search-normalize', 'true');
+        if ($isExternal) {
+            $excludeSegmentInput->setDisabled();
+        } else {
+            $excludeSegmentsDefault = array_map(static function (array $excludeSegment) {
+                return $excludeSegment['provider'] . '::' . $excludeSegment['code'];
+            }, $jobSegmentsManager->getExcludeSegments());
+            $excludeSegmentInput->setDefaultValue($excludeSegmentsDefault);
+        }
 
         $form->addText('context', 'Context')
             ->setNullable()
@@ -103,13 +113,17 @@ class JobFormFactory
         $job = $this->jobsRepository->find($values['job_id']);
 
         $jobSegmentsManager = new JobSegmentsManager();
-        foreach ($values['include_segment_codes'] as $includeSegment) {
-            [$provider, $code] = explode('::', $includeSegment);
-            $jobSegmentsManager->includeSegment($code, $provider);
+        if (isset($values['include_segment_codes'])) {
+            foreach ($values['include_segment_codes'] as $includeSegment) {
+                [$provider, $code] = explode('::', $includeSegment);
+                $jobSegmentsManager->includeSegment($code, $provider);
+            }
         }
-        foreach ($values['exclude_segment_codes'] as $excludeSegment) {
-            [$provider, $code] = explode('::', $excludeSegment);
-            $jobSegmentsManager->excludeSegment($code, $provider);
+        if (isset($values['exclude_segment_codes'])) {
+            foreach ($values['exclude_segment_codes'] as $excludeSegment) {
+                [$provider, $code] = explode('::', $excludeSegment);
+                $jobSegmentsManager->excludeSegment($code, $provider);
+            }
         }
 
         $jobNewData = [

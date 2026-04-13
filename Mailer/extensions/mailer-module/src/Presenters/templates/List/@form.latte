@@ -20,6 +20,17 @@
                 </div>
             </div>
 
+            <div class="form-group m-b-30">
+                <div class="toggle-switch" data-ts-color="cyan">
+                    {label is_external:, class => 'ts-label' /}
+                    {input is_external:, hidden => 'hidden'}
+                    <label for="{$form['is_external']->htmlId}" class="ts-helper"></label>
+                    <small class="help-block">
+                        If enabled, this list does not require a segment when creating a job. Emails will be sent to all subscribed users without verifying their existence in CRM. This is useful when users are subscribed via an external tool and the only available data about them is their email address.
+                    </small>
+                </div>
+            </div>
+
             <div class="form-group fg-float m-b-30">
                 <div class="fg-line">
                     {input mail_from, class => 'form-control fg-input'}
@@ -64,52 +75,6 @@
                 </small>
             </div>
 
-            <div class="form-group fg-float m-b-30">
-                <div class="fg-line">
-                    {input description, class => 'form-control fg-input auto-size'}
-                    {label description, class => 'fg-label' /}
-                </div>
-            </div>
-
-            {if isset($list)}
-                <div class="form-group fg-float m-b-0">
-                    {label preview_template /}
-                    {input preview_template, class => 'selectpicker', data-live-search => 'true' }
-                </div>
-            {/if}
-
-            <div class="form-group fg-float m-b-30">
-                <div class="fg-line">
-                    {input preview_url, class => 'form-control fg-input'}
-                    {if !isset($list)}
-                    {label preview_url, class => 'fg-label' /}
-                    {/if}
-                    <small class="help-block">
-                        Public URL with preview of newsletter.
-                    </small>
-                </div>
-            </div>
-
-            <div class="form-group fg-float m-b-30">
-                <div class="fg-line">
-                    {input page_url, class => 'form-control fg-input'}
-                    {label page_url, class => 'fg-label' /}
-                    <small class="help-block">
-                        Public URL where information about this newsletter (with past editions) is available.
-                    </small>
-                </div>
-            </div>
-
-            <div class="form-group fg-float m-b-30">
-                <div class="fg-line">
-                    {input image_url, class => 'form-control fg-input'}
-                    {label image_url, class => 'fg-label' /}
-                    <small class="help-block">
-                        URL to image to use as icon for newsletter.
-                    </small>
-                </div>
-            </div>
-
             <div class="form-group m-b-30">
                 Order
                 <div n:foreach="$form['sorting']->getItems() as $key => $label" class="radio m-b-15">
@@ -128,43 +93,92 @@
                 </div>
             </div>
 
-            <div class="clearfix m-b-30"></div>
+            <div id="non-external-fields">
 
-            <div class="form-group m-b-30">
-                <div class="toggle-switch" data-ts-color="cyan">
-                    {label auto_subscribe:, class => 'ts-label' /}
-                    {input auto_subscribe:, hidden => 'hidden'}
-                    <label for="{$form['auto_subscribe']->htmlId}" class="ts-helper"></label>
-
-                    {var $whichUsers = 'new users'}
-                    {if $form['id']->getValue() === ''} {* missing ID => we are adding new newsletter list *}
-                        {var $whichUsers = 'existing and new users'}
-                    {/if}
-                    <small class="help-block">
-                        Toggles whether <b>{$whichUsers}</b> should be automatically subscribed to the newsletter after the registration.
-                    </small>
+                <div class="form-group fg-float m-b-30">
+                    <div class="fg-line">
+                        {input description, class => 'form-control fg-input auto-size'}
+                        {label description, class => 'fg-label' /}
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group m-b-30">
-                <div class="toggle-switch" data-ts-color="cyan">
-                    {label locked:, class => 'ts-label' /}
-                    {input locked:, hidden => 'hidden'}
-                    <label for="{$form['locked']->htmlId}" class="ts-helper"></label>
-                    <small class="help-block">
-                        Toggles whether user should be able to change subscription settings of this newsletter.
-                    </small>
+                {if isset($list)}
+                    <div class="form-group fg-float m-b-0">
+                        {label preview_template /}
+                        {input preview_template, class => 'selectpicker', data-live-search => 'true' }
+                    </div>
+                {/if}
+
+                <div class="form-group fg-float m-b-30">
+                    <div class="fg-line">
+                        {input preview_url, class => 'form-control fg-input'}
+                        {if !isset($list)}
+                        {label preview_url, class => 'fg-label' /}
+                        {/if}
+                        <small class="help-block">
+                            Public URL with preview of newsletter.
+                        </small>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group m-b-30">
-                <div class="toggle-switch" data-ts-color="cyan">
-                    {label public_listing:, class => 'ts-label' /}
-                    {input public_listing:, hidden => 'hidden'}
-                    <label for="{$form['public_listing']->htmlId}" class="ts-helper" ></label>
-                    <small class="help-block">
-                        Configures whether the newsletter should be publicly available for the subscribers in their subscription settings.
-                    </small>
+                <div class="form-group fg-float m-b-30">
+                    <div class="fg-line">
+                        {input page_url, class => 'form-control fg-input'}
+                        {label page_url, class => 'fg-label' /}
+                        <small class="help-block">
+                            Public URL where information about this newsletter (with past editions) is available.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group fg-float m-b-30">
+                    <div class="fg-line">
+                        {input image_url, class => 'form-control fg-input'}
+                        {label image_url, class => 'fg-label' /}
+                        <small class="help-block">
+                            URL to image to use as icon for newsletter.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="clearfix m-b-30"></div>
+
+                <div class="form-group m-b-30">
+                    <div class="toggle-switch" data-ts-color="cyan">
+                        {label auto_subscribe:, class => 'ts-label' /}
+                        {input auto_subscribe:, hidden => 'hidden'}
+                        <label for="{$form['auto_subscribe']->htmlId}" class="ts-helper"></label>
+
+                        {var $whichUsers = 'new users'}
+                        {if $form['id']->getValue() === ''} {* missing ID => we are adding new newsletter list *}
+                            {var $whichUsers = 'existing and new users'}
+                        {/if}
+                        <small class="help-block">
+                            Toggles whether <b>{$whichUsers}</b> should be automatically subscribed to the newsletter after the registration.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group m-b-30">
+                    <div class="toggle-switch" data-ts-color="cyan">
+                        {label locked:, class => 'ts-label' /}
+                        {input locked:, hidden => 'hidden'}
+                        <label for="{$form['locked']->htmlId}" class="ts-helper"></label>
+                        <small class="help-block">
+                            Toggles whether user should be able to change subscription settings of this newsletter.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group m-b-30">
+                    <div class="toggle-switch" data-ts-color="cyan">
+                        {label public_listing:, class => 'ts-label' /}
+                        {input public_listing:, hidden => 'hidden'}
+                        <label for="{$form['public_listing']->htmlId}" class="ts-helper" ></label>
+                        <small class="help-block">
+                            Configures whether the newsletter should be publicly available for the subscribers in their subscription settings.
+                        </small>
+                    </div>
                 </div>
             </div>
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\Job;
 
+use Nette\Utils\Json;
 use Remp\MailerModule\Models\RedisClientFactory;
 use Remp\MailerModule\Models\RedisClientTrait;
 
@@ -49,9 +50,15 @@ class MailCache
      *
      * @return bool
      */
-    public function addJob(int $userId, string $email, string $templateCode, int $queueId, ?string $context = null, array $params = []): bool
-    {
-        $job = json_encode([
+    public function addJob(
+        string $email,
+        string $templateCode,
+        int $queueId,
+        ?int $userId = null,
+        ?string $context = null,
+        array $params = []
+    ): bool {
+        $job = Json::encode([
             'userId' => $userId,
             'email' => $email,
             'templateCode' => $templateCode,

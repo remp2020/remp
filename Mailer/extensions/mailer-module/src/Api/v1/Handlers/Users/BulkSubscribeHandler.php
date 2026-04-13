@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
+use Nette\Http\IResponse;
 use Nette\Utils\Strings;
 use Remp\MailerModule\Api\InvalidApiInputParamException;
 use Remp\MailerModule\Api\JsonValidationTrait;
@@ -43,9 +44,16 @@ class BulkSubscribeHandler extends SubscribeHandler
                 continue;
             }
 
+            if (!$list->is_external && !isset($item['user_id'])) {
+                $listIdentifier = $item['list_code'] ?? $item['list_id'];
+                $errorMessage = "Missing 'user_id', it's required when subscribing for mail_type [{$listIdentifier}]";
+                $errors = array_merge($errors, ["element_" . $iteration => $errorMessage]);
+                continue;
+            }
+
             $users[] = [
                 'email' => $item['email'],
-                'user_id' => $item['user_id'],
+                'user_id' => $item['user_id'] ?? null,
                 'list' => $list,
                 'variant_id' => $variantID,
                 'subscribe' => $item['subscribe'],
@@ -55,8 +63,16 @@ class BulkSubscribeHandler extends SubscribeHandler
             ];
         }
 
+        if (!empty($errors)) {
+            return new JsonApiResponse(400, [
+                'status' => 'error',
+                'message' => 'Input data contains errors. See included list of errors.',
+                'errors' => $errors,
+            ]);
+        }
+
         foreach ($users as $user) {
-            $rtmParams = $item['rtm_params'] ?? [];
+            $rtmParams = $user['rtm_params'] ?? [];
 
             if ($user['subscribe'] === true) {
                 $this->userSubscriptionsRepository->subscribeUser(

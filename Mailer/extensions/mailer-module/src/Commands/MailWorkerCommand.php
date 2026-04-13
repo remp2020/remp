@@ -34,29 +34,8 @@ class MailWorkerCommand extends Command
 {
     public const COMMAND_NAME = "worker:mail";
     
-    private $applicationMailer;
-
-    private $mailJobBatchRepository;
-
-    private $mailJobQueueRepository;
-
-    private $mailLogRepository;
-
-    private $mailTemplateRepository;
-
-    private $batchTemplatesRepository;
-
-    private $mailCache;
-
-    private $emailAllowList;
-
-    private $eventDispatcher;
-
     private $isFirstLine = true;
-
     private $smtpErrors = 0;
-
-    private $logger;
 
     /** @var ShutdownInterface */
     private $shutdown;
@@ -64,33 +43,20 @@ class MailWorkerCommand extends Command
     /** @var DateTime */
     private $startTime;
 
-    private HealthChecker $healthChecker;
-
     public function __construct(
-        LoggerInterface $logger,
-        Sender $applicationMailer,
-        BatchesRepository $mailJobBatchRepository,
-        JobQueueRepository $mailJobQueueRepository,
-        LogsRepository $mailLogRepository,
-        TemplatesRepository $mailTemplatesRepository,
-        BatchTemplatesRepository $batchTemplatesRepository,
-        MailCache $redis,
-        EmailAllowList $emailAllowList,
-        EventDispatcher $eventDispatcher,
-        HealthChecker $healthChecker
+        private LoggerInterface $logger,
+        private Sender $applicationMailer,
+        private BatchesRepository $mailJobBatchRepository,
+        private JobQueueRepository $mailJobQueueRepository,
+        private LogsRepository $mailLogRepository,
+        private TemplatesRepository $mailTemplatesRepository,
+        private BatchTemplatesRepository $batchTemplatesRepository,
+        private MailCache $mailCache,
+        private EmailAllowList $emailAllowList,
+        private EventDispatcher $eventDispatcher,
+        private HealthChecker $healthChecker
     ) {
         parent::__construct();
-        $this->applicationMailer = $applicationMailer;
-        $this->mailJobBatchRepository = $mailJobBatchRepository;
-        $this->mailJobQueueRepository = $mailJobQueueRepository;
-        $this->mailLogRepository = $mailLogRepository;
-        $this->mailTemplateRepository = $mailTemplatesRepository;
-        $this->batchTemplatesRepository = $batchTemplatesRepository;
-        $this->mailCache = $redis;
-        $this->emailAllowList = $emailAllowList;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->logger = $logger;
-        $this->healthChecker = $healthChecker;
     }
 
     /**
@@ -256,7 +222,7 @@ class MailWorkerCommand extends Command
                     $this->logger->info(" * Processing $jobsCount jobs of template <info>{$templateCode}</info>, batch <info>{$batch->id}</info>");
                     foreach ($jobs as $i => $job) {
                         if (!$template) {
-                            $template = $this->mailTemplateRepository->getByCode($job->templateCode);
+                            $template = $this->mailTemplatesRepository->getByCode($job->templateCode);
                         }
 
                         $output->writeln(" * sending <info>{$job->templateCode}</info> from batch <info>{$batch->id}</info> to <info>{$job->email}</info>");
@@ -291,7 +257,17 @@ class MailWorkerCommand extends Command
                         $this->logger->info(" * $sentCount mail(s) of batch <info>{$batch->id}</info> sent");
 
                         foreach ($jobs as $job) {
-                            $this->eventDispatcher->dispatch(new MailSentEvent($job->userId, $job->email, $job->templateCode, $batch->id, time()));
+                            // only track for job-s with user ID
+                            if ($job->userId) {
+                                $mailSentEvent = new MailSentEvent(
+                                    userId: $job->userId,
+                                    email: $job->email,
+                                    templateCode: $job->templateCode,
+                                    batchId: $batch->id,
+                                    time: time(),
+                                );
+                                $this->eventDispatcher->dispatch($mailSentEvent);
+                            }
                         }
 
                         $this->smtpErrors = 0;
@@ -342,7 +318,14 @@ class MailWorkerCommand extends Command
     private function cacheJobs(array $jobs, int $batchId): void
     {
         foreach ($jobs as $job) {
-            $this->mailCache->addJob($job->userId, $job->email, $job->templateCode, $batchId, $job->context, (array) ($job->params ?? []));
+            $this->mailCache->addJob(
+                email: $job->email,
+                templateCode: $job->templateCode,
+                queueId: $batchId,
+                userId: $job->userId,
+                context: $job->context,
+                params: (array) ($job->params ?? [])
+            );
         }
     }
 
@@ -354,7 +337,7 @@ class MailWorkerCommand extends Command
         $jobsByEmails = [];
         foreach ($jobs as $i => $job) {
             if (!isset($mailTemplates[$job->templateCode])) {
-                $mailTemplates[$job->templateCode] = $this->mailTemplateRepository->getByCode($job->templateCode);
+                $mailTemplates[$job->templateCode] = $this->mailTemplatesRepository->getByCode($job->templateCode);
             }
             $emailsByTemplateCodes[$job->templateCode][] = $job->email;
             $jobsByEmails[$job->email] = $job;

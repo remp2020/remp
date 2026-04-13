@@ -70,7 +70,7 @@ class UnSubscribeHandler extends BaseHandler
         $keepListSubscription = $payload['keep_list_subscription'] ?? false;
 
         if ($variant) {
-            $userSubscription = $this->userSubscriptionsRepository->getUserSubscription($list, $payload['user_id'], $payload['email']);
+            $userSubscription = $this->userSubscriptionsRepository->getEmailSubscription($list, $payload['email']);
             if (!$userSubscription) {
                 return new JsonApiResponse(200, ['status' => 'ok']);
             }
@@ -85,7 +85,7 @@ class UnSubscribeHandler extends BaseHandler
         } else {
             $this->userSubscriptionsRepository->unsubscribeUser(
                 mailType: $list,
-                userId: $payload['user_id'],
+                userId: $payload['user_id'] ?? null,
                 email: $payload['email'],
                 rtmParams: $this->getRtmParams($payload),
                 sendGoodbyeEmail: $sendGoodbyeEmail,

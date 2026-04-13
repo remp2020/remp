@@ -50,10 +50,6 @@ class JobSegmentsManager
 
     public function toJson()
     {
-        if (empty($this->includeSegments)) {
-            throw new Exception("You have to add at least one include segment.");
-        }
-
         $segments = [
             'include' => $this->includeSegments,
             'exclude' => $this->excludeSegments,

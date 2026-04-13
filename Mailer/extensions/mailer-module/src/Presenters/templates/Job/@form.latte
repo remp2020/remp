@@ -11,6 +11,20 @@
 
     <div class="row">
         <div class="col-sm-6">
+            <div class="row form-group">
+                <div class="col-sm-12">
+                    {label mail_type_id /}
+                    {input mail_type_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+                </div>
+            </div>
+
+            <div class="row form-group" n:ifset="$control['newBatchForm']['mail_type_variant_id']">
+                <div class="col-sm-12">
+                    {label mail_type_variant_id /}
+                    {input mail_type_variant_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
+                </div>
+            </div>
+
             <div class="row form-group" n:ifset="$control['newBatchForm']['include_segment_codes']">
                 <div class="col-sm-12">
                     {label include_segment_codes /}
@@ -31,21 +45,6 @@
                 <div class="col-sm-12">
                     {label method /}
                     {input method, class => 'selectpicker'}
-                </div>
-            </div>
-
-            <div class="row form-group">
-                <div class="col-sm-12">
-                    {label mail_type_id /}
-                    {input mail_type_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
-                </div>
-            </div>
-
-
-            <div class="row form-group" n:ifset="$control['newBatchForm']['mail_type_variant_id']">
-                <div class="col-sm-12">
-                    {label mail_type_variant_id /}
-                    {input mail_type_variant_id, class => 'selectpicker',  data-live-search => 'true', data-live-search-normalize => 'true'}
                 </div>
             </div>
 
@@ -98,6 +97,7 @@
 
     {include jsCallback, form => $form}
     {include onChangeStartTimeCallback, form => $form, input => start_at, button => save_start}
+    {include externalMailTypeCallback, form => $form}
 {/form}
 
 
@@ -118,6 +118,32 @@
         {/foreach}
     });
 </script>
+{/define}
+
+{define externalMailTypeCallback}
+    <script type="application/javascript">
+        $(function() {
+            var mailTypeSelect = $('select[name="mail_type_id"]');
+            var externalIds = mailTypeSelect.data('external-mail-type-ids') || [];
+            var includeSegment = $('select[name="include_segment_codes[]"]');
+            var excludeSegment = $('select[name="exclude_segment_codes[]"]');
+
+            function toggleSegments() {
+                var isExternal = externalIds.indexOf(parseInt(mailTypeSelect.val())) !== -1;
+                includeSegment.closest('.row.form-group').toggle(!isExternal);
+                excludeSegment.closest('.row.form-group').toggle(!isExternal);
+                if (isExternal) {
+                    includeSegment.selectpicker('deselectAll');
+                    excludeSegment.selectpicker('deselectAll');
+                }
+                includeSegment.selectpicker('refresh');
+                excludeSegment.selectpicker('refresh');
+            }
+
+            mailTypeSelect.on('change', toggleSegments);
+            toggleSegments();
+        });
+    </script>
 {/define}
 
 {define onChangeStartTimeCallback}

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use InvalidArgumentException;
 use Nette\Caching\Storage;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
@@ -67,13 +68,14 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_email' => $email])->fetchAll();
     }
 
-    public function allSubscribers(): array
+    public function allSubscribersWithUserId(): array
     {
         $result = [];
 
         $lastUserId = 0;
         $query = $this->getTable()
             ->select('DISTINCT user_id')
+            ->where('user_id IS NOT NULL')
             ->order('user_id')
             ->limit(10000);
 
@@ -143,6 +145,26 @@ class UserSubscriptionsRepository extends Repository
         return $this->getTable()->where(['user_id' => $userId, 'mail_type_id' => $mailTypeId, 'subscribed' => true])->count('*') > 0;
     }
 
+    public function isUserAndEmailSubscribed($userId, $email, $mailTypeId): bool
+    {
+        return $this->getTable()->where([
+            'user_id' => $userId,
+            'user_email' => $email,
+            'mail_type_id' => $mailTypeId,
+            'subscribed' => true,
+            ])->count('*') > 0;
+    }
+
+    public function isUserAndEmailUnsubscribed($userId, $email, $mailTypeId): bool
+    {
+        return $this->getTable()->where([
+                'user_id' => $userId,
+                'user_email' => $email,
+                'mail_type_id' => $mailTypeId,
+                'subscribed' => false,
+            ])->count('*') > 0;
+    }
+
     public function filterSubscribedEmails(array $emails, int $typeId): array
     {
         return $this->getTable()->where([
@@ -163,7 +185,7 @@ class UserSubscriptionsRepository extends Repository
 
     public function subscribeUser(
         ActiveRow $mailType,
-        int $userId,
+        ?int $userId,
         string $email,
         ?int $variantId = null,
         bool $sendWelcomeEmail = true,
@@ -172,6 +194,10 @@ class UserSubscriptionsRepository extends Repository
     ): ActiveRow {
         if ($variantId === null) {
             $variantId = $mailType->default_variant_id;
+        }
+
+        if (!$mailType->is_external && !$userId) {
+            throw new InvalidArgumentException("For non-external mail type, user id parameter is required");
         }
 
         // TODO: handle user ID even when searching for actual subscription
@@ -232,12 +258,14 @@ class UserSubscriptionsRepository extends Repository
 
     public function unsubscribeUser(
         ActiveRow $mailType,
-        int $userId,
+        ?int $userId,
         string $email,
         array $rtmParams = [],
         bool $sendGoodbyeEmail = true
     ): void {
-        // TODO: check for userId also when searching for actual subscription
+        if (!$mailType->is_external && !$userId) {
+            throw new InvalidArgumentException("For non-external mail type, user id parameter is required");
+        }
 
         /** @var ActiveRow $actual */
         $actual = $this->getTable()->where([

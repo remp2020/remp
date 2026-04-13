@@ -34,10 +34,6 @@ class TrackSubscribeUnsubscribeHandler implements HandlerInterface
             );
         }
 
-        if (!isset($payload['user_id'])) {
-            throw new HermesException('unable to handle event: user_id is missing');
-        }
-
         if (!isset($payload['mail_type_id'])) {
             throw new HermesException('unable to handle event: mail_type_id is missing');
         }
@@ -46,10 +42,16 @@ class TrackSubscribeUnsubscribeHandler implements HandlerInterface
             throw new HermesException('unable to handle event: time is missing');
         }
 
+        if (empty($payload['user_id'])) {
+            // currently we do not track users without ID to tracker
+            return true;
+        }
+
         $options = new EventOptions();
-        $options->setUser(new User([
-            'id' => $payload['user_id']
-        ]));
+        $options->setUser(new User(
+            id: $payload['user_id'],
+            email: $payload['user_email'] ?? null
+        ));
 
         $rtmParams = [
             'rtm_source' => $payload['rtm_source'] ?? null,

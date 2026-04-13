@@ -227,19 +227,20 @@ class Sender
                 'recipients_count' => count($subscribedEmails)
             ]);
         }
-        $subscribedEmails = $this->userSubscriptionsRepository->filterSubscribedEmailsAndIds($subscribedEmails, $this->template->mail_type_id);
+        // emails are always set, IDs may be null
+        $subscribedEmailsAndIds = $this->userSubscriptionsRepository->filterSubscribedEmailsAndIds($subscribedEmails, $this->template->mail_type_id);
 
         if ($logger !== null) {
             $logger->info("Sender - subscribers filtering before sending {$this->batchId}", [
-                'recipients_count_after_filtering' => count($subscribedEmails)
+                'recipients_count_after_filtering' => count($subscribedEmailsAndIds)
             ]);
         }
 
-        $autologinTokens = $this->autoLogin->createTokens(array_keys($subscribedEmails));
+        $autologinTokens = $this->autoLogin->createTokens(array_keys($subscribedEmailsAndIds));
 
         $transformedParams = [];
         foreach ($this->recipients as $recipient) {
-            if (!isset($subscribedEmails[$recipient['email']]) || !$subscribedEmails[$recipient['email']]) {
+            if (!array_key_exists($recipient['email'], $subscribedEmailsAndIds)) {
                 continue;
             }
 
@@ -330,15 +331,15 @@ class Sender
         $insertLogsData = [];
         foreach ($templateParams as $email => $params) {
             $insertLogsData[] = $this->logsRepository->getInsertData(
-                (string) $email,
-                $this->template->subject,
-                $this->template->id,
-                $this->jobId,
-                $this->batchId,
-                $params['mail_sender_id'],
-                $attachmentSize,
-                $this->context,
-                (int) $subscribedEmails[$email]
+                email: (string) $email,
+                subject: $this->template->subject,
+                templateId: $this->template->id,
+                jobId: $this->jobId,
+                batchId: $this->batchId,
+                mailSenderId: $params['mail_sender_id'],
+                attachmentSize: $attachmentSize,
+                context: $this->context,
+                userId: $subscribedEmailsAndIds[$email] ?? null,
             );
         }
         $logsTableName = $this->logsRepository->getTable()->getName();

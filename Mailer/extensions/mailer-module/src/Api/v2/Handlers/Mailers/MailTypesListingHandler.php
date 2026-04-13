@@ -68,6 +68,7 @@ class MailTypesListingHandler extends BaseHandler
             $item->is_multi_variant = (bool) $row->is_multi_variant;
             $item->sorting = $row->sorting;
             $item->variants = $this->listVariantsRepository->getVariantsForType($row)->order('sorting')->fetchPairs('id', 'title');
+            $item->is_external = (bool) $row->is_external;
             $output[] = $item;
         }
 

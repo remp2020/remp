@@ -37,7 +37,8 @@ class NotifyCrmSubscribeUnsubscribeHandler implements HandlerInterface
         }
 
         if (!isset($payload['user_id'])) {
-            throw new HermesException('unable to handle event: user_id is missing');
+            // some user are un/subscribed without user_id, ignore those
+            return true;
         }
 
         $key = "user_touch_call:" . $payload['user_id'];

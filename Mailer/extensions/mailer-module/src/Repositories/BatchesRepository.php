@@ -101,7 +101,7 @@ class BatchesRepository extends Repository implements DataRetentionInterface
             $this->emitter->emit(new HermesMessage('batch-status-change', [
                 'mail_job_batch_id' => $batch->id,
                 'time' => time(),
-                'status' => $status
+                'status' => $status,
             ]), RedisDriver::PRIORITY_LOW);
         }
 
@@ -118,6 +118,11 @@ class BatchesRepository extends Repository implements DataRetentionInterface
             'created_at' => new DateTime(),
         ]);
         return new ActiveRow($row->toArray(), $row->getTable());
+    }
+
+    public function findByJob(ActiveRow $job): ?\Nette\Database\Table\ActiveRow
+    {
+        return $job->related('mail_job_batch')->fetch();
     }
 
     public function getBatchReady(): ?ActiveRow
@@ -164,8 +169,8 @@ class BatchesRepository extends Repository implements DataRetentionInterface
                     self::STATUS_READY_TO_PROCESS_AND_SEND,
                     self::STATUS_PROCESSING,
                     self::STATUS_PROCESSED,
-                    self::STATUS_SENDING
-                ]
+                    self::STATUS_SENDING,
+                ],
             ])
             ->order('start_at ASC')
             ->limit($limit);
@@ -176,8 +181,8 @@ class BatchesRepository extends Repository implements DataRetentionInterface
         return $this->getTable()
             ->where([
                 'mail_job_batch.status' => [
-                    self::STATUS_DONE
-                ]
+                    self::STATUS_DONE,
+                ],
             ])
             ->order('mail_job_batch.last_email_sent_at DESC')
             ->limit($limit);

@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- **IMPORTANT**: Changed column `user_id` to nullable in `mail_user_subscriptions` table (migration included).
+    - This migration is non-blocking but it may take some time - e.g locally, 30M entries takes about 5 minutes.
+- **BREAKING**: Added support for "external" mail types — newsletters that can be sent to subscribers without user account in CRM. remp/remp#1516
+    - Added `is_external` boolean column to `mail_types` table (migration included).
+    - External mail types skip segment selection when creating/editing mail jobs — recipients are resolved directly from subscriptions.
+- **BREAKING**: Made `user_id` optional in subscribe/unsubscribe/is-subscribed/is-unsubscribed/bulk-subscribe/user-preferences API endpoints. remp/remp#1516
+    - For non-external mail types, `user_id` is still required and validated at the handler level.
+    - For external mail types, `user_id` can be omitted.
+- **BREAKING** - Changed `UserSubscriptionsRepository::allSubscribers()` to `allSubscribersWithUserId()`, filtering out subscribers without `user_id` from segment results. remp/remp#1516
+- Added `is_external` field to mail type listing API responses (v1, v2, v3). remp/remp#1516
+- Added `is_external` field to mail type upsert API response and creation. remp/remp#1516
+- Added `is_external` checkbox to the mail type (newsletter list) create/edit form. remp/remp#1516
+
 ## Archive
 
 - [v5.0](./changelogs/CHANGELOG-v5.0.md)

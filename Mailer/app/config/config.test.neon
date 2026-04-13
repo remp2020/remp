@@ -12,6 +12,11 @@ parameters:
 		project_root: /data/web/remp2020.com/app/Mailer/current
 
 services:
+	nullLogger:
+		factory: Psr\Log\NullLogger
+	batchEmailGeneratorTestWrapper:
+		factory: Tests\Feature\Mails\BatchEmailGeneratorTestWrapper(@nullLogger)
+		autowired: false
 	- Remp\MailerModule\Models\Users\Dummy
 	hermesMemoryDriver:
 		factory: Remp\MailerModule\Hermes\MemoryDriver

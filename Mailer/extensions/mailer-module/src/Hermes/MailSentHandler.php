@@ -15,11 +15,8 @@ class MailSentHandler implements HandlerInterface
 {
     use LoggerAwareTrait;
 
-    private $tracker;
-
-    public function __construct(ITracker $tracker)
+    public function __construct(private ITracker $tracker)
     {
-        $this->tracker = $tracker;
     }
 
     public function handle(MessageInterface $message): bool
@@ -42,9 +39,10 @@ class MailSentHandler implements HandlerInterface
         }
 
         $options = new EventOptions();
-        $options->setUser(new User([
-            'id' => $payload['user_id'],
-        ]));
+        $options->setUser(new User(
+            id: $payload['user_id'],
+            email: $payload['user_email'] ?? null,
+        ));
         $options->setFields([
             'email' => $payload['email'],
             'template_code' => $payload['template_code'],

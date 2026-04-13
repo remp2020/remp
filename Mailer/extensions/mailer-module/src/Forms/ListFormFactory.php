@@ -173,6 +173,10 @@ class ListFormFactory
         $form->addCheckbox('auto_subscribe', 'Auto subscribe');
         $form->addCheckbox('locked', 'Locked');
         $form->addCheckbox('public_listing', 'List publicly');
+        $form->addCheckbox('is_external', 'External')
+            ->addCondition($form::Equal, true)
+                ->toggle('#non-external-fields', false)
+            ->endCondition();
 
         $form->addHidden('id', $id);
 
@@ -270,6 +274,7 @@ class ListFormFactory
                 $values['mail_from'],
                 $values['subscribe_mail_template_id'],
                 $values['unsubscribe_mail_template_id'],
+                isExternal: $values['is_external'],
             );
             ($this->onCreate)($row);
         }

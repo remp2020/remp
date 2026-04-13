@@ -114,7 +114,7 @@ class UnsubscribeInactiveUsersCommand extends Command
                         $this->userSubscriptionsRepository->unsubscribeUserFromAll($userId, $userEmail, $omitMailTypeCodes);
 
                         $eventOptions = new EventOptions();
-                        $eventOptions->setUser(new User(['id' => $userId]));
+                        $eventOptions->setUser(new User(id: $userId, email: $userEmail));
                         $this->tracker?->trackEvent(
                             new DateTime(),
                             'mail-type',

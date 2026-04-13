@@ -16,22 +16,12 @@ use Tomaj\NetteApi\Response\ResponseInterface;
 
 class MailTypeUpsertHandler extends BaseHandler
 {
-    private $listsRepository;
-
-    private $listCategoriesRepository;
-
-    private $templatesRepository;
-
     public function __construct(
-        ListsRepository $listsRepository,
-        ListCategoriesRepository $listCategoriesRepository,
-        TemplatesRepository $templatesRepository
+        private ListsRepository $listsRepository,
+        private ListCategoriesRepository $listCategoriesRepository,
+        private TemplatesRepository $templatesRepository
     ) {
         parent::__construct();
-
-        $this->listsRepository = $listsRepository;
-        $this->listCategoriesRepository = $listCategoriesRepository;
-        $this->templatesRepository = $templatesRepository;
     }
 
     public function params(): array
@@ -157,6 +147,7 @@ class MailTypeUpsertHandler extends BaseHandler
                 'updated_at' => $list->updated_at->format(DATE_RFC3339),
                 'is_multi_variant' => (bool) $list->is_multi_variant,
                 'default_variant_id' => $list->default_variant_id,
+                'is_external' => (bool) $list->is_external,
                 'subscribe_mail_template_code' => $list->subscribe_mail_template->code ?? null,
                 'unsubscribe_mail_template_code' => $list->unsubscribe_mail_template->code ?? null,
             ],
@@ -214,20 +205,21 @@ class MailTypeUpsertHandler extends BaseHandler
 
 
         return $this->listsRepository->add(
-            $params['mail_type_category_id'],
-            $params['priority'],
-            $params['code'],
-            $params['title'],
-            $params['sorting'] ?? $this->getLastSortingNumberByCategory($params['mail_type_category_id']),
-            $params['auto_subscribe'] ?? false,
-            $params['locked'] ?? false,
-            $params['description'] ?? null,
-            $params['preview_url'] ?? null,
-            $params['page_url'] ?? null,
-            $params['image_url'] ?? null,
-            $params['public_listing'] ?? true,
-            $params['mail_from'] ?? null,
-            $params['subscribe_mail_template_id'] ?? null
+            categoryId: $params['mail_type_category_id'],
+            priority: $params['priority'],
+            code: $params['code'],
+            name: $params['title'],
+            sorting: $params['sorting'] ?? $this->getLastSortingNumberByCategory($params['mail_type_category_id']),
+            isAutoSubscribe: $params['auto_subscribe'] ?? false,
+            isLocked: $params['locked'] ?? false,
+            description: $params['description'] ?? null,
+            previewUrl: $params['preview_url'] ?? null,
+            pageUrl: $params['page_url'] ?? null,
+            imageUrl: $params['image_url'] ?? null,
+            publicListing: $params['public_listing'] ?? true,
+            mailFrom: $params['mail_from'] ?? null,
+            subscribeEmailTemplateId: $params['subscribe_mail_template_id'] ?? null,
+            isExternal: $params['is_external'] ?? false,
         );
     }
 }
