@@ -21,7 +21,7 @@ readonly class User
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
+            'id' => (string) $this->id,
             'ip_address' => $this->ipAddress,
             'url' => $this->url,
             'user_agent' => $this->userAgent,
