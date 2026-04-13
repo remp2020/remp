@@ -7,7 +7,6 @@ readonly class User
 {
     public function __construct(
         private string|int|null $id = null,
-        private ?string $email = null,
         private ?string $ipAddress = null,
         private ?string $url = null,
         private ?string $userAgent = null,
@@ -23,7 +22,6 @@ readonly class User
     {
         return [
             'id' => $this->id,
-            'email' => $this->email,
             'ip_address' => $this->ipAddress,
             'url' => $this->url,
             'user_agent' => $this->userAgent,

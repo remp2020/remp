@@ -22,7 +22,6 @@ class MailSentEventHandler
         $options = new EventOptions();
         $options->setUser(new User(
             id: $event->getUserId(),
-            email: $event->getEmail(),
         ));
 
         $options->setFields([

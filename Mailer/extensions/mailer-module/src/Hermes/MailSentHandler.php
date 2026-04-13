@@ -41,7 +41,6 @@ class MailSentHandler implements HandlerInterface
         $options = new EventOptions();
         $options->setUser(new User(
             id: $payload['user_id'],
-            email: $payload['user_email'] ?? null,
         ));
         $options->setFields([
             'email' => $payload['email'],
