@@ -41,6 +41,8 @@ class NewsfilterGenerator implements IGenerator
             (new PostInputParam('from'))->setRequired(),
             (new PostInputParam('summary')),
             (new PostInputParam('editor_avatar_url')),
+            (new PostInputParam('featured_image_url')),
+            (new PostInputParam('featured_image_title')),
         ];
     }
 
@@ -91,6 +93,8 @@ class NewsfilterGenerator implements IGenerator
             'title' => $values['title'],
             'editor' => $values['editor'],
             'editor_avatar_url' => $values['editor_avatar_url'] ?? null,
+            'featured_image_url' => $values['featured_image_url'] ?? null,
+            'featured_image_title' => $values['featured_image_title'] ?? null,
             'summary' => $values['summary'],
             'url' => $values['url'],
             'html' => $post,
@@ -101,6 +105,8 @@ class NewsfilterGenerator implements IGenerator
             'title' => $values['title'],
             'editor' => $values['editor'],
             'editor_avatar_url' => $values['editor_avatar_url'] ?? null,
+            'featured_image_url' => $values['featured_image_url'] ?? null,
+            'featured_image_title' => $values['featured_image_title'] ?? null,
             'summary' => $values['summary'],
             'url' => $values['url'],
             'html' => $lockedPost,
@@ -154,6 +160,9 @@ class NewsfilterGenerator implements IGenerator
             ->setRequired("Field 'Newsfilter URL' is required.");
 
         $form->addText('from', 'Sender');
+
+        $form->addText('featured_image_url', 'Featured image URL');
+        $form->addText('featured_image_title', 'Featured image title');
 
         $form->addText('editor', 'Editor')
             ->setRequired("Field 'Editor' is required.");
@@ -244,6 +253,8 @@ class NewsfilterGenerator implements IGenerator
         $output->newsfilter_html = $data->post_content;
 
         $output->article_id = $data->ID;
+        $output->featured_image_url = $data->post_image->image_sizes->medium->file ?? $data->post_image->image_sizes->full->file;
+        $output->featured_image_title = $data->post_image->image_title;
 
         return $output;
     }
