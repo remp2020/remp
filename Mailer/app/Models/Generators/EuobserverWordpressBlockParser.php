@@ -7,7 +7,7 @@ use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\ContentGenerator\Engine\IEngine;
 use Remp\MailerModule\Models\ContentGenerator\Engine\TwigEngine;
 
-class InterimWordpressBlockParser
+class EuobserverWordpressBlockParser
 {
     public const BLOCK_CORE_GROUP = 'core/group';
     public const BLOCK_CORE_HEADING = 'core/heading';
@@ -178,15 +178,15 @@ class InterimWordpressBlockParser
     public function getTemplate(string $blockName): string
     {
         $templateFile = match ($blockName) {
-            self::BLOCK_CORE_GROUP => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-group.twig',
-            self::BLOCK_CORE_HEADING => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-heading.twig',
-            self::BLOCK_CORE_PARAGRAPH => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-paragraph.twig',
-            self::BLOCK_CORE_IMAGE => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-image.twig',
-            self::BLOCK_CORE_LIST => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-list.twig',
-            self::BLOCK_CORE_LIST_ITEM => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-list-item.twig',
-            self::BLOCK_CORE_COLUMNS => __DIR__ . '/resources/templates/InterimWordpressBlockParser/core-columns.twig',
-            self::BLOCK_EO_POST => __DIR__ . '/resources/templates/InterimWordpressBlockParser/eo-post.twig',
-            self::BLOCK_EO_ADVERT => __DIR__ . '/resources/templates/InterimWordpressBlockParser/eo-advert.twig',
+            self::BLOCK_CORE_GROUP => __DIR__ . '/resources/templates/EuobserverWordpressBlockParser/core-group.twig',
+            self::BLOCK_CORE_HEADING => __DIR__ . '/resources/templates/EuobserverWordpressBlockParser/core-heading.twig',
+            self::BLOCK_CORE_PARAGRAPH => __DIR__ . '/resources/templates/EuobserverWordpressBlockParser/core-paragraph.twig',
+            self::BLOCK_CORE_IMAGE => __DIR__ . '/resources/templates/EuobserverWordpressBlockParser/core-image.twig',
+            self::BLOCK_CORE_LIST => __DIR__ . '/resources/templates/EuobserverWordpressBlockParser/core-list.twig',
+            self::BLOCK_CORE_LIST_ITEM => __DIR__ . '/resources/templates/EuobserverWordpressBlockParser/core-list-item.twig',
+            self::BLOCK_CORE_COLUMNS => __DIR__ . '/resources/templates/EuobserverWordpressBlockParser/core-columns.twig',
+            self::BLOCK_EO_POST => __DIR__ . '/resources/templates/EuobserverWordpressBlockParser/eo-post.twig',
+            self::BLOCK_EO_ADVERT => __DIR__ . '/resources/templates/EuobserverWordpressBlockParser/eo-advert.twig',
 
             default => throw new \Exception("not existing block template: '{$blockName}'"),
         };

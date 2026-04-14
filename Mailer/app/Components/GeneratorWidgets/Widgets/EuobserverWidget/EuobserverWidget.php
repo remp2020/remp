@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Remp\Mailer\Components\GeneratorWidgets\Widgets\InterimWidget;
+namespace Remp\Mailer\Components\GeneratorWidgets\Widgets\EuobserverWidget;
 
 use Nette\Application\Responses\JsonResponse;
 use Nette\Application\UI\Form;
 use Nette\Http\Session;
-use Remp\Mailer\Forms\InterimTemplateFormFactory;
+use Remp\Mailer\Forms\EuobserverTemplateFormFactory;
 use Remp\MailerModule\Components\BaseControl;
 use Remp\MailerModule\Components\GeneratorWidgets\Widgets\IGeneratorWidget;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
@@ -16,9 +16,9 @@ use Remp\MailerModule\Repositories\ActiveRowFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 
-class InterimWidget extends BaseControl implements IGeneratorWidget
+class EuobserverWidget extends BaseControl implements IGeneratorWidget
 {
-    private string $templateName = 'interim_widget.latte';
+    private string $templateName = 'euobserver_widget.latte';
 
     public function __construct(
         private Session $session,
@@ -27,13 +27,13 @@ class InterimWidget extends BaseControl implements IGeneratorWidget
         private ContentGenerator $contentGenerator,
         private GeneratorInputFactory $generatorInputFactory,
         private ActiveRowFactory $activeRowFactory,
-        private InterimTemplateFormFactory $dailyMinuteSchedulableTemplateFormFactory,
+        private EuobserverTemplateFormFactory $dailyMinuteSchedulableTemplateFormFactory,
     ) {
     }
 
     public function identifier(): string
     {
-        return "interimwidget";
+        return "euobserverwidget";
     }
 
     public function render($params): void
@@ -50,7 +50,7 @@ class InterimWidget extends BaseControl implements IGeneratorWidget
         $this->template->render();
     }
 
-    public function createComponentInterimTemplateForm(): Form
+    public function createComponentEuobserverTemplateForm(): Form
     {
         $form = $this->dailyMinuteSchedulableTemplateFormFactory->create();
         $this->dailyMinuteSchedulableTemplateFormFactory->onSave = function () {
@@ -61,7 +61,7 @@ class InterimWidget extends BaseControl implements IGeneratorWidget
         return $form;
     }
 
-    public function handleInterimPreview(): void
+    public function handleEuobserverPreview(): void
     {
         $request = $this->getPresenter()->getRequest();
 

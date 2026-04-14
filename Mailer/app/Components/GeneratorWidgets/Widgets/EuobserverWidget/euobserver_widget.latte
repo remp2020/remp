@@ -3,15 +3,15 @@
         $('[aria-controls="daily-minute-preview"]').on('shown.bs.tab', function () {
             $.nette.ajax({
                 type: 'POST',
-                url: {link interimPreview!},
+                url: {link euobserverPreview!},
                 data: {
                     'html_content': {$htmlContent},
                     'text_content': {$textContent},
-                    'name': $('#' + {$control["interimTemplateForm"]['name']->htmlId}).val(),
-                    'mail_layout_id': $('#' + {$control["interimTemplateForm"]['mail_layout_id']->htmlId}).val(),
-                    'mail_type_id': $('#' + {$control["interimTemplateForm"]['mail_type_id']->htmlId}).val(),
-                    'from': $('#' + {$control["interimTemplateForm"]['from']->htmlId}).val(),
-                    'subject': $('#' + {$control["interimTemplateForm"]['subject']->htmlId}).val()
+                    'name': $('#' + {$control["euobserverTemplateForm"]['name']->htmlId}).val(),
+                    'mail_layout_id': $('#' + {$control["euobserverTemplateForm"]['mail_layout_id']->htmlId}).val(),
+                    'mail_type_id': $('#' + {$control["euobserverTemplateForm"]['mail_type_id']->htmlId}).val(),
+                    'from': $('#' + {$control["euobserverTemplateForm"]['from']->htmlId}).val(),
+                    'subject': $('#' + {$control["euobserverTemplateForm"]['subject']->htmlId}).val()
                 },
                 success: function(data) {
                     previewFrame('#daily-minute-preview-full-frame', data['generatedHtml']);
@@ -55,7 +55,7 @@
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="daily-minute-form">
 
-                    {form interimTemplateForm, class => form-horizontal}
+                    {form euobserverTemplateForm, class => form-horizontal}
 
                         <div class="col-sm-6">
                             <div class="form-group fg-float m-b-30">
@@ -121,7 +121,7 @@
                 </div>
 
                 <div role="tabpanel" class="tab-pane" id="daily-minute-preview">
-                    {snippet interimPreviewWrapper}
+                    {snippet euobserverPreviewWrapper}
                         <div class="row">
                             <div class="col-md-6 text-center">
                                 <h4>Mobile preview

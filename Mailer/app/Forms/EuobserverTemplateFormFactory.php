@@ -17,7 +17,7 @@ use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
-class InterimTemplateFormFactory
+class EuobserverTemplateFormFactory
 {
     private const FORM_ACTION_WITH_JOBS_CREATED = 'generate_emails_jobs_created';
     private const FORM_ACTION_WITH_JOBS_STARTED = 'generate_emails_jobs';
@@ -143,8 +143,8 @@ class InterimTemplateFormFactory
 
         $defaults =  match ($sourceTemplateCode) {
             'euobserver_daily' => [
-                'name' => 'Daily minute ' . $tomorrowMorning->format('j.n.Y'),
-                'code' => 'daily_minute_' . $tomorrowMorning->format('dmy'),
+                'name' => 'EUobserver morning update ' . $tomorrowMorning->format('j.n.Y'),
+                'code' => 'euobserver_morning_update_' . $tomorrowMorning->format('dmy'),
                 'mail_layout_code' => 'empty-layout',
                 'mail_type_code' => 'euobserver-daily',
                 'send_at' => $tomorrowMorning->format('m/d/Y H:i A'),

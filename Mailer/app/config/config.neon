@@ -7,7 +7,7 @@ services:
 	- Remp\Mailer\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\Mailer\Forms\GrafdnaTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	dailyMinuteTemplateFormFactory: Remp\Mailer\Forms\DailyMinuteTemplateFormFactory('minuta-daily-digest')
-	interimTemplateFormFactory: Remp\Mailer\Forms\InterimTemplateFormFactory()
+	euobserverTemplateFormFactory: Remp\Mailer\Forms\EuobserverTemplateFormFactory()
 	articleUrlParserTemplateFormFactory: Remp\Mailer\Forms\ArticleUrlParserTemplateFormFactory()
 	respektUrlParserTemplateFormFactory: Remp\Mailer\Forms\RespektUrlParserTemplateFormFactory
 	respektArticleParserTemplateFormFactory: Remp\Mailer\Forms\RespektArticleParserTemplateFormFactory
@@ -23,12 +23,12 @@ services:
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\DailyMinuteWidget\DailyMinuteWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\RespektUrlParserWidget\RespektUrlParserWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\RespektArticleParserWidget\RespektArticleParserWidget
-	- Remp\Mailer\Components\GeneratorWidgets\Widgets\InterimWidget\InterimWidget
+	- Remp\Mailer\Components\GeneratorWidgets\Widgets\EuobserverWidget\EuobserverWidget
 
 	- Remp\Mailer\Models\WebClient(@environmentConfig::get('WEB_ADDR'))
 
 	- Remp\Mailer\Models\Generators\WordpressBlockParser
-	- Remp\Mailer\Models\Generators\InterimWordpressBlockParser
+	- Remp\Mailer\Models\Generators\EuobserverWordpressBlockParser
 	n3ArticleLocker: Remp\Mailer\Models\Generators\N3ArticleLocker
 
 	embedParser:

@@ -5,7 +5,7 @@ namespace Remp\Mailer\Models\Generators;
 
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
-use Remp\Mailer\Components\GeneratorWidgets\Widgets\InterimWidget\InterimWidget;
+use Remp\Mailer\Components\GeneratorWidgets\Widgets\EuobserverWidget\EuobserverWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\InvalidUrlException;
@@ -13,14 +13,14 @@ use Remp\MailerModule\Models\Generators\PreprocessException;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\PostInputParam;
 
-class InterimGenerator implements IGenerator
+class EuobserverGenerator implements IGenerator
 {
     public $onSubmit;
 
     public function __construct(
         private SourceTemplatesRepository $sourceTemplatesRepository,
         private EngineFactory $engineFactory,
-        private InterimWordpressBlockParser $wordpressBlockParser,
+        private EuobserverWordpressBlockParser $wordpressBlockParser,
     ) {
     }
 
@@ -77,7 +77,7 @@ class InterimGenerator implements IGenerator
 
     public function getWidgets(): array
     {
-        return [InterimWidget::class];
+        return [EuobserverWidget::class];
     }
 
     public function apiParams(): array
