@@ -38,8 +38,9 @@ class NewsfilterGenerator implements IGenerator
             (new PostInputParam('url'))->setRequired(),
             (new PostInputParam('title'))->setRequired(),
             (new PostInputParam('editor'))->setRequired(),
-            (new PostInputParam('summary')),
             (new PostInputParam('from'))->setRequired(),
+            (new PostInputParam('summary')),
+            (new PostInputParam('editor_avatar_url')),
         ];
     }
 
@@ -89,6 +90,7 @@ class NewsfilterGenerator implements IGenerator
         $params = [
             'title' => $values['title'],
             'editor' => $values['editor'],
+            'editor_avatar_url' => $values['editor_avatar_url'] ?? null,
             'summary' => $values['summary'],
             'url' => $values['url'],
             'html' => $post,
@@ -98,6 +100,7 @@ class NewsfilterGenerator implements IGenerator
         $lockedParams = [
             'title' => $values['title'],
             'editor' => $values['editor'],
+            'editor_avatar_url' => $values['editor_avatar_url'] ?? null,
             'summary' => $values['summary'],
             'url' => $values['url'],
             'html' => $lockedPost,
