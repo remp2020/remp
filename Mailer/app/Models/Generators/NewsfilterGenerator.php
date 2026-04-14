@@ -253,8 +253,8 @@ class NewsfilterGenerator implements IGenerator
         $output->newsfilter_html = $data->post_content;
 
         $output->article_id = $data->ID;
-        $output->featured_image_url = $data->post_image->image_sizes->medium->file ?? $data->post_image->image_sizes->full->file;
-        $output->featured_image_title = $data->post_image->image_title;
+        $output->featured_image_url = $data->post_image->image_sizes->medium->file ?? $data->post_image->image_sizes->full->file ?? null;
+        $output->featured_image_title = $data->post_image->image_title ?? null;
 
         return $output;
     }

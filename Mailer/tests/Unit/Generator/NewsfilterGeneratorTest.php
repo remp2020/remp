@@ -82,4 +82,113 @@ EOD;
         self::assertStringContainsString("Matej Cifra sa nedohodol s televíziami a tak", $output->summary);
         self::assertStringContainsString("ako zarábajú slovenskí youtuberi", $output->newsfilter_html);
     }
+
+    public function testPreprocessParametersWithImages()
+    {
+        $wpJson = <<<EOD
+{
+    "ID": 5272059,
+    "post_author": "518",
+    "post_date": "2026-04-13 14:45:11",
+    "post_date_gmt": "2026-04-13 12:45:11",
+    "post_content": "<ul>\r\n \t<li><strong>Načo sú nám vojnové lode, keď nebojujú, pýtajú sa Rusi.</strong></li>\r\n \t<li><strong>Útočný pluk Skala porušuje práva vojakov omnoho častejšie než iné jednotky.</strong></li>\r\n \t<li><strong>Bojovalo sa aj počas prímeria, ale výrazne menej.</strong></li>\r\n \t<li><strong>Rusi dobyli Myrne pri Huľajpoli, pohyby na fronte boli inak minimálne až žiadne.</strong></li>\r\n \t<li><strong>Mapy dňa - Huľajpole; Kosťantynivka.</strong></li>\r\n \t<li><strong>Videá dňa - čo bolo v roku 2022 sci-fi, je dnes realita; Su-25 odhadzuje francúzske riadené bomby; dvaja americkí vojaci skúsili, aké je bojovať s dronom.</strong></li>\r\n</ul>\r\nInformácie v tomto texte sú zhrnutím udalostí za nedeľu 12. apríla. Situácia už môže byť medzičasom iná.\r\n\r\n<strong>Načo sú nám vojnové lode, keď nebojujú, pýtajú sa Rusi. </strong>\"Čiernomorská flotila sa, mierne povedané, dostatočne nezapája do bojových operácií a nie je úplne spôsobilá na boj na mori s takým protivníkom, ako sú Ukrajinci,\" <a href=\"https://t.me/vysokygovorit/22727\" target=\"_blank\" rel=\"noopener\">sťažuje</a> sa autor veľkého blogu s pol miliónom čitateľov German Kulikovskij. Je jedným z Rusov, ktorí sa pustili do analyzovania stavu ruského námorníctva po zatiaľ poslednom útoku na jeho základňu v Novorossijsku, počas ktorého drony zasiahli jednu z fregát triedy Grigorovič.\r\n\r\nhttps://x.com/bayraktar_1love/status/2041100980494708878?s=20\r\n\r\nSvoje názory na pôsobenie Čiernomorskej flotily okrem Kulikovského zverejnili aj iní vplyvní provojnoví autori. Slovo porážka v súvislosti s ňou nepoužívajú explicitne, ale dostatočne otvorene, aby bolo zrejmé, že práve to si myslia.\r\n\r\n\"Netreba byť akademikom, aby každý videl, že Čiernomorská flotila vypadla z diania a v podstate jej jedinou funkciou je [lock]vystreliť Kalibre z móla,\" píše Kulikovskij. Kalibre sú strely s plochou dráhou letu, proti Ukrajine ich okrem iných plavidiel vystreľujú aj fregaty triedy Grigorovič a naozaj sú známe prípady, keď z obáv pred ukrajinskými dronmi tieto zbrane vystreľovali priamo z kotviska v prístave.",
+    "post_title": "Vývoj bojov (1509. deň): Čiernomorskú flotilu porazili drony. Rusko kritizuje bezmocné loďstvo",
+    "post_excerpt": "",
+    "post_status": "publish",
+    "comment_status": "closed",
+    "ping_status": "closed",
+    "post_password": "",
+    "post_name": "vyvoj-bojov-1509-den-nase-namornictvo-porazili-drony-rusko-kritizuje-bezmocne-lodstvo",
+    "to_ping": "",
+    "pinged": "",
+    "post_modified": "2026-04-13 15:45:20",
+    "post_modified_gmt": "2026-04-13 13:45:20",
+    "post_content_filtered": "",
+    "post_parent": 0,
+    "guid": "https://dennikn.sk/?p=5272059",
+    "menu_order": 0,
+    "post_type": "post",
+    "post_mime_type": "",
+    "comment_count": "0",
+    "filter": "raw",
+    "post_authors": [{
+        "ID": "518",
+        "user_login": "roman.pataj",
+        "user_nicename": "roman-pataj",
+        "user_email": "roman.pataj@dennikn.sk",
+        "user_url": "",
+        "user_registered": "2015-01-04 19:36:48",
+        "user_activation_key": "",
+        "user_status": "0",
+        "display_name": "Roman Pataj",
+        "type": "wpuser",
+        "gender": "male",
+        "avatar_url": "https://img.projektn.sk/wp-static/2015/05/pataj.jpg?w=96&h=96&fit=crop&fm=jpg&q=85",
+        "author_url": "https://dennikn.sk/autor/roman-pataj/"
+    }],
+    "post_tags": [{
+            "term_id": 6826,
+            "name": "Vojna na Ukrajine",
+            "slug": "vojna-na-ukrajine",
+            "term_url": "https://dennikn.sk/tema/vojna-na-ukrajine/"
+        },
+        {
+            "term_id": 14432,
+            "name": "Vývoj bojov na Ukrajine",
+            "slug": "vyvoj-vojny-na-ukrajine",
+            "term_url": "https://dennikn.sk/tema/vyvoj-vojny-na-ukrajine/"
+        }
+    ],
+    "post_categories": [{
+            "term_id": 12197,
+            "name": "Audio N",
+            "slug": "audio",
+            "term_url": "https://dennikn.sk/audio/"
+        },
+        {
+            "term_id": 435,
+            "name": "Komentáre",
+            "slug": "komentare",
+            "term_url": "https://dennikn.sk/komentare/"
+        },
+        {
+            "term_id": 431,
+            "name": "Svet",
+            "slug": "svet",
+            "term_url": "https://dennikn.sk/svet/"
+        }
+    ],
+    "post_url": "https://dennikn.sk/5272059/vyvoj-bojov-1509-den-nase-namornictvo-porazili-drony-rusko-kritizuje-bezmocne-lodstvo/",
+    "sender_email": "Denník N",
+    "post_image": {
+        "image_id": 2813726,
+        "image_title": "Horiaci krížnik Moskva. Foto – Twitter",
+        "image_sizes": {
+            "thumbnail": {
+                "file": "https://a-static.projektn.sk/2022/04/moskva-horiaca-360x200.jpg",
+                "width": 360,
+                "height": 200,
+                "mime-type": "image/jpeg"
+            },
+            "full": {
+                "file": "https://a-static.projektn.sk/2022/04/moskva-horiaca.jpg",
+                "width": 960,
+                "height": 720
+            }
+        }
+    }
+}
+EOD;
+        $wpJson = str_replace(["\n", "\r", "\t"], ["", "", ""], $wpJson);
+
+        $data = json_decode($wpJson);
+
+        $output = $this->generator->preprocessParameters($data);
+        self::assertEquals("Denník N", $output->from);
+        self::assertEquals("Vývoj bojov (1509. deň): Čiernomorskú flotilu porazili drony. Rusko kritizuje bezmocné loďstvo", $output->title);
+        self::assertEquals("Roman Pataj", $output->editor);
+        self::assertEquals("https://dennikn.sk/5272059/vyvoj-bojov-1509-den-nase-namornictvo-porazili-drony-rusko-kritizuje-bezmocne-lodstvo/", $output->url);
+        self::assertEmpty($output->summary);
+        self::assertStringContainsString("tieto zbrane vystreľovali priamo", $output->newsfilter_html);
+    }
 }
