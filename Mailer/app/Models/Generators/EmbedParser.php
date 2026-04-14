@@ -22,7 +22,7 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
         $this->salt = $salt;
     }
 
-    private function isTwitterLink($link): bool
+    protected function isTwitterLink($link): bool
     {
         return str_contains($link, 'twitt') || str_contains($link, 'x.com');
     }
@@ -54,7 +54,7 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
         return $html . "</a>" . PHP_EOL;
     }
 
-    private function existImage(string $link): bool
+    protected function existImage(string $link): bool
     {
         $response = @get_headers($link);
 

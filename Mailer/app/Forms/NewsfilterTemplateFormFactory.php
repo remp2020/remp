@@ -157,7 +157,7 @@ class NewsfilterTemplateFormFactory
                 'mail_type_code' => 'napunk-newsfilter',
                 'from' => 'Napunk <napunk@napunk.sk>',
             ],
-            'vyvoj-bojov' => [
+            'vyvoj-bojov', 'dn3-vyvoj-bojov' => [
                 'name' => 'Vývoj bojov ' . date('j.n.Y'),
                 'code' => 'nwsf_vyvoj_bojov_' . date('dmY'),
                 'mail_type_code' => 'vyvoj-bojov',
