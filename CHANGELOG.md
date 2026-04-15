@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Fixed chart.js configuration objects to match the current library version.
+
 ### [Mailer]
 
 - **IMPORTANT**: Changed column `user_id` to nullable in `mail_user_subscriptions` table (migration included).

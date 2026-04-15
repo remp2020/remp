@@ -102,7 +102,7 @@
                         timeUnit: timeUnit,
                     };
                     this.chart.config.options.scales.x.time.unit = timeUnit;
-                    this.chart.config.options.scales.x.time.stepSize = stepSize;
+                    this.chart.config.options.scales.x.ticks.stepSize = stepSize;
                     this.chart.update();
                     return;
                 }
@@ -132,11 +132,9 @@
                         },
                         scales: {
                             x: {
-                                type: 'time',
-                                distribution: 'series',
+                                type: 'timeseries',
                                 time: {
                                     unit: timeUnit,
-                                    stepSize: stepSize,
                                     displayFormats: {
                                         minute: 'HH:mm',
                                         hour: 'HH:mm',
@@ -147,22 +145,23 @@
                                     source: 'labels',
                                     maxRotation: 0,
                                     minRotation: 0,
+                                    stepSize: stepSize,
                                 },
                             },
                             y: {
-                                ticks: {
-                                    beginAtZero: true,
-                                },
+                                beginAtZero: true,
                             },
                         },
-                        tooltips: {
-                            callbacks: {
-                                title: function(tooltipItem, chartData) {
-                                    // we have only on x axis, we can use zero item directly
-                                    if (chartData.timeUnit === 'day' || chartData.timeUnit === 'week') {
-                                        return moment(tooltipItem[0].xLabel).format('LL');
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        const timeUnit = tooltipItems[0].chart.data.timeUnit;
+                                        if (timeUnit === 'day' || timeUnit === 'week') {
+                                            return moment(tooltipItems[0].label).format('LL');
+                                        }
+                                        return moment(tooltipItems[0].label).format('LLL');
                                     }
-                                    return moment(tooltipItem[0].xLabel).format('LLL');
                                 }
                             }
                         }

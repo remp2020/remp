@@ -134,5 +134,4 @@ global.Chart.mailerTooltip = function(context) {
     tooltipEl.style.pointerEvents = 'none';
     tooltipEl.style.borderRadius = '15px';
     tooltipEl.style.backgroundColor = 'rgba(0,0,0,0.9)';
-    tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
 }

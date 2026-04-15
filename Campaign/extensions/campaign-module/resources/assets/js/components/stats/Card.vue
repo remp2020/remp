@@ -99,35 +99,28 @@
                                 hitRadius: 3
                             }
                         },
-                        layout: {
-                            padding: -20
-                        },
                         scales: {
                             x: {
                                 ticks: {
                                     display: false
                                 },
-                                gridLines: {
+                                grid: {
                                     display: false,
-                                    // color: "rgba(255, 255, 255, 1)",
-                                    color: "rgba(0, 0, 0, 0)",
-                                    lineWidth: 0
                                 },
                             },
                             y: {
                                 ticks: {
                                     display: false,
                                 },
-                                gridLines: {
+                                grid: {
                                     display: false,
-                                    // color: "rgba(255, 255, 255, 1)",
-                                    color: "rgba(0, 0, 0, 0)",
-                                    lineWidth: 0
                                 },
                             },
                         },
-                        legend: {
-                            display: false
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
                         }
                     }
                 });
