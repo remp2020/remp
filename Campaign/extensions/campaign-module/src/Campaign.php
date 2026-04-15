@@ -107,6 +107,9 @@ class Campaign extends Model implements Searchable
         'countries' => Country::class,
         'countriesWhitelist' => Country::class,
         'countriesBlacklist' => Country::class,
+        'ipRanges' => CampaignIpRange::class,
+        'ipRangesWhitelist' => CampaignIpRange::class,
+        'ipRangesBlacklist' => CampaignIpRange::class,
         'schedules' => Schedule::class,
         'campaignBanners' => CampaignBanner::class,
         'campaignBanners.banner' => Banner::class,
@@ -230,6 +233,30 @@ class Campaign extends Model implements Searchable
     public function countriesBlacklist(): BelongsToMany
     {
         return $this->countries()->wherePivot('blacklisted', '=', true);
+    }
+
+    /**
+     * @return HasMany<CampaignIpRange, $this>
+     */
+    public function ipRanges(): HasMany
+    {
+        return $this->hasMany(CampaignIpRange::class);
+    }
+
+    /**
+     * @return HasMany<CampaignIpRange, $this>
+     */
+    public function ipRangesWhitelist(): HasMany
+    {
+        return $this->ipRanges()->where('blacklisted', false);
+    }
+
+    /**
+     * @return HasMany<CampaignIpRange, $this>
+     */
+    public function ipRangesBlacklist(): HasMany
+    {
+        return $this->ipRanges()->where('blacklisted', true);
     }
 
     /**

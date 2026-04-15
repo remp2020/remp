@@ -90,6 +90,18 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
                 "label" => "Blacklist"
             ]
         ],
+        "ipRanges" => $selectedIpRanges ?? [],
+        "ipRangesBlacklist" => $ipRangesBlacklist ?? 0,
+        "ipRangesBlacklistOptions" => [
+            [
+                "value" => 0,
+                "label" => "Whitelist"
+            ],
+            [
+                "value" => 1,
+                "label" => "Blacklist"
+            ]
+        ],
         "activationMode" => "activate-now",
     ]) }};
 

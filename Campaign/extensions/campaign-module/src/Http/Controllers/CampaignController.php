@@ -5,6 +5,7 @@ namespace Remp\CampaignModule\Http\Controllers;
 use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;
+use Remp\CampaignModule\CampaignIpRange;
 use Remp\CampaignModule\CampaignSegment;
 use Remp\CampaignModule\CampaignCollection;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
@@ -214,7 +215,9 @@ class CampaignController extends Controller
             $variants,
             $selectedCountries,
             $selectedLanguages,
-            $countriesBlacklist
+            $countriesBlacklist,
+            $selectedIpRanges,
+            $ipRangesBlacklist,
         ] = $this->processOldCampaign($campaign, old());
 
         return view('campaign::campaigns.create', [
@@ -224,6 +227,8 @@ class CampaignController extends Controller
             'selectedCountries' => $selectedCountries,
             'selectedLanguages' => $selectedLanguages,
             'countriesBlacklist' => $countriesBlacklist,
+            'selectedIpRanges' => $selectedIpRanges,
+            'ipRangesBlacklist' => $ipRangesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all(),
             'availableLanguages' => Campaign::getAvailableLanguages(),
@@ -234,7 +239,7 @@ class CampaignController extends Controller
 
     public function copy(Campaign $sourceCampaign, SegmentAggregator $segmentAggregator, ?CampaignCollection $collection = null)
     {
-        $sourceCampaign->load('banners', 'campaignBanners', 'segments', 'countries');
+        $sourceCampaign->load('banners', 'campaignBanners', 'segments', 'countries', 'ipRanges');
         /** @var Campaign $campaign */
         $campaign = $sourceCampaign->replicate();
 
@@ -246,7 +251,9 @@ class CampaignController extends Controller
             $variants,
             $selectedCountries,
             $selectedLanguages,
-            $countriesBlacklist
+            $countriesBlacklist,
+            $selectedIpRanges,
+            $ipRangesBlacklist,
         ] = $this->processOldCampaign($campaign, old());
 
         return view('campaign::campaigns.create', [
@@ -256,6 +263,8 @@ class CampaignController extends Controller
             'selectedCountries' => $selectedCountries,
             'selectedLanguages' => $selectedLanguages,
             'countriesBlacklist' => $countriesBlacklist,
+            'selectedIpRanges' => $selectedIpRanges,
+            'ipRangesBlacklist' => $ipRangesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all()->keyBy("iso_code"),
             'availableLanguages' => Campaign::getAvailableLanguages(),
@@ -322,7 +331,9 @@ class CampaignController extends Controller
             $variants,
             $selectedCountries,
             $selectedLanguages,
-            $countriesBlacklist
+            $countriesBlacklist,
+            $selectedIpRanges,
+            $ipRangesBlacklist,
         ] = $this->processOldCampaign($campaign, old());
 
         return view('campaign::campaigns.edit', [
@@ -332,6 +343,8 @@ class CampaignController extends Controller
             'selectedCountries' => $selectedCountries,
             'selectedLanguages' => $selectedLanguages,
             'countriesBlacklist' => $countriesBlacklist,
+            'selectedIpRanges' => $selectedIpRanges,
+            'ipRangesBlacklist' => $ipRangesBlacklist,
             'banners' => Banner::all(),
             'availableCountries' => Country::all()->keyBy("iso_code"),
             'availableLanguages' => Campaign::getAvailableLanguages(),
@@ -569,6 +582,25 @@ class CampaignController extends Controller
             )
         );
 
+        $campaign->ipRanges()->delete();
+        $ipRanges = $data['ip_ranges'] ?? [];
+        $ipRangesBlacklist = (bool) ($data['ip_ranges_blacklist'] ?? false);
+        $ipRangeRows = [];
+        foreach ($ipRanges as $range) {
+            if (empty($range['ip_from'])) {
+                continue;
+            }
+            $ipRangeRows[] = [
+                'campaign_id' => $campaign->id,
+                'ip_from' => $range['ip_from'],
+                'ip_to' => !empty($range['ip_to']) ? $range['ip_to'] : null,
+                'blacklisted' => $ipRangesBlacklist,
+            ];
+        }
+        if (!empty($ipRangeRows)) {
+            CampaignIpRange::insert($ipRangeRows);
+        }
+
         $segments = $data['segments'] ?? [];
 
         foreach ($segments as $segment) {
@@ -587,6 +619,8 @@ class CampaignController extends Controller
         if ($collection !== null && !$campaign->collections->contains($collection)) {
             $campaign->collections()->attach($collection);
         }
+
+        $campaign->cache();
     }
 
     public function processOldCampaign(Campaign $campaign, array $data)
@@ -612,10 +646,16 @@ class CampaignController extends Controller
         }, $countries);
 
         // countries blacklist?
-        $blacklisted = 0;
-        foreach ($countries as $country) {
-            $blacklisted = (int)$country['pivot']['blacklisted'];
-        }
+        $countryBlacklisted = !empty($countries) ? (int) $countries[0]['pivot']['blacklisted'] : 0;
+
+        // parse selected IP ranges
+        $ipRanges = $campaign->ipRanges->toArray();
+        $selectedIpRanges = $data['ip_ranges'] ?? array_map(fn ($range) => [
+            'ip_from' => $range['ip_from'],
+            'ip_to' => $range['ip_to'],
+        ], $ipRanges);
+
+        $ipRangesBlacklisted = !empty($ipRanges) ? (int) $ipRanges[0]['blacklisted'] : 0;
 
         // main banner
         if (array_key_exists('banner_id', $data)) {
@@ -643,7 +683,9 @@ class CampaignController extends Controller
             $variants,
             $selectedCountries,
             $campaign->languages,
-            $data['countries_blacklist'] ?? $blacklisted
+            $data['countries_blacklist'] ?? $countryBlacklisted,
+            $selectedIpRanges,
+            $data['ip_ranges_blacklist'] ?? $ipRangesBlacklisted,
         ];
     }
 

@@ -195,6 +195,26 @@
                         </li>
                     @endif
 
+                    @if($campaign->ipRangesWhitelist->count())
+                        <li class="list-group-item">
+                            <strong>IP whitelist (IPv4):</strong>
+                            <ul>
+                            @foreach($campaign->ipRangesWhitelist as $range)
+                                <li>{{ $range->ip_from }}@if($range->ip_to) — {{ $range->ip_to }}@endif</li>
+                            @endforeach
+                            </ul>
+                        </li>
+                    @elseif($campaign->ipRangesBlacklist->count())
+                        <li class="list-group-item">
+                            <strong>IP blacklist (IPv4):</strong>
+                            <ul>
+                            @foreach($campaign->ipRangesBlacklist as $range)
+                                <li>{{ $range->ip_from }}@if($range->ip_to) — {{ $range->ip_to }}@endif</li>
+                            @endforeach
+                            </ul>
+                        </li>
+                    @endif
+
                     @foreach(['desktop', 'mobile'] as $device)
                         <li class="list-group-item">
                             <strong>Show on {{ ucfirst($device) }}:</strong>

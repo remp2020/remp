@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Campaign]
 
 - Fixed chart.js configuration objects to match the current library version.
+- Added IP address targeting for campaigns with whitelist/blacklist support for single IPs and ranges. remp/euobserver#132
 
 ### [Mailer]
 

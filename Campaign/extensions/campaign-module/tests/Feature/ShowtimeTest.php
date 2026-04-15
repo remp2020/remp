@@ -486,6 +486,57 @@ class ShowtimeTest extends TestCase
         }
     }
 
+    public function testIpRangeRules()
+    {
+        $this->scheduleCampaign();
+        $activeCampaignUuids = [];
+
+        $request = Mockery::mock(Request::class);
+        $request->shouldReceive('ip')->andReturn('192.168.1.50');
+        $this->showtime->setRequest($request);
+
+        // Single IP whitelist — match
+        $this->campaign->ipRanges()->delete();
+        $this->campaign->ipRanges()->create([
+            'ip_from' => '192.168.1.50', 'ip_to' => null, 'blacklisted' => false,
+        ]);
+        $this->campaign->load(['ipRanges', 'ipRangesWhitelist', 'ipRangesBlacklist']);
+        $userData = $this->getUserData();
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+
+        // Single IP whitelist — no match
+        $this->campaign->ipRanges()->delete();
+        $this->campaign->ipRanges()->create([
+            'ip_from' => '10.0.0.1', 'ip_to' => null, 'blacklisted' => false,
+        ]);
+        $this->campaign->load(['ipRanges', 'ipRangesWhitelist', 'ipRangesBlacklist']);
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+
+        // IP range whitelist — within range
+        $this->campaign->ipRanges()->delete();
+        $this->campaign->ipRanges()->create([
+            'ip_from' => '192.168.1.0', 'ip_to' => '192.168.1.255', 'blacklisted' => false,
+        ]);
+        $this->campaign->load(['ipRanges', 'ipRangesWhitelist', 'ipRangesBlacklist']);
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+
+        // Single IP blacklist — match
+        $this->campaign->ipRanges()->delete();
+        $this->campaign->ipRanges()->create([
+            'ip_from' => '192.168.1.50', 'ip_to' => null, 'blacklisted' => true,
+        ]);
+        $this->campaign->load(['ipRanges', 'ipRangesWhitelist', 'ipRangesBlacklist']);
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+
+        // Single IP blacklist — no match (should display)
+        $this->campaign->ipRanges()->delete();
+        $this->campaign->ipRanges()->create([
+            'ip_from' => '10.0.0.1', 'ip_to' => null, 'blacklisted' => true,
+        ]);
+        $this->campaign->load(['ipRanges', 'ipRangesWhitelist', 'ipRangesBlacklist']);
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+    }
+
     public function testCountryRules()
     {
         $this->seed(CountrySeeder::class);

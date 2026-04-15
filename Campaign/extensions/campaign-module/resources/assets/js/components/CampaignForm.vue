@@ -463,6 +463,83 @@
                     </div><!-- .panel (geo targeting) -->
 
                     <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingIpTargeting">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseIpTargeting" aria-expanded="false" aria-controls="collapseIpTargeting" :class="{ green: highlightIpRangesCollapse }">
+                                    IP address targeting (IPv4)
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseIpTargeting" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingIpTargeting">
+                            <div class="panel-body p-b-30 p-l-10 p-r-20">
+
+                                <div class="input-group m-t-20">
+                                    <span class="input-group-addon"><i class="zmdi zmdi-dns"></i></span>
+                                    <div>
+                                        <div class="row">
+                                            <div class="col-md-8 col-sm-12">
+                                                <label class="fg-label">Whitelist / Blacklist</label>
+                                            </div>
+                                            <div class="col-md-8 col-sm-12">
+                                                <v-select v-model="ipRangesBlacklist"
+                                                          :name="'ip_ranges_blacklist'"
+                                                          :value="ipRangesBlacklist"
+                                                          :options.sync="ipRangesBlacklistOptions">
+                                                </v-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="input-group m-t-30">
+                                    <span class="input-group-addon"><i class="zmdi zmdi-dns"></i></span>
+                                    <div>
+                                        <div class="row">
+                                            <div class="col-md-4 col-sm-6">
+                                                <input type="text" v-model="addedIpFrom" class="form-control" placeholder="IP from (e.g. 192.168.1.0)">
+                                            </div>
+                                            <div class="col-md-4 col-sm-6">
+                                                <input type="text" v-model="addedIpTo" class="form-control" placeholder="IP to (optional, for range)">
+                                            </div>
+                                            <div class="col-md-4 col-sm-12">
+                                                <button type="button" class="btn btn-info waves-effect" @click="addIpRange" :disabled="!addedIpFrom">
+                                                    <i class="zmdi zmdi-plus"></i> Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-for="(range, index) in ipRanges">
+                                    <input type="hidden" :name="'ip_ranges[' + index + '][ip_from]'" :value="range.ip_from" />
+                                    <input type="hidden" :name="'ip_ranges[' + index + '][ip_to]'" :value="range.ip_to" />
+                                </div>
+
+                                <div class="row m-t-20 m-l-30" v-if="ipRanges.length">
+                                    <div class="col-md-10">
+                                        <small>Selected IP addresses / ranges</small>
+                                    </div>
+                                </div>
+                                <div class="row m-t-10 m-l-30">
+                                    <div class="col-md-12">
+                                        <div class="row m-b-10" v-for="(range, i) in ipRanges" style="line-height: 25px">
+                                            <div class="col-md-12 text-left">
+                                                {{ range.ip_from }}<span v-if="range.ip_to"> — {{ range.ip_to }}</span>
+                                                <div class="pull-left m-r-20">
+                                                    <span @click="removeIpRange(i)" class="btn btn-sm bg palette-Red waves-effect p-5 remove-segment">
+                                                        &times;
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div><!-- .panel (IP targeting) -->
+
+                    <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="headingDevicesTargeting">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseDevicesTargeting" aria-expanded="false" aria-controls="collapseDevicesTargeting" :class="{ green: highlightDevicesCollapse }">
@@ -648,6 +725,9 @@
         "_availableCountries",
         "_availableLanguages",
         "_countriesBlacklistOptions",
+        "_ipRanges",
+        "_ipRangesBlacklist",
+        "_ipRangesBlacklistOptions",
         "_pageviewAttributes",
 
         "_activationMode",
@@ -740,6 +820,11 @@
                 "availableCountries": null,
                 "languages": null,
                 "countriesBlacklistOptions": null,
+                "ipRanges": [],
+                "addedIpFrom": "",
+                "addedIpTo": "",
+                "ipRangesBlacklist": null,
+                "ipRangesBlacklistOptions": null,
                 "pageviewAttributes": [],
 
                 "startTime": null,
@@ -816,6 +901,9 @@
             highlightCountriesCollapse: function () {
                 return (this.countries && this.countries.length);
             },
+            highlightIpRangesCollapse: function () {
+                return (this.ipRanges && this.ipRanges.length);
+            },
             highlightDevicesCollapse: function () {
                 return (this.selectedDevices.length < this.allDevices.length) || this.selectedOperatingSystems.length > 0;
             },
@@ -880,6 +968,18 @@
             },
             removeCountry: function(index) {
                 this.countries.splice(index, 1);
+            },
+            addIpRange: function () {
+                if (!this.addedIpFrom) return;
+                this.ipRanges.push({
+                    ip_from: this.addedIpFrom,
+                    ip_to: this.addedIpTo || null,
+                });
+                this.addedIpFrom = "";
+                this.addedIpTo = "";
+            },
+            removeIpRange: function (index) {
+                this.ipRanges.splice(index, 1);
             },
             updatePageviewRules: function (pageviewRules) {
                 this.pageviewRules = pageviewRules.rules;

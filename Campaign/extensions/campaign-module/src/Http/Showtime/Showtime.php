@@ -579,6 +579,32 @@ class Showtime
             $this->logger->error("Unable to load user agent for userId [{$userId}]");
         }
 
+        // IP range rules
+        if (!$campaign->ipRanges->isEmpty()) {
+            $visitorIp = $this->getRequest()->ip();
+
+            if (!$campaign->ipRangesBlacklist->isEmpty()) {
+                foreach ($campaign->ipRangesBlacklist as $range) {
+                    if ($range->containsIp($visitorIp)) {
+                        return "Campaign not shown because IP [{$visitorIp}] is blacklisted";
+                    }
+                }
+            }
+
+            if (!$campaign->ipRangesWhitelist->isEmpty()) {
+                $matched = false;
+                foreach ($campaign->ipRangesWhitelist as $range) {
+                    if ($range->containsIp($visitorIp)) {
+                        $matched = true;
+                        break;
+                    }
+                }
+                if (!$matched) {
+                    return "Campaign not shown because IP [{$visitorIp}] is not whitelisted";
+                }
+            }
+        }
+
         // country rules
         if (!$campaign->countries->isEmpty()) {
             // load country ISO code based on IP

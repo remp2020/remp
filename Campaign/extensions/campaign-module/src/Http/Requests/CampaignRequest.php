@@ -3,6 +3,7 @@
 namespace Remp\CampaignModule\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Remp\CampaignModule\Rules\ValidIpRange;
 use Remp\CampaignModule\Rules\VariantsProportionSum;
 
 class CampaignRequest extends FormRequest
@@ -53,7 +54,19 @@ class CampaignRequest extends FormRequest
             'variants.*.control_group' => 'integer|required',
             'variants.*.weight' => 'integer|required',
             'variants.*.banner_id' => 'required_unless:variants.*.control_group,1',
-            'variants.0.proportion' => ['integer', 'required', new VariantsProportionSum]
+            'variants.0.proportion' => ['integer', 'required', new VariantsProportionSum],
+            'ip_ranges.*.ip_from' => 'required|ipv4',
+            'ip_ranges.*.ip_to' => ['nullable', 'ipv4', new ValidIpRange()],
+            'ip_ranges_blacklist' => 'nullable|boolean',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'ip_ranges.*.ip_from.required' => 'IP "from" address is required.',
+            'ip_ranges.*.ip_from.ipv4' => 'IP "from" address ":input" is not a valid IPv4 address.',
+            'ip_ranges.*.ip_to.ipv4' => 'IP "to" address ":input" is not a valid IPv4 address.',
         ];
     }
 
