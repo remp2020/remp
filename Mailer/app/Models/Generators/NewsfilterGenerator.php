@@ -167,6 +167,8 @@ class NewsfilterGenerator implements IGenerator
         $form->addText('editor', 'Editor')
             ->setRequired("Field 'Editor' is required.");
 
+        $form->addText('editor_avatar_url', 'Editor avatar URL');
+
         $form->addTextArea('summary', 'Summary')
             ->setHtmlAttribute('rows', 3)
             ->setRequired(false);
