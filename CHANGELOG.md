@@ -25,6 +25,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `is_external` field to mail type listing API responses (v1, v2, v3). remp/remp#1516
 - Added `is_external` field to mail type upsert API response and creation. remp/remp#1516
 - Added `is_external` checkbox to the mail type (newsletter list) create/edit form. remp/remp#1516
+- Fixed `mail_types.code` index to be unique for MySQL 8.4+ compatibility.
+  - The foreign key from `mail_user_preferences.code` requires the referenced column to have a unique index.
 
 ## Archive
 
