@@ -378,15 +378,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/parser@npm:^7.18.4":
-  version: 7.19.4
-  resolution: "@babel/parser@npm:7.19.4"
-  bin:
-    parser: ./bin/babel-parser.js
-  checksum: 89d2cf90e59f13aecc6f7c83019c3431d501a966a8af9b86d80bff5c5598a3d27d63baece76c10da54ac90f775b76fff4eb2342b8d7f6968051652733b2a9d40
-  languageName: node
-  linkType: hard
-
 "@babel/parser@npm:^7.28.4, @babel/parser@npm:^7.28.5":
   version: 7.28.5
   resolution: "@babel/parser@npm:7.28.5"
@@ -1705,13 +1696,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@remp/js-commons@portal:../Package/remp::locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
-    chart.js: ^2.9.3
+    rison: ^0.1.1
+  peerDependencies:
     datatables.net: ^1.10.25
     datatables.net-responsive: ^2.2.9
     datatables.net-rowgroup: ^1.1.3
-    jquery: 3.6.0
-    rison: ^0.1.1
-    vue: ^2.7.14
+    jquery: ">=3"
+    vue: ^2.7 || ^3
   languageName: node
   linkType: soft
 
@@ -2332,17 +2323,6 @@ __metadata:
     "@vue/compiler-core": 3.5.24
     "@vue/shared": 3.5.24
   checksum: 99e40953544cfd4e23dd88bd60d881084a0850e11628c2f9e1f21ea2857f103231321c0ec78e1f26ef36e0974bffda1f1dbebf1cba139a1f48ec0ec9582ec448
-  languageName: node
-  linkType: hard
-
-"@vue/compiler-sfc@npm:2.7.14":
-  version: 2.7.14
-  resolution: "@vue/compiler-sfc@npm:2.7.14"
-  dependencies:
-    "@babel/parser": ^7.18.4
-    postcss: ^8.4.14
-    source-map: ^0.6.1
-  checksum: e99c478edb2f66dd6082fb583302cef7198924f40916a6356368e6789b1675f6f5785aeeb249468d13d75ec83f75309e52dc5a5c4a9c37ca5ffdd1d051671379
   languageName: node
   linkType: hard
 
@@ -3461,41 +3441,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chart.js@npm:^2.9.3":
-  version: 2.9.4
-  resolution: "chart.js@npm:2.9.4"
-  dependencies:
-    chartjs-color: ^2.1.0
-    moment: ^2.10.2
-  checksum: 4551932943bc5e42d25ae5632d91878fb89e22937095a2742e23c4d0d0bde405bed6be2cb8480694ba599d6dbb9882c8bce6bac1e4667c820eb24c38416380aa
-  languageName: node
-  linkType: hard
-
 "chart.js@npm:^4.4":
   version: 4.4.3
   resolution: "chart.js@npm:4.4.3"
   dependencies:
     "@kurkle/color": ^0.3.0
   checksum: 70e01da30240e1e87394faf343f2674adad246faf3cce52684bffdf857730f3a63cb272b9d62dd19e9d944047d9d68d403575cd01d1a4077e58e2dae080babba
-  languageName: node
-  linkType: hard
-
-"chartjs-color-string@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "chartjs-color-string@npm:0.6.0"
-  dependencies:
-    color-name: ^1.0.0
-  checksum: 29f7ef3ebf5af1a76034da3148e1f230eee0c0f6df497ab7072ce5fb9c11ff37f5f030d2a2a5f1fd9230895d9aa294b455c5dd0f0e04f38688c69d0ccbdca7dd
-  languageName: node
-  linkType: hard
-
-"chartjs-color@npm:^2.1.0":
-  version: 2.4.1
-  resolution: "chartjs-color@npm:2.4.1"
-  dependencies:
-    chartjs-color-string: ^0.6.0
-    color-convert: ^1.9.3
-  checksum: 850408dfcda057ef0115018d5c83b88f5539cf93bbae8389bd3c5caa405a18e1f1d89b22a26107e1559248206a4ad6243294a820d50f042c6782a1d9d09fb3de
   languageName: node
   linkType: hard
 
@@ -3625,7 +3576,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-convert@npm:^1.9.0, color-convert@npm:^1.9.3":
+"color-convert@npm:^1.9.0":
   version: 1.9.3
   resolution: "color-convert@npm:1.9.3"
   dependencies:
@@ -3650,7 +3601,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-name@npm:^1.0.0, color-name@npm:~1.1.4":
+"color-name@npm:~1.1.4":
   version: 1.1.4
   resolution: "color-name@npm:1.1.4"
   checksum: 3e1c9a4dee12eada307436f61614dd11fe300469db2b83f80c8b7a7cd8a1015f0f18dd13403f018927b249003777ff60baba4a03c65f12e6bddc0dfd9642021f
@@ -4140,13 +4091,6 @@ __metadata:
   dependencies:
     css-tree: ^1.1.2
   checksum: 757304b1c78052e74d2235b775b9a5fee287c66a189944732165021a0bb45b65ba8e1b9cfa478884d5721967f98c9c6d998240c5c78b2a003e4ab76a5a5b7b10
-  languageName: node
-  linkType: hard
-
-"csstype@npm:^3.1.0":
-  version: 3.1.1
-  resolution: "csstype@npm:3.1.1"
-  checksum: b47b351bb6686b405b22075b64577abbc50e6700d3b1e4b0ea1f8fa8fc4ebd649e6b3764a17cf080e6da448b8c04c57fc4003799a4e83282be785ae6f7a8b2ed
   languageName: node
   linkType: hard
 
@@ -6112,13 +6056,6 @@ fsevents@~2.3.3:
   languageName: node
   linkType: hard
 
-"jquery@npm:3.6.0":
-  version: 3.6.0
-  resolution: "jquery@npm:3.6.0"
-  checksum: a0a819022a1bdff5efa79bbd9d4d7352de5bd32dabe42108e6ec0797238dba36c09c108e0eea2724f5d03acc1b30ee87d76bec80e15b9510106532292ebe6ba4
-  languageName: node
-  linkType: hard
-
 "jquery@npm:>=1.7, jquery@npm:>=1.7.2, jquery@npm:^3.5.1, jquery@npm:^3.6.0":
   version: 3.6.1
   resolution: "jquery@npm:3.6.1"
@@ -6555,7 +6492,7 @@ fsevents@~2.3.3:
 
 "mailer-module@file:extensions/mailer-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 2.0.0
-  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=9b159f&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "mailer-module@file:extensions/mailer-module#extensions/mailer-module::hash=195d09&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@remp/js-commons": ^2.4.0
     animate.css: ^3.7.0
@@ -6588,7 +6525,7 @@ fsevents@~2.3.3:
     salvattore: ^1.0.9
     trumbowyg: ^2.25.1
     vue: ^3.5
-  checksum: 6994d29c55855742b88f84037dc968818c8a2742b205bb8bfbd992eba41000473228a72e69c39f88d5cd4567c1671345f012daf022f23ccd048d99e5b1701c85
+  checksum: 104412cf4ca47873cde549c972d8017c566c89bf1f1635fba5a3b41dc234644a8dd632d8ab1311f3f4a288bfc57becd2132ab6c186e01ec87fa7e99b42de536c
   languageName: node
   linkType: hard
 
@@ -6998,13 +6935,6 @@ fsevents@~2.3.3:
   version: 2.29.4
   resolution: "moment@npm:2.29.4"
   checksum: 5aa949ddcfc8dee4984123410cc0cd504caa6ef691bd191a527a1de67529895dcc8a8342cd67fb1953ae87172ea701bb957cea6d30abf0677ca9c62e834a5b5a
-  languageName: node
-  linkType: hard
-
-"moment@npm:^2.10.2":
-  version: 2.30.1
-  resolution: "moment@npm:2.30.1"
-  checksum: 74c146f9ea946b7f0fc480c305ea71198acabb435e0359817d2535927480275234bbc24fc82febc0b156e980e8b5d2614c4002ce700905f2412fbe257701a2e6
   languageName: node
   linkType: hard
 
@@ -8115,17 +8045,6 @@ fsevents@~2.3.3:
     picocolors: ^1.0.0
     source-map-js: ^1.0.2
   checksum: 76b9cefb74af346af7ec82c680a8448fc3472deaf19cf9d5d40ebf597e75f2e8ee54b8c83dd772db994276b3d3729628a21147f409d55599a08775b11f9447cd
-  languageName: node
-  linkType: hard
-
-"postcss@npm:^8.4.14":
-  version: 8.4.17
-  resolution: "postcss@npm:8.4.17"
-  dependencies:
-    nanoid: ^3.3.4
-    picocolors: ^1.0.0
-    source-map-js: ^1.0.2
-  checksum: 1b42f98edcf9495cc3e9e4228d79bac089d1a51d98a5a896148e62e0a543b01da0501c16135d03c44959aa09210f6ebbe6536af115ec1655a75d4543a29b9262
   languageName: node
   linkType: hard
 
@@ -9927,16 +9846,6 @@ fsevents@~2.3.3:
     hash-sum: ^1.0.2
     loader-utils: ^1.0.2
   checksum: 6c5e914011903c65acb5642987da6590b743a1f484d79fec2e10f1406fb5beca0c152cd4f10f8eae32412349bd09cad7f1ede00b18fd74481de78e8402a8c7c0
-  languageName: node
-  linkType: hard
-
-"vue@npm:^2.7.14":
-  version: 2.7.14
-  resolution: "vue@npm:2.7.14"
-  dependencies:
-    "@vue/compiler-sfc": 2.7.14
-    csstype: ^3.1.0
-  checksum: 7aafbb1e438c16bb7ec7b6bce3a59fe0494ed26ac80579627c0be0f88a37328af7a7e3996e4574df23f26a5a6a33041f55f93d332d5724004316530e4dfaf25e
   languageName: node
   linkType: hard
 

@@ -6,10 +6,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Project
+
+- Removed unused `chart.js` and `vuefilters.js` from the shared `remp/js-commons` library.
+- Fixed `DateTimePickerWrapper` to support Vue v3.
+
+### [Beam]
+
+- Removed reference to `vuefilters` from the shared `remp/js-commons`, they weren't activelly used anywhere.
+
 ### [Campaign]
 
 - Fixed chart.js configuration objects to match the current library version.
 - Added IP address targeting for campaigns with whitelist/blacklist support for single IPs and ranges. remp/euobserver#132
+- Moved `vuefilters` internally from the shared library inside the project.
 
 ### [Mailer]
 

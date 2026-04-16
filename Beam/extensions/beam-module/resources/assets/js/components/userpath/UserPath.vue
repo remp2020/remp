@@ -54,9 +54,6 @@
 </template>
 
 <script>
-    Vue.filter('roundNumber', n => parseFloat(n).toFixed(2))
-    Vue.filter('choices', (condition, a1, a2) => condition ? a1 : a2)
-
     export default {
         name: "user-path",
         props: {

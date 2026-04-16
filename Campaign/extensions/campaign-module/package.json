@@ -27,7 +27,7 @@
   "dependencies": {
     "@babel/core": "^7.0",
     "@medv/finder": "^4.0.2",
-    "@remp/js-commons": "^2.4",
+    "@remp/js-commons": "^2.5",
     "animate.css": "^3.7.0",
     "autosize": "^4.0.2",
     "bootstrap": "^3.4.1",

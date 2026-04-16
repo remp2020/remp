@@ -6,6 +6,8 @@
 </template>
 
 <script type="text/javascript">
+    let uidCounter = 0;
+
     export default {
         name: "DateTimePicker",
         props: {
@@ -22,7 +24,7 @@
             }
         },
         created() {
-            this.labelId = "dtp-input-" + this._uid
+            this.labelId = "dtp-input-" + (++uidCounter)
         },
         mounted() {
             let datetime = $("#" + this.labelId)
@@ -32,7 +34,7 @@
             })
 
             // defaultDate() changes DOM directly, therefore doing it in nextTick()
-            Vue.nextTick()
+            this.$nextTick()
                 .then(function(){
                     let timeToSet = that.value ? moment(that.value) : moment()
                     datetime.data("DateTimePicker").defaultDate(timeToSet)
