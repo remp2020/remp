@@ -10,7 +10,11 @@ use Remp\MailerModule\Models\MailTranslator;
 
 class ContentGenerator
 {
-    /** @var IReplace[] */
+    public const PRIORITY_HIGH = 100;
+    public const PRIORITY_DEFAULT = 200;
+    public const PRIORITY_LOW = 300;
+
+    /** @var array<array{replace: IReplace, priority: int}> */
     private array $replaceList = [];
 
     public function __construct(
@@ -19,9 +23,19 @@ class ContentGenerator
     ) {
     }
 
-    public function register(IReplace $replace): void
+    public function register(IReplace $replace, int $priority = self::PRIORITY_DEFAULT): void
     {
-        $this->replaceList[] = $replace;
+        $this->replaceList[] = ['replace' => $replace, 'priority' => $priority];
+    }
+
+    /**
+     * @return IReplace[]
+     */
+    private function getSortedReplaceList(): array
+    {
+        $list = $this->replaceList;
+        usort($list, static fn($a, $b) => $a['priority'] <=> $b['priority']);
+        return array_map(static fn($item) => $item['replace'], $list);
     }
 
     public function render(GeneratorInput $generatorInput, ?array $context = null): MailContent
@@ -54,7 +68,7 @@ class ContentGenerator
 
         $subject = $this->generate($template->getSubject(), $params);
 
-        foreach ($this->replaceList as $replace) {
+        foreach ($this->getSortedReplaceList() as $replace) {
             $html = $replace->replace($html, $generatorInput, $context);
             $text = $replace->replace($text, $generatorInput, $context);
         }
@@ -72,7 +86,7 @@ class ContentGenerator
                 continue;
             }
 
-            foreach ($this->replaceList as $replace) {
+            foreach ($this->getSortedReplaceList() as $replace) {
                 $value = $replace->replace($value, $generatorInput, $context);
             }
             $outputParams[$name] = $value;

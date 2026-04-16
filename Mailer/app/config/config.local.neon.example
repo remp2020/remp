@@ -123,7 +123,15 @@ services:
 #	allowedDomainManager:
 #		setup:
 #			- addDomain('dennikn.sk')
-
+#	contentGenerator:
+#		setup:
+#			- register(Remp\Mailer\Models\ContentGenerator\AnchorWirelinkReplace(
+#					wirelinkHost: https://wirelink.dennikn.sk/
+#					wirelinkedDomains: [
+#						dennikn.sk,
+#						e.dennikn.sk
+#					]
+#				))
 # configuration required by Respekt's URL parser generators
 # (this is whole configuration; merge it with your existing configuration (other generators)
 #	generator:

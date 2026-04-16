@@ -2,8 +2,6 @@
 
 namespace Remp\MailerModule\Models\ContentGenerator;
 
-use Nette\Utils\Strings;
-
 class AllowedDomainManager
 {
     private array $allowedDomains = [];
@@ -16,7 +14,7 @@ class AllowedDomainManager
     public function isAllowed(string $domain): bool
     {
         foreach ($this->allowedDomains as $allowedDomain) {
-            if (Strings::endsWith($domain, $allowedDomain)) {
+            if (str_ends_with($domain, $allowedDomain)) {
                 return true;
             }
         }

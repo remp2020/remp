@@ -37,6 +37,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `is_external` checkbox to the mail type (newsletter list) create/edit form. remp/remp#1516
 - Fixed `mail_types.code` index to be unique for MySQL 8.4+ compatibility.
   - The foreign key from `mail_user_preferences.code` requires the referenced column to have a unique index.
+- Added a priority parameter to the content generator replacers register method to ensure the replacers are applied in the correct order. remp/remp#1450
+- Added AnchorWirelinkReplace content generator replacer to support deeplinking in emails. remp/remp#1450
 
 ## Archive
 
