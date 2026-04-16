@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import BannerPreview from './components/BannerPreview.vue';
-import {registerStripHtmlFilter} from "./vueFilters";
+import "./vueFilters";
 
 window.remplib = window.remplib || {};
 
@@ -172,8 +172,6 @@ window.remplib = window.remplib || {};
         },
 
         bindPreview: function(el, banner) {
-            registerStripHtmlFilter(Vue);
-
             return new Vue({
                 el: el,
                 data: banner,
