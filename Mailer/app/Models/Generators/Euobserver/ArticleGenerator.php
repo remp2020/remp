@@ -24,6 +24,8 @@ class ArticleGenerator implements IGenerator
 
     public $onSubmit;
 
+    private bool $lockingEnabled = false;
+
     protected function getLinksColor(): string
     {
         return '#f0523c';
@@ -106,16 +108,22 @@ class ArticleGenerator implements IGenerator
 
         $params['html'] = $engine->markSafe($params['html']);
         $params['text'] = $engine->markSafe($params['text']);
-        $lockedParams['html'] = $engine->markSafe($lockedParams['html']);
-        $lockedParams['text'] = $engine->markSafe($lockedParams['text']);
 
-        return [
+        $result = [
             'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
             'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
-            'lockedHtmlContent' => $engine->render($sourceTemplate->content_html, $lockedParams),
-            'lockedTextContent' => strip_tags($engine->render($sourceTemplate->content_text, $lockedParams)),
             'errors' => $errors,
         ];
+
+        if ($this->lockingEnabled) {
+            $lockedParams['html'] = $engine->markSafe($lockedParams['html']);
+            $lockedParams['text'] = $engine->markSafe($lockedParams['text']);
+
+            $result['lockedHtmlContent'] = $engine->render($sourceTemplate->content_html, $lockedParams);
+            $result['lockedTextContent'] = strip_tags($engine->render($sourceTemplate->content_text, $lockedParams));
+        }
+
+        return $result;
     }
 
     public function formSucceeded(Form $form, ArrayHash $values): void
@@ -123,14 +131,18 @@ class ArticleGenerator implements IGenerator
         $output = $this->process((array) $values);
 
         $addonParams = [
-            'lockedHtmlContent' => $output['lockedHtmlContent'],
-            'lockedTextContent' => $output['lockedTextContent'],
+            'lockingEnabled' => $this->lockingEnabled,
             'articleTitle' => $values->title,
             'from' => $values->from,
             'render' => true,
             'articleId' => $values->article_id ?? null,
             'errors' => $output['errors'],
         ];
+
+        if ($this->lockingEnabled) {
+            $addonParams['lockedHtmlContent'] = $output['lockedHtmlContent'];
+            $addonParams['lockedTextContent'] = $output['lockedTextContent'];
+        }
 
         $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);
     }
@@ -273,9 +285,6 @@ class ArticleGenerator implements IGenerator
 
     private function splitOnLock(string $post): string
     {
-        // Temporary, requested in remp/euobserver#181
-        return $post;
-
         $lockPos = stripos($post, self::LOCK_BLOCK);
         if ($lockPos === false) {
             return $post;

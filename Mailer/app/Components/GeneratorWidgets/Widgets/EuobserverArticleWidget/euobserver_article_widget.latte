@@ -7,8 +7,10 @@
                 data: {
                     'html_content': {$htmlContent},
                     'text_content': {$textContent},
+                    {if $lockingEnabled}
                     'locked_html_content': {$lockedHtmlContent},
                     'locked_text_content': {$lockedTextContent},
+                    {/if}
                     'name': $('#' + {$control["euobserverTemplateForm"]['name']->htmlId}).val(),
                     'mail_layout_id': $('#' + {$control["euobserverTemplateForm"]['mail_layout_id']->htmlId}).val(),
                     'mail_type_id': $('#' + {$control["euobserverTemplateForm"]['mail_type_id']->htmlId}).val(),
@@ -126,18 +128,21 @@
                     {snippet articlePreviewWrapper}
                         <div class="row">
                             <div class="col-md-6 text-center">
-                                <h4>For subscribers - mobile preview
+                                <h4>
+                                    {if $lockingEnabled}For subscribers - {/if}Mobile preview
                                     <a target="_blank" style="font-size: 12px" href="{plink MailGenerator:preview false}"><i class="zmdi zmdi-arrow-right-top zmdi-hc-fw"></i> Full-screen preview</a>
                                 </h4>
                                 <iframe id="article-preview-full-frame" frameBorder="0" style="max-width: 576px; width:100%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
                             </div>
 
+                            {if $lockingEnabled}
                             <div class="col-md-6 text-center">
-                                <h4>For non-subscribers - mobile preview
+                                <h4>For non-subscribers - Mobile preview
                                     <a target="_blank" style="font-size: 12px" href="{plink MailGenerator:preview true}"><i class="zmdi zmdi-arrow-right-top zmdi-hc-fw"></i> Full-screen preview</a>
                                 </h4>
                                 <iframe id="article-preview-locked-frame" frameBorder="0" style="max-width: 576px; width:100%; height: 500px; border:1px solid #ddd; margin-top:2em"></iframe>
                             </div>
+                            {/if}
                         </div>
                     {/snippet}
                 </div>

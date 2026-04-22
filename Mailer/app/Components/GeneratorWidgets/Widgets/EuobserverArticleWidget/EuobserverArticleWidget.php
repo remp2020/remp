@@ -67,8 +67,6 @@ class EuobserverArticleWidget extends BaseControl implements IGeneratorWidget
 
         $htmlContent = $request->getPost('html_content');
         $textContent = $request->getPost('text_content');
-        $lockedHtmlContent = $request->getPost('locked_html_content');
-        $lockedTextContent = $request->getPost('locked_text_content');
 
         $mailLayout = $this->layoutsRepository->find($request->getPost('mail_layout_id'));
         $mailType = $this->listsRepository->find($request->getPost('mail_type_id'));
@@ -96,18 +94,27 @@ class EuobserverArticleWidget extends BaseControl implements IGeneratorWidget
         };
 
         $mailContent = $generate($htmlContent, $textContent, $mailLayout, $mailType);
-        $lockedMailContent = $generate($lockedHtmlContent, $lockedTextContent, $mailLayout, $mailType);
-
         $sessionSection = $this->session->getSection(MailGeneratorPresenter::SESSION_SECTION_CONTENT_PREVIEW);
         $sessionSection->generatedHtml = $mailContent->html();
-        $sessionSection->generatedLockedHtml = $lockedMailContent->html();
 
-        $response = new JsonResponse([
+        $result = [
             'generatedHtml' => $mailContent->html(),
             'generatedText' => $mailContent->text(),
-            'generatedLockedHtml' => $lockedMailContent->html(),
-            'generatedLockedText' => $lockedMailContent->text(),
-        ]);
+        ];
+
+        if ($request->getPost('locked_html_content')) {
+            $lockedHtmlContent = $request->getPost('locked_html_content');
+            $lockedTextContent = $request->getPost('locked_text_content');
+
+            $lockedMailContent = $generate($lockedHtmlContent, $lockedTextContent, $mailLayout, $mailType);
+
+            $sessionSection->generatedLockedHtml = $lockedMailContent->html();
+
+            $result['generatedLockedHtml'] = $lockedMailContent->html();
+            $result['generatedLockedText'] = $lockedMailContent->text();
+        }
+
+        $response = new JsonResponse($result);
         $this->getPresenter()->sendResponse($response);
     }
 }
