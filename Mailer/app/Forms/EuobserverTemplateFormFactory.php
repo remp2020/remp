@@ -141,7 +141,7 @@ class EuobserverTemplateFormFactory
         $tomorrowMorning = new \DateTime('tomorrow 7:30AM');
         $now = new \DateTime();
 
-        $defaults =  match ($sourceTemplateCode) {
+        $defaults = match ($sourceTemplateCode) {
             'euobserver_daily' => [
                 'name' => 'EUobserver morning update ' . $tomorrowMorning->format('j.n.Y'),
                 'code' => 'euobserver_morning_update_' . $tomorrowMorning->format('dmy'),
@@ -154,10 +154,15 @@ class EuobserverTemplateFormFactory
                 'code' => 'friday_five_' . $now->format('dmy'),
                 'mail_layout_code' => 'default',
                 'mail_type_code' => 'the-friday-five',
-            ]
+            ],
+            default => [],
         };
 
-        if (isset($defaults['mail_type_code']) && !isset($defaults['from'])) {
+        if (!isset($defaults['mail_layout_code'], $defaults['mail_type_code'])) {
+            return $defaults;
+        }
+
+        if (!isset($defaults['from'])) {
             $mailType = $this->listsRepository->findByCode($defaults['mail_type_code'])->fetch();
             if ($mailType->mail_from) {
                 $defaults['from'] = $mailType->mail_from;

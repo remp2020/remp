@@ -132,10 +132,10 @@ HTML;
 
         $generatorRules = [
             "/\[embed\](.*?)\[\/embed\]/is" => function ($matches) {
-                return '<p>Graf nájdete aj na <a href="' . $matches[1] . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">' . $matches[1] . ' </a>.</p>';
+                return '<p>Graf nájdete aj na <a href="' . $matches[1] . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->getLinksColor() . ';text-decoration:underline;">' . $matches[1] . ' </a>.</p>';
             },
             "/^(http|https)\:\/\/[a-zA-Z0-9\-\.]*(flourish|datawrapper)+[a-zA-Z0-9\-\.]*\.[a-zA-Z]+(\/\S*)?\s*$/im" => function ($matches) {
-                return '<p>Graf nájdete aj na <a href="' . $matches[0] . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">' . $matches[0] . ' </a>.</p>';
+                return '<p>Graf nájdete aj na <a href="' . $matches[0] . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->getLinksColor() . ';text-decoration:underline;">' . $matches[0] . ' </a>.</p>';
             },
         ];
         $rules = $this->getRules($generatorRules);
@@ -279,7 +279,7 @@ HTML;
 HTML;
 
         $captionWithLinkTemplate = <<< HTML
-    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:{$this->linksColor};text-decoration:none;">
+    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:{$this->getLinksColor()};text-decoration:none;">
     <img src="$2" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;border:none;">
 </a>
     <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">

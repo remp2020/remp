@@ -4,7 +4,10 @@ namespace Remp\Mailer\Models\Generators;
 
 trait RulesTrait
 {
-    private $linksColor = "#1F3F83";
+    protected function getLinksColor(): string
+    {
+        return '#1F3F83';
+    }
 
     public function getRules($generatorRules = [])
     {
@@ -40,23 +43,24 @@ trait RulesTrait
             // replace em-s
             "/<em.*?>(.*?)<\/em>/is" => "<i style=\"margin:0 0 26px 0;color:#181818;padding:0;font-size:18px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;\">$1</i>",
 
+            // replace images before captions so the caption rule overwrites the plain image output for captioned images
+            '/<img.*?src="(.*?)".*?>/is' => $imageTemplate,
+
             // remove new lines from inside caption shortcode
             "/\[caption.*?\/caption\]/is" => function ($matches) {
                 return str_replace(array("\n\r", "\n", "\r"), '', $matches[0]);
             },
 
-            // replace captions
+            // replace captions — accept both /> and > for the img closing tag since the image rule above
+            // may have already rewritten the self-closing <img .../> to a non-self-closing tag
             '/\[caption.*?\].*?href="(.*?)".*?src="(.*?)".*?\/a>(.*?)\[\/caption\]/im' => $captionWithLinkTemplate,
-            '/\[caption.*?\].*?src="(.*?)".*?\/>(.*?)\[\/caption\]/im' => $captionTemplate,
+            '/\[caption.*?\].*?src="(.*?)".*?(?:\/>|>)(.*?)\[\/caption\]/im' => $captionTemplate,
 
             // replace hrefs
-            '/<a\s[^>]*href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="padding:0;margin:0;line-height:1.3;color:' . $this->linksColor . ';text-decoration:underline;">$2</a>',
+            '/<a\s[^>]*href="(.*?)".*?>(.*?)<\/a>/is' => '<a href="$1" style="padding:0;margin:0;line-height:1.3;color:' . $this->getLinksColor() . ';text-decoration:underline;">$2</a>',
 
             // replace h2
             '/<h2.*?>(.*?)<\/h2>/is' => '<h2 style="color:#181818;padding:0;line-height:1.3;font-weight:bold;text-align:left;margin:0 0 30px 0;font-size:24px;">$1</h2>' . PHP_EOL,
-
-            // replace images
-            '/<img.*?src="(.*?)".*?>/is' => $imageTemplate,
 
             // replace ul & ol
             '/<ul.*?>/is' => '<table style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;line-height:1.3;text-align:left;font-family:\'Helvetica Neue\', Helvetica, Arial;width:100%;"><tbody>',

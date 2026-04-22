@@ -24,6 +24,7 @@ services:
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\RespektUrlParserWidget\RespektUrlParserWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\RespektArticleParserWidget\RespektArticleParserWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\EuobserverWidget\EuobserverWidget
+	- Remp\Mailer\Components\GeneratorWidgets\Widgets\EuobserverArticleWidget\EuobserverArticleWidget
 
 	- Remp\Mailer\Models\WebClient(@environmentConfig::get('WEB_ADDR'))
 
