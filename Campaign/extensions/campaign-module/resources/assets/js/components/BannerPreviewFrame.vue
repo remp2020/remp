@@ -17,7 +17,7 @@
 <script>
 import Vue from "vue";
 import BannerPreview from "./BannerPreview.vue";
-import {registerStripHtmlFilter} from "../vueFilters";
+import "../vueFilters";
 
 export default {
     props: BannerPreview.props,
@@ -43,7 +43,6 @@ export default {
 
         iframe.contentWindow.document.close();
 
-        registerStripHtmlFilter(Vue);
         new Vue({
             el: iframe.contentWindow.document.body.firstChild,
             render: h => h(BannerPreview, {
