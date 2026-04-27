@@ -70,7 +70,7 @@ trait RulesTrait
             '/<\/ol>/is' => '</tbody></table>' . PHP_EOL,
 
             // replace li
-            '/<li.*?>(.*?)<\/li>/is' => $liTemplate,
+            '/<li.*?>(?:<p.*?>)?(.*?)(?:<\/p>)?<\/li>/is' => $liTemplate,
 
             // hr
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
