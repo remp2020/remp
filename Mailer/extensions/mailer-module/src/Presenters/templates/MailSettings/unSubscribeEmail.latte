@@ -36,7 +36,7 @@
                 <div class="value">{$mailType->title}</div>
             </div>
 
-            <form method="post" action="{link unsubscribe! token => $token, listCode => $mailType->code}">
+            <form method="post" action="{link Unsubscribe, token => $token, listCode => $mailType->code}">
                 <button type="submit" class="btn-unsubscribe">Unsubscribe</button>
             </form>
         </div>
