@@ -70,11 +70,7 @@ class ListVariantsRepository extends Repository
             ->where('deleted_at', null)
             ->group('mail_type_variants.id');
 
-        if ($order === 'count') {
-            $selection->order('COUNT(*) DESC');
-        } else {
-            $selection->order($order . ' ' . strtoupper($orderDirection));
-        }
+        $selection->order($order . ' ' . strtoupper($orderDirection));
 
         if (!empty($query)) {
             $where = [];

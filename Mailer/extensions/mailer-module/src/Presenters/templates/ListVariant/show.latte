@@ -1,0 +1,57 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Newsletter list variant</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2 n:block="title">Show variant <small>{$variant->title}</small></h2>
+        <div class="actions">
+            <a n:if="$mailType->is_external" n:href="import $variant->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-upload"></i> Import subscribers</button>
+            </a>
+            <a n:href="edit $variant->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Edit</button>
+            </a>
+            <a n:href="List:show $mailType->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-long-arrow-return"></i> Back to list</button>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h2>Settings</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Mail type:</strong> <a n:href="List:show $mailType->id">{$mailType->title}</a></li>
+                    <li class="list-group-item"><strong>Title:</strong> {$variant->title}</li>
+                    <li class="list-group-item"><strong>Code:</strong> {$variant->code}</li>
+                    <li class="list-group-item"><strong>Sorting:</strong> {$variant->sorting}</li>
+                    <li class="list-group-item"><strong>Created at:</strong> {$variant->created_at|date:'j.n.Y G:i'}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h2>Subscribers</h2>
+            </div>
+            <div class="card-body">
+                {control dataTableSubscribers}
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}

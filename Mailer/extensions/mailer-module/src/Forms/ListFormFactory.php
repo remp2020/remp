@@ -171,6 +171,7 @@ class ListFormFactory
                 ->setPrompt('Choose newsletter list');
 
         $form->addCheckbox('auto_subscribe', 'Auto subscribe');
+        $form->addCheckbox('is_multi_variant', 'Is multi-variant');
         $form->addCheckbox('locked', 'Locked');
         $form->addCheckbox('public_listing', 'List publicly');
         $form->addCheckbox('is_external', 'External')
@@ -259,21 +260,22 @@ class ListFormFactory
             ($this->onUpdate)($list);
         } else {
             $row = $this->listsRepository->add(
-                $values[self::MAIL_TYPE_CATEGORY],
-                $values['priority'],
-                $values['code'],
-                $values['title'],
-                $values[self::SORTING],
-                $values['auto_subscribe'],
-                $values['locked'],
-                $values['description'],
-                $values['preview_url'],
-                $values['page_url'],
-                $values['image_url'],
-                $values['public_listing'],
-                $values['mail_from'],
-                $values['subscribe_mail_template_id'],
-                $values['unsubscribe_mail_template_id'],
+                categoryId: $values[self::MAIL_TYPE_CATEGORY],
+                priority: $values['priority'],
+                code: $values['code'],
+                name: $values['title'],
+                sorting: $values[self::SORTING],
+                isAutoSubscribe: $values['auto_subscribe'],
+                isLocked: $values['locked'],
+                description: $values['description'],
+                previewUrl: $values['preview_url'],
+                pageUrl: $values['page_url'],
+                imageUrl: $values['image_url'],
+                publicListing: $values['public_listing'],
+                mailFrom: $values['mail_from'],
+                subscribeEmailTemplateId: $values['subscribe_mail_template_id'],
+                unSubscribeEmailTemplateId: $values['unsubscribe_mail_template_id'],
+                isMultiVariant: $values['is_multi_variant'] ?? false,
                 isExternal: $values['is_external'],
             );
             ($this->onCreate)($row);

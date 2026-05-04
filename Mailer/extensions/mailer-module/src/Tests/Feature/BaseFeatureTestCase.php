@@ -161,6 +161,7 @@ class BaseFeatureTestCase extends TestCase
         bool $isMultiVariant = false,
         ?int $defaultVariantId = null,
         ?string $mailFrom = null,
+        bool $isExternal = false,
     ) {
         $listCategory = $this->createMailTypeCategory($categoryName);
 
@@ -177,6 +178,7 @@ class BaseFeatureTestCase extends TestCase
             mailFrom: $mailFrom,
             isMultiVariant: $isMultiVariant,
             defaultVariantId: $defaultVariantId,
+            isExternal: $isExternal,
         );
     }
 

@@ -7,12 +7,14 @@ use DateInterval;
 use DateTimeZone;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
+use Nette\Http\IResponse;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\DuplicateListFormFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
+use Remp\MailerModule\Forms\ListSubscribersImportFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Hermes\RedisDriver;
 use Remp\MailerModule\Models\ChartTrait;
@@ -40,6 +42,7 @@ final class ListPresenter extends BasePresenter
         private readonly ListVariantsRepository $listVariantsRepository,
         private readonly Emitter $emitter,
         private readonly DataTableFactory $dataTableFactory,
+        private readonly ListSubscribersImportFormFactory $listSubscribersImportFormFactory,
     ) {
         parent::__construct();
     }
@@ -342,6 +345,11 @@ final class ListPresenter extends BasePresenter
             ->setColSetting('count', [
                 'priority' => 1,
             ])
+            ->setRowAction('showVariant', 'palette-Cyan zmdi-eye', 'Show variant')
+            ->setRowAction('editVariant', 'palette-Cyan zmdi-edit', 'Edit variant')
+            ->setTableSetting('actionButtons', Json::encode([
+                ['url' => $this->link('ListVariant:new', $this->getParameter('id')), 'text' => 'New variant'],
+            ]))
             ->setTableSetting('add-params', Json::encode(['listId' => $this->getParameter('id')]))
             ->setTableSetting('order', Json::encode([[2, 'DESC']]));
 
@@ -384,6 +392,10 @@ final class ListPresenter extends BasePresenter
         /** @var ActiveRow $variant */
         foreach ($variants as $variant) {
             $result['data'][] = [
+                'actions' => [
+                    'showVariant' => $this->link('ListVariant:show', $variant->id),
+                    'editVariant' => $this->link('ListVariant:edit', $variant->id),
+                ],
                 $variant->title,
                 $variant->code,
                 $variant->count,
@@ -500,6 +512,35 @@ final class ListPresenter extends BasePresenter
             $this->template->clickRateDataSet = $data['clickRateDataSet'];
             $this->template->unsubscibedDataSet = $data['unsubscibedDataSet'];
         }
+    }
+
+    public function renderImport($id): void
+    {
+        $mailType = $this->listsRepository->find($id);
+        if (!$mailType) {
+            throw new BadRequestException("Mail type [{$id}] not found", IResponse::S404_NotFound);
+        }
+        if (!$mailType->is_external) {
+            throw new BadRequestException("Cannot import subscribers for non-external mail type", IResponse::S400_BadRequest);
+        }
+
+        $this->template->list = $mailType;
+    }
+
+    public function createComponentImportForm(): Form
+    {
+        $form = $this->listSubscribersImportFormFactory->create((int) $this->getParameter('id'));
+
+        $this->listSubscribersImportFormFactory->onImport = function ($mailType, int $importedCount) {
+            if ($importedCount > 0) {
+                $this->flashMessage("{$importedCount} email(s) were imported successfully.");
+            } else {
+                $this->flashMessage("No emails were imported.");
+            }
+            $this->redirect('show', $mailType->id);
+        };
+
+        return $form;
     }
 
     public function emailsDetailData($id, $from, $to, $groupBy, $tz): array

@@ -1,0 +1,20 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Newsletter list variant</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2 n:block="title">Edit variant <small>{$variant->title}</small></h2>
+        <div class="actions">
+            <a n:href="show $variant->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-eye"></i> View</button>
+            </a>
+        </div>
+    </div>
+    <div class="card-body card-padding">
+        {include '@form.latte'}
+    </div>
+</div>

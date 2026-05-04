@@ -33,7 +33,7 @@ use Tracy\ILogger;
 class MailWorkerCommand extends Command
 {
     public const COMMAND_NAME = "worker:mail";
-    
+
     private $isFirstLine = true;
     private $smtpErrors = 0;
 

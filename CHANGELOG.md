@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - **IMPORTANT**: Changed column `user_id` to nullable in `mail_user_subscriptions` table (migration included).
     - This migration is non-blocking but it may take some time - e.g locally, 30M entries takes about 5 minutes.
+- **BREAKING**: Added new required env variable `APP_URL` — base URL of the Mailer admin. remp/remp#1516
+  - Make sure this variable is set, it's required for native unsubscribe links. 
 - **BREAKING**: Added support for "external" mail types — newsletters that can be sent to subscribers without user account in CRM. remp/remp#1516
     - Added `is_external` boolean column to `mail_types` table (migration included).
     - External mail types skip segment selection when creating/editing mail jobs — recipients are resolved directly from subscriptions.
@@ -40,6 +42,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - The foreign key from `mail_user_preferences.code` requires the referenced column to have a unique index.
 - Added a priority parameter to the content generator replacers register method to ensure the replacers are applied in the correct order. remp/remp#1450
 - Added AnchorWirelinkReplace content generator replacer to support deeplinking in emails. remp/remp#1450
+- Added admin UI for managing mail type variants (`ListVariantPresenter`) — list, create, edit, show, and soft-delete variants from the newsletter list detail page. remp/remp#1516
+- Added ability to mark a mail type as multi-variant from the newsletter list form (`is_multi_variant` checkbox). remp/remp#1516
+- Added `SubscribersImporter` model for bulk-subscribing emails to a mail type, with optional pruning of subscribers missing from the imported list. remp/remp#1516
+- Added "Import subscribers" admin flow for external mail types (`ListSubscribersImportFormFactory`) — supports selecting target variants, forcing no-variant subscription, and removing missing subscribers. remp/remp#1516
+- Added "Import subscribers" admin flow per variant (`VariantSubscribersImportFormFactory`) for external mail types. remp/remp#1516
+- Added `MailSettingsPresenter` with public `unSubscribeEmail`, `unSubscribeSuccess`, and `tokenExpired` routes — native Mailer-side unsubscribe pages that don't require a CRM round-trip. remp/remp#1516
+- Added `mailer_unsubscribe` template variable available in all emails when an autologin token is present, linking to the new native (directly in Mailer) unsubscribe page. remp/remp#1516
+- Added `actionButtons` table setting to the shared `DataTable` component — renders custom action buttons (URL + label) in the data table toolbar. remp/remp#1516
+- Fixed autologin token handling in the unsubscribe flow. remp/remp#1516
+- Fixed `ListVariantsRepository` to order variants by count correctly. remp/remp#1516
 - Fixed `RulesTrait` not formatting `[caption]` tags in generator with its designated template but rather with `$imageTemplate`. remp/euobserver#181
 
 ## Archive

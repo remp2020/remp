@@ -41,10 +41,18 @@ class IsSubscribedHandler extends BaseHandler
         }
 
         $mailType = $this->listsRepository->find($payload['list_id']);
+        if (!$mailType) {
+            return new JsonApiResponse(404, [
+                'status' => 'error',
+                'message' => 'Mail type not found.',
+                'code' => 'mail_type_not_found',
+            ]);
+        }
         if (!$mailType->is_external && !isset($payload['user_id'])) {
             return new JsonApiResponse(400, [
                 'status' => 'error',
                 'message' => 'For given non-external mail type, user_id parameter is required.',
+                'code' => 'required_user_id',
             ]);
         }
 

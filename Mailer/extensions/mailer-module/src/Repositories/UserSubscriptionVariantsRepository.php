@@ -136,6 +136,27 @@ class UserSubscriptionVariantsRepository extends Repository
             ->order('count DESC');
     }
 
+    public function tableFilter(string $query, string $order, string $orderDirection, int $variantId, ?int $limit = null, ?int $offset = null): Selection
+    {
+        $selection = $this->getTable()
+            ->select('mail_user_subscription_variants.*, mail_user_subscription.user_email')
+            ->where([
+                'mail_type_variant_id' => $variantId,
+                'mail_user_subscription.subscribed' => true,
+            ])
+            ->order($order . ' ' . strtoupper($orderDirection));
+
+        if (!empty($query)) {
+            $selection->where('mail_user_subscription.user_email LIKE ?', $query . '%');
+        }
+
+        if ($limit !== null) {
+            $selection->limit($limit, $offset);
+        }
+
+        return $selection;
+    }
+
     public function delete(ActiveRow &$row): bool
     {
         if ($this->newTableDataMigrationIsRunning()) {

@@ -1,0 +1,72 @@
+{layout '../@layout.latte'}
+
+{block #content}
+
+<div class="c-header">
+    <h2>Newsletter list</h2>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h2 n:block="title">Import subscribers <small>{$list->title}</small></h2>
+        <div class="actions">
+            <a n:href="show $list->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-long-arrow-return"></i> Back to list</button>
+            </a>
+        </div>
+    </div>
+    <div class="card-body card-padding">
+        {form importForm}
+            <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger m-b-30" role="alert">
+                {$error}<br>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div n:if="isset($form['variant_ids'])" id="variant-ids-wrapper" class="form-group m-b-30">
+                        {label variant_ids /}
+                        {input variant_ids, class => 'selectpicker', data-live-search => 'true', data-live-search-normalize => 'true', multiple => $form['variant_ids']->getOption('multiple')}
+                        <small class="help-block">{$form['variant_ids']->getOption('description')}</small>
+                    </div>
+
+                    <div n:if="isset($form['force_no_variant_subscription'])" class="form-group m-b-30">
+                        <div class="toggle-switch" data-ts-color="cyan">
+                            {label force_no_variant_subscription:, class => 'ts-label' /}
+                            {input force_no_variant_subscription:, hidden => 'hidden'}
+                            <label for="{$form['force_no_variant_subscription']->htmlId}" class="ts-helper"></label>
+                            <small class="help-block">
+                                When enabled, subscribers will not be added to any variant.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="alert bg palette-Grey-200 m-b-30">
+                        Add emails to import as subscribers to this mail list. One email per line.
+                        <br /><br />
+                        If user unsubscribed from the mail type in the past, he/she won't be subscribed again.
+                    </div>
+
+                    <div class="form-group m-b-30">
+                        {label emails /}
+                        {input emails, class => 'form-control', rows => 15}
+                    </div>
+
+                    <div class="form-group m-b-30">
+                        <div class="toggle-switch" data-ts-color="cyan">
+                            {label remove_not_present:, class => 'ts-label' /}
+                            {input remove_not_present:, hidden => 'hidden'}
+                            <label for="{$form['remove_not_present']->htmlId}" class="ts-helper"></label>
+                            <small class="help-block">
+                                    Remove existing newsletter list subscribers not present in the list of emails.
+                            </small>
+
+                        </div>
+                    </div>
+
+                    <div class="fg-line">
+                        {input send, class => 'btn btn-info waves-effect'}
+                    </div>
+                </div>
+            </div>
+        {/form}
+    </div>
+</div>

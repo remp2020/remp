@@ -229,6 +229,25 @@
             }
         });
 
+        {if isset($tableSettings['actionButtons']) && !empty($tableSettings['actionButtons'])}
+        new $.fn.dataTable.Buttons(dataTable, {
+            buttons: [
+                {foreach json_decode($tableSettings['actionButtons']) as $actionButton}
+                {
+                    text: {$actionButton->text},
+                    className: 'btn palette-Cyan bg',
+                    action: function () {
+                        window.location.href = {$actionButton->url};
+                    }
+                },
+                {/foreach}
+            ]
+        });
+
+        dataTable.buttons().container()
+                .appendTo( $('#dt-buttons-' + {$tableId}) );
+        {/if}
+
         {if isset($tableSettings['exportColumns']) && !empty($tableSettings['exportColumns'])}
         new $.fn.dataTable.Buttons(dataTable, {
             buttons: [ {

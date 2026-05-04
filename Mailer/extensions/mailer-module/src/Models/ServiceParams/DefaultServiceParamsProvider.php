@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Models\ServiceParams;
 
+use Nette\Application\LinkGenerator;
 use Nette\Caching\Cache;
 use Nette\Caching\Storage;
 use Nette\Utils\Json;
@@ -15,14 +16,18 @@ class DefaultServiceParamsProvider implements ServiceParamsProviderInterface
     private const NO_ASSIGNED_VARIANT_DATA = '__NO_ASSIGNED_VARIANT_DATA__';
 
     public function __construct(
+        private string $mailerBaseUrl,
         private BatchesRepository $batchesRepository,
-        private Storage $cacheStorage
+        private Storage $cacheStorage,
+        private LinkGenerator $linkGenerator,
     ) {
+        $this->linkGenerator = $this->linkGenerator->withReferenceUrl($this->mailerBaseUrl);
     }
 
     public function provide($template, string $email, ?int $batchId = null, ?string $autoLogin = null): array
     {
         $variantCode = null;
+        $variantData = [];
         if ($batchId) {
             $variantData = $this->loadVariantData($batchId);
             if (isset($variantData['code'])) {
@@ -31,7 +36,24 @@ class DefaultServiceParamsProvider implements ServiceParamsProviderInterface
         }
 
         $params = [];
-        if (isset($_ENV['UNSUBSCRIBE_URL'])) {
+
+        if ($autoLogin) {
+            $autologinToken = str_replace("?token=", "", $autoLogin);
+            $mailerUnsubscribeParams = [
+                'token' => $autologinToken,
+                'listCode' => $template->mail_type->code,
+            ];
+            $params['mailer_unsubscribe'] = $this->linkGenerator->link('Mailer:MailSettings:unSubscribeEmail', $mailerUnsubscribeParams);
+            // TODO: add mailer_unsubscribe_variant ($mailerUnsubscribeParams['variantCode'] = $variantCode;)
+        }
+
+        if ($template->mail_type->is_external) {
+            // for external mail types, unsubscribe can be the same as mailer_unsubscribe,
+            // since users do not have CRM profile
+            if (isset($params['mailer_unsubscribe'])) {
+                $params['unsubscribe'] = $params['mailer_unsubscribe'];
+            }
+        } elseif (isset($_ENV['UNSUBSCRIBE_URL'])) {
             $unsubscribe = str_replace('%type%', $template->mail_type->code, $_ENV['UNSUBSCRIBE_URL']) . $autoLogin;
             if ($variantCode) {
                 $unsubscribe .= '&variantCode=' . $variantCode;

@@ -27,6 +27,9 @@
             <a n:href="edit $list->id">
                 <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Edit</button>
             </a>
+            <a n:if="$list->is_external" n:href="import $list->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-edit"></i> Import subscribers</button>
+            </a>
         </div>
     </div>
     <div class="card-body card-padding">
@@ -97,6 +100,7 @@
                     <li class="list-group-item"><strong>Welcome e-mail:</strong> {ifset $list->subscribe_mail_template} <a n:href="Template:Show $list->subscribe_mail_template_id">{$list->subscribe_mail_template->subject}</a>{else}No{/ifset}</li>
                     <li class="list-group-item"><strong>Goodbye e-mail:</strong> {ifset $list->unsubscribe_mail_template} <a n:href="Template:Show $list->unsubscribe_mail_template_id">{$list->unsubscribe_mail_template->subject}</a>{else}No{/ifset}</li>
                     <li class="list-group-item"><strong>External:</strong> {$list->is_external|yesNo}</li>
+                    <li class="list-group-item"><strong>Is multi-variant:</strong> {$list->is_multi_variant|yesNo}</li>
                 </ul>
             </div>
         </div>
@@ -147,8 +151,6 @@
     </div>
 </div>
 
-{var $hasVariantsTab = $list->related('mail_type_variants')->where('deleted_at', null)->count('*')}
-
 <div class="row">
     <div class="col-md-12">
         <div role="tabpanel">
@@ -156,7 +158,7 @@
                 <li class="active"><a href="#templates" aria-controls="templates" role="tab" data-toggle="tab" aria-expanded="true">
                     <i class="zmdi zmdi-email"></i> Emails
                 </a></li>
-                <li n:if="$hasVariantsTab"><a href="#variants" aria-controls="variants" role="tab" data-toggle="tab">
+                <li><a href="#variants" aria-controls="variants" role="tab" data-toggle="tab">
                     <i class="zmdi zmdi zmdi-arrow-split"></i> Variants
                 </a></li>
                 <li><a href="#subscribers" aria-controls="subscribers" role="tab" data-toggle="tab">
@@ -172,7 +174,7 @@
                         </div>
                     </div>
                 </div>
-                <div n:if="$hasVariantsTab" role="tabpanel" class="tab-pane" id="variants">
+                <div role="tabpanel" class="tab-pane" id="variants">
                     {control dataTableVariants}
                 </div>
                 <div role="tabpanel" class="tab-pane" id="subscribers">

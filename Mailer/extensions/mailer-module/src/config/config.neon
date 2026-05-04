@@ -163,7 +163,7 @@ services:
 		factory: Remp\MailerModule\Models\Auth\SsoTokenRepository
 
 	serviceParamsProvider:
-		factory: Remp\MailerModule\Models\ServiceParams\DefaultServiceParamsProvider
+		factory: Remp\MailerModule\Models\ServiceParams\DefaultServiceParamsProvider(@environmentConfig::get('APP_URL'))
 
 	# Beam
 	- Remp\MailerModule\Models\Beam\Client(%remp.beam.web_addr%, %remp.beam.token%)
@@ -323,6 +323,9 @@ services:
 	configFormFactory: Remp\MailerModule\Forms\ConfigFormFactory
 	listFormFactory: Remp\MailerModule\Forms\ListFormFactory
 	duplicateListFormFactory: Remp\MailerModule\Forms\DuplicateListFormFactory
+	listVariantFormFactory: Remp\MailerModule\Forms\ListVariantFormFactory
+	variantSubscribersImportFormFactory: Remp\MailerModule\Forms\VariantSubscribersImportFormFactory
+	listSubscribersImportFormFactory: Remp\MailerModule\Forms\ListSubscribersImportFormFactory
 	listCategoryFormFactory: Remp\MailerModule\Forms\ListCategoryFormFactory
 	layoutFormFactory: Remp\MailerModule\Forms\LayoutFormFactory
 	snippetFormFactory: Remp\MailerModule\Forms\SnippetFormFactory
@@ -350,3 +353,5 @@ services:
 	- Remp\MailerModule\Presenters\HealthPresenter(%tempDir%)
 
 	- Remp\MailerModule\Components\MailLinkStats\MailLinkStats
+
+	- Remp\MailerModule\Models\SubscribersImporter

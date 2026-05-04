@@ -1,0 +1,34 @@
+{form listVariantForm}
+    <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger m-b-30" role="alert">
+        {$error}<br>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input title, class => 'form-control fg-input'}
+                    {label title, class => 'fg-label' /}
+                </div>
+            </div>
+
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input code, class => 'form-control fg-input'}
+                    {label code, class => 'fg-label' /}
+                </div>
+            </div>
+
+            <div class="form-group fg-float m-b-30">
+                <div class="fg-line">
+                    {input sorting, class => 'form-control fg-input'}
+                    {label sorting, class => 'fg-label' /}
+                </div>
+            </div>
+
+            <div class="fg-line">
+                {input save, class => 'btn btn-info waves-effect'}
+            </div>
+        </div>
+    </div>
+{/form}
