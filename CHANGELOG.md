@@ -53,6 +53,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed autologin token handling in the unsubscribe flow. remp/remp#1516
 - Fixed `ListVariantsRepository` to order variants by count correctly. remp/remp#1516
 - Fixed `RulesTrait` not formatting `[caption]` tags in generator with its designated template but rather with `$imageTemplate`. remp/euobserver#181
+- Fixed broken start_date input in Generate emails form. remp/helpdesk#4600
 
 ## Archive
 

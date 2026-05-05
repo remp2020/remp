@@ -144,7 +144,7 @@ $(document).ready(function(){
         $('.fg-float .form-control').each(function(){
             var i = $(this).val();
 
-            if (!i.length == 0) {
+            if (i && i.length) {
                 $(this).closest('.fg-line').addClass('fg-toggled');
             }
 
