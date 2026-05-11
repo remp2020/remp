@@ -56,14 +56,16 @@ class MailgunEventHandler implements HandlerInterface
             return false;
         }
 
+        if ($log->$mailgunEvent === null) {
+            $column = $this->batchTemplatesRepository->mapEvent($mailgunEvent);
+            if (isset($column)) {
+                $this->batchTemplatesRepository->incrementColumn($column, $log->mail_template_id, $log->mail_job_batch_id);
+            }
+        }
+
         $this->logsRepository->update($log, [
             $mailgunEvent => $date,
         ]);
-
-        $column = $this->batchTemplatesRepository->mapEvent($mailgunEvent);
-        if (isset($column)) {
-            $this->batchTemplatesRepository->incrementColumn($column, $log->mail_template_id, $log->mail_job_batch_id);
-        }
 
         if ($payload['event'] === 'dropped') {
             $this->emitter->emit(new Message('email-dropped', ['email' => $log->email]), RedisDriver::PRIORITY_LOW);
