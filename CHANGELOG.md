@@ -56,6 +56,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed temporary duplication of Mailgun webhook events in the sending summary widget. remp/euobserver#162
     - Subsequent events coming from Mailgun weren't previously filtered and always incremented stat counters. Multiple opens/clicks in the email caused repeated incrementation of a metric.
     - The stats were always recalculated and corrected by `mail:job-stats` command, which should be run at least daily.
+- Added `--from` option to `mail:job-stats` command.
+    - The parameter only evaluates batches which report activity in their mail logs within the selected time range. If not used, all batches are aggregated.
 
 ## Archive
 

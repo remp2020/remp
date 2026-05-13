@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
-use Remp\MailerModule\Repositories\ActiveRow;
+use Nette\Utils\DateTime;
 use Remp\MailerModule\Repositories\BatchTemplatesRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Symfony\Component\Console\Command\Command;
@@ -36,12 +36,28 @@ class ProcessJobStatsCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Gets batch template stats only for column converted'
+            )
+            ->addOption(
+                'from',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Only process batches with mail log activity after selected date',
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $onlyConverted = (bool) $input->getOption('only-converted');
+
+        $from = null;
+        try {
+            if ($input->getOption('from')) {
+                $from = DateTime::from($input->getOption('from'));
+            }
+        } catch (\Exception $e) {
+            $output->writeln("<error>Invalid value for --from option: {$e->getMessage()}</error>");
+            return self::FAILURE;
+        }
 
         $output->writeln('');
         $output->writeln('<info>***** UPDATE EMAIL JOB STATS *****</info>');
@@ -53,25 +69,47 @@ class ProcessJobStatsCommand extends Command
         $output->writeln('<info>Column converted updated.</info>');
 
         if (!$onlyConverted) {
-            $batchTemplatesCount = $this->batchTemplatesRepository->getTable()->count('*');
+            if ($input->getOption('from')) {
+                $output->writeln("<info>Looking for batches with activity after {$from->format(DATE_RFC3339)}.</info>");
+
+                $batchIds = $this->logsRepository->getTable()
+                    ->select('mail_job_batch_id')
+                    ->where('updated_at >= ?', $from)
+                    ->where('mail_job_batch_id IS NOT NULL')
+                    ->group('mail_job_batch_id')
+                    ->fetchPairs('mail_job_batch_id', 'mail_job_batch_id');
+
+                if (empty($batchIds)) {
+                    $output->writeln('<info>Nothing to do, exiting.</info>');
+                    return Command::SUCCESS;
+                }
+
+                $batchTemplatesQuery = $this->batchTemplatesRepository->findByBatchIds($batchIds);
+            } else {
+                $batchTemplatesQuery = $this->batchTemplatesRepository->getTable();
+            }
+
+            $batchTemplatesCount = (clone $batchTemplatesQuery)->count('*');
             if ($batchTemplatesCount === 0) {
                 $output->writeln('<info>Nothing to do, exiting.</info>');
-                return 0;
+                return Command::SUCCESS;
             }
 
             ProgressBar::setFormatDefinition(
                 'processStats',
                 "%processing% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%"
             );
+
             $progressBar = new ProgressBar($output, $batchTemplatesCount);
             $progressBar->setFormat('processStats');
             $progressBar->start();
 
-            $page = 1;
-            do {
-                $batchTemplates = $this->batchTemplatesRepository->getTable()->page($page, 1000)->fetchAll();
-                /** @var ActiveRow $batchTemplate */
+            $batchTemplatesQuery->limit(1000)->order('id ASC');
+            $lastId = 0;
+
+            while ($batchTemplates = (clone $batchTemplatesQuery)->where('id > ?', $lastId)->fetchAll()) {
                 foreach ($batchTemplates as $batchTemplate) {
+                    $lastId = $batchTemplate->id;
                     $progressBar->setMessage('Processing jobBatchTemplate <info>' . $batchTemplate->id . '</info>', 'processing');
                     $stats = $this->logsRepository->getBatchTemplateStats($batchTemplate);
 
@@ -85,8 +123,7 @@ class ProcessJobStatsCommand extends Command
                     ]);
                     $progressBar->advance();
                 }
-                $page++;
-            } while (!empty($batchTemplates));
+            }
 
             $progressBar->setMessage('done');
             $progressBar->finish();
