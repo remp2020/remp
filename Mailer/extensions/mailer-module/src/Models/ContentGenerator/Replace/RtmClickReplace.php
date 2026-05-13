@@ -36,19 +36,20 @@ abstract class RtmClickReplace implements IReplace
 
     public function setRtmClickHashInUrl(string $url, string $hash): string
     {
+        // Strip fragment so rtm_click lands in the query, not buried inside it.
+        [$url, $fragment] = self::splitFragment($url);
         $url = self::removeRtmClickHash($url);
+
         $hashQueryParam = self::HASH_PARAM . '=' . $hash;
+        $separator = str_contains($url, '?') ? '&' : '?';
 
-        // url already has query params
-        if (isset(explode('?', $url)[1])) {
-            return "{$url}&{$hashQueryParam}";
-        }
-
-        return "{$url}?{$hashQueryParam}";
+        return $url . $separator . $hashQueryParam . $fragment;
     }
 
     public static function getRtmClickHashFromUrl(string $url): ?string
     {
+        [$url] = self::splitFragment($url);
+
         $matches = [];
         // Extracts RTM click hash value from URL query params
         preg_match('/^[^?]*\??.*[?&]' . self::HASH_PARAM . '=([^?&\s]*).*$/m', $url, $matches);
@@ -58,6 +59,9 @@ abstract class RtmClickReplace implements IReplace
 
     public static function removeRtmClickHash(string $url): string
     {
+        // Strip fragment so '?' characters inside the fragment aren't mistaken for query separators.
+        [$url, $fragment] = self::splitFragment($url);
+
         $matches = [];
         // Split URL between path and params (before and after '?')
         preg_match('/^([^?]*)\??(.*)$/', $url, $matches);
@@ -81,9 +85,20 @@ abstract class RtmClickReplace implements IReplace
         }
 
         if (empty($finalParams)) {
-            return $path;
+            return $path . $fragment;
         }
 
-        return $path . '?' . implode('&', $finalParams);
+        return $path . '?' . implode('&', $finalParams) . $fragment;
+    }
+
+    /** @return array{0: string, 1: string} */
+    private static function splitFragment(string $url): array
+    {
+        $fragmentPos = strpos($url, '#');
+        if ($fragmentPos === false) {
+            return [$url, ''];
+        }
+
+        return [substr($url, 0, $fragmentPos), substr($url, $fragmentPos)];
     }
 }

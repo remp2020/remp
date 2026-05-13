@@ -78,7 +78,7 @@ class MailLinkStats extends Control
         $parsedLinks = $this->extractUrlContent($mailContent->html());
         $dbLinks = $this->mailTemplateLinksRepository->getLinksForTemplate($template);
 
-        $mailLinks = array_replace_recursive($dbLinks, $parsedLinks);
+        $mailLinks = array_replace_recursive($parsedLinks, $dbLinks);
         $linksCount = count($mailLinks);
 
         $resultData = [];

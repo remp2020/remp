@@ -58,6 +58,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - The stats were always recalculated and corrected by `mail:job-stats` command, which should be run at least daily.
 - Added `--from` option to `mail:job-stats` command.
     - The parameter only evaluates batches which report activity in their mail logs within the selected time range. If not used, all batches are aggregated.
+- Fixed `AnchorWirelinkReplace` to expose `rtm_click` on the outer Wirelink URL so the Mailgun click webhook can increment `mail_template_links.click_count`. remp/helpdesk#4617
+  - Fixed `RtmClickReplace::setRtmClickHashInUrl`, `removeRtmClickHash`, and `getRtmClickHashFromUrl` to handle URL fragments; previously any anchor href containing `#` had `rtm_click` appended inside the fragment, causing the Mailgun click webhook to silently ignore those events.
 
 ## Archive
 

@@ -3,15 +3,16 @@ declare(strict_types=1);
 
 namespace Tests\Unit\ContentGenerator\Replace;
 
+use Nette\Http\Url;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Remp\Mailer\Models\ContentGenerator\AnchorWirelinkReplace;
-use Remp\MailerModule\Models\ContentGenerator\AllowedDomainManager;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInput;
+use Remp\MailerModule\Models\ContentGenerator\Replace\RtmClickReplace;
 
 class AnchorWirelinkReplaceTest extends TestCase
 {
-    private const WIRELINK_HOST = 'https://wirelink.example.com';
+    private const WIRELINK_HOST = 'https://wirelink.dennikn.sk';
 
     private AnchorWirelinkReplace $wirelinkReplace;
     private GeneratorInput $generatorInput;
@@ -86,5 +87,22 @@ class AnchorWirelinkReplaceTest extends TestCase
 
         $input = '<a href="https://dennikn.sk/article">';
         $this->assertEquals($input, $replacer->replace($input, $this->generatorInput));
+    }
+
+    public function testLiftsRtmClickToOuterWirelinkUrl(): void
+    {
+        $hash = 'abc123';
+        $input = '<a href="https://dennikn.sk/article?foo=bar&rtm_click=' . $hash . '">Read</a>';
+
+        $result = $this->wirelinkReplace->replace($input, $this->generatorInput);
+
+        $matches = [];
+        $this->assertSame(1, preg_match('/href="([^"]+)"/', $result, $matches));
+
+        $wirelinkUrl = new Url($matches[1]);
+
+        $this->assertSame('wirelink.dennikn.sk', $wirelinkUrl->getHost());
+        $this->assertSame($hash, $wirelinkUrl->getQueryParameter(RtmClickReplace::HASH_PARAM));
+        $this->assertSame('/r/https%3A%2F%2Fdennikn.sk%2Farticle%3Ffoo%3Dbar', $wirelinkUrl->getPath());
     }
 }
