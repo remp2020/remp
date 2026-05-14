@@ -6,7 +6,9 @@ require (
 	cloud.google.com/go/pubsub v1.43.0
 	github.com/Shopify/sarama v1.23.0
 	github.com/avct/uasurfer v0.0.0-20180817072212-dc0ec4fd1e87
+	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/goadesign/goa v2.2.5+incompatible
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/imdario/mergo v0.3.11
@@ -14,7 +16,6 @@ require (
 	github.com/jmoiron/sqlx v0.0.0-20170430194603-d9bd385d68c0
 	github.com/joho/godotenv v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/olivere/elastic/v7 v7.0.14
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	goa.design/goa/v3 v3.25.3
@@ -34,6 +35,7 @@ require (
 	github.com/eapache/go-resiliency v1.1.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.7.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-chi/chi/v5 v5.2.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
@@ -47,9 +49,7 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/go-uuid v1.0.1 // indirect
 	github.com/jcmturner/gofork v1.0.0 // indirect
-	github.com/josharian/intern v1.0.0 // indirect
 	github.com/lib/pq v1.3.0 // indirect
-	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/pierrec/lz4 v2.0.5+incompatible // indirect
@@ -86,5 +86,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/olivere/elastic/v7 => github.com/rootpd/elastic/v7 v7.0.0-20240911082621-bad91d4bff6b

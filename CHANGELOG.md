@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Removed reference to `vuefilters` from the shared `remp/js-commons`, they weren't activelly used anywhere.
+- [Segments] Migrated Elasticsearch client from `olivere/elastic/v7` to `go-elasticsearch/v8` TypedAPI . `olivere/elastic/v7` dependency removed. remp/remp#1436
+    - **Removed:** `olivere/elastic/v7` library and all implementations based on it (`ElasticDB`, `EventElastic`, `PageviewElastic`, `CommerceElastic`, `ConcurrentElastic`).
+    - **Removed:** Scroll API usage — replaced by `search_after` + Point-In-Time (PIT) for all paginated listing operations. PIT opens a frozen index snapshot for the duration of pagination, eliminating duplicate/missing documents caused by concurrent writes. Scroll API keeps all search context in JVM heap; PIT does not.
 
 ### [Campaign]
 

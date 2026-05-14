@@ -8,8 +8,10 @@ import (
 	"beam/cmd/segments/gen/pageviews"
 	"beam/cmd/segments/gen/segments"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -17,11 +19,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/olivere/elastic/v7"
 	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
@@ -76,7 +78,7 @@ func main() {
 	var commerceStorage model.CommerceStorage
 	var concurrentsStorage model.ConcurrentsStorage
 
-	eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initElasticEventStorages(ctx, c, logger)
+	eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initGoElasticsearchStorages(ctx, c, logger)
 	if err != nil {
 		logger.Fatalln(err)
 	}
@@ -208,39 +210,39 @@ func main() {
 	logger.Println("bye bye")
 }
 
-func initElasticEventStorages(ctx context.Context, c Config, mainLog *log.Logger) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {
-	elasticAddrs := strings.Split(c.ElasticAddrs, ",")
-	eopts := []elastic.ClientOptionFunc{
-		elastic.SetBasicAuth(c.ElasticUser, c.ElasticPasswd),
-		elastic.SetURL(elasticAddrs...),
-		elastic.SetSniff(false),
-		elastic.SetHealthcheckInterval(10 * time.Second),
-		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
-	}
-	if c.Debug {
-		eopts = append(
-			eopts,
-			elastic.SetInfoLog(log.New(os.Stdout, "", log.LstdFlags)),
-			elastic.SetTraceLog(log.New(os.Stdout, "", log.LstdFlags)),
-		)
-	}
-	ec, err := elastic.NewClient(eopts...)
-	if err != nil {
-		return nil, nil, nil, nil, errors.Wrap(err, "unable to initialize elasticsearch client")
-	}
-	elasticDB := model.NewElasticDB(ctx, ec, c.IndexPrefix, c.Debug)
 
-	eventStorage := &model.EventElastic{
-		DB: elasticDB,
+func initGoElasticsearchStorages(ctx context.Context, c Config, logger *log.Logger) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {
+	elasticAddrs := strings.Split(c.ElasticAddrs, ",")
+
+	cfg := elasticsearch.Config{
+		Addresses: elasticAddrs,
+		Username:  c.ElasticUser,
+		Password:  c.ElasticPasswd,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
 	}
-	commerceStorage := &model.CommerceElastic{
-		DB: elasticDB,
+
+	ec, err := elasticsearch.NewClient(cfg)
+	if err != nil {
+		return nil, nil, nil, nil, errors.Wrap(err, "unable to initialize go-elasticsearch client")
 	}
-	pageviewStorage := &model.PageviewElastic{
-		DB: elasticDB,
+
+	esDB := model.NewElasticsearchDB(ctx, ec, c.IndexPrefix, c.Debug)
+
+	eventStorage := &model.EventElasticsearch{
+		DB: esDB,
 	}
-	concurrentsStorage := &model.ConcurrentElastic{
-		DB: elasticDB,
+	commerceStorage := &model.CommerceElasticsearch{
+		DB: esDB,
+	}
+	pageviewStorage := &model.PageviewElasticsearch{
+		DB: esDB,
+	}
+	concurrentsStorage := &model.ConcurrentElasticsearch{
+		DB: esDB,
 	}
 
 	// push explicit mapping to existing indices
@@ -258,21 +260,19 @@ func initElasticEventStorages(ctx context.Context, c Config, mainLog *log.Logger
 		index := row[0]
 		mapping := row[1]
 
-		exists, err := elasticDB.IndexOrAliasExists(ctx, index)
+		exists, err := esDB.IndexOrAliasExists(ctx, index)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
 
-		// Pushing mapping only to existing index. This might seem counter-intuitive, but we want to give
-		// init script (or people) space to setup the index correctly via Index Lifecycle Management (ILM).
-		// https://github.com/remp2020/remp/blob/master/Docker/elasticsearch/create-indexes.sh
 		if exists && mapping != "" {
-			err = elasticDB.PushMapping(ctx, index, mapping)
+			err = esDB.PushMapping(ctx, index, mapping)
 			if err != nil {
 				return nil, nil, nil, nil, err
 			}
 		}
 	}
 
+	logger.Println("go-elasticsearch/v8 storages initialized successfully")
 	return eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, nil
 }
