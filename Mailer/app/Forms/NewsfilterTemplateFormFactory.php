@@ -157,10 +157,17 @@ class NewsfilterTemplateFormFactory
                 'mail_type_code' => 'napunk-newsfilter',
                 'from' => 'Napunk <napunk@napunk.sk>',
             ],
-            'vyvoj-bojov', 'dn3-vyvoj-bojov' => [
+            'vyvoj-bojov' => [
                 'name' => 'Vývoj bojov ' . date('j.n.Y'),
                 'code' => 'nwsf_vyvoj_bojov_' . date('dmY'),
                 'mail_type_code' => 'vyvoj-bojov',
+            ],
+            'dn3-vyvoj-bojov' => [
+                'name' => 'Vývoj bojov ' . date('j.n.Y'),
+                'code' => 'nwsf_vyvoj_bojov_' . date('dmY'),
+                'mail_type_code' => 'vyvoj-bojov',
+                'mail_layout_code' => 'dn3-default-wide',
+                'locked_mail_layout_code' => 'dn3-default-wide',
             ],
             'boxova-ulicka' => [
                 'name' => 'Boxová ulička ' . date('j.n.Y'),

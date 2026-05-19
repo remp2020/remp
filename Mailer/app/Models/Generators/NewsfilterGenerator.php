@@ -63,9 +63,15 @@ class NewsfilterGenerator implements IGenerator
 
         $generatorRules = [
             '/<h2.*?>.*?\*.*?<\/h2>/im' => '<div style="color:#181818;padding:0;line-height:1.3;font-weight:bold;text-align:center;margin:0 0 30px 0;font-size:24px;">*</div>',
+            '/<p.*?>(.*?)<\/p>/is' => "<p style=\"color:#181818;font-family:Georgia,sans-serif;font-weight:400;padding:0;text-align:left;font-size:18px;line-height:27px;margin: 16px 0 16px 0\">$1</p>",
             "/https:\/\/dennikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
         ];
         $rules = $this->getRules($generatorRules);
+
+        // prepend greybox before rules remove all DIVs.
+        $rules = array_merge([
+            '/<div class="t_greybox">(.*?)<\/div>/is' => $this->getGreyboxTemplate(),
+        ], $rules);
 
         foreach ($rules as $rule => $replace) {
             if (is_array($replace) || is_callable($replace)) {
@@ -85,7 +91,7 @@ class NewsfilterGenerator implements IGenerator
         $post = $this->helpers->wpParseArticleLinks($post, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction(), $errors);
         $lockedPost = $this->helpers->wpParseArticleLinks($lockedPost, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction(), $errors);
 
-        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:160%;margin: 16px 0 16px 0\">", [$post, $lockedPost]);
+        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:Georgia,sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:27px;margin: 16px 0 16px 0\">", [$post, $lockedPost]);
 
         $lockedPost = $this->n3ArticleLocker->injectLockedMessage($lockedPost);
 
@@ -259,6 +265,19 @@ class NewsfilterGenerator implements IGenerator
         $output->featured_image_title = $data->post_image->image_title ?? null;
 
         return $output;
+    }
+
+    private function getGreyboxTemplate(): string
+    {
+        return <<<HTML
+<table role="presentation" width="600" style="width: 100%; max-width: 600px; border-spacing:0; border-collapse:collapse; vertical-align:top; background-color:#F2EAE8; padding:0; text-align:left; margin:0;">
+    <tbody>
+        <tr>
+            <td style="padding: 30px 24px;">$1</td>
+        </tr>
+    </tbody>
+</table>
+HTML;
     }
 
     public function getTemplates(): array

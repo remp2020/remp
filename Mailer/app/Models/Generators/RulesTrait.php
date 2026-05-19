@@ -6,7 +6,7 @@ trait RulesTrait
 {
     protected function getLinksColor(): string
     {
-        return '#1F3F83';
+        return '#AE0D21';
     }
 
     public function getRules($generatorRules = [])
@@ -70,7 +70,7 @@ trait RulesTrait
             '/<\/ol>/is' => '</tbody></table>' . PHP_EOL,
 
             // replace li
-            '/<li.*?>(?:<p.*?>)?(.*?)(?:<\/p>)?<\/li>/is' => $liTemplate,
+            '/<li[^>]*>(?:<p.*?>)?(.*?)(?:<\/p>)?<\/li>/is' => $liTemplate,
 
             // hr
             '/(<hr>|<hr \/>)/is' => $hrTemplate,
