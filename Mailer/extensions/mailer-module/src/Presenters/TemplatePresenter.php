@@ -20,10 +20,10 @@ use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Components\SendingStats\ISendingStatsFactory;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
+use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Forms\TemplateFormFactory;
 use Remp\MailerModule\Forms\TemplateTestFormFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
-use Remp\MailerModule\Repositories\LayoutTranslationsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\SnippetsRepository;
@@ -44,11 +44,11 @@ final class TemplatePresenter extends BasePresenter
         private DataTableFactory $dataTableFactory,
         private ISendingStatsFactory $sendingStatsFactory,
         private GeneratorInputFactory $generatorInputFactory,
-        private LayoutTranslationsRepository $layoutTranslationsRepository,
         private TemplateTranslationsRepository $templateTranslationsRepository,
         private MailLinkStats $mailLinkStats,
         private Config $config,
         private EditorConfig $editorConfig,
+        private EngineFactory $engineFactory,
     ) {
         parent::__construct();
     }
@@ -261,11 +261,9 @@ final class TemplatePresenter extends BasePresenter
 
     public function renderNew(): void
     {
-        $layouts = $this->layoutsRepository->all()->fetchPairs('id', 'layout_html');
         $snippets = $this->snippetsRepository->getTable()->select('code')->group('code')->fetchAssoc('code');
         $lists = $this->listsRepository->all()->fetchAssoc('id');
 
-        $this->template->layouts = $layouts;
         $this->template->snippets = $snippets;
         $this->template->lists = $lists;
         $this->template->templateEditor = $this->editorConfig->getTemplateEditor();
@@ -278,22 +276,10 @@ final class TemplatePresenter extends BasePresenter
         if (!$template) {
             throw new BadRequestException();
         }
-        $layouts = $this->layoutsRepository->all()->fetchAssoc('id');
-        if ($editedLocale && $editedLocale !== $this->localizationConfig->getDefaultLocale()) {
-            $layoutTranslations = $this->layoutTranslationsRepository->getTranslationsForLocale($editedLocale)
-                ->fetchAssoc('mail_layout_id');
-            foreach ($layouts as $layoutId => $layout) {
-                if (isset($layoutTranslations[$layoutId])) {
-                    $layouts[$layoutId] = $layoutTranslations[$layoutId];
-                }
-            }
-        }
-
         $snippets = $this->snippetsRepository->getTable()->select('code')->group('code')->fetchAssoc('code');
         $lists = $this->listsRepository->all()->fetchAssoc('id');
 
         $this->template->mailTemplate = $template;
-        $this->template->layouts = $layouts;
         $this->template->snippets = $snippets;
         $this->template->lists = $lists;
         $this->template->templateEditor = $this->editorConfig->getTemplateEditor();
@@ -315,6 +301,64 @@ final class TemplatePresenter extends BasePresenter
         } catch (Exception $exception) {
             $this->template->content = $exception->getMessage();
         }
+    }
+
+    public function actionRenderContentPreview(): void
+    {
+        if (!$this->isAjax()) {
+            throw new BadRequestException();
+        }
+
+        $httpRequest = $this->getHttpRequest();
+        $htmlContent = $httpRequest->getPost('htmlContent') ?? '';
+        $textContent = $httpRequest->getPost('textContent') ?? '';
+        $layoutId = $httpRequest->getPost('mailLayoutId') ? (int) $httpRequest->getPost('mailLayoutId') : null;
+        $mailTypeId = $httpRequest->getPost('mailTypeId') ? (int) $httpRequest->getPost('mailTypeId') : null;
+
+        $snippetSelection = $this->snippetsRepository->getSnippetsForMailType($mailTypeId);
+
+        $htmlSnippets = [];
+        $textSnippets = [];
+        foreach ($snippetSelection->fetchAll() as $row) {
+            $htmlSnippets[$row->code] = $row->html;
+            $textSnippets[$row->code] = $row->text;
+        }
+
+        $engine = $this->engineFactory->engine();
+        $layout = $layoutId ? $this->layoutsRepository->find($layoutId) : null;
+        $result = [];
+
+        try {
+            $renderedHtml = $engine->render($htmlContent, ['snippets' => $htmlSnippets]);
+            if ($layout && $layout->layout_html) {
+                $renderedHtml = $engine->render($layout->layout_html, [
+                    'snippets' => $htmlSnippets,
+                    'content' => $renderedHtml,
+                    'title' => '',
+                ]);
+            }
+            $result['html'] = $renderedHtml;
+        } catch (Exception $e) {
+            $result['html'] = $htmlContent;
+        }
+
+        try {
+            if ($textContent) {
+                $renderedText = $engine->render($textContent, ['snippets' => $textSnippets]);
+                if ($layout && $layout->layout_text) {
+                    $renderedText = $engine->render($layout->layout_text, [
+                        'snippets' => $textSnippets,
+                        'content' => $renderedText,
+                        'title' => '',
+                    ]);
+                }
+                $result['text'] = $renderedText;
+            }
+        } catch (Exception $e) {
+            $result['text'] = $textContent;
+        }
+
+        $this->sendJson($result);
     }
 
     public function handleDuplicate($id): void

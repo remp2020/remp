@@ -90,31 +90,35 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
         editorChoice: () => {
             return $('.js-editor-choice:checked').val();
         },
-        previewInit: (element, mailLayoutSelect, layoutsHtmlTemplates, initialHtmlContent, initialTextContent) => {
-            const getLayoutValue = () => mailLayoutSelect[mailLayoutSelect.selectedIndex].value;
-            const getLayoutTemplate = () => layoutsHtmlTemplates[getLayoutValue()];
+        previewInit: (element, mailLayoutSelect, mailTypeSelect, initialHtmlContent, initialTextContent) => {
+            const getLayoutValue = () => mailLayoutSelect.value;
+            const getMailTypeValue = () => mailTypeSelect.value;
             const app = createApp({
                 data() {
                     return {
                         htmlContent: initialHtmlContent,
                         textContent: initialTextContent,
-                        htmlLayout: getLayoutTemplate().layout_html,
-                        textLayout: getLayoutTemplate().layout_text,
+                        mailLayoutId: getLayoutValue(),
+                        mailTypeId: getMailTypeValue(),
                     }
                 },
                 render() {
                     return h(MailPreview, {
                         htmlContent: this.htmlContent,
                         textContent: this.textContent,
-                        htmlLayout: this.htmlLayout,
-                        textLayout: this.textLayout
+                        mailTypeId: this.mailTypeId,
+                        mailLayoutId: this.mailLayoutId,
                     });
                 },
             });
             const vm = app.mount(element);
-            mailLayoutSelect.addEventListener('change', function(e) {
-                vm.htmlLayout = getLayoutTemplate().layout_html;
-                vm.textLayout = getLayoutTemplate().layout_text;
+            mailLayoutSelect.addEventListener('change', function() {
+                vm.mailLayoutId = getLayoutValue();
+                $('body').trigger('preview:change');
+            });
+
+            mailTypeSelect.addEventListener('change', function () {
+                vm.mailTypeId = getMailTypeValue();
                 $('body').trigger('preview:change');
             });
 
@@ -161,7 +165,7 @@ CodeMirror.defineMode("htmltwig", function(config, parserConfig) {
             const vue = remplib.templateForm.previewInit(
                 '#js-mail-preview',
                 $('[name="mail_layout_id"]')[0],
-                $('.js-mail-layouts-templates').data('mail-layouts'),
+                $('[name="mail_type_id"]')[0],
                 $('.js-mail-body-html-input').val(),
                 $('.js-mail-body-text-input').val(),
             );

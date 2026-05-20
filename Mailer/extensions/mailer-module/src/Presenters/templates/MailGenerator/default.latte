@@ -29,10 +29,10 @@
                 <a href="#" data-t class="btn palette-Cyan bg waves-effect btn-sm" onclick="clipboard.copy($('#generatedhtmlcontent').text()); $.notify('Copied to clipboard', { allow_dismiss: false, delay:1000,type: 'inverse', placement : { from: 'bottom', align: 'right'}}); return false;"><i class="zmdi zmdi-copy"></i></a>
             </h4>
 
-            <div role="tabpanel">
+            <div role="tabpanel" id="html-tabpanel" data-preview-url="{plink Template:renderContentPreview}">
                 <ul class="tab-nav" role="tablist">
                     <li class="active"><a href="#html" aria-controls="html" role="tab" data-toggle="tab">Generated HTML</a></li>
-                    <li><a href="#html-preview" aria-controls="html-preview" role="tab" data-toggle="tab" onclick="$('#html-preview-frame').contents().find('html').html($('#generatedhtmlcontent').text());">Preview</a></li>
+                    <li><a href="#html-preview" aria-controls="html-preview" role="tab" data-toggle="tab" onclick="renderGeneratorPreview();">Preview</a></li>
                 </ul>
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="html">
@@ -43,6 +43,31 @@
                     </div>
                 </div>
             </div>
+            <script>
+                function renderGeneratorPreview() {
+                    var htmlContent = $('#generatedhtmlcontent').text();
+                    var previewUrl = $('#html-tabpanel').data('preview-url');
+
+                    $.ajax({
+                        url: previewUrl,
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        data: {
+                            htmlContent: htmlContent,
+                            mailLayoutId: '',
+                            mailTypeId: '',
+                        },
+                        success: function(data) {
+                            var frame = document.getElementById('html-preview-frame');
+                            frame.srcdoc = data.html || htmlContent;
+                        },
+                        error: function() {
+                            var frame = document.getElementById('html-preview-frame');
+                            frame.srcdoc = htmlContent;
+                        }
+                    });
+                }
+            </script>
 
         {/ifset}
 

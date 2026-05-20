@@ -30,7 +30,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **IMPORTANT**: Changed column `user_id` to nullable in `mail_user_subscriptions` table (migration included).
     - This migration is non-blocking but it may take some time - e.g locally, 30M entries takes about 5 minutes.
 - **BREAKING**: Added new required env variable `APP_URL` — base URL of the Mailer admin. remp/remp#1516
-  - Make sure this variable is set, it's required for native unsubscribe links. 
+  - Make sure this variable is set, it's required for native unsubscribe links.
 - **BREAKING**: Added support for "external" mail types — newsletters that can be sent to subscribers without user account in CRM. remp/remp#1516
     - Added `is_external` boolean column to `mail_types` table (migration included).
     - External mail types skip segment selection when creating/editing mail jobs — recipients are resolved directly from subscriptions.
@@ -63,6 +63,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - The parameter only evaluates batches which report activity in their mail logs within the selected time range. If not used, all batches are aggregated.
 - Fixed `AnchorWirelinkReplace` to expose `rtm_click` on the outer Wirelink URL so the Mailgun click webhook can increment `mail_template_links.click_count`. remp/helpdesk#4617
   - Fixed `RtmClickReplace::setRtmClickHashInUrl`, `removeRtmClickHash`, and `getRtmClickHashFromUrl` to handle URL fragments; previously any anchor href containing `#` had `rtm_click` appended inside the fragment, causing the Mailgun click webhook to silently ignore those events.
+- Added server-side Twig rendering for email preview. Preview now correctly renders snippets and layouts instead of stripping Twig syntax client-side. remp/remp#1434
+    - Added `Template:renderContentPreview` AJAX endpoint that renders HTML/text content via `TwigEngine` with correct snippets scoped to the mail type.
+    - `MailPreview` Vue component now fetches rendered preview from `previewUrl`.
 
 ## Archive
 
