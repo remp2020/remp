@@ -64,6 +64,7 @@ class NewsfilterGenerator implements IGenerator
         $generatorRules = [
             '/<h2.*?>.*?\*.*?<\/h2>/im' => '<div style="color:#181818;padding:0;line-height:1.3;font-weight:bold;text-align:center;margin:0 0 30px 0;font-size:24px;">*</div>',
             '/<p.*?>(.*?)<\/p>/is' => "<p style=\"color:#181818;font-family:Georgia,sans-serif;font-weight:400;padding:0;text-align:left;font-size:18px;line-height:27px;margin: 16px 0 16px 0\">$1</p>",
+            "/<blockquote.*?>(.*?)<\/blockquote>/is" => '<blockquote style="position: relative;padding: 16px;border-radius: 6px;font-style: normal; background: #F2EAE8; margin: 0 0 16px 0">$1</blockquote>',
             "/https:\/\/dennikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
         ];
         $rules = $this->getRules($generatorRules);
@@ -290,7 +291,7 @@ HTML;
 HTML;
 
         $captionWithLinkTemplate = <<< HTML
-    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:{$this->getLinksColor()};text-decoration:none;">
+    <a href="$1" style="color:#181818;font-family:'Georgia,sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:{$this->getLinksColor()};text-decoration:none;">
     <img src="$2" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;border:none;">
 </a>
     <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
@@ -301,14 +302,14 @@ HTML;
         $liTemplate = <<< HTML
     <tr style="padding:0;vertical-align:top;text-align:left;">
         <td class="bullet" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;width:30px;border-collapse:collapse !important;">&#8226;</td>
-        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;border-collapse:collapse !important;">
+        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;font-family:Georgia,sans-serif;border-collapse:collapse !important;">
             <p style="color:#181818;padding:0;margin:0 0 5px 0;font-size:18px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</p>
         </td>
     </tr>
 HTML;
 
         $hrTemplate = <<< HTML
-    <table cellspacing="0" cellpadding="0" border="0" width="100%" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:100%;min-width:100%;">
+    <table cellspacing="0" cellpadding="0" border="0" width="100%" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:Georgia,sans-serif;width:100%;min-width:100%;">
         <tr style="padding:0;vertical-align:top;text-align:left;width:100%;min-width:100%;">
             <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important; padding: 30px 0 0 0; border-top:1px solid #E2E2E2;height:0;line-height: 0;width:100%;min-width:100%;">&#xA0;</td>
         </tr>
@@ -317,7 +318,7 @@ HTML;
 HTML;
 
         $spacerTemplate = <<< HTML
-        <table class="spacer" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:100%;">
+        <table class="spacer" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:Georgia,sans-serif;width:100%;">
             <tbody>
                 <tr style="padding:0;vertical-align:top;text-align:left;">
                     <td height="20px" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;mso-line-height-rule:exactly;border-collapse:collapse !important;font-size:20px;line-height:20px;">&#xA0;</td>
