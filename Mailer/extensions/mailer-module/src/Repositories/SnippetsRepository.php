@@ -75,15 +75,18 @@ class SnippetsRepository extends Repository
         return $selection;
     }
 
-    public function getSnippetsForMailType($mailTypeId): Selection
+    public function getSnippetsForMailType(?int $mailTypeId = null): Selection
     {
-        $mailTypeSnippets = $this->getTable()->where('mail_type_id', $mailTypeId)->fetchPairs(null, 'code');
+        $mailTypeSpecificSnippets = [];
+        if (isset($mailTypeId)) {
+            $mailTypeSpecificSnippets = $this->getTable()->where('mail_type_id', $mailTypeId)->fetchPairs(null, 'code');
+        }
 
         $where = [];
-        if (empty($mailTypeSnippets)) {
+        if (empty($mailTypeSpecificSnippets)) {
             $where['mail_type_id'] = null;
         } else {
-            $where['(code IN (?) AND mail_type_id = ?) OR (code NOT IN (?) AND mail_type_id IS NULL)'] = [$mailTypeSnippets, $mailTypeId, $mailTypeSnippets];
+            $where['(code IN (?) AND mail_type_id = ?) OR (code NOT IN (?) AND mail_type_id IS NULL)'] = [$mailTypeSpecificSnippets, $mailTypeId, $mailTypeSpecificSnippets];
         }
 
         return $this->getTable()->where($where);
