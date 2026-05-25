@@ -196,27 +196,6 @@ class SubscribersImporterTest extends BaseFeatureTestCase
         $this->assertTrue($this->userSubscriptionsRepository->isEmailSubscribed('user2@example.com', $mailType->id));
     }
 
-    public function testImportWithoutVariantRemoveNotPresent(): void
-    {
-        $mailType = $this->createMailTypeWithCategory(
-            typeCode: 'external_no_variant_remove',
-            typeName: 'External No Variant Remove',
-            isExternal: true,
-        );
-
-        $this->importer->import($mailType, null, [
-            'keep@example.com',
-            'remove@example.com',
-        ], false);
-        $this->assertTrue($this->userSubscriptionsRepository->isEmailSubscribed('keep@example.com', $mailType->id));
-        $this->assertTrue($this->userSubscriptionsRepository->isEmailSubscribed('remove@example.com', $mailType->id));
-
-        $this->importer->import($mailType, null, ['keep@example.com'], true);
-
-        $this->assertTrue($this->userSubscriptionsRepository->isEmailSubscribed('keep@example.com', $mailType->id));
-        $this->assertFalse($this->userSubscriptionsRepository->isEmailSubscribed('remove@example.com', $mailType->id));
-    }
-
     public function testImportToMultipleVariants(): void
     {
         [$mailType, $variantA] = $this->createExternalMailTypeWithVariant(isMultiVariant: true);

@@ -38,7 +38,7 @@ class VariantSubscribersImportFormFactory
 
         $form->addHidden('variant_id', (string) $variantId);
 
-        $form->addCheckbox('remove_not_present', 'Remove missing')
+        $form->addCheckbox('remove_not_present', 'Remove missing email(s) from variant subscribers')
             ->setDefaultValue(true);
 
         $form->addTextArea('emails', 'Emails')

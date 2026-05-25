@@ -73,9 +73,6 @@ class ListSubscribersImportFormFactory
             }
         }
 
-        $form->addCheckbox('remove_not_present', 'Remove missing')
-            ->setDefaultValue(true);
-
         $form->addTextArea('emails', 'Emails')
             ->setRequired("Field 'Emails' is required.")
             ->setHtmlAttribute('placeholder', "For example: user@example.com\nOne email per line.");
@@ -124,7 +121,7 @@ class ListSubscribersImportFormFactory
             $mailType,
             $variants,
             $emails,
-            (bool) $values['remove_not_present'],
+            false,
             $forceNoVariant,
         );
 

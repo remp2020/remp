@@ -19,7 +19,7 @@ readonly class SubscribersImporter
         ActiveRow $mailType,
         ?array $variants,
         array $emails,
-        bool $removeNotPresent,
+        bool $removeFromUnselectedVariants = false,
         bool $forceNoVariant = false,
     ): int {
         $emails = array_map(static fn(string $line) => strtolower(trim($line)), $emails);
@@ -57,43 +57,27 @@ readonly class SubscribersImporter
             }
         }
 
-        if ($removeNotPresent) {
-            if (!empty($variants)) {
-                $variantIds = [];
-                foreach ($variants as $variant) {
-                    $variantIds[] = $variant->id;
-                }
+        if ($removeFromUnselectedVariants && !empty($variants)) {
+            $variantIds = [];
+            foreach ($variants as $variant) {
+                $variantIds[] = $variant->id;
+            }
 
-                $subscribersToRemove = $this->userSubscriptionVariantsRepository->getTable()
-                    ->select('mail_user_subscription_variants.*')
-                    ->where('mail_type_variant_id IN (?)', $variantIds)
-                    ->where('mail_user_subscription.subscribed', true);
-                if ($subscribedEmails) {
-                    $subscribersToRemove = $subscribersToRemove->where('mail_user_subscription.user_email NOT IN (?)', $subscribedEmails);
-                }
-                $subscribersToRemove = $subscribersToRemove->fetchAll();
+            $subscribersToRemove = $this->userSubscriptionVariantsRepository->getTable()
+                ->select('mail_user_subscription_variants.*')
+                ->where('mail_type_variant_id IN (?)', $variantIds)
+                ->where('mail_user_subscription.subscribed', true);
+            if ($subscribedEmails) {
+                $subscribersToRemove = $subscribersToRemove->where('mail_user_subscription.user_email NOT IN (?)', $subscribedEmails);
+            }
+            $subscribersToRemove = $subscribersToRemove->fetchAll();
 
-                foreach ($subscribersToRemove as $subscriber) {
-                    $this->userSubscriptionsRepository->unsubscribeUserVariant(
-                        userSubscription: $subscriber->mail_user_subscription,
-                        variant: $subscriber->mail_type_variant,
-                        keepMailTypeSubscription: true,
-                    );
-                }
-            } else {
-                $subscribersToRemove = $this->userSubscriptionsRepository->getTable()
-                    ->where([
-                        'mail_type_id' => $mailType->id,
-                        'subscribed' => true,
-                    ]);
-                if ($subscribedEmails) {
-                    $subscribersToRemove = $subscribersToRemove->where('user_email NOT IN (?)', $subscribedEmails);
-                }
-                $subscribersToRemove = $subscribersToRemove->fetchAll();
-
-                foreach ($subscribersToRemove as $subscriber) {
-                    $this->userSubscriptionsRepository->unsubscribeEmail($mailType, $subscriber->user_email);
-                }
+            foreach ($subscribersToRemove as $subscriber) {
+                $this->userSubscriptionsRepository->unsubscribeUserVariant(
+                    userSubscription: $subscriber->mail_user_subscription,
+                    variant: $subscriber->mail_type_variant,
+                    keepMailTypeSubscription: true,
+                );
             }
         }
 
