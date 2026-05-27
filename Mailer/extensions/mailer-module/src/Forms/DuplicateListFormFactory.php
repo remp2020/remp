@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Forms;
 use Exception;
 use InvalidArgumentException;
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\BaseControl;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Repositories\ListsRepository;
@@ -41,7 +42,7 @@ class DuplicateListFormFactory
 
         $form->addText('code', 'Code')
             ->setRequired("Field 'Code' is required.")
-            ->addRule(function ($input) {
+            ->addRule(function (BaseControl $input) {
                 $exists = $this->listsRepository->getTable()
                     ->where('code = ?', $input->value)
                     ->count('*');

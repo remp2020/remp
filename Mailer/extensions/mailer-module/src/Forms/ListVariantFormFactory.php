@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Forms;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Database\Table\ActiveRow;
+use Nette\Forms\Controls\BaseControl;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
 use Remp\MailerModule\Repositories\ListsRepository;
@@ -46,7 +47,7 @@ class ListVariantFormFactory implements IFormFactory
             ->setRequired("Field 'Code' is required.")
             ->setDisabled($variant !== null)
             ->addRule(Form::Pattern, "Field 'Code' can only contain letters, numbers, underscores, slashes and dots (no whitespace or diacritics).", '[A-Za-z0-9_\/.]+')
-            ->addRule(function ($input) {
+            ->addRule(function (BaseControl $input) {
                 $exists = $this->listVariantsRepository->getTable()
                     ->where('code = ?', $input->value)
                     ->count('*');

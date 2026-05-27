@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\BaseControl;
 use Nette\Forms\Controls\SubmitButton;
 use Nette\SmartObject;
 use Nette\Utils\ArrayHash;
@@ -58,7 +59,7 @@ class LayoutFormFactory implements IFormFactory
 
         $codeInput = $form->addText('code', 'Code')
             ->setRequired("Field 'Code' is required.")
-            ->addRule(function ($input) {
+            ->addRule(function (BaseControl $input) {
                 $exists = $this->layoutsRepository->getTable()
                     ->where('code = ?', $input->value)
                     ->count('*');

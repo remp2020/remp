@@ -354,7 +354,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $this->assertEquals(83, $this->jobQueueCount($batch, $template));
 
         $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
-        $this->assertEqualsCanonicalizing(array_map(fn($user) => $user['email'], $userList), $actualUsers);
+        $this->assertEqualsCanonicalizing(array_column($userList, 'email'), $actualUsers);
     }
 
     public function testFilteringAlreadyQueued()
@@ -410,7 +410,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $this->assertEquals(85, $this->jobQueueCount($batch, $template));
 
         $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
-        $this->assertEqualsCanonicalizing(array_map(fn($user) => $user['email'], $userList), $actualUsers);
+        $this->assertEqualsCanonicalizing(array_column($userList, 'email'), $actualUsers);
     }
 
     public function testFilteringAlreadySent()
@@ -462,7 +462,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $this->assertEquals(93, $this->jobQueueCount($batch, $template));
 
         $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
-        $this->assertEqualsCanonicalizing(array_map(fn($user) => $user['email'], $userList), $actualUsers);
+        $this->assertEqualsCanonicalizing(array_column($userList, 'email'), $actualUsers);
     }
 
     public function testFilteringStripEmails()
@@ -546,7 +546,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         $this->assertEquals(count($subscribedUsers1), $this->jobQueueCount($batch1, $template1));
 
         $actualUsers = $this->jobQueueRepository->getBatchEmails($batch1)->fetchPairs(null, 'email');
-        $this->assertEqualsCanonicalizing(array_map(fn($user) => $user['email'], $subscribedUsers1), $actualUsers);
+        $this->assertEqualsCanonicalizing(array_column($subscribedUsers1, 'email'), $actualUsers);
 
 
         ////////////
@@ -704,7 +704,7 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         // Only subscribed users should be in the queue
         $this->assertEquals(10, $this->jobQueueCount($batch, $template));
 
-        $expectedUsers = array_map(fn($user) => $user['email'], $subscribedUsers);
+        $expectedUsers = array_column($subscribedUsers, 'email');
         $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
         $this->assertEqualsCanonicalizing($expectedUsers, $actualUsers);
     }
@@ -759,20 +759,14 @@ class BatchEmailGeneratorTest extends BaseFeatureTestCase
         // Only subscribed users should be in the queue
         $this->assertEquals(5, $this->jobQueueCount($batch, $template));
 
-        $expectedUsers = array_map(fn($user) => $user['email'], $subscribedUsers);
+        $expectedUsers = array_column($subscribedUsers, 'email');
         $actualUsers = $this->jobQueueRepository->getBatchEmails($batch)->fetchPairs(null, 'email');
         $this->assertEqualsCanonicalizing($expectedUsers, $actualUsers);
     }
 
     private function getUserEmailsByIds($users, $ids): array
     {
-        return array_map(
-            static function ($user) {
-                return $user['email'];
-            },
-            array_filter($users, static function ($user) use ($ids) {
-                return in_array($user['id'], $ids, true);
-            })
-        );
+        $emailsById = array_column($users, 'email', 'id');
+        return array_values(array_intersect_key($emailsById, array_flip($ids)));
     }
 }

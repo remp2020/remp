@@ -97,7 +97,7 @@ class ListFormFactory
 
         $codeInput = $form->addText('code', 'Code')
             ->setRequired("Field 'Code' is required.")
-            ->addRule(function ($input) {
+            ->addRule(function (BaseControl $input) {
                 $exists = $this->listsRepository->getTable()
                     ->where('code = ?', $input->value)
                     ->count('*');
