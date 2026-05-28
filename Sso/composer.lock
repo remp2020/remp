@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "48efdb57ddcd8a634f763820bd1615bd",
+    "content-hash": "7c93f0f5c106b49216c1515129c695fa",
     "packages": [
         {
             "name": "ans-group/laravel-health-check",
@@ -7773,16 +7773,16 @@
         },
         {
             "name": "yajra/laravel-datatables-oracle",
-            "version": "v12.7.2",
+            "version": "v12.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yajra/laravel-datatables.git",
-                "reference": "af48ca6c9f05ee4b67353c630a8f2cae0f2a8a46"
+                "reference": "1e4251feeb21f17a817ae06ed29ec91338641868"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/af48ca6c9f05ee4b67353c630a8f2cae0f2a8a46",
-                "reference": "af48ca6c9f05ee4b67353c630a8f2cae0f2a8a46",
+                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/1e4251feeb21f17a817ae06ed29ec91338641868",
+                "reference": "1e4251feeb21f17a817ae06ed29ec91338641868",
                 "shasum": ""
             },
             "require": {
@@ -7850,7 +7850,7 @@
             ],
             "support": {
                 "issues": "https://github.com/yajra/laravel-datatables/issues",
-                "source": "https://github.com/yajra/laravel-datatables/tree/v12.7.2"
+                "source": "https://github.com/yajra/laravel-datatables/tree/v12.7.0"
             },
             "funding": [
                 {
@@ -7858,7 +7858,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-16T02:08:01+00:00"
+            "time": "2026-02-20T15:00:37+00:00"
         }
     ],
     "packages-dev": [

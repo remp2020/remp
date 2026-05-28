@@ -4390,7 +4390,7 @@
             "dist": {
                 "type": "path",
                 "url": "extensions/beam-module",
-                "reference": "5e2ead77ffc9a009c173bc0416cc2c592c603add"
+                "reference": "606deaea7e1fcdeb475141908207d6eb85bf9e40"
             },
             "require": {
                 "ans-group/laravel-health-check": "^2.0",
@@ -4419,7 +4419,7 @@
                 "symfony/yaml": "^7.2",
                 "tightenco/ziggy": "^2.5",
                 "yadakhov/insert-on-duplicate-key": "^1.2",
-                "yajra/laravel-datatables-oracle": "^12.0"
+                "yajra/laravel-datatables-oracle": "12.7.0"
             },
             "require-dev": {
                 "barryvdh/laravel-debugbar": "^4.0",
@@ -8113,16 +8113,16 @@
         },
         {
             "name": "yajra/laravel-datatables-oracle",
-            "version": "v12.7.2",
+            "version": "v12.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yajra/laravel-datatables.git",
-                "reference": "af48ca6c9f05ee4b67353c630a8f2cae0f2a8a46"
+                "reference": "1e4251feeb21f17a817ae06ed29ec91338641868"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/af48ca6c9f05ee4b67353c630a8f2cae0f2a8a46",
-                "reference": "af48ca6c9f05ee4b67353c630a8f2cae0f2a8a46",
+                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/1e4251feeb21f17a817ae06ed29ec91338641868",
+                "reference": "1e4251feeb21f17a817ae06ed29ec91338641868",
                 "shasum": ""
             },
             "require": {
@@ -8190,7 +8190,7 @@
             ],
             "support": {
                 "issues": "https://github.com/yajra/laravel-datatables/issues",
-                "source": "https://github.com/yajra/laravel-datatables/tree/v12.7.2"
+                "source": "https://github.com/yajra/laravel-datatables/tree/v12.7.0"
             },
             "funding": [
                 {
@@ -8198,7 +8198,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-16T02:08:01+00:00"
+            "time": "2026-02-20T15:00:37+00:00"
         }
     ],
     "packages-dev": [
