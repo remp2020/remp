@@ -349,6 +349,11 @@ class NewsfilterTemplateFormFactory
                 'mail_type_code' => 'valaszt-a-magyar',
                 'from' => 'Napunk <napunk@dennikn.sk>',
             ],
+            'poradna-byvanie-zahrada' => [
+                'name' => 'Poradňa o bývaní a záhrade ' . date('Y. n. j.'),
+                'code' => 'poradna_byvanie_zahrada_' . date('dmY'),
+                'mail_type_code' => 'poradna-byvanie-zahrada',
+            ],
             default => throw new \Exception("No default values found for source template code='{$sourceTemplate->code}'"),
         };
 
