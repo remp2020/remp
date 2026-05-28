@@ -123,7 +123,7 @@ class AuthorsDataTableTest extends TestCase
         $json->assertJsonPath('data.1.conversions_count', 4);
     }
 
-    private function request(string $contentType = null)
+    private function request(?string $contentType = null)
     {
         return $this->getJson(route('authors.dtAuthors', [
             'content_type' => $contentType,
