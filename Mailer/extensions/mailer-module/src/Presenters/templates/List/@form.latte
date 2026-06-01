@@ -204,11 +204,11 @@
 {define jsCallbackRenderSorting}
     <script>
         const $category = $('#' + {$control['listForm']['mail_type_category_id']->htmlId}),
-            $sorting = $('[name=' + {$control['listForm']['sorting']->name} + ']');
+            $sorting = $('[name=' + {$control['listForm']['sorting']->getName()} + ']');
 
         {if isset($list)}
-            const $templateSelect = $('[name=' + {$control['listForm']['preview_template']->name} + ']'),
-                $previewUrl = $('[name=' + {$control['listForm']['preview_url']->name} + ']');
+            const $templateSelect = $('[name=' + {$control['listForm']['preview_template']->getName()} + ']'),
+                $previewUrl = $('[name=' + {$control['listForm']['preview_url']->getName()} + ']');
 
             const setTemplatePreviewUrl = () => {
                 if ($templateSelect.val() !== '') {

@@ -76,7 +76,7 @@
 
 {define jsCallbackRenderSorting}
     <script>
-        var $sorting = $('[name={$control['mailSourceTemplateForm']['sorting']->name|noescape}]');
+        var $sorting = $('[name={$control['mailSourceTemplateForm']['sorting']->getName()|noescape}]');
 
         var renderSortingAction = function () {
             $.nette.ajax({
