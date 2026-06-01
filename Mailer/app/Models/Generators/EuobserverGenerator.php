@@ -5,6 +5,7 @@ namespace Remp\Mailer\Models\Generators;
 
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Json;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\EuobserverWidget\EuobserverWidget;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\IGenerator;
@@ -85,8 +86,8 @@ class EuobserverGenerator implements IGenerator
         return [
             (new PostInputParam('url'))->setRequired(),
             (new PostInputParam('subject'))->setRequired(),
-            (new PostInputParam('blocks_json'))->setRequired(),
-            (new PostInputParam('settings_json'))->setRequired(),
+            (new PostInputParam('blocks_json')),
+            (new PostInputParam('settings_json')),
             (new PostInputParam('from')),
         ];
     }
@@ -111,26 +112,27 @@ class EuobserverGenerator implements IGenerator
     {
         $output = new ArrayHash();
 
-        if (!isset($data->blocks)) {
-            throw new PreprocessException("WP json object does not contain required attribute 'blocks'");
+        if (!isset($data->blocks) && !isset($data->post_blocks)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'post_blocks'");
         }
 
         if (!isset($data->settings)) {
             throw new PreprocessException("WP json object does not contain required attribute 'settings'");
         }
 
-        if (!isset($data->subject)) {
-            throw new PreprocessException("WP json object does not contain required attribute 'subject'");
+        if (!isset($data->subject) && !isset($data->post_title)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'post_title'");
         }
 
-        if (!isset($data->url)) {
-            throw new PreprocessException("WP json object does not contain required attribute 'url'");
+        if (!isset($data->url) && !isset($data->post_url)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'post_url'");
         }
 
-        $output->blocks_json = $data->blocks;
-        $output->settings_json = $data->settings;
-        $output->subject = $data->subject;
-        $output->url = $data->url;
+        $output->blocks_json = $data->blocks
+            ?? (is_array($data->post_blocks) ? Json::encode($data->post_blocks) : $data->post_blocks);
+        $output->settings_json = is_object($data->settings) ? Json::encode($data->settings) : $data->settings;
+        $output->subject = $data->subject ?? $data->post_title;
+        $output->url = $data->url ?? $data->post_url;
 
         return $output;
     }
