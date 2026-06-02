@@ -128,9 +128,16 @@ class EuobserverGenerator implements IGenerator
             throw new PreprocessException("WP json object does not contain required attribute 'post_url'");
         }
 
-        $output->blocks_json = $data->blocks
-            ?? (is_array($data->post_blocks) ? Json::encode($data->post_blocks) : $data->post_blocks);
-        $output->settings_json = is_object($data->settings) ? Json::encode($data->settings) : $data->settings;
+        if (isset($data->blocks)) {
+            // wp-based frontend scenario
+            $output->blocks_json = $data->blocks;
+            $output->settings_json = $data->settings;
+        } else {
+            // hub-based backend scenario
+            $output->blocks_json = Json::encode($data->post_blocks);
+            $output->settings_json = Json::encode($data->settings);
+        }
+
         $output->subject = $data->subject ?? $data->post_title;
         $output->url = $data->url ?? $data->post_url;
 
