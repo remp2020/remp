@@ -14,10 +14,10 @@ class UuidIndices extends Migration
     public function up()
     {
         Schema::table('properties', function (Blueprint $table) {
-            $table->index(['uuid']);
+            $table->unique(['uuid']);
         });
         Schema::table('accounts', function (Blueprint $table) {
-            $table->index(['uuid']);
+            $table->unique(['uuid']);
         });
     }
 
@@ -29,10 +29,10 @@ class UuidIndices extends Migration
     public function down()
     {
         Schema::table('properties', function (Blueprint $table) {
-            $table->dropIndex(['uuid']);
+            $table->dropUnique(['uuid']);
         });
         Schema::table('accounts', function (Blueprint $table) {
-            $table->dropIndex(['uuid']);
+            $table->dropUnique(['uuid']);
         });
     }
 }

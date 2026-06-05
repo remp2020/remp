@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Segments] Migrated Elasticsearch client from `olivere/elastic/v7` to `go-elasticsearch/v8` TypedAPI . `olivere/elastic/v7` dependency removed. remp/remp#1436
     - **Removed:** `olivere/elastic/v7` library and all implementations based on it (`ElasticDB`, `EventElastic`, `PageviewElastic`, `CommerceElastic`, `ConcurrentElastic`).
     - **Removed:** Scroll API usage — replaced by `search_after` + Point-In-Time (PIT) for all paginated listing operations. PIT opens a frozen index snapshot for the duration of pagination, eliminating duplicate/missing documents caused by concurrent writes. Scroll API keeps all search context in JVM heap; PIT does not.
+- Fixed MySQL 8.4 compatibility issues in DB schema. remp/remp#1474
 
 ### [Campaign]
 
@@ -24,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added IP address targeting for campaigns with whitelist/blacklist support for single IPs and ranges. remp/euobserver#132
 - Moved `vuefilters` internally from the shared library inside the project.
 - Fixed JS errors and possibly broken click event on the banner edit page. [remp2020/remp#236](https://github.com/remp2020/remp/pull/236)
+
 
 ### [Mailer]
 

@@ -15,7 +15,7 @@ CREATE TABLE `banners` (
   `transition` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `target_url` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_url` varchar(768) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `position` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `offset_horizontal` int NOT NULL,
   `offset_vertical` int NOT NULL,
@@ -132,6 +132,20 @@ CREATE TABLE `campaign_country` (
   KEY `campaign_country_country_iso_code_foreign` (`country_iso_code`),
   CONSTRAINT `campaign_country_campaign_id_foreign` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`),
   CONSTRAINT `campaign_country_country_iso_code_foreign` FOREIGN KEY (`country_iso_code`) REFERENCES `countries` (`iso_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `campaign_ip_ranges`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `campaign_ip_ranges` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `campaign_id` int unsigned NOT NULL,
+  `ip_from` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_to` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `blacklisted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `campaign_ip_ranges_campaign_id_foreign` (`campaign_id`),
+  CONSTRAINT `campaign_ip_ranges_campaign_id_foreign` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `campaign_segments`;
@@ -313,7 +327,7 @@ CREATE TABLE `newsletter_rectangle_templates` (
   `text` text COLLATE utf8mb4_unicode_ci,
   `success` text COLLATE utf8mb4_unicode_ci,
   `failure` text COLLATE utf8mb4_unicode_ci,
-  `terms` text COLLATE utf8mb4_unicode_ci,
+  `terms` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `width` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `height` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `color_scheme` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -486,3 +500,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (66,'2023_11_21_084
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (67,'2024_04_17_091341_refactor_referer_related_columns_to_source_in_campaigns_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (68,'2024_12_03_095025_banner_use_color_scheme_and_drop_color_columns',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (69,'2025_02_24_160123_add_operating_systems_column_to_campaigns',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (70,'2025_11_13_132323_increase_target_url_length_in_banners_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (71,'2025_12_11_120000_fix_banner_includes_null_arrays',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (72,'2025_12_16_130430_make_terms_not_nullable_on_newsletter_rectangles',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (73,'2026_01_21_100000_populate_collections_timestamps',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (74,'2026_03_07_100000_create_campaign_ip_ranges_table',1);
