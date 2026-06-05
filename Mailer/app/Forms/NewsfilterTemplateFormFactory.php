@@ -140,6 +140,12 @@ class NewsfilterTemplateFormFactory
         }
 
         $override = match ($sourceTemplate->code) {
+            'suhrn-ms-vo-futbale' => [
+                'name' => 'Súhrn MS vo futbale ' . date('j.n.Y'),
+                'code' => 'suhrn_ms_vo_futbale_' . date('dmY'),
+                'mail_type_code' => 'newsfilter_sport',
+                'mail_type_variant_code' => 'newsfilter_sport.suhrn-ms-vo-futbale'
+            ],
             'rano-nhl' => [
                 'name' => 'Ráno s NHL ' . date('j.n.Y'),
                 'code' => 'nwsf_rano-nhl_' . date('dmY'),
