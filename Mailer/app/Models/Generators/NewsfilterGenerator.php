@@ -66,6 +66,19 @@ class NewsfilterGenerator implements IGenerator
             '/<p.*?>(.*?)<\/p>/is' => "<p style=\"color:#181818;font-family:Georgia,sans-serif;font-weight:400;padding:0;text-align:left;font-size:18px;line-height:27px;margin: 16px 0 16px 0\">$1</p>",
             "/<blockquote.*?>(.*?)<\/blockquote>/is" => '<blockquote style="position: relative;padding: 16px;border-radius: 6px;font-style: normal; background: #F2EAE8; margin: 0 0 16px 0">$1</blockquote>',
             "/https:\/\/dennikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
+            '/<img.*?src="(.*?)".*?>/is' => function ($matches) {
+                $src = $matches[1];
+                $width = 564;
+                $maxWidth = '100%';
+                if (preg_match('/width="(\d+)"/i', $matches[0], $widthMatches)) {
+                    $imgWidth = (int) $widthMatches[1];
+                    if ($imgWidth < 564) {
+                        $width = $imgWidth;
+                        $maxWidth = $imgWidth . 'px';
+                    }
+                }
+                return '<img src="' . $src . '" alt="" width="' . $width . '" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:100%;max-width:' . $maxWidth . ';clear:both;display:block;margin-bottom:20px;">';
+            },
         ];
         $rules = $this->getRules($generatorRules);
 
