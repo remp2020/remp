@@ -107,7 +107,7 @@ class DuplicateListFormFactory
             mailFrom: $sourceList->mail_from,
             subscribeEmailTemplateId: $sourceList->subscribe_mail_template_id,
             unSubscribeEmailTemplateId: $sourceList->unsubscribe_mail_template_id,
-            isExternal: $sourceList->is_external,
+            isExternal: (bool) $sourceList->is_external,
         );
 
         ($this->onCreate)($newList, $sourceList, $values['copy_subscribers'] ?? false);
