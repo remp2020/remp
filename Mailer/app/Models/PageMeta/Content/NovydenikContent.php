@@ -50,7 +50,7 @@ class NovydenikContent implements ContentInterface
 
     public function parseMeta(string $content): ?Meta
     {
-        preg_match_all('/<script id="schema" type="application\/ld\+json">(.*?)<\/script>/', $content, $matches);
+        preg_match_all('/<script.*?type="application\/ld\+json">(.*?)<\/script>/', $content, $matches);
 
         if (!$matches || empty($matches[1])) {
             return null;
@@ -63,19 +63,25 @@ class NovydenikContent implements ContentInterface
         }
 
         // author
-        $denniknAuthors = [];
+        $authors = [];
         if (isset($schema->author) && !is_array($schema->author)) {
             $schema->author = [$schema->author];
         }
         foreach ($schema->author as $author) {
-            $denniknAuthors[] = Strings::upper($author->name);
+            $authors[] = $author->name;
         }
 
         $title = $schema->headline ?? null;
         $description = $schema->description ?? null;
-        $image = $this->processImage($schema->image->url ?? null);
 
-        return new Meta($title, $description, $image, $denniknAuthors);
+        $image = null;
+        if (isset($schema->image) && !is_array($schema->image)) {
+            $image = $this->processImage($schema->image->url ?? null);
+        } elseif (is_array($schema->image)) {
+            $image = $this->processImage($schema->image[0]->url ?? null);
+        }
+
+        return new Meta($title, $description, $image, $authors);
     }
 
     public function parseShopMeta(string $content): ?Meta
@@ -117,6 +123,10 @@ class NovydenikContent implements ContentInterface
     {
         if (!$imageUrl) {
             return 'https://static.novydenik.com/2018/11/placeholder_2@2x.png';
+        }
+
+        if (!str_starts_with($imageUrl, 'https://img.novydenik.com')) {
+            return $imageUrl;
         }
 
         $url = new Url($imageUrl);

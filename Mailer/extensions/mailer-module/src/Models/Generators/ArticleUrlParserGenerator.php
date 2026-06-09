@@ -149,11 +149,15 @@ class ArticleUrlParserGenerator implements IGenerator
                 continue;
             }
             try {
+                $meta = null;
+
                 $parsedUrl = new Url($url);
                 if (isset($this->contentProcessors[$parsedUrl->getDomain()])) {
                     $processor = $this->contentProcessors[$parsedUrl->getDomain()];
                     $meta = $processor->fetchUrlMeta($url);
-                } else {
+                }
+
+                if (!$meta) {
                     $meta = $this->content->fetchUrlMeta($url);
                 }
 
