@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed JS errors and possibly broken click event on the banner edit page. [remp2020/remp#236](https://github.com/remp2020/remp/pull/236)
 - Fixed Bar template mobile layout when close button is used. remp/helpdesk#4684
 - Fixed input label visual issue if the input was populated programatically. remp/remp#1476
+- Fixed banner JS includes loading order, execute in the declared order instead of racing. remp/helpdesk#4673
 
 ### [Mailer]
 

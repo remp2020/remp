@@ -336,7 +336,7 @@
                 jsIncludes.forEach((jsInclude) => {
                     let script = document.createElement('script');
                     script.src = this.injectSnippets(jsInclude);
-                    script.async = true;
+                    script.async = false; // preserve include execution order; does not block HTML rendering (script-inserted scripts never block the parser)
 
                     let callbackOnLoad = () => {
                         loadedScriptsCount += 1;
