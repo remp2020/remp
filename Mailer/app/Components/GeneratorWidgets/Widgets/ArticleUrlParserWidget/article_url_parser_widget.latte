@@ -3,16 +3,15 @@
       $('[aria-controls="url-parser-preview"]').on('shown.bs.tab', function () {
           var form = $("#" + {$control['templateForm']->getElementPrototype()->getId()})[0];
 
-          if ($('select[name="mail_type_id"]').val()) {
+          if ($('select[name="mail_type_code"]').val()) {
             $.nette.ajax({
                 type: 'POST',
                 url: {link preview!},
                 data: {
                     'html_content': {$htmlContent},
                     'text_content': {$textContent},
-                    'name': $('#' + {$control["templateForm"]['name']->htmlId}).val(),
-                    'mail_layout_id': $('input[name="mail_layout_id"]').val(),
-                    'mail_type_id': $('select[name="mail_type_id"]').val(),
+                    'mail_layout_code': {$mailLayoutCode},
+                    'mail_type_code': $('select[name="mail_type_code"]').val(),
                     'from': $('#' + {$control["templateForm"]['from']->htmlId}).val(),
                     'subject': $('#' + {$control["templateForm"]['subject']->htmlId}).val(),
                 },
@@ -70,22 +69,8 @@
 
             <div class="col-sm-6">
               <div class="form-group fg-float m-b-30">
-                <div class="fg-line">
-                  {input name, class => 'form-control fg-input'}
-                  {label name, class => 'fg-label' /}
-                </div>
-              </div>
-
-              <div class="form-group fg-float m-b-30">
-                <div class="fg-line">
-                  {input code, class => 'form-control fg-input'}
-                  {label code, class => 'fg-label' /}
-                </div>
-              </div>
-
-              <div class="form-group fg-float m-b-30">
-                {label mail_type_id /}
-                {input mail_type_id, id => 'mail-type-id', class => 'form-control selectpicker',  data-live-search => 'true'}
+                {label mail_type_code /}
+                {input mail_type_code, id => 'mail-type-id', class => 'form-control selectpicker',  data-live-search => 'true'}
               </div>
 
               <div class="form-group fg-float m-b-30">
@@ -158,12 +143,10 @@
 {include previewCallback}
 
 <script type="application/javascript">
-  let lists = {$lists};
+  let senders = {$senders};
 
   $('#mail-type-id').on('changed.bs.select', function (e) {
-    let selectedTypeId = $(e.target).val();
-    let fromInput = $('input[name="from"]');
-
-    fromInput.val(lists[selectedTypeId].mail_from);
+    let selectedTypeCode = $(e.target).val();
+    $('input[name="from"]').val(senders[selectedTypeCode]);
   });
 </script>

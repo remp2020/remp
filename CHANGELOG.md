@@ -71,6 +71,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - Added `Template:renderContentPreview` AJAX endpoint that renders HTML/text content via `TwigEngine` with correct snippets scoped to the mail type.
     - `MailPreview` Vue component now fetches rendered preview from `previewUrl`.
 - Fixed input label visual issue if the input was populated programatically. remp/remp#1476
+- Updated Article URL parser widget to support universal layout. remp/remp#1471
 
 ### [Sso]
 

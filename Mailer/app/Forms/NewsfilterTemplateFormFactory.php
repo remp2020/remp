@@ -89,7 +89,6 @@ class NewsfilterTemplateFormFactory
             ->setHtmlAttribute('data-url', $this->linkGenerator->link('Mailer:Job:MailTypeCodeVariants', ['id'=>'%value%']));
 
         $form->addText('from', 'Sender')
-            ->setHtmlAttribute('placeholder', 'e.g. info@domain.com')
             ->setRequired("Field 'Sender' is required.");
 
         $form->addText('subject', 'Subject')

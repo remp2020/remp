@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Remp\Mailer\Forms;
 
 use Nette\Application\UI\Form;
+use Nette\Database\Table\ActiveRow;
 use Nette\Forms\Controls\SubmitButton;
+use Nette\Http\Request;
 use Nette\Security\User;
 use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
@@ -14,6 +16,7 @@ use Remp\MailerModule\Repositories\BatchesRepository;
 use Remp\MailerModule\Repositories\JobsRepository;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\MailTypesRepository;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 
@@ -38,9 +41,10 @@ class ArticleUrlParserTemplateFormFactory
         private readonly ListsRepository $listsRepository,
         private readonly JobsRepository $jobsRepository,
         private readonly BatchesRepository $batchesRepository,
-        private readonly SourceTemplatesRepository $sourceTemplatesRepository,
         private readonly PermissionManager $permissionManager,
-        private readonly User $user
+        private readonly User $user,
+        private readonly Request $request,
+        private readonly MailTypesRepository $mailTypesRepository,
     ) {
     }
 
@@ -64,22 +68,15 @@ class ArticleUrlParserTemplateFormFactory
             $form->addError("Default value 'layout code' is missing.");
         }
 
-        $form->addText('name', 'Name')
-            ->setRequired("Field 'Name' is required.");
-
-        $form->addText('code', 'Identifier')
-            ->setRequired("Field 'Identifier' is required.");
-
         $mailTypes = $this->listsRepository->all()
             ->where(['public_listing' => true])
-            ->fetchPairs('id', 'title');
+            ->fetchPairs('code', 'title');
 
-        $form->addSelect('mail_type_id', 'Type', $mailTypes)
+        $form->addSelect('mail_type_code', 'Newsletter list', $mailTypes)
             ->setPrompt('Select type')
             ->setRequired("Field 'Type' is required.");
 
         $form->addText('from', 'Sender')
-            ->setHtmlAttribute('placeholder', 'e.g. info@domain.com')
             ->setRequired("Field 'Sender' is required.");
 
         $form->addText('subject', 'Subject')
@@ -94,22 +91,15 @@ class ArticleUrlParserTemplateFormFactory
         $form->addText('start_at', 'Start date')
             ->setNullable();
 
-        $form->addHidden('mail_layout_id');
+        $form->addHidden('mail_layout_code');
         $form->addHidden('source_template_id');
         $form->addHidden('html_content');
         $form->addHidden('text_content');
 
-        $sourceTemplate = $this->sourceTemplatesRepository->find($_POST['source_template_id']);
-
         $defaults = [
-            'source_template_id' => $sourceTemplate->id,
-            'name' => "{$sourceTemplate->title} " . date('d. m. Y'),
-            'code' => "{$sourceTemplate->code}_" . date('Y-m-d'),
+            'source_template_id' => $this->request->getPost('source_template_id'),
+            'mail_layout_code' => $this->getLayoutCode($this->request->getPost('source_template_id')),
         ];
-
-        if ($this->layoutCode) {
-            $defaults['mail_layout_id'] = (int)$this->layoutsRepository->findBy('code', $this->layoutCode)->id;
-        }
 
         $form->setDefaults($defaults);
 
@@ -131,17 +121,27 @@ class ArticleUrlParserTemplateFormFactory
 
     public function formSucceeded(Form $form, $values)
     {
-        $generate = function ($htmlBody, $textBody, $mailLayoutId) use ($values, $form) {
+        try {
+            $defaults = $this->getMailTypeDefaults($values['mail_type_code']);
+        } catch (\UnhandledMatchError) {
+            $form->addError("Unsupported mail type selected.");
+            return;
+        }
+
+        $generate = function ($htmlBody, $textBody, $mailLayoutCode) use ($values, $form, $defaults) {
+            $mailType = $this->mailTypesRepository->findBy('code', $values['mail_type_code']);
+            $mailLayout = $this->layoutsRepository->findBy('code', $mailLayoutCode);
+
             $mailTemplate = $this->templatesRepository->add(
-                $values['name'],
-                $this->templatesRepository->getUniqueTemplateCode($values['code']),
+                $defaults['name'],
+                $this->templatesRepository->getUniqueTemplateCode($defaults['code']),
                 '',
                 $values['from'],
                 $values['subject'],
                 $textBody,
                 $htmlBody,
-                (int)$mailLayoutId,
-                $values['mail_type_id']
+                $mailLayout->id,
+                $mailType->id,
             );
 
             if (isset($this->segmentCode)) {
@@ -166,15 +166,15 @@ class ArticleUrlParserTemplateFormFactory
 
             if (isset($values['subject_b'])) {
                 $mailTemplateB = $this->templatesRepository->add(
-                    $values['name'],
-                    $this->templatesRepository->getUniqueTemplateCode($values['code']),
+                    $defaults['name'],
+                    $this->templatesRepository->getUniqueTemplateCode($defaults['code']),
                     '',
                     $values['from'],
                     $values['subject_b'],
                     $textBody,
                     $htmlBody,
-                    (int)$mailLayoutId,
-                    $values['mail_type_id']
+                    $mailLayout->id,
+                    $mailType->id
                 );
                 $this->batchesRepository->addTemplate($batch, $mailTemplateB);
             }
@@ -192,9 +192,59 @@ class ArticleUrlParserTemplateFormFactory
         $generate(
             $values['html_content'],
             $values['text_content'],
-            $values['mail_layout_id'],
+            $values['mail_layout_code'],
         );
 
         $this->onSave->__invoke();
+    }
+
+    public function getLayoutCode(string $sourceTemplateCode): string
+    {
+        return match ($sourceTemplateCode) {
+            'dn3-article-url-parser' => 'dn3-default-wide',
+            default => $this->layoutCode,
+        };
+    }
+
+    public function getMailTypeDefaults(string $mailTypeCode): array
+    {
+        return match ($mailTypeCode) {
+            'newsletter_weekly' => [
+                'name' => 'Piatkový výber šéfredaktora ' . date('j.n.Y'),
+                'code' => 'piatkovy_vyber_sefredaktora_' . date('dmY'),
+            ],
+            'napunk-weekly' => [
+                'name' => 'Napunk piatkový výber ' . date('j.n.Y'),
+                'code' => 'napunk_piatkovy_vyber_' . date('dmY'),
+            ],
+            'kultura-vyber' => [
+                'name' => 'Najlepšie z kultúry ' . date('j.n.Y'),
+                'code' => 'najlepsie_z_kultury_' . date('dmY'),
+            ],
+            'vyber-sport' => [
+                'name' => 'Najlepšie zo športu ' . date('j.n.Y'),
+                'code' => 'najlepsie_zo_sportu_' . date('dmY'),
+            ],
+            'veda' => [
+                'name' => 'Najlepšie z vedy ' . date('j.n.Y'),
+                'code' => 'najlepsie_z_vedy_' . date('dmY'),
+            ],
+            'ekonomika-vyber' => [
+                'name' => 'Najlepšie z Denníka E ' . date('j.n.Y'),
+                'code' => 'najlepsie_z_dennika_e_' . date('dmY'),
+            ],
+            'novinky-obchod' => [
+                'name' => 'Novinky v obchode Denníka N ' . date('j.n.Y'),
+                'code' => 'novinky_v_obchode_dennika_n_' . date('dmY'),
+            ],
+            'blogs' => [
+                'name' => 'Najlepšie z Blogov N ' . date('j.n.Y'),
+                'code' => 'najlepsie_z_blogov_n_' . date('dmY'),
+            ],
+            'health' => [
+                'name' => 'Rodina a vzťahy ' . date('j.n.Y'),
+                'code' => 'rodina_a_vztahy_' . date('dmY'),
+            ],
+        };
     }
 }

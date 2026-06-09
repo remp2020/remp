@@ -5,6 +5,7 @@ namespace Remp\Mailer\Components\GeneratorWidgets\Widgets\ArticleUrlParserWidget
 
 use Nette\Application\Responses\JsonResponse;
 use Nette\Application\UI\Form;
+use Nette\Http\Request;
 use Nette\Http\Session;
 use Remp\Mailer\Forms\ArticleUrlParserTemplateFormFactory;
 use Remp\MailerModule\Components\BaseControl;
@@ -15,6 +16,8 @@ use Remp\MailerModule\Presenters\MailGeneratorPresenter;
 use Remp\MailerModule\Repositories\ActiveRowFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
+use Remp\MailerModule\Repositories\MailTypesRepository;
+use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 
 class ArticleUrlParserWidget extends BaseControl implements IGeneratorWidget
 {
@@ -27,7 +30,9 @@ class ArticleUrlParserWidget extends BaseControl implements IGeneratorWidget
         private ListsRepository $listsRepository,
         private ContentGenerator $contentGenerator,
         private GeneratorInputFactory $generatorInputFactory,
-        private ActiveRowFactory $activeRowFactory
+        private ActiveRowFactory $activeRowFactory,
+        private readonly Request $request,
+        private readonly SourceTemplatesRepository $sourceTemplatesRepository,
     ) {
     }
 
@@ -47,7 +52,18 @@ class ArticleUrlParserWidget extends BaseControl implements IGeneratorWidget
 
         $this->template->htmlContent = $params['htmlContent'];
         $this->template->textContent = $params['textContent'];
-        $this->template->lists = $this->listsRepository->all()->fetchAssoc('id');
+
+        $mailTypes = $this->listsRepository->all()->fetchAll();
+        $senders = [];
+
+        foreach ($mailTypes as $mailType) {
+            $senders[$mailType->code] = $mailType['mail_from'] ?? null;
+        }
+
+        $sourceTemplate = $this->sourceTemplatesRepository->find($this->request->getPost('source_template_id'));
+
+        $this->template->mailLayoutCode = $this->templateFormFactory->getLayoutCode($sourceTemplate->code);
+        $this->template->senders = $senders;
         $this->template->setFile(__DIR__ . '/' . $this->templateName);
         $this->template->render();
     }
@@ -70,12 +86,12 @@ class ArticleUrlParserWidget extends BaseControl implements IGeneratorWidget
         $htmlContent = $request->getPost('html_content');
         $textContent = $request->getPost('text_content');
 
-        $mailLayout = $this->layoutsRepository->find($_POST['mail_layout_id']);
-        $mailType = $this->listsRepository->find($_POST['mail_type_id']);
+        $mailLayout = $this->layoutsRepository->findBy('code', $this->request->getPost('mail_layout_code'));
+        $mailType = $this->listsRepository->findBy('code', $this->request->getPost('mail_type_code'));
 
         $generate = function ($htmlContent, $textContent, $mailLayout, $mailType) use ($request) {
             $mailTemplate = $this->activeRowFactory->create([
-                'name' => $request->getPost('name'),
+                'name' => 'Preview',
                 'code' => 'tmp_' . microtime(true),
                 'description' => '',
                 'from' => $request->getPost('from'),
@@ -86,7 +102,7 @@ class ArticleUrlParserWidget extends BaseControl implements IGeneratorWidget
                 'mail_body_html' => $htmlContent,
                 'mail_layout_id' => $mailLayout->id,
                 'mail_layout' => $mailLayout,
-                'mail_type_id' => $request->getPost('mail_type_id'),
+                'mail_type_id' => $mailType->id,
                 'mail_type' => $mailType,
                 'params' => null,
                 'click_tracking' => false,
