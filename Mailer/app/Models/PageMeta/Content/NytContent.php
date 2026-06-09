@@ -36,8 +36,9 @@ class NytContent implements ContentInterface
             $responseJson = $responseRaw->getBody()->getContents();
             $response = Json::decode($responseJson, forceArrays: true);
 
-            if (count($response['response']['docs']) !== 1) {
-                throw new \RuntimeException('Unable to fetch NYT article: ' . $responseJson);
+            if (!isset($response['response']['docs']) || count($response['response']['docs']) !== 1) {
+                Debugger::log('Unable to match NYT article via API: ' . $responseJson, ILogger::EXCEPTION);
+                return null;
             }
         } catch (ClientException $e) {
             throw new InvalidUrlException("Invalid URL: {$url}", $e->getCode(), $e);
