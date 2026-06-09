@@ -90,6 +90,7 @@
 
 .bar-main {
     font-size: 17px;
+    line-height: initial;
     text-decoration: none;
     word-wrap: break-word;
     padding-right: 5px;
@@ -116,21 +117,20 @@
 }
 
 @media (max-width: 640px) {
-    .bar-preview-close {
-        top: -9px;
-        right: -20px;
-    }
-
     .bar-preview-box {
         flex-wrap: wrap;
-        padding: 9px 20px;
+        padding: 0;
     }
 
     .bar-main {
         text-align: center;
+        padding: 5px 10px;
         margin-bottom: 9px;
-        padding: 0 25px;
         flex: 1;
+    }
+
+    .bar-main-closeable {
+        padding: 5px 0 5px 10px;
     }
 
     .bar-button {
@@ -142,6 +142,7 @@
     .bar-button-wrap {
         order: 2;
         flex-basis: 100%;
+        margin-bottom: 10px;
     }
 
     .bar-preview-close {
@@ -156,14 +157,6 @@
 
     .bar-close-text-filled-button {
         display: none;
-    }
-
-    .bar-main {
-        padding: 0;
-    }
-
-    .bar-main-closeable {
-        max-width: 86%;
     }
 }
 </style>

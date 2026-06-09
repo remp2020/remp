@@ -25,7 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added IP address targeting for campaigns with whitelist/blacklist support for single IPs and ranges. remp/euobserver#132
 - Moved `vuefilters` internally from the shared library inside the project.
 - Fixed JS errors and possibly broken click event on the banner edit page. [remp2020/remp#236](https://github.com/remp2020/remp/pull/236)
-
+- Fixed Bar template mobile layout when close button is used. remp/helpdesk#4684
 
 ### [Mailer]
 
