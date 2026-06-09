@@ -149,6 +149,9 @@ $(document).ready(function(){
             }
 
         });
+
+        // Enable CSS :placeholder-shown trick for programmatic value changes (works with vanilla JS too)
+        $('.fg-float .form-control:not([placeholder])').attr('placeholder', ' ');
     }
 
     /*

@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - **Removed:** `olivere/elastic/v7` library and all implementations based on it (`ElasticDB`, `EventElastic`, `PageviewElastic`, `CommerceElastic`, `ConcurrentElastic`).
     - **Removed:** Scroll API usage — replaced by `search_after` + Point-In-Time (PIT) for all paginated listing operations. PIT opens a frozen index snapshot for the duration of pagination, eliminating duplicate/missing documents caused by concurrent writes. Scroll API keeps all search context in JVM heap; PIT does not.
 - Fixed MySQL 8.4 compatibility issues in DB schema. remp/remp#1474
+- Fixed input label visual issue if the input was populated programatically. remp/remp#1476
 
 ### [Campaign]
 
@@ -26,6 +27,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Moved `vuefilters` internally from the shared library inside the project.
 - Fixed JS errors and possibly broken click event on the banner edit page. [remp2020/remp#236](https://github.com/remp2020/remp/pull/236)
 - Fixed Bar template mobile layout when close button is used. remp/helpdesk#4684
+- Fixed input label visual issue if the input was populated programatically. remp/remp#1476
 
 ### [Mailer]
 
@@ -68,6 +70,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added server-side Twig rendering for email preview. Preview now correctly renders snippets and layouts instead of stripping Twig syntax client-side. remp/remp#1434
     - Added `Template:renderContentPreview` AJAX endpoint that renders HTML/text content via `TwigEngine` with correct snippets scoped to the mail type.
     - `MailPreview` Vue component now fetches rendered preview from `previewUrl`.
+- Fixed input label visual issue if the input was populated programatically. remp/remp#1476
+
+### [Sso]
+
+- Fixed input label visual issue if the input was populated programatically. remp/remp#1476
 
 ## Archive
 

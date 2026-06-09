@@ -10200,6 +10200,14 @@ html:not(.ie9) .select.fg-line:before {
   top: -20px;
   font-size: 11px;
 }
+.fg-float .fg-line:has(.form-control:not(:placeholder-shown)) .fg-label,
+.fg-float .fg-line:has(.form-control:focus) .fg-label {
+  top: -20px;
+  font-size: 11px;
+}
+.fg-line:has(.form-control:focus):after {
+  transform: scale(1);
+}
 .control-label {
   font-weight: normal;
 }
