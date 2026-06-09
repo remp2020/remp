@@ -27,15 +27,16 @@ class NytContent implements ContentInterface
         $client = new Client();
 
         try {
-            $responseRaw = $client->get('http://api.nytimes.com/svc/news/v3/content.json', [
+            $responseRaw = $client->request('GET', 'https://api.nytimes.com/svc/search/v2/articlesearch.json', [
                 'query' => [
-                    'url' => $url,
+                    'fq' => 'url:"' . $url . '"',
                     'api-key' => $this->apiKey,
                 ],
             ]);
             $responseJson = $responseRaw->getBody()->getContents();
             $response = Json::decode($responseJson, forceArrays: true);
-            if ($response['num_results'] !== 1) {
+
+            if (count($response['response']['docs']) !== 1) {
                 throw new \RuntimeException('Unable to fetch NYT article: ' . $responseJson);
             }
         } catch (ClientException $e) {
@@ -45,24 +46,16 @@ class NytContent implements ContentInterface
             return null;
         }
 
-        return $this->parseMeta($response['results'][0]);
+        return $this->parseMeta($response['response']['docs'][0]);
     }
 
     public function parseMeta(array $article): ?Meta
     {
-        $imageUrl = null;
-        foreach ($article['multimedia'] as $imageDef) {
-            if ($imageDef['format'] === 'mediumThreeByTwo440') {
-                $imageUrl = $imageDef['url'];
-                break;
-            }
-        }
-
         return new Meta(
-            title: $article['title'],
+            title: $article['headline']['main'],
             description: $article['abstract'],
-            image: $imageUrl,
-            authors: [$article['byline']], // e.g. "By Devlin Barrett"
+            image: $article['multimedia']['default']['url'],
+            authors: [$article['byline']['original']], // e.g. "By Devlin Barrett"
         );
     }
 }

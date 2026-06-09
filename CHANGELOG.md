@@ -72,6 +72,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - `MailPreview` Vue component now fetches rendered preview from `previewUrl`.
 - Fixed input label visual issue if the input was populated programatically. remp/remp#1476
 - Updated Article URL parser widget to support universal layout. remp/remp#1471
+- Updated `NytContent` implementation to use Article Search v2 API instead of now unavailable news v3 API.
 
 ### [Sso]
 
