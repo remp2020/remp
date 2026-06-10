@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\RequestException;
 use Remp\MailerModule\Models\PageMeta\Meta;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
 
-class GenericShopContent implements ShopContentInterface
+class OpenGraphPageContent implements ContentInterface
 {
     private $transport;
 

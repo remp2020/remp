@@ -236,10 +236,7 @@ services:
 		factory: Remp\MailerModule\Models\PageMeta\Transport\GuzzleTransport
 
 	content:
-		factory: Remp\MailerModule\Models\PageMeta\Content\GenericPageContent
-
-	shopContent:
-		factory: Remp\MailerModule\Models\PageMeta\Content\GenericShopContent
+		factory: Remp\MailerModule\Models\PageMeta\Content\OpenGraphPageContent
 
 	# Repositories
 	- Remp\MailerModule\Repositories\AuditLogRepository

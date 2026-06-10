@@ -42,7 +42,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Made `user_id` optional in subscribe/unsubscribe/is-subscribed/is-unsubscribed/bulk-subscribe/user-preferences API endpoints. remp/remp#1516
     - For non-external mail types, `user_id` is still required and validated at the handler level.
     - For external mail types, `user_id` can be omitted.
-- **BREAKING** - Changed `UserSubscriptionsRepository::allSubscribers()` to `allSubscribersWithUserId()`, filtering out subscribers without `user_id` from segment results. remp/remp#1516
+- **BREAKING**: Changed `UserSubscriptionsRepository::allSubscribers()` to `allSubscribersWithUserId()`, filtering out subscribers without `user_id` from segment results. remp/remp#1516
+- **BREAKING**: Class `GenericPageContent` was renamed to `OpenGraphPageContent` to specifically identify source of the metadata. remp/remp#1477
 - Added `is_external` field to mail type listing API responses (v1, v2, v3). remp/remp#1516
 - Added `is_external` field to mail type upsert API response and creation. remp/remp#1516
 - Added `is_external` checkbox to the mail type (newsletter list) create/edit form. remp/remp#1516
@@ -74,6 +75,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed input label visual issue if the input was populated programatically. remp/remp#1476
 - Updated Article URL parser widget to support universal layout. remp/remp#1471
 - Updated `NytContent` implementation to use Article Search v2 API instead of now unavailable news v3 API.
+- Added `JsonLDContent` content metadata extractor using JSON+LD schema found at the target URL. remp/remp#1477
 
 ### [Sso]
 

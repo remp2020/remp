@@ -6,7 +6,7 @@ namespace Tests\Unit\Generator;
 use PHPUnit\Framework\TestCase;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\GenericBestPerformingArticlesGenerator;
-use Remp\MailerModule\Models\PageMeta\Content\GenericPageContent;
+use Remp\MailerModule\Models\PageMeta\Content\OpenGraphPageContent;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
@@ -85,7 +85,7 @@ HTML;
 
         $generator = new GenericBestPerformingArticlesGenerator(
             $this->sourceTemplateRepository,
-            new GenericPageContent($transport),
+            new OpenGraphPageContent($transport),
             $this->engineFactory
         );
 
