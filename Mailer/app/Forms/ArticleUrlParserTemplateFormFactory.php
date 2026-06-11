@@ -45,6 +45,7 @@ class ArticleUrlParserTemplateFormFactory
         private readonly User $user,
         private readonly Request $request,
         private readonly MailTypesRepository $mailTypesRepository,
+        private readonly SourceTemplatesRepository $sourceTemplatesRepository,
     ) {
     }
 
@@ -96,9 +97,10 @@ class ArticleUrlParserTemplateFormFactory
         $form->addHidden('html_content');
         $form->addHidden('text_content');
 
+        $sourceTemplate = $this->sourceTemplatesRepository->find($this->request->getPost('source_template_id'));
         $defaults = [
-            'source_template_id' => $this->request->getPost('source_template_id'),
-            'mail_layout_code' => $this->getLayoutCode($this->request->getPost('source_template_id')),
+            'source_template_id' => $sourceTemplate->id,
+            'mail_layout_code' => $this->getLayoutCode($sourceTemplate->code),
         ];
 
         $form->setDefaults($defaults);
