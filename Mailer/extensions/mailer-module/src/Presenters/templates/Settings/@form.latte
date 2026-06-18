@@ -4,7 +4,7 @@
     </div>
 
     <div>
-        <div n:foreach="$form['settings']->components as $name => $component" class="form-group fg-float m-b-30">
+        <div n:foreach="$form['settings']->getComponents() as $name => $component" class="form-group fg-float m-b-30">
             <h3 style="margin: 0 0 30px;">{$name}</h3>
             <div id="{$name}">
                 <div n:foreach="$component->controls as $input" class="form-group fg-float m-b-30">
