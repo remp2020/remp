@@ -5,6 +5,7 @@ namespace Remp\Mailer\Forms;
 
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\SubmitButton;
+use Nette\Http\Request;
 use Nette\Security\User;
 use Remp\MailerModule\Models\Auth\PermissionManager;
 use Remp\MailerModule\Models\Job\JobSegmentsManager;
@@ -38,7 +39,8 @@ class DailyMinuteTemplateFormFactory
         private JobsRepository $jobsRepository,
         private BatchesRepository $batchesRepository,
         private PermissionManager $permissionManager,
-        private User $user
+        private User $user,
+        private Request $request,
     ) {
     }
 
@@ -98,6 +100,7 @@ class DailyMinuteTemplateFormFactory
 
         $form->addHidden('html_content');
         $form->addHidden('text_content');
+        $form->addHidden('context');
 
         $form->setDefaults([
             'name' => 'Daily minute ' . date('j.n.Y'),
@@ -105,6 +108,7 @@ class DailyMinuteTemplateFormFactory
             'mail_layout_id' => $mailLayout->id,
             'mail_type_id' => $mailType->id,
             'from' => $this->from,
+            'context' => $this->request->getPost('context'),
         ]);
 
         if ($this->permissionManager->isAllowed($this->user, 'batch', 'start')) {
@@ -139,8 +143,7 @@ class DailyMinuteTemplateFormFactory
             );
 
             // Temporary disable contenxt for CZ testing purposes
-            // $jobContext = 'daily_minute.' . date('Ymd');
-            $jobContext = null;
+            $jobContext = $values['context'] ?? 'daily_minute.' . date('Ymd');
             $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, Crm::PROVIDER_ALIAS), $jobContext);
             $batch = $this->batchesRepository->add($mailJob->id, null, null, BatchesRepository::METHOD_RANDOM);
             $this->batchesRepository->addTemplate($batch, $mailTemplate);

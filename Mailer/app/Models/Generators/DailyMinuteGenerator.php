@@ -61,6 +61,8 @@ class DailyMinuteGenerator implements IGenerator
             ->setHtmlAttribute('class', 'form-control')
             ->setRequired();
 
+        $form->addHidden('context');
+
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
@@ -99,6 +101,7 @@ class DailyMinuteGenerator implements IGenerator
             (new PostInputParam('subject'))->setRequired(),
             (new PostInputParam('blocks_json'))->setRequired(),
             (new PostInputParam('from')),
+            (new PostInputParam('context')),
         ];
     }
 
@@ -152,6 +155,7 @@ class DailyMinuteGenerator implements IGenerator
         $output->blocks_json = $data->blocks;
         $output->subject = $data->subject;
         $output->url = $data->url;
+        $output->context = "post.{$data->id}";
 
         return $output;
     }
