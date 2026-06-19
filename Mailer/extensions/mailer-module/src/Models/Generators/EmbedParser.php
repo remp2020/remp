@@ -64,12 +64,21 @@ class EmbedParser
     {
         $link = trim($link);
 
-        if (preg_match('/^(?:(?:https?:)?\/\/)?(?:www\.)?facebook\.com\/[a-zA-Z0-9.]+\/videos\/(?:[a-zA-Z0-9.]+\/)?([0-9]+)/', $link)
+        if ($this->isTwitterLink($link)) {
+            return $this->createEmbedMarkup(
+                link: $link,
+            );
+        } elseif (preg_match('/^(?:(?:https?:)?\/\/)?(?:www\.)?facebook\.com\/[a-zA-Z0-9.]+\/videos\/(?:[a-zA-Z0-9.]+\/)?([0-9]+)/', $link)
             || str_contains($link, 'youtu')
         ) {
             try {
                 if ($data = $this->fetch($link)) {
-                    return $this->createEmbedMarkup($data['link'], $data['title'], $data['image'], $data['isVideo']);
+                    return $this->createEmbedMarkup(
+                        link: $data['link'],
+                        title: $data['title'],
+                        image: $data['image'],
+                        isVideo: $data['isVideo'],
+                    );
                 }
             } catch (\Embed\Http\NetworkException $exception) {
                 Debugger::log("Network error while retrieving embedded link [$link], reason: " . $exception->getMessage(), Debugger::EXCEPTION);

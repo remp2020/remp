@@ -15,11 +15,13 @@ class EmbedParser extends DefaultEmbedParser
     public function createEmbedMarkup(string $link, ?string $title = null, ?string $image = null, bool $isVideo = false): string
     {
         if ($this->isTwitterLink($link)) {
-            $html = '<p style="margin: 16px 0 16px 0">';
+            $html = '';
 
             if ($imageUrl = $this->fetchXPreview($link)) {
                 $html = <<<HTML
-<img src='{$imageUrl}' alt='X.com post' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:inline;' width='660'>
+<p style="margin: 16px 0 16px 0">
+    <img src='{$imageUrl}' alt='X.com post' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:inline;' width='660'>
+</p>
 HTML;
             }
 
