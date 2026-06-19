@@ -66,7 +66,6 @@ class EmbedParser
 
         if (preg_match('/^(?:(?:https?:)?\/\/)?(?:www\.)?facebook\.com\/[a-zA-Z0-9.]+\/videos\/(?:[a-zA-Z0-9.]+\/)?([0-9]+)/', $link)
             || str_contains($link, 'youtu')
-            || $this->isTwitterLink($link)
         ) {
             try {
                 if ($data = $this->fetch($link)) {
