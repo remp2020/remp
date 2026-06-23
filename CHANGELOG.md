@@ -44,6 +44,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - For external mail types, `user_id` can be omitted.
 - **BREAKING**: Changed `UserSubscriptionsRepository::allSubscribers()` to `allSubscribersWithUserId()`, filtering out subscribers without `user_id` from segment results. remp/remp#1516
 - **BREAKING**: Class `GenericPageContent` was renamed to `OpenGraphPageContent` to specifically identify source of the metadata. remp/remp#1477
+- **BREAKING**: Interface `ShopContentInterface` and its implementations are moved out of the Mailer module to the internal part of the app. remp/remp#1477
+    - In case you used it, feel free to copy the implementation to your skeleton app and maintain it further yourself.
 - Added `is_external` field to mail type listing API responses (v1, v2, v3). remp/remp#1516
 - Added `is_external` field to mail type upsert API response and creation. remp/remp#1516
 - Added `is_external` checkbox to the mail type (newsletter list) create/edit form. remp/remp#1516

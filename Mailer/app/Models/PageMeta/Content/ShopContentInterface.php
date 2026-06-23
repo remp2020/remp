@@ -1,6 +1,6 @@
 <?php
 
-namespace Remp\MailerModule\Models\PageMeta\Content;
+namespace Remp\Mailer\Models\PageMeta\Content;
 
 use Remp\MailerModule\Models\PageMeta\Meta;
 

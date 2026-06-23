@@ -6,7 +6,6 @@ namespace Remp\Mailer\Models\PageMeta\Content;
 use GuzzleHttp\Exception\RequestException;
 use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Models\PageMeta\Content\JsonLDSchemaTrait;
-use Remp\MailerModule\Models\PageMeta\Content\ShopContentInterface;
 use Remp\MailerModule\Models\PageMeta\Meta;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
 

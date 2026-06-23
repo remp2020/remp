@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Remp\MailerModule\Models\Generators;
+namespace Remp\Mailer\Models\Generators;
 
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\ArticleUrlParserWidget\ArticleUrlParserWidget;
+use Remp\Mailer\Models\PageMeta\Content\ShopContentInterface;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
+use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
-use Remp\MailerModule\Models\PageMeta\Content\ShopContentInterface;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 use Tomaj\NetteApi\Params\PostInputParam;
 
