@@ -19,6 +19,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/elastic/elastic-transport-go/v8/elastictransport"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -223,6 +224,14 @@ func initGoElasticsearchStorages(ctx context.Context, c Config, logger *log.Logg
 				InsecureSkipVerify: true,
 			},
 		},
+	}
+
+	if c.Debug {
+		cfg.Logger = &elastictransport.TextLogger{
+			Output:             os.Stdout,
+			EnableRequestBody:  true,
+			EnableResponseBody: true,
+		}
 	}
 
 	ec, err := elasticsearch.NewClient(cfg)

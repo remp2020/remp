@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- [Segments] Enabled Elasticsearch query logging when Debug mode is enabled.
+
 ## Archive
 
 - [v5.1](./changelogs/CHANGELOG-v5.1.md)
