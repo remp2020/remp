@@ -111,7 +111,6 @@ func (eDB *EventElasticsearch) List(options ListOptions) (EventRowCollection, er
 	erBuckets := make(map[string]*EventRow)
 
 	// Use TypedAPI for search_after pagination with PIT for consistency
-	var searchAfter []types.FieldValue
 	batchSize := eDB.DB.BatchSize
 
 	// Build query using TypedAPI
@@ -130,50 +129,65 @@ func (eDB *EventElasticsearch) List(options ListOptions) (EventRowCollection, er
 		}
 	}()
 
-	for {
-		res, err := eDB.DB.SearchAfterTypedPIT(pitID, "5m", query, batchSize, searchAfter, options.SelectFields)
-		if err != nil {
-			return nil, err
-		}
+	type eventBatchResult struct {
+		response *search.Response
+		err      error
+	}
+	batchCh := make(chan *eventBatchResult, 1)
 
-		if res.PitId != nil {
-			pitID = *res.PitId
+	go func() {
+		defer close(batchCh)
+		var searchAfter []types.FieldValue
+		curPitID := pitID
+		for {
+			searchResponse, err := eDB.DB.SearchAfterTypedPIT(curPitID, "5m", query, batchSize, searchAfter, options.SelectFields)
+			if err != nil {
+				batchCh <- &eventBatchResult{nil, err}
+				return
+			}
+			if searchResponse.PitId != nil {
+				curPitID = *searchResponse.PitId
+			}
+			hits := searchResponse.Hits.Hits
+			if len(hits) == 0 {
+				return
+			}
+			batchCh <- &eventBatchResult{searchResponse, nil}
+			searchAfter = hits[len(hits)-1].Sort
 		}
+	}()
 
-		// Check if we have hits
-		if len(res.Hits.Hits) == 0 {
-			break
+	for batchResult := range batchCh {
+		if batchResult.err != nil {
+			return nil, batchResult.err
 		}
+		hits := batchResult.response.Hits.Hits
+		for _, hit := range hits {
+			// Single MarshalJSON call; reuse bytes for both unmarshal operations
+			sourceBytes, err := hit.Source_.MarshalJSON()
+			if err != nil {
+				return nil, err
+			}
 
-		// Process hits - type-safe!
-		for _, hit := range res.Hits.Hits {
-			// Unmarshal to Event struct
 			e := &Event{}
-			if err2 := UnmarshalHitSource(hit, e); err2 != nil {
-				return nil, err2
+			if err = json.Unmarshal(sourceBytes, e); err != nil {
+				return nil, err
 			}
 
 			if hit.Id_ != nil {
 				e.ID = *hit.Id_
 			}
 
-			// Convert Source_ to map for buildTagsFromSource helper
 			var sourceMap map[string]interface{}
-			sourceBytes, err2 := hit.Source_.MarshalJSON()
-			if err2 != nil {
-				return nil, err2
-			}
-			if err2 = json.Unmarshal(sourceBytes, &sourceMap); err2 != nil {
-				return nil, err2
+			if err = json.Unmarshal(sourceBytes, &sourceMap); err != nil {
+				return nil, err
 			}
 
-			// Build tags from source using helper function
-			tags, key, err2 := eDB.DB.buildTagsFromSource(sourceMap, options.GroupBy, "event listing")
-			if err2 != nil {
-				return nil, err2
+			tags, key, err := eDB.DB.buildTagsFromSource(sourceMap, options.GroupBy, "event listing")
+			if err != nil {
+				return nil, err
 			}
 
-			// place Event instance into proper EventRow based on tags (key)
 			er, ok := erBuckets[key]
 			if !ok {
 				er = &EventRow{
@@ -183,9 +197,6 @@ func (eDB *EventElasticsearch) List(options ListOptions) (EventRowCollection, er
 			}
 
 			er.Events = append(er.Events, e)
-
-			// Extract sort values for next iteration - type-safe!
-			searchAfter = hit.Sort
 		}
 	}
 
