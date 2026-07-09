@@ -909,6 +909,20 @@ aggregation, so they're displayed right in the job detail.
 * * * * * php /home/remp/workspace/remp/Mailer/bin/command.php mail:job-stats
 ```
 
+#### Mail logs partitioning
+
+Once `mail_logs` has been migrated to a partitioned table (see [Mail logs partitioning migration](#mail-logs-partitioning-migration-version--520) below), two commands need to run permanently to keep partitioning and pruning working as expected:
+
+```
+# Keep future partitions materialized ahead of time.
+0 3 1 * * php /home/remp/workspace/remp/Mailer/bin/command.php mail_logs:seed-partitions --months=6
+
+# Prune non-priority mail_logs data older than the retention window.
+0 4 1 * * php /home/remp/workspace/remp/Mailer/bin/command.php mail_logs:prune-partitions --cutoff-date=$(date -d '-13 months' +\%Y-\%m-01) --priority-threshold=1000
+```
+
+See [`docs/MAIL_LOGS_PARTITIONING.md`](./docs/MAIL_LOGS_PARTITIONING.md) for how to choose the retention window and priority threshold.
+
 ### Authentication
 
 The default implementation authenticates via REMP SSO.
@@ -1062,6 +1076,14 @@ Steps:
 2. running command `mail:migrate-autologin-tokens` which copies data from old tables to new (`autologin_tokens` to `autologin_tokens_v2`) - command will after successful migration atomically rename tables (`autologin_tokens` -> `autologin_tokens_old` and `autologin_tokens_v2` -> `autologin_tokens`) so when the migration ends only new tables are used
 
 It's recommended to run `mail:bigint_migration_cleanup autologin_tokens` command, at least 2 weeks (to preserve backup data, if some issue emerges) after successful migration to drop left-over tables.
+
+### Mail logs partitioning migration (version < 5.2.0)
+
+`mail_logs` is now partitioned by month to stay performant at scale. This is a more involved,
+multi-step migration with operational decisions to make beforehand (retention cutoff, priority
+threshold) and commands that must be permanently scheduled afterwards.
+
+See [`docs/MAIL_LOGS_PARTITIONING.md`](./docs/MAIL_LOGS_PARTITIONING.md) for the full runbook.
 
 ## API Documentation
 

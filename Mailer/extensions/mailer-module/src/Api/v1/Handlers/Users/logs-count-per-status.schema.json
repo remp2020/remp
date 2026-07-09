@@ -17,7 +17,7 @@
     "filter": {
       "type": "array",
       "items": {
-        "enum": ["sent_at", "delivered_at", "clicked_at", "opened_at", "dropped_at", "spam_complained_at", "hard_bounced_at"]
+        "enum": ["sent_at", "delivered_at", "clicked_at", "opened_at", "dropped_at", "spam_complained_at"]
       },
       "additionalProperties": false
     },

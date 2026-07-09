@@ -43,13 +43,16 @@ class MailgunEventHandler implements HandlerInterface
             throw new HermesException('unable to handle event: event is missing');
         }
 
-        $log = $this->logsRepository->findBySenderId($payload['mail_sender_id']);
+        $eventTimestamp = explode('.', (string) $payload['timestamp'])[0];
+        $date = DateTime::from($eventTimestamp);
+
+        // Search only recent partitions (events arrive within a few days of sending).
+        // findBySenderId automatically falls back to a full scan if not found in the window.
+        $since = (clone $date)->sub(new \DateInterval('P' . LogsRepository::SENDER_ID_LOOKUP_WINDOW_DAYS . 'D'));
+        $log = $this->logsRepository->findBySenderId($payload['mail_sender_id'], $since);
         if (!$log) {
             return false;
         }
-
-        $eventTimestamp = explode('.', (string) $payload['timestamp'])[0];
-        $date = DateTime::from($eventTimestamp);
 
         $mailgunEvent = $this->logsRepository->mapEvent($payload['event'], $payload['reason']);
         if (!$mailgunEvent) {

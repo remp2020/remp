@@ -101,17 +101,22 @@ class MailgunEventsCommand extends Command
                     continue;
                 }
 
-                $logs = $this->logsRepository->findAllBySenderId($userVariables['mail_sender_id']);
-                foreach ($logs as $log) {
-                    $updated = $this->logsRepository->update($log, [
-                        $mappedEvent => $date,
-                    ]);
+                $since = (clone $date)->sub(new DateInterval('P' . LogsRepository::SENDER_ID_LOOKUP_WINDOW_DAYS . 'D'));
+                $logs = $this->logsRepository->findAllBySenderId($userVariables['mail_sender_id'], $since);
+                if ((clone $logs)->count('*') === 0) {
+                    $logs = $this->logsRepository->findAllBySenderId($userVariables['mail_sender_id']);
+                }
 
-                    if (!$updated) {
-                        $output->writeln(sprintf("%s: event ignored, missing mail_logs record: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
-                    } else {
-                        $output->writeln(sprintf("%s: event processed: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
-                    }
+                $updated = false;
+                foreach ($logs as $log) {
+                    $this->logsRepository->update($log, [$mappedEvent => $date]);
+                    $updated = true;
+                }
+
+                if (!$updated) {
+                    $output->writeln(sprintf("%s: event ignored, missing mail_logs record: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
+                } else {
+                    $output->writeln(sprintf("%s: event processed: %s (%s)", $date, $event->getRecipient(), $event->getEvent()));
                 }
             }
 

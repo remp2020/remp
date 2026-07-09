@@ -14,7 +14,6 @@ class BatchTemplatesRepository extends Repository
         'clicked_at' => 'clicked',
         'opened_at' => 'opened',
         'spam_complained_at' => 'spam_complained',
-        'hard_bounced_at' => 'hard_bounced',
         'dropped_at' => 'dropped',
     ];
 

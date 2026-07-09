@@ -35,10 +35,6 @@
         },
         "spam_complained_at": {
           "from": "2020-04-07T13:33:44+02:00"
-        },
-        "hard_bounced_at": {
-          "from": "2020-04-07T13:33:44+02:00",
-          "to": "2020-06-07T13:33:44+02:00"
         }
       },
       "page": 1,
@@ -79,10 +75,6 @@
         },
         "spam_complained_at": {
           "title": "Spam complained at filter",
-          "$ref": "#/definitions/date-filter"
-        },
-        "hard_bounced_at": {
-          "title": "Hard bounced at filter",
           "$ref": "#/definitions/date-filter"
         }
       },

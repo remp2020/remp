@@ -31,7 +31,6 @@ trait ParseLogFilterConditionsTrait
             "opened_at" => "opened_at",
             "dropped_at" => "dropped_at",
             "spam_complained_at" => "spam_complained_at",
-            "hard_bounced_at" => "hard_bounced_at"
         ];
 
         if (!array_key_exists($field, $availableColumns)) {

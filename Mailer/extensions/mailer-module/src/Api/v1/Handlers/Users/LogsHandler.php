@@ -96,7 +96,6 @@ class LogsHandler extends BaseHandler
             $item->delivered_at = $this->formatDate($log->delivered_at);
             $item->dropped_at = $this->formatDate($log->dropped_at);
             $item->spam_complained_at = $this->formatDate($log->spam_complained_at);
-            $item->hard_bounced_at = $this->formatDate($log->hard_bounced_at);
             $item->clicked_at = $this->formatDate($log->clicked_at);
             $item->opened_at = $this->formatDate($log->opened_at);
             $item->attachment_size = $log->attachment_size;

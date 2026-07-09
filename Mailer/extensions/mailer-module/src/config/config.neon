@@ -57,6 +57,10 @@ services:
 			- add(Remp\MailerModule\Commands\HeartbeatCommand())
 			- add(Remp\MailerModule\Commands\MailTypeStatsCommand())
 			- add(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand())
+			- add(Remp\MailerModule\Commands\MigrateMailLogsToPartitionsCommand())
+			- add(Remp\MailerModule\Commands\BackfillMailLogsPartitionsCommand())
+			- add(Remp\MailerModule\Commands\PruneMailLogsPartitionsCommand())
+			- add(Remp\MailerModule\Commands\SeedMailLogsPartitionsCommand())
 			- add(Remp\MailerModule\Commands\MigrateUserSubscriptionsAndVariantsCommand())
 			- add(Remp\MailerModule\Commands\MigrateAutologinTokensCommand())
 			- add(Remp\MailerModule\Commands\BigintMigrationCleanupCommand())
@@ -262,7 +266,7 @@ services:
 		factory: Remp\MailerModule\Repositories\LogsRepository
 		setup:
 			- setNewTableName('mail_logs_v2')
-			- setNewTableDataMigrationIsRunningFlag(Remp\MailerModule\Commands\MigrateMailLogsAndConversionsCommand::MAIL_LOGS_AND_CONVERSIONS_IS_RUNNING)
+			- setNewTableDataMigrationIsRunningFlag(Remp\MailerModule\Commands\MigrateMailLogsToPartitionsCommand::MAIL_LOGS_PARTITIONS_MIGRATION_IS_RUNNING)
 			- setRedisClientFactory(@redisClientFactory)
 
 	logConversionsRepository:

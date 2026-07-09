@@ -119,7 +119,6 @@ class ProcessJobStatsCommand extends Command
                         'clicked' => $stats->clicked ?? 0,
                         'dropped' => $stats->dropped ?? 0,
                         'spam_complained' => $stats->spam_complained ?? 0,
-                        'hard_bounced' => $stats->hard_bounced ?? 0,
                     ]);
                     $progressBar->advance();
                 }

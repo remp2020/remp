@@ -10,6 +10,13 @@ class LogsRepository extends Repository
 {
     use NewTableDataMigrationTrait;
 
+    /**
+     * Delivery events normally arrive within a few days of sending. Callers doing a
+     * mail_sender_id lookup use this as the created_at lower bound so MySQL can prune
+     * to recent partitions instead of scanning the whole (500M+ row) table.
+     */
+    public const SENDER_ID_LOOKUP_WINDOW_DAYS = 14;
+
     protected $tableName = 'mail_logs';
 
     protected array $dataTableSearchable = ['email'];
@@ -19,15 +26,15 @@ class LogsRepository extends Repository
         'clicked' => 'clicked_at',
         'opened' => 'opened_at',
         'complained' => 'spam_complained_at',
-        'bounced' => 'hard_bounced_at',
+        'bounced' => 'dropped_at',
         'failed' => 'dropped_at',
         'dropped' => 'dropped_at',
     ];
 
     private array $bouncesMap = [
-        'suppress-bounce' => 'hard_bounced_at',
-        'suppress-complaint' => 'hard_bounced_at',
-        'suppress-unsubscribe' => 'hard_bounced_at',
+        'suppress-bounce' => 'dropped_at',
+        'suppress-complaint' => 'dropped_at',
+        'suppress-unsubscribe' => 'dropped_at',
     ];
 
     public function allForEmail(string $email): Selection
@@ -43,8 +50,17 @@ class LogsRepository extends Repository
         return $this->getTable()->where('email', $emails);
     }
 
-    public function add(string $email, string $subject, int $templateId, ?int $jobId = null, ?int $batchId = null, ?string $mailSenderId = null, ?int $attachmentSize = null, ?string $context = null, ?int $userId = null): ActiveRow
-    {
+    public function add(
+        string $email,
+        string $subject,
+        int $templateId,
+        ?int $jobId = null,
+        ?int $batchId = null,
+        ?string $mailSenderId = null,
+        ?int $attachmentSize = null,
+        ?string $context = null,
+        ?int $userId = null,
+    ): ActiveRow {
         return $this->insert(
             $this->getInsertData($email, $subject, $templateId, $jobId, $batchId, $mailSenderId, $attachmentSize, $context, $userId)
         );
@@ -100,14 +116,51 @@ class LogsRepository extends Repository
         return $this->getTable()->where('mail_job_id', $jobId)->order('created_at DESC');
     }
 
-    public function findBySenderId(string $senderId): ?ActiveRow
+    /**
+     * findBySenderId finds the first log row matching $senderId.
+     *
+     * When $since is provided the query also adds a created_at >= $since predicate,
+     * which lets the MySQL optimizer prune old partitions and touch only the recent
+     * months when delivery events normally arrive (typically within a few days of
+     * sending). If no row is found within the window the method retries without
+     * the bound so that rare late events are still matched.
+     */
+    public function findBySenderId(string $senderId, ?\DateTimeInterface $since = null): ?ActiveRow
     {
-        return $this->getTable()->where('mail_sender_id', $senderId)->limit(1)->fetch();
+        if ($since !== null) {
+            /** @var ActiveRow $row */
+            $row = $this->getTable()
+                ->where('mail_sender_id', $senderId)
+                ->where('created_at >= ?', $since)
+                ->limit(1)
+                ->fetch();
+
+            if ($row !== null) {
+                return $row;
+            }
+            // Rare late event: fall back to a full-table scan.
+        }
+
+        /** @var ActiveRow $row */
+        $row = $this->getTable()->where('mail_sender_id', $senderId)->limit(1)->fetch();
+
+        return $row;
     }
 
-    public function findAllBySenderId(string $senderId): Selection
+    /**
+     * Returns all log rows matching $senderId.
+     *
+     * When $since is provided the query adds a created_at >= $since predicate for
+     * partition pruning.  Unlike findBySenderId there is no automatic fallback here;
+     * callers that need the fallback behaviour should handle it themselves.
+     */
+    public function findAllBySenderId(string $senderId, ?\DateTimeInterface $since = null): Selection
     {
-        return $this->getTable()->where('mail_sender_id', $senderId);
+        $query = $this->getTable()->where('mail_sender_id', $senderId);
+        if ($since !== null) {
+            $query = $query->where('created_at >= ?', $since);
+        }
+        return $query;
     }
 
     public function getBatchTemplateStats(ActiveRow $batchTemplate): ?ActiveRow
@@ -117,10 +170,10 @@ class LogsRepository extends Repository
             'COUNT(delivered_at) AS delivered',
             'COUNT(dropped_at) AS dropped',
             'COUNT(spam_complained_at) AS spam_complained',
-            'COUNT(hard_bounced_at) AS hard_bounced',
             'COUNT(clicked_at) AS clicked',
             'COUNT(opened_at) AS opened'
         ];
+
         return $this->getTable()
             ->select(implode(',', $columns))
             ->where([
@@ -138,7 +191,6 @@ class LogsRepository extends Repository
             'COUNT(delivered_at) AS delivered',
             'COUNT(dropped_at) AS dropped',
             'COUNT(spam_complained_at) AS spam_complained',
-            'COUNT(hard_bounced_at) AS hard_bounced',
             'COUNT(clicked_at) AS clicked',
             'COUNT(opened_at) AS opened',
             'COUNT(:mail_log_conversions.converted_at) AS converted',
@@ -292,7 +344,9 @@ class LogsRepository extends Repository
         $data['updated_at'] = new \DateTime();
         $result = parent::update($row, $data);
         if ($this->newTableDataMigrationIsRunning()) {
-            $this->getNewTable()->where('id', $row->id)->update($data);
+            // Include created_at in the WHERE clause so the query prunes to the
+            // correct partition on the shadow table during the migration window.
+            $this->getNewTable()->where(['id' => $row->id, 'created_at' => $row->created_at])->update($data);
         }
         return $result;
     }

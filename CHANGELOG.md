@@ -27,6 +27,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added a per-newsletter-type "Exclude emails from search" option that hides a mail type's templates from the email template search. remp/remp#1462
 - Fixed a null error in the newsletter list form when no `system` mail type exists. remp/remp#1462
+- **IMPORTANT**: Added support for partitioning the `mail_logs` table by month to keep it performant at scale. Requires a manual migration and permanently scheduled commands afterwards — see `Mailer/extensions/mailer-module/docs/MAIL_LOGS_PARTITIONING.md`. remp/remp#1481
+  - Added `mail_logs:migrate-to-partitions`, `mail_logs:backfill-partitions`, `mail_logs:prune-partitions` and `mail_logs:seed-partitions` commands.
+  - Added a persisted daily stats rollup (`mail_template_direct_stats`) and a `mail_logs_stats_state` cutoff date so template/newsletter statistics stay accurate after old `mail_logs` rows are pruned.
+- **BREAKING**: Removed the `hard_bounced_at` column from `mail_logs`, and the matching `hard_bounced_at` filter/response field from the `mail:logs` and `mail:logs-count-per-status` API endpoints. remp/remp#1481
+  - Use `dropped_at` instead — bounce events are now recorded there.
+- **BREAKING**: Removed `LogsRepository::getNonBatchTemplateStats()`. remp/remp#1481
+  - Use `MailTemplateDirectStatsRepository::sumForTemplates()` instead; it reads a daily precomputed rollup (populated by `mail:aggregate-mail-template-stats`) rather than live-scanning `mail_logs`, and no longer exposes a `hard_bounced` key.
+- **BREAKING**: Changed `mail:aggregate-mail-template-stats` to take `--date=`/`--from=` options instead of a positional `date` argument. remp/remp#1481
+  - Update any crontab/scheduler entries from `mail:aggregate-mail-template-stats YYYY-MM-DD` to `mail:aggregate-mail-template-stats --date=YYYY-MM-DD` (or `--from=YYYY-MM-DD` to recompute/backfill a range, including today).
+- **BREAKING**: Dropped all foreign keys to/from `mail_logs` (InnoDB forbids FKs on partitioned tables); its primary key is now composite `(id, created_at)` instead of `id`. remp/remp#1481
+  - If you have custom modules/repositories doing implicit Nette DB joins against `mail_logs` (e.g. `->where('mail_template.code', ...)`), either register a `Conventions` service that knows these relations (see `Models/Database/PartitionedConventions.php` for the pattern) or rewrite them as explicit `WHERE` conditions on the FK id column — the default `DiscoveredConventions` FK-based join discovery no longer resolves joins to/from this table.
 
 ## Archive
 

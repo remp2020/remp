@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Hermes;
 
+use Nette\Utils\DateTime;
 use Remp\MailerModule\Models\Crm\Client;
 use Remp\MailerModule\Models\Crm\UserNotFoundException;
 use Remp\MailerModule\Repositories\LogsRepository;
@@ -40,7 +41,13 @@ class ValidateCrmEmailHandler implements HandlerInterface
             return true;
         }
 
-        $log = $this->logsRepository->findBySenderId($payload['mail_sender_id']);
+        $eventTimestamp = explode('.', (string) $payload['timestamp'])[0];
+        $date = DateTime::from($eventTimestamp);
+
+        // Search only recent partitions (events arrive within a few days of sending).
+        // findBySenderId automatically falls back to a full scan if not found in the window.
+        $since = (clone $date)->sub(new \DateInterval('P' . LogsRepository::SENDER_ID_LOOKUP_WINDOW_DAYS . 'D'));
+        $log = $this->logsRepository->findBySenderId($payload['mail_sender_id'], $since);
         if (!$log) {
             return false;
         }
