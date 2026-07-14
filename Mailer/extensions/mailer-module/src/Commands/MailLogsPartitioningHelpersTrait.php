@@ -23,23 +23,20 @@ use Symfony\Component\Console\Output\OutputInterface;
  * regexp/format copy.
  *
  * Requires the consuming class to have a `private Explorer $database` (or
- * compatible) property, and a `TABLE` constant naming the partitioned table
- * (used by isPartitioned()).
+ * compatible) property. The partitioned table name is fixed to self::TABLE below.
  */
 trait MailLogsPartitioningHelpersTrait
 {
+    public const TABLE = 'mail_logs';
+
     /**
-     * Default --priority-threshold used by MigrateMailLogsToPartitionsCommand,
-     * BackfillMailLogsPartitionsCommand and PruneMailLogsPartitionsCommand alike, so all
-     * three resolve the same system/priority template set unless an operator overrides it.
+     * Determines minimum priority outside of system emails to keep forever.
      */
     public const DEFAULT_PRIORITY_THRESHOLD = 1000;
 
     /**
      * Column lists shared by every INSERT IGNORE ... SELECT ... used to copy rows between
-     * mail_logs / mail_logs_v2 / mail_logs_old / stage_YYYY_MM tables — single source of
-     * truth for the fleet-drift normalisations (see insertSelectSql()) instead of
-     * copy-pasted column lists at every call site.
+     * mail_logs / mail_logs_partitioned / mail_logs_old / stage_YYYY_MM tables.
      */
     public const INSERT_COLUMNS = "`id`, `email`, `user_id`, `subject`,
              `mail_template_id`, `mail_job_id`, `mail_job_batch_id`,
@@ -55,30 +52,18 @@ trait MailLogsPartitioningHelpersTrait
              `clicked_at`, `opened_at`,
              `attachment_size`, `created_at`, COALESCE(`updated_at`, `created_at`)";
 
+
     /**
-     * Secondary indexes of the canonical schema (see createCanonicalTable() in the
-     * CreatePartitionedMailLogsTable migration) — single source of truth for the
-     * drop-before/rebuild-after steps around a bulk load. Dropped before the backfill
+     * The p_YYYY_MM partition-name convention.
+     */
+    private const PARTITION_NAME_PATTERN = '^p_([0-9]{4})_([0-9]{2})$';
+
+    /**
+     * Secondary indexes of the new mail_logs canonical schema (see createCanonicalTable() in the
+     * CreatePartitionedMailLogsTable migration). Dropped before the backfill
      * (so rows are inserted via the near-sequential PK only, not 14 additional
-     * random-insert B-trees) and rebuilt afterwards in a single combined ALTER TABLE,
-     * which lets InnoDB use its sort-based bulk index builder to build every index from
-     * one pass over the clustered index instead of maintaining them row-by-row during
-     * the backfill (or re-scanning the table once per index).
+     * random-insert B-trees) and rebuilt afterward.
      */
-    /**
-     * The p_YYYY_MM partition-name convention established by the CreatePartitionedMailLogsTable
-     * migration, in PCRE form — single source of truth so every command parses/validates
-     * partition names identically. Capture groups: 1 = year, 2 = month.
-     */
-    private const PARTITION_NAME_PATTERN = '/^p_(\d{4})_(\d{2})$/';
-
-    /**
-     * Same convention as PARTITION_NAME_PATTERN, in MySQL's POSIX regexp dialect — needed
-     * wherever the match happens in SQL (e.g. filtering information_schema.PARTITIONS)
-     * rather than in PHP.
-     */
-    private const PARTITION_NAME_SQL_PATTERN = '^p_[0-9]{4}_[0-9]{2}$';
-
     public const SECONDARY_INDEXES = [
         'email' => ['email'],
         'user_id' => ['user_id'],
@@ -247,7 +232,7 @@ trait MailLogsPartitioningHelpersTrait
      */
     private function isPartitionName(string $name): bool
     {
-        return (bool) preg_match(self::PARTITION_NAME_PATTERN, $name);
+        return (bool) preg_match('/' . self::PARTITION_NAME_PATTERN . '/', $name);
     }
 
     /**
@@ -256,7 +241,7 @@ trait MailLogsPartitioningHelpersTrait
      */
     private function monthBoundsForPartitionName(string $partitionName): array
     {
-        if (!preg_match(self::PARTITION_NAME_PATTERN, $partitionName, $m)) {
+        if (!preg_match('/' . self::PARTITION_NAME_PATTERN . '/', $partitionName, $m)) {
             throw new \InvalidArgumentException("Partition name `{$partitionName}` does not match p_YYYY_MM.");
         }
 

@@ -35,8 +35,6 @@ class SeedMailLogsPartitionsCommand extends Command
 
     public const COMMAND_NAME = 'mail_logs:seed-partitions';
 
-    private const TABLE = 'mail_logs';
-
     public function __construct(
         private Explorer $database,
     ) {

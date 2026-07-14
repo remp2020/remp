@@ -77,6 +77,11 @@ class UnsubscribeInactiveUsersCommand extends Command
 
         $userIds = $this->segmentAggregator->users(['provider' => $segmentProvider, 'code' => $segment]);
 
+        // No join to mail_logs (due to partitioning), need to fetch template ID separately.
+        $allowedTemplateIds = $this->templatesRepository->getTable()
+            ->where('mail_type.code NOT IN', $omitMailTypeCodes)
+            ->fetchPairs(null, 'id');
+
         foreach ($userIds as $userId) {
             $output->write("* Checking user <info>{$userId}</info>: ");
             $subscribed = $this->userSubscriptionsRepository->getTable()
@@ -90,7 +95,7 @@ class UnsubscribeInactiveUsersCommand extends Command
                 $logs = $this->logsRepository->getTable()
                     ->where('user_id', $userId)
                     ->where('delivered_at > ', DateTime::from("-{$dayLimit} days"))
-                    ->where('mail_template.mail_type.code NOT IN', $omitMailTypeCodes)
+                    ->where('mail_template_id', $allowedTemplateIds)
                     ->fetchAll();
 
                 $logCount = count($logs);

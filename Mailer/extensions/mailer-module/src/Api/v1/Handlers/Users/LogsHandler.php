@@ -8,6 +8,7 @@ use Nette\Utils\DateTime;
 use Remp\MailerModule\Api\JsonValidationTrait;
 use Remp\MailerModule\Api\v1\Handlers\Mailers\Traits\ParseLogFilterConditionsTrait;
 use Remp\MailerModule\Repositories\LogsRepository;
+use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tomaj\NetteApi\Handlers\BaseHandler;
 use Tomaj\NetteApi\Params\JsonInputParam;
 use Tomaj\NetteApi\Response\JsonApiResponse;
@@ -17,16 +18,14 @@ use Tracy\ILogger;
 
 class LogsHandler extends BaseHandler
 {
-    private $logsRepository;
-
     use JsonValidationTrait;
     use ParseLogFilterConditionsTrait;
 
     public function __construct(
-        LogsRepository $logsRepository
+        private readonly LogsRepository $logsRepository,
+        private readonly TemplatesRepository $templatesRepository
     ) {
         parent::__construct();
-        $this->logsRepository = $logsRepository;
     }
 
     public function params(): array
@@ -50,7 +49,11 @@ class LogsHandler extends BaseHandler
             $logs->where('mail_template_id', $payload['mail_template_ids']);
         }
         if (isset($payload['mail_template_codes'])) {
-            $logs->where('mail_template.code', $payload['mail_template_codes']);
+            $mailTemplates = $this->templatesRepository->getTable()
+                ->select('id')
+                ->where('code', $payload['mail_template_codes']);
+
+            $logs->where('mail_template_id', $mailTemplates);
         }
         if (isset($payload['page'])) {
             $logs->limit($payload['limit'], ($payload['page'] - 1) * $payload['limit']);
@@ -69,13 +72,18 @@ class LogsHandler extends BaseHandler
 
         try {
             $logs = $logs->order('created_at DESC')->fetchAll();
+
+            $mailTemplateIds = array_unique(array_map(fn ($log) => $log->mail_template_id, $logs));
+            $mailTemplates = $this->templatesRepository->getTable()
+                ->where('id', $mailTemplateIds)
+                ->fetchPairs('id');
         } catch (\Exception $exception) {
             if ($exception->getCode() === '42S22' && str_contains($exception->getMessage(), 'user_id')) {
                 Debugger::log("Missing 'user_id' column in 'mail_logs' table", ILogger::WARNING);
                 return new JsonApiResponse(IResponse::S501_NotImplemented, [
                     'status' => 'error',
                     'message' => "Missing 'user_id' column in 'mail_logs' table",
-                    'detail' => "You probably don't have newest version of 'mail_logs' table. For more information about migration, check 'mail:migrate-mail-logs-and-conversions' command."
+                    'detail' => "You probably don't have newest version of 'mail_logs' table. The 'user_id' column is added by the 'CreateNewMailLogsAndMailConversionsTable' migration, which has to be completed on a pre-5.2.0 release (see the README's bigint migration section)."
                 ]);
             }
             throw $exception;
@@ -89,8 +97,8 @@ class LogsHandler extends BaseHandler
             $item->subject = $log->subject;
             $item->mail_template = [
                 'id' => $log->mail_template_id,
-                'code' => $log->mail_template->code,
-                'name' => $log->mail_template->name,
+                'code' => $mailTemplates[$log->mail_template_id]->code,
+                'name' => $mailTemplates[$log->mail_template_id]->name,
             ];
             $item->sent_at = $this->formatDate($log->created_at);
             $item->delivered_at = $this->formatDate($log->delivered_at);

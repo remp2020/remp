@@ -68,7 +68,7 @@ class UserDeleteApiHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals(3, $this->mailLogsRepository->totalCount());
         $this->assertEquals(1, $this->mailLogsRepository->getTable()->where('email', $email)->count('*'));
         $this->assertEquals(3, $this->mailLogConversionsRepository->totalCount());
-        $this->assertEquals(1, $this->mailLogConversionsRepository->getTable()->where('mail_log.email', $email)->count('*'));
+        $this->assertEquals(1, $this->countMailLogConversionsForEmail($email));
         $this->assertEquals(3, $this->userSubscriptionsRepository->totalCount());
         $this->assertEquals(1, $this->userSubscriptionsRepository->getTable()->where('user_email', $email)->count('*'));
         $this->assertEquals(3, $this->userSubscriptionVariantsRepository->totalCount());
@@ -94,11 +94,22 @@ class UserDeleteApiHandlerTest extends BaseApiHandlerTestCase
         $this->assertEquals(2, $this->mailLogsRepository->totalCount());
         $this->assertEquals(0, $this->mailLogsRepository->getTable()->where('email', $email)->count('*'));
         $this->assertEquals(2, $this->mailLogConversionsRepository->totalCount());
-        $this->assertEquals(0, $this->mailLogConversionsRepository->getTable()->where('mail_log.email', $email)->count('*'));
+        $this->assertEquals(0, $this->countMailLogConversionsForEmail($email));
         $this->assertEquals(2, $this->userSubscriptionsRepository->totalCount());
         $this->assertEquals(0, $this->userSubscriptionsRepository->getTable()->where('user_email', $email)->count('*'));
         $this->assertEquals(2, $this->userSubscriptionVariantsRepository->totalCount());
         $this->assertEquals(0, $this->userSubscriptionVariantsRepository->getTable()->where('mail_user_subscription.user_email', $email)->count('*'));
+    }
+
+    /**
+     * mail_logs is partitioned and carries no FK to mail_log_conversions (InnoDB forbids
+     * FKs on partitioned tables), so `mail_log_conversions->getTable()->where('mail_log.email', ...)`
+     * can no longer be used. Resolve the mail_log ids for the email first instead.
+     */
+    private function countMailLogConversionsForEmail(string $email): int
+    {
+        $mailLogIds = $this->mailLogsRepository->getTable()->where('email', $email)->fetchPairs(null, 'id');
+        return $this->mailLogConversionsRepository->getTable()->where('mail_log_id', $mailLogIds)->count('*');
     }
 
     /** MAIL DATA helper */

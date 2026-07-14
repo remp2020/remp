@@ -7,14 +7,8 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
  * ConsoleOutput that prefixes every non-empty line with a `[Y-m-d H:i:s]` timestamp,
- * so long-running commands (e.g. MigrateMailLogsToPartitionsCommand,
- * BackfillMailLogsPartitionsCommand) can be paced from their CLI output without every
- * call site having to time-stamp itself.
- *
- * Overriding doWrite() (rather than implementing the whole OutputInterface) is enough:
- * every write()/writeln() call — including calls made from shared traits — passes
- * through it exactly once per line. Blank lines (used as visual spacing) are left
- * untouched.
+ * so long-running commands can be paced from their CLI output without every
+ * call site having to time-stamp itself. Blank lines are left untouched.
  */
 class TimestampedConsoleOutput extends ConsoleOutput
 {

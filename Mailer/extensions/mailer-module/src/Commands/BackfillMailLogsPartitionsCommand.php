@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Commands;
 
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Repositories\MailLogsStatsStateRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,12 +49,11 @@ class BackfillMailLogsPartitionsCommand extends Command
 
     public const COMMAND_NAME = 'mail_logs:backfill-partitions';
 
-    private const TABLE = 'mail_logs';
-
     private const OLD_TABLE = 'mail_logs_old';
 
     public function __construct(
         private Explorer $database,
+        private MailLogsStatsStateRepository $mailLogsStatsStateRepository,
     ) {
         parent::__construct();
     }
@@ -237,6 +237,13 @@ class BackfillMailLogsPartitionsCommand extends Command
             // it) — nothing to exchange, just mark it done.
             $output->writeln("  Live partition already has all {$liveCount} targeted row(s) for this month; skipping stage/exchange.");
             $this->markDone($partitionName);
+
+            if ($cutoffDate !== null) {
+                $this->mailLogsStatsStateRepository->raiseCutoffDateTo($cutoffDate);
+            } else {
+                $this->mailLogsStatsStateRepository->lowerCutoffDateTo($monthStart);
+            }
+
             return;
         }
 
@@ -273,6 +280,13 @@ class BackfillMailLogsPartitionsCommand extends Command
         $this->database->query("DROP TABLE `{$stageTable}`");
 
         $this->markDone($partitionName);
+
+        if ($cutoffDate !== null) {
+            $this->mailLogsStatsStateRepository->raiseCutoffDateTo($cutoffDate);
+        } else {
+            $this->mailLogsStatsStateRepository->lowerCutoffDateTo($monthStart);
+        }
+
         $output->writeln("  `{$partitionName}` done.");
     }
 

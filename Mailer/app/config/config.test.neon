@@ -43,6 +43,8 @@ services:
 			- addDomain('expresso.pt')
 
 	- Remp\MailerModule\Commands\UnsubscribeInactiveUsersCommand
+	- Remp\MailerModule\Commands\AggregateMailTemplateStatsCommand
+	- Remp\MailerModule\Commands\ProcessJobStatsCommand
 
 	- Tests\Unit\NullTracker
 	- Tests\Feature\TestSegmentProvider

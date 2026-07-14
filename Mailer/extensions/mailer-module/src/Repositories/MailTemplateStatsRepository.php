@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use DateTime;
 use Nette\Caching\Storage;
 use Nette\Database\Explorer;
-use Nette\Utils\DateTime;
 
 class MailTemplateStatsRepository extends Repository
 {
+    use DailyTemplateStatsUpsertTrait;
+
     protected $tableName = 'mail_template_stats';
 
     public function __construct(
@@ -17,14 +19,6 @@ class MailTemplateStatsRepository extends Repository
         ?Storage $cacheStorage = null
     ) {
         parent::__construct($database, $cacheStorage);
-    }
-
-    public function byDateAndMailTemplateId(DateTime $date, int $id): ?ActiveRow
-    {
-        return $this->getTable()
-            ->where('mail_template_id', $id)
-            ->where('date', $date->format('Y-m-d'))
-            ->fetch();
     }
 
     public function byMailTemplateId(int $id): Selection

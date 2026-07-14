@@ -21,6 +21,7 @@ use Remp\MailerModule\Models\ChartTrait;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
+use Remp\MailerModule\Repositories\MailTemplateDirectStatsRepository;
 use Remp\MailerModule\Repositories\MailTemplateStatsRepository;
 use Remp\MailerModule\Repositories\MailTypeStatsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
@@ -36,6 +37,7 @@ final class ListPresenter extends BasePresenter
         private readonly TemplatesRepository $templatesRepository,
         private readonly MailTypeStatsRepository $mailTypeStatsRepository,
         private readonly MailTemplateStatsRepository $mailTemplateStatsRepository,
+        private readonly MailTemplateDirectStatsRepository $mailTemplateDirectStatsRepository,
         private readonly UserSubscriptionsRepository $userSubscriptionsRepository,
         private readonly ListFormFactory $listFormFactory,
         private readonly DuplicateListFormFactory $duplicateListFormFactory,
@@ -314,6 +316,11 @@ final class ListPresenter extends BasePresenter
                 $opened += $jobBatchTemplate->opened;
                 $clicked += $jobBatchTemplate->clicked;
             }
+
+            $direct = $this->mailTemplateDirectStatsRepository->sumForTemplates([$template->id]);
+            $opened += $direct['opened'];
+            $clicked += $direct['clicked'];
+
             $result['data'][] = [
                 'actions' => [
                     'show' => $this->link('Template:Show', $template->id),

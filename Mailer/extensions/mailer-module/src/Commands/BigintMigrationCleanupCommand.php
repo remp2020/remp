@@ -39,6 +39,20 @@ class BigintMigrationCleanupCommand extends Command
             return Command::FAILURE;
         }
 
+        if ($migratedTable === MigrateMailLogsToPartitionsCommand::TABLE && $this->partitionBackfillIsPending()) {
+            $this->error(
+                'The mail_logs partitioning backfill is not finished: `'
+                . MigrateMailLogsToPartitionsCommand::BACKFILL_STATE_TABLE
+                . '` still has pending month partition(s).'
+            );
+            $this->error(
+                '`mail_logs_old` is the only source mail_logs:backfill-partitions can read from, so dropping it now '
+                . 'would permanently lose those months. Finish mail_logs:backfill-partitions first — or, if you have '
+                . 'deliberately abandoned the backfill, drop the table manually.'
+            );
+            return Command::FAILURE;
+        }
+
         $v2Table = $migratedTable . '_v2';
         if ($this->tableExists($v2Table) && !$this->confirm("Migration table `{$v2Table}` still exists, are you sure that migration was successful?", false)) {
             $this->error("Cleanup cancelled.");
@@ -60,6 +74,18 @@ class BigintMigrationCleanupCommand extends Command
         $this->database->query("DROP TABLE IF EXISTS {$tableToDrop};");
         $this->info('Done.');
         return Command::SUCCESS;
+    }
+
+    private function partitionBackfillIsPending(): bool
+    {
+        $stateTable = MigrateMailLogsToPartitionsCommand::BACKFILL_STATE_TABLE;
+        if (!$this->tableExists($stateTable)) {
+            return false;
+        }
+
+        return (bool) $this->database
+            ->query("SELECT 1 FROM `{$stateTable}` WHERE `status` = 'pending' LIMIT 1")
+            ->fetch();
     }
 
     private function tableExists(string $tableName): bool

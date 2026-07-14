@@ -26,6 +26,7 @@ use Remp\MailerModule\Forms\TemplateTestFormFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\LogsRepository;
+use Remp\MailerModule\Repositories\MailTemplateDirectStatsRepository;
 use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\TemplateTranslationsRepository;
@@ -35,6 +36,7 @@ final class TemplatePresenter extends BasePresenter
     public function __construct(
         private TemplatesRepository $templatesRepository,
         private LogsRepository $logsRepository,
+        private MailTemplateDirectStatsRepository $mailTemplateDirectStatsRepository,
         private TemplateFormFactory $templateFormFactory,
         private TemplateTestFormFactory $templateTestFormFactory,
         private LayoutsRepository $layoutsRepository,
@@ -135,6 +137,9 @@ final class TemplatePresenter extends BasePresenter
         /** @var ActiveRow $template */
         foreach ($templates as $template) {
             $editUrl = $this->link('Edit', $template->id);
+
+            $direct = $this->mailTemplateDirectStatsRepository->sumForTemplates([$template->id]);
+
             $result['data'][] = [
                 'actions' => [
                     'show' => $this->link('Show', $template->id),
@@ -150,8 +155,8 @@ final class TemplatePresenter extends BasePresenter
                 ],
                 $template->type->title,
                 $template->mail_layout->name,
-                $template->related('mail_job_batch_template')->sum('opened') + $template->related('mail_logs', 'mail_template_id')->where('mail_job_id IS NULL')->count('opened_at'),
-                $template->related('mail_job_batch_template')->sum('clicked') + $template->related('mail_logs', 'mail_template_id')->where('mail_job_id IS NULL')->count('clicked_at'),
+                $template->related('mail_job_batch_template')->sum('opened') + $direct['opened'],
+                $template->related('mail_job_batch_template')->sum('clicked') + $direct['clicked'],
             ];
         }
         $this->presenter->sendJson($result);

@@ -909,9 +909,33 @@ aggregation, so they're displayed right in the job detail.
 * * * * * php /home/remp/workspace/remp/Mailer/bin/command.php mail:job-stats
 ```
 
+#### Mail template statistics aggregation
+
+Template and newsletter statistics (sent/delivered/opened/clicked/converted, both for batch sends and for direct
+sends such as system/transactional mail) are read from persisted daily rollups (`mail_template_stats` /
+`mail_template_direct_stats`) rather than live-queried from `mail_logs`. This is required, not optional — without
+these commands running, the rollups stop being updated and reported statistics go stale or, for tables that were
+never backfilled, stay at zero forever.
+
+```
+# Keep yesterday's and today's stats rollups current (the only source the UI reads from).
+# Both entries share one lock: the per-minute run can outlast a minute on a large installation,
+# and at 02:00 it overlaps the trailing-window run below by construction.
+* * * * * flock -n /var/lock/mailer-aggregate-stats.lock php /home/remp/workspace/remp/Mailer/bin/command.php mail:aggregate-mail-template-stats
+
+# Re-aggregate the last 30 days once a day, so opens/clicks/conversions that arrive after
+# a day was first sealed still land on the day the mail was actually sent.
+0 2 * * * flock /var/lock/mailer-aggregate-stats.lock php /home/remp/workspace/remp/Mailer/bin/command.php mail:aggregate-mail-template-stats --from=$(date -d '-30 days' +\%Y-\%m-\%d)
+```
+
+With no options, the command aggregates yesterday and today; the daily `--from=` run re-aggregates a trailing
+window to pick up late-arriving webhook events. If `mail_logs` has been migrated to a partitioned table, this range
+is automatically clamped to the pruning cutoff date — see
+[`docs/MAIL_LOGS_PARTITIONING.md`](./docs/MAIL_LOGS_PARTITIONING.md#permanently-scheduled).
+
 #### Mail logs partitioning
 
-Once `mail_logs` has been migrated to a partitioned table (see [Mail logs partitioning migration](#mail-logs-partitioning-migration-version--520) below), two commands need to run permanently to keep partitioning and pruning working as expected:
+Once `mail_logs` has been migrated to a partitioned table (see [Mail logs partitioning migration](#mail-logs-partitioning-migration-version--520) below), two more commands need to run permanently to keep partitioning and pruning working as expected, in addition to `mail:aggregate-mail-template-stats` above:
 
 ```
 # Keep future partitions materialized ahead of time.
@@ -1043,6 +1067,8 @@ _This migration process is necessary only for installations after specific versi
 
 Consists of `mail_logs` and `mail_log_conversions` table migration. Also contains adding `user_id` column to `mail_logs` table.
 
+> **The `mail:migrate-mail-logs-and-conversions` command was removed in 5.2.0.** If this migration never completed on your installation — `mail_logs.user_id` missing, or a leftover `mail_logs_v2` / `mail_log_conversions_v2` / `mail_logs_old` table — you have to finish it on a pre-5.2.0 release before upgrading. The [`mail_logs` partitioning migration](docs/MAIL_LOGS_PARTITIONING.md) hard-requires it (its copy queries select `user_id`), so `CreatePartitionedMailLogsTable` aborts with instructions when it detects an unfinished bigint migration.
+
 Steps:
 1. running phinx migration `CreateNewMailLogsAndMailConversionsTable` - which creates new tables `mail_logs_v2` and `mail_log_conversions_v2` (in case there is no data in tables, migration just changes type of primary key and next steps are not needed)
 2. running command `mail:migrate-mail-logs-and-conversions` which copies data from old tables to new (e.g. `mail_logs` to `mail_logs_v2`) - command will after successful migration atomically rename tables (e.g. `mail_logs` -> `mail_logs_old` and `mail_logs_v2` -> `mail_logs`) so when the migration ends only new tables are used
@@ -1052,6 +1078,8 @@ It's recommended to run (in order):
 2. `mail:bigint_migration_cleanup mail_logs`
 
 commands, at least 2 weeks (to preserve backup data, if some issue emerges) after successful migration to drop left-over tables.
+
+> `mail:bigint_migration_cleanup mail_logs` refuses to run while `mail_logs_backfill_state` still has `pending` rows, because `mail_logs_old` is also the frozen source the [partitioning backfill](docs/MAIL_LOGS_PARTITIONING.md) reads from. Finish `mail_logs:backfill-partitions` first, or drop the table manually if you have deliberately abandoned the backfill.
 
 ### User subscription migration (version < 1.2.0)
 
@@ -1082,6 +1110,16 @@ It's recommended to run `mail:bigint_migration_cleanup autologin_tokens` command
 `mail_logs` is now partitioned by month to stay performant at scale. This is a more involved,
 multi-step migration with operational decisions to make beforehand (retention cutoff, priority
 threshold) and commands that must be permanently scheduled afterwards.
+
+Like the bigint migrations above it builds the new schema in a shadow table — `mail_logs_partitioned`,
+created by the `CreatePartitionedMailLogsTable` phinx migration — which `mail_logs:migrate-to-partitions`
+then swaps in (`mail_logs` -> `mail_logs_old`, `mail_logs_partitioned` -> `mail_logs`).
+
+**Precondition:** the [mail logs bigint migration](#mail-logs-migration-version--110) must already be
+complete — `mail_logs.user_id` present, and no leftover `mail_logs_v2` / `mail_log_conversions_v2` /
+`mail_logs_old` tables. Its `mail:migrate-mail-logs-and-conversions` command was removed in this
+release, so an unfinished bigint migration has to be completed on a pre-5.2.0 release first. Both
+`CreatePartitionedMailLogsTable` and `mail_logs:migrate-to-partitions` refuse to run otherwise.
 
 See [`docs/MAIL_LOGS_PARTITIONING.md`](./docs/MAIL_LOGS_PARTITIONING.md) for the full runbook.
 
@@ -1891,8 +1929,8 @@ Returns mail logs based on given criteria.
   "user_id": 123, // Integer
 
   // optional
-  "filter": { // Available filters are delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
-    "hard_bounced_at": {
+  "filter": { // Available filters are sent_at, delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at
+    "dropped_at": {
       "from": "2020-04-07T13:33:44+02:00", // String - RFC 3339 format; Restrict results to specific from date, optional
       "to": "2020-04-10T13:33:44+02:00" // String - RFC 3339 format; Restrict results to specific to date, optional
     }
@@ -1907,7 +1945,7 @@ Returns mail logs based on given criteria.
 
 ```json5
 {
-  "filter": ["dropped_at", "delivered_at"] // Available filters are sent_at, delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at, hard_bounced_at
+  "filter": ["dropped_at", "delivered_at"] // Available filters are sent_at, delivered_at, clicked_at, opened_at, dropped_at, spam_complained_at
 }
 ```
 
@@ -1927,7 +1965,7 @@ curl -X POST \
         "spam_complained_at": {
           "from": "2020-04-07T13:33:44+02:00"
         },
-        "hard_bounced_at": {
+        "opened_at": {
           "from": "2020-04-07T13:33:44+02:00",
           "to": "2020-04-10T13:33:44+02:00"
         }
@@ -1947,6 +1985,7 @@ Response:
  {
     "id": 2,
     "email": "test@test.com",
+    "user_id": 123, // Integer or null
     "subject": null,
     "mail_template": {
       "id": 1,
@@ -1957,7 +1996,6 @@ Response:
     "delivered_at": "2020-04-08T13:33:44+02:00",
     "dropped_at": "2020-04-08T19:28:36+02:00",
     "spam_complained_at": null,
-    "hard_bounced_at": null,
     "clicked_at": null,
     "opened_at": null,
     "attachment_size": null
@@ -1965,6 +2003,7 @@ Response:
   {
     "id": 4,
     "email": "test@test.com",
+    "user_id": 123,
     "subject": null,
     "mail_template": {
       "id": 2,
@@ -1975,7 +2014,6 @@ Response:
     "delivered_at": null,
     "dropped_at": "2020-04-08T19:28:46+02:00",
     "spam_complained_at": null,
-    "hard_bounced_at": null,
     "clicked_at": null,
     "opened_at": null,
     "attachment_size": null

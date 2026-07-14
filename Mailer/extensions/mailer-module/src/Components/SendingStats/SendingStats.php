@@ -6,17 +6,17 @@ namespace Remp\MailerModule\Components\SendingStats;
 use Nette\Application\UI\Control;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\BatchesRepository;
-use Remp\MailerModule\Repositories\LogsRepository;
+use Remp\MailerModule\Repositories\MailTemplateDirectStatsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Remp\MailerModule\Repositories\UserSubscriptionsRepository;
 
 class SendingStats extends Control
 {
-    private $logsRepository;
-
     private $templatesRepository;
 
     private $userSubscriptionsRepository;
+
+    private $mailTemplateDirectStatsRepository;
 
     private $templateIds = [];
 
@@ -27,13 +27,13 @@ class SendingStats extends Control
     private $showConversions = false;
 
     public function __construct(
-        LogsRepository $mailLogsRepository,
         TemplatesRepository $templatesRepository,
-        UserSubscriptionsRepository $userSubscriptionsRepository
+        UserSubscriptionsRepository $userSubscriptionsRepository,
+        MailTemplateDirectStatsRepository $mailTemplateDirectStatsRepository
     ) {
-        $this->logsRepository = $mailLogsRepository;
         $this->templatesRepository = $templatesRepository;
         $this->userSubscriptionsRepository = $userSubscriptionsRepository;
+        $this->mailTemplateDirectStatsRepository = $mailTemplateDirectStatsRepository;
     }
 
     public function addTemplate(ActiveRow $mailTemplate): self
@@ -103,15 +103,16 @@ class SendingStats extends Control
                 ->count('*');
         }
 
-        $nonBatchTemplateStat = $this->logsRepository->getNonBatchTemplateStats($this->templateIds);
-        if ($nonBatchTemplateStat) {
-            $total += $nonBatchTemplateStat->sent;
-            $stats['delivered']['value'] += $nonBatchTemplateStat->delivered;
-            $stats['opened']['value'] += $nonBatchTemplateStat->opened;
-            $stats['clicked']['value'] += $nonBatchTemplateStat->clicked;
-            $stats['converted']['value'] += $nonBatchTemplateStat->converted;
-            $stats['dropped']['value'] += $nonBatchTemplateStat->dropped;
-            $stats['spam_complained']['value'] += $nonBatchTemplateStat->spam_complained;
+        if ($this->templateIds) {
+            $direct = $this->mailTemplateDirectStatsRepository->sumForTemplates($this->templateIds);
+
+            $total += $direct['sent'];
+            $stats['delivered']['value'] += $direct['delivered'];
+            $stats['opened']['value'] += $direct['opened'];
+            $stats['clicked']['value'] += $direct['clicked'];
+            $stats['converted']['value'] += $direct['converted'];
+            $stats['dropped']['value'] += $direct['dropped'];
+            $stats['spam_complained']['value'] += $direct['spam_complained'];
 
             $templateCodes = $this->templatesRepository->getTable()
                 ->where(['id' => $this->templateIds])

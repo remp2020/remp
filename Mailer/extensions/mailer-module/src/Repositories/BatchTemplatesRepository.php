@@ -75,19 +75,38 @@ class BatchTemplatesRepository extends Repository
         return $this->eventMap[$event] ?? null;
     }
 
-    public function updateAllConverted()
+    public function updateAllConverted(?\DateTimeInterface $firstEmailSentFrom = null)
     {
-        return $this->database->query('
+        $params = [];
+        $conditionalJoins = '';
+        $conditionalWhere = '';
+
+        if ($firstEmailSentFrom !== null) {
+            $conditionalJoins = <<<SQL
+                join mail_job_batch on mail_job_batch.id = mail_job_batch_templates.mail_job_batch_id
+SQL;
+            $conditionalWhere = <<<SQL
+                where mail_job_batch.first_email_sent_at >= ?
+SQL;
+
+            $params[] = $firstEmailSentFrom;
+        }
+
+        $sql = <<<SQL
             update mail_job_batch_templates
-                left join (
-                    select count(*) as count, mail_job_batch_id, mail_template_id
-                    from mail_log_conversions
-                             left join mail_logs on mail_log_id = mail_logs.id
-                    group by mail_job_batch_id, mail_template_id
-                ) t1 on mail_job_batch_templates.mail_template_id = t1.mail_template_id and
-                        mail_job_batch_templates.mail_job_batch_id = t1.mail_job_batch_id
+            $conditionalJoins
+            left join (
+                select count(*) as count, mail_job_batch_id, mail_template_id
+                from mail_log_conversions
+                         left join mail_logs on mail_log_id = mail_logs.id
+                group by mail_job_batch_id, mail_template_id
+            ) t1 on mail_job_batch_templates.mail_template_id = t1.mail_template_id and
+                    mail_job_batch_templates.mail_job_batch_id = t1.mail_job_batch_id
             set converted = coalesce(t1.count, 0)
-        ');
+            $conditionalWhere
+SQL;
+
+        return $this->database->query($sql, ...$params);
     }
 
     public function incrementColumn($column, $mailTemplateId, $mailJobBatchId)

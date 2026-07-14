@@ -61,6 +61,10 @@ database:
 		options:
 			lazy: yes
 
+services:
+	database.default.conventions:
+		factory: Remp\MailerModule\Models\Database\PartitionedConventions(Nette\Database\Conventions\DiscoveredConventions(@database.default.structure))
+
 latte:
     extensions:
         - Remp\MailerModule\Latte\MailerModuleExtension

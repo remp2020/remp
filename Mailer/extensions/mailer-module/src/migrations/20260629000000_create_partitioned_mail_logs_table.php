@@ -5,9 +5,13 @@ use Phinx\Migration\AbstractMigration;
 
 final class CreatePartitionedMailLogsTable extends AbstractMigration
 {
+    private const SHADOW_TABLE = 'mail_logs_partitioned';
+
     public function up(): void
     {
-        if ($this->hasTable('mail_logs_v2')) {
+        $this->assertBigintMigrationCompleted();
+
+        if ($this->hasTable(self::SHADOW_TABLE)) {
             // Shadow table already exists from a previous partial run; skip creation.
             return;
         }
@@ -27,15 +31,15 @@ final class CreatePartitionedMailLogsTable extends AbstractMigration
             // Non-empty table: create the canonical shadow table. Data is moved by
             // MigrateMailLogsToPartitionsCommand; the FK on mail_log_conversions is
             // dropped there, right before the RENAME, when no live FK can block it.
-            $this->createCanonicalTable('mail_logs_v2', $partitionsSql);
+            $this->createCanonicalTable(self::SHADOW_TABLE, $partitionsSql);
         }
     }
 
     public function down(): void
     {
         // Drop the shadow table if still present (non-empty path).
-        if ($this->hasTable('mail_logs_v2')) {
-            $this->table('mail_logs_v2')->drop()->save();
+        if ($this->hasTable(self::SHADOW_TABLE)) {
+            $this->table(self::SHADOW_TABLE)->drop()->save();
         }
 
         // The fresh-install rebuild (empty path) and the swapped-in partitioned table
@@ -43,6 +47,51 @@ final class CreatePartitionedMailLogsTable extends AbstractMigration
     }
 
     // -------------------------------------------------------------------------
+
+    /**
+     * Refuses to run unless the older bigint migration (CreateNewMailLogsAndMailConversionsTable
+     * plus its mail:migrate-mail-logs-and-conversions command) has been completed.
+     *
+     * That migration is what widens mail_logs.id to bigint and adds mail_logs.user_id, and
+     * MailLogsPartitioningHelpersTrait copies user_id — so partitioning cannot work without it.
+     * Its command was removed in 5.2.0, which means an unfinished bigint migration can only be
+     * completed on an earlier release. Fail here, before anything is created, instead of
+     * failing obscurely halfway through the go-live command.
+     */
+    private function assertBigintMigrationCompleted(): void
+    {
+        $leftovers = array_values(array_filter(
+            ['mail_logs_v2', 'mail_log_conversions_v2'],
+            fn (string $table) => $this->hasTable($table)
+        ));
+
+        if ($leftovers !== []) {
+            throw new RuntimeException(sprintf(
+                'Cannot partition mail_logs: leftover bigint migration table(s) %s found, which means '
+                . '`mail:migrate-mail-logs-and-conversions` never finished. That command was removed in '
+                . '5.2.0 — finish the bigint migration on a pre-5.2.0 release (and clean up with '
+                . '`mail:bigint_migration_cleanup mail_logs` / `mail_log_conversions`) before upgrading.',
+                implode(', ', $leftovers)
+            ));
+        }
+
+        if (!$this->table('mail_logs')->hasColumn('user_id')) {
+            throw new RuntimeException(
+                'Cannot partition mail_logs: the `user_id` column is missing, which means the bigint '
+                . 'migration (CreateNewMailLogsAndMailConversionsTable + '
+                . '`mail:migrate-mail-logs-and-conversions`) never ran. That command was removed in '
+                . '5.2.0 — complete the bigint migration on a pre-5.2.0 release before upgrading.'
+            );
+        }
+
+        if ($this->hasTable('mail_logs_old')) {
+            throw new RuntimeException(
+                'Cannot partition mail_logs: `mail_logs_old` already exists. The go-live command renames '
+                . 'mail_logs to mail_logs_old, so this leftover (from the bigint migration) must be '
+                . 'archived and dropped first — `mail:bigint_migration_cleanup mail_logs`.'
+            );
+        }
+    }
 
     /**
      * Creates the single canonical, partitioned mail_logs schema under $tableName.

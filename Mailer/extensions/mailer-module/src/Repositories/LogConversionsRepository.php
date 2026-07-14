@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Repositories;
 
+use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow as NetteActiveRow;
 use Nette\Utils\DateTime;
 
@@ -11,6 +12,13 @@ class LogConversionsRepository extends Repository
     use NewTableDataMigrationTrait;
 
     protected $tableName = 'mail_log_conversions';
+
+    public function __construct(
+        Explorer $database,
+        private readonly LogsRepository $logsRepository,
+    ) {
+        parent::__construct($database);
+    }
 
     public function upsert(NetteActiveRow $mailLog, DateTime $convertedAt): void
     {
@@ -47,5 +55,23 @@ class LogConversionsRepository extends Repository
         }
 
         return $result;
+    }
+
+    public function countConvertedGroupedByTemplate(
+        \DateTimeInterface $createdAtFrom,
+        \DateTimeInterface $createdAtTo,
+        bool $directOnly = false
+    ): array {
+        $query = $this->getTable()
+            ->select('mail_log.mail_template_id, COUNT(*) AS converted')
+            ->where('mail_log.created_at >= ?', $createdAtFrom)
+            ->where('mail_log.created_at < ?', $createdAtTo)
+            ->group('mail_template_id');
+
+        if ($directOnly) {
+            $query->where('mail_log.mail_job_id IS NULL');
+        }
+
+        return $query->fetchPairs('mail_template_id', 'converted');
     }
 }

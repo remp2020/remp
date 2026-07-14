@@ -9,6 +9,8 @@ use Remp\MailerModule\Models\EnvironmentConfig;
 use Remp\MailerModule\Models\RedisClientFactory;
 use Remp\MailerModule\Models\RedisClientTrait;
 use Remp\MailerModule\Repositories\LogsRepository;
+use Remp\MailerModule\Repositories\MailLogsStatsStateRepository;
+use Remp\MailerModule\Repositories\MailTemplateDirectStatsRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,18 +22,18 @@ use Symfony\Component\Console\Output\OutputInterface;
  * queryable immediately — system/high-priority mail (any age) plus the complete
  * current and previous month (guaranteeing at least the last full calendar month of
  * data is live, regardless of which day of the month go-live happens to run) — into
- * the partitioned mail_logs_v2 shadow table, then swaps the tables atomically.
+ * the partitioned mail_logs_partitioned shadow table, then swaps the tables atomically.
  * Historical newsletter months are intentionally left out and filled in afterwards by
  * BackfillMailLogsPartitionsCommand via EXCHANGE PARTITION, which keeps their (much
  * larger) secondary-index maintenance entirely offline instead of paying
  * live-index-maintenance cost on the swapped-in table.
  *
  * Run AFTER the Phinx migration CreatePartitionedMailLogsTable has been applied
- * (i.e. mail_logs_v2 already exists with the correct partitioned schema).
+ * (i.e. mail_logs_partitioned already exists with the correct partitioned schema).
  *
  * The migration is resumable: re-run the command if it is interrupted.  It uses
  * a Redis flag to activate the dual-write path in LogsRepository, so new inserts
- * and webhook updates are mirrored into mail_logs_v2 throughout the backfill.
+ * and webhook updates are mirrored into mail_logs_partitioned throughout the backfill.
  *
  * After completion:
  *   mail_logs      → partitioned; contains system/priority mail (all history) and
@@ -78,6 +80,8 @@ class MigrateMailLogsToPartitionsCommand extends Command
         private Explorer $database,
         private LogsRepository $logsRepository,
         private EnvironmentConfig $environmentConfig,
+        private MailLogsStatsStateRepository $mailLogsStatsStateRepository,
+        private MailTemplateDirectStatsRepository $mailTemplateDirectStatsRepository,
         RedisClientFactory $redisClientFactory,
     ) {
         parent::__construct();
@@ -100,6 +104,14 @@ class MigrateMailLogsToPartitionsCommand extends Command
                 . 'live at go-live time, along with system mail. Inspect the distribution first with: '
                 . 'SELECT priority, COUNT(*) FROM mail_types GROUP BY priority ORDER BY priority DESC.',
                 default: self::DEFAULT_PRIORITY_THRESHOLD
+            )
+            ->addOption(
+                name: 'force',
+                shortcut: null,
+                mode: InputOption::VALUE_NONE,
+                description: 'Proceed even if mail_template_direct_stats has not been backfilled for the '
+                . 'pre-migration history. Only use this once you have deliberately decided pre-migration '
+                . 'direct-send statistics can be lost (e.g. a fresh install with no history worth keeping).'
             );
     }
 
@@ -114,7 +126,7 @@ class MigrateMailLogsToPartitionsCommand extends Command
         $priorityThreshold = (int) $input->getOption('priority-threshold');
 
         $sourceTable = $this->logsRepository->getTable()->getName();  // mail_logs
-        $shadowTable = $this->logsRepository->getNewTable()->getName(); // mail_logs_v2
+        $shadowTable = $this->logsRepository->getNewTable()->getName(); // mail_logs_partitioned
 
         if (!$this->tableExists($shadowTable)) {
             $output->writeln("<error>Shadow table `{$shadowTable}` does not exist.</error>");
@@ -122,10 +134,59 @@ class MigrateMailLogsToPartitionsCommand extends Command
             return Command::FAILURE;
         }
 
+        // Preflight: Phase 5 below renames the source table to `<source>_old`, which fails if
+        // that name is taken — and it fails AFTER the point of no return (indexes dropped and
+        // rebuilt, the conversions FK dropped, the dual-write flag cleared). A leftover
+        // `mail_logs_old`/`mail_logs_v2` means the older bigint migration was never cleaned up;
+        // its command was removed in 5.2.0, so finish it on a pre-5.2.0 release and archive the
+        // leftovers with `mail:bigint_migration_cleanup mail_logs` before running this.
+        foreach (["{$sourceTable}_old", "{$sourceTable}_v2"] as $leftoverTable) {
+            if ($this->tableExists($leftoverTable)) {
+                $output->writeln("<error>Table `{$leftoverTable}` already exists.</error>");
+                $output->writeln(
+                    "<error>This command renames `{$sourceTable}` to `{$sourceTable}_old`, so that name must be free, "
+                    . 'and a leftover table means an unfinished bigint migration. Archive and drop the leftovers '
+                    . '(`mail:bigint_migration_cleanup ' . $sourceTable . '`) before running this.</error>'
+                );
+                return Command::FAILURE;
+            }
+        }
+
         if (!$this->tableExists(self::BACKFILL_STATE_TABLE)) {
             $output->writeln('<error>`' . self::BACKFILL_STATE_TABLE . '` does not exist.</error>');
             $output->writeln('<error>Run the CreateMailLogsBackfillStateTable Phinx migration first.</error>');
             return Command::FAILURE;
+        }
+
+        // Preflight: mail_template_direct_stats starts out empty (see
+        // CreateMailTemplateDirectStatsTable) and nothing else in this migration fills it.
+        // sumForTemplates() is an unbounded lifetime SUM, so any pre-migration day left
+        // unaggregated reports 0 forever for every direct-send template (in particular,
+        // system/transactional templates, which have no mail_job_batch_templates rows at
+        // all). Once this command swaps the tables, the current/previous month is still
+        // complete, but everything older only holds system/priority mail until the backfill
+        // command lands it — aggregating after that point would compute understated numbers
+        // (see mail:aggregate-mail-template-stats' own stats-cutoff clamp). So this has to be
+        // caught here, before anything below is touched.
+        $force = (bool) $input->getOption('force');
+        $mailLogsIsEmpty = $this->database->query("SELECT 1 FROM `{$sourceTable}` LIMIT 1")->fetch() === null;
+        if (!$mailLogsIsEmpty) {
+            $liveWindowStartForGuard = (new DateTime())->modify('first day of last month')->setTime(0, 0, 0);
+            if (!$this->mailTemplateDirectStatsRepository->hasRowsBefore($liveWindowStartForGuard)) {
+                $message = "`mail_template_direct_stats` has no rows before {$liveWindowStartForGuard->format('Y-m-d')} — "
+                    . 'it looks like the pre-migration statistics backfill has not run yet. Once this command '
+                    . 'swaps the tables, historical months are no longer complete in `mail_logs` until '
+                    . 'mail_logs:backfill-partitions finishes, so pre-migration direct-send statistics would be '
+                    . 'permanently stuck at 0. Run this first: '
+                    . 'mail:aggregate-mail-template-stats --from=<MIN(created_at) of mail_logs>';
+                if (!$force) {
+                    $output->writeln("<error>{$message}</error>");
+                    $output->writeln('<error>Re-run with --force once you have deliberately decided to accept this.</error>');
+                    return Command::FAILURE;
+                }
+                $output->writeln("<comment>WARNING: {$message}</comment>");
+                $output->writeln('<comment>Proceeding anyway because --force was given.</comment>');
+            }
         }
 
         $output->writeln("STARTING mail_logs → partitioned `{$shadowTable}` MIGRATION");
@@ -304,9 +365,9 @@ class MigrateMailLogsToPartitionsCommand extends Command
         // ------------------------------------------------------------------
         // Stop dual-writes BEFORE the swap.
         //
-        // After the RENAME below, the shadow table `mail_logs_v2` no longer
+        // After the RENAME below, the shadow table `mail_logs_partitioned` no longer
         // exists, but LogsRepository::insert()/update() mirror writes into
-        // getNewTable() (mail_logs_v2) while this flag is set — which would throw
+        // getNewTable() (mail_logs_partitioned) while this flag is set — which would throw
         // on every live insert/webhook update. Clearing it now means writes go
         // only to the (still-live) source table until the RENAME; anything written
         // in that brief pre-rename window is reconciled by the Phase 6 catch-up
@@ -326,6 +387,14 @@ class MigrateMailLogsToPartitionsCommand extends Command
                 `{$shadowTable}` TO `{$sourceTable}`
         ");
         $this->recordSwapTime();
+
+        // Seeds the cutoff date (see MailLogsStatsStateRepository) to the start of the
+        // live window established above — everything older is still `pending` backfill
+        // (Phase 4.5), so it is correctly sealed until BackfillMailLogsPartitionsCommand
+        // lowers the cutoff date as each month actually lands. No-op if already initialized
+        // (e.g. a resumed/re-run migration).
+        $this->mailLogsStatsStateRepository->initCutoffDate($liveWindowStart);
+
         $output->writeln('Phase 5 complete.');
         $output->writeln('');
 
@@ -345,11 +414,10 @@ class MigrateMailLogsToPartitionsCommand extends Command
         $output->writeln("<info>`{$sourceTable}_old` is kept as the frozen source for the newsletter backfill — do NOT drop it yet.</info>");
         $output->writeln('');
         $output->writeln('<comment>IMPORTANT: clear the application cache on all web/worker nodes now.</comment>');
-        $output->writeln('<comment>The primary key changed from (id) to (id, created_at); until the Nette database</comment>');
-        $output->writeln('<comment>structure cache is rebuilt, wherePrimary() updates emit `WHERE id = ?` only and</comment>');
-        $output->writeln('<comment>cannot prune partitions (they scan every partition). Clear the app cache (and</comment>');
-        $output->writeln('<comment>opcache) as part of the deploy, then verify with `EXPLAIN PARTITIONS` that a</comment>');
-        $output->writeln('<comment>single-row update by primary key touches exactly one partition.</comment>');
+        $output->writeln('<comment>The swapped-in table has a different column list (no hard_bounced_at), charset</comment>');
+        $output->writeln('<comment>and primary key than the one Nette cached in its database structure. Until that</comment>');
+        $output->writeln('<comment>cache is rebuilt, queries are still built against the old shape and can fail with</comment>');
+        $output->writeln('<comment>"Unknown column". Clear the app cache (and opcache) as part of the deploy.</comment>');
         $output->writeln('');
         $output->writeln('<comment>NEXT STEP: run mail_logs:backfill-partitions (repeatedly, or with --limit) to fill in</comment>');
         $output->writeln('<comment>historical newsletter months via EXCHANGE PARTITION. Drop `' . $sourceTable . '_old` with</comment>');
@@ -599,15 +667,19 @@ class MigrateMailLogsToPartitionsCommand extends Command
         //    The original `id` is carried over (and INSERT IGNORE used) so the row keeps
         //    its identity — mail_log_conversions references mail_logs by id, so inserting
         //    with a fresh AUTO_INCREMENT id would break that linkage.
-        $this->database->query(
-            $this->insertSelectSql($to, $from) . "
+        $query = $this->insertSelectSql($to, $from) . "
             WHERE `{$from}`.created_at >= ?
               AND mail_sender_id IS NOT NULL
               AND mail_sender_id NOT IN (
                   SELECT mail_sender_id FROM `{$to}`
                   WHERE `{$to}`.created_at >= ?
               )
-        ", $updatedAfter, $updatedAfter);
+        ";
+        $this->database->query(
+            $query,
+            $updatedAfter,
+            $updatedAfter,
+        );
     }
 
     private function dropConversionsForeignKey(OutputInterface $output): void

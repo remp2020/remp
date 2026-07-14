@@ -21,6 +21,14 @@ class LogsRepository extends Repository
 
     protected array $dataTableSearchable = ['email'];
 
+    public function __construct(
+        \Nette\Database\Explorer $database,
+        private readonly TemplatesRepository $templatesRepository,
+        ?\Nette\Caching\Storage $cacheStorage = null,
+    ) {
+        parent::__construct($database, $cacheStorage);
+    }
+
     private array $eventMap = [
         'delivered' => 'delivered_at',
         'clicked' => 'clicked_at',
@@ -184,27 +192,6 @@ class LogsRepository extends Repository
             ->fetch();
     }
 
-    public function getNonBatchTemplateStats(array $templateIds): ?ActiveRow
-    {
-        $columns = [
-            'COUNT(created_at) AS sent',
-            'COUNT(delivered_at) AS delivered',
-            'COUNT(dropped_at) AS dropped',
-            'COUNT(spam_complained_at) AS spam_complained',
-            'COUNT(clicked_at) AS clicked',
-            'COUNT(opened_at) AS opened',
-            'COUNT(:mail_log_conversions.converted_at) AS converted',
-        ];
-        return $this->getTable()
-            ->select(implode(',', $columns))
-            ->where([
-                'mail_template_id' => $templateIds,
-                'mail_job_batch_id IS NULL',
-            ])
-            ->limit(1)
-            ->fetch();
-    }
-
     public function tableFilter(
         string $query,
         string $order,
@@ -253,7 +240,7 @@ class LogsRepository extends Repository
     {
         return $this->getTable()->where([
             'mail_logs.email' => $email,
-            'mail_template.code' => $mailTemplateCode
+            'mail_template.code' => $mailTemplateCode,
         ])->count('*') > 0;
     }
 
@@ -264,7 +251,7 @@ class LogsRepository extends Repository
     {
         $query = $this->getTable()->where([
             'mail_logs.email' => $emails,
-            'mail_template.code' => $mailTemplateCode
+            'mail_template.code' => $mailTemplateCode,
         ])->whereOr([
             'mail_logs.email' => $emails,
             'mail_logs.mail_job_id' => $jobId,
@@ -334,7 +321,12 @@ class LogsRepository extends Repository
     {
         $result = parent::insert($data);
         if ($this->newTableDataMigrationIsRunning()) {
-            $this->getNewTable()->insert($result->toArray());
+            // filterToNewTableColumns() is essential here, not defensive: the live table
+            // still has hard_bounced_at until the swap, while the partitioned shadow table
+            // deliberately does not (see CreatePartitionedMailLogsTable). Mirroring the raw
+            // row would fail with "Unknown column 'hard_bounced_at'" on every single send
+            // for the whole duration of the migration.
+            $this->getNewTable()->insert($this->filterToNewTableColumns($result->toArray()));
         }
         return $result;
     }
@@ -346,7 +338,9 @@ class LogsRepository extends Repository
         if ($this->newTableDataMigrationIsRunning()) {
             // Include created_at in the WHERE clause so the query prunes to the
             // correct partition on the shadow table during the migration window.
-            $this->getNewTable()->where(['id' => $row->id, 'created_at' => $row->created_at])->update($data);
+            $this->getNewTable()
+                ->where(['id' => $row->id, 'created_at' => $row->created_at])
+                ->update($this->filterToNewTableColumns($data));
         }
         return $result;
     }

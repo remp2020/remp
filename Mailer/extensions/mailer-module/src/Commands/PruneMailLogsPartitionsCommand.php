@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Commands;
 
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
+use Remp\MailerModule\Repositories\MailLogsStatsStateRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -40,10 +41,9 @@ class PruneMailLogsPartitionsCommand extends Command
 
     public const COMMAND_NAME = 'mail_logs:prune-partitions';
 
-    private const TABLE = 'mail_logs';
-
     public function __construct(
         private Explorer $database,
+        private MailLogsStatsStateRepository $mailLogsStatsStateRepository,
     ) {
         parent::__construct();
     }
@@ -124,6 +124,7 @@ class PruneMailLogsPartitionsCommand extends Command
 
         if (!$partitions) {
             $output->writeln('<info>Nothing to prune.</info>');
+            $this->mailLogsStatsStateRepository->raiseCutoffDateTo($cutoffDate);
             return Command::SUCCESS;
         }
 
@@ -143,6 +144,8 @@ class PruneMailLogsPartitionsCommand extends Command
             $this->prunePartition($output, $partitionName, $cutoffDate, $keepTemplateIds);
             $output->writeln('');
         }
+
+        $this->mailLogsStatsStateRepository->raiseCutoffDateTo($cutoffDate);
 
         $output->writeln('<info>Prune run complete.</info>');
 
@@ -253,7 +256,7 @@ class PruneMailLogsPartitionsCommand extends Command
               AND TABLE_NAME   = ?
               AND PARTITION_NAME REGEXP ?
             ORDER BY PARTITION_NAME ASC
-        ", self::TABLE, self::PARTITION_NAME_SQL_PATTERN)->fetchPairs(null, 'PARTITION_NAME');
+        ", self::TABLE, self::PARTITION_NAME_PATTERN)->fetchPairs(null, 'PARTITION_NAME');
 
         $prunable = array_values(array_filter(
             $rows,
