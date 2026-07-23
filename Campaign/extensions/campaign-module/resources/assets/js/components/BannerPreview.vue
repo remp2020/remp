@@ -474,7 +474,9 @@
                 return str;
             },
             closed: function(event) {
-                event.preventDefault();
+                if (event) {
+                    event.preventDefault();
+                }
                 remplib.campaign.storeCampaignClosed(this.campaignPublicId);
 
                 this.visible = false;
@@ -546,16 +548,24 @@
                       try {
                           // Evaluating JS code using Function with passed params object
                           // https://stackoverflow.com/questions/49125059/how-to-pass-parameters-to-an-eval-based-function-injavascript
+                          // Wrap the author's snippet as a function-expression string that takes a `params` argument.
+                          // injectSnippets() pre-processes the snippet (substitutes template placeholders).
                           let body = 'function(params) { ' + that.injectSnippets(js) + ' }';
+                          // Wrap it once more so the outer function *returns* the inner function(params){...}.
                           let wrap = s => "{ return " + body + " };";
 
+                          // Run in the preview iframe's context if present, otherwise the current window.
+                          // Using the iframe's Function constructor scopes the code to the iframe's global.
                           let contentWindow = window;
                           let iframe = document.getElementById("iframe-preview");
                           if (iframe) {
                               contentWindow = iframe.contentWindow;
                           }
 
+                          // Build the outer function from the wrapped body string.
                           contentWindow.myFunction = new contentWindow.Function(wrap(body));
+                          // First call() runs the outer function -> returns the inner function(params){...};
+                          // second call() runs that inner function with the params object.
                           contentWindow.myFunction.call(null).call(null, that.paramsForCustomJavascript());
                       } catch(err) {
                           console.warn("unable to execute custom banner JS:", js);
@@ -576,6 +586,8 @@
                     "utmCampaign": this.campaignUuid,
                     "utmContent": this.uuid,
                     "bannerVariant": this.variantUuid,
+                    "closedBanner": () => this.closed(),
+                    "clickedBanner": () => this.clicked(),
                 }
             }
         }

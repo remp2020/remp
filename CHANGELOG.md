@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Segments] Fixed low performance of query results processing caused by double unmarshalling of JSON data.
 - [Segments] Improved querying performance by executing Elasticsearch scrolls while the previous scrolls are still being processed.
 
+### [Campaign]
+
+- Added `closed` and `clicked` function between custom JS params to allow correctly handling events. remp/remp#1487
+
 ## Archive
 
 - [v5.1](./changelogs/CHANGELOG-v5.1.md)
