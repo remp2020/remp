@@ -48,6 +48,50 @@ class ConfigSeeder extends Seeder
             'value' => 5
         ]);
 
+        Config::firstOrCreate([
+            'name' => ConfigNames::CONVERSIONS_COUNT_THRESHOLD_LOW,
+            'config_category_id' => $dashboardConfigCategory->id,
+            'display_name' => 'Conversions count threshold low',
+            'type' => 'int',
+            'value' => 3
+        ]);
+        Config::firstOrCreate([
+            'name' => ConfigNames::CONVERSIONS_COUNT_THRESHOLD_MEDIUM,
+            'config_category_id' => $dashboardConfigCategory->id,
+            'display_name' => 'Conversions count threshold medium',
+            'type' => 'int',
+            'value' => 8
+        ]);
+        Config::firstOrCreate([
+            'name' => ConfigNames::CONVERSIONS_COUNT_THRESHOLD_HIGH,
+            'config_category_id' => $dashboardConfigCategory->id,
+            'display_name' => 'Conversions count threshold high',
+            'type' => 'int',
+            'value' => 13
+        ]);
+
+        Config::firstOrCreate([
+            'name' => ConfigNames::CONVERSION_RATE_THRESHOLD_LOW,
+            'config_category_id' => $dashboardConfigCategory->id,
+            'display_name' => 'Conversion rate threshold low',
+            'type' => 'float',
+            'value' => 3.0
+        ]);
+        Config::firstOrCreate([
+            'name' => ConfigNames::CONVERSION_RATE_THRESHOLD_MEDIUM,
+            'config_category_id' => $dashboardConfigCategory->id,
+            'display_name' => 'Conversion rate threshold medium',
+            'type' => 'float',
+            'value' => 5.0
+        ]);
+        Config::firstOrCreate([
+            'name' => ConfigNames::CONVERSION_RATE_THRESHOLD_HIGH,
+            'config_category_id' => $dashboardConfigCategory->id,
+            'display_name' => 'Conversion rate threshold high',
+            'type' => 'float',
+            'value' => 7.0
+        ]);
+
         $authorSegmentsConfigCategory = ConfigCategory::firstOrCreate([
             'code' => ConfigCategory::CODE_SECTION_SEGMENTS,
             'display_name' => 'Section Segments'

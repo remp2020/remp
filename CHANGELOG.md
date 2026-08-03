@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Segments] Enabled Elasticsearch query logging when Debug mode is enabled.
 - [Segments] Fixed low performance of query results processing caused by double unmarshalling of JSON data.
 - [Segments] Improved querying performance by executing Elasticsearch scrolls while the previous scrolls are still being processed.
+- Fixed seeding of config options, which were included in the migration, but not present in the `ConfigSeeder`. remp/euobserver#268
 
 ### [Campaign]
 
