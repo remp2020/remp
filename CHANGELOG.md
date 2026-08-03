@@ -17,6 +17,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added `closed` and `clicked` function between custom JS params to allow correctly handling events. remp/remp#1487
 
+### [Campaign]
+
+- Fixed snippet and collection edit forms breaking when a name contains JavaScript-sensitive characters; such snippets can now be opened and fixed. remp/remp#1405
+
 ## Archive
 
 - [v5.1](./changelogs/CHANGELOG-v5.1.md)
