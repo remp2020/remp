@@ -36,6 +36,9 @@ $config = [
             'name' => 'Hidden (tracking) / JS-based',
             'width' => '0px',
             'height' => '0px',
+            // Any dimension may set this flag. When true, manual events tracking is forced
+            // on for banners using this dimension - both in the banner form and at showtime.
+            'force_manual_tracking' => false,
         ]
     ],
     'positions' => [

@@ -8,7 +8,8 @@ class Dimensions
         public string $key,
         public string $name,
         public $width,
-        public $height
+        public $height,
+        public bool $force_manual_tracking = false
     ) {
     }
 }

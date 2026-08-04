@@ -264,6 +264,28 @@ If user collapses campaign banner then it displays collapsed on the next display
 
 In collapsible banner settings there is a toggle to override this behaviour and display banner always in initial state.
 
+##### Forced manual events tracking per dimension
+
+Banner dimensions are configured in [`config/banners.php`](config/banners.php). Each dimension may set the `force_manual_tracking` flag:
+
+```php
+'dimensions' => [
+    'hidden' => [
+        'name' => 'Hidden (tracking) / JS-based',
+        'width' => '0px',
+        'height' => '0px',
+        'force_manual_tracking' => true,
+    ],
+],
+```
+
+When the flag is `true`, banners using that dimension always track their events manually:
+
+- In the banner form (HTML template banners, where dimensions are selectable), the *Track banner events manually* checkbox is checked and disabled, with a note explaining why.
+- On save, `manual_events_tracking` is forced to `true` regardless of the submitted value.
+
+This is useful for dimensions that render no visible banner (e.g. hidden JS-based banners), where automatic show/click/close tracking would produce misleading data.
+
 ##### Snippets
 
 Campaign supports use of snippets in your banner template contents, custom javascript and custom css. You can create snippets using `Add new snippet` in the `Snippets` main menu section.

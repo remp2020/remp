@@ -211,13 +211,16 @@
                             <div class="input-group fg-float checkbox">
                                 <label class="m-l-15">
                                     Track banner events manually
-                                    <input v-model="manualEventsTracking" value="1" name="manual_events_tracking" type="checkbox">
+                                    <input v-model="manualEventsTracking" value="1" name="manual_events_tracking" type="checkbox" :disabled="forceManualTracking">
                                     <i class="input-helper"></i>
                                     <small class="help-block">
                                         Banner events (show, click, close) are tracked back to Campaign tool automatically.
                                         Enable if you need to manually control when events are fired.
                                         To track events manually, use <code>remplib.tracker.trackEvent()</code> function.
                                         See <a href="https://github.com/remp2020/remp/tree/master/Beam#js-tracking-interface">documentation</a> for further details.
+                                    </small>
+                                    <small class="help-block text-warning" v-if="forceManualTracking">
+                                        Manual events tracking is forced on for the selected dimension.
                                     </small>
                                 </label>
                             </div><!-- .input-group -->
@@ -568,7 +571,24 @@
 
             fieldParamsMessage: "RTM (REMP's UTM) params will be automatically appended to every link in this field.<br> If you want to add custom parameter to specific link: add <code>data-param-*</code> attribute. e.g.: <code>data-param-foo=\"baz\"</code>"
         }),
+        watch: {
+            forceManualTracking: {
+                immediate: true,
+                handler: function(force) {
+                    if (force) {
+                        this.manualEventsTracking = true;
+                    }
+                }
+            }
+        },
         computed: {
+            forceManualTracking: function() {
+                if (this.template !== 'html' || !this.htmlTemplate || !this.htmlTemplate.dimensions) {
+                    return false;
+                }
+                var dimension = this.dimensionOptions[this.htmlTemplate.dimensions];
+                return !!(dimension && dimension.force_manual_tracking);
+            },
             isOverlay: function() {
                 return this.overlayRectangleTemplate == null && this.htmlOverlayTemplate == null && this.overlayTwoButtonsSignatureTemplate == null;
             },

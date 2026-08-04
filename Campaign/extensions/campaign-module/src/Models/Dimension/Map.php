@@ -18,7 +18,8 @@ class Map
                 $key,
                 $dc['name'],
                 $dc['width'],
-                $dc['height']
+                $dc['height'],
+                $dc['force_manual_tracking'] ?? false
             );
         }
     }

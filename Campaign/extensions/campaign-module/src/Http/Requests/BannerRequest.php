@@ -156,6 +156,16 @@ class BannerRequest extends FormRequest
         $result['closeable'] ??= false;
         $result['force_initial_state'] ??= false;
 
+        // Force manual events tracking on when the selected dimension requires it.
+        // Dimensions are only a selectable key for HTML template banners.
+        if (($result['template'] ?? null) === Banner::TEMPLATE_HTML) {
+            $dimension = $result['dimensions'] ?? null;
+            $dimensions = config('banners.dimensions', []);
+            if ($dimension && ($dimensions[$dimension]['force_manual_tracking'] ?? false)) {
+                $result['manual_events_tracking'] = true;
+            }
+        }
+
         return $result;
     }
 }
