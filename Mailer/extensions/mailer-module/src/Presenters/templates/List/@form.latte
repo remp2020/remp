@@ -104,6 +104,17 @@
                 </div>
             </div>
 
+            <div class="form-group m-b-30">
+                <div class="toggle-switch" data-ts-color="cyan">
+                    {label exclude_from_search:, class => 'ts-label' /}
+                    {input exclude_from_search:, hidden => 'hidden'}
+                    <label for="{$form['exclude_from_search']->htmlId}" class="ts-helper"></label>
+                    <small class="help-block">
+                        When enabled, emails of this type are hidden from the Email templates search. Useful for newsletter types with many auto-generated emails.
+                    </small>
+                </div>
+            </div>
+
             <div id="non-external-fields">
 
                 <div class="form-group fg-float m-b-30">

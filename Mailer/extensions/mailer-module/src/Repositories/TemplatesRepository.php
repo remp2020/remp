@@ -12,7 +12,7 @@ class TemplatesRepository extends Repository
 
     protected $tableName = 'mail_templates';
 
-    protected $dataTableSearchable = ['name', 'code', 'description', 'subject'];
+    protected $dataTableSearchable = ['mail_templates.name', 'mail_templates.code', 'mail_templates.description', 'mail_templates.subject'];
     protected $dataTableSearchableFullText = ['mail_body_html'];
 
     public function all(): Selection
@@ -192,7 +192,7 @@ class TemplatesRepository extends Repository
     public function tableFilter(string $query, string $order, string $orderDirection, ?array $mailTypeIds = null, ?array $mailLayoutIds = null, ?int $limit = null, ?int $offset = null): Selection
     {
         $selection = $this->getTable()
-            ->where('deleted_at', null)
+            ->where('mail_templates.deleted_at', null)
             ->order($order . ' ' . strtoupper($orderDirection));
 
         if (!empty($query)) {
@@ -205,6 +205,8 @@ class TemplatesRepository extends Repository
                 $where['MATCH('.$col . ') AGAINST(? IN BOOLEAN MODE)'] = '+' . $query . '*';
             }
             $selection->whereOr($where);
+
+            $selection->where('mail_type.exclude_from_search', false);
         }
 
         if ($mailTypeIds !== null) {
@@ -228,7 +230,7 @@ class TemplatesRepository extends Repository
 
     public function search(string $term, int $limit)
     {
-        $searchable = ['code', 'name', 'subject', 'description'];
+        $searchable = ['mail_templates.code', 'mail_templates.name', 'mail_templates.subject', 'mail_templates.description'];
         foreach ($searchable as $column) {
             $whereFast[$column . ' LIKE ?'] = $term . '%';
             $whereWild[$column . ' LIKE ?'] = '%' . $term . '%';
@@ -236,6 +238,7 @@ class TemplatesRepository extends Repository
 
         $resultsFast = $this->all()
             ->whereOr($whereFast)
+            ->where('mail_type.exclude_from_search', false)
             ->limit($limit)
             ->fetchAll();
         if (count($resultsFast) === $limit) {
@@ -244,6 +247,7 @@ class TemplatesRepository extends Repository
 
         $resultsWild = $this->all()
             ->whereOr($whereWild)
+            ->where('mail_type.exclude_from_search', false)
             ->limit($limit - count($resultsFast))
             ->fetchAll();
 

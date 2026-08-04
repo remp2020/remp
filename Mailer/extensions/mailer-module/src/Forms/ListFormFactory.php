@@ -172,6 +172,7 @@ class ListFormFactory
 
         $form->addCheckbox('auto_subscribe', 'Auto subscribe');
         $form->addCheckbox('is_multi_variant', 'Is multi-variant');
+        $form->addCheckbox('exclude_from_search', 'Exclude emails from search');
         $form->addCheckbox('locked', 'Locked');
         $form->addCheckbox('public_listing', 'List publicly');
         $form->addCheckbox('is_external', 'External')
@@ -277,6 +278,7 @@ class ListFormFactory
                 unSubscribeEmailTemplateId: $values['unsubscribe_mail_template_id'],
                 isMultiVariant: $values['is_multi_variant'] ?? false,
                 isExternal: $values['is_external'],
+                excludeFromSearch: $values['exclude_from_search'] ?? false,
             );
             ($this->onCreate)($row);
         }
@@ -322,7 +324,7 @@ class ListFormFactory
             $items[$systemList->title] = $systemEmails;
         }
 
-        if ($list !== null && $list->id !== $systemList->id) {
+        if ($list !== null && $list->id !== $systemList?->id) {
             $newsletterEmails = $this->templatesRepository
                 ->findByList($list->id)
                 ->select('mail_templates.id, mail_templates.name')

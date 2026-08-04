@@ -47,6 +47,7 @@ class ListsRepository extends Repository
         bool $isMultiVariant = false,
         ?int $defaultVariantId = null,
         bool $isExternal = false,
+        bool $excludeFromSearch = false,
     ): ActiveRow {
         $result = $this->insert([
             'mail_type_category_id' => $categoryId,
@@ -69,6 +70,7 @@ class ListsRepository extends Repository
             'is_multi_variant' => $isMultiVariant,
             'default_variant_id' => $defaultVariantId,
             'is_external' => $isExternal,
+            'exclude_from_search' => $excludeFromSearch,
         ]);
 
         if (is_numeric($result)) {

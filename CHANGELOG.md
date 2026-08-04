@@ -23,6 +23,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Fixed snippet and collection edit forms breaking when a name contains JavaScript-sensitive characters; such snippets can now be opened and fixed. remp/remp#1405
 
+### [Mailer]
+
+- Added a per-newsletter-type "Exclude emails from search" option that hides a mail type's templates from the email template search. remp/remp#1462
+- Fixed a null error in the newsletter list form when no `system` mail type exists. remp/remp#1462
+
 ## Archive
 
 - [v5.1](./changelogs/CHANGELOG-v5.1.md)
