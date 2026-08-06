@@ -141,7 +141,18 @@ class PruneMailLogsPartitionsCommand extends Command
 
         foreach ($partitions as $partitionName) {
             $output->writeln("=== Pruning `{$partitionName}` ===");
-            $this->prunePartition($output, $partitionName, $cutoffDate, $keepTemplateIds);
+            try {
+                $this->prunePartition($output, $partitionName, $cutoffDate, $keepTemplateIds);
+            } catch (\RuntimeException $e) {
+                // Bounded lock wait exhausted, or the DDL itself was rejected (see
+                // executeDdlWithBoundedLockWait(); Nette's DriverException is a RuntimeException too,
+                // so both land here). Report and stop rather than moving on: the cutoff date must not
+                // be raised while a partition before it still holds unpruned rows.
+                $output->writeln('<error>' . $e->getMessage() . '</error>');
+                $output->writeln("<error>`{$partitionName}` was left untouched and nothing is half-applied. Resolve the "
+                    . 'cause above, then re-run this command.</error>');
+                return Command::FAILURE;
+            }
             $output->writeln('');
         }
 
@@ -221,8 +232,15 @@ class PruneMailLogsPartitionsCommand extends Command
         $output->writeln('  Building indexes …');
         $this->rebuildSecondaryIndexes($output, $stageTable);
 
+        // Bounded metadata-lock wait: EXCHANGE PARTITION permits concurrent DML, but acquiring
+        // its lock does not — and this command runs unattended on a monthly cron, where a
+        // stalled acquisition would block every mail_logs write until someone notices. See
+        // executeDdlWithBoundedLockWait(). Giving up here leaves the live partition untouched
+        // and only a stage table behind, which the next run drops and rebuilds.
         $output->writeln('  Exchanging partition …');
-        $this->database->query(
+        $this->executeDdlWithBoundedLockWait(
+            $output,
+            "EXCHANGE PARTITION `{$partitionName}`",
             "ALTER TABLE `" . self::TABLE . "` EXCHANGE PARTITION `{$partitionName}` WITH TABLE `{$stageTable}` WITHOUT VALIDATION"
         );
 

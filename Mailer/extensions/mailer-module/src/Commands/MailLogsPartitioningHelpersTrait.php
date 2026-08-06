@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
+use Nette\Database\DriverException;
 use Nette\Utils\DateTime;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -82,16 +83,63 @@ trait MailLogsPartitioningHelpersTrait
     ];
 
     /**
-     * Pins the session time_zone to the offset the running PHP process is using, so the
-     * TIMESTAMP → DATETIME conversion MySQL performs while copying created_at/updated_at
-     * is deterministic and matches what the app itself writes — instead of depending on
-     * whichever TZ the operator's shell happens to be in.
+     * Bounded metadata-lock wait for DDL that touches the LIVE mail_logs table — see
+     * executeDdlWithBoundedLockWait() for why every such statement has to go through it.
+     *
+     * These are deliberately fixed constants rather than CLI options: the values below are
+     * safe even against a fully live table, and an operator staring at a stalled migration
+     * should not have to reason about a lock-timeout knob. DDL_LOCK_WAIT_TIMEOUT is the
+     * session-only `lock_wait_timeout` used per attempt; DDL_MAX_ATTEMPTS ×
+     * DDL_RETRY_DELAY_SECONDS is roughly how long the command keeps trying (~10 minutes)
+     * before it gives up and reports failure instead of hanging.
+     */
+    private const DDL_LOCK_WAIT_TIMEOUT = 5;
+    private const DDL_MAX_ATTEMPTS = 60;
+    private const DDL_RETRY_DELAY_SECONDS = 10;
+
+    /**
+     * MySQL ER_LOCK_WAIT_TIMEOUT — the errno `lock_wait_timeout` raises when a metadata
+     * lock could not be acquired in time. Shared with `innodb_lock_wait_timeout`, but the
+     * statements routed through executeDdlWithBoundedLockWait() are metadata-only.
+     */
+    private const MYSQL_ER_LOCK_WAIT_TIMEOUT = 1205;
+
+    /**
+     * Pins the session time_zone to the *named* zone the running PHP process uses, so the
+     * TIMESTAMP → DATETIME conversion MySQL performs while copying created_at/updated_at is
+     * deterministic and matches what the app itself writes — instead of depending on whichever
+     * TZ the operator's shell happens to be in.
+     *
+     * It has to be the named zone, not a fixed offset: a fixed offset applies today's DST state
+     * to every row, so on a table spanning a DST boundary every row from the other side of it
+     * lands an hour off the local wall-clock time the application would have written. Measured
+     * on a real 3.7M-row installation migrated in August: 1.13M rows shifted by an hour, 219 of
+     * them onto the wrong calendar day (wrong daily stats bucket) and 7 into the wrong month
+     * partition.
+     *
+     * Named zones need MySQL's time-zone tables to be populated (mysql_tzinfo_to_sql), which is
+     * not guaranteed, so this falls back to the fixed offset and says plainly what that costs.
      */
     private function pinSessionTimeZone(OutputInterface $output): void
     {
+        $zone = date_default_timezone_get();
+
+        try {
+            $this->database->query('SET time_zone = ?', $zone);
+            $output->writeln("Session time_zone pinned to {$zone}.");
+            $output->writeln('');
+            return;
+        } catch (DriverException $e) {
+            // Unknown or incorrect time zone: mysql.time_zone_name is empty on this server.
+        }
+
         $offset = (new \DateTime())->format('P');
         $this->database->query('SET time_zone = ?', $offset);
-        $output->writeln("Session time_zone pinned to {$offset}.");
+        $output->writeln("<comment>MySQL rejected the named time zone `{$zone}` — its time-zone tables are not "
+            . "populated. Falling back to the fixed offset {$offset}.</comment>");
+        $output->writeln('<comment>Rows created under a different DST offset than the one in force right now will be '
+            . 'copied with created_at/updated_at off by the difference (typically an hour). To avoid that, load the '
+            . 'tables once (`mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql`) and re-run.</comment>');
         $output->writeln('');
     }
 
@@ -373,6 +421,135 @@ trait MailLogsPartitioningHelpersTrait
             } catch (\Throwable $e) {
                 $output->writeln("  <comment>Could not set session {$variable} (unsupported on this MySQL version) — continuing without it.</comment>");
             }
+        }
+    }
+
+    /**
+     * Runs one DDL statement against the live mail_logs table with a BOUNDED metadata-lock
+     * wait, retrying until it gets a window. Every statement that takes MDL on the live
+     * table (RENAME TABLE, EXCHANGE PARTITION, REORGANIZE PARTITION, DROP FOREIGN KEY) must
+     * go through here.
+     *
+     * Why this exists: `lock_wait_timeout` defaults to 31536000 seconds — a full year, and
+     * not to be confused with `innodb_lock_wait_timeout`'s 50s. A partitioning DDL statement
+     * that cannot get its metadata lock therefore does not fail, it hangs; and because MDL
+     * is held until transaction *commit* (not statement end), a single long-running
+     * transaction is enough to stall it. Worse, the pending MDL request blocks the queue
+     * behind it, so every subsequent application INSERT/UPDATE on mail_logs waits too, each
+     * one holding a connection — which is exactly how a metadata-only ALTER took a whole
+     * production database down (max_connections exhausted, no logins possible).
+     *
+     * The fix is to bound each attempt to DDL_LOCK_WAIT_TIMEOUT seconds. On timeout the
+     * pending request is withdrawn, so the queued application writes drain immediately
+     * instead of accumulating, and we retry after a pause. No application write ever fails
+     * because of this: the timeout is set on THIS session only, never globally — nothing on
+     * the application's connections changes.
+     *
+     * On exhaustion this throws instead of continuing, so a caller never proceeds past a
+     * DDL step that did not actually happen.
+     *
+     * @param string[] $lockedTables tables to inspect for blockers when an attempt times out
+     * @throws \RuntimeException if the lock could not be acquired within DDL_MAX_ATTEMPTS; any
+     *                           driver error other than a lock-wait timeout propagates unchanged
+     */
+    private function executeDdlWithBoundedLockWait(
+        OutputInterface $output,
+        string $description,
+        string $sql,
+        array $lockedTables = [self::TABLE],
+    ): void {
+        $previousTimeout = $this->applySessionLockWaitTimeout($output);
+
+        try {
+            for ($attempt = 1; $attempt <= self::DDL_MAX_ATTEMPTS; $attempt++) {
+                try {
+                    $this->database->query($sql);
+                    if ($attempt > 1) {
+                        $output->writeln("  <info>{$description}: acquired the lock on attempt {$attempt}.</info>");
+                    }
+                    return;
+                } catch (DriverException $e) {
+                    if ((int) $e->getDriverCode() !== self::MYSQL_ER_LOCK_WAIT_TIMEOUT) {
+                        throw $e;
+                    }
+
+                    $output->writeln(sprintf(
+                        '  <comment>%s: could not get a metadata lock within %ds (attempt %d/%d).</comment>',
+                        $description,
+                        self::DDL_LOCK_WAIT_TIMEOUT,
+                        $attempt,
+                        self::DDL_MAX_ATTEMPTS
+                    ));
+
+                    // Said once, not on every attempt. Identifying the blocking session needs
+                    // performance_schema.metadata_locks, which an application database user
+                    // normally cannot read — so this points at the fix an operator can always
+                    // apply, and leaves the privileged diagnosis to the runbook.
+                    if ($attempt === 1) {
+                        $output->writeln('    Another session holds a metadata lock on ' . implode(', ', $lockedTables)
+                            . '. Metadata locks are released only at transaction commit, so this clears as soon as '
+                            . 'that transaction ends.');
+                        $output->writeln('    Pausing the writers listed in the partitioning runbook is the reliable '
+                            . 'fix; it also shows how to identify the holder if you have a privileged account.');
+                    }
+
+                    if ($attempt < self::DDL_MAX_ATTEMPTS) {
+                        $output->writeln('  Waiting ' . self::DDL_RETRY_DELAY_SECONDS . 's for writers to drain, then retrying …');
+                        sleep(self::DDL_RETRY_DELAY_SECONDS);
+                    }
+                }
+            }
+
+            throw new \RuntimeException(sprintf(
+                '%s: gave up after %d attempts over ~%d minutes without acquiring a metadata lock. '
+                . 'Something is holding a long-running transaction on: %s. Nothing was changed by this step. '
+                . 'Pause the writers (see the partitioning runbook, "Locking behaviour") and re-run the command.',
+                $description,
+                self::DDL_MAX_ATTEMPTS,
+                (int) round(self::DDL_MAX_ATTEMPTS * self::DDL_RETRY_DELAY_SECONDS / 60),
+                implode(', ', $lockedTables)
+            ));
+        } finally {
+            $this->restoreSessionLockWaitTimeout($previousTimeout);
+        }
+    }
+
+    /**
+     * Sets this session's `lock_wait_timeout` to DDL_LOCK_WAIT_TIMEOUT and returns the
+     * previous value so it can be restored. Session scope only — deliberately never
+     * `SET GLOBAL`, which would make application statements start failing.
+     */
+    private function applySessionLockWaitTimeout(OutputInterface $output): ?int
+    {
+        try {
+            $row = $this->database->query('SELECT @@SESSION.lock_wait_timeout AS timeout')->fetch();
+            $previous = $row !== null ? (int) $row->timeout : null;
+            $this->database->query('SET SESSION lock_wait_timeout = ?', self::DDL_LOCK_WAIT_TIMEOUT);
+
+            return $previous;
+        } catch (\Throwable $e) {
+            // Without the bounded timeout the statement would wait for up to a year, which is
+            // the failure mode this whole helper exists to prevent — so this is fatal, not
+            // something to swallow like the tuneSessionForBulkDdl() boosts.
+            throw new \RuntimeException(
+                'Could not set a bounded session lock_wait_timeout, refusing to run partitioning DDL that '
+                . 'could then block indefinitely: ' . $e->getMessage(),
+                previous: $e
+            );
+        }
+    }
+
+    private function restoreSessionLockWaitTimeout(?int $previousTimeout): void
+    {
+        if ($previousTimeout === null) {
+            return;
+        }
+
+        try {
+            $this->database->query('SET SESSION lock_wait_timeout = ?', $previousTimeout);
+        } catch (\Throwable $e) {
+            // Best effort: the session is about to end anyway, and a failure here must not
+            // mask the exception that is potentially already propagating.
         }
     }
 }

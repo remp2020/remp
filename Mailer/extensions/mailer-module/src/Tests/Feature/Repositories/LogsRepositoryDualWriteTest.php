@@ -55,7 +55,8 @@ class LogsRepositoryDualWriteTest extends BaseFeatureTestCase
             'The configured dual-write target changed; update this test.'
         );
 
-        $this->redis()->set(MigrateMailLogsToPartitionsCommand::MAIL_LOGS_PARTITIONS_MIGRATION_IS_RUNNING, (new DateTime())->format(DATE_ATOM));
+        // Pure boolean flag — the migration's start time lives in its own Redis key.
+        $this->redis()->set(MigrateMailLogsToPartitionsCommand::MAIL_LOGS_PARTITIONS_MIGRATION_IS_RUNNING, '1');
     }
 
     protected function tearDown(): void

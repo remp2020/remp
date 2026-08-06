@@ -172,7 +172,14 @@ class BackfillMailLogsPartitionsCommand extends Command
 
         foreach ($partitions as $partitionName) {
             $output->writeln("=== Backfilling `{$partitionName}` ===");
-            $this->backfillPartition($output, $partitionName, $swapTime, $cutoffDate, $keepTemplateIds);
+            try {
+                $this->backfillPartition($output, $partitionName, $swapTime, $cutoffDate, $keepTemplateIds);
+            } catch (\RuntimeException $e) {
+                $output->writeln('<error>' . $e->getMessage() . '</error>');
+                $output->writeln("<error>`{$partitionName}` is still pending. Resolve the cause above, then re-run this "
+                    . 'command.</error>');
+                return Command::FAILURE;
+            }
             $output->writeln('');
         }
 
@@ -272,8 +279,14 @@ class BackfillMailLogsPartitionsCommand extends Command
         $output->writeln('  Reconciling post-swap updates …');
         $this->reconcilePostSwapUpdates($stageTable, $partitionName, $monthStart, $monthEnd, $swapTime);
 
+        // Bounded metadata-lock wait: EXCHANGE PARTITION permits concurrent DML, but acquiring
+        // its lock does not, and an unbounded wait on the live table would queue every mail_logs
+        // write behind it. See executeDdlWithBoundedLockWait(). Giving up here leaves the live
+        // partition untouched and the month still `pending`, so a re-run redoes it from scratch.
         $output->writeln('  Exchanging partition …');
-        $this->database->query(
+        $this->executeDdlWithBoundedLockWait(
+            $output,
+            "EXCHANGE PARTITION `{$partitionName}`",
             "ALTER TABLE `" . self::TABLE . "` EXCHANGE PARTITION `{$partitionName}` WITH TABLE `{$stageTable}` WITHOUT VALIDATION"
         );
 

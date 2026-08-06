@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Commands;
 
+use Nette\Database\DriverException;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Models\EnvironmentConfig;
@@ -52,11 +53,43 @@ class MigrateMailLogsToPartitionsCommand extends Command
     use RedisClientTrait;
     use MailLogsPartitioningHelpersTrait;
 
+    /**
+     * Pure boolean flag (value '1') activating the dual-write path in LogsRepository — wired
+     * up via setNewTableDataMigrationIsRunningFlag() in config.neon. Deliberately holds no
+     * payload: it is cleared before the swap (see Phase 6), and the migration start time it
+     * used to double as must survive that, so the timestamp lives in
+     * REDIS_MIGRATION_STARTED_AT instead.
+     */
     public const MAIL_LOGS_PARTITIONS_MIGRATION_IS_RUNNING = 'mail_logs_partitions_migration_running';
+
+    /**
+     * ISO start time of the (possibly resumed) migration run — the lower bound
+     * fixTableDifferences() catches up from. Must outlive the dual-write flag: the swap is
+     * abortable (its metadata lock wait is bounded and can be exhausted), and a resumed run
+     * that recomputed a *later* start time would permanently miss every row written while
+     * dual-write was off. Cleared only once the final catch-up has succeeded.
+     */
+    private const REDIS_MIGRATION_STARTED_AT = 'mail_logs_partitions_migration_started_at';
+
+    /**
+     * How many ids fixTableDifferences() puts into a single `IN (…)` catch-up insert. The
+     * catch-up window spans the whole run — every row written while dual-write was off, which
+     * is up to ~10 minutes of RENAME retries, or arbitrarily long for a run resumed later —
+     * so the id list it works from has no useful upper bound.
+     */
+    private const DIFF_INSERT_CHUNK_SIZE = 10000;
 
     public const COMMAND_NAME = 'mail_logs:migrate-to-partitions';
 
     private const PAGE_SIZE = 200_000;
+
+    /**
+     * MySQL ER_FOREIGN_KEY_ON_PARTITIONED — InnoDB refuses to let a foreign key reference a
+     * partitioned table. Phase 6 relies on MySQL retargeting the mail_log_conversions FK to
+     * `mail_logs_old` as part of the atomic RENAME; if a given server version rejects that
+     * instead, it reports this errno and the FK has to be dropped before the rename retries.
+     */
+    private const MYSQL_ER_FOREIGN_KEY_ON_PARTITIONED = 1506;
 
     /**
      * Per-tier Redis cursors for the Phase 1 backfill below. Explicit per-tier state
@@ -71,7 +104,7 @@ class MigrateMailLogsToPartitionsCommand extends Command
 
     /**
      * Drives BackfillMailLogsPartitionsCommand. Seeded with one 'pending' row per
-     * historical month partition below (Phase 4.5); the reserved `__swap__` row
+     * historical month partition below (Phase 5); the reserved `__swap__` row
      * records when the swap happened, for that command's update-reconciliation step.
      */
     public const BACKFILL_STATE_TABLE = 'mail_logs_backfill_state';
@@ -134,9 +167,9 @@ class MigrateMailLogsToPartitionsCommand extends Command
             return Command::FAILURE;
         }
 
-        // Preflight: Phase 5 below renames the source table to `<source>_old`, which fails if
+        // Preflight: Phase 6 below renames the source table to `<source>_old`, which fails if
         // that name is taken — and it fails AFTER the point of no return (indexes dropped and
-        // rebuilt, the conversions FK dropped, the dual-write flag cleared). A leftover
+        // rebuilt, the dual-write flag cleared). A leftover
         // `mail_logs_old`/`mail_logs_v2` means the older bigint migration was never cleaned up;
         // its command was removed in 5.2.0, so finish it on a pre-5.2.0 release and archive the
         // leftovers with `mail:bigint_migration_cleanup mail_logs` before running this.
@@ -195,13 +228,23 @@ class MigrateMailLogsToPartitionsCommand extends Command
         $this->pinSessionTimeZone($output);
 
         // Record (or restore) the start time so that fixTableDifferences knows which
-        // updated_at range to catch up on restarts.
+        // updated_at range to catch up on restarts. Kept in its own key, independent of the
+        // dual-write flag: the flag is cleared before the swap and the swap can be aborted,
+        // so a shared key would make a resumed run compute a later start time and silently
+        // skip everything written in between.
         $migrationStartTime = new DateTime();
-        if ($this->redis()->exists(self::MAIL_LOGS_PARTITIONS_MIGRATION_IS_RUNNING)) {
-            $migrationStartTime = new DateTime($this->redis()->get(self::MAIL_LOGS_PARTITIONS_MIGRATION_IS_RUNNING));
+        if ($this->redis()->exists(self::REDIS_MIGRATION_STARTED_AT)) {
+            $migrationStartTime = new DateTime($this->redis()->get(self::REDIS_MIGRATION_STARTED_AT));
+            $output->writeln("Resuming an earlier run started at {$migrationStartTime->format(DATE_ATOM)}.");
         } else {
-            $this->redis()->set(self::MAIL_LOGS_PARTITIONS_MIGRATION_IS_RUNNING, $migrationStartTime->format(DATE_ATOM));
+            $this->redis()->set(self::REDIS_MIGRATION_STARTED_AT, $migrationStartTime->format(DATE_ATOM));
         }
+
+        // Always (re-)enable dual-writes: a run resumed after an aborted swap must start
+        // mirroring again. Safe to set unconditionally — the `mail_logs_old` preflight above
+        // already refuses to run once the swap has actually happened, so this can never
+        // re-enable mirroring into a shadow table that no longer exists.
+        $this->redis()->set(self::MAIL_LOGS_PARTITIONS_MIGRATION_IS_RUNNING, '1');
 
         $this->database->query("SET FOREIGN_KEY_CHECKS=0; SET UNIQUE_CHECKS=0;");
 
@@ -308,30 +351,33 @@ class MigrateMailLogsToPartitionsCommand extends Command
         $output->writeln('');
 
         // ------------------------------------------------------------------
-        // Phase 1.5: rebuild secondary indexes dropped in Phase 0, in a single
+        // Phase 2: rebuild secondary indexes dropped in Phase 0, in a single
         // combined ALTER TABLE so InnoDB's sort-based bulk index builder reads
         // the clustered index once for all of them. Idempotent: a resumed run
         // only rebuilds whichever indexes are still missing.
-        // Must happen before Phase 2, whose safety-net queries rely on these
+        // Must happen before Phase 3, whose safety-net queries rely on these
         // indexes to be efficient.
         // ------------------------------------------------------------------
-        $output->writeln('Phase 1.5: rebuilding secondary indexes …');
+        $output->writeln('Phase 2: rebuilding secondary indexes …');
         $this->rebuildSecondaryIndexes($output, $shadowTable);
-        $output->writeln('Phase 1.5 complete.');
-        $output->writeln('');
-
-        // ------------------------------------------------------------------
-        // Phase 2: catch up rows updated/inserted since migration started
-        // ------------------------------------------------------------------
-        $output->writeln('Phase 2: applying differences (updated rows, missed inserts) …');
-        $this->fixTableDifferences($sourceTable, $shadowTable, $migrationStartTime);
         $output->writeln('Phase 2 complete.');
         $output->writeln('');
 
         // ------------------------------------------------------------------
-        // Phase 3: set AUTO_INCREMENT on the shadow table
+        // Phase 3: catch up rows updated/inserted since migration started
         // ------------------------------------------------------------------
-        $output->writeln('Phase 3: aligning AUTO_INCREMENT …');
+        $output->writeln('Phase 3: applying differences (updated rows, missed inserts) …');
+        $this->reportTableDifferences(
+            $output,
+            $this->fixTableDifferences($sourceTable, $shadowTable, $migrationStartTime)
+        );
+        $output->writeln('Phase 3 complete.');
+        $output->writeln('');
+
+        // ------------------------------------------------------------------
+        // Phase 4: set AUTO_INCREMENT on the shadow table
+        // ------------------------------------------------------------------
+        $output->writeln('Phase 4: aligning AUTO_INCREMENT …');
         $dbName = $this->environmentConfig->get('DB_NAME');
         $this->database->query("
             SELECT MAX(id) + 10000 INTO @AutoInc FROM `{$sourceTable}`;
@@ -340,26 +386,17 @@ class MigrateMailLogsToPartitionsCommand extends Command
             EXECUTE stmt;
             DEALLOCATE PREPARE stmt;
         ");
-        $output->writeln('Phase 3 complete.');
-        $output->writeln('');
-
-        // ------------------------------------------------------------------
-        // Phase 4: drop the FK from mail_log_conversions so RENAME succeeds
-        // (InnoDB forbids any table from referencing a partitioned table)
-        // ------------------------------------------------------------------
-        $output->writeln('Phase 4: dropping mail_log_conversions → mail_logs FK …');
-        $this->dropConversionsForeignKey($output);
         $output->writeln('Phase 4 complete.');
         $output->writeln('');
 
         // ------------------------------------------------------------------
-        // Phase 4.5: seed the backfill state so
+        // Phase 5: seed the backfill state so
         // BackfillMailLogsPartitionsCommand knows which historical months still
         // need to be loaded. Idempotent (INSERT IGNORE) — safe to re-run.
         // ------------------------------------------------------------------
-        $output->writeln('Phase 4.5: seeding backfill state …');
+        $output->writeln('Phase 5: seeding backfill state …');
         $this->seedBackfillState($output, $sourceTable, $liveWindowStart);
-        $output->writeln('Phase 4.5 complete.');
+        $output->writeln('Phase 5 complete.');
         $output->writeln('');
 
         // ------------------------------------------------------------------
@@ -370,43 +407,100 @@ class MigrateMailLogsToPartitionsCommand extends Command
         // getNewTable() (mail_logs_partitioned) while this flag is set — which would throw
         // on every live insert/webhook update. Clearing it now means writes go
         // only to the (still-live) source table until the RENAME; anything written
-        // in that brief pre-rename window is reconciled by the Phase 6 catch-up
+        // in that brief pre-rename window is reconciled by the Phase 8 catch-up
         // from the old table.
+        //
+        // "Brief" is up to ~10 minutes if the RENAME below has to retry for its metadata
+        // lock, and if it exhausts its retries the flag stays cleared until the command is
+        // re-run (which re-sets it). Both cases are covered: those writes land in the live
+        // `mail_logs` either way, and the preserved REDIS_MIGRATION_STARTED_AT keeps them
+        // inside the catch-up window of Phase 8 — or of Phase 3 on a resumed run.
         // ------------------------------------------------------------------
         $output->writeln('Clearing dual-write flag before swap …');
         $this->redis()->del(self::MAIL_LOGS_PARTITIONS_MIGRATION_IS_RUNNING);
 
         // ------------------------------------------------------------------
-        // Phase 5: atomic table swap
+        // Phase 6: atomic table swap
+        //
+        // RENAME TABLE needs an EXCLUSIVE metadata lock on the live `mail_logs`, so it goes
+        // through the bounded-wait helper: an unbounded wait here would queue every
+        // application write behind it and exhaust the connection pool (see
+        // executeDdlWithBoundedLockWait()). Unlike an FK drop, an EXCLUSIVE request is
+        // high-priority — new writers queue behind it rather than overtaking it — so each
+        // attempt only has to outlast the transactions that are already open.
         // ------------------------------------------------------------------
-        $output->writeln('Phase 5: analysing and swapping tables …');
+        $output->writeln('Phase 6: analysing and swapping tables …');
         $this->database->query("ANALYZE TABLE `{$shadowTable}`;");
-        $this->database->query("
-            RENAME TABLE
-                `{$sourceTable}` TO `{$sourceTable}_old`,
-                `{$shadowTable}` TO `{$sourceTable}`
-        ");
+        try {
+            $this->swapTables($output, $sourceTable, $shadowTable);
+        } catch (\RuntimeException $e) {
+            $output->writeln('<error>' . $e->getMessage() . '</error>');
+            $output->writeln("<error>Nothing was swapped — `{$sourceTable}` is still the live unpartitioned table and no</error>");
+            $output->writeln('<error>data was lost. Dual-writes stay OFF until this command is re-run, which re-enables</error>');
+            $output->writeln('<error>them and catches up everything written in the meantime. Pause the writers first.</error>');
+            return Command::FAILURE;
+        }
         $this->recordSwapTime();
 
         // Seeds the cutoff date (see MailLogsStatsStateRepository) to the start of the
         // live window established above — everything older is still `pending` backfill
-        // (Phase 4.5), so it is correctly sealed until BackfillMailLogsPartitionsCommand
+        // (Phase 5), so it is correctly sealed until BackfillMailLogsPartitionsCommand
         // lowers the cutoff date as each month actually lands. No-op if already initialized
         // (e.g. a resumed/re-run migration).
         $this->mailLogsStatsStateRepository->initCutoffDate($liveWindowStart);
 
-        $output->writeln('Phase 5 complete.');
-        $output->writeln('');
-
-        // ------------------------------------------------------------------
-        // Phase 6: final catch-up from the old table
-        // ------------------------------------------------------------------
-        $output->writeln('Phase 6: final differences catch-up (old → new) …');
-        $this->fixTableDifferences($sourceTable . '_old', $sourceTable, $migrationStartTime);
         $output->writeln('Phase 6 complete.');
         $output->writeln('');
 
+        // ------------------------------------------------------------------
+        // Phase 7: drop the mail_log_conversions → mail_logs FK.
+        //
+        // Deliberately AFTER the swap, not before it. Dropping an FK takes a SHARED_READ_ONLY
+        // metadata lock on the *parent* table (MySQL 8.0 extends FK DDL locks to the related
+        // table, WL#6049 — and FOREIGN_KEY_CHECKS=0 does not avoid it, bug #103575). That
+        // request is low-priority, so on a write-heavy live `mail_logs` it can be starved
+        // indefinitely while itself blocking every queued write — which is exactly how running
+        // this before the swap took production down. Post-swap the FK instead points at the
+        // frozen, traffic-free `mail_logs_old`, where the same statement is instant.
+        //
+        // It must not be deferred any further, though: while the FK still references
+        // `mail_logs_old`, a conversion recorded for a newly-sent mail would violate it (that
+        // id exists only in the new `mail_logs`). Conversions are written by the
+        // mail:process-conversion-stats cron rather than by the send path, so the window is
+        // harmless in practice — but if this step fails it has to be finished by hand before
+        // that cron next runs.
+        // ------------------------------------------------------------------
+        $output->writeln('Phase 7: dropping mail_log_conversions → mail_logs FK …');
+        try {
+            $this->dropConversionsForeignKey($output);
+        } catch (\Throwable $e) {
+            $output->writeln('<error>Phase 7 failed: ' . $e->getMessage() . '</error>');
+            $output->writeln("<error>The tables are already swapped and `{$sourceTable}` is live — do NOT re-run this command.</error>");
+            $output->writeln('<error>Finish the drop manually before mail:process-conversion-stats next runs, otherwise</error>');
+            $output->writeln('<error>conversions recorded for newly-sent mail will fail against the stale FK:</error>');
+            $output->writeln('<error>  ALTER TABLE mail_log_conversions DROP FOREIGN KEY `mail_log_conversions_ibfk_1`;</error>');
+            return Command::FAILURE;
+        }
+        $output->writeln('Phase 7 complete.');
+        $output->writeln('');
+
+        // ------------------------------------------------------------------
+        // Phase 8: final catch-up from the old table
+        // ------------------------------------------------------------------
+        $output->writeln('Phase 8: final differences catch-up (old → new) …');
+        $this->reportTableDifferences(
+            $output,
+            $this->fixTableDifferences($sourceTable . '_old', $sourceTable, $migrationStartTime)
+        );
+        $output->writeln('Phase 8 complete.');
+        $output->writeln('');
+
         $this->database->query("SET FOREIGN_KEY_CHECKS=1; SET UNIQUE_CHECKS=1;");
+
+        // The catch-up window is closed, so the start time is no longer needed. Cleared only
+        // here: any earlier and an aborted run would resume with a later window, permanently
+        // skipping the rows written in between.
+        $this->redis()->del(self::REDIS_MIGRATION_STARTED_AT);
 
         $output->writeln('');
         $output->writeln('<info>Go-live migration completed successfully.</info>');
@@ -616,13 +710,32 @@ class MigrateMailLogsToPartitionsCommand extends Command
     }
 
     /**
+     * Prints what a fixTableDifferences() pass reconciled. Worth showing even though it is
+     * usually small: in Phase 8 this is exactly the set of rows that were written while
+     * dual-write was off, so "0 rows" on a busy installation is a signal that the catch-up
+     * window (REDIS_MIGRATION_STARTED_AT) is wrong rather than a sign of a clean run.
+     *
+     * @param array{updated: int, inserted: int} $counts
+     */
+    private function reportTableDifferences(OutputInterface $output, array $counts): void
+    {
+        $output->writeln(sprintf(
+            '  %d row(s) refreshed, %d row(s) copied in.',
+            $counts['updated'],
+            $counts['inserted']
+        ));
+    }
+
+    /**
      * Copies rows that were updated or inserted in the source table after
      * $updatedAfter into the destination table.
+     *
+     * @return array{updated: int, inserted: int} rows reconciled, for reporting
      */
-    private function fixTableDifferences(string $from, string $to, DateTime $updatedAfter): void
+    private function fixTableDifferences(string $from, string $to, DateTime $updatedAfter): array
     {
         // 1. Update rows that exist in both tables but diverged after migration start.
-        $this->database->query("
+        $updated = $this->database->query("
             UPDATE `{$to}` ml_to
             JOIN   `{$from}` ml_from ON ml_to.id = ml_from.id AND ml_to.created_at = ml_from.created_at
             SET
@@ -643,21 +756,27 @@ class MigrateMailLogsToPartitionsCommand extends Command
                 ml_to.attachment_size     = ml_from.attachment_size
             WHERE ml_from.updated_at > ?
               AND (ml_to.updated_at IS NULL OR ml_from.updated_at != ml_to.updated_at)
-        ", $updatedAfter);
+        ", $updatedAfter)->getRowCount();
 
         // 2. Insert rows that exist only in the source (created after migration start).
+        //
+        // fetchPairs(null, 'id') — NOT fetchFields(), which is an alias for fetchList() and
+        // returns only the *first* row. With that, this step copied a single missed row and
+        // silently dropped every other one; the rows it drops are live production rows written
+        // while dual-write was off, and only those that happen to carry a mail_sender_id would
+        // be rescued by the safety net in step 3.
         $missingIds = $this->database->query("
             SELECT `id` FROM `{$from}`
             WHERE created_at > ?
               AND `id` NOT IN (
                   SELECT `id` FROM `{$to}` WHERE created_at > ?
               )
-        ", $updatedAfter, $updatedAfter)->fetchFields();
+        ", $updatedAfter, $updatedAfter)->fetchPairs(null, 'id');
 
-        if ($missingIds) {
+        foreach (array_chunk($missingIds, self::DIFF_INSERT_CHUNK_SIZE) as $chunk) {
             $this->database->query(
                 $this->insertSelectSql($to, $from) . " WHERE `id` IN ?",
-                $missingIds
+                $chunk
             );
         }
 
@@ -680,19 +799,68 @@ class MigrateMailLogsToPartitionsCommand extends Command
             $updatedAfter,
             $updatedAfter,
         );
+
+        return ['updated' => $updated, 'inserted' => count($missingIds)];
     }
 
+    /**
+     * Performs the go-live RENAME with a bounded metadata-lock wait.
+     *
+     * The happy path renames straight over the mail_log_conversions FK: MySQL retargets it to
+     * `<source>_old` as part of the (atomic) rename, which is what lets Phase 7 drop it against
+     * a table nothing is writing to. If a server rejects that with ER_FOREIGN_KEY_ON_PARTITIONED
+     * we fall back to the pre-swap drop — the statement that caused the original outage, so it
+     * is the fallback, not the default, and it also runs bounded and retried. RENAME TABLE is
+     * atomic, so a rejected attempt changes nothing and the fallback starts from a clean state.
+     */
+    private function swapTables(OutputInterface $output, string $sourceTable, string $shadowTable): void
+    {
+        $renameSql = "
+            RENAME TABLE
+                `{$sourceTable}` TO `{$sourceTable}_old`,
+                `{$shadowTable}` TO `{$sourceTable}`
+        ";
+        $lockedTables = [$sourceTable, 'mail_log_conversions'];
+
+        try {
+            $this->executeDdlWithBoundedLockWait($output, 'Go-live RENAME TABLE', $renameSql, $lockedTables);
+            return;
+        } catch (DriverException $e) {
+            if ((int) $e->getDriverCode() !== self::MYSQL_ER_FOREIGN_KEY_ON_PARTITIONED) {
+                throw $e;
+            }
+        }
+
+        $output->writeln("  <comment>This MySQL refuses to rename `{$sourceTable}` while mail_log_conversions still</comment>");
+        $output->writeln('  <comment>references it, so the FK has to go first — against the LIVE table, whose lock</comment>');
+        $output->writeln('  <comment>request can be starved by concurrent writes. Pause the writers if this stalls.</comment>');
+        $this->dropConversionsForeignKey($output);
+
+        $this->executeDdlWithBoundedLockWait($output, 'Go-live RENAME TABLE (retry)', $renameSql, $lockedTables);
+    }
+
+    /**
+     * Drops the mail_log_conversions → mail_logs FK, if it is still there. Idempotent (a
+     * resumed run, or the swapTables() fallback having already done it, is a no-op) and it
+     * resolves the constraint name dynamically rather than assuming `mail_log_conversions_ibfk_1`.
+     *
+     * Accepts the FK whether it still points at `mail_logs` or has already been retargeted to
+     * `mail_logs_old` by the swap — Phase 7 calls this after the rename, when the latter is the
+     * normal case.
+     */
     private function dropConversionsForeignKey(OutputInterface $output): void
     {
+        $sourceTable = $this->logsRepository->getTable()->getName();
+
         $row = $this->database->query("
-            SELECT CONSTRAINT_NAME
+            SELECT CONSTRAINT_NAME, REFERENCED_TABLE_NAME
             FROM information_schema.KEY_COLUMN_USAGE
             WHERE TABLE_SCHEMA = DATABASE()
               AND TABLE_NAME   = 'mail_log_conversions'
               AND COLUMN_NAME  = 'mail_log_id'
-              AND REFERENCED_TABLE_NAME = 'mail_logs'
+              AND REFERENCED_TABLE_NAME IN ?
             LIMIT 1
-        ")->fetch();
+        ", [$sourceTable, "{$sourceTable}_old"])->fetch();
 
         if (!$row || !$row->CONSTRAINT_NAME) {
             $output->writeln('  No FK found on mail_log_conversions (already dropped or never existed).');
@@ -700,7 +868,14 @@ class MigrateMailLogsToPartitionsCommand extends Command
         }
 
         $fkName = $row->CONSTRAINT_NAME;
-        $output->writeln("  Dropping FK `{$fkName}` …");
-        $this->database->query("ALTER TABLE mail_log_conversions DROP FOREIGN KEY `{$fkName}`");
+        $referencedTable = $row->REFERENCED_TABLE_NAME;
+        $output->writeln("  Dropping FK `{$fkName}` (→ `{$referencedTable}`) …");
+
+        $this->executeDdlWithBoundedLockWait(
+            $output,
+            "DROP FOREIGN KEY `{$fkName}`",
+            "ALTER TABLE mail_log_conversions DROP FOREIGN KEY `{$fkName}`",
+            ['mail_log_conversions', $referencedTable],
+        );
     }
 }

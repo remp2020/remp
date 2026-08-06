@@ -96,6 +96,23 @@ class SeedMailLogsPartitionsCommand extends Command
             count($missing)
         ));
 
+        // REORGANIZE PARTITION below rewrites p_max and does NOT permit concurrent DML, so its
+        // cost is proportional to how many rows have accumulated there — which is exactly what
+        // a lapsed schedule causes. Report it before the ALTER, so an operator watching a long
+        // write stall knows why (and can decide to pause the writers first).
+        $pMaxRows = (int) $this->database
+            ->query("SELECT COUNT(*) AS cnt FROM `" . self::TABLE . "` PARTITION (`p_max`)")
+            ->fetch()
+            ->cnt;
+        if ($pMaxRows > 0) {
+            $output->writeln(sprintf(
+                '<comment>`p_max` currently holds %d row(s); each REORGANIZE below rewrites them and blocks writes to '
+                . '`%s` for its duration.</comment>',
+                $pMaxRows,
+                self::TABLE
+            ));
+        }
+
         // We must add partitions in chronological order (each REORGANIZE splits the
         // current p_max into one new named month + the new p_max tail).
         sort($missing);
@@ -107,17 +124,37 @@ class SeedMailLogsPartitionsCommand extends Command
                 continue;
             }
 
-            $output->write("  Creating `{$partitionName}` (< {$upperBound}) … ");
+            $output->writeln("  Creating `{$partitionName}` (< {$upperBound}) … ");
 
-            $this->database->query("
-                ALTER TABLE `" . self::TABLE . "`
-                REORGANIZE PARTITION `p_max` INTO (
-                    PARTITION `{$partitionName}` VALUES LESS THAN ('{$upperBound}'),
-                    PARTITION `p_max`            VALUES LESS THAN (MAXVALUE)
-                )
-            ");
+            // Bounded metadata-lock wait: this runs unattended on a monthly cron against the
+            // live table, where an unbounded wait would queue every mail_logs write behind it
+            // and exhaust the connection pool. See executeDdlWithBoundedLockWait().
+            //
+            // Giving up is safe here: each REORGANIZE is independent and the p_max catch-all is
+            // always preserved, so a partition that could not be created just means inserts for
+            // that month keep landing in p_max until the next run.
+            try {
+                $this->executeDdlWithBoundedLockWait(
+                    $output,
+                    "REORGANIZE PARTITION for `{$partitionName}`",
+                    "
+                        ALTER TABLE `" . self::TABLE . "`
+                        REORGANIZE PARTITION `p_max` INTO (
+                            PARTITION `{$partitionName}` VALUES LESS THAN ('{$upperBound}'),
+                            PARTITION `p_max`            VALUES LESS THAN (MAXVALUE)
+                        )
+                    "
+                );
+            } catch (\RuntimeException $e) {
+                // Covers both the exhausted lock wait and a rejected ALTER — Nette's DriverException
+                // is a RuntimeException too, and neither leaves anything half-applied.
+                $output->writeln('<error>' . $e->getMessage() . '</error>');
+                $output->writeln('<error>Partitions after `' . $partitionName . '` were not created either; inserts keep '
+                    . 'falling into `p_max` until this command is run again.</error>');
+                return Command::FAILURE;
+            }
 
-            $output->writeln('done.');
+            $output->writeln('  done.');
         }
 
         $output->writeln('');
