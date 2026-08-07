@@ -101,6 +101,7 @@
                     <li class="list-group-item"><strong>Goodbye e-mail:</strong> {ifset $list->unsubscribe_mail_template} <a n:href="Template:Show $list->unsubscribe_mail_template_id">{$list->unsubscribe_mail_template->subject}</a>{else}No{/ifset}</li>
                     <li class="list-group-item"><strong>External:</strong> {$list->is_external|yesNo}</li>
                     <li class="list-group-item"><strong>Is multi-variant:</strong> {$list->is_multi_variant|yesNo}</li>
+                    <li class="list-group-item"><strong>Exclude emails from search:</strong> {$list->exclude_from_search|yesNo}</li>
                 </ul>
             </div>
         </div>
