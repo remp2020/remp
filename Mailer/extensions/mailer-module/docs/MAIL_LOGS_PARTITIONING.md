@@ -45,46 +45,19 @@
 7. Record `SELECT MIN(created_at) FROM mail_logs;` — you'll need this date for the statistics backfill in step 2 of the next section.
 8. Optionally pause the `mail:aggregate-mail-template-stats` cron while the (potentially long) backfill run in the next section is in progress. This is a load consideration only, not a correctness one.
 
-## Locking behaviour
+## Pausing the writers before go-live
 
-Partitioning DDL (`RENAME TABLE`, `EXCHANGE PARTITION`, `REORGANIZE PARTITION`, `DROP FOREIGN KEY`) needs a **table-level metadata lock** on `mail_logs`. Metadata locks are never partition-scoped.
+Partitioning DDL (`RENAME TABLE`, `EXCHANGE PARTITION`, `REORGANIZE PARTITION`, `DROP FOREIGN KEY`) needs a table-level metadata lock on `mail_logs`. Run it against live traffic and it can end up waiting behind application writes, with further writes piling up behind it in turn.
 
-Two MySQL defaults make this dangerous, and they are the reason all four commands behave the way described below:
-
-- **`lock_wait_timeout` defaults to 31536000 seconds — a full year** (not to be confused with `innodb_lock_wait_timeout`'s 50 seconds). DDL that cannot get its metadata lock therefore does not fail, it *hangs*.
-- **A pending metadata-lock request blocks the queue behind it.** Every subsequent application `INSERT`/`UPDATE` on `mail_logs` waits too, each holding a connection — so a metadata-only `ALTER` that does microseconds of actual work can exhaust `max_connections` and take the whole database down.
-
-All four commands (`mail_logs:migrate-to-partitions`, `mail_logs:backfill-partitions`, `mail_logs:prune-partitions`, `mail_logs:seed-partitions`) therefore route every such statement through a **bounded lock wait**: each attempt waits at most 5 seconds, then withdraws its request so the queued application writes drain immediately, and retries.
-
-If a command does give up, the DDL step in question simply did not happen — nothing is left half-applied. Pause the writers (below) and re-run.
-
-The commands do not name the blocking session: identifying it needs `performance_schema.metadata_locks`, which the application database user normally cannot read. If you have a privileged account and want to know who is holding the lock, run this yourself:
-
-```sql
-SELECT ml.OBJECT_NAME, ml.LOCK_TYPE, ml.LOCK_STATUS, t.PROCESSLIST_ID,
-       t.PROCESSLIST_TIME, t.PROCESSLIST_STATE, LEFT(t.PROCESSLIST_INFO, 200) AS info,
-       trx.trx_started, trx.trx_state
-  FROM performance_schema.metadata_locks ml
-  JOIN performance_schema.threads t ON t.THREAD_ID = ml.OWNER_THREAD_ID
-  LEFT JOIN information_schema.innodb_trx trx ON trx.trx_mysql_thread_id = t.PROCESSLIST_ID
- WHERE ml.OBJECT_SCHEMA = DATABASE()
-   AND ml.OBJECT_NAME IN ('mail_logs', 'mail_log_conversions')
-   AND ml.LOCK_STATUS = 'GRANTED'
-   AND t.PROCESSLIST_ID <> CONNECTION_ID()
- ORDER BY t.PROCESSLIST_TIME DESC;
-```
-
-A cruder fallback that works with fewer privileges is `SHOW FULL PROCESSLIST` — look for `Waiting for table metadata lock` and for the oldest session in `Sleep` inside a transaction. Pausing the writers is the fix in either case; do not `KILL` an application transaction to force the DDL through unless you know what that transaction was doing.
-
-### Pausing the writers before go-live
-
-**Strongly recommended for `mail_logs:migrate-to-partitions`.** The bounded retry loop is designed to succeed against live traffic, but with the writers paused the go-live `RENAME` lands on the first attempt instead of possibly retrying for minutes.
+**Strongly recommended for `mail_logs:migrate-to-partitions`:** pause the writers for the duration of the run, so the go-live swap lands immediately instead of possibly waiting.
 
 Stop these for the duration of the run — how you do that depends on your deployment (systemd units, supervisor, container orchestration, crontab), so the list below is what needs to stop, not how:
 
 - **`worker:mail`** 
 - **`worker:hermes`** 
 - Any cron of your own that sends mail through Mailer's API or commands.
+
+If a command reports it gave up waiting for a lock, that DDL step simply did not happen — nothing is left half-applied. Pause the writers and re-run.
 
 ## Migration execution steps
 
@@ -106,12 +79,29 @@ Stop these for the duration of the run — how you do that depends on your deplo
 4. **Immediately clear the application cache and opcache on every web/worker node.** The swapped-in table has a different column list (no `hard_bounced_at`), charset and primary key than the one Nette cached in its database structure; until that cache is rebuilt, queries are still built against the old shape and can fail with `Unknown column`.
    > Don't expect primary-key updates to prune to a single partition, before or after the cache rebuild. `PartitionedConventions::getPrimary()` deliberately reports `id` (not the composite `(id, created_at)`) — returning the composite would break every `ActiveRow`/`wherePrimary()` caller — so `wherePrimary()` updates always emit `WHERE id = ?` and always scan every partition by design. Partition pruning applies to queries that filter on `created_at`.
 5. **Run `mail_logs:backfill-partitions`** (optionally repeatedly with `--limit`, `--month`, and `--cutoff-date`/`--priority-threshold` if you decided on a backfill cutoff) until `mail_logs_backfill_state` has no rows left with `status = 'pending'`. This fills in the historical newsletter months that step 3 deliberately left out.
-6. **Once every month reports done**, archive `mail_logs_old` per the strategy you decided on, then drop it with `mail:bigint_migration_cleanup mail_logs` (the command takes the *base* table name and drops `mail_logs_old` + `mail_logs_v2`). As with this module's other bigint migrations, wait at least 2 weeks after the backfill completes before dropping it, in case an issue emerges and you need the original data.
-   > The command refuses to run while `mail_logs_backfill_state` still has `pending` rows: `mail_logs_old` is the only source the backfill can read from, so dropping it early loses those months irrecoverably. If you have deliberately abandoned the backfill, drop the table manually.
+6. **Once every month reports done**, archive `mail_logs_old` per the strategy you decided on, then drop it manually.
+   > The command refuses to run while `mail_logs_backfill_state` still has `pending` rows: `mail_logs_old` is the only source the backfill can read from, so dropping it early loses those months irrecoverably. If you have deliberately abandoned the backfill, drop the table manually.  
+   > 
+   > **Risk:** `mail_logs_old` is typically the largest table this migration leaves behind, and dropping a table that large (roughly 10G+) can stall the whole MySQL instance for the duration of the drop. Recommended instead: hard-link its tablespace file first so the `DROP` is instant, then reclaim the space gradually outside MySQL.
+   > ```bash
+   > # On the DB host, in this database's datadir (same directory keeps it on the same filesystem).
+   > cd /var/lib/mysql/<database>
+   > ls -l mail_logs_old.ibd                        # note the size
+   > ln mail_logs_old.ibd mail_logs_old.ibd.unlink
+   > ```
+   > ```sql
+   > DROP TABLE mail_logs_old;   -- instant
+   > ```
+   > ```bash
+   > # Shrink in steps to keep IO low; start at the size noted above.
+   > for i in $(seq 250 -1 1); do truncate -s "${i}G" mail_logs_old.ibd.unlink; sleep 2; done
+   > rm mail_logs_old.ibd.unlink
+   > ```
+   > Needs shell access to the DB host as the MySQL data owner; the hard link must exist before the `DROP`; the space is not freed until the `truncate` loop runs; archive first — the data is unrecoverable from here on.
 
 ## Permanently scheduled
 
-Both scheduled commands take a metadata lock on the live `mail_logs` and can therefore exit non-zero when they cannot get one in time — see [Locking behaviour](#locking-behaviour) for what that means and what it leaves behind (nothing half-applied; a re-run redoes the step). Alert on their exit status rather than assuming a silent cron is a successful one.
+Both scheduled commands take a metadata lock on the live `mail_logs` and can therefore exit non-zero when they cannot get one in time — that step simply did not run and nothing is left half-applied, so a re-run redoes it. Alert on their exit status rather than assuming a silent cron is a successful one.
 
 `mail_logs:seed-partitions` and `mail_logs:prune-partitions` need to run indefinitely from this point on, in addition to the existing `mail:process-job` / `mail:job-stats` crontab entries documented under [Scheduled events](../README.md#scheduled-events) — and `mail:aggregate-mail-template-stats`'s existing schedule needs to change:
 

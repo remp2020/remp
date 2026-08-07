@@ -281,12 +281,14 @@ class MigrateMailLogsToPartitionsCommand extends Command
             $systemTemplateIds = $this->resolveSystemTemplateIds();
             $priorityTemplateIds = $this->resolvePriorityTemplateIds($systemTemplateIds, $priorityThreshold);
 
+            $output->writeln('Phase 1: resolving the live-window boundary id …');
+            $forceIndex = $this->indexExists($sourceTable, 'created_at') ? ' FORCE INDEX (`created_at`)' : '';
             $liveWindowStartRow = $this->database
-                ->query("SELECT id FROM `{$sourceTable}` WHERE created_at >= ? ORDER BY id ASC LIMIT 1", $liveWindowStart)
+                ->query("SELECT MIN(`id`) AS id FROM `{$sourceTable}`{$forceIndex} WHERE created_at >= ?", $liveWindowStart)
                 ->fetch();
             // No rows yet in the live window → tier is empty; start cursor at maxId so
             // the loop below is a no-op.
-            $liveWindowDefaultCursor = $liveWindowStartRow !== null
+            $liveWindowDefaultCursor = $liveWindowStartRow !== null && $liveWindowStartRow->id !== null
                 ? max(0, ((int) $liveWindowStartRow->id) - 1)
                 : $maxId;
 
