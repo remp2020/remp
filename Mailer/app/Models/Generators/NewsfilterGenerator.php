@@ -356,32 +356,22 @@ HTML;
 
     public function parseOls($post)
     {
-        $ols = [];
-        preg_match_all('/<ol.*?>(.*?)<\/ol>/is', $post, $ols);
-
-        foreach ($ols[1] as $olContent) {
+        return preg_replace_callback('/<ol([^>]*)>(.*?)<\/ol>/is', function ($matches) {
             $olsLis = [];
-            $liNum = 1;
-            $newOlContent = '';
+            preg_match_all('/<li[^>]*>(?:<p.*?>)?(.*?)(?:<\/p>)?<\/li>/is', $matches[2], $olsLis);
+            if (!$olsLis[1]) {
+                return $matches[0];
+            }
 
-            preg_match_all('/<li>(.*?)<\/li>/is', $olContent, $olsLis);
+            $liNum = preg_match('/\bstart="?(\d+)"?/i', $matches[1], $start) ? (int) $start[1] : 1;
 
-
+            $items = [];
             foreach ($olsLis[1] as $liContent) {
-                $newOlContent .= '
-    <tr style="padding:0;vertical-align:top;text-align:left;">
-        <td class="bullet" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;width:30px;border-collapse:collapse !important;">' . $liNum . '</td>
-        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important;">
-            <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">' . $liContent . '</p>
-        </td>
-    </tr>';
-
+                $items[] = '<span style="color:#AE0D21;">' . $liNum . '.</span> ' . trim($liContent);
                 $liNum++;
             }
 
-            $post = str_replace($olContent, $newOlContent, $post);
-        }
-
-        return $post;
+            return PHP_EOL . '<p>' . implode('<br>', $items) . '</p>' . PHP_EOL;
+        }, $post);
     }
 }
