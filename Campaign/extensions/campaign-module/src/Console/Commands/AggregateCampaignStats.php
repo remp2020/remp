@@ -5,6 +5,7 @@ namespace Remp\CampaignModule\Console\Commands;
 use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBannerPurchaseStats;
 use Remp\CampaignModule\CampaignBannerStats;
+use Remp\CampaignModule\Contracts\StatsException;
 use Remp\CampaignModule\Contracts\StatsHelper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -40,9 +41,27 @@ class AggregateCampaignStats extends Command
             });
         }
 
+        $total = 0;
+        $failures = 0;
+        $lastException = null;
+
         foreach ($campaigns as $campaign) {
             foreach ($campaign->campaignBanners as $campaignBanner) {
-                $stats = $this->statsHelper->variantStats($campaignBanner, $timeFrom, $timeTo);
+                $total++;
+
+                try {
+                    $stats = $this->statsHelper->variantStats($campaignBanner, $timeFrom, $timeTo);
+                } catch (StatsException $e) {
+                    $failures++;
+                    $lastException = $e;
+                    $this->error(sprintf(
+                        "Unable to fetch stats for campaign banner <comment>%s</comment> (campaign <comment>%s</comment>): %s",
+                        $campaignBanner->uuid,
+                        $campaign->name,
+                        $e->getMessage()
+                    ));
+                    continue;
+                }
 
                 /** @var CampaignBannerStats $cbs */
                 $cbs = CampaignBannerStats::firstOrNew([
@@ -83,7 +102,24 @@ class AggregateCampaignStats extends Command
             }
         }
 
-        $this->line(' <info>OK!</info>');
-        return 0;
+        if ($total > 0 && $failures === $total) {
+            throw new StatsException(
+                sprintf('All %d campaign banner(s) failed to fetch stats; last error: %s', $total, $lastException->getMessage()),
+                0,
+                $lastException
+            );
+        }
+
+        if ($failures > 0) {
+            $this->line(sprintf(
+                ' <comment>Done with %d/%d banner(s) skipped due to stats API errors; the next run recomputes the same hour bucket.</comment>',
+                $failures,
+                $total
+            ));
+        } else {
+            $this->line(' <info>OK!</info>');
+        }
+
+        return Command::SUCCESS;
     }
 }

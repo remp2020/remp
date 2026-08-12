@@ -18,10 +18,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added `closed` and `clicked` function between custom JS params to allow correctly handling events. remp/remp#1487
 - Added banner dimension option `force_manual_tracking` to force manual events tracking for banners using given dimension. remp/remp#1489
   - When enabled for a dimension, the *Track banner events manually* checkbox is checked and disabled in the banner form, and the flag is enforced on save.
-
-### [Campaign]
-
 - Fixed snippet and collection edit forms breaking when a name contains JavaScript-sensitive characters; such snippets can now be opened and fixed. remp/remp#1405
+- Changed `campaigns:aggregate-stats` command so it no longer aborts the whole run when only *some* campaign banners' stats requests to Beam Segments fail; those banners are skipped, the errors are printed. If *every* banner fails, it still fails loudly (non-zero exit). remp/remp#1491
+- Raised the Beam Segments stats client's connect timeout from 1s to 3s, and made `REMP_SEGMENTS_TIMEOUT` the budget for the query alone rather than for connect + query. remp/remp#1491
 
 ### [Mailer]
 

@@ -8,6 +8,8 @@ use GuzzleHttp\RequestOptions;
 use Remp\CampaignModule\Contracts\StatsContract;
 use Remp\CampaignModule\Contracts\StatsException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
 
 class StatsRequest implements StatsContract
 {
@@ -194,6 +196,10 @@ class StatsRequest implements StatsContract
             ]);
         } catch (ClientException $e) {
             throw new StatsException('bad request', 400, $e);
+        } catch (ConnectException $e) {
+            throw new StatsException("could not connect to Segments stats endpoint: {$e->getMessage()}", 0, $e);
+        } catch (GuzzleException $e) {
+            throw new StatsException("Segments stats request failed: {$e->getMessage()}", 0, $e);
         }
 
         $stream = $result->getBody();
