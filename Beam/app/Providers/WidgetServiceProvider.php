@@ -24,6 +24,6 @@ class WidgetServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Widget::group('article.show.info')->addWidget('\App\Widgets\GenderBalanceWidget');
+        //
     }
 }

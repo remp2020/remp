@@ -3,16 +3,13 @@
 namespace App\Providers;
 
 use App\Console\MigrateMakeCommand;
-use App\Console\ProcessGenderBalanceCommand;
 use App\Console\UploadPageviewsToGorse;
-use App\Observers\GenderBalanceObserver;
 use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Remp\BeamModule\Http\Resources\SearchResource;
-use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Model\Config\ConversionRateConfig;
 use Remp\BeamModule\Model\Property\SelectedProperty;
 use Remp\LaravelHelpers\Database\MySqlConnection;
@@ -42,13 +39,8 @@ class AppServiceProvider extends ServiceProvider
         SearchResource::withoutWrapping();
 
         $this->commands([
-            ProcessGenderBalanceCommand::class,
             UploadPageviewsToGorse::class,
         ]);
-
-        if (config('internal.gender_balance_enabled')) {
-            Article::observe(GenderBalanceObserver::class);
-        }
     }
 
     /**

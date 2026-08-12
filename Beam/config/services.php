@@ -30,12 +30,6 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'azure_computer_vision' => [
-        'endpoint' => env('AZURE_COMPUTER_VISION_ENDPOINT'),
-        'api_key' => env('AZURE_COMPUTER_VISION_API_KEY'),
-        'api_version' => env('AZURE_COMPUTER_VISION_API_VERSION', '2024-02-01'),
-    ],
-
     'gorse_recommendation' => [
         'endpoint' => env('GORSE_RECOMMENDATION_ENDPOINT'),
         'api_key' => env('GORSE_RECOMMENDATION_API_KEY'),
