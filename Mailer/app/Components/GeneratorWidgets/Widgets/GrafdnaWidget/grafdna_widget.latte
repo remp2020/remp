@@ -10,8 +10,8 @@
                   'locked_html_content': {$lockedHtmlContent},
                   'locked_text_content': {$lockedTextContent},
                   'name': $('#' + {$control["grafdnaTemplateForm"]['name']->htmlId}).val(),
-                  'mail_layout_id': $('#' + {$control["grafdnaTemplateForm"]['mail_layout_id']->htmlId}).val(),
-                  'locked_mail_layout_id': $('#' + {$control["grafdnaTemplateForm"]['locked_mail_layout_id']->htmlId}).val(),
+                  'mail_layout_code': $('#' + {$control["grafdnaTemplateForm"]['mail_layout_code']->htmlId}).val(),
+                  'locked_mail_layout_code': $('#' + {$control["grafdnaTemplateForm"]['locked_mail_layout_code']->htmlId}).val(),
                   'mail_type_id': $('#' + {$control["grafdnaTemplateForm"]['mail_type_id']->htmlId}).val(),
                   'from': $('#' + {$control["grafdnaTemplateForm"]['from']->htmlId}).val(),
                   'subject': $('#' + {$control["grafdnaTemplateForm"]['subject']->htmlId}).val(),
@@ -78,38 +78,38 @@
               </div>
 
               <div class="form-group fg-float m-b-30">
-                {label mail_layout_id /}
-                                {input mail_layout_id, class => 'form-control selectpicker',  data-live-search => 'true'}
+                {label mail_layout_code /}
+                {input mail_layout_code, class => 'form-control selectpicker',  data-live-search => 'true'}
               </div>
 
               <div class="form-group fg-float m-b-30">
-                {label locked_mail_layout_id /}
-                                {input locked_mail_layout_id, class => 'form-control selectpicker',  data-live-search => 'true'}
+                {label locked_mail_layout_code /}
+                {input locked_mail_layout_code, class => 'form-control selectpicker',  data-live-search => 'true'}
               </div>
 
               <div class="form-group fg-float m-b-30">
                 {label mail_type_id /}
-                                {input mail_type_id, class => 'form-control selectpicker',  data-live-search => 'true'}
+                {input mail_type_id, class => 'form-control selectpicker',  data-live-search => 'true'}
               </div>
 
               <div class="form-group fg-float m-b-30">
                 <div class="fg-line">
                   {input from, class => 'form-control fg-input', value => $from}
-                                    {label from, class => 'fg-label' /}
+                  {label from, class => 'fg-label' /}
                 </div>
               </div>
 
               <div class="form-group fg-float m-b-30">
                 <div class="fg-line">
                   {input subject, class => 'form-control fg-input', value => $grafdnaTitle}
-                                    {label subject, class => 'fg-label' /}
+                  {label subject, class => 'fg-label' /}
                 </div>
               </div>
 
               <div class="form-group fg-float m-b-30">
                 {input generate_emails_jobs_created, class => 'btn palette-Cyan bg waves-effect'}
 
-                                {if isset($form['generate_emails_jobs'])}
+                {if isset($form['generate_emails_jobs'])}
                   {input generate_emails_jobs, class => 'btn palette-Cyan bg waves-effect'}
                 {/if}
               </div>

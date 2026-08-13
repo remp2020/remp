@@ -69,9 +69,9 @@ class GrafdnaWidget extends BaseControl implements IGeneratorWidget
         $lockedHtmlContent = $request->getPost('locked_html_content');
         $lockedTextContent = $request->getPost('locked_text_content');
 
-        $mailLayout = $this->layoutsRepository->find($_POST['mail_layout_id']);
-        $lockedMailLayout = $this->layoutsRepository->find($_POST['locked_mail_layout_id']);
-        $mailType = $this->listsRepository->find($_POST['mail_type_id']);
+        $mailLayout = $this->layoutsRepository->findBy('code', $request->getPost('mail_layout_code'));
+        $lockedMailLayout = $this->layoutsRepository->findBy('code', $request->getPost('locked_mail_layout_code'));
+        $mailType = $this->listsRepository->find($request->getPost('mail_type_id'));
 
         $generate = function ($htmlContent, $textContent, $mailLayout, $mailType) use ($request) {
             $mailTemplate = $this->activeRowFactory->create([

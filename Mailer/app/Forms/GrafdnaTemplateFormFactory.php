@@ -26,13 +26,13 @@ class GrafdnaTemplateFormFactory
     public function __construct(
         private $activeUsersSegment,
         private $inactiveUsersSegment,
-        private TemplatesRepository $templatesRepository,
-        private LayoutsRepository $layoutsRepository,
-        private ListsRepository $listsRepository,
-        private JobsRepository $jobsRepository,
-        private BatchesRepository $batchesRepository,
-        private PermissionManager $permissionManager,
-        private User $user
+        private readonly TemplatesRepository $templatesRepository,
+        private readonly LayoutsRepository $layoutsRepository,
+        private readonly ListsRepository $listsRepository,
+        private readonly JobsRepository $jobsRepository,
+        private readonly BatchesRepository $batchesRepository,
+        private readonly PermissionManager $permissionManager,
+        private readonly User $user
     ) {
     }
 
@@ -47,9 +47,9 @@ class GrafdnaTemplateFormFactory
         $form->addText('code', 'Identifier')
             ->setRequired("Field 'Identifier' is required.");
 
-        $form->addSelect('mail_layout_id', 'Template', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
+        $form->addSelect('mail_layout_code', 'Template', $this->layoutsRepository->all()->fetchPairs('code', 'name'));
 
-        $form->addSelect('locked_mail_layout_id', 'Template for non-subscribers', $this->layoutsRepository->all()->fetchPairs('id', 'name'));
+        $form->addSelect('locked_mail_layout_code', 'Template for non-subscribers', $this->layoutsRepository->all()->fetchPairs('code', 'name'));
 
         $mailTypes = $this->listsRepository->all()->where(['public_listing' => true])->fetchPairs('id', 'code');
 
@@ -71,8 +71,8 @@ class GrafdnaTemplateFormFactory
         $defaults = [
             'name' => 'Graf dňa ' . date('j.n.Y'),
             'code' => 'graf_dna_' . date('dmY'),
-            'mail_layout_id' => 33, // layout for subscribers
-            'locked_mail_layout_id' => 33, // layout for non-subscribers
+            'mail_layout_code' => 'dn3-default-wide',
+            'locked_mail_layout_code' => 'dn3-default-wide',
             'mail_type_id' => 60, // Graf dna
             'from' => 'Denník E <e@dennikn.sk>',
         ];
@@ -102,7 +102,12 @@ class GrafdnaTemplateFormFactory
 
     public function formSucceeded(Form $form, $values)
     {
-        $generate = function ($htmlBody, $textBody, $mailLayoutId, $segmentCode = null) use ($values, $form) {
+        $generate = function ($htmlBody, $textBody, $mailLayoutCode, $segmentCode = null) use ($values, $form) {
+            $mailLayout = $this->layoutsRepository->findBy('code', $mailLayoutCode);
+            if (!$mailLayout) {
+                throw new \Exception("Unable to find mail_layout with code '{$mailLayoutCode}'");
+            }
+
             $mailTemplate = $this->templatesRepository->add(
                 $values['name'],
                 $this->templatesRepository->getUniqueTemplateCode($values['code']),
@@ -111,7 +116,7 @@ class GrafdnaTemplateFormFactory
                 $values['subject'],
                 $textBody,
                 $htmlBody,
-                $mailLayoutId,
+                $mailLayout->id,
                 $values['mail_type_id']
             );
 
@@ -138,13 +143,13 @@ class GrafdnaTemplateFormFactory
         $generate(
             $values['locked_html_content'],
             $values['locked_text_content'],
-            $values['locked_mail_layout_id'],
+            $values['locked_mail_layout_code'],
             $this->inactiveUsersSegment
         );
         $generate(
             $values['html_content'],
             $values['text_content'],
-            $values['mail_layout_id'],
+            $values['mail_layout_code'],
             $this->activeUsersSegment
         );
 

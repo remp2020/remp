@@ -9,7 +9,6 @@ use Nette\Utils\Strings;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\GrafdnaWidget\GrafdnaWidget;
 use Remp\Mailer\Models\WebClient;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
-use Remp\MailerModule\Models\Generators\HtmlArticleLocker;
 use Remp\MailerModule\Models\Generators\EmbedParser;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
@@ -27,15 +26,15 @@ class GrafdnaGenerator implements IGenerator
     public $onSubmit;
 
     public function __construct(
-        private SourceTemplatesRepository $mailSourceTemplateRepository,
-        private WordpressHelpers          $helpers,
-        private ContentInterface          $content,
-        private EmbedParser               $embedParser,
-        private HtmlArticleLocker         $articleLocker,
-        private EngineFactory             $engineFactory,
-        private WebClient                 $webClient,
-        private SnippetsRepository        $snippetsRepository,
-        private TransportInterface        $transport,
+        private readonly SourceTemplatesRepository $mailSourceTemplateRepository,
+        private readonly WordpressHelpers $helpers,
+        private readonly ContentInterface $content,
+        private readonly EmbedParser $embedParser,
+        private readonly N3ArticleLocker $articleLocker,
+        private readonly EngineFactory $engineFactory,
+        private readonly WebClient $webClient,
+        private readonly SnippetsRepository $snippetsRepository,
+        private readonly TransportInterface $transport,
     ) {
     }
 
@@ -47,13 +46,16 @@ class GrafdnaGenerator implements IGenerator
             (new PostInputParam('image_url')),
             (new PostInputParam('title'))->setRequired(),
             (new PostInputParam('from'))->setRequired(),
+            (new PostInputParam('editor'))->setRequired(),
+            (new PostInputParam('editor_avatar_url')),
+            (new PostInputParam('summary')),
         ];
     }
 
     public function generateForm(Form $form): void
     {
         // disable CSRF protection as external sources could post the params here
-        $form->offsetUnset(Form::PROTECTOR_ID);
+        $form->offsetUnset(Form::ProtectorId);
 
         $form->addText('title', 'Title')
             ->setRequired("Field 'Title' is required.");
@@ -67,6 +69,15 @@ class GrafdnaGenerator implements IGenerator
             ->addRule(Form::URL);
 
         $form->addText('from', 'Sender');
+
+        $form->addText('editor', 'Editor')
+            ->setRequired("Field 'Editor' is required.");
+
+        $form->addText('editor_avatar_url', 'Editor avatar URL');
+
+        $form->addTextArea('summary', 'Summary')
+            ->setHtmlAttribute('rows', 3)
+            ->setRequired(false);
 
         $form->addTextArea('grafdna_html', 'HTML')
             ->setHtmlAttribute('rows', 20)
@@ -131,14 +142,31 @@ HTML;
         }
 
         $generatorRules = [
-            "/\[embed\](.*?)\[\/embed\]/is" => function ($matches) {
-                return '<p>Graf nájdete aj na <a href="' . $matches[1] . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->getLinksColor() . ';text-decoration:underline;">' . $matches[1] . ' </a>.</p>';
-            },
-            "/^(http|https)\:\/\/[a-zA-Z0-9\-\.]*(flourish|datawrapper)+[a-zA-Z0-9\-\.]*\.[a-zA-Z]+(\/\S*)?\s*$/im" => function ($matches) {
-                return '<p>Graf nájdete aj na <a href="' . $matches[0] . '" style="padding:0;margin:0;line-height:1.3;color:' . $this->getLinksColor() . ';text-decoration:underline;">' . $matches[0] . ' </a>.</p>';
+            '/<h2.*?>.*?\*.*?<\/h2>/im' => '<div style="color:#181818;padding:0;line-height:1.3;font-weight:bold;text-align:center;margin:0 0 30px 0;font-size:24px;">*</div>',
+            '/<p.*?>(.*?)<\/p>/is' => "<p style=\"color:#181818;font-family:Georgia,sans-serif;font-weight:400;padding:0;text-align:left;font-size:18px;line-height:27px;margin: 16px 0 16px 0\">$1</p>",
+            "/<blockquote.*?>(.*?)<\/blockquote>/is" => '<blockquote style="position: relative;padding: 16px;border-radius: 6px;font-style: normal; background: #F2EAE8; margin: 0 0 16px 0">$1</blockquote>',
+            "/https:\/\/dennikn\.podbean\.com\/e\/.*?[\s\n\r]/is" => "",
+            '/<img.*?src="(.*?)".*?>/is' => function ($matches) {
+                $src = $matches[1];
+                $width = 564;
+                $maxWidth = '100%';
+                if (preg_match('/width="(\d+)"/i', $matches[0], $widthMatches)) {
+                    $imgWidth = (int) $widthMatches[1];
+                    if ($imgWidth < 564) {
+                        $width = $imgWidth;
+                        $maxWidth = $imgWidth . 'px';
+                    }
+                }
+                return '<img src="' . $src . '" alt="" width="' . $width . '" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:100%;max-width:' . $maxWidth . ';clear:both;display:block;margin-bottom:20px;">';
             },
         ];
         $rules = $this->getRules($generatorRules);
+
+        // prepend greybox before rules remove all DIVs.
+        $rules = array_merge([
+            '/<div class="t_greybox">(.*?)<\/div>/is' => $this->getGreyboxTemplate(),
+        ], $rules);
+
         foreach ($rules as $rule => $replace) {
             if (is_array($replace) || is_callable($replace)) {
                 $post = preg_replace_callback($rule, $replace, $post);
@@ -157,7 +185,7 @@ HTML;
         $post = $this->helpers->wpParseArticleLinks($post, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction(), $errors);
         $lockedPost = $this->helpers->wpParseArticleLinks($lockedPost, 'https://dennikn.sk/', $this->getArticleLinkTemplateFunction(), $errors);
 
-        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:160%;margin: 16px 0 16px 0\">", [$post, $lockedPost]);
+        [$post, $lockedPost] = preg_replace('/<p>/is', "<p style=\"color:#181818;font-family:Georgia,sans-serif;font-weight:normal;padding:0;text-align:left;font-size:18px;line-height:27px;margin: 16px 0 16px 0\">", [$post, $lockedPost]);
 
         $lockedPost = $this->articleLocker->injectLockedMessage($lockedPost);
 
@@ -180,6 +208,9 @@ HTML;
             'title' => $values['title'],
             'url' => $values['url'],
             'image_url' => $values['image_url'],
+            'editor' => $values['editor'],
+            'editor_avatar_url' => $values['editor_avatar_url'] ?? null,
+            'summary' => $values['summary'] ?? null,
             'html' => $post,
             'text' => strip_tags($post),
             'excerpt' => $excerpt,
@@ -192,9 +223,13 @@ HTML;
             'title' => $values['title'],
             'url' => $values['url'],
             'image_url' => $values['image_url'],
+            'editor' => $values['editor'],
+            'editor_avatar_url' => $values['editor_avatar_url'] ?? null,
+            'summary' => $values['summary'] ?? null,
             'html' => $lockedPost,
             'text' => strip_tags($lockedPost),
             'excerpt' => $excerpt,
+            'excerptText' => strip_tags($excerpt),
             'economyPosts' => $economyPosts,
             'adSnippetHtml' => $adSnippet?->html,
             'adSnippetText' => $adSnippet?->text,
@@ -202,6 +237,12 @@ HTML;
 
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values['source_template_id']);
         $engine = $this->engineFactory->engine();
+
+        $params['html'] = $engine->markSafe($params['html']);
+        $params['text'] = $engine->markSafe($params['text']);
+        $lockedParams['html'] = $engine->markSafe($lockedParams['html']);
+        $lockedParams['text'] = $engine->markSafe($lockedParams['text']);
+
         return [
             'htmlContent' => $engine->render($sourceTemplate->content_html, $params),
             'textContent' => strip_tags($engine->render($sourceTemplate->content_text, $params)),
@@ -238,6 +279,21 @@ HTML;
 
         $output->from = "Denník E <e@dennikn.sk>";
 
+        if (!isset($data->post_authors[0]->display_name)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'post_authors.0.display_name'");
+        }
+        $output->editor = $data->post_authors[0]->display_name;
+        $output->editor_avatar_url = $data->post_authors[0]->avatar_url;
+
+        foreach ($data->post_authors as $author) {
+            if ($author->user_email === "editori@dennikn.sk") {
+                continue;
+            }
+
+            $output->editor = $author->display_name;
+            break;
+        }
+
         if (!isset($data->post_title)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_title'");
         }
@@ -247,6 +303,11 @@ HTML;
             throw new PreprocessException("WP json object  does not contain required attribute 'post_url'");
         }
         $output->url = $data->post_url;
+
+        if (!isset($data->post_excerpt)) {
+            throw new PreprocessException("WP json object does not contain required attribute 'post_excerpt'");
+        }
+        $output->summary = $data->post_excerpt;
 
         if (!isset($data->post_content)) {
             throw new PreprocessException("WP json object does not contain required attribute 'post_content'");
@@ -279,7 +340,7 @@ HTML;
 HTML;
 
         $captionWithLinkTemplate = <<< HTML
-    <a href="$1" style="color:#181818;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:{$this->getLinksColor()};text-decoration:none;">
+    <a href="$1" style="color:#181818;font-family:Georgia,sans-serif;font-weight:normal;padding:0;margin:0;Margin:0;text-align:left;line-height:1.3;color:{$this->getLinksColor()};text-decoration:none;">
     <img src="$2" alt="" style="outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:auto;max-width:100%;clear:both;display:block;margin-bottom:20px;border:none;">
 </a>
     <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">
@@ -290,14 +351,14 @@ HTML;
         $liTemplate = <<< HTML
     <tr style="padding:0;vertical-align:top;text-align:left;">
         <td class="bullet" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;width:30px;border-collapse:collapse !important;">&#8226;</td>
-        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;border-collapse:collapse !important;">
+        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;font-family:Georgia,sans-serif;border-collapse:collapse !important;">
             <p style="color:#181818;padding:0;margin:0 0 5px 0;font-size:18px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">$1</p>
         </td>
     </tr>
 HTML;
 
         $hrTemplate = <<< HTML
-    <table cellspacing="0" cellpadding="0" border="0" width="100%" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:100%;min-width:100%;">
+    <table cellspacing="0" cellpadding="0" border="0" width="100%" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:Georgia,sans-serif;width:100%;min-width:100%;">
         <tr style="padding:0;vertical-align:top;text-align:left;width:100%;min-width:100%;">
             <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important; padding: 30px 0 0 0; border-top:1px solid #E2E2E2;height:0;line-height: 0;width:100%;min-width:100%;">&#xA0;</td>
         </tr>
@@ -306,7 +367,7 @@ HTML;
 HTML;
 
         $spacerTemplate = <<< HTML
-        <table class="spacer" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:'Helvetica Neue', Helvetica, Arial;width:100%;">
+        <table class="spacer" style="border-spacing:0;border-collapse:collapse;vertical-align:top;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;text-align:left;font-family:Georgia,sans-serif;width:100%;">
             <tbody>
                 <tr style="padding:0;vertical-align:top;text-align:left;">
                     <td height="20px" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;mso-line-height-rule:exactly;border-collapse:collapse !important;font-size:20px;line-height:20px;">&#xA0;</td>
@@ -329,35 +390,38 @@ HTML;
         ];
     }
 
+    private function getGreyboxTemplate(): string
+    {
+        return <<<HTML
+<table role="presentation" width="600" style="width: 100%; max-width: 600px; border-spacing:0; border-collapse:collapse; vertical-align:top; background-color:#F2EAE8; padding:0; text-align:left; margin:0;">
+    <tbody>
+        <tr>
+            <td style="padding: 30px 24px;">$1</td>
+        </tr>
+    </tbody>
+</table>
+HTML;
+    }
+
     public function parseOls($post)
     {
-        $ols = [];
-        preg_match_all('/<ol.*?>(.*?)<\/ol>/is', $post, $ols);
-
-        foreach ($ols[1] as $olContent) {
+        return preg_replace_callback('/<ol([^>]*)>(.*?)<\/ol>/is', function ($matches) {
             $olsLis = [];
-            $liNum = 1;
-            $newOlContent = '';
+            preg_match_all('/<li[^>]*>(?:<p.*?>)?(.*?)(?:<\/p>)?<\/li>/is', $matches[2], $olsLis);
+            if (!$olsLis[1]) {
+                return $matches[0];
+            }
 
-            preg_match_all('/<li>(.*?)<\/li>/is', $olContent, $olsLis);
+            $liNum = preg_match('/\bstart="?(\d+)"?/i', $matches[1], $start) ? (int) $start[1] : 1;
 
-
+            $items = [];
             foreach ($olsLis[1] as $liContent) {
-                $newOlContent .= '
-    <tr style="padding:0;vertical-align:top;text-align:left;">
-        <td class="bullet" style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;width:30px;border-collapse:collapse !important;">' . $liNum . '</td>
-        <td style="padding:0;vertical-align:top;text-align:left;font-size:18px;line-height:1.6;border-collapse:collapse !important;">
-            <p style="margin:0 0 0 26px;Margin:0 0 0 26px;color:#181818;padding:0;margin:0;Margin:0;line-height:1.3;font-size:18px;line-height:1.6;margin-bottom:26px;Margin-bottom:26px;line-height:160%;text-align:left;font-weight:normal;word-wrap:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;border-collapse:collapse !important;">' . $liContent . '</p>
-        </td>
-    </tr>';
-
+                $items[] = '<span style="color:#AE0D21;">' . $liNum . '.</span> ' . trim($liContent);
                 $liNum++;
             }
 
-            $post = str_replace($olContent, $newOlContent, $post);
-        }
-
-        return $post;
+            return PHP_EOL . '<p>' . implode('<br>', $items) . '</p>' . PHP_EOL;
+        }, $post);
     }
 
     private function filterPosts($posts): array
