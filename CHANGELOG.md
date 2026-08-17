@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
-- Added `closed` and `clicked` function between custom JS params to allow correctly handling events. remp/remp#1487
+- Added `bannerClosed`, `bannerClicked`, `bannerShown` function between custom JS params to allow correctly handling banner events. remp/remp#1487
 - Added banner dimension option `force_manual_tracking` to force manual events tracking for banners using given dimension. remp/remp#1489
   - When enabled for a dimension, the *Track banner events manually* checkbox is checked and disabled in the banner form, and the flag is enforced on save.
 - Fixed snippet and collection edit forms breaking when a name contains JavaScript-sensitive characters; such snippets can now be opened and fixed. remp/remp#1405

@@ -473,17 +473,15 @@
                 }
                 return str;
             },
-            closed: function(event) {
-                if (event) {
-                    event.preventDefault();
-                }
+            closed: function(event, manualEventsTracking = this.manualEventsTracking) {
+                event.preventDefault();
                 remplib.campaign.storeCampaignClosed(this.campaignPublicId);
 
                 this.visible = false;
                 this.$parent.$emit('values-changed', [
                     {key: "show", val: false}
                 ]);
-                if (this.manualEventsTracking || this.closeTracked) {
+                if (manualEventsTracking || this.closeTracked) {
                     return true;
                 }
                 this.trackEvent("banner", "close", null, null, {
@@ -495,13 +493,13 @@
                 });
                 this.closeTracked = true;
             },
-            clicked: function(event, hideBanner = false) {
+            clicked: function(event, hideBanner = false, manualTracking = this.manualEventsTracking) {
                 if (typeof remplib.campaign === 'undefined') {
                     return;
                 }
                 remplib.campaign.storeCampaignClicked(this.campaignPublicId);
 
-                if (this.manualEventsTracking || this.clickTracked) {
+                if (manualTracking || this.clickTracked) {
                     return true;
                 }
                 this.trackEvent("banner", "click", null, null, {
@@ -516,6 +514,19 @@
                     this.visible = false;
                 }
                 return true;
+            },
+            shown: function(manualTracking = this.manualEventsTracking) {
+                if (manualTracking || this.shownTracked) {
+                    return true;
+                }
+                this.trackEvent("banner", "show", null, null, {
+                    "rtm_source": "remp_campaign",
+                    "rtm_medium": this.displayType,
+                    "rtm_campaign": this.campaignUuid,
+                    "rtm_content": this.uuid,
+                    "rtm_variant": this.variantUuid
+                });
+                this.shownTracked = true;
             },
             collapsed: function(isCollapsed) {
                 if (typeof remplib.campaign === 'undefined') {
@@ -586,8 +597,9 @@
                     "utmCampaign": this.campaignUuid,
                     "utmContent": this.uuid,
                     "bannerVariant": this.variantUuid,
-                    "closedBanner": () => this.closed(),
-                    "clickedBanner": () => this.clicked(),
+                    "bannerClosed": () => this.closed(new Event('event'), false),
+                    "bannerClicked": () => this.clicked(new Event('event'), false, false),
+                    "bannerShown": () => this.shown(false),
                 }
             }
         }
