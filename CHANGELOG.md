@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- Added a `configuration`/`update` permission check to the Settings (mailer configuration) page, following the existing `batch`/`start` pattern. As with other privileges, it's unrestricted by default; register it via `permissionManager` in `config.local.neon` to require a role for access — see `Mailer/extensions/mailer-module/README.md`'s "Permission management" section.
 - Added a per-newsletter-type "Exclude emails from search" option that hides a mail type's templates from the email template search. remp/remp#1462
 - Fixed a null error in the newsletter list form when no `system` mail type exists. remp/remp#1462
 - **IMPORTANT**: Added support for partitioning the `mail_logs` table by month to keep it performant at scale. Requires a manual migration and permanently scheduled commands afterwards — see `Mailer/extensions/mailer-module/docs/MAIL_LOGS_PARTITIONING.md`. remp/remp#1481

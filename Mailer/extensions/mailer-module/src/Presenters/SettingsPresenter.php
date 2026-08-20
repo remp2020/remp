@@ -5,28 +5,25 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\UI\Form;
 use Remp\MailerModule\Forms\ConfigFormFactory;
-use Remp\MailerModule\Models\Config\Config;
 use Remp\MailerModule\Models\Mailer\Mailer;
 use Remp\MailerModule\Models\Sender\MailerFactory;
 
 final class SettingsPresenter extends BasePresenter
 {
-    private $mailerFactory;
-
-    private $configFormFactory;
-
-    private $config;
-
-    public function __construct(MailerFactory $mailerFactory, ConfigFormFactory $configFormFactory, Config $config)
-    {
+    public function __construct(
+        private readonly MailerFactory $mailerFactory,
+        private readonly ConfigFormFactory $configFormFactory,
+    ) {
         parent::__construct();
-        $this->mailerFactory = $mailerFactory;
-        $this->configFormFactory = $configFormFactory;
-        $this->config = $config;
     }
 
     public function renderDefault(): void
     {
+        if (!$this->permissionManager->isAllowed($this->user, 'configuration', 'update')) {
+            $this->flashMessage("You do not have permission to manage mailers.", 'warning');
+            $this->redirect(':Mailer:Dashboard:default');
+        }
+
         $availableMailers =  $this->mailerFactory->getAvailableMailers();
 
         $requiredFields = [];

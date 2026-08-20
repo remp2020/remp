@@ -58,11 +58,12 @@ services:
 
 List of allowable privileges:
 
-| resource | privilege | description                              |
-|----------|-----------|------------------------------------------|
-| batch    | start     | Allows user to start sending mail batch. |
-| batch    | stop      | Allows user to stop sending mail batch.  |
-| batch    | process   | Allows user to process mail batch.       |
+| resource      | privilege | description                                          |
+|---------------|-----------|-------------------------------------------------------|
+| batch         | start     | Allows user to start sending mail batch.             |
+| batch         | stop      | Allows user to stop sending mail batch.              |
+| batch         | process   | Allows user to process mail batch.                   |
+| configuration | update    | Allows user to manage mailer configuration (Settings page). |
 
 ### Email's localization
 
