@@ -22,6 +22,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added audio metadata parsing to `JsonLDContent`. remp/remp#1499
 - `JsonLDContent` now also accepts a plain URL string in the schema's `image` property. Previously only an `ImageObject` (or an array of them) was read.
 - Refactored X embedding from `Euobserver\EmbedParser` to the shared `Remp\Mailer\Models\Generators\EmbedParser::fetchXPreviewImage()`. remp/remp#1505
+- Added support for a locked (non-subscriber) variant of EUobserver newsletters, first used by the This week newsletter. remp/euobserver#262
+  - An article generator registered with `lockingEnabled: true` cuts the content at the article's `eo/lock` block and appends the `eo-subscribe-cta` snippet, which must exist in Mailer.
+  - The generator response then also contains `lockedHtmlContent`/`lockedTextContent`, based on which the Hub creates separate jobs for subscribers and non-subscribers.
 
 ## Archive
 

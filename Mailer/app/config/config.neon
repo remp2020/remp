@@ -24,9 +24,10 @@ services:
 
 	- Remp\Mailer\Models\WebClient(@environmentConfig::get('WEB_ADDR'))
 
+	- Remp\Mailer\Models\Auth\SsoFlowState
 	- Remp\Mailer\Models\Generators\WordpressBlockParser
 	- Remp\Mailer\Models\Generators\EuobserverWordpressBlockParser
-	- Remp\Mailer\Models\Auth\SsoFlowState
+	- Remp\Mailer\Models\Generators\EuobserverArticleLocker
 	n3ArticleLocker: Remp\Mailer\Models\Generators\N3ArticleLocker
 
 	embedParser:

@@ -9,6 +9,7 @@ use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\EuobserverArticleWidget\EuobserverArticleWidget;
 use Remp\Mailer\Models\Generators\EmbedParser;
+use Remp\Mailer\Models\Generators\EuobserverArticleLocker;
 use Remp\Mailer\Models\Generators\RulesTrait;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\IGenerator;
@@ -24,21 +25,20 @@ class ArticleGenerator implements IGenerator
 
     public $onSubmit;
 
-    private bool $lockingEnabled = false;
-
     protected function getLinksColor(): string
     {
         return '#f0523c';
     }
 
-    private const LOCK_BLOCK = '<!-- wp:eo/lock -->';
-    private const ARTICLE_BASE_URL = 'https://euobserver.com/';
+    private const string ARTICLE_BASE_URL = 'https://euobserver.com/';
 
     public function __construct(
         protected readonly SourceTemplatesRepository $mailSourceTemplateRepository,
         protected readonly ContentInterface $content,
         protected readonly EmbedParser $embedParser,
         protected readonly EngineFactory $engineFactory,
+        protected readonly EuobserverArticleLocker $articleLocker,
+        private readonly bool $lockingEnabled = false,
     ) {
     }
 
@@ -68,41 +68,14 @@ class ArticleGenerator implements IGenerator
         $errors = [];
         $articleLinkPlaceholders = [];
 
-        $post = $values['article_html'];
-
         // Replace eo/link blocks with unique placeholders, fetching metadata now.
         // This must happen before comment stripping so we can read the block attributes,
         // and before rules run so the rendered card HTML is not re-processed.
-        $post = $this->processArticleLinks($post, $articleLinkPlaceholders, $errors);
+        $rawPost = $this->processArticleLinks($values['article_html'], $articleLinkPlaceholders, $errors);
 
-        // The locked version is everything before the eo/lock block.
-        $lockedPost = $this->splitOnLock($post);
-
-        $post = $this->stripBlockComments($post);
-        $lockedPost = $this->stripBlockComments($lockedPost);
-
-        $post = $this->preprocessBlockHtml($post);
-        $lockedPost = $this->preprocessBlockHtml($lockedPost);
-
-        $rules = $this->getRules();
-        foreach ($rules as $rule => $replace) {
-            if (is_array($replace) || is_callable($replace)) {
-                $post = preg_replace_callback($rule, $replace, $post);
-                $lockedPost = preg_replace_callback($rule, $replace, $lockedPost);
-            } else {
-                $post = preg_replace($rule, $replace, $post);
-                $lockedPost = preg_replace($rule, $replace, $lockedPost);
-            }
-        }
-
-        // Substitute article card placeholders after rules to prevent re-processing of card HTML.
-        $post = str_replace(array_keys($articleLinkPlaceholders), array_values($articleLinkPlaceholders), $post);
-        $lockedPost = str_replace(array_keys($articleLinkPlaceholders), array_values($articleLinkPlaceholders), $lockedPost);
-
-        $lockedPost = $this->injectLockedCta($lockedPost);
+        $post = $this->transformPost($rawPost, $articleLinkPlaceholders);
 
         $params = $this->buildParams($values, $post, false);
-        $lockedParams = $this->buildParams($values, $lockedPost, true);
 
         $engine = $this->engineFactory->engine();
 
@@ -116,6 +89,14 @@ class ArticleGenerator implements IGenerator
         ];
 
         if ($this->lockingEnabled) {
+            $lockedSource = $this->articleLocker->getLockedPost($rawPost);
+            if ($lockedSource !== $rawPost) {
+                $lockedSource = $this->articleLocker->injectLockedMessage($lockedSource);
+            }
+
+            $lockedPost = $this->transformPost($lockedSource, $articleLinkPlaceholders);
+
+            $lockedParams = $this->buildParams($values, $lockedPost, true);
             $lockedParams['html'] = $engine->markSafe($lockedParams['html']);
             $lockedParams['text'] = $engine->markSafe($lockedParams['text']);
 
@@ -124,6 +105,21 @@ class ArticleGenerator implements IGenerator
         }
 
         return $result;
+    }
+
+    private function transformPost(string $post, array $articleLinkPlaceholders): string
+    {
+        $post = $this->stripBlockComments($post);
+        $post = $this->preprocessBlockHtml($post);
+
+        foreach ($this->getRules() as $rule => $replace) {
+            $post = is_array($replace) || is_callable($replace)
+                ? preg_replace_callback($rule, $replace, $post)
+                : preg_replace($rule, $replace, $post);
+        }
+
+        // Resolved only after the rules so they are not applied to the injected card HTML.
+        return strtr($post, $articleLinkPlaceholders);
     }
 
     public function formSucceeded(Form $form, ArrayHash $values): void
@@ -137,12 +133,9 @@ class ArticleGenerator implements IGenerator
             'render' => true,
             'articleId' => $values->article_id ?? null,
             'errors' => $output['errors'],
+            'lockedHtmlContent' => $output['lockedHtmlContent'] ?? null,
+            'lockedTextContent' => $output['lockedTextContent'] ?? null,
         ];
-
-        if ($this->lockingEnabled) {
-            $addonParams['lockedHtmlContent'] = $output['lockedHtmlContent'];
-            $addonParams['lockedTextContent'] = $output['lockedTextContent'];
-        }
 
         $this->onSubmit->__invoke($output['htmlContent'], $output['textContent'], $addonParams);
     }
@@ -283,15 +276,6 @@ class ArticleGenerator implements IGenerator
         );
     }
 
-    private function splitOnLock(string $post): string
-    {
-        $lockPos = stripos($post, self::LOCK_BLOCK);
-        if ($lockPos === false) {
-            return $post;
-        }
-        return substr($post, 0, $lockPos);
-    }
-
     private function stripBlockComments(string $post): string
     {
         return preg_replace('/<!--\s*\/?wp:[^>]*-->/s', '', $post);
@@ -333,13 +317,6 @@ class ArticleGenerator implements IGenerator
         $post = preg_replace('/<p[^>]*>\s*<\/p>/i', '', $post);
 
         return $post;
-    }
-
-    private function injectLockedCta(string $post): string
-    {
-        // The actual CTA markup is expected to be defined as a Twig snippet named 'eo-subscribe-cta'
-        // in the source template.
-        return $post . "\n\n{{ include('eo-subscribe-cta') }}\n";
     }
 
     public function getArticleLinkTemplateFunction(): callable
