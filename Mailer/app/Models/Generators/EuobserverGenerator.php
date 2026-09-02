@@ -50,6 +50,8 @@ class EuobserverGenerator implements IGenerator
             ->setHtmlAttribute('class', 'form-control')
             ->setRequired();
 
+        $form->addHidden('article_id');
+
         $form->onSuccess[] = [$this, 'formSucceeded'];
     }
 
@@ -62,6 +64,7 @@ class EuobserverGenerator implements IGenerator
                 'render' => true,
                 'from' => $values->from,
                 'subject' => $values->subject,
+                'articleId' => $values->article_id ?? null,
                 'errors' => $output['errors'],
             ];
 
@@ -140,6 +143,7 @@ class EuobserverGenerator implements IGenerator
 
         $output->subject = $data->subject ?? $data->post_title;
         $output->url = $data->url ?? $data->post_url;
+        $output->article_id = $data->ID ?? null;
 
         return $output;
     }

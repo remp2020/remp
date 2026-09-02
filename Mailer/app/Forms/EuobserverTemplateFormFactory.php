@@ -70,6 +70,7 @@ class EuobserverTemplateFormFactory
 
         $sourceTemplate = $this->sourceTemplatesRepository->find((int) $this->request->getPost('source_template_id'));
         $form->addHidden('source_template_id', $sourceTemplate->id);
+        $form->addHidden('article_id', $this->request->getPost('article_id'));
 
         $defaults = array_filter($this->getDefaults($sourceTemplate->code));
         $form->setDefaults($defaults);
@@ -108,7 +109,12 @@ class EuobserverTemplateFormFactory
             if (!$segmentCode) {
                 $segmentCode = Mailer::mailTypeSegment($mailTemplate->mail_type->code);
             }
-            $jobContext = $mailTemplate->mail_type->code . '.' . date('Ymd');
+
+            if (isset($values['article_id'])) {
+                $jobContext = $mailTemplate->mail_type->code . '.' . $values['article_id'];
+            } else {
+                $jobContext = $mailTemplate->mail_type->code . '.' . date('Ymd');
+            }
 
             $mailJob = $this->jobsRepository->add((new JobSegmentsManager())->includeSegment($segmentCode, Mailer::PROVIDER_ALIAS), $jobContext);
             $batch = $this->batchesRepository->add($mailJob->id, null, $values['send_at'], BatchesRepository::METHOD_RANDOM);
