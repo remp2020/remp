@@ -1,10 +1,6 @@
 services:
 	- Remp\Mailer\Forms\NovydenikNewsfilterTemplateFormFactory('users_with_any_subscriptions', 'users-without-subscription')
 	- Remp\Mailer\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-	- Remp\Mailer\Forms\MediaBriefingTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-	- Remp\Mailer\Forms\DennikeTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-	- Remp\Mailer\Forms\TldrTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
-	- Remp\Mailer\Forms\MMSTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	- Remp\Mailer\Forms\GrafdnaTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
 	dailyMinuteTemplateFormFactory: Remp\Mailer\Forms\DailyMinuteTemplateFormFactory('minuta-daily-digest')
 	euobserverTemplateFormFactory: Remp\Mailer\Forms\EuobserverTemplateFormFactory()
@@ -14,10 +10,6 @@ services:
 
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\NewsfilterWidget\NewsfilterWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\NovydenikNewsfilterWidget\NovydenikNewsfilterWidget
-	- Remp\Mailer\Components\GeneratorWidgets\Widgets\MediaBriefingWidget\MediaBriefingWidget
-	- Remp\Mailer\Components\GeneratorWidgets\Widgets\DennikeWidget\DennikeWidget
-	- Remp\Mailer\Components\GeneratorWidgets\Widgets\TldrWidget\TldrWidget
-	- Remp\Mailer\Components\GeneratorWidgets\Widgets\MMSWidget\MMSWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\ArticleUrlParserWidget\ArticleUrlParserWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\GrafdnaWidget\GrafdnaWidget
 	- Remp\Mailer\Components\GeneratorWidgets\Widgets\DailyMinuteWidget\DailyMinuteWidget
