@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
+use Nette\Http\Request;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\LayoutFormFactory;
@@ -18,15 +19,19 @@ final class LayoutPresenter extends BasePresenter
 
     private $dataTableFactory;
 
+    private $httpRequest;
+
     public function __construct(
         LayoutsRepository $layoutsRepository,
         LayoutFormFactory $layoutFormFactory,
-        DataTableFactory $dataTableFactory
+        DataTableFactory $dataTableFactory,
+        Request $httpRequest
     ) {
         parent::__construct();
         $this->layoutsRepository = $layoutsRepository;
         $this->layoutFormFactory = $layoutFormFactory;
         $this->dataTableFactory = $dataTableFactory;
+        $this->httpRequest = $httpRequest;
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -55,14 +60,14 @@ final class LayoutPresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
         $layoutsCount = $this->layoutsRepository
-                ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'])
+                ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'])
                 ->count('*');
 
         $layouts = $this->layoutsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['length'], (int)$request['start'])
+            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], (int)$params['length'], (int)$params['start'])
             ->fetchAll();
 
         $result = [
@@ -87,7 +92,7 @@ final class LayoutPresenter extends BasePresenter
                 $layout->created_at,
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function renderEdit($id): void

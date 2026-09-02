@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
+use Nette\Http\Request;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\SnippetFormFactory;
@@ -21,17 +22,21 @@ final class SnippetPresenter extends BasePresenter
 
     private SnippetTranslationsRepository $snippetTranslationsRepository;
 
+    private Request $httpRequest;
+
     public function __construct(
         SnippetsRepository $snippetsRepository,
         SnippetFormFactory $snippetFormFactory,
         DataTableFactory $dataTableFactory,
-        SnippetTranslationsRepository $snippetTranslationsRepository
+        SnippetTranslationsRepository $snippetTranslationsRepository,
+        Request $httpRequest
     ) {
         parent::__construct();
         $this->snippetsRepository = $snippetsRepository;
         $this->snippetFormFactory = $snippetFormFactory;
         $this->dataTableFactory = $dataTableFactory;
         $this->snippetTranslationsRepository = $snippetTranslationsRepository;
+        $this->httpRequest = $httpRequest;
     }
 
     public function createComponentDataTableDefault(): DataTable
@@ -64,17 +69,17 @@ final class SnippetPresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
-        $query = $request['search']['value'];
-        $order = $request['columns'][$request['order'][0]['column']]['name'];
-        $orderDir = $request['order'][0]['dir'];
+        $query = $params['search']['value'];
+        $order = $params['columns'][$params['order'][0]['column']]['name'];
+        $orderDir = $params['order'][0]['dir'];
         $snippetsCount = $this->snippetsRepository
                 ->tableFilter($query, $order, $orderDir)
                 ->count('*');
 
         $snippets = $this->snippetsRepository
-            ->tableFilter($query, $order, $orderDir, (int)$request['length'], (int)$request['start'])
+            ->tableFilter($query, $order, $orderDir, (int)$params['length'], (int)$params['start'])
             ->fetchAll();
 
         $result = [
@@ -100,7 +105,7 @@ final class SnippetPresenter extends BasePresenter
                 $snippet->created_at,
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function renderEdit($id): void

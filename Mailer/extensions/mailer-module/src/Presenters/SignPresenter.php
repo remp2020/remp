@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\UI\Form;
 use Nette\Application\UI\Presenter;
+use Nette\Http\Request;
 use Remp\MailerModule\Forms\SignInFormFactory;
 
 final class SignPresenter extends Presenter
@@ -12,10 +13,13 @@ final class SignPresenter extends Presenter
     /** @var SignInFormFactory */
     private $signInFormFactory;
 
-    public function __construct(SignInFormFactory $signInFormFactory)
+    private $httpRequest;
+
+    public function __construct(SignInFormFactory $signInFormFactory, Request $httpRequest)
     {
         parent::__construct();
         $this->signInFormFactory = $signInFormFactory;
+        $this->httpRequest = $httpRequest;
     }
 
     public function renderIn(): void
@@ -34,7 +38,7 @@ final class SignPresenter extends Presenter
 
     public function renderError(): void
     {
-        $this->template->error = $this->request->getParameter('error');
+        $this->template->error = $this->httpRequest->getQuery('error');
     }
 
     protected function createComponentSignInForm(): Form

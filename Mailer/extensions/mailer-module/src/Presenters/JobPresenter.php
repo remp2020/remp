@@ -10,6 +10,7 @@ use Nette\Application\UI\Multiplier;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Nette\Bridges\ApplicationLatte\UIExtension;
 use Nette\Http\IResponse;
+use Nette\Http\Request;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
@@ -36,25 +37,26 @@ use Tracy\Debugger;
 final class JobPresenter extends BasePresenter
 {
     public function __construct(
-        private JobsRepository $jobsRepository,
-        private JobFormFactory $jobFormFactory,
-        private BatchesRepository $batchesRepository,
-        private BatchTemplatesRepository $batchTemplatesRepository,
-        private TemplatesRepository $templatesRepository,
-        private LogsRepository $logsRepository,
-        private NewBatchFormFactory $newBatchFormFactory,
-        private EditBatchFormFactory $editBatchFormFactory,
-        private NewTemplateFormFactory $newTemplateFormFactory,
-        private Aggregator $segmentAggregator,
-        private MailCache $mailCache,
-        private JobQueueRepository $jobQueueRepository,
-        private LatteFactory $latteFactory,
-        private LinkGenerator $linkGenerator,
-        private ListsRepository $listsRepository,
-        private DataTableFactory $dataTableFactory,
-        private ISendingStatsFactory $sendingStatsFactory,
-        private IBatchExperimentEvaluationFactory $batchExperimentEvaluationFactory,
-        private ListVariantsRepository $listVariantsRepository,
+        private readonly JobsRepository $jobsRepository,
+        private readonly JobFormFactory $jobFormFactory,
+        private readonly BatchesRepository $batchesRepository,
+        private readonly BatchTemplatesRepository $batchTemplatesRepository,
+        private readonly TemplatesRepository $templatesRepository,
+        private readonly LogsRepository $logsRepository,
+        private readonly NewBatchFormFactory $newBatchFormFactory,
+        private readonly EditBatchFormFactory $editBatchFormFactory,
+        private readonly NewTemplateFormFactory $newTemplateFormFactory,
+        private readonly Aggregator $segmentAggregator,
+        private readonly MailCache $mailCache,
+        private readonly JobQueueRepository $jobQueueRepository,
+        private readonly LatteFactory $latteFactory,
+        private readonly LinkGenerator $linkGenerator,
+        private readonly ListsRepository $listsRepository,
+        private readonly DataTableFactory $dataTableFactory,
+        private readonly ISendingStatsFactory $sendingStatsFactory,
+        private readonly IBatchExperimentEvaluationFactory $batchExperimentEvaluationFactory,
+        private readonly ListVariantsRepository $listVariantsRepository,
+        private readonly Request $httpRequest,
     ) {
         parent::__construct();
     }
@@ -119,10 +121,10 @@ final class JobPresenter extends BasePresenter
 
     public function renderDefaultJsonData()
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
         $listIds = [];
-        foreach ($request['columns'] as $column) {
+        foreach ($params['columns'] as $column) {
             if ($column['name'] !== 'batches') {
                 continue;
             }
@@ -133,11 +135,11 @@ final class JobPresenter extends BasePresenter
         }
 
         $jobsCount = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds)
+            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], $listIds)
             ->count('*');
 
         $jobs = $this->jobsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], $listIds, (int)$request['length'], (int)$request['start'])
+            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], $listIds, (int)$params['length'], (int)$params['start'])
             ->fetchAll();
 
         $result = [
@@ -200,7 +202,7 @@ final class JobPresenter extends BasePresenter
                 $unsubscribedCount,
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function renderShow($id)

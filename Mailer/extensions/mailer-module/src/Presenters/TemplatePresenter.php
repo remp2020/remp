@@ -8,6 +8,7 @@ use Http\Discovery\Exception\NotFoundException;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
+use Nette\Http\Request;
 use Remp\MailerModule\Components\MailLinkStats\MailLinkStats;
 use Remp\MailerModule\Forms\IFormFactory;
 use Remp\MailerModule\Models\Config\Config;
@@ -51,6 +52,7 @@ final class TemplatePresenter extends BasePresenter
         private Config $config,
         private EditorConfig $editorConfig,
         private EngineFactory $engineFactory,
+        private Request $httpRequest,
     ) {
         parent::__construct();
     }
@@ -112,20 +114,20 @@ final class TemplatePresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
-        $mailTypeIds = $this->getColumnValue('type', $request['columns']);
-        $mailLayoutIds = $this->getColumnValue('layout', $request['columns']);
+        $mailTypeIds = $this->getColumnValue('type', $params['columns']);
+        $mailLayoutIds = $this->getColumnValue('layout', $params['columns']);
 
-        $query = $request['search']['value'];
-        $order = $request['columns'][$request['order'][0]['column']]['name'];
-        $orderDir = $request['order'][0]['dir'];
+        $query = $params['search']['value'];
+        $order = $params['columns'][$params['order'][0]['column']]['name'];
+        $orderDir = $params['order'][0]['dir'];
         $templatesCount = $this->templatesRepository
             ->tableFilter($query, $order, $orderDir, $mailTypeIds, $mailLayoutIds)
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($query, $order, $orderDir, $mailTypeIds, $mailLayoutIds, (int)$request['length'], (int)$request['start'])
+            ->tableFilter($query, $order, $orderDir, $mailTypeIds, $mailLayoutIds, (int)$params['length'], (int)$params['start'])
             ->fetchAll();
 
         $result = [
@@ -159,7 +161,7 @@ final class TemplatePresenter extends BasePresenter
                 $template->related('mail_job_batch_template')->sum('clicked') + $direct['clicked'],
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     private function getColumnValue($columnName, $columns)
@@ -229,14 +231,14 @@ final class TemplatePresenter extends BasePresenter
 
     public function renderLogJsonData(): void
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
         $logsCount = $this->logsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], null, null, (int)$request['templateId'])
+            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], null, null, (int)$params['templateId'])
             ->count('*');
 
         $logs = $this->logsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['length'], (int)$request['start'], (int)$request['templateId'])
+            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], (int)$params['length'], (int)$params['start'], (int)$params['templateId'])
             ->fetchAll();
 
         $result = [
@@ -260,7 +262,7 @@ final class TemplatePresenter extends BasePresenter
                 ],
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function renderNew(): void

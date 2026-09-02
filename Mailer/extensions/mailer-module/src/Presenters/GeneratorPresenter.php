@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\BaseControl;
+use Nette\Http\Request;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
 use Remp\MailerModule\Forms\SourceTemplateFormFactory;
@@ -15,9 +16,10 @@ use Remp\MailerModule\Repositories\SourceTemplatesRepository;
 final class GeneratorPresenter extends BasePresenter
 {
     public function __construct(
-        private SourceTemplatesRepository $sourceTemplatesRepository,
-        private SourceTemplateFormFactory $sourceTemplateFormFactory,
-        private DataTableFactory $dataTableFactory
+        private readonly SourceTemplatesRepository $sourceTemplatesRepository,
+        private readonly SourceTemplateFormFactory $sourceTemplateFormFactory,
+        private readonly DataTableFactory $dataTableFactory,
+        private readonly Request $httpRequest,
     ) {
         parent::__construct();
     }
@@ -60,15 +62,15 @@ final class GeneratorPresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $request = $this->request->getParameters();
-        [$orderColumn, $orderDir] = $this->dataTableFactory->getOrderFromRequest($request);
+        $params = $this->httpRequest->getQuery();
+        [$orderColumn, $orderDir] = $this->dataTableFactory->getOrderFromRequest($params);
 
         $sourceTemplatesCount = $this->sourceTemplatesRepository
-            ->tableFilter($request['search']['value'], $orderColumn, $orderDir)
+            ->tableFilter($params['search']['value'], $orderColumn, $orderDir)
             ->count('*');
 
         $sourceTemplates = $this->sourceTemplatesRepository
-            ->tableFilter($request['search']['value'], $orderColumn, $orderDir, (int)$request['length'], (int)$request['start'])
+            ->tableFilter($params['search']['value'], $orderColumn, $orderDir, (int)$params['length'], (int)$params['start'])
             ->fetchAll();
 
         $result = [
@@ -98,7 +100,7 @@ final class GeneratorPresenter extends BasePresenter
                 $sourceTemplate->updated_at,
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function renderEdit($id): void

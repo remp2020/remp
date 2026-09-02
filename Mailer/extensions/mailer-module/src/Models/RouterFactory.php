@@ -15,13 +15,19 @@ class RouterFactory
     {
         $router = new RouteList;
 
-        $router[] = new Route('/api/v<version>/<package>[/<apiAction>][/<params>]', 'Api:Api:default');
-        $router[] = new Route('<module>/<presenter>/<action>[/<id>]', [
-            'module' => 'Mailer',
-            'presenter' => 'Dashboard',
-            'action' => 'default',
-            'id' => null,
-        ]);
+        $router->addRoute(
+            mask: '/api/v<version>/<package>[/<apiAction>][/<params>]',
+            metadata: 'Api:Api:default',
+        );
+        $router->addRoute(
+            mask: '<module>/<presenter>/<action>[/<id>]',
+            metadata: [
+                'module' => 'Mailer',
+                'presenter' => 'Dashboard',
+                'action' => 'default',
+                'id' => null,
+            ],
+        );
 
         return $router;
     }

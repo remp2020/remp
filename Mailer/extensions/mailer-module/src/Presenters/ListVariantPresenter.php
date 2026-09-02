@@ -6,6 +6,7 @@ namespace Remp\MailerModule\Presenters;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Http\IResponse;
+use Nette\Http\Request;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
@@ -25,6 +26,7 @@ final class ListVariantPresenter extends BasePresenter
         private readonly VariantSubscribersImportFormFactory $variantSubscribersImportFormFactory,
         private readonly UserSubscriptionVariantsRepository $userSubscriptionVariantsRepository,
         private readonly DataTableFactory $dataTableFactory,
+        private readonly Request $httpRequest,
     ) {
         parent::__construct();
     }
@@ -115,27 +117,27 @@ final class ListVariantPresenter extends BasePresenter
 
     public function renderSubscribersJsonData(): void
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
-        $variantId = (int)$request['variantId'];
+        $variantId = (int)$params['variantId'];
 
         $subscribersCount = $this->userSubscriptionVariantsRepository
             ->tableFilter(
-                $request['search']['value'],
-                $request['columns'][$request['order'][0]['column']]['name'],
-                $request['order'][0]['dir'],
+                $params['search']['value'],
+                $params['columns'][$params['order'][0]['column']]['name'],
+                $params['order'][0]['dir'],
                 $variantId
             )
             ->count('*');
 
         $subscribers = $this->userSubscriptionVariantsRepository
             ->tableFilter(
-                $request['search']['value'],
-                $request['columns'][$request['order'][0]['column']]['name'],
-                $request['order'][0]['dir'],
+                $params['search']['value'],
+                $params['columns'][$params['order'][0]['column']]['name'],
+                $params['order'][0]['dir'],
                 $variantId,
-                (int)$request['length'],
-                (int)$request['start']
+                (int)$params['length'],
+                (int)$params['start']
             )
             ->fetchAll();
 
@@ -152,7 +154,7 @@ final class ListVariantPresenter extends BasePresenter
                 $subscriber->created_at,
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function createComponentListVariantForm(): Form

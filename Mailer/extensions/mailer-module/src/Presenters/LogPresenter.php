@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Presenters;
 
+use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
+use Nette\Http\Request;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
@@ -14,16 +16,16 @@ use Tomaj\Form\Renderer\BootstrapInlineRenderer;
 
 final class LogPresenter extends BasePresenter
 {
-    /** @persistent */
+    #[Persistent]
     public $email;
 
-    /** @persistent */
+    #[Persistent]
     public $created_at_from;
 
-    /** @persistent */
+    #[Persistent]
     public $created_at_to;
 
-    /** @persistent */
+    #[Persistent]
     public $mail_template_code;
 
     private $logsRepository;
@@ -32,15 +34,19 @@ final class LogPresenter extends BasePresenter
 
     private $templatesRepository;
 
+    private $httpRequest;
+
     public function __construct(
         LogsRepository $logsRepository,
         DataTableFactory $dataTableFactory,
-        TemplatesRepository $templatesRepository
+        TemplatesRepository $templatesRepository,
+        Request $httpRequest
     ) {
         parent::__construct();
         $this->logsRepository = $logsRepository;
         $this->dataTableFactory = $dataTableFactory;
         $this->templatesRepository = $templatesRepository;
+        $this->httpRequest = $httpRequest;
     }
 
     public function startup(): void
@@ -114,7 +120,7 @@ final class LogPresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
         $mailTemplateId = null;
         if ($this->mail_template_code) {
@@ -132,8 +138,8 @@ final class LogPresenter extends BasePresenter
             $logsCount = $this->logsRepository
                 ->tableFilter(
                     $this->email ?? '',
-                    $request['columns'][$request['order'][0]['column']]['name'],
-                    $request['order'][0]['dir'],
+                    $params['columns'][$params['order'][0]['column']]['name'],
+                    $params['order'][0]['dir'],
                     null,
                     null,
                     $mailTemplateId,
@@ -143,10 +149,10 @@ final class LogPresenter extends BasePresenter
             $logs = $this->logsRepository
                 ->tableFilter(
                     $this->email ?? '',
-                    $request['columns'][$request['order'][0]['column']]['name'],
-                    $request['order'][0]['dir'],
-                    (int)$request['length'],
-                    (int)$request['start'],
+                    $params['columns'][$params['order'][0]['column']]['name'],
+                    $params['order'][0]['dir'],
+                    (int)$params['length'],
+                    (int)$params['start'],
                     $mailTemplateId,
                     $this->created_at_from ? DateTime::createFromFormat('m/d/Y H:i A', $this->created_at_from) : null,
                     $this->created_at_to ? DateTime::createFromFormat('m/d/Y H:i A', $this->created_at_to) : null,
@@ -180,7 +186,7 @@ final class LogPresenter extends BasePresenter
                 ],
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function createComponentFilterLogsForm()
@@ -224,6 +230,6 @@ final class LogPresenter extends BasePresenter
 
     public function adminFilterSubmitted($form, $values)
     {
-        $this->redirect($this->action, (array) $values);
+        $this->redirect($this->getAction(), (array) $values);
     }
 }

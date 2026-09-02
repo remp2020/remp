@@ -8,6 +8,7 @@ use DateTimeZone;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\Http\IResponse;
+use Nette\Http\Request;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
@@ -45,6 +46,7 @@ final class ListPresenter extends BasePresenter
         private readonly Emitter $emitter,
         private readonly DataTableFactory $dataTableFactory,
         private readonly ListSubscribersImportFormFactory $listSubscribersImportFormFactory,
+        private readonly Request $httpRequest,
     ) {
         parent::__construct();
     }
@@ -146,7 +148,7 @@ final class ListPresenter extends BasePresenter
             ];
         }
 
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function renderShow($id): void
@@ -291,14 +293,14 @@ final class ListPresenter extends BasePresenter
 
     public function renderTemplateJsonData(): void
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
         $templatesCount = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], [$request['listId']])
+            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], [$params['listId']])
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], [$request['listId']], null, (int)$request['length'], (int)$request['start'])
+            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], [$params['listId']], null, (int)$params['length'], (int)$params['start'])
             ->fetchAll();
 
         $result = [
@@ -331,7 +333,7 @@ final class ListPresenter extends BasePresenter
                 $clicked,
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function createComponentDataTableVariants(): DataTable
@@ -365,26 +367,26 @@ final class ListPresenter extends BasePresenter
 
     public function renderVariantsJsonData(): void
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
-        $listId = $request['listId'] ? (int)$request['listId'] : null;
-        $length = $request['length'] ? (int)$request['length'] : null;
-        $start = $request['start'] ? (int)$request['start'] : null;
+        $listId = $params['listId'] ? (int)$params['listId'] : null;
+        $length = $params['length'] ? (int)$params['length'] : null;
+        $start = $params['start'] ? (int)$params['start'] : null;
 
         $variantsCount = $this->listVariantsRepository
             ->tableFilter(
-                $request['search']['value'],
-                $request['columns'][$request['order'][0]['column']]['name'],
-                $request['order'][0]['dir'],
+                $params['search']['value'],
+                $params['columns'][$params['order'][0]['column']]['name'],
+                $params['order'][0]['dir'],
                 [$listId]
             )
             ->count('*');
 
         $variants = $this->listVariantsRepository
             ->tableFilter(
-                $request['search']['value'],
-                $request['columns'][$request['order'][0]['column']]['name'],
-                $request['order'][0]['dir'],
+                $params['search']['value'],
+                $params['columns'][$params['order'][0]['column']]['name'],
+                $params['order'][0]['dir'],
                 [$listId],
                 $length,
                 $start
@@ -408,7 +410,7 @@ final class ListPresenter extends BasePresenter
                 $variant->count,
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function createComponentListForm(): Form
@@ -736,14 +738,14 @@ final class ListPresenter extends BasePresenter
 
     public function renderSubscriberEmailsJsonData(): void
     {
-        $request = $this->request->getParameters();
+        $params = $this->httpRequest->getQuery();
 
         $subscriberEmailsCount = $this->userSubscriptionsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['listId'])
+            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], (int)$params['listId'])
             ->count('*');
 
         $subscriberEmails = $this->userSubscriptionsRepository
-            ->tableFilter($request['search']['value'], $request['columns'][$request['order'][0]['column']]['name'], $request['order'][0]['dir'], (int)$request['listId'], (int)$request['length'], (int)$request['start'])
+            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], (int)$params['listId'], (int)$params['length'], (int)$params['start'])
             ->fetchAll();
 
         $result = [
@@ -759,7 +761,7 @@ final class ListPresenter extends BasePresenter
                 $subscriberEmail->updated_at,
             ];
         }
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     public function handleDelete($id): void

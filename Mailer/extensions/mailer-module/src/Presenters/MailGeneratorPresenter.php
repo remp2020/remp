@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Presenters;
 
 use Nette\Application\UI\Form;
+use Nette\Http\Request;
 use Remp\MailerModule\Components\GeneratorWidgets\GeneratorWidgets;
 use Remp\MailerModule\Components\GeneratorWidgets\IGeneratorWidgetsFactory;
 use Remp\MailerModule\Forms\MailGeneratorFormFactory;
@@ -19,15 +20,19 @@ final class MailGeneratorPresenter extends BasePresenter
 
     private $generatorWidgetsFactory;
 
+    private $httpRequest;
+
     public function __construct(
         SourceTemplatesRepository $sourceTemplatesRepository,
         MailGeneratorFormFactory $mailGeneratorFormFactory,
-        IGeneratorWidgetsFactory $generatorWidgetsFactory
+        IGeneratorWidgetsFactory $generatorWidgetsFactory,
+        Request $httpRequest
     ) {
         parent::__construct();
         $this->sourceTemplatesRepository = $sourceTemplatesRepository;
         $this->mailGeneratorFormFactory = $mailGeneratorFormFactory;
         $this->generatorWidgetsFactory = $generatorWidgetsFactory;
+        $this->httpRequest = $httpRequest;
     }
 
     public function renderDefault(): void
@@ -37,7 +42,7 @@ final class MailGeneratorPresenter extends BasePresenter
 
     public function renderPreview($isLocked): void
     {
-        $section = $this->session->getSection(self::SESSION_SECTION_CONTENT_PREVIEW);
+        $section = $this->getSession()->getSection(self::SESSION_SECTION_CONTENT_PREVIEW);
         $this->template->content = $isLocked ? $section->generatedLockedHtml : $section->generatedHtml;
     }
 
@@ -62,9 +67,9 @@ final class MailGeneratorPresenter extends BasePresenter
 
     private function getSourceTemplateIdParameter(): int
     {
-        $sourceTemplateId = $this->request->getParameter('source_template_id');
+        $sourceTemplateId = $this->httpRequest->getQuery('source_template_id');
         if (!$sourceTemplateId) {
-            $sourceTemplateId = $this->request->getPost('source_template_id');
+            $sourceTemplateId = $this->httpRequest->getPost('source_template_id');
         }
         return (int)$sourceTemplateId;
     }

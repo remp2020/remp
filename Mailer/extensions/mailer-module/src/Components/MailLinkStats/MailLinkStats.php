@@ -106,7 +106,7 @@ class MailLinkStats extends Control
             'data' => $resultData
         ];
 
-        $this->presenter->sendJson($result);
+        $this->getPresenter()->sendJson($result);
     }
 
     /**
