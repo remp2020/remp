@@ -143,7 +143,7 @@ class EuobserverGenerator implements IGenerator
 
         $output->subject = $data->subject ?? $data->post_title;
         $output->url = $data->url ?? $data->post_url;
-        $output->article_id = $data->ID ?? null;
+        $output->article_id = $data->id ?? null;
 
         return $output;
     }
