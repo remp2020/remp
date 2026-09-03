@@ -17,7 +17,7 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class NewsfilterGenerator implements IGenerator
 {
-    use RulesTrait, TemplatesTrait;
+    use RulesTrait, TemplatesTrait, WordpressBlocksTrait;
 
     public $onSubmit;
 
@@ -55,7 +55,7 @@ class NewsfilterGenerator implements IGenerator
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values['source_template_id']);
 
-        $post = $values['newsfilter_html'];
+        $post = $this->preprocessBlocks($values['newsfilter_html']);
         $post = $this->parseOls($post);
 
         $lockedPost = $this->n3ArticleLocker->getLockedPost($post);

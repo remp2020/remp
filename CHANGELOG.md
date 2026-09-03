@@ -24,6 +24,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- Added support for WordPress block-editor (Gutenberg) content to the Newsfilter, Napunk Newsfilter, Grafdna and Novydenik Newsfilter generators. remp/remp#1498
+- Fixed a PHP 8.5 deprecation (`Non-canonical cast (boolean)`) in the `yesno` Latte/Twig filter, which Tracy escalates to an exception with `error_reporting(E_ALL)`.
 - Added a `configuration`/`update` permission check to the Settings (mailer configuration) page, following the existing `batch`/`start` pattern. As with other privileges, it's unrestricted by default; register it via `permissionManager` in `config.local.neon` to require a role for access — see `Mailer/extensions/mailer-module/README.md`'s "Permission management" section.
 - Added a per-newsletter-type "Exclude emails from search" option that hides a mail type's templates from the email template search. remp/remp#1462
 - Fixed a null error in the newsletter list form when no `system` mail type exists. remp/remp#1462

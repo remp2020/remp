@@ -21,7 +21,7 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class GrafdnaGenerator implements IGenerator
 {
-    use RulesTrait, TemplatesTrait;
+    use RulesTrait, TemplatesTrait, WordpressBlocksTrait;
 
     public $onSubmit;
 
@@ -111,7 +111,7 @@ class GrafdnaGenerator implements IGenerator
 
         $errors = [];
 
-        $post = $values['grafdna_html'];
+        $post = $this->preprocessBlocks($values['grafdna_html']);
         $post = $this->parseOls($post);
 
         $lockedPost = $this->articleLocker->getLockedPost($post);

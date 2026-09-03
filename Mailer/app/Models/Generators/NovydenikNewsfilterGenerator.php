@@ -18,7 +18,7 @@ use Tomaj\NetteApi\Params\PostInputParam;
 
 class NovydenikNewsfilterGenerator implements IGenerator
 {
-    use RulesTrait;
+    use RulesTrait, WordpressBlocksTrait;
 
     public $onSubmit;
 
@@ -72,7 +72,7 @@ class NovydenikNewsfilterGenerator implements IGenerator
     {
         $sourceTemplate = $this->mailSourceTemplateRepository->find($values['source_template_id']);
 
-        $post = $values['newsfilter_html'];
+        $post = $this->preprocessBlocks($values['newsfilter_html']);
         $lockedPost = $this->articleLocker->getLockedPost($post);
 
         $generatorRules = [

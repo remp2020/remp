@@ -5,6 +5,7 @@
 *.sublime-project
 *.sublime-workspace
 .metadata
+.phpunit.cache
 
 docker-compose.override.yml
 .yarn-error.log
