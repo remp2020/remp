@@ -14,15 +14,23 @@ use Remp\Mailer\Models\Auth\SsoFlowState;
  */
 final class SsoPresenter extends Presenter
 {
+    /**
+     * $crmSsoClient is optional on purpose - presenters are auto-registered as services, so requiring it
+     * would break the DI container on deployments that don't configure the CRM SSO login at all.
+     */
     public function __construct(
         private readonly SsoFlowState $ssoFlowState,
-        private readonly CrmSsoClient $crmSsoClient,
+        private readonly ?CrmSsoClient $crmSsoClient = null,
     ) {
         parent::__construct();
     }
 
     public function actionCallback(?string $code = null, ?string $state = null, ?string $error = null): void
     {
+        if ($this->crmSsoClient === null) {
+            $this->signInFailed('CRM SSO login is not configured. Have you add CrmSsoClient to the configuration?');
+        }
+
         $destinationUrl = $this->ssoFlowState->consume($state);
 
         if ($error !== null) {
