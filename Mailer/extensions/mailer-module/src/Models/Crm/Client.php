@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Remp\MailerModule\Models\Crm;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\RequestOptions;
 use Nette\Utils\Json;
-use GuzzleHttp\Exception\ClientException;
 
 class Client
 {
@@ -24,23 +24,24 @@ class Client
         ]);
     }
 
-    public function validateEmail(string $email): array
+    public function confirmUser(string $email): array
     {
         try {
-            $response = $this->client->post('api/v1/users/set-email-validated', [
+            $response = $this->client->post('api/v1/users/confirm', [
                 RequestOptions::FORM_PARAMS => [
                     'email' => $email,
                 ],
             ]);
 
-            return Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
+            return Json::decode($response->getBody()->getContents(), forceArrays: true);
         } catch (ConnectException $connectException) {
             throw new Exception("could not connect to CRM: {$connectException->getMessage()}");
         } catch (ClientException $clientException) {
-            $body = Json::decode($clientException->getResponse()->getBody()->getContents(), Json::FORCE_ARRAY);
-            if (isset($body['code']) && $body['code'] === 'email_not_found') {
-                throw new UserNotFoundException("Unable to find email: {$clientException->getMessage()}");
+            $body = Json::decode($clientException->getResponse()->getBody()->getContents(), forceArrays: true);
+            if (isset($body['code']) && $body['code'] === 'user_not_found') {
+                throw new UserNotFoundException("Unable to find user: {$clientException->getMessage()}");
             }
+
             throw new Exception("unable to confirm CRM user: {$clientException->getMessage()}");
         } catch (ServerException $serverException) {
             throw new Exception("unable to confirm CRM user: {$serverException->getMessage()}");
@@ -56,13 +57,13 @@ class Client
         if (count($emails) === 0) {
             return [];
         }
-        
+
         try {
             $response = $this->client->post('api/v2/users/set-email-validated', [
                 RequestOptions::JSON => ['emails' => $emails]
             ]);
 
-            return Json::decode($response->getBody()->getContents(), Json::FORCE_ARRAY);
+            return Json::decode($response->getBody()->getContents(), forceArrays: true);
         } catch (ConnectException $connectException) {
             throw new Exception("could not connect to CRM: {$connectException->getMessage()}");
         } catch (ClientException $clientException) {

@@ -53,6 +53,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - If that migration never completed on your installation — `mail_logs.user_id` missing, or a leftover `mail_logs_v2` / `mail_log_conversions_v2` / `mail_logs_old` table — complete it on a pre-5.2.0 release before upgrading. The partitioning migration hard-requires it (it copies `mail_logs.user_id`), so `CreatePartitionedMailLogsTable` and `mail_logs:migrate-to-partitions` both abort with instructions instead of failing halfway through.
 - **BREAKING**: `mail:bigint_migration_cleanup mail_logs` now refuses to drop `mail_logs_old` while `mail_logs_backfill_state` still has `pending` month partitions. remp/remp#1481
   - `mail_logs_old` is the only source `mail_logs:backfill-partitions` can read historical months from, so dropping it early loses them irrecoverably. Finish the backfill first, or drop the table manually if you have deliberately abandoned it.
+- **BREAKING**: Removed unused `Remp\MailerModule\Hermes\ValidateCrmEmailHandler` and `Remp\MailerModule\Models\Crm\Client::validateEmail()`. remp/euobserver#266
+  - If you had the handler registered in `config.local.neon`, remove it; the `crm:validate-emails` command still covers email validation.
+- Added `Remp\Mailer\Hermes\ConfirmCrmUserHandler` confirming a not-yet-confirmed CRM user account when the user clicks any link in a received email. remp/euobserver#266
+  - Added `Client::confirmUser()` calling CRM's `users/confirm` API.
+  - To enable, register the handler in `config.local.neon` (see `config.local.neon.example`); requires `crmClient`, and the CRM API token needs the `Users:UsersConfirm` API resource.
 
 ## Archive
 

@@ -63,6 +63,7 @@ services:
             #- add(user-subscribed-variant, Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
             #- add(user-unsubscribed-variant, Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
             #- add(batch-status-change, Remp\Mailer\Hermes\BatchSendingFinishedSlackHandler(@environmentConfig::get('APP_URL'), 'REMP', https://hooks.slack.com/services/dummy))
+            #- add(mailgun-event, Remp\Mailer\Hermes\ConfirmCrmUserHandler())
 
     # Required by the SSO 'authenticator' above (SsoPresenter resolves the CRM code through it).
     crmClient:
