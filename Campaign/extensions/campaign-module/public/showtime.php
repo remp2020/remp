@@ -13,6 +13,7 @@ use Remp\CampaignModule\Http\Showtime\ShowtimeResponse;
 use Remp\CampaignModule\Http\Showtime\ShowtimeConfig;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Laravel\SerializableClosure\SerializableClosure;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
@@ -372,6 +373,13 @@ JS;
 }
 $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../');
 $dotenv->load();
+
+if ($appKey = env('APP_KEY')) {
+    if (Str::startsWith($appKey, 'base64:')) {
+        $appKey = base64_decode(Str::after($appKey, 'base64:'));
+    }
+    SerializableClosure::setSecretKey($appKey);
+}
 
 $logger = new Logger('showtime');
 $streamHandler = new \Monolog\Handler\StreamHandler(__DIR__ . '/../../../storage/logs/laravel.log');
