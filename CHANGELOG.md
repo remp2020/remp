@@ -21,6 +21,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed snippet and collection edit forms breaking when a name contains JavaScript-sensitive characters; such snippets can now be opened and fixed. remp/remp#1405
 - Changed `campaigns:aggregate-stats` command so it no longer aborts the whole run when only *some* campaign banners' stats requests to Beam Segments fail; those banners are skipped, the errors are printed. If *every* banner fails, it still fails loudly (non-zero exit). remp/remp#1491
 - Raised the Beam Segments stats client's connect timeout from 1s to 3s, and made `REMP_SEGMENTS_TIMEOUT` the budget for the query alone rather than for connect + query. remp/remp#1491
+- Fixed 14 banner template text columns being `NOT NULL` on freshly installed databases, while long-running databases kept them nullable.
+  - The new `2026_08_28_120105_fix_nullable_fields_set_as_not_nullable_by_mistake` migration restores the intended nullability. It is a no-op on databases that never lost it.
+  - The `2021_02_22_084635_banner_template_texts` migration changed these columns from `string` to `text` with `->change()` without restating `->nullable()`. Under Doctrine DBAL (Laravel 10 and older) `->change()` kept attributes that were not stated, so the columns stayed nullable; since Laravel 11 it rebuilds the whole column definition and drops them. Databases migrated from scratch — or imported from the SQL schema dump, which was regenerated under the new behaviour — therefore ended up rejecting `NULL` banner texts that existing installations accept.
 
 ### [Mailer]
 
