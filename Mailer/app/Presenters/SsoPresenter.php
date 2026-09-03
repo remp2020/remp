@@ -45,7 +45,8 @@ final class SsoPresenter extends Presenter
 
         $roles = $crmUser['roles'] ?? [];
         if (!in_array('superadmin', $roles, true) && !in_array('remp/mailer', $roles, true)) {
-            $this->signInFailed('You are not authorized to access Mailer.');
+            $email = $crmUser['email'];
+            $this->signInFailed("Your CRM account $email is not authorized to access Mailer. Either log in with different user or request additional access.");
         }
 
         $this->getUser()->login(new SimpleIdentity($crmUser['id'], 'admin', [
