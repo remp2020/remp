@@ -1,3 +1,7 @@
+application:
+	mapping:
+		Crm: Remp\Mailer\Presenters\*Presenter
+
 services:
 	- Remp\Mailer\Forms\NovydenikNewsfilterTemplateFormFactory('users_with_any_subscriptions', 'users-without-subscription')
 	- Remp\Mailer\Forms\NewsfilterTemplateFormFactory('users_with_active_subscriptions', 'users_without_actual_subscriptions')
@@ -22,6 +26,7 @@ services:
 
 	- Remp\Mailer\Models\Generators\WordpressBlockParser
 	- Remp\Mailer\Models\Generators\EuobserverWordpressBlockParser
+	- Remp\Mailer\Models\Auth\SsoFlowState
 	n3ArticleLocker: Remp\Mailer\Models\Generators\N3ArticleLocker
 
 	embedParser:

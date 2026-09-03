@@ -4,10 +4,10 @@ php:
 extensions:
 #	newrelic: Remp\NewrelicModule\DI\NewrelicModuleExtension
 
-#parameters:
-#	crm:
-#		addr: @environmentConfig::get('CRM_API_ADDR')
-#		api_token: @environmentConfig::get('CRM_API_TOKEN')
+parameters:
+	crm:
+		addr: @environmentConfig::get('CRM_API_ADDR')
+		api_token: @environmentConfig::get('CRM_API_TOKEN')
 #	respekt:
 #		content_url: @environmentConfig::get('RESPEKT_CONTENT_URL')
 #		content_token: @environmentConfig::get('RESPEKT_CONTENT_TOKEN')
@@ -26,11 +26,11 @@ services:
             # Enable only if "crmClient" service is available
             - add(Remp\MailerModule\Commands\ValidateCrmEmailsCommand())
 
-#	# Internal CRM system. For more details contact Tomas Bella.
-#	authenticator:
-#		factory: Remp\MailerModule\Models\Auth\Authenticator
-#	authStorage:
-#		factory: Remp\MailerModule\Models\Auth\RemoteUser(%sso_host%)
+    # Log in through REMP CRM with a redirect (SSO) flow
+    # The matching CRM should register this app with URL callback:
+    #   redirectUris: ['https://mailer.example.com/crm/sso/callback']
+    authenticator:
+        factory: Remp\Mailer\Models\Auth\CrmSsoAuthenticator('remp-mailer', %crm.addr%)
 
     embedParser:
         setup:
@@ -64,8 +64,9 @@ services:
             #- add(user-unsubscribed-variant, Remp\MailerModule\Hermes\NotifyCrmSubscribeUnsubscribeHandler())
             #- add(batch-status-change, Remp\Mailer\Hermes\BatchSendingFinishedSlackHandler(@environmentConfig::get('APP_URL'), 'REMP', https://hooks.slack.com/services/dummy))
 
-    #crmClient:
-    #    factory: Remp\MailerModule\Models\Crm\Client(%crm.addr%, %crm.api_token%)
+    # Required by the SSO 'authenticator' above (SsoPresenter resolves the CRM code through it).
+    crmClient:
+        factory: Remp\Mailer\Models\Auth\CrmSsoClient(%crm.addr%, %crm.api_token%)
 
 
     # Setup loggers output
@@ -164,3 +165,8 @@ local_configs:
 #webpack:
 #    build:
 #        directory: /FULL_PATH_TO_REMP_FOLDER/Mailer/www/assets/vendor
+
+# When using SSO CRM authentication, enable short sessions. It's more secure and re-authentication is done
+# automatically against CRM, so user doesn't even notice.
+session:
+	expiration: 4 hours

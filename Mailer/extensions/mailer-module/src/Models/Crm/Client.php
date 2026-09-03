@@ -12,7 +12,7 @@ use GuzzleHttp\Exception\ClientException;
 
 class Client
 {
-    private $client;
+    protected GuzzleClient $client;
 
     public function __construct(string $baseUrl, string $token)
     {

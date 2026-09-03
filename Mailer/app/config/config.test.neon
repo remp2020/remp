@@ -33,7 +33,7 @@ services:
 		setup:
 			- addMailer(Tests\Feature\Mails\TestMailer())
 	crmClient:
-		factory: Remp\MailerModule\Models\Crm\Client(%crm.addr%, %crm.api_token%)
+		factory: Remp\Mailer\Models\Auth\CrmSsoClient(%crm.addr%, %crm.api_token%)
 
 	serviceParamsProvider:
 		factory: Remp\MailerModule\Models\ServiceParams\DefaultServiceParamsProvider('http://mailer.test')
