@@ -25,8 +25,12 @@ final class SsoPresenter extends Presenter
         parent::__construct();
     }
 
-    public function actionCallback(?string $code = null, ?string $state = null, ?string $error = null): void
-    {
+    public function actionCallback(
+        ?string $code = null,
+        ?string $state = null,
+        ?string $error = null,
+        ?string $email = null,
+    ): void {
         if ($this->crmSsoClient === null) {
             $this->signInFailed('CRM SSO login is not configured. Have you add CrmSsoClient to the configuration?');
         }
@@ -34,7 +38,11 @@ final class SsoPresenter extends Presenter
         $destinationUrl = $this->ssoFlowState->consume($state);
 
         if ($error !== null) {
-            $this->signInFailed('You are not authorized to access Mailer.');
+            if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $this->errorSignForEmailNotAllowed($email);
+            } else {
+                $this->signInFailed('You are not authorized to access Mailer.');
+            }
         }
 
         if ($destinationUrl === null) {
@@ -53,8 +61,7 @@ final class SsoPresenter extends Presenter
 
         $roles = $crmUser['roles'] ?? [];
         if (!in_array('superadmin', $roles, true) && !in_array('remp/mailer', $roles, true)) {
-            $email = $crmUser['email'];
-            $this->signInFailed("Your CRM account $email is not authorized to access Mailer. Either log in with different user or request additional access.");
+            $this->errorSignForEmailNotAllowed($crmUser['email']);
         }
 
         $this->getUser()->login(new SimpleIdentity($crmUser['id'], 'admin', [
@@ -62,6 +69,11 @@ final class SsoPresenter extends Presenter
         ]));
 
         $this->redirectUrl($destinationUrl);
+    }
+
+    private function errorSignForEmailNotAllowed(string $email): void
+    {
+        $this->signInFailed("Your CRM account $email is not authorized to access Mailer. Either log in with different user or request additional access.");
     }
 
     private function signInFailed(string $message): never
