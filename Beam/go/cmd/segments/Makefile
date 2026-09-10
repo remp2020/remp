@@ -29,7 +29,7 @@ gen:
 	goa gen $(DESIGN_PKG) --output .
 
 build-static: gen
-	CGO_ENABLED=0 GOOS=$(TARGET_GOOS) GOARCH=$(TARGET_GOARCH) go build -a -installsuffix cgo -o segments$(TARGET_SUFFIX)
+	CGO_ENABLED=0 GOOS=$(TARGET_GOOS) GOARCH=$(TARGET_GOARCH) go build -ldflags="-s -w" -trimpath -o segments$(TARGET_SUFFIX)
 
 docker-build:
 	set -e; \

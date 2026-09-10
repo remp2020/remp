@@ -6,9 +6,9 @@ require (
 	cloud.google.com/go/pubsub v1.43.0
 	github.com/Shopify/sarama v1.23.0
 	github.com/avct/uasurfer v0.0.0-20180817072212-dc0ec4fd1e87
+	github.com/elastic/elastic-transport-go/v8 v8.7.0
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/goadesign/goa v2.2.5+incompatible
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/imdario/mergo v0.3.11
@@ -35,7 +35,6 @@ require (
 	github.com/eapache/go-resiliency v1.1.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.7.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-chi/chi/v5 v5.2.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect

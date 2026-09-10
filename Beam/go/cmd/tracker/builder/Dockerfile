@@ -1,4 +1,4 @@
-FROM golang:1.25
+FROM golang:1.27
 
 RUN go install golang.org/x/tools/cmd/goimports@latest
 

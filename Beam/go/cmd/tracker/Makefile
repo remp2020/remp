@@ -34,7 +34,7 @@ build: gen
 	go build -o tracker
 
 build-static: gen
-	CGO_ENABLED=0 GOOS=$(TARGET_GOOS) GOARCH=$(TARGET_GOARCH) go build -a -installsuffix cgo -o tracker$(TARGET_SUFFIX)
+	CGO_ENABLED=0 GOOS=$(TARGET_GOOS) GOARCH=$(TARGET_GOARCH) go build -ldflags="-s -w" -trimpath -o tracker$(TARGET_SUFFIX)
 
 docker-build:
 	set -e; \
