@@ -286,6 +286,26 @@ When the flag is `true`, banners using that dimension always track their events 
 
 This is useful for dimensions that render no visible banner (e.g. hidden JS-based banners), where automatic show/click/close tracking would produce misleading data.
 
+##### Custom Javascript `params` object
+
+A banner's *Custom Javascript* field is invoked with a `params` object giving it access to the current display's tracking values and to the banner's own event tracking:
+
+```javascript
+// tracking values, same as the rtm_* values described in "RTM tracking" below
+params.rtmSource    // always "remp_campaign"
+params.rtmMedium    // "overlay" or "inline"
+params.rtmCampaign  // campaign UUID
+params.rtmContent   // banner UUID
+params.rtmVariant   // banner variant UUID
+
+// manually trigger the banner's show/click/close tracking
+params.bannerShown()
+params.bannerClicked()
+params.bannerClosed()
+```
+
+`bannerShown`, `bannerClicked` and `bannerClosed` are needed when a banner has manual events tracking enabled (see *Forced manual events tracking per dimension* above, or the *Track banner events manually* checkbox) — the custom JS is then responsible for calling them at the right time instead of relying on Campaign's automatic show/click/close detection.
+
 ##### Snippets
 
 Campaign supports use of snippets in your banner template contents, custom javascript and custom css. You can create snippets using `Add new snippet` in the `Snippets` main menu section.
@@ -579,3 +599,5 @@ Following params are added to every request or link within banners. They serve f
 - rtm_campaign: `campaignUuid` => campaign id
 - rtm_content: `uuid` => banner id
 - banner_variant: `variantUuid` => banner variant id (in campaign)
+
+The same values are available as `rtmSource`, `rtmMedium`, `rtmCampaign`, `rtmContent` and `rtmVariant` on the `params` object passed into a banner's *Custom Javascript* — see *Custom Javascript `params` object* above.
