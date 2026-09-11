@@ -648,6 +648,48 @@ class ShowtimeTest extends TestCase
 
     }
 
+    public function testPageviewRulesDisplayBannerFrom()
+    {
+        $this->scheduleCampaign();
+
+        $this->campaign->update([
+            'pageview_rules' => [
+                'display_banner' => 'every',
+                'display_banner_every' => 3,
+                'display_banner_from' => 5,
+            ]
+        ]);
+
+        // campaign is not tracked by the client yet, therefore this is its first pageview
+        $userData = $this->getUserData();
+        $activeCampaignUuids = [];
+        $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+        $this->assertCount(1, $activeCampaignUuids); // campaign should still be counted as active
+
+        // pageview count is the number of preceding pageviews, banner should be displayed on 5th, 8th, ...
+        foreach ([3 => false, 4 => true, 5 => false, 7 => true] as $count => $shouldDisplay) {
+            $campaignsData = [$this->campaign->uuid => ['count' => $count, 'seen' => 0]];
+            $userData = $this->getUserData(null, null, null, true, $campaignsData);
+            $activeCampaignUuids = [];
+
+            $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids);
+            $this->assertSame($shouldDisplay, $bannerVariant !== null, "Unexpected display result with pageview count [$count]");
+            $this->assertCount(1, $activeCampaignUuids);
+        }
+
+        // rule is ignored when banner is displayed always
+        $this->campaign->update([
+            'pageview_rules' => [
+                'display_banner' => 'always',
+                'display_banner_from' => 5,
+            ]
+        ]);
+
+        $userData = $this->getUserData();
+        $activeCampaignUuids = [];
+        $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+    }
+
     public function testPageviewRulesAfterClickRule()
     {
         $this->scheduleCampaign();

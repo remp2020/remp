@@ -700,8 +700,8 @@ class Showtime
         $seenCampaign = $seenCampaigns->{$campaign->uuid} ?? $seenCampaigns->{$campaign->public_id} ?? null;
 
         // pageview rules - check display banner every n-th request
-        if ($seenCampaign !== null && $campaign->pageview_rules !== null) {
-            $pageviewCount = $seenCampaign->count ?? null;
+        if ($campaign->pageview_rules !== null) {
+            $pageviewCount = $seenCampaign === null ? 0 : ($seenCampaign->count ?? null);
 
             if ($pageviewCount === null) {
                 // if campaign is recorder as seen but has no pageview count,
@@ -710,12 +710,21 @@ class Showtime
                 return "Campaign not executed because user has no pageview count (probably old version of remplib)";
             }
 
-            $displayBanner = $campaign->pageview_rules['display_banner'] ?? null;
-            $displayBannerEvery = $campaign->pageview_rules['display_banner_every'] ?? 1;
-            if ($displayBanner === 'every' && $pageviewCount % $displayBannerEvery !== 0) {
-                return "Campaign not executed because of 'display-banner-every' pageview rule (pageview count [$pageviewCount])";
-            }
+            if (($campaign->pageview_rules['display_banner'] ?? null) === 'every') {
+                $displayBannerEvery = $campaign->pageview_rules['display_banner_every'] ?? 1;
+                $firstDisplayCount = ($campaign->pageview_rules['display_banner_from'] ?? 1) - 1;
 
+                if ($pageviewCount < $firstDisplayCount) {
+                    return "Campaign not executed because of 'display-banner-from' pageview rule (pageview count [$pageviewCount])";
+                }
+                if (($pageviewCount - $firstDisplayCount) % $displayBannerEvery !== 0) {
+                    return "Campaign not executed because of 'display-banner-every' pageview rule (pageview count [$pageviewCount])";
+                }
+            }
+        }
+
+        // pageview rules - check rules after banner was closed or clicked
+        if ($seenCampaign !== null && $campaign->pageview_rules !== null) {
             $sessionCampaign = $campaignsSeenInSession->{$campaign->uuid} ?? $campaignsSeenInSession->{$campaign->public_id} ?? null;
 
             if (property_exists($seenCampaign, 'closedAt')) {

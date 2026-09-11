@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Campaign]
+
+- Added `From` option to campaign `Every N page views` display rule, allowing the banner to start displaying at a later pageview than the first one. remp/remp#1488
 
 ## Archive
 

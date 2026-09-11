@@ -23,20 +23,30 @@
 
                             <div class="col-sm-12" style="margin-left: -15px;">
                                 <div class="input-group fg-float radio flex-input-group">
-                                    <label class="m-l-15 m-10">
+                                    <label class="m-l-15 m-10" for="display_banner_every_radio">
                                         Every
                                         <input v-model="displayBanner"
+                                               id="display_banner_every_radio"
                                                type="radio"
                                                name="pageview_rules[display_banner]"
                                                value="every">
                                         <i class="input-helper"></i>
                                     </label>
                                     <input v-model="displayBannerEvery"
+                                           v-on:click="displayBanner = 'every'"
                                            type="text"
+                                           aria-label="Display banner every N page views"
                                            name="pageview_rules[display_banner_every]"
                                            class="form-control fg-input every-input inline-flex-input"
                                            id="num">
-                                    <span style="margin: 10px"> page views</span>
+                                    <label for="display_banner_every_radio" class="inline-label">page views, starting from</label>
+                                    <input v-model="displayBannerFrom"
+                                           v-on:click="displayBanner = 'every'"
+                                           id="display_banner_from"
+                                           type="text"
+                                           aria-label="Start displaying from page view number"
+                                           name="pageview_rules[display_banner_from]"
+                                           class="form-control fg-input every-input inline-flex-input">
                                 </div>
                             </div>
                         </div>
@@ -218,7 +228,7 @@
 
 <style scoped>
     .pageview-rules-wrapper {
-        max-width: 340px;
+        max-width: 440px;
     }
     .input-group .input-group-addon.pageview-rules-addon {
         vertical-align: top;
@@ -242,6 +252,14 @@
     .input-inline-block {
         display: inline-block;
     }
+    .flex-input-group .inline-label {
+        display: inline;
+        padding-left: 0;
+        margin: 0 10px;
+        font-weight: normal;
+        white-space: nowrap;
+        cursor: pointer;
+    }
 </style>
 
 <script type="text/javascript">
@@ -255,6 +273,7 @@
             return {
                 displayBanner: 'always',
                 displayBannerEvery: 2,
+                displayBannerFrom: 1,
                 displayTimes: false,
                 displayNTimes: 2,
                 oncePerSessionVal: false,
@@ -270,6 +289,9 @@
             }
             if (this.pageviewRules.display_banner_every !== undefined) {
                 this.displayBannerEvery = this.pageviewRules.display_banner_every;
+            }
+            if (this.pageviewRules.display_banner_from !== undefined) {
+                this.displayBannerFrom = this.pageviewRules.display_banner_from;
             }
             if (this.pageviewRules.display_times !== undefined) {
                 this.displayTimes = this.pageviewRules.display_times;
@@ -300,6 +322,9 @@
             displayBannerEvery: function () {
                 this.updatePageviewRules();
             },
+            displayBannerFrom: function () {
+                this.updatePageviewRules();
+            },
             displayTimes: function () {
                 this.updatePageviewRules();
             },
@@ -328,6 +353,7 @@
                     rules: {
                         display_banner: this.displayBanner,
                         display_banner_every: this.displayBannerEvery,
+                        display_banner_from: this.displayBannerFrom,
                         display_times: this.displayTimes,
                         display_n_times: this.displayNTimes,
                         after_banner_closed_display: this.afterBannerClosedDisplay,

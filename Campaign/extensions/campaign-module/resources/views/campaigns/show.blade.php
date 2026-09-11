@@ -134,6 +134,11 @@
                             <li>
                                 Display banner: @if($campaign->pageview_rules['display_banner'] === 'every')Every {{ $campaign->pageview_rules['display_banner_every'] }} page views @else Always @endif
                             </li>
+                            @if($campaign->pageview_rules['display_banner'] === 'every' && ($campaign->pageview_rules['display_banner_from'] ?? 1) > 1)
+                            <li>
+                                Display banner from pageview {{ $campaign->pageview_rules['display_banner_from'] }}.
+                            </li>
+                            @endif
                             @if($campaign->pageview_rules['display_times'])
                             <li>
                                 Display to user {{ $campaign->pageview_rules['display_n_times'] }} times, then stop.

@@ -37,7 +37,8 @@ class CampaignRequest extends FormRequest
             'segments.*.code' => 'required|string',
             'segments.*.inclusive' => 'required|boolean',
             'pageview_rules.display_banner' => 'required|string',
-            'pageview_rules.display_banner_every' => 'required|integer',
+            'pageview_rules.display_banner_every' => 'required|integer|min:1',
+            'pageview_rules.display_banner_from' => 'required|integer|min:1',
             'pageview_rules.display_times' => 'required',
             'pageview_rules.display_n_times' => 'required|integer',
             'pageview_rules.after_banner_closed_display' => 'required|string',
@@ -127,6 +128,11 @@ class CampaignRequest extends FormRequest
             $data['pageview_rules']['display_banner_every'],
             FILTER_VALIDATE_INT,
             ['options' => ['default' => 2]]
+        );
+        $data['pageview_rules']['display_banner_from'] = filter_var(
+            $data['pageview_rules']['display_banner_from'] ?? 1,
+            FILTER_VALIDATE_INT,
+            ['options' => ['default' => 1]]
         );
         $data['pageview_rules']['display_n_times'] = filter_var(
             $data['pageview_rules']['display_n_times'],
