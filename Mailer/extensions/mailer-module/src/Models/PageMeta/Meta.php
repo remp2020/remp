@@ -10,6 +10,7 @@ class Meta
         private readonly ?string $description = null,
         private readonly ?string $image = null,
         private readonly array $authors = [],
+        private readonly ?Audio $audio = null,
     ) {
     }
 
@@ -31,5 +32,10 @@ class Meta
     public function getAuthors(): array
     {
         return $this->authors;
+    }
+
+    public function getAudio(): ?Audio
+    {
+        return $this->audio;
     }
 }

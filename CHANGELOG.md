@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Added `From` option to campaign `Every N page views` display rule, allowing the banner to start displaying at a later pageview than the first one. remp/remp#1488
 
+### [Mailer]
+
+- **BREAKING**: Removed `JsonLDContent::postProcessMeta()` in favor of the narrower `processImage(?string): ?string` and `processAuthors(array): array` hooks, which `JsonLDContent` applies before constructing `Meta`. remp/remp#1499
+- Added audio metadata parsing to `JsonLDContent`. remp/remp#1499
+- `JsonLDContent` now also accepts a plain URL string in the schema's `image` property. Previously only an `ImageObject` (or an array of them) was read.
+
 ## Archive
 
 - [v5.1](./changelogs/CHANGELOG-v5.2.md)

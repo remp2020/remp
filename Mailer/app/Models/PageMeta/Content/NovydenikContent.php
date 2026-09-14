@@ -32,17 +32,7 @@ class NovydenikContent extends JsonLDContent
         }
     }
 
-    protected function postProcessMeta(Meta $meta): Meta
-    {
-        return new Meta(
-            $meta->getTitle(),
-            $meta->getDescription(),
-            $this->processImage($meta->getImage()),
-            $meta->getAuthors(),
-        );
-    }
-
-    private function processImage(?string $imageUrl): string
+    protected function processImage(?string $imageUrl): string
     {
         if (!$imageUrl) {
             return 'https://static.novydenik.com/2018/11/placeholder_2@2x.png';
