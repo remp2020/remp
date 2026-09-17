@@ -11,7 +11,7 @@
   padding: 10px 20px;
   display: flex;
   align-items: center;
-  z-index: 9999999;
+  z-index: 9997;
   &:hover {
     cursor: pointer;
   }

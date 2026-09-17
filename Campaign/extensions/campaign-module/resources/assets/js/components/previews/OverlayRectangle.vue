@@ -75,6 +75,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     z-index: 100000;
 }
 
@@ -137,6 +139,7 @@
 
 .overlay-rectangle-wrap {
     position: relative;
+    margin: auto;
     padding: 5px;
     background: #fff;
     -webkit-box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.26);

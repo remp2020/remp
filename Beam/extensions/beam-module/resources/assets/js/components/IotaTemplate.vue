@@ -13,7 +13,7 @@ $colors: (
   position: relative;
   &__inline-metric {
     position: absolute;
-    z-index: 999999;
+    z-index: 9996;
     width: 100%;
     left: 0;
     right: 0;
@@ -65,7 +65,7 @@ $colors: (
     background-color: white;
     box-shadow: 5px 9px 30px 0 rgba(168, 173, 187, 0.6);
     position: absolute;
-    z-index: 9999999;
+    z-index: 9997;
     width: 300px;
     top: calc(100% - 5px);
     left: 15px;

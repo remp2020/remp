@@ -28,6 +28,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow-y: auto;
+        overscroll-behavior: contain;
         z-index: 100000;
     }
 

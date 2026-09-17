@@ -11,7 +11,7 @@
   flex-direction: column;
   justify-content: space-between;
   width: 25%;
-  z-index: 999999;
+  z-index: 9996;
   transition: all 0.3s ease-in-out, z-index 0s ease-in-out;
   &__item {
     display: flex;

@@ -6,9 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Beam]
+
+- Lowered z-index of the iota on-site overlay (metrics bubble, detail popover, scroll-depth pill, histogram, settings panel) from 999999–99999999 to 9996–9998 so it no longer covers Campaign banners (fixed banners use 9999, overlay backdrops 100000). Iota now renders below publisher elements with z-index above 9998. remp/helpdesk#5008
+
 ### [Campaign]
 
 - Added `From` option to campaign `Every N page views` display rule, allowing the banner to start displaying at a later pageview than the first one. remp/remp#1488
+- Fixed `overlay_rectangle`, `html_overlay` and `overlay_two_buttons_signature` banners being clipped on both ends and unclosable when taller than the viewport (e.g. phone in landscape). The backdrop now scrolls and the banner box stays reachable. remp/helpdesk#5008
 
 ### [Mailer]
 

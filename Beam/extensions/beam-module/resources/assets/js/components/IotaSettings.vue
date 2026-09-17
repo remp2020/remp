@@ -9,7 +9,7 @@
   position: fixed;
   right: 30px;
   top: 70px;
-  z-index: 99999999;
+  z-index: 9998;
   &__header {
     display: flex;
     align-items: center;
