@@ -44,7 +44,7 @@
                 :buttonText="mediumRectangleTemplate.buttonText"
                 :width="mediumRectangleTemplate.width"
                 :height="mediumRectangleTemplate.height"
-                :colorScheme="colorSchemes[mediumRectangleTemplate.colorScheme]"
+                :colorScheme="colorSchemeFor(mediumRectangleTemplate.colorScheme)"
 
                 :position="position"
                 :offsetVertical="offsetVertical"
@@ -66,7 +66,7 @@
 
                 :mainText="barTemplate.mainText"
                 :buttonText="barTemplate.buttonText"
-                :colorScheme="colorSchemes[barTemplate.colorScheme]"
+                :colorScheme="colorSchemeFor(barTemplate.colorScheme)"
 
                 :position="position"
                 :offsetVertical="offsetVertical"
@@ -91,7 +91,7 @@
                 :collapseText="collapsibleBarTemplate.collapseText"
                 :expandText="collapsibleBarTemplate.expandText"
                 :buttonText="collapsibleBarTemplate.buttonText"
-                :colorScheme="colorSchemes[collapsibleBarTemplate.colorScheme]"
+                :colorScheme="colorSchemeFor(collapsibleBarTemplate.colorScheme)"
                 :initialState="collapsibleBarTemplate.initialState"
 
                 :targetUrl="targetUrl"
@@ -108,7 +108,7 @@
                 :forcedPosition="forcedPosition"
 
                 :text="shortMessageTemplate.text"
-                :colorScheme="colorSchemes[shortMessageTemplate.colorScheme]"
+                :colorScheme="colorSchemeFor(shortMessageTemplate.colorScheme)"
 
                 :position="position"
                 :offsetVertical="offsetVertical"
@@ -131,7 +131,7 @@
                 :buttonText="overlayRectangleTemplate.buttonText"
                 :width="overlayRectangleTemplate.width"
                 :height="overlayRectangleTemplate.height"
-                :colorScheme="colorSchemes[overlayRectangleTemplate.colorScheme]"
+                :colorScheme="colorSchemeFor(overlayRectangleTemplate.colorScheme)"
                 :imageLink="overlayRectangleTemplate.imageLink"
 
                 :targetUrl="targetUrl"
@@ -203,7 +203,7 @@
                                       :success="newsletterRectangleTemplate.success"
                                       :failure="newsletterRectangleTemplate.failure"
                                       :terms="newsletterRectangleTemplate.terms"
-                                      :colorScheme="colorSchemes[newsletterRectangleTemplate.colorScheme]"
+                                      :colorScheme="colorSchemeFor(newsletterRectangleTemplate.colorScheme)"
                                       :width="newsletterRectangleTemplate.width"
                                       :height="newsletterRectangleTemplate.height"
 
@@ -237,6 +237,9 @@
     import HtmlOverlayPreview from "./previews/HtmlOverlay"
     import OverlayTwoButtonsSignaturePreview from "./previews/OverlayTwoButtonsSignature"
     import NewsletterRectanglePreview from "./previews/NewsletterRectangle"
+
+    // color scheme keys already reported as missing, to warn once per key instead of on every render
+    const warnedColorSchemes = new Set();
 
     const props = [
         "name",
@@ -389,6 +392,26 @@
             },
         },
         methods: {
+            colorSchemeFor: function (key) {
+                if (this.colorSchemes && this.colorSchemes[key]) {
+                    return this.colorSchemes[key];
+                }
+                const fallback = this.colorSchemes ? Object.values(this.colorSchemes)[0] : undefined;
+                if (!warnedColorSchemes.has(key)) {
+                    warnedColorSchemes.add(key);
+                    console.warn('remplib: unknown banner color scheme "' + key + '", using "' + (fallback ? fallback.key : 'built-in default') + '"');
+                }
+
+                return fallback || {
+                    key: 'grey',
+                    label: 'Grey',
+                    textColor: '#000000',
+                    backgroundColor: '#ededed',
+                    buttonTextColor: '#ffffff',
+                    buttonBackgroundColor: '#000000',
+                    closeTextColor: '#000000',
+                };
+            },
             addParamsToLinks: function () {
                 if (!this.paramsAdded) {
                     this.$nextTick(function () {
