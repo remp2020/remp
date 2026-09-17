@@ -3,8 +3,19 @@ declare(strict_types=1);
 
 namespace Remp\Mailer\Models\Generators;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\TransferException;
+use Nette\Utils\Json;
+use Nette\Utils\JsonException;
+use Tracy\Debugger;
+
 class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
 {
+    private const X_PREVIEW_CONNECT_TIMEOUT = 3;
+
+    private const X_PREVIEW_TIMEOUT = 5;
+
     protected string $twitterLinkText = "Click to display on X (Twitter)";
 
     protected ?string $embedImagePreprocessingUrl = null;
@@ -59,5 +70,34 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
         $response = @get_headers($link);
 
         return $response && is_array($response) && str_contains($response[0], '200');
+    }
+
+    protected function fetchXPreviewImage(string $link): ?string
+    {
+        if (!preg_match('/status\/(\d+)/', $link, $matches)) {
+            return null;
+        }
+        $xId = $matches[1];
+
+        $client = new Client();
+        try {
+            $response = $client->get("https://cdn.syndication.twimg.com/tweet-result?id={$xId}&token=!", [
+                'connect_timeout' => self::X_PREVIEW_CONNECT_TIMEOUT,
+                'timeout' => self::X_PREVIEW_TIMEOUT,
+            ]);
+            $data = Json::decode($response->getBody()->getContents(), forceArrays: true);
+        } catch (ClientException $e) {
+            Debugger::log('Unable to fetch X embed: ' . (string) $e->getResponse()->getBody(), Debugger::EXCEPTION);
+            return null;
+        } catch (TransferException | JsonException $e) {
+            Debugger::log($e, Debugger::EXCEPTION);
+            return null;
+        }
+
+        if (!empty($data['mediaDetails'])) {
+            return $data['mediaDetails'][0]['media_url_https'] ?? null;
+        }
+
+        return null;
     }
 }

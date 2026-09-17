@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **BREAKING**: Removed `JsonLDContent::postProcessMeta()` in favor of the narrower `processImage(?string): ?string` and `processAuthors(array): array` hooks, which `JsonLDContent` applies before constructing `Meta`. remp/remp#1499
 - Added audio metadata parsing to `JsonLDContent`. remp/remp#1499
 - `JsonLDContent` now also accepts a plain URL string in the schema's `image` property. Previously only an `ImageObject` (or an array of them) was read.
+- Refactored X embedding from `Euobserver\EmbedParser` to the shared `Remp\Mailer\Models\Generators\EmbedParser::fetchXPreviewImage()`. remp/remp#1505
 
 ## Archive
 
