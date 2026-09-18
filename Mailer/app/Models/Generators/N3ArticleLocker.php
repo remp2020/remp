@@ -18,6 +18,8 @@ class N3ArticleLocker implements ArticleLockerInterface
             $lock = '[lock newsletter]';
         } elseif (stripos($post, '[lock]') !== false) {
             $lock = '[lock]';
+        } elseif (stripos($post, '[lock e]') !== false) {
+            $lock = '[lock e]';
         } else {
             // no lock, no placeholder
             return $post;
