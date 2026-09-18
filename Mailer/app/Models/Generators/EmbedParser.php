@@ -6,14 +6,16 @@ namespace Remp\Mailer\Models\Generators;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\RedirectMiddleware;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Tracy\Debugger;
 
 class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
 {
+    private const IMAGE_CONNECT_TIMEOUT = 3;
+    private const IMAGE_TIMEOUT = 5;
     private const X_PREVIEW_CONNECT_TIMEOUT = 3;
-
     private const X_PREVIEW_TIMEOUT = 5;
 
     protected string $twitterLinkText = "Click to display on X (Twitter)";
@@ -47,9 +49,7 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
         if (!is_null($image) && !is_null($title)) {
             if ($this->embedImagePreprocessingUrl) {
                 $preprocessedImage = sprintf($this->embedImagePreprocessingUrl, $image, hash('sha256', $this->salt . $image));
-                if ($this->existImage($preprocessedImage)) {
-                    $image = $preprocessedImage;
-                }
+                $image = $this->resolveImage($preprocessedImage) ?? $image;
             }
             $html .= "<img src='{$image}' alt='{$title}' style='outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;max-width:100%;clear:both;display:inline;width:100%;height:auto;'>";
         } elseif ($this->isTwitterLink($link)) {
@@ -65,11 +65,22 @@ class EmbedParser extends \Remp\MailerModule\Models\Generators\EmbedParser
         return $html . "</a>" . PHP_EOL;
     }
 
-    protected function existImage(string $link): bool
+    protected function resolveImage(string $link): ?string
     {
-        $response = @get_headers($link);
+        $client = new Client();
+        try {
+            $response = $client->head($link, [
+                'connect_timeout' => self::IMAGE_CONNECT_TIMEOUT,
+                'timeout' => self::IMAGE_TIMEOUT,
+                'allow_redirects' => ['track_redirects' => true], // in case there's redirect to canonical
+            ]);
+        } catch (TransferException $e) {
+            return null;
+        }
 
-        return $response && is_array($response) && str_contains($response[0], '200');
+        $redirects = $response->getHeader(RedirectMiddleware::HISTORY_HEADER);
+
+        return end($redirects) ?: $link;
     }
 
     protected function fetchXPreviewImage(string $link): ?string
