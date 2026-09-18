@@ -238,9 +238,6 @@
     import OverlayTwoButtonsSignaturePreview from "./previews/OverlayTwoButtonsSignature"
     import NewsletterRectanglePreview from "./previews/NewsletterRectangle"
 
-    // color scheme keys already reported as missing, to warn once per key instead of on every render
-    const warnedColorSchemes = new Set();
-
     const props = [
         "name",
         "targetUrl",
@@ -396,21 +393,12 @@
                 if (this.colorSchemes && this.colorSchemes[key]) {
                     return this.colorSchemes[key];
                 }
-                const fallback = this.colorSchemes ? Object.values(this.colorSchemes)[0] : undefined;
-                if (!warnedColorSchemes.has(key)) {
-                    warnedColorSchemes.add(key);
-                    console.warn('remplib: unknown banner color scheme "' + key + '", using "' + (fallback ? fallback.key : 'built-in default') + '"');
-                }
-
-                return fallback || {
-                    key: 'grey',
-                    label: 'Grey',
-                    textColor: '#000000',
-                    backgroundColor: '#ededed',
-                    buttonTextColor: '#ffffff',
-                    buttonBackgroundColor: '#000000',
-                    closeTextColor: '#000000',
-                };
+                const available = this.colorSchemes ? Object.keys(this.colorSchemes).join(', ') : '(none)';
+                throw new Error(
+                    'remplib: banner ' + this.uuid + ' uses unknown color scheme "' + key + '"; ' +
+                    'available schemes: ' + available + '. ' +
+                    'Check config/banners.local.php and run `campaigns:refresh-cache`.'
+                );
             },
             addParamsToLinks: function () {
                 if (!this.paramsAdded) {
