@@ -184,6 +184,7 @@ services:
 	- Remp\MailerModule\Models\MailTranslator
 
 	# API
+	- Tomaj\NetteApi\Presenters\ApiPresenter
 	- Tomaj\NetteApi\Link\ApiLink
 	- Tomaj\NetteApi\Misc\IpDetector
 	netteApiConfigurator: Tomaj\NetteApi\Output\Configurator\DebuggerConfigurator
