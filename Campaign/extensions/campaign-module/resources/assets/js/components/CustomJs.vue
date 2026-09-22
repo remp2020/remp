@@ -126,6 +126,7 @@
                     autoCloseTags: true,
                     matchBrackets: true,
                     lint: {
+                        esversion: 6,
                         onUpdateLinting: this.handleErrors,
                     },
                     selfContain: true,
