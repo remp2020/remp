@@ -79,6 +79,7 @@ trait WordpressBlocksTrait
                 return match (strtolower($type)) {
                     'newsletter' => "\n\n[lock newsletter]\n\n",
                     'hard' => "\n\n[lock]\n\n",
+                    'e' => "\n\n[lock e]\n\n",
                     // `email`, `e` and `club` do not cut a newsletter today either.
                     default => '',
                 };
