@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added support for a locked (non-subscriber) variant of EUobserver newsletters, first used by the This week newsletter. remp/euobserver#262
   - An article generator registered with `lockingEnabled: true` cuts the content at the article's `eo/lock` block and appends the `eo-subscribe-cta` snippet, which must exist in Mailer.
   - The generator response then also contains `lockedHtmlContent`/`lockedTextContent`, based on which the Hub creates separate jobs for subscribers and non-subscribers.
+- Added "Sign out and log in with a different account" button to the sign-in error page, so users signed into CRM with a wrong account are no longer stuck. remp/remp#1507
+  - Shown when the configured `authenticator` implements the new `SignOutUrlProviderInterface`.
 
 ## Archive
 

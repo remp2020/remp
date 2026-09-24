@@ -24,6 +24,9 @@
 
         <div class="lb-body">
             {$error}
+            <p n:if="$signOutUrl" class="m-t-20">
+                <a href="{$signOutUrl}" class="btn palette-Teal bg waves-effect">Sign out and log in with a different account</a>
+            </p>
         </div>
     </div>
 </div>

@@ -7,19 +7,16 @@ use Nette\Application\UI\Form;
 use Nette\Application\UI\Presenter;
 use Nette\Http\Request;
 use Remp\MailerModule\Forms\SignInFormFactory;
+use Remp\MailerModule\Models\Auth\SignOutUrlProviderInterface;
 
 final class SignPresenter extends Presenter
 {
-    /** @var SignInFormFactory */
-    private $signInFormFactory;
-
-    private $httpRequest;
-
-    public function __construct(SignInFormFactory $signInFormFactory, Request $httpRequest)
-    {
+    public function __construct(
+        private readonly SignInFormFactory $signInFormFactory,
+        private readonly Request $httpRequest,
+        private readonly ?SignOutUrlProviderInterface $signOutUrlProvider = null,
+    ) {
         parent::__construct();
-        $this->signInFormFactory = $signInFormFactory;
-        $this->httpRequest = $httpRequest;
     }
 
     public function renderIn(): void
@@ -39,6 +36,7 @@ final class SignPresenter extends Presenter
     public function renderError(): void
     {
         $this->template->error = $this->httpRequest->getQuery('error');
+        $this->template->signOutUrl = $this->signOutUrlProvider?->getSignOutUrl($this->link('//Dashboard:Default'));
     }
 
     protected function createComponentSignInForm(): Form

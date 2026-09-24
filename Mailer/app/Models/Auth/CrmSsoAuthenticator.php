@@ -8,8 +8,9 @@ use Nette\Http\IRequest;
 use Nette\Http\IResponse;
 use Nette\Http\Url;
 use Nette\Security\IIdentity;
+use Remp\MailerModule\Models\Auth\SignOutUrlProviderInterface;
 
-class CrmSsoAuthenticator implements \Nette\Security\Authenticator
+class CrmSsoAuthenticator implements \Nette\Security\Authenticator, SignOutUrlProviderInterface
 {
     public function __construct(
         private readonly string $clientId,
@@ -29,12 +30,24 @@ class CrmSsoAuthenticator implements \Nette\Security\Authenticator
     {
         $state = $this->ssoFlowState->start($this->request->getUrl()->getAbsoluteUrl());
 
-        $url = new Url(rtrim($this->crmAddr, '/') . '/sso/authorize');
-        $url->setQueryParameter('client_id', $this->clientId)
+        $url = $this->crmUrl('/sso/authorize')
+            ->setQueryParameter('client_id', $this->clientId)
             ->setQueryParameter('redirect_uri', $this->linkGenerator->link('Crm:Sso:callback'))
             ->setQueryParameter('state', $state);
 
         $this->response->redirect($url->getAbsoluteUrl());
         exit;
+    }
+
+    public function getSignOutUrl(string $redirectUrl): string
+    {
+        return $this->crmUrl('/internal/sign/out')
+            ->setQueryParameter('url', $redirectUrl)
+            ->getAbsoluteUrl();
+    }
+
+    private function crmUrl(string $path): Url
+    {
+        return new Url(rtrim($this->crmAddr, '/') . $path);
     }
 }

@@ -29,6 +29,7 @@ services:
     # Log in through REMP CRM with a redirect (SSO) flow
     # The matching CRM should register this app with URL callback:
     #   redirectUris: ['https://mailer.example.com/crm/sso/callback']
+    # The "sign out" button on the sign-in error page returns to Mailer only if CRM's redirectValidator allows Mailer's domain.
     authenticator:
         factory: Remp\Mailer\Models\Auth\CrmSsoAuthenticator('remp-mailer', %crm.addr%)
 
