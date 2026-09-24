@@ -344,8 +344,8 @@ services:
 	snippetArticleLocker:
 		factory: Remp\MailerModule\Models\Generators\SnippetArticleLocker
 
-	# healtCheck - inject temp for storage check
-	- Remp\MailerModule\Presenters\HealthPresenter(%tempDir%)
+	# healthCheck - inject temp dir for storage check, debug mode for hiding error details
+	- Remp\MailerModule\Presenters\HealthPresenter(%tempDir%, %debugMode%)
 
 	- Remp\MailerModule\Components\MailLinkStats\MailLinkStats
 

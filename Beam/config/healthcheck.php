@@ -25,7 +25,9 @@ return [
      * See UKFast\HealthCheck\BasicAuth for a one-size-fits all
      * solution
      */
-    'middleware' => [],
+    'middleware' => [
+        Remp\LaravelHelpers\Http\Middleware\HideHealthCheckContext::class,
+    ],
 
     /**
      * Used by the basic auth middleware

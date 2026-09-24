@@ -1053,7 +1053,7 @@ Returns:
       "log":{
         "status":"PROBLEM",
         "message":"Could not write to log file",
-        "context": // error or thrown exception...
+        "context": // error or thrown exception, only in debug mode (see below)
       //...
     }
     ```

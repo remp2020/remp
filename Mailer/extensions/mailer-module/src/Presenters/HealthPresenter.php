@@ -34,8 +34,11 @@ final class HealthPresenter extends Presenter
 
     private HealthChecker $healthChecker;
 
+    private bool $debugMode;
+
     public function __construct(
         string $tempDir,
+        bool $debugMode,
         ConfigsRepository $configsRepository,
         MailCache $mailCache,
         HealthChecker $healthChecker
@@ -44,6 +47,7 @@ final class HealthPresenter extends Presenter
         $this->configsRepository = $configsRepository;
         $this->mailCache = $mailCache;
         $this->tempDir = $tempDir;
+        $this->debugMode = $debugMode;
         $this->healthChecker = $healthChecker;
     }
 
@@ -68,6 +72,10 @@ final class HealthPresenter extends Presenter
             }
         }
 
+        if (!$this->debugMode) {
+            $result = $this->hideContext($result);
+        }
+
         // set correct response code and return results
         if ($result['status'] === self::STATUS_OK) {
             $resultCode = IResponse::S200_OK;
@@ -77,6 +85,24 @@ final class HealthPresenter extends Presenter
 
         $this->getHttpResponse()->setCode($resultCode);
         $this->sendResponse(new JsonApiResponse($resultCode, $result));
+    }
+
+    private function hideContext(array $result): array
+    {
+        foreach ($result as $key => $value) {
+            if (!isset($value['context'])) {
+                continue;
+            }
+
+            try {
+                Debugger::log("Healthcheck [{$key}] problem: {$value['context']}", ILogger::WARNING);
+            } catch (\Throwable) {
+                // logging itself might be the failing check; never break the health endpoint
+            }
+            unset($result[$key]['context']);
+        }
+
+        return $result;
     }
 
     private function databaseCheck(): array

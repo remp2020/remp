@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### [Beam]
 
 - Lowered z-index of the iota on-site overlay to 9996–9998 so it no longer covers Campaign banners (9999 and above). remp/helpdesk#5008
+- Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
 
 ### [Campaign]
 
@@ -19,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed banners with a publisher-defined color scheme (`config/banners.local.php`) failing to render after a deploy, because `campaigns:refresh-cache` ran without the local config and overwrote the cached schemes with the defaults. An unknown scheme now fails with an error naming the banner, the scheme and the available schemes, and saving a banner or campaign in admin re-serializes the config maps to Redis. remp/helpdesk#5008
 - Changed the JSHint linter in the snippet and banner custom JS editors to check the code as ES6 (`esversion: 6`) instead of ES5, so `const`, arrow functions and template literals are no longer reported as errors. Newer syntax (optional chaining, nullish coalescing) is still flagged, because it may not be supported by older browsers. remp/remp#1486
 - Fixed missing tracking parameters (`rtm_*`) in the target URL when clicking the button or banner area outside the main link of Overlay Rectangle, HTML and HTML Overlay banners. remp/helpdesk#5042
+- Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
 
 ### [Mailer]
 
@@ -31,6 +33,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - The generator response then also contains `lockedHtmlContent`/`lockedTextContent`, based on which the Hub creates separate jobs for subscribers and non-subscribers.
 - Added "Sign out and log in with a different account" button to the sign-in error page, so users signed into CRM with a wrong account are no longer stuck. remp/remp#1507
   - Shown when the configured `authenticator` implements the new `SignOutUrlProviderInterface`.
+- Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
+
+### [Sso]
+
+- Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
 
 ## Archive
 
