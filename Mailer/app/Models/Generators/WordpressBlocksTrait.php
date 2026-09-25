@@ -133,10 +133,21 @@ trait WordpressBlocksTrait
     private function convertBlockEmbeds(string $post): string
     {
         return preg_replace_callback(
-            '/<figure\b[^>]*class="[^"]*wp-block-embed[^"]*"[^>]*>.*?'
-                . '<div\b[^>]*class="[^"]*wp-block-embed__wrapper[^"]*"[^>]*>\s*(https?:\/\/\S+)\s*<\/div>'
-                . '.*?<\/figure>/is',
-            static fn(array $matches): string => "\n\n" . trim($matches[1]) . "\n\n",
+            '/<!--\s*wp:embed\s+(\{.*?\})\s*-->.*?<!--\s*\/wp:embed\s*-->/is',
+            static function (array $matches): string {
+                $attributes = json_decode($matches[1], true);
+                $url = $attributes['url'];
+                $poster = $attributes['poster'] ?? null;
+
+                if (!$poster) {
+                    return "\n\n{$url}\n\n";
+                }
+
+                $url = htmlspecialchars($url, ENT_QUOTES);
+                $poster = htmlspecialchars($poster, ENT_QUOTES);
+
+                return "\n\n<a href=\"{$url}\"><img src=\"{$poster}\" alt=\"\" /></a>\n\n";
+            },
             $post
         );
     }
