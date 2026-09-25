@@ -5,8 +5,6 @@ namespace Remp\Mailer\Models\Generators\Euobserver;
 
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
-use Nette\Utils\Json;
-use Nette\Utils\JsonException;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\EuobserverArticleWidget\EuobserverArticleWidget;
 use Remp\Mailer\Models\Generators\EmbedParser;
 use Remp\Mailer\Models\Generators\EuobserverArticleLocker;
@@ -14,6 +12,7 @@ use Remp\Mailer\Models\Generators\RulesTrait;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
+use Remp\MailerModule\Models\Generators\WordpressBlocks;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
@@ -109,6 +108,7 @@ class ArticleGenerator implements IGenerator
 
     private function transformPost(string $post, array $articleLinkPlaceholders): string
     {
+        $post = $this->convertBlockEmbeds($post);
         $post = $this->stripBlockComments($post);
         $post = $this->preprocessBlockHtml($post);
 
@@ -246,16 +246,16 @@ class ArticleGenerator implements IGenerator
     private function processArticleLinks(string $post, array &$placeholders, array &$errors): string
     {
         $counter = 0;
-        return preg_replace_callback(
-            '/<!--\s*wp:eo\/link\s+({[^}]+})\s*\/-->/i',
-            function (array $matches) use (&$errors, &$counter, &$placeholders): string {
-                try {
-                    $data = Json::decode($matches[1]);
-                    $id = $data->id ?? null;
-                    if (!$id) {
-                        return '';
-                    }
+        return WordpressBlocks::replace(
+            $post,
+            'eo/link',
+            function (array $attributes) use (&$errors, &$counter, &$placeholders): string {
+                $id = $attributes['id'] ?? null;
+                if (!$id) {
+                    return '';
+                }
 
+                try {
                     $url = self::ARTICLE_BASE_URL . $id . '/';
                     $meta = $this->content->fetchUrlMeta($url);
                     if (!$meta) {
@@ -267,13 +267,29 @@ class ArticleGenerator implements IGenerator
                     $placeholders[$key] = $cardHtml;
                     $counter++;
                     return $key;
-                } catch (InvalidUrlException | JsonException $e) {
-                    $errors[$matches[0]] = 'Could not fetch linked article: ' . $e->getMessage();
+                } catch (InvalidUrlException $e) {
+                    $errors[(string) $id] = 'Could not fetch linked article: ' . $e->getMessage();
                     return '';
                 }
-            },
-            $post
+            }
         );
+    }
+
+    private function convertBlockEmbeds(string $post): string
+    {
+        return WordpressBlocks::replace($post, 'embed', static function (array $attributes): string {
+            $url = $attributes['url'];
+            $poster = $attributes['poster'] ?? null;
+
+            if (!$poster) {
+                return "\n{$url}\n";
+            }
+
+            $url = htmlspecialchars($url, ENT_QUOTES);
+            $poster = htmlspecialchars($poster, ENT_QUOTES);
+
+            return "\n<a href=\"{$url}\"><img src=\"{$poster}\" alt=\"\" /></a>\n";
+        });
     }
 
     private function stripBlockComments(string $post): string
@@ -287,13 +303,6 @@ class ArticleGenerator implements IGenerator
      */
     private function preprocessBlockHtml(string $post): string
     {
-        // Convert wp-block-embed figures to bare URLs so the embed rule in getRules() picks them up.
-        $post = preg_replace_callback(
-            '/<figure\b[^>]*class="[^"]*wp-block-embed[^"]*"[^>]*>.*?<div\b[^>]*class="[^"]*wp-block-embed__wrapper[^"]*"[^>]*>\s*(https?:\/\/\S+)\s*<\/div>.*?<\/figure>/is',
-            fn(array $m): string => "\n" . trim($m[1]) . "\n",
-            $post
-        );
-
         // Convert wp-block-image figures to either a [caption] shortcode (handled by getRules()) or
         // a bare <img> tag (handled by the image rule in getRules()).
         $post = preg_replace_callback(

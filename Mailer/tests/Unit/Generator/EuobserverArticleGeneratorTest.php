@@ -24,7 +24,7 @@ class EuobserverArticleGeneratorTest extends TestCase
         <!-- wp:paragraph --><p>AFTER-LOCK</p><!-- /wp:paragraph -->
         HTML;
 
-    private function process(bool $lockingEnabled, string $articleHtml): array
+    private function process(bool $lockingEnabled, string $articleHtml, ?EmbedParser $embedParser = null): array
     {
         $sourceTemplateRepository = $this->createConfiguredStub(SourceTemplatesRepository::class, [
             'find' => new ActiveRow([
@@ -36,7 +36,7 @@ class EuobserverArticleGeneratorTest extends TestCase
         $generator = new ArticleGenerator(
             $sourceTemplateRepository,
             $this->createStub(ContentInterface::class),
-            $this->createStub(EmbedParser::class),
+            $embedParser ?? $this->createStub(EmbedParser::class),
             $GLOBALS['container']->getByType(EngineFactory::class),
             new EuobserverArticleLocker(),
             $lockingEnabled,
@@ -86,5 +86,42 @@ class EuobserverArticleGeneratorTest extends TestCase
         self::assertStringContainsString('AFTER-LOCK', $output['htmlContent']);
         self::assertArrayNotHasKey('lockedHtmlContent', $output);
         self::assertArrayNotHasKey('lockedTextContent', $output);
+    }
+
+    public function testEmbedWithPosterIsReplacedByPoster(): void
+    {
+        $embedParser = $this->createMock(EmbedParser::class);
+        $embedParser->expects($this->never())->method('parse');
+
+        $output = $this->process(false, <<<HTML
+            <!-- wp:embed {"url":"https://public.flourish.studio/visualisation/30337987/","providerNameSlug":"flourish","poster":"https://public.flourish.studio/visualisation/30337987/thumbnail"} -->
+            <figure class="wp-block-embed is-provider-flourish"><div class="wp-block-embed__wrapper">
+            https://public.flourish.studio/visualisation/30337987/
+            </div></figure>
+            <!-- /wp:embed -->
+            HTML, $embedParser);
+
+        self::assertStringContainsString('src="https://public.flourish.studio/visualisation/30337987/thumbnail"', $output['htmlContent']);
+        self::assertStringContainsString('href="https://public.flourish.studio/visualisation/30337987/"', $output['htmlContent']);
+    }
+
+    public function testEmbedWithoutPosterIsResolved(): void
+    {
+        $embedParser = $this->createMock(EmbedParser::class);
+        $embedParser->expects($this->once())
+            ->method('parse')
+            // The embed rule captures the surrounding whitespace too, parse() trims it.
+            ->with($this->callback(static fn(string $link): bool => trim($link) === 'https://www.youtube.com/watch?v=abc'))
+            ->willReturn('RESOLVED-EMBED');
+
+        $output = $this->process(false, <<<HTML
+            <!-- wp:embed {"url":"https://www.youtube.com/watch?v=abc","providerNameSlug":"youtube"} -->
+            <figure class="wp-block-embed is-provider-youtube"><div class="wp-block-embed__wrapper">
+            https://www.youtube.com/watch?v=abc
+            </div></figure>
+            <!-- /wp:embed -->
+            HTML, $embedParser);
+
+        self::assertStringContainsString('RESOLVED-EMBED', $output['htmlContent']);
     }
 }

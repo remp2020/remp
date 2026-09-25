@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Remp\Mailer\Models\Generators;
 
+use Remp\MailerModule\Models\Generators\WordpressBlocks;
+
 /**
  * Translates WordPress block-editor markup into the classic constructs {@see RulesTrait}.
  *
@@ -56,50 +58,32 @@ trait WordpressBlocksTrait
     }
 
     /**
-     * A lock is a marker, not a container: the delimiter, an empty `<div id="p_lock__…">`, then the
-     * closing delimiter, and everything after it in the document is gated.
+     * A lock is a marker, not a container: everything after it in the document is gated.
      */
     private function convertBlockLocks(string $post): string
     {
-        return preg_replace_callback(
-            '/<!--\s*wp:[a-z0-9-]+\/lock(?:\s+(\{.*?\}))?\s*\/?-->'
-                . '\s*(?:<div\b[^>]*>\s*<\/div>\s*)?'
-                . '(?:<!--\s*\/wp:[a-z0-9-]+\/lock\s*-->)?/is',
-            static function (array $matches): string {
-                // `hard` is the default type, and the editor omits attributes left at their default,
-                // so a bare `<!-- wp:nn/lock -->` is a hard lock rather than an unknown one.
-                $type = 'hard';
-                if (($matches[1] ?? '') !== '') {
-                    $attributes = json_decode($matches[1], true);
-                    if (is_array($attributes)) {
-                        $type = (string) ($attributes['type'] ?? 'hard');
-                    }
-                }
+        return WordpressBlocks::replace($post, '*/lock', static function (array $attributes): string {
+            // `hard` is the default type, and the editor omits attributes left at their default,
+            // so a bare `<!-- wp:nn/lock -->` is a hard lock rather than an unknown one.
+            $type = (string) ($attributes['type'] ?? 'hard');
 
-                return match (strtolower($type)) {
-                    'newsletter' => "\n\n[lock newsletter]\n\n",
-                    'hard' => "\n\n[lock]\n\n",
-                    'e' => "\n\n[lock e]\n\n",
-                    // `email`, `e` and `club` do not cut a newsletter today either.
-                    default => '',
-                };
-            },
-            $post
-        );
+            return match (strtolower($type)) {
+                'newsletter' => "\n\n[lock newsletter]\n\n",
+                'hard' => "\n\n[lock]\n\n",
+                'e' => "\n\n[lock e]\n\n",
+                // `email` and `club` do not cut a newsletter today either.
+                default => '',
+            };
+        });
     }
 
     private function convertBlockArticleLinks(string $post): string
     {
-        return preg_replace_callback(
-            '/<!--\s*wp:[a-z0-9-]+\/link\s+(\{.*?\})\s*\/-->/is',
-            static function (array $matches): string {
-                $attributes = json_decode($matches[1], true);
-                $id = is_array($attributes) ? ($attributes['postId'] ?? $attributes['id'] ?? null) : null;
+        return WordpressBlocks::replace($post, '*/link', static function (array $attributes): string {
+            $id = $attributes['postId'] ?? $attributes['id'] ?? null;
 
-                return $id ? "\n\n[articlelink id=\"{$id}\"]\n\n" : '';
-            },
-            $post
-        );
+            return $id ? "\n\n[articlelink id=\"{$id}\"]\n\n" : '';
+        });
     }
 
     /**
@@ -108,11 +92,7 @@ trait WordpressBlocksTrait
      */
     private function dropPullQuoteBlocks(string $post): string
     {
-        return preg_replace(
-            '/<!--\s*wp:[a-z0-9-]+\/pull(?:\s+\{.*?\})?\s*-->.*?<!--\s*\/wp:[a-z0-9-]+\/pull\s*-->/is',
-            '',
-            $post
-        );
+        return WordpressBlocks::replace($post, '*/pull', static fn(): string => '');
     }
 
     /**
@@ -121,35 +101,27 @@ trait WordpressBlocksTrait
      */
     private function convertBoxBlocks(string $post): string
     {
-        $post = preg_replace(
-            '/<!--\s*wp:[a-z0-9-]+\/box(?:\s+\{.*?\})?\s*-->\s*<div\b[^>]*>/is',
-            '<div class="t_greybox">',
-            $post
-        );
-
-        return preg_replace('/<\/div>\s*<!--\s*\/wp:[a-z0-9-]+\/box\s*-->/is', '</div>', $post);
+        return WordpressBlocks::replace($post, '*/box', static function (array $attributes, string $innerHtml): string {
+            // The box renders as a single wrapping <div>; only its classes are replaced.
+            return preg_replace('/^\s*<div\b[^>]*>/i', '<div class="t_greybox">', $innerHtml);
+        });
     }
 
     private function convertBlockEmbeds(string $post): string
     {
-        return preg_replace_callback(
-            '/<!--\s*wp:embed\s+(\{.*?\})\s*-->.*?<!--\s*\/wp:embed\s*-->/is',
-            static function (array $matches): string {
-                $attributes = json_decode($matches[1], true);
-                $url = $attributes['url'];
-                $poster = $attributes['poster'] ?? null;
+        return WordpressBlocks::replace($post, 'embed', static function (array $attributes): string {
+            $url = $attributes['url'];
+            $poster = $attributes['poster'] ?? null;
 
-                if (!$poster) {
-                    return "\n\n{$url}\n\n";
-                }
+            if (!$poster) {
+                return "\n\n{$url}\n\n";
+            }
 
-                $url = htmlspecialchars($url, ENT_QUOTES);
-                $poster = htmlspecialchars($poster, ENT_QUOTES);
+            $url = htmlspecialchars($url, ENT_QUOTES);
+            $poster = htmlspecialchars($poster, ENT_QUOTES);
 
-                return "\n\n<a href=\"{$url}\"><img src=\"{$poster}\" alt=\"\" /></a>\n\n";
-            },
-            $post
-        );
+            return "\n\n<a href=\"{$url}\"><img src=\"{$poster}\" alt=\"\" /></a>\n\n";
+        });
     }
 
     private function convertBlockImages(string $post): string
