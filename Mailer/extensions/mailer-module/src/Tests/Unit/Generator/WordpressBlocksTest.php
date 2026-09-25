@@ -84,4 +84,27 @@ class WordpressBlocksTest extends TestCase
             $result
         );
     }
+
+    public function testNullLeavesBlockUntouched(): void
+    {
+        $html = '<!-- wp:embed {"url":"https://a.example/"} --><figure></figure><!-- /wp:embed -->'
+            . '<!-- wp:embed {"url":"https://b.example/"} --><figure></figure><!-- /wp:embed -->';
+
+        $result = WordpressBlocks::replace(
+            $html,
+            'embed',
+            static fn(array $attributes): ?string => $attributes['url'] === 'https://b.example/' ? 'B' : null
+        );
+
+        $this->assertSame('<!-- wp:embed {"url":"https://a.example/"} --><figure></figure><!-- /wp:embed -->B', $result);
+    }
+
+    public function testEmptyStringRemovesBlock(): void
+    {
+        $html = 'before <!-- wp:nn/pull --><blockquote>Q</blockquote><!-- /wp:nn/pull --> after';
+
+        $result = WordpressBlocks::replace($html, 'nn/pull', static fn(): string => '');
+
+        $this->assertSame('before  after', $result);
+    }
 }

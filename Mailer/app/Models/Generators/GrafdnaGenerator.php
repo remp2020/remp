@@ -5,13 +5,13 @@ namespace Remp\Mailer\Models\Generators;
 use Nette\Application\UI\Form;
 use Nette\Http\Url;
 use Nette\Utils\ArrayHash;
-use Nette\Utils\Strings;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\GrafdnaWidget\GrafdnaWidget;
 use Remp\Mailer\Models\WebClient;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\EmbedParser;
 use Remp\MailerModule\Models\Generators\IGenerator;
 use Remp\MailerModule\Models\Generators\PreprocessException;
+use Remp\MailerModule\Models\Generators\WordpressBlocks;
 use Remp\MailerModule\Models\Generators\WordpressHelpers;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
@@ -111,35 +111,34 @@ class GrafdnaGenerator implements IGenerator
 
         $errors = [];
 
-        $post = $this->preprocessBlocks($values['grafdna_html']);
+        $post = $values['grafdna_html'];
+
+        // remp/remp#1174: the first graph is replaced by the provided image (og:image of the post), which
+        // carries labels and the logo. It takes precedence over the embed's poster.
+        if (!empty($values['image_url'])) {
+            $replaced = false;
+            $post = WordpressBlocks::replace($post, 'embed', function (array $attributes) use ($values, &$replaced): ?string {
+                $url = $attributes['url'] ?? '';
+                $host = (string) parse_url($url, PHP_URL_HOST);
+                $isGraph = str_contains($host, 'flourish') || str_contains($host, 'datawrapper');
+
+                if ($replaced || !$isGraph) {
+                    return null;
+                }
+                $replaced = true;
+
+                $url = htmlspecialchars($url, ENT_QUOTES);
+                $src = htmlspecialchars($values['image_url'], ENT_QUOTES);
+
+                return "\n\n<a href=\"{$src}\"><img src=\"{$src}\" alt=\"\" style=\"width: 100%\"/></a>\n"
+                    . "<p>Graf nájdete aj na <a href=\"{$url}\">{$url}</a>.</p>\n\n";
+            });
+        }
+
+        $post = $this->preprocessBlocks($post);
         $post = $this->parseOls($post);
 
         $lockedPost = $this->articleLocker->getLockedPost($post);
-
-        if (!empty($values['image_url'])) {
-            // match first embed or graph URL in text and replace with provided image
-            $specialRule = [
-                "/(\[embed\](.*?)\[\/embed\]|^(http|https)\:\/\/[a-zA-Z0-9\-\.]*(flourish|datawrapper)+[a-zA-Z0-9\-\.]*\.[a-zA-Z]+(\/\S*)?\s*$)/im" => function ($matches) use ($values) {
-                    $link = null;
-                    foreach ($matches as $match) {
-                        if (Strings::startsWith($match, 'http')) {
-                            $link = $match;
-                            break;
-                        }
-                    }
-
-                    if (isset($link)) {
-                        return <<< HTML
-<img src={$values['image_url']} alt="" style="width: 100%"/>
-<p>Graf nájdete aj na <a href="$link">$link</a>.</p>
-HTML;
-                    }
-                    return '';
-                }
-            ];
-            $post = preg_replace_callback(key($specialRule), current($specialRule), $post, 1);
-            $lockedPost = preg_replace_callback(key($specialRule), current($specialRule), $lockedPost, 1);
-        }
 
         $generatorRules = [
             '/<h2.*?>.*?\*.*?<\/h2>/im' => '<div style="color:#181818;padding:0;line-height:1.3;font-weight:bold;text-align:center;margin:0 0 30px 0;font-size:24px;">*</div>',

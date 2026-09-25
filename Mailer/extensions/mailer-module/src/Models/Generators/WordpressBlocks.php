@@ -19,9 +19,10 @@ class WordpressBlocks
      *
      * Blocks of the same name nested in each other are not supported.
      *
-     * @param callable(array $attributes, string $innerHtml): string $callback
+     * @param callable(array $attributes, string $innerHtml): ?string $callback
      *   $attributes are the decoded JSON attributes (empty if the block has none), $innerHtml is the
-     *   rendered HTML between the delimiters (empty for self-closing blocks).
+     *   rendered HTML between the delimiters (empty for self-closing blocks). Returning null leaves
+     *   the block untouched.
      */
     public static function replace(string $html, string $name, callable $callback): string
     {
@@ -37,7 +38,12 @@ class WordpressBlocks
                 $attributes = json_decode($matches[2] ?? '', true);
                 $innerHtml = $matches[3] ?? '';
 
-                return $callback(is_array($attributes) ? $attributes : [], $innerHtml);
+                $replacement = $callback(is_array($attributes) ? $attributes : [], $innerHtml);
+                if ($replacement !== null) {
+                    return $replacement;
+                }
+
+                return $matches[0];
             },
             $html
         );
