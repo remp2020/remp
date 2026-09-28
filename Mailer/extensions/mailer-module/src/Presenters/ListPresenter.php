@@ -495,15 +495,15 @@ final class ListPresenter extends BasePresenter
     public function renderSentEmailsDetail($id): void
     {
         $mailType = $this->listsRepository->find($id);
-        $groupBy = $this->getParameter('group_by', 'day');
+        $groupBy = $this->getParameter('group_by') ?? 'day';
 
         $this->template->mailTypeId = $mailType->id;
         $this->template->mailTypeTitle = $mailType->title;
         $this->template->groupBy = $groupBy;
 
         if (!$this->isAjax()) {
-            $from = $this->getParameter('published_from', 'today - 30 days');
-            $to = $this->getParameter('published_to', 'now');
+            $from = $this->getParameter('published_from') ?? 'today - 30 days';
+            $to = $this->getParameter('published_to') ?? 'now';
             $tz = $this->getParameter('tz');
 
             $this->template->from = $from;
