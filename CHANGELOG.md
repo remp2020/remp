@@ -12,10 +12,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
+- **IMPORTANT**: The `data-href` attribute of Overlay Rectangle, HTML and HTML Overlay banners now contains the tracking parameters (`rtm_*`), same as the `href` of the banner link it replaced. remp/helpdesk#5042 
+  - If your custom code reads `data-href` and appends the tracking parameters itself, remove that to avoid duplicate parameters.
 - Added `From` option to campaign `Every N page views` display rule, allowing the banner to start displaying at a later pageview than the first one. remp/remp#1488
 - Fixed overlay banners taller than the viewport (e.g. phone in landscape) being cut off and unclosable. The backdrop now scrolls. remp/helpdesk#5008
 - Fixed banners with a publisher-defined color scheme (`config/banners.local.php`) failing to render after a deploy, because `campaigns:refresh-cache` ran without the local config and overwrote the cached schemes with the defaults. An unknown scheme now fails with an error naming the banner, the scheme and the available schemes, and saving a banner or campaign in admin re-serializes the config maps to Redis. remp/helpdesk#5008
 - Changed the JSHint linter in the snippet and banner custom JS editors to check the code as ES6 (`esversion: 6`) instead of ES5, so `const`, arrow functions and template literals are no longer reported as errors. Newer syntax (optional chaining, nullish coalescing) is still flagged, because it may not be supported by older browsers. remp/remp#1486
+- Fixed missing tracking parameters (`rtm_*`) in the target URL when clicking the button or banner area outside the main link of Overlay Rectangle, HTML and HTML Overlay banners. remp/helpdesk#5042
 
 ### [Mailer]
 

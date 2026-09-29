@@ -387,6 +387,12 @@
                 }
                 return null;
             },
+            trackedUrl: function() {
+                if (this.url) {
+                    return this.addUrlParams(this.url);
+                }
+                return null;
+            },
         },
         methods: {
             colorSchemeFor: function (key) {

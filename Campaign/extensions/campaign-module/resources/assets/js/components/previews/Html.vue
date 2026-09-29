@@ -67,7 +67,7 @@
             <div class="html-preview-box sans-serif"
                  role="button"
                  tabindex="0"
-                 v-bind:data-href="this.$parent.url"
+                 v-bind:data-href="$parent.trackedUrl"
                  v-on:click="click"
                  v-on:keydown.enter.space="click"
                  v-bind:style="[
@@ -216,7 +216,7 @@ export default {
             }
 
             this.$parent.clicked(event);
-            window.location.href = this.$parent.url;
+            window.location.href = this.$parent.trackedUrl;
         }
     }
 }

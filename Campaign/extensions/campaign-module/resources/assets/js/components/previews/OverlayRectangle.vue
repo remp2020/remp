@@ -178,7 +178,7 @@
                         <div
                             v-on:click="click"
                             class="overlay-rectangle-preview-link"
-                            v-bind:data-href="this.$parent.url"
+                            v-bind:data-href="$parent.trackedUrl"
                             v-bind:style="[linkStyles]"
                         >
                             <div class="overlay-rectangle-preview-box" v-bind:style="[boxStyles]">
@@ -308,7 +308,7 @@ export default {
             }
 
             this.$parent.clicked(event);
-            window.location.href = this.$parent.url;
+            window.location.href = this.$parent.trackedUrl;
         }
     }
 }

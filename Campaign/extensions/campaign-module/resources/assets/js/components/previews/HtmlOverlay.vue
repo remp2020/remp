@@ -142,7 +142,7 @@
                         class="html-overlay-rectangle-wrap"
                         role="button"
                         tabindex="0"
-                        v-bind:data-href="this.$parent.url"
+                        v-bind:data-href="$parent.trackedUrl"
                         v-bind:class="{ closeable: closeable }"
                         v-on:click.stop="click"
                         v-on:keydown.enter.space="click"
@@ -273,7 +273,7 @@ export default {
             }
 
             this.$parent.clicked(event);
-            window.location.href = this.$parent.url;
+            window.location.href = this.$parent.trackedUrl;
         }
     }
 }
