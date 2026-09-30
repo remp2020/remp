@@ -28,6 +28,14 @@ class ListsRepository extends Repository
             ->order('sorting ASC');
     }
 
+    public function allInternal(): Selection
+    {
+        return $this->getTable()
+            ->where('deleted_at', null)
+            ->where('is_external', 0)
+            ->order('sorting ASC');
+    }
+
     public function add(
         int $categoryId,
         int $priority,

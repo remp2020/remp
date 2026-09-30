@@ -44,7 +44,7 @@ class SyncUserSubscriptionsCommand extends Command
         $output->writeln('');
 
         $page = 1;
-        $lists = $this->listsRepository->all();
+        $lists = $this->listsRepository->allInternal();
 
         while ($users = $this->userProvider->list([], $page)) {
             $emails = [];

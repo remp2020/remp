@@ -67,7 +67,8 @@ class ListCreatedHandler implements HandlerInterface
                     'rtm_content' => $subscriber->rtm_content,
                 ]));
             }
-        } else {
+        } elseif (!$list->is_external) {
+            // external lists are not bound to the user base, their subscribers are managed separately
             $page = 1;
             while ($users = $this->userProvider->list([], $page)) {
                 foreach ($users as $user) {

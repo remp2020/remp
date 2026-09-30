@@ -35,6 +35,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added "Sign out and log in with a different account" button to the sign-in error page, so users signed into CRM with a wrong account are no longer stuck. remp/remp#1507
   - Shown when the configured `authenticator` implements the new `SignOutUrlProviderInterface`.
 - Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
+- Fixed external newsletter lists getting a subscription record for every user from the user base. remp/web#3108
 
 ### [Sso]
 

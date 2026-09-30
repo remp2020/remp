@@ -95,7 +95,7 @@ class BulkUserRegisteredHandler extends BaseHandler
             ]);
         }
 
-        $lists = $this->listsRepository->all();
+        $lists = $this->listsRepository->allInternal();
         foreach ($users as $user) {
             /** @var ActiveRow $list */
             foreach ($lists as $list) {

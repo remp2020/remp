@@ -30,7 +30,7 @@ class UserRegisteredHandler extends BaseHandler
 
     public function handle(array $params): ResponseInterface
     {
-        $lists = $this->listsRepository->all();
+        $lists = $this->listsRepository->allInternal();
 
         $userSubscriptions = $this->userSubscriptionsRepository->findByEmail($params['email']);
         $mappedSubscriptions = [];
