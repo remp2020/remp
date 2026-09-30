@@ -120,7 +120,7 @@
 </style>
 
 <script type="text/javascript">
-    import RRule from 'rrule'
+    import RRule, { rrulestr } from 'rrule'
     import DateTimePicker from '@remp/js-commons/js/components/DateTimePickerWrapper'
 
     let repeat2freq = {
@@ -205,14 +205,14 @@
             if (this.recurrence !== null) {
                 this.repeat = true
 
-                let rule = Rule.rrulestr(this.recurrence)
+                let rule = rrulestr(this.recurrence)
 
                 this.repeatInterval = rule.options.interval
                 this.repeatEvery = rRuleFreqToRepeatEvery(rule.options.freq)
 
                 if (rule.options.byweekday !== null) {
                     for (let i = 0; i < 7; i++) {
-                        this.weekRecurrence[i] = rule.options.byweekday.includes(i)
+                        this.weekRecurrence.splice(i, 1, rule.options.byweekday.includes(i))
                     }
                 }
 

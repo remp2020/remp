@@ -8336,7 +8336,7 @@ fsevents@~2.3.2:
 
 "remp-beam@file:extensions/beam-module::locator=root-workspace-0b6124%40workspace%3A.":
   version: 1.0.0
-  resolution: "remp-beam@file:extensions/beam-module#extensions/beam-module::hash=17e400&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "remp-beam@file:extensions/beam-module#extensions/beam-module::hash=95f0e5&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@babel/core": ^7.0
     "@remp/js-commons": ^2.5.0
@@ -8376,7 +8376,7 @@ fsevents@~2.3.2:
     vue2-filters: ^0.6.0
     vuex: ^3.1.0
     vuex-persistedstate: ^2.5.4
-  checksum: 02bbdc1d5d8bc4b81636e3eab68de957ceb7bd80fe48bcf4cf16b02b97a6008fa5d75176b4877a40aba8fe6e0947f875b9a435178b1a519243deb2ee1e151e6c
+  checksum: 2a0eb5732f8d66911da7725b91b47f5ea1ccc81f2fd5a04328e2dc6f6db265eab04e1a251292cb4efd5c3d0b1f9d47d1f957086ddd59e16b09aa487513f74a12
   languageName: node
   linkType: hard
 

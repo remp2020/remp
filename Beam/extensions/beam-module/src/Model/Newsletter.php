@@ -62,9 +62,12 @@ class Newsletter extends BaseModel
         return explode('::', $this->segment)[0];
     }
 
-    public function getRecurrenceRuleInlineAttribute($value)
+    public function getRecurrenceRuleInlineAttribute()
     {
-        return str_replace("\r\n", " ", $value);
+        if ($this->recurrence_rule === null) {
+            return null;
+        }
+        return preg_replace('/\r?\n/', ' ', $this->recurrence_rule);
     }
 
     public function isFinished()
