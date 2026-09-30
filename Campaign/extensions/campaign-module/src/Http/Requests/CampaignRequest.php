@@ -11,20 +11,16 @@ class CampaignRequest extends FormRequest
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name' => 'required|max:255',
@@ -56,32 +52,31 @@ class CampaignRequest extends FormRequest
             'variants.*.weight' => 'integer|required',
             'variants.*.banner_id' => 'required_unless:variants.*.control_group,1',
             'variants.0.proportion' => ['integer', 'required', new VariantsProportionSum],
-            'ip_ranges.*.ip_from' => 'required|ipv4',
-            'ip_ranges.*.ip_to' => ['nullable', 'ipv4', new ValidIpRange()],
-            'ip_ranges_blacklist' => 'nullable|boolean',
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'ip_ranges.*.ip_from.required' => 'IP "from" address is required.',
-            'ip_ranges.*.ip_from.ipv4' => 'IP "from" address ":input" is not a valid IPv4 address.',
-            'ip_ranges.*.ip_to.ipv4' => 'IP "to" address ":input" is not a valid IPv4 address.',
+            'ip_ranges' => 'nullable|array',
+            'ip_ranges.*' => [new ValidIpRange()],
+            'countries_blacklist' => 'boolean',
+            'ip_ranges_blacklist' => 'boolean',
         ];
     }
 
     /**
      * Prepare inputs for validation.
-     *
-     * @return void
      */
-    protected function prepareForValidation()
+    protected function prepareForValidation(): void
     {
         $this->merge([
             'signed_in' => $this->input('signed_in') !== null ? $this->boolean('signed_in') : null,
             'using_adblock' => $this->input('using_adblock') !== null ? $this->boolean('using_adblock') : null,
+            'countries_blacklist' => $this->boolean('countries_blacklist'),
+            'ip_ranges_blacklist' => $this->boolean('ip_ranges_blacklist'),
         ]);
+
+        $ipRanges = $this->input('ip_ranges');
+        if (is_string($ipRanges) && ($decoded = self::decodeIpRanges($ipRanges)) !== null) {
+            $this->merge([
+                'ip_ranges' => $decoded,
+            ]);
+        }
 
         $segments = $this->input('segments');
         if (is_array($segments)) {
@@ -98,7 +93,15 @@ class CampaignRequest extends FormRequest
         }
     }
 
-    public function all($keys = null)
+    // Form sends ip_ranges as one JSON string to sidestep max_input_vars; API sends an array.
+    public static function decodeIpRanges(string $json): ?array
+    {
+        $decoded = json_decode($json, true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    public function all($keys = null): array
     {
         $data = parent::all($keys);
         if (!isset($data['signed_in'])) {

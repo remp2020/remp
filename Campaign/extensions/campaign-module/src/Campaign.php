@@ -2,14 +2,17 @@
 
 namespace Remp\CampaignModule;
 
+use Closure;
 use Database\Factories\CampaignFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
 use Remp\CampaignModule\Concerns\HasCacheableRelation;
+use Remp\CampaignModule\Models\Targeting\TargetingMatchEnum;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
@@ -105,11 +108,7 @@ class Campaign extends Model implements Searchable
     protected $cacheableRelations = [
         'segments' => CampaignSegment::class,
         'countries' => Country::class,
-        'countriesWhitelist' => Country::class,
-        'countriesBlacklist' => Country::class,
         'ipRanges' => CampaignIpRange::class,
-        'ipRangesWhitelist' => CampaignIpRange::class,
-        'ipRangesBlacklist' => CampaignIpRange::class,
         'schedules' => Schedule::class,
         'campaignBanners' => CampaignBanner::class,
         'campaignBanners.banner' => Banner::class,
@@ -219,20 +218,9 @@ class Campaign extends Model implements Searchable
         )->withPivot('blacklisted');
     }
 
-    /**
-     * @return BelongsToMany<Country, $this>
-     */
-    public function countriesWhitelist(): BelongsToMany
+    public function hasCountriesBlacklist(): bool
     {
-        return $this->countries()->wherePivot('blacklisted', '=', false);
-    }
-
-    /**
-     * @return BelongsToMany<Country, $this>
-     */
-    public function countriesBlacklist(): BelongsToMany
-    {
-        return $this->countries()->wherePivot('blacklisted', '=', true);
+        return $this->countries->contains(fn (Country $country) => $country->isBlacklisted());
     }
 
     /**
@@ -243,20 +231,52 @@ class Campaign extends Model implements Searchable
         return $this->hasMany(CampaignIpRange::class);
     }
 
-    /**
-     * @return HasMany<CampaignIpRange, $this>
-     */
-    public function ipRangesWhitelist(): HasMany
+    public function hasIpRangesBlacklist(): bool
     {
-        return $this->ipRanges()->where('blacklisted', false);
+        return $this->ipRanges->contains(fn (CampaignIpRange $range) => $range->isBlacklisted());
+    }
+
+    public function matchIpRanges(?string $ip): TargetingMatchEnum
+    {
+        $packedIp = $ip === null ? null : CampaignIpRange::packIp($ip);
+
+        return $this->matchTargeting(
+            $this->ipRanges,
+            fn (CampaignIpRange $range) => $packedIp !== null && $range->containsPackedIp($packedIp),
+        );
+    }
+
+    public function matchCountry(string $countryCode): TargetingMatchEnum
+    {
+        return $this->matchTargeting(
+            $this->countries,
+            fn (Country $country) => $country->iso_code === $countryCode,
+        );
     }
 
     /**
-     * @return HasMany<CampaignIpRange, $this>
+     * @param Collection<int, CampaignIpRange|Country> $items
      */
-    public function ipRangesBlacklist(): HasMany
+    private function matchTargeting(Collection $items, Closure $matches): TargetingMatchEnum
     {
-        return $this->ipRanges()->where('blacklisted', true);
+        foreach ($items as $item) {
+            if ($item->isBlacklisted() && $matches($item)) {
+                return TargetingMatchEnum::Blacklisted;
+            }
+        }
+
+        $hasWhitelist = false;
+        foreach ($items as $item) {
+            if ($item->isBlacklisted()) {
+                continue;
+            }
+            if ($matches($item)) {
+                return TargetingMatchEnum::Allowed;
+            }
+            $hasWhitelist = true;
+        }
+
+        return $hasWhitelist ? TargetingMatchEnum::NotWhitelisted : TargetingMatchEnum::Allowed;
     }
 
     /**

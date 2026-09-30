@@ -23,4 +23,9 @@ class Country extends Model
         'iso_code' => 'string',
         'name' => 'string',
     ];
+
+    public function isBlacklisted(): bool
+    {
+        return (bool) data_get($this, 'pivot.blacklisted');
+    }
 }

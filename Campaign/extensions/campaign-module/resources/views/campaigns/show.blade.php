@@ -169,20 +169,11 @@
                         {{ @yesno($campaign->once_per_session) }}
                     </li>
 
-                    @if($campaign->countriesWhitelist->count())
+                    @if($campaign->countries->isNotEmpty())
                         <li class="list-group-item">
-                            <strong>Countries whitelist:</strong>
+                            <strong>Countries {{ $campaign->hasCountriesBlacklist() ? 'blacklist' : 'whitelist' }}:</strong>
                             <ul>
-                            @foreach($campaign->countriesWhitelist as $country)
-                                <li>{{ $country->name }}</li>
-                            @endforeach
-                            </ul>
-                        </li>
-                    @elseif($campaign->countriesBlacklist->count())
-                        <li class="list-group-item">
-                            <strong>Countries blacklist:</strong>
-                            <ul>
-                            @foreach($campaign->countriesBlacklist as $country)
+                            @foreach($campaign->countries as $country)
                                 <li>{{ $country->name }}</li>
                             @endforeach
                             </ul>
@@ -200,20 +191,11 @@
                         </li>
                     @endif
 
-                    @if($campaign->ipRangesWhitelist->count())
+                    @if($campaign->ipRanges->isNotEmpty())
                         <li class="list-group-item">
-                            <strong>IP whitelist (IPv4):</strong>
+                            <strong>IP {{ $campaign->hasIpRangesBlacklist() ? 'blacklist' : 'whitelist' }}:</strong>
                             <ul>
-                            @foreach($campaign->ipRangesWhitelist as $range)
-                                <li>{{ $range->ip_from }}@if($range->ip_to) — {{ $range->ip_to }}@endif</li>
-                            @endforeach
-                            </ul>
-                        </li>
-                    @elseif($campaign->ipRangesBlacklist->count())
-                        <li class="list-group-item">
-                            <strong>IP blacklist (IPv4):</strong>
-                            <ul>
-                            @foreach($campaign->ipRangesBlacklist as $range)
+                            @foreach($campaign->ipRanges as $range)
                                 <li>{{ $range->ip_from }}@if($range->ip_to) — {{ $range->ip_to }}@endif</li>
                             @endforeach
                             </ul>

@@ -388,7 +388,7 @@
                                                         id="countries_blacklist"
                                                         :name="'countries_blacklist'"
                                                         :value="countriesBlacklist"
-                                                        :options.sync="countriesBlacklistOptions"
+                                                        :options.sync="blacklistOptions"
                                                 >
                                                 </v-select>
                                             </div>
@@ -466,7 +466,7 @@
                         <div class="panel-heading" role="tab" id="headingIpTargeting">
                             <h4 class="panel-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseIpTargeting" aria-expanded="false" aria-controls="collapseIpTargeting" :class="{ green: highlightIpRangesCollapse }">
-                                    IP address targeting (IPv4)
+                                    IP address targeting
                                 </a>
                             </h4>
                         </div>
@@ -484,7 +484,7 @@
                                                 <v-select v-model="ipRangesBlacklist"
                                                           :name="'ip_ranges_blacklist'"
                                                           :value="ipRangesBlacklist"
-                                                          :options.sync="ipRangesBlacklistOptions">
+                                                          :options.sync="blacklistOptions">
                                                 </v-select>
                                             </div>
                                         </div>
@@ -505,15 +505,15 @@
                                                 <button type="button" class="btn btn-info waves-effect" @click="addIpRange" :disabled="!addedIpFrom">
                                                     <i class="zmdi zmdi-plus"></i> Add
                                                 </button>
+                                                <button type="button" class="btn btn-default waves-effect m-l-5" @click="$refs.ipRangesModal.open(ipRanges)" title="Edit all IP addresses / ranges as text, one per line (paste from an export)">
+                                                    <i class="zmdi zmdi-edit"></i> Edit as list
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div v-for="(range, index) in ipRanges">
-                                    <input type="hidden" :name="'ip_ranges[' + index + '][ip_from]'" :value="range.ip_from" />
-                                    <input type="hidden" :name="'ip_ranges[' + index + '][ip_to]'" :value="range.ip_to" />
-                                </div>
+                                <input type="hidden" name="ip_ranges" :value="ipRangesJson" />
 
                                 <div class="row m-t-20 m-l-30" v-if="ipRanges.length">
                                     <div class="col-md-10">
@@ -521,7 +521,7 @@
                                     </div>
                                 </div>
                                 <div class="row m-t-10 m-l-30">
-                                    <div class="col-md-12">
+                                    <div class="col-md-12 pre-scrollable">
                                         <div class="row m-b-10" v-for="(range, i) in ipRanges" style="line-height: 25px">
                                             <div class="col-md-12 text-left">
                                                 {{ range.ip_from }}<span v-if="range.ip_to"> — {{ range.ip_to }}</span>
@@ -674,6 +674,9 @@
         </div>
 
 
+        <!-- outside the accordion: a collapsed panel would hide it -->
+        <ip-ranges-list-modal ref="ipRangesModal" @apply="ipRanges = $event"></ip-ranges-list-modal>
+
         <form-validator :url="validateUrl"></form-validator>
     </div>
 </template>
@@ -685,6 +688,8 @@
     import AbTesting from "./AbTesting";
     import UrlRules from "./UrlRules";
     import PageviewAttributes from "./PageviewAttributes";
+    import IpRangesListModal from "./IpRangesListModal";
+    import {ipRangeKey} from "./_ipRanges";
 
     let props = [
         "_name",
@@ -724,10 +729,8 @@
         "_eventTypes",
         "_availableCountries",
         "_availableLanguages",
-        "_countriesBlacklistOptions",
         "_ipRanges",
         "_ipRangesBlacklist",
-        "_ipRangesBlacklistOptions",
         "_pageviewAttributes",
 
         "_activationMode",
@@ -740,7 +743,8 @@
             FormValidator,
             PageviewRules,
             UrlRules,
-            PageviewAttributes
+            PageviewAttributes,
+            IpRangesListModal
         },
         created: function(){
             let self = this;
@@ -819,12 +823,10 @@
                 "pageviewRules": {},
                 "availableCountries": null,
                 "languages": null,
-                "countriesBlacklistOptions": null,
                 "ipRanges": [],
                 "addedIpFrom": "",
                 "addedIpTo": "",
                 "ipRangesBlacklist": null,
-                "ipRangesBlacklistOptions": null,
                 "pageviewAttributes": [],
 
                 "startTime": null,
@@ -867,6 +869,15 @@
                     {"label": "Only with adblock", "value": true},
                     {"label": "Only without adblock", "value": false}
                 ];
+            },
+            blacklistOptions: function () {
+                return [
+                    {"label": "Whitelist", "value": false},
+                    {"label": "Blacklist", "value": true},
+                ];
+            },
+            ipRangesJson: function () {
+                return JSON.stringify(this.ipRanges);
             },
             pageviewRulesNotDefault: function () {
                 if (this.pageviewRules.display_banner !== 'always' || this.pageviewRules.display_times) {
@@ -970,11 +981,13 @@
                 this.countries.splice(index, 1);
             },
             addIpRange: function () {
-                if (!this.addedIpFrom) return;
-                this.ipRanges.push({
-                    ip_from: this.addedIpFrom,
-                    ip_to: this.addedIpTo || null,
-                });
+                const range = {ip_from: this.addedIpFrom.trim(), ip_to: this.addedIpTo.trim() || null};
+                if (!range.ip_from) {
+                    return;
+                }
+                if (!this.ipRanges.some(r => ipRangeKey(r) === ipRangeKey(range))) {
+                    this.ipRanges.push(range);
+                }
                 this.addedIpFrom = "";
                 this.addedIpTo = "";
             },

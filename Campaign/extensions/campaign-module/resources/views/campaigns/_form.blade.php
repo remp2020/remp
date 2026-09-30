@@ -41,7 +41,7 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         "pageviewAttributes" => $campaign->pageview_attributes ?? [],
         "countries" => $selectedCountries,
         "languages" => $selectedLanguages,
-        "countriesBlacklist" => $countriesBlacklist ?? 0,
+        "countriesBlacklist" => $countriesBlacklist ?? false,
         "allDevices" => $campaign->getAllDevices(),
         "availableOperatingSystems" => $campaign->getAvailableOperatingSystems(),
         "selectedDevices" => $campaign->devices ?? [],
@@ -80,28 +80,8 @@ $segmentMap = $segments->flatten()->mapWithKeys(function ($item) {
         ],
         "availableCountries" => $availableCountries,
         "availableLanguages" => $availableLanguages,
-        "countriesBlacklistOptions" => [
-            [
-                "value" => 0,
-                "label" => "Whitelist"
-            ],
-            [
-                "value" => 1,
-                "label" => "Blacklist"
-            ]
-        ],
         "ipRanges" => $selectedIpRanges ?? [],
-        "ipRangesBlacklist" => $ipRangesBlacklist ?? 0,
-        "ipRangesBlacklistOptions" => [
-            [
-                "value" => 0,
-                "label" => "Whitelist"
-            ],
-            [
-                "value" => 1,
-                "label" => "Blacklist"
-            ]
-        ],
+        "ipRangesBlacklist" => $ipRangesBlacklist ?? false,
         "activationMode" => "activate-now",
     ]) }};
 

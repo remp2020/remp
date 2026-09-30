@@ -23,6 +23,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed the JSHint linter in the snippet and banner custom JS editors to check the code as ES6 (`esversion: 6`) instead of ES5, so `const`, arrow functions and template literals are no longer reported as errors. Newer syntax (optional chaining, nullish coalescing) is still flagged, because it may not be supported by older browsers. remp/remp#1486
 - Fixed missing tracking parameters (`rtm_*`) in the target URL when clicking the button or banner area outside the main link of Overlay Rectangle, HTML and HTML Overlay banners. remp/helpdesk#5042
 - Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
+- Added bulk editing of IP address targeting in the campaign form. The new `Edit as list` button opens the whole list in a text area, one IP address or range per line. Adding a single address trims the input and skips duplicates; addresses are validated on save. remp/euobserver#281
+- Added IPv6 support to campaign IP address targeting (single addresses and ranges; a range must be either IPv4 or IPv6). remp/euobserver#281
+- Changed campaign cache to store IP ranges and countries once instead of duplicating them into whitelist/blacklist copies. remp/euobserver#281
 
 ### [Mailer]
 

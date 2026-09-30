@@ -28,7 +28,7 @@ use Yajra\DataTables\QueryDataTable;
 
 class CampaignController extends Controller
 {
-    private $beamJournalConfigured;
+    private bool $beamJournalConfigured;
 
     private $showtime;
 
@@ -578,27 +578,19 @@ class CampaignController extends Controller
         $campaign->countries()->sync(
             $this->processCountries(
                 $data['countries'] ?? [],
-                (bool)$data['countries_blacklist']
+                $data['countries_blacklist']
             )
         );
 
         $campaign->ipRanges()->delete();
-        $ipRanges = $data['ip_ranges'] ?? [];
-        $ipRangesBlacklist = (bool) ($data['ip_ranges_blacklist'] ?? false);
-        $ipRangeRows = [];
-        foreach ($ipRanges as $range) {
-            if (empty($range['ip_from'])) {
-                continue;
-            }
-            $ipRangeRows[] = [
-                'campaign_id' => $campaign->id,
-                'ip_from' => $range['ip_from'],
-                'ip_to' => !empty($range['ip_to']) ? $range['ip_to'] : null,
-                'blacklisted' => $ipRangesBlacklist,
-            ];
-        }
-        if (!empty($ipRangeRows)) {
-            CampaignIpRange::insert($ipRangeRows);
+        $ipRangeRows = array_map(fn (array $range) => [
+            'campaign_id' => $campaign->id,
+            'ip_from' => $range['ip_from'],
+            'ip_to' => !empty($range['ip_to']) ? $range['ip_to'] : null,
+            'blacklisted' => $data['ip_ranges_blacklist'],
+        ], $data['ip_ranges'] ?? []);
+        foreach (array_chunk($ipRangeRows, 1000) as $chunk) {
+            CampaignIpRange::insert($chunk);
         }
 
         $segments = $data['segments'] ?? [];
@@ -639,23 +631,17 @@ class CampaignController extends Controller
         }
         $campaign->setRelation('segments', collect($segments));
 
-        // parse selected countries
-        $countries = $campaign->countries->toArray();
-        $selectedCountries = $data['countries'] ?? array_map(function ($country) {
-            return $country['iso_code'];
-        }, $countries);
+        $selectedCountries = $data['countries'] ?? $campaign->countries->pluck('iso_code')->all();
 
-        // countries blacklist?
-        $countryBlacklisted = !empty($countries) ? (int) $countries[0]['pivot']['blacklisted'] : 0;
-
-        // parse selected IP ranges
-        $ipRanges = $campaign->ipRanges->toArray();
-        $selectedIpRanges = $data['ip_ranges'] ?? array_map(fn ($range) => [
-            'ip_from' => $range['ip_from'],
-            'ip_to' => $range['ip_to'],
-        ], $ipRanges);
-
-        $ipRangesBlacklisted = !empty($ipRanges) ? (int) $ipRanges[0]['blacklisted'] : 0;
+        // old() holds the base request's raw input: Laravel flashes the base request, not the FormRequest copy that prepareForValidation() decoded
+        $oldIpRanges = $data['ip_ranges'] ?? null;
+        if (is_string($oldIpRanges)) {
+            $oldIpRanges = CampaignRequest::decodeIpRanges($oldIpRanges);
+        }
+        $selectedIpRanges = $oldIpRanges ?? $campaign->ipRanges->map(fn (CampaignIpRange $range) => [
+            'ip_from' => $range->ip_from,
+            'ip_to' => $range->ip_to,
+        ])->all();
 
         // main banner
         if (array_key_exists('banner_id', $data)) {
@@ -683,9 +669,9 @@ class CampaignController extends Controller
             $variants,
             $selectedCountries,
             $campaign->languages,
-            $data['countries_blacklist'] ?? $countryBlacklisted,
+            $data['countries_blacklist'] ?? $campaign->hasCountriesBlacklist(),
             $selectedIpRanges,
-            $data['ip_ranges_blacklist'] ?? $ipRangesBlacklisted,
+            $data['ip_ranges_blacklist'] ?? $campaign->hasIpRangesBlacklist(),
         ];
     }
 

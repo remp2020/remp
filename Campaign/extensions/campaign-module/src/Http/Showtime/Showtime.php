@@ -7,6 +7,7 @@ use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;
 use Remp\CampaignModule\CampaignSegment;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
+use Remp\CampaignModule\Models\Targeting\TargetingMatchEnum;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -582,26 +583,13 @@ class Showtime
         // IP range rules
         if (!$campaign->ipRanges->isEmpty()) {
             $visitorIp = $this->getRequest()->ip();
+            $ipRangesMatch = $campaign->matchIpRanges($visitorIp);
 
-            if (!$campaign->ipRangesBlacklist->isEmpty()) {
-                foreach ($campaign->ipRangesBlacklist as $range) {
-                    if ($range->containsIp($visitorIp)) {
-                        return "Campaign not shown because IP [{$visitorIp}] is blacklisted";
-                    }
-                }
+            if ($ipRangesMatch === TargetingMatchEnum::Blacklisted) {
+                return "Campaign not shown because IP [{$visitorIp}] is blacklisted";
             }
-
-            if (!$campaign->ipRangesWhitelist->isEmpty()) {
-                $matched = false;
-                foreach ($campaign->ipRangesWhitelist as $range) {
-                    if ($range->containsIp($visitorIp)) {
-                        $matched = true;
-                        break;
-                    }
-                }
-                if (!$matched) {
-                    return "Campaign not shown because IP [{$visitorIp}] is not whitelisted";
-                }
+            if ($ipRangesMatch === TargetingMatchEnum::NotWhitelisted) {
+                return "Campaign not shown because IP [{$visitorIp}] is not whitelisted";
             }
         }
 
@@ -624,11 +612,12 @@ class Showtime
             }
 
             // check against white / black listed countries
+            $countryMatch = $campaign->matchCountry($countryCode);
 
-            if (!$campaign->countriesBlacklist->isEmpty() && $campaign->countriesBlacklist->contains('iso_code', $countryCode)) {
+            if ($countryMatch === TargetingMatchEnum::Blacklisted) {
                 return "Campaign not executed because country [{$countryCode}] is blacklisted";
             }
-            if (!$campaign->countriesWhitelist->isEmpty() && !$campaign->countriesWhitelist->contains('iso_code', $countryCode)) {
+            if ($countryMatch === TargetingMatchEnum::NotWhitelisted) {
                 return "Campaign not executed because country [{$countryCode}] is not whitelisted";
             }
         }

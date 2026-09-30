@@ -2,45 +2,60 @@
 
 namespace Remp\CampaignModule\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
-use Request;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Remp\CampaignModule\CampaignIpRange;
 
-class ValidIpRange implements Rule
+class ValidIpRange implements ValidationRule
 {
-    private string $failMessage = 'IP range is invalid.';
+    public bool $implicit = true;
 
-    public function passes($attribute, $value)
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if ($value === null || $value === '') {
-            return true;
+        $ipFrom = data_get($value, 'ip_from');
+        $ipTo = data_get($value, 'ip_to');
+
+        if ($ipFrom === null || (is_string($ipFrom) && trim($ipFrom) === '')) {
+            $fail('IP "from" address is required.');
+            return;
         }
 
-        if (!preg_match('/^ip_ranges\.(\d+)\.ip_to$/', $attribute, $matches)) {
-            return true;
+        $from = $this->pack('from', $ipFrom, $fail);
+
+        if ($ipTo === null || $ipTo === '') {
+            return;
         }
 
-        $ipRanges = Request::get('ip_ranges');
-        $ipFrom = $ipRanges[$matches[1]]['ip_from'] ?? null;
-        if ($ipFrom === null) {
-            return true;
+        $to = $this->pack('to', $ipTo, $fail);
+
+        if ($from === null || $to === null) {
+            return;
         }
 
-        $from = ip2long($ipFrom);
-        $to = ip2long($value);
-        if ($from === false || $to === false) {
-            return true;
+        if (strlen($from) !== strlen($to)) {
+            $fail("IP \"from\" address \"{$ipFrom}\" and IP \"to\" address \"{$ipTo}\" must be both IPv4 or both IPv6.");
+            return;
         }
 
-        if ($from > $to) {
-            $this->failMessage = "IP \"from\" address \"{$ipFrom}\" must be lower than or equal to IP \"to\" address \"{$value}\".";
-            return false;
+        if (strcmp($from, $to) > 0) {
+            $fail("IP \"from\" address \"{$ipFrom}\" must be lower than or equal to IP \"to\" address \"{$ipTo}\".");
         }
-
-        return true;
     }
 
-    public function message()
+    // filter_var first: same acceptance as Laravel's `ip` rule. inet_pton alone is platform-dependent
+    // (macOS accepts "01.2.3.4" and "fe80::1%eth0", Linux does not) and throws ValueError on a NUL byte.
+    private function pack(string $bound, mixed $ip, Closure $fail): ?string
     {
-        return $this->failMessage;
+        $packed = is_string($ip) && filter_var($ip, FILTER_VALIDATE_IP) !== false
+            ? CampaignIpRange::packIp($ip)
+            : null;
+
+        if ($packed === null) {
+            $fail(is_string($ip)
+                ? "IP \"{$bound}\" address \"{$ip}\" is not a valid IP address."
+                : "IP \"{$bound}\" address is not a valid IP address.");
+        }
+
+        return $packed;
     }
 }
