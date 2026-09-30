@@ -714,8 +714,11 @@ func (eDB *ElasticsearchDB) sumRowCollectionFromTypedResponse(res *search.Respon
 			sumAgg, ok := aggs[targetAgg].(*types.SumAggregate)
 			if !ok {
 				// Match old sumRowCollectionFromAggregations behavior: when sum agg is not found
-				// (e.g. GroupBy field had no buckets), fall back to docCount.
-				log.Printf("warn: sum agg %q not found in response; falling back to docCount=%d", targetAgg, count)
+				// (e.g. GroupBy field had no buckets), fall back to docCount. Zero docCount is
+				// the expected "no matching data" case; only non-zero is suspicious.
+				if count > 0 {
+					log.Printf("warn: sum agg %q not found in response; falling back to docCount=%d", targetAgg, count)
+				}
 				sumValue = float64(count)
 			} else if sumAgg.Value != nil {
 				sumValue = float64(*sumAgg.Value)
