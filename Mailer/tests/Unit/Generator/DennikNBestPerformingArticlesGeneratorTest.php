@@ -6,9 +6,9 @@ namespace Tests\Unit\Generator;
 use Nette\Database\Table\Selection;
 use PHPUnit\Framework\TestCase;
 use Remp\Mailer\Models\PageMeta\Content\DenniknContent;
-use Remp\Mailer\Models\PageMeta\Content\DenniknShopContent;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
 use Remp\MailerModule\Models\Generators\GenericBestPerformingArticlesGenerator;
+use Remp\MailerModule\Models\ImageUrlSigner\ImageUrlSigner;
 use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
@@ -411,9 +411,12 @@ HTML;
             }
         };
 
+        $imageUrlSigner = $this->createStub(ImageUrlSigner::class);
+        $imageUrlSigner->method('sign')->willReturnArgument(0);
+
         $generator = new GenericBestPerformingArticlesGenerator(
             $this->sourceTemplateRepository,
-            new DenniknContent($transport),
+            new DenniknContent($transport, $imageUrlSigner),
             $this->engineFactory
         );
 

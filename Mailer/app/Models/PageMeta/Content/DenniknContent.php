@@ -5,13 +5,22 @@ namespace Remp\Mailer\Models\PageMeta\Content;
 
 use GuzzleHttp\Exception\RequestException;
 use Nette\Http\Url;
+use Remp\MailerModule\Models\ImageUrlSigner\ImageUrlSigner;
 use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Models\PageMeta\Content\JsonLDContent;
 use Remp\MailerModule\Models\PageMeta\Meta;
+use Remp\MailerModule\Models\PageMeta\Transport\TransportInterface;
 
 class DenniknContent extends JsonLDContent
 {
     use ShopSchemaTrait;
+
+    public function __construct(
+        TransportInterface $transport,
+        private readonly ImageUrlSigner $imageUrlSigner,
+    ) {
+        parent::__construct($transport);
+    }
 
     public function fetchUrlMeta(string $url): ?Meta
     {
@@ -38,12 +47,13 @@ class DenniknContent extends JsonLDContent
             return 'https://static.novydenik.com/2018/11/placeholder_2@2x.png';
         }
 
-        if (!str_starts_with($imageUrl, 'https://img.projektn.sk')) {
+        if (!str_starts_with($imageUrl, 'https://img.dennikn.sk') && !str_starts_with($imageUrl, 'https://img.projektn.sk')) {
             return $imageUrl;
         }
 
         $url = new Url($imageUrl);
-        $url = (string) $url->appendQuery(['w' => 558, 'h' => 270, 'fit' =>'crop']);
+        // signed already here, otherwise the check below would get 403 instead of 404
+        $url = $this->imageUrlSigner->sign((string) $url->appendQuery(['w' => 558, 'h' => 270, 'fit' =>'crop']));
 
         // return placeholder if image doesn't exist
         $response = get_headers($url);

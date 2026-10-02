@@ -135,6 +135,16 @@ services:
 #						e.dennikn.sk
 #					]
 #				))
+#	imageUrlSigner: Remp\Mailer\Models\Realic\RealicUrlSigner(
+#		key: @environmentConfig::get('REALIC_SIGN_KEY')
+#		targetHost: img.dennikn.sk
+#		retiredHosts: [img.projektn.sk]
+#		originHosts: [wp-static: a-static.projektn.sk]
+#	)
+#	contentGenerator:
+#		setup:
+#			# has to run after every other replacer, so the signature covers the parameters they add
+#			- register(Remp\MailerModule\Models\ContentGenerator\Replace\ImageUrlSignReplace(), 1000)
 # configuration required by Respekt's URL parser generators
 # (this is whole configuration; merge it with your existing configuration (other generators)
 #	generator:

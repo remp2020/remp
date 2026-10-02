@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Shown when the configured `authenticator` implements the new `SignOutUrlProviderInterface`.
 - Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
 - Fixed external newsletter lists getting a subscription record for every user from the user base. remp/web#3108
+- Added signing of image URLs, so Mailer can add its own parameters (resizing, `rtm_*` tracking) to images served through a signing image proxy. remp/remp#1516
 
 ### [Sso]
 
