@@ -76,4 +76,30 @@ HTML;
             trim($result)
         );
     }
+
+    public function testImageKeepsWidthAttribute(): void
+    {
+        $post = <<<HTML
+<!-- wp:image {"id":3545467,"sizeSlug":"full","linkDestination":"media","align":"right"} -->
+<figure class="wp-block-image alignright size-full"><a href="https://example.com/avatar-100.png"><img src="https://example.com/avatar-100.png" alt="" width="100" height="100" class="wp-image-3545467"/></a></figure>
+<!-- /wp:image -->
+HTML;
+
+        $result = $this->preprocessor->preprocessBlocks($post);
+
+        $this->assertSame('<img src="https://example.com/avatar-100.png" width="100" alt="" />', trim($result));
+    }
+
+    public function testImageWithoutWidthAttributeGetsNone(): void
+    {
+        $post = <<<HTML
+<!-- wp:image {"id":3545467,"sizeSlug":"full","linkDestination":"media"} -->
+<figure class="wp-block-image size-full"><a href="https://example.com/photo.png"><img src="https://example.com/photo.png" alt="" class="wp-image-3545467"/></a></figure>
+<!-- /wp:image -->
+HTML;
+
+        $result = $this->preprocessor->preprocessBlocks($post);
+
+        $this->assertSame('<img src="https://example.com/photo.png" alt="" />', trim($result));
+    }
 }

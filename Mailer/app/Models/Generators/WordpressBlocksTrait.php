@@ -131,7 +131,9 @@ trait WordpressBlocksTrait
                 . '\s*(?:<\/a>\s*)?(?:<figcaption[^>]*>(.*?)<\/figcaption>)?\s*<\/figure>/is',
             static function (array $matches): string {
                 preg_match('/src="([^"]+)"/', $matches[1], $src);
-                $image = '<img src="' . ($src[1] ?? '') . '" alt="" />';
+                preg_match('/\swidth="(\d+)"/', $matches[1], $width);
+                $widthAttribute = isset($width[1]) ? ' width="' . $width[1] . '"' : '';
+                $image = '<img src="' . ($src[1] ?? '') . '"' . $widthAttribute . ' alt="" />';
 
                 $caption = isset($matches[2]) ? trim(strip_tags($matches[2])) : '';
                 if ($caption === '') {
