@@ -247,6 +247,10 @@ class ArticleUrlParserTemplateFormFactory
                 'name' => 'Rodina a vzťahy ' . date('j.n.Y'),
                 'code' => 'rodina_a_vztahy_' . date('dmY'),
             ],
+            'najlepsie-podcasty' => [
+                'name' => 'Najlepšie z podcastov ' . date('j.n.Y'),
+                'code' => 'najlepsie_z_podcastov' . date('dmY'),
+            ],
         };
     }
 }
