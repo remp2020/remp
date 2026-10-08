@@ -203,7 +203,7 @@ class ArticleUrlParserTemplateFormFactory
     public function getLayoutCode(string $sourceTemplateCode): string
     {
         return match ($sourceTemplateCode) {
-            'dn3-article-url-parser' => 'dn3-default-wide',
+            'dn3-article-url-parser', 'dn3-podcast-url-parser' => 'dn3-default-wide',
             default => $this->layoutCode,
         };
     }
