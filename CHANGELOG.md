@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
 - [Segments] Fixed unnecessary warnings logging when aggregation did not match any records. remp/remp#1514  
 - Fixed newsletter edit form ignoring the stored recurrence and always showing "Repeat every 1 day". remp/remp#1515 
+- Fixed possibility of `newsletters:send` crashing on newsletters with personalized content.
 
 ### [Campaign]
 

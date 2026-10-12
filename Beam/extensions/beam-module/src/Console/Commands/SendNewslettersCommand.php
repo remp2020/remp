@@ -111,18 +111,20 @@ class SendNewslettersCommand extends Command
 
     private function sendNewsletter(Newsletter $newsletter, array $ignoreAuthors, array $ignoreContentTypes)
     {
-        $criterion = new NewsletterCriterion(NewsletterCriterionEnum::from($newsletter->criteria));
-        $articles = $newsletter->personalized_content ? [] :
-            $criterion->getArticles(
+        $articles = collect();
+        if (!$newsletter->personalized_content) {
+            $criterion = new NewsletterCriterion(NewsletterCriterionEnum::from($newsletter->criteria));
+            $articles = $criterion->getArticles(
                 timespan: $newsletter->timespan,
                 articlesCount: $newsletter->articles_count,
                 ignoreAuthors: $ignoreAuthors,
                 ignoreContentTypes: $ignoreContentTypes,
             );
 
-        if ($articles->count() === 0) {
-            $this->line(Carbon::now() . ':     <comment>WARNING:</comment> No articles found for selected timespan, nothing is sent');
-            return;
+            if ($articles->count() === 0) {
+                $this->line(Carbon::now() . ':     <comment>WARNING:</comment> No articles found for selected timespan, nothing is sent');
+                return;
+            }
         }
 
         [$htmlContent, $textContent] = $this->generateEmail($newsletter, $articles);
