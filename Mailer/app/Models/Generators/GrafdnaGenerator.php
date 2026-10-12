@@ -113,28 +113,7 @@ class GrafdnaGenerator implements IGenerator
 
         $post = $values['grafdna_html'];
 
-        // remp/remp#1174: the first graph is replaced by the provided image (og:image of the post), which
-        // carries labels and the logo. It takes precedence over the embed's poster.
-        if (!empty($values['image_url'])) {
-            $replaced = false;
-            $post = WordpressBlocks::replace($post, 'embed', function (array $attributes) use ($values, &$replaced): ?string {
-                $url = $attributes['url'] ?? '';
-                $host = (string) parse_url($url, PHP_URL_HOST);
-                $isGraph = str_contains($host, 'flourish') || str_contains($host, 'datawrapper');
-
-                if ($replaced || !$isGraph) {
-                    return null;
-                }
-                $replaced = true;
-
-                $url = htmlspecialchars($url, ENT_QUOTES);
-                $src = htmlspecialchars($values['image_url'], ENT_QUOTES);
-
-                return "\n\n<a href=\"{$src}\"><img src=\"{$src}\" alt=\"\" style=\"width: 100%\"/></a>\n"
-                    . "<p>Graf nájdete aj na <a href=\"{$url}\">{$url}</a>.</p>\n\n";
-            });
-        }
-
+        $post = $this->convertGraphEmbeds($post);
         $post = $this->preprocessBlocks($post);
         $post = $this->parseOls($post);
 
@@ -313,9 +292,6 @@ class GrafdnaGenerator implements IGenerator
         }
         $output->grafdna_html = $data->post_content;
 
-        // remp/remp#1174
-        // og:image is used as graph image instead of complex graph element in generated newsletter
-        // this image contains labels and logo
         $imageUrl = $this->getSocialImageUrl($data->post_url);
         if (!$imageUrl) {
             $meta = $this->content->fetchUrlMeta($data->post_url);
@@ -400,6 +376,22 @@ HTML;
     </tbody>
 </table>
 HTML;
+    }
+
+    private function convertGraphEmbeds(string $post): string
+    {
+        return WordpressBlocks::replace($post, 'embed', static function (array $attributes): ?string {
+            $poster = $attributes['poster'] ?? null;
+            if (!$poster) {
+                return null;
+            }
+
+            $url = htmlspecialchars($attributes['url'] ?? '', ENT_QUOTES);
+            $poster = htmlspecialchars($poster, ENT_QUOTES);
+
+            return "\n\n<a href=\"{$url}\"><img src=\"{$poster}\" alt=\"\" /></a>\n"
+                . "<p>Graf nájdete aj na <a href=\"{$url}\">{$url}</a>.</p>\n\n";
+        });
     }
 
     public function parseOls($post)

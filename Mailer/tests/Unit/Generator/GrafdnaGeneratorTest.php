@@ -71,30 +71,25 @@ class GrafdnaGeneratorTest extends TestCase
             HTML;
     }
 
-    public function testFirstGraphIsReplacedByImageEvenIfItHasPoster(): void
+    public function testEveryEmbedWithPosterUsesItAndLinksToEmbed(): void
     {
         $html = $this->embed('https://public.flourish.studio/visualisation/1/', 'https://public.flourish.studio/visualisation/1/thumbnail')
-            . "\n\n" . $this->embed('https://public.flourish.studio/visualisation/2/', 'https://public.flourish.studio/visualisation/2/thumbnail');
+            . "\n\n" . $this->embed('https://example.com/chart/1/', 'https://example.com/chart/1/thumbnail');
 
         $output = $this->process($html);
 
-        self::assertStringContainsString('src="' . self::IMAGE_URL . '"', $output);
-        self::assertStringContainsString('href="' . self::IMAGE_URL . '"', $output);
-        self::assertStringContainsString('Graf nájdete aj na', $output);
-        self::assertStringNotContainsString('visualisation/1/thumbnail', $output);
-        // Only the first graph gets the image, the second one falls back to its poster.
-        self::assertStringContainsString('src="https://public.flourish.studio/visualisation/2/thumbnail"', $output);
-        self::assertSame(1, substr_count($output, 'src="' . self::IMAGE_URL . '"'));
+        self::assertStringNotContainsString(self::IMAGE_URL, $output);
+        self::assertStringContainsString('src="https://public.flourish.studio/visualisation/1/thumbnail"', $output);
+        self::assertStringContainsString('src="https://example.com/chart/1/thumbnail"', $output);
+        self::assertStringContainsString('Graf nájdete aj na <a href="https://public.flourish.studio/visualisation/1/"', $output);
+        self::assertStringContainsString('Graf nájdete aj na <a href="https://example.com/chart/1/"', $output);
     }
 
-    public function testNonGraphEmbedIsNotReplaced(): void
+    public function testEmbedWithoutPosterHasNoGraphLink(): void
     {
-        $html = $this->embed('https://www.youtube.com/watch?v=abc')
-            . "\n\n" . $this->embed('https://datawrapper.dwcdn.net/abc/1/');
+        $output = $this->process($this->embed('https://datawrapper.dwcdn.net/abc/1/'));
 
-        $output = $this->process($html);
-
-        self::assertSame(1, substr_count($output, 'src="' . self::IMAGE_URL . '"'));
-        self::assertStringContainsString('href="https://datawrapper.dwcdn.net/abc/1/"', $output);
+        self::assertStringNotContainsString('<img', $output);
+        self::assertStringNotContainsString('Graf nájdete aj na', $output);
     }
 }
