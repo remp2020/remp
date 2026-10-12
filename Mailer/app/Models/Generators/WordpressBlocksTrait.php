@@ -28,6 +28,7 @@ trait WordpressBlocksTrait
         $post = $this->dropPullQuoteBlocks($post);
         $post = $this->convertBoxBlocks($post);
         $post = $this->convertBlockEmbeds($post);
+        $post = $this->convertHtmlBlocks($post);
         $post = $this->convertBlockImages($post);
 
         // The <hr> rule matches the literal tag only, so drop the separator block's classes.
@@ -121,6 +122,20 @@ trait WordpressBlocksTrait
             $poster = htmlspecialchars($poster, ENT_QUOTES);
 
             return "\n\n<a href=\"{$url}\"><img src=\"{$poster}\" alt=\"\" /></a>\n\n";
+        });
+    }
+
+    private function convertHtmlBlocks(string $post): string
+    {
+        return WordpressBlocks::replace($post, 'html', static function (array $attributes): ?string {
+            $poster = $attributes['poster'] ?? null;
+            if (!$poster) {
+                return null;
+            }
+
+            $poster = htmlspecialchars($poster, ENT_QUOTES);
+
+            return "\n\n<img src=\"{$poster}\" alt=\"\" />\n\n";
         });
     }
 

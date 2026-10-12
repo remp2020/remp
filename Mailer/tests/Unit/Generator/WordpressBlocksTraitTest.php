@@ -77,6 +77,35 @@ HTML;
         );
     }
 
+    public function testHtmlWithPosterIsReplacedByPoster(): void
+    {
+        $post = <<<HTML
+<!-- wp:html {"poster":"https://img.dennikn.sk/wp-static/2026/10/graf-dna-poster.png?s=fe903dc06ba9609738d4efebdf95f933"} -->
+<div class="graf-dna"><canvas id="g"></canvas><script src="https://example.com/chart.js"></script></div>
+<!-- /wp:html -->
+HTML;
+
+        $result = $this->preprocessor->preprocessBlocks($post);
+
+        $this->assertSame(
+            '<img src="https://img.dennikn.sk/wp-static/2026/10/graf-dna-poster.png?s=fe903dc06ba9609738d4efebdf95f933" alt="" />',
+            trim($result)
+        );
+    }
+
+    public function testHtmlWithoutPosterIsKept(): void
+    {
+        $post = <<<HTML
+<!-- wp:html -->
+<div class="custom"><strong>Hello</strong></div>
+<!-- /wp:html -->
+HTML;
+
+        $result = $this->preprocessor->preprocessBlocks($post);
+
+        $this->assertSame('<div class="custom"><strong>Hello</strong></div>', trim($result));
+    }
+
     public function testImageKeepsWidthAttribute(): void
     {
         $post = <<<HTML
