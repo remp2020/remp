@@ -144,11 +144,6 @@ class Showtime
             }
         }
 
-        $segmentAggregator = $this->segmentAggregator;
-        if (isset($data->cache)) {
-            $segmentAggregator->setProviderData($data->cache);
-        }
-
         $this->loadMaps();
 
         $positions = $this->positionMap;
@@ -181,7 +176,6 @@ class Showtime
                     callback: $callback,
                     data: $displayData,
                     activeCampaigns: [],
-                    providerData: $segmentAggregator->getProviderData(),
                     suppressedBanners: [],
                     evaluationMessages: $evaluationMessages,
                 );
@@ -194,7 +188,6 @@ class Showtime
                 callback: $callback,
                 data: [],
                 activeCampaigns: [],
-                providerData: $segmentAggregator->getProviderData(),
                 suppressedBanners: [],
                 evaluationMessages: $evaluationMessages,
             );
@@ -286,7 +279,6 @@ class Showtime
             $callback,
             $displayData,
             array_values($activeCampaigns), // make sure $activeCampaigns is always encoded as array in JSON, remove keys
-            $segmentAggregator->getProviderData(),
             $suppressedBanners,
             $evaluationMessages
         );

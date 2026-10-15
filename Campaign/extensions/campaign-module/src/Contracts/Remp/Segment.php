@@ -23,19 +23,9 @@ class Segment implements SegmentContract
 
     private $client;
 
-    private $cache;
-
-    private $eventRules;
-
-    private $overridableFields;
-
-    private $flags;
-
     public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->cache = new \stdClass;
-        $this->eventRules = new \stdClass;
     }
 
     public function provider(): string
@@ -107,9 +97,6 @@ class Segment implements SegmentContract
             if ($cso) {
                 $params['fields'] = json_encode($cso);
             }
-            if ($this->cache) {
-                $params['cache'] = json_encode($this->cache);
-            }
             $response = $this->client->get(sprintf($endpoint, $campaignSegment->code, $checkedId), [
                 'query' => $params,
             ]);
@@ -119,21 +106,6 @@ class Segment implements SegmentContract
         }
 
         $result = json_decode($response->getBody());
-        if ($result->cache) {
-            foreach (get_object_vars($result->cache) as $ruleId => $ruleCache) {
-                $this->cache->$ruleId = $ruleCache;
-            }
-        }
-        if (isset($result->event_rules)) {
-            $this->eventRules = $result->event_rules;
-        }
-        if (isset($result->overridable_fields)) {
-            $this->overridableFields = $result->overridable_fields;
-        }
-        if (isset($result->flags)) {
-            $this->flags = $result->flags;
-        }
-
         return $result->check;
     }
 
@@ -172,28 +144,5 @@ class Segment implements SegmentContract
     public function removeUserFromCache(CampaignSegment $campaignSegment, string $userId): bool
     {
         return false;
-    }
-
-    public function setProviderData($cache): void
-    {
-        $this->cache = $cache;
-    }
-
-    public function getProviderData()
-    {
-        $pd = new \stdClass();
-        if ($this->cache) {
-            $pd->cache = $this->cache;
-        }
-        if ($this->eventRules) {
-            $pd->event_rules = $this->eventRules;
-        }
-        if ($this->overridableFields) {
-            $pd->overridable_fields = $this->overridableFields;
-        }
-        if ($this->flags) {
-            $pd->flags = $this->flags;
-        }
-        return $pd;
     }
 }

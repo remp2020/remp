@@ -6,16 +6,8 @@ import (
 
 // set of constants reused within multiple actions
 const (
-	SegmentPattern        = `^[a-zA-Z0-9_\-@.]+$`
-	UserPattern           = `^[a-zA-Z0-9_\-@.]+$`
-	CacheParamDescription = `JSON-encoded object of internal cache with count of events provided by third party (mostly Beam's remplib.js), e.g.:
-
-	{
-		10: { // segment rule ID
-			"d": "2017-11-07T08:06:26.612Z" // RFC3339 date
-			"c": 11 // number of occurrences
-		}
-	}`
+	SegmentPattern         = `^[a-zA-Z0-9_\-@.]+$`
+	UserPattern            = `^[a-zA-Z0-9_\-@.]+$`
 	FieldsParamDescription = `JSON-encoded object of overriden pairs, e.g.:
 
 	{
@@ -92,7 +84,6 @@ var _ = Service("segments", func() {
 				Pattern(UserPattern)
 			})
 			Attribute("fields", String, FieldsParamDescription)
-			Attribute("cache", String, CacheParamDescription)
 		})
 		Error("not_found")
 		Error("bad_request")
@@ -101,7 +92,6 @@ var _ = Service("segments", func() {
 			GET("/{segment_code}/users/check/{user_id}")
 			Params(func() {
 				Param("fields")
-				Param("cache")
 			})
 			Response("not_found", StatusNotFound)
 			Response("bad_request", StatusBadRequest)
@@ -121,14 +111,12 @@ var _ = Service("segments", func() {
 				Pattern(UserPattern)
 			})
 			Attribute("fields", String, FieldsParamDescription)
-			Attribute("cache", String, CacheParamDescription)
 		})
 		Result(SegmentCheck)
 		HTTP(func() {
 			GET("/{segment_code}/browsers/check/{browser_id}")
 			Params(func() {
 				Param("fields")
-				Param("cache")
 			})
 			Response("not_found", StatusNotFound)
 			Response("bad_request", StatusBadRequest)

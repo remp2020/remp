@@ -62,9 +62,6 @@ type PageviewRow model.PageviewRow
 // PageviewRowCollection is the collection of PageviewRow events.
 type PageviewRowCollection model.PageviewRowCollection
 
-// SegmentCache represent cache object for count of events of SegmentRules.
-type SegmentCache model.SegmentCache
-
 // TimeHistogramItem represent row with date time histogram data.
 type TimeHistogramItem model.TimeHistogramItem
 
@@ -583,18 +580,6 @@ func (prc PageviewRowCollection) ToMediaType() (pageviews.PageviewsCollection, e
 		mt = append(mt, pr)
 	}
 	return mt, nil
-}
-
-// ToMediaType converts internal PageviewRowCollection representation to application one.
-func (sc SegmentCache) ToMediaType() map[int]*segments.SegmentRuleCache {
-	mt := make(map[int]*segments.SegmentRuleCache)
-	for key, c := range sc {
-		mt[key] = &segments.SegmentRuleCache{
-			S: c.SyncedAt.Format(time.RFC3339),
-			C: c.Count,
-		}
-	}
-	return mt
 }
 
 // ToMediaType converts internal TimeHistogramItem representation to application one.

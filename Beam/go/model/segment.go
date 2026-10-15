@@ -33,36 +33,18 @@ type SegmentStorage interface {
 	// Groups returns all available segment groups.
 	Groups() (SegmentGroupCollection, error)
 	// CheckUser verifies presence of user within provided segment.
-	CheckUser(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
+	CheckUser(segment *Segment, userID string, now time.Time, ro RuleOverrides) (bool, error)
 	// CheckBrowser verifies presence of browser within provided segment.
-	CheckBrowser(segment *Segment, browserID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error)
+	CheckBrowser(segment *Segment, browserID string, now time.Time, ro RuleOverrides) (bool, error)
 	// Users return list of all users within segment.
 	Users(segment *Segment, now time.Time, ro RuleOverrides) ([]string, error)
 	// CountAll returns count of unique tracked users.
 	CountAll() (int, error)
-	// EventRules returns map of rules assigned to given "category/event" key.
-	EventRules() EventRules
-	// OverridableFields returns array of fields that expect to be overriden when rule is checked.
-	OverridableFields() OverridableFields
-	// Flags returns array of flags available for rules.
-	Flags() Flags
 	// Related compares provided criteria to existing segments and returns segments with same criteria.
 	Related(SegmentCriteria) (SegmentCollection, error)
 	// BuildRules builds segment rules from segment criteria.
 	BuildRules(segment *Segment) ([]SegmentRule, bool, error)
 }
-
-// EventRules represent map of rules with given "category/event" assigned
-type EventRules map[string][]int
-
-// OverridableFields represent array of fields (key-value pairs) keyed by Rule ID.
-type OverridableFields map[int][]string
-
-// Flags represent array of flags keyed by Rule ID.
-type Flags map[int]map[string]string
-
-// SegmentCache represents event count information for SegmentRules indexed by SegmentRule ID.
-type SegmentCache map[int]*SegmentRuleCache
 
 // Segment structure.
 type Segment struct {
@@ -317,7 +299,7 @@ func (sDB *SegmentDB) Groups() (SegmentGroupCollection, error) {
 }
 
 // CheckUser verifies presence of user within provided segment.
-func (sDB *SegmentDB) CheckUser(segment *Segment, userID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
+func (sDB *SegmentDB) CheckUser(segment *Segment, userID string, now time.Time, ro RuleOverrides) (bool, error) {
 	if segment.Group.Type == explicitSegmentType {
 		if _, ok := sDB.ExplicitSegmentsUsers[segment.Code]; !ok {
 			// if segment is not present in the cache, reload
@@ -325,16 +307,16 @@ func (sDB *SegmentDB) CheckUser(segment *Segment, userID string, now time.Time, 
 		}
 		segmentUsers, ok := sDB.ExplicitSegmentsUsers[segment.Code]
 		if !ok {
-			return cache, false, nil
+			return false, nil
 		}
 		_, ok = segmentUsers[userID]
-		return cache, ok, nil
+		return ok, nil
 	}
-	return sDB.check(segment, "user_id", userID, now, cache, ro)
+	return sDB.check(segment, "user_id", userID, now, ro)
 }
 
 // CheckBrowser verifies presence of browser within provided segment.
-func (sDB *SegmentDB) CheckBrowser(segment *Segment, browserID string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
+func (sDB *SegmentDB) CheckBrowser(segment *Segment, browserID string, now time.Time, ro RuleOverrides) (bool, error) {
 	if segment.Group.Type == explicitSegmentType {
 		if _, ok := sDB.ExplicitSegmentsBrowsers[segment.Code]; !ok {
 			// if segment is not present in the cache, reload
@@ -342,67 +324,36 @@ func (sDB *SegmentDB) CheckBrowser(segment *Segment, browserID string, now time.
 		}
 		segmentBrowsers, ok := sDB.ExplicitSegmentsBrowsers[segment.Code]
 		if !ok {
-			return cache, false, nil
+			return false, nil
 		}
 		_, ok = segmentBrowsers[browserID]
-		return cache, ok, nil
+		return ok, nil
 	}
-	return sDB.check(segment, "browser_id", browserID, now, cache, ro)
+	return sDB.check(segment, "browser_id", browserID, now, ro)
 }
 
 // Check verifies presence of provided tag within segment by its value.
-func (sDB *SegmentDB) check(segment *Segment, tagName, tagValue string, now time.Time, cache SegmentCache, ro RuleOverrides) (SegmentCache, bool, error) {
-	c := make(SegmentCache)
-
-	// copy cache to new instance to prevent mutability of original cache
-	for key, val := range cache {
-		c[key] = &SegmentRuleCache{
-			Count:    val.Count,
-			SyncedAt: val.SyncedAt,
-		}
-	}
-
+func (sDB *SegmentDB) check(segment *Segment, tagName, tagValue string, now time.Time, ro RuleOverrides) (bool, error) {
 	for _, sr := range segment.Rules {
 		osr := sr.applyOverrides(ro)
 
-		cacheKey := sr.getCacheKey(ro)
-		src, ok := cache[cacheKey]
-
-		// get count
-		var count int
-		var err error
-		if sr.cacheable() && ok {
-			count = src.Count
-			// update cache
-			c[cacheKey] = &SegmentRuleCache{
-				Count:    count,
-				SyncedAt: cache[cacheKey].SyncedAt,
-			}
-		} else {
-			count, err = sDB.getRuleEventCount(osr, tagName, tagValue, now, ro)
-			if err != nil {
-				return nil, false, errors.Wrap(err, "unable to get SegmentRule event count")
-			}
-			// set synced cache
-			c[cacheKey] = &SegmentRuleCache{
-				Count:    count,
-				SyncedAt: now,
-			}
+		count, err := sDB.getRuleEventCount(osr, tagName, tagValue, now, ro)
+		if err != nil {
+			return false, errors.Wrap(err, "unable to get SegmentRule event count")
 		}
 
-		// evaluate
-		ok, err = osr.Evaluate(count)
+		ok, err := osr.Evaluate(count)
 		if err != nil {
-			return nil, false, errors.Wrap(err, "unable to evaluate SegmentRule")
+			return false, errors.Wrap(err, "unable to evaluate SegmentRule")
 		}
 
 		// if user doesn't match current rule, no need to evaluate further
 		if !ok {
-			return c, ok, nil
+			return false, nil
 		}
 	}
 
-	return c, true, nil
+	return true, nil
 }
 
 // getRuleEventCount returns real db-based number of events occurred based on provided SegmentRule.
@@ -658,43 +609,6 @@ func (sDB *SegmentDB) CacheExplicitSegments() error {
 	sDB.ExplicitSegmentsUsers = usersSet
 	sDB.ExplicitSegmentsBrowsers = browsersSet
 	return nil
-}
-
-// EventRules returns map of rules assigned to given "category/event" key
-func (sDB *SegmentDB) EventRules() EventRules {
-	er := make(EventRules)
-	for _, s := range sDB.Segments {
-		for _, sr := range s.Rules {
-			if !sr.cacheable() {
-				continue
-			}
-			key := fmt.Sprintf("%s/%s", sr.EventCategory, sr.EventAction)
-			er[key] = append(er[key], sr.ID)
-		}
-	}
-	return er
-}
-
-// OverridableFields returns array of fields that expect to be overriden when rule is checked.
-func (sDB *SegmentDB) OverridableFields() OverridableFields {
-	of := make(OverridableFields)
-	for _, s := range sDB.Segments {
-		for _, sr := range s.Rules {
-			of[sr.ID] = sr.overridableFields()
-		}
-	}
-	return of
-}
-
-// Flags returns array of flags available for rules.
-func (sDB *SegmentDB) Flags() Flags {
-	flags := make(Flags)
-	for _, s := range sDB.Segments {
-		for _, sr := range s.Rules {
-			flags[sr.ID] = sr.flags()
-		}
-	}
-	return flags
 }
 
 // Related compares provided criteria to existing segments and returns segments with same criteria.

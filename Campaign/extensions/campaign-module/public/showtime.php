@@ -142,7 +142,7 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
         ], $statusCode);
     }
 
-    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners, array $evaluationMessages = [])
+    public function success(string $callback, $data, $activeCampaigns, $suppressedBanners, array $evaluationMessages = [])
     {
         $responseData = [
             'success' => true,
@@ -150,7 +150,6 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
             'data' => empty($data) ? [] : $data,
             'activeCampaignIds' => array_column($activeCampaigns, 'uuid'),
             'activeCampaigns' => $activeCampaigns,
-            'providerData' => $providerData,
             'suppressedBanners' => $suppressedBanners,
         ];
 

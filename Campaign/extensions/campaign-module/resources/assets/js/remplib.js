@@ -47,7 +47,6 @@ class Campaign {
                 "sessionReferer": remplib.getRempSessionReferer() || null,
                 "campaigns": remplib.campaign.getCampaignsForShowtime(),
                 "campaignsSession": remplib.campaign.getCampaignsSessionsForShowtime(),
-                "cache": JSON.parse(localStorage.getItem(remplib.segmentProviderCacheKey)),
                 "userAgent": window.navigator.userAgent,
                 "usingAdblock": remplib.usingAdblock,
                 "pageviewAttributes": remplib.campaign.pageviewAttributes,
@@ -67,10 +66,6 @@ class Campaign {
                 return;
             }
 
-            // deprecated
-            window.dispatchEvent(new CustomEvent("campaign_showtime", {
-                detail: response.providerData,
-            }));
             window.dispatchEvent(new CustomEvent("campaign_showtime_response", {
                 detail: { response, requestData }
             }));

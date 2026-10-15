@@ -10,17 +10,6 @@ var RuleOverrides = Type("RuleOverrides", func() {
 	Attribute("fields", MapOf(String, String), "Field values")
 })
 
-var SegmentRuleCache = Type("SegmentRuleCache", func() {
-	Description("Internal cache object with count of event")
-
-	Attribute("s", String, "Date of last sync with DB.", func() {
-		Format(FormatDateTime)
-	})
-	Attribute("c", Int, "Count of events occurred within timespan of segment rule.")
-
-	Required("s", "c")
-})
-
 var ListEventOptionsPayload = Type("ListEventOptionsPayload", func() {
 	Description("Parameters to filter events list")
 

@@ -18,7 +18,7 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             ]);
     }
 
-    public function success(string $callback, $data, $activeCampaigns, $providerData, $suppressedBanners, array $evaluationMessages = [])
+    public function success(string $callback, $data, $activeCampaigns, $suppressedBanners, array $evaluationMessages = [])
     {
         $responseData = [
             'success' => true,
@@ -26,7 +26,6 @@ class ControllerShowtimeResponse implements ShowtimeResponse
             'data' => empty($data) ? [] : $data,
             'activeCampaignIds' => array_column($activeCampaigns, 'uuid'),
             'activeCampaigns' => $activeCampaigns,
-            'providerData' => $providerData,
             'suppressedBanners' => $suppressedBanners
         ];
 

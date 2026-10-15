@@ -118,26 +118,6 @@ class SegmentAggregator implements SegmentContract
         return "{$campaignSegment->provider}|{$campaignSegment->code}";
     }
 
-    public function setProviderData($cache): void
-    {
-        foreach ($this->contracts as $provider => $contract) {
-            if ($cache && isset($cache->$provider)) {
-                $contract->setProviderData($cache->$provider);
-            }
-        }
-    }
-
-    public function getProviderData()
-    {
-        $cache = new \stdClass;
-        foreach ($this->contracts as $provider => $contract) {
-            if ($cc = $contract->getProviderData()) {
-                $cache->$provider = $cc;
-            }
-        }
-        return $cache;
-    }
-
     public function hasErrors()
     {
         return count($this->errors) > 0;

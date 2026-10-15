@@ -150,12 +150,8 @@ var SegmentCheck = ResultType("application/vnd.segment.check+json", func() {
 	Description("Segment check")
 	Attributes(func() {
 		Attribute("check", Boolean, "Flag whether user is in the segment or not")
-		Attribute("cache", MapOf(Int, SegmentRuleCache), "Cache object for third party (remplib.js) to use indexed by SegmentRule-based key")
-		Attribute("event_rules", MapOf(String, ArrayOf(Int)), "Map of which rules should be incremented for selected events.")
-		Attribute("overridable_fields", MapOf(Int, ArrayOf(String)), "Array of overridable fields belonging to rules.")
-		Attribute("flags", MapOf(Int, MapOf(String, String)), "Array of flags belonging to rules.")
 	})
-	Required("check", "cache", "event_rules", "overridable_fields", "flags")
+	Required("check")
 })
 
 var SegmentGroup = ResultType("application/vnd.segment.group+json", func() {

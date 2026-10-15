@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Beam]
 
+- **BREAKING**: [Segments] Removed the `cache` parameter and the `cache`, `event_rules`, `overridable_fields` and `flags` response fields from the `/segments/{code}/users/check/{user_id}` and `/segments/{code}/browsers/check/{browser_id}` endpoints. Feature has not been actually used for some time. remp/remp#772
+  - Older Campaign versions expect the removed fields and may fail to evaluate Beam segments. Deploy this version of Campaign before or together with Beam Segments API.
+  - If you call these endpoints from your own code, stop reading the removed fields.
+- Removed the client-side segment rule cache from `remplib.js`. The tracker no longer stores segment rules or event counts in `localStorage` (and removes the `segment_provider_cache` and `beam_event_rules_map` keys left there by previous versions). remp/remp#772
 - Lowered z-index of the iota on-site overlay to 9996–9998 so it no longer covers Campaign banners (9999 and above). remp/helpdesk#5008
 - Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
 - [Segments] Fixed unnecessary warnings logging when aggregation did not match any records. remp/remp#1514  
@@ -16,6 +20,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Campaign]
 
+- **BREAKING**: Removed `setProviderData()` and `getProviderData()` from `SegmentContract` and `SegmentAggregator`. They only passed the unused client-side Beam segment cache between the browser and the Segments API. remp/remp#772
+  - Custom segment providers can delete their implementations of these methods; keeping them does no harm.
+  - Remove any of your code calling these methods on `SegmentAggregator`.
+- **BREAKING**: Removed the `$providerData` parameter from `ShowtimeResponse::success()`. Custom `ShowtimeResponse` implementations have to drop the parameter from their `success()` method. remp/remp#772
+- **BREAKING**: Removed `providerData` from the showtime response and the deprecated `campaign_showtime` browser event, which only carried `providerData`. If you listen to `campaign_showtime`, switch to `campaign_showtime_response`. remp/remp#772
+- `remplib.js` no longer sends the client-side segment cache in the showtime request, which made the request URL grow with every evaluated segment rule. remp/remp#772
 - **IMPORTANT**: The `data-href` attribute of Overlay Rectangle, HTML and HTML Overlay banners now contains the tracking parameters (`rtm_*`), same as the `href` of the banner link it replaced. remp/helpdesk#5042 
   - If your custom code reads `data-href` and appends the tracking parameters itself, remove that to avoid duplicate parameters.
 - Added `From` option to campaign `Every N page views` display rule, allowing the banner to start displaying at a later pageview than the first one. remp/remp#1488

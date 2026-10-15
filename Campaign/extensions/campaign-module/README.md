@@ -212,17 +212,6 @@ If you want to link the Campaign to your own system, these are the methods to im
   by the application or not. If `true`, Campaign will every hour request `users()` for each active Campaign
   and stores the collection of user IDs to the application cache.
 
-* `getProviderData()`: Provider can pass arbitrary data back to the user's browser. This can be leveraged to cache
-  browser/user related information without affecting the backend system. This data can be then altered by JS
-  in the frontend application (if needed). All provided data is passed back to the server on each `campaign/showtime`
-  request - on each banner display attempt.
-
-  *Note: We use this kind of caching to count number of trackable events directly in browser. Segment rules based
-  on these events are then evaluated based on the data provided in cache instead of hitting database.
-  This method dramatically improved performance of REMP Beam event database (Elasticsearch).*
-* `setProviderData($providerData): void`: Complementary *providerData* method to store back the data provided
-  by frontend application in incoming request.
-
 When implemented, create a segment provider providing the instance of your implementation. The provider
 should set `\App\Contracts\SegmentAggregator::TAG` to the class so your implementation would get also
 registered to the `SegmentAggregator`.

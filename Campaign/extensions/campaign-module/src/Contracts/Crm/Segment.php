@@ -23,14 +23,11 @@ class Segment implements SegmentContract, RedisAwareInterface
 
     private $client;
 
-    private $providerData;
-
     private $redis;
 
     public function __construct(Client $client, \Predis\Client|\Redis $redis)
     {
         $this->client = $client;
-        $this->providerData = new \stdClass;
         $this->redis = $redis;
     }
 
@@ -121,16 +118,6 @@ class Segment implements SegmentContract, RedisAwareInterface
     public function cacheEnabled(CampaignSegment $campaignSegment): bool
     {
         return true;
-    }
-
-    public function setProviderData($providerData): void
-    {
-        $this->providerData = $providerData;
-    }
-
-    public function getProviderData()
-    {
-        return $this->providerData;
     }
 
     public function addUserToCache(CampaignSegment $campaignSegment, string $userId): bool

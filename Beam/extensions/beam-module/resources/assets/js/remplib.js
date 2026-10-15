@@ -1,5 +1,4 @@
 import Remplib from '@remp/js-commons/js/remplib'
-import Hash from 'fnv1a'
 import throttle from 'lodash/throttle';
 import Impressions from "./impressions";
 
@@ -22,14 +21,6 @@ class Tracker {
     refererMedium = null;
 
     uriParams = {};
-
-    segmentProvider = "remp_segment";
-
-    eventRulesMapKey = "beam_event_rules_map";
-
-    overridableFieldsKey = "overridable_fields";
-
-    flagsKey = "flags";
 
     timeSpentEnabled = false;
 
@@ -134,11 +125,13 @@ class Tracker {
             }
         }
 
-        window.addEventListener("campaign_showtime", this.syncSegmentRulesCache);
-        window.addEventListener("campaign_showtime", this.syncEventRulesMap);
-        window.addEventListener("campaign_showtime", this.syncOverridableFields);
-        window.addEventListener("campaign_showtime", this.syncFlags);
-        window.addEventListener("beam_event", this.incrementSegmentRulesCache);
+        // cleanup of storage keys of removed client-side segment cache; can be removed in the future
+        try {
+            localStorage.removeItem("segment_provider_cache");
+            localStorage.removeItem("beam_event_rules_map");
+        } catch (e) {
+            // storage not accessible, nothing to clean up
+        }
 
         if (typeof config.tracker.readingProgress === 'object') {
             if (typeof config.tracker.readingProgress.enabled === 'boolean') {
@@ -234,143 +227,6 @@ class Tracker {
                 this.article.elementFn = article.elementFn
             }
         }
-    }
-
-    syncSegmentRulesCache(e) {
-        if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
-            return;
-        }
-        if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("cache")) {
-            return;
-        }
-        let segmentProviderCache = localStorage.getItem(remplib.segmentProviderCacheKey);
-        if (segmentProviderCache) {
-            segmentProviderCache = JSON.parse(segmentProviderCache);
-        }
-        if (!segmentProviderCache) {
-            segmentProviderCache = {};
-        }
-        segmentProviderCache[remplib.tracker.segmentProvider] = e.detail[remplib.tracker.segmentProvider]["cache"]
-        localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(segmentProviderCache));
-    }
-
-    syncEventRulesMap(e) {
-        if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
-            return;
-        }
-        if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("event_rules")) {
-            return;
-        }
-        localStorage.setItem(remplib.tracker.eventRulesMapKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["event_rules"]));
-    }
-
-    syncOverridableFields(e) {
-        if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
-            return;
-        }
-        if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("overridable_fields")) {
-            return;
-        }
-        localStorage.setItem(remplib.tracker.overridableFieldsKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["overridable_fields"]));
-    }
-
-    syncFlags(e) {
-        if (!e.detail.hasOwnProperty(remplib.tracker.segmentProvider)) {
-            return;
-        }
-        if (!e.detail[remplib.tracker.segmentProvider].hasOwnProperty("flags")) {
-            return;
-        }
-        localStorage.setItem(remplib.tracker.flagsKey, JSON.stringify(e.detail[remplib.tracker.segmentProvider]["flags"]));
-    }
-
-    incrementSegmentRulesCache(event) {
-        let cache = localStorage.getItem(remplib.segmentProviderCacheKey);
-        if (cache) {
-            cache = JSON.parse(cache);
-        }
-        if (!cache || !cache.hasOwnProperty(remplib.tracker.segmentProvider)) {
-            return;
-        }
-        let eventRules = localStorage.getItem(remplib.tracker.eventRulesMapKey);
-        if (eventRules) {
-            eventRules = JSON.parse(eventRules);
-        }
-        if (!eventRules) {
-            return;
-        }
-
-        // check whether some rule uses triggered event
-        let params = event.detail;
-        let key = params["_category"] + "/" + params["_action"];
-        if (!eventRules.hasOwnProperty(key)) {
-            return;
-        }
-
-        // increment counts where applicable
-        for (let ruleId of eventRules[key]) {
-            const flagsValid = remplib.tracker.validateFlags(ruleId);
-            if (!flagsValid) {
-                continue;
-            }
-
-            let overridableFields = localStorage.getItem(remplib.tracker.overridableFieldsKey);
-            if (overridableFields) {
-                overridableFields = JSON.parse(overridableFields);
-            } else {
-                overridableFields = [];
-            }
-            if (!overridableFields.hasOwnProperty(ruleId)) {
-                console.warn("remplib: missing overridable fields for rule " + ruleId);
-                continue;
-            }
-
-            const cacheKey = remplib.tracker.segmentRuleKey(ruleId, of[ruleId], params);
-            if (!cache[remplib.tracker.segmentProvider].hasOwnProperty(cacheKey)) {
-                continue;
-            }
-            cache[remplib.tracker.segmentProvider][cacheKey]["c"] += 1;
-        }
-        localStorage.setItem(remplib.segmentProviderCacheKey, JSON.stringify(cache));
-
-    }
-
-    // checks if all flags are matched against provided config
-    validateFlags(ruleId) {
-        let flags = localStorage.getItem(remplib.tracker.flagsKey);
-        if (flags) {
-            flags = JSON.parse(flags);
-        } else {
-            flags = [];
-        }
-
-        if (!flags.hasOwnProperty(ruleId)) {
-            console.warn("remplib: missing flags for rule " + ruleId);
-            return false;
-        }
-
-        for (let f of Object.keys(flags[ruleId])) {
-            // duplicating flag handling from track/pageviews API call
-            if (f === 'is_article') {
-                if (flags[ruleId][f] === '1' && !remplib.tracker.article) {
-                    return false;
-                }
-                if (flags[ruleId][f] === '0' && remplib.tracker.article) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    // this function needs to work the same way as SegmentRule.getCacheKey on the segments backend.
-    segmentRuleKey(ruleId, overridableFields, params) {
-        let k = ruleId.toString();
-        overridableFields = overridableFields.sort();
-        for (let f of overridableFields) {
-            k += "_" + (params['tags'][f] || params['fields'][f] || '');
-        }
-        return Hash(k);
     }
 
     checkInit() {

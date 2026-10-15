@@ -89,7 +89,7 @@ func (c *SegmentController) Groups(ctx context.Context) (res *segments.SegmentGr
 
 // CheckUser runs the check_user action.
 func (c *SegmentController) CheckUser(ctx context.Context, p *segments.CheckUserPayload) (res *segments.SegmentCheck, err error) {
-	sc, ok, err := c.handleCheck(UserSegment, *p.SegmentCode, *p.UserID, p.Fields, p.Cache)
+	sc, ok, err := c.handleCheck(UserSegment, *p.SegmentCode, *p.UserID, p.Fields)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *SegmentController) CheckUser(ctx context.Context, p *segments.CheckUser
 
 // CheckBrowser runs the check_browser action.
 func (c *SegmentController) CheckBrowser(ctx context.Context, p *segments.CheckBrowserPayload) (res *segments.SegmentCheck, err error) {
-	sc, ok, err := c.handleCheck(BrowserSegment, *p.SegmentCode, *p.BrowserID, p.Fields, p.Cache)
+	sc, ok, err := c.handleCheck(BrowserSegment, *p.SegmentCode, *p.BrowserID, p.Fields)
 	if err != nil {
 		return nil, err
 	}
@@ -294,7 +294,7 @@ func (c *SegmentController) handleUpdate(p *segments.SegmentPayload) (*segments.
 }
 
 // handleCheck determines whether provided identifier is part of segment based on given segment type.
-func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, identifier string, fields, cache *string) (*segments.SegmentCheck, bool, error) {
+func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, identifier string, fields *string) (*segments.SegmentCheck, bool, error) {
 	s, ok, err := c.SegmentStorage.Get(segmentCode)
 	if err != nil {
 		return nil, false, err
@@ -304,7 +304,7 @@ func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, id
 	}
 	now := time.Now()
 
-	// unmarshal fields and cache
+	// unmarshal fields
 	var ro model.RuleOverrides
 	if fields != nil {
 		overrides := make(map[string]string)
@@ -313,30 +313,12 @@ func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, id
 		}
 		ro.Fields = overrides
 	}
-	var segmentCache model.SegmentCache
-	if cache != nil {
-		if err := json.Unmarshal([]byte(*cache), &segmentCache); err != nil {
-			return nil, false, errors.Wrap(err, "invalid format of cache JSON string")
-		}
-	}
 
 	switch segmentType {
 	case BrowserSegment:
-		// unset invalidated elements, keeping the cache longer as single-browser doesn't need count syncing that often (no other devices affect the count)
-		for id, c := range segmentCache {
-			if c.SyncedAt.Before(now.Add(-24 * time.Hour)) {
-				delete(segmentCache, id)
-			}
-		}
-		segmentCache, ok, err = c.SegmentStorage.CheckBrowser(s, identifier, now, segmentCache, ro)
+		ok, err = c.SegmentStorage.CheckBrowser(s, identifier, now, ro)
 	case UserSegment:
-		// unset invalidated elements, removing the cache after one hour to sync count which could include other user's devices
-		for id, c := range segmentCache {
-			if c.SyncedAt.Before(now.Add(-1 * time.Hour)) {
-				delete(segmentCache, id)
-			}
-		}
-		segmentCache, ok, err = c.SegmentStorage.CheckUser(s, identifier, now, segmentCache, ro)
+		ok, err = c.SegmentStorage.CheckUser(s, identifier, now, ro)
 	default:
 		return nil, false, fmt.Errorf("unhandled segment type: %d", segmentType)
 	}
@@ -344,15 +326,8 @@ func (c *SegmentController) handleCheck(segmentType SegmentType, segmentCode, id
 	if err != nil {
 		return nil, false, err
 	}
-	er := c.SegmentStorage.EventRules()
-	of := c.SegmentStorage.OverridableFields()
-	flags := c.SegmentStorage.Flags()
 
 	return &segments.SegmentCheck{
-		Check:             ok,
-		Cache:             (SegmentCache(segmentCache)).ToMediaType(),
-		EventRules:        er,
-		OverridableFields: of,
-		Flags:             flags,
+		Check: ok,
 	}, true, nil
 }

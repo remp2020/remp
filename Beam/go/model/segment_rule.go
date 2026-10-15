@@ -5,9 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"hash/fnv"
 	"sort"
-	"strconv"
 	"time"
 
 	cache "github.com/patrickmn/go-cache"
@@ -32,8 +30,6 @@ type SegmentRule struct {
 	Flags         JSONMap
 
 	Segment *Segment `db:"segment"`
-
-	cacheKey int
 }
 
 // RuleOverrides represent key-value string pairs for overriding stored tags in segment rules.
@@ -43,12 +39,6 @@ type RuleOverrides struct {
 
 // JSONMap represents key-value string pairs stored as string JSON [{"key": "foo", "value": "bar"}].
 type JSONMap []map[string]string
-
-// SegmentRuleCache represents event count information for single SegmentRule.
-type SegmentRuleCache struct {
-	SyncedAt time.Time `json:"s"`
-	Count    int       `json:"c"`
-}
 
 // Value returns JSON-encoded value of JSONMap.
 func (jm JSONMap) Value() (driver.Value, error) {
@@ -242,59 +232,4 @@ func (sr *SegmentRule) overridableFields() []string {
 	}
 	sort.Strings(fields)
 	return fields
-}
-
-// flags returns map of used flags with values (e.g. "is_article": "1")
-func (sr *SegmentRule) flags() map[string]string {
-	flags := make(map[string]string)
-	for _, def := range sr.Flags {
-		if def["value"] == "" {
-			continue
-		}
-		flags[def["key"]] = def["value"]
-	}
-	return flags
-}
-
-// getCacheKey generates unique int-based key based on SegmentRule definition.
-func (sr *SegmentRule) getCacheKey(ro RuleOverrides) int {
-	if sr.cacheKey != 0 {
-		return sr.cacheKey
-	}
-	k := strconv.Itoa(sr.ID)
-
-	// use overridable fields
-	for _, f := range sr.overridableFields() {
-		k = fmt.Sprintf("%s_%s", k, ro.Fields[f])
-	}
-
-	// generate and store hash
-	h := fnv.New32a()
-	h.Write([]byte(k))
-	sr.cacheKey = int(h.Sum32())
-
-	return sr.cacheKey
-}
-
-// cacheable indicates whether the rule is cacheable or not. Only events trackable
-// via remplib.js on the frontend should be cacheable, otherwise the cache would keep
-// the segment in inconsistent state until the cache is invalidated.
-//
-// Idea behind cacheability is that frontend is able to keep track of number of actual
-// events and the count gets synced with DB state only once in a while
-func (sr *SegmentRule) cacheable() bool {
-	if sr.EventCategory == "pageview" && sr.EventAction == "load" {
-		return false
-	}
-	if sr.EventCategory == "banner" && sr.EventAction == "show" {
-		return false
-	}
-	if sr.EventCategory == "banner" && sr.EventAction == "click" {
-		return false
-	}
-	if sr.EventCategory == "banner" && sr.EventAction == "close" {
-		return false
-	}
-
-	return false
 }
