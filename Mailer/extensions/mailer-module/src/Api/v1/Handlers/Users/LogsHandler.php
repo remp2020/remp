@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\MailerModule\Api\v1\Handlers\Users;
 
+use Nette\Application\LinkGenerator;
 use Nette\Http\IResponse;
 use Nette\Utils\DateTime;
 use Remp\MailerModule\Api\JsonValidationTrait;
@@ -23,9 +24,11 @@ class LogsHandler extends BaseHandler
 
     public function __construct(
         private readonly LogsRepository $logsRepository,
-        private readonly TemplatesRepository $templatesRepository
+        private readonly TemplatesRepository $templatesRepository,
+        private readonly LinkGenerator $netteLinkGenerator,
     ) {
         parent::__construct();
+        $this->linkGenerator = $this->netteLinkGenerator;
     }
 
     public function params(): array
@@ -95,10 +98,17 @@ class LogsHandler extends BaseHandler
             $item->email = $log->email;
             $item->user_id = $log->user_id ?? null;
             $item->subject = $log->subject;
+            $mailTemplate = $mailTemplates[$log->mail_template_id];
             $item->mail_template = [
                 'id' => $log->mail_template_id,
-                'code' => $mailTemplates[$log->mail_template_id]->code,
-                'name' => $mailTemplates[$log->mail_template_id]->name,
+                'code' => $mailTemplate->code,
+                'name' => $mailTemplate->name,
+                'public_preview_url' => $this->netteLinkGenerator->link('Mailer:Preview:Public', [$mailTemplate->public_code]),
+            ];
+            $item->mail_type = [
+                'id' => $mailTemplate->mail_type_id,
+                'code' => $mailTemplate->mail_type->code,
+                'title' => $mailTemplate->mail_type->title,
             ];
             $item->sent_at = $this->formatDate($log->created_at);
             $item->delivered_at = $this->formatDate($log->delivered_at);

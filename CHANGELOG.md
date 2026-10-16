@@ -42,6 +42,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Health check endpoint (`/health`) no longer exposes error details (file paths, stack traces) in `context` of failed checks unless debug mode is enabled; details are written to the application log instead. remp/crm#1796
 - Fixed external newsletter lists getting a subscription record for every user from the user base. remp/web#3108
 - Added signing of image URLs, so Mailer can add its own parameters (resizing, `rtm_*` tracking) to images served through a signing image proxy. remp/remp#1516
+- Added mail type and template's public preview URL to the `/api/v1/users/logs` API response. remp/crm#3904
 
 ### [Sso]
 
@@ -49,7 +50,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## Archive
 
-- [v5.1](./changelogs/CHANGELOG-v5.2.md)
+- [v5.2](./changelogs/CHANGELOG-v5.2.md)
 - [v5.1](./changelogs/CHANGELOG-v5.1.md)
 - [v5.0](./changelogs/CHANGELOG-v5.0.md)
 - [v4.3](./changelogs/CHANGELOG-v4.3.md)

@@ -118,6 +118,7 @@ class DemoSeedCommand extends Command
         if (!$category) {
             $category = $this->listCategoriesRepository->insert([
                 'title' => 'Newsletters',
+                'code' => 'newsletters',
                 'sorting' => 100,
                 'created_at' => new DateTime(),
             ]);
