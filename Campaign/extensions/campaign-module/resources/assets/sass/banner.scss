@@ -1,8 +1,8 @@
-.serif {
+.remp-banner .serif {
     font-family: serif;
 }
 
-.sans-serif {
+.remp-banner .sans-serif {
     font-family: sans-serif;
 }
 
@@ -14,13 +14,12 @@
   padding-bottom: env(safe-area-inset-top, 0px);
 }
 
-/* transitions */
-
 .remp-banner #preview-close.hidden {
     display: none;
 }
 
-.remp-banner .fade-enter-active, .fade-leave-active {
+.remp-banner .fade-enter-active,
+.remp-banner .fade-leave-active {
     transition: opacity .5s
 }
 .remp-banner .fade-enter,
@@ -29,11 +28,11 @@
 }
 
 .remp-banner .bounce-enter-active {
-    animation: bounce linear 0.5s;
+    animation: remp-bounce linear 0.5s;
     animation-iteration-count: 1;
     transform-origin: 50% 50%;
 }
-@keyframes bounce{
+@keyframes remp-bounce {
     0% { transform: translate(0px,0px) }
     15% { transform: translate(0px,-25px) }
     30% { transform: translate(0px,0px) }
@@ -44,11 +43,11 @@
 }
 
 .remp-banner .shake-enter-active{
-    animation: shake linear 0.5s;
+    animation: remp-shake linear 0.5s;
     animation-iteration-count: 1;
     transform-origin: 50% 50%;
 }
-@keyframes shake{
+@keyframes remp-shake {
     0% { transform: translate(0px,0px) }
     10% { transform: translate(-10px,0px) }
     20% { transform: translate(10px,0px) }
@@ -63,13 +62,13 @@
 }
 
 .remp-banner .fade-in-down-enter-active {
-    animation: fadeInDown ease 0.5s;
+    animation: remp-fade-in-down ease 0.5s;
     animation-iteration-count: 1;
     transform-origin: 50% 50%;
     animation-fill-mode:forwards; /*when the spec is finished*/
 }
 
-@keyframes fadeInDown{
+@keyframes remp-fade-in-down {
     0% { opacity: 0;  transform: translate(0px,-25px) }
     100% { opacity: 1; transform: translate(0px,0px) }
 }

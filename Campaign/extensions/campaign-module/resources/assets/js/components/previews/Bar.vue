@@ -1,6 +1,4 @@
 <style type="text/css" scoped>
-@import url('../../../sass/transitions.scss');
-
 .bar-preview-close {
     position: relative;
     display: flex;

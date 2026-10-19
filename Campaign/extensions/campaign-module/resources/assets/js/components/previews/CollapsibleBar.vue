@@ -1,6 +1,4 @@
 <style type="text/css" scoped>
-@import url('../../../sass/transitions.scss');
-
 .collapsible-bar-wrap {
     bottom: 0;
     left: 0;

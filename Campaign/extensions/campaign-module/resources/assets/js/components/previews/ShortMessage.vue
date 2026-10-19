@@ -1,6 +1,4 @@
 <style type="text/css" scoped>
-@import url('../../../sass/transitions.scss');
-
 .short-message-preview-wrap {
     cursor: pointer;
 }

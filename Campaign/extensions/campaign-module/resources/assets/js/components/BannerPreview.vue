@@ -1,5 +1,5 @@
-<style type="text/css">
-    @import '../../sass/banner.scss';
+<style lang="scss">
+    @import '../../sass/banner';
 </style>
 
 <template>

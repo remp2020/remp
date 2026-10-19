@@ -1,6 +1,4 @@
 <style type="text/css" scoped>
-    @import url('../../../sass/transitions.scss');
-
     .preview-admin-close {
         position: fixed;
         top: 14px;

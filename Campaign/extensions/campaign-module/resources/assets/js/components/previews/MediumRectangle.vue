@@ -1,6 +1,4 @@
 <style type="text/css" scoped>
-@import url('../../../sass/transitions.scss');
-
 .medium-rectangle-preview-close {
     position: absolute;
     display: flex;

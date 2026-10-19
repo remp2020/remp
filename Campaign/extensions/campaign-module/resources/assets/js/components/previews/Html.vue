@@ -1,6 +1,4 @@
 <style type="text/css" scoped>
-@import url('../../../sass/transitions.scss');
-
 .html-preview-link {
     overflow: hidden;
     cursor: pointer;
@@ -133,7 +131,11 @@ export default {
         }
     },
     mounted: function () {
-        let styles = this.css ? this.css.replace(/\r?\n|\r/gm, " ") : '',
+        if (!this.css) {
+            return;
+        }
+
+        let styles = this.css.replace(/\r?\n|\r/gm, " "),
             head = document.head || document.getElementsByTagName('head')[0],
             style = document.createElement('style');
 

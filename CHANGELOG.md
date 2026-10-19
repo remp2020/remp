@@ -40,6 +40,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added IPv6 support to campaign IP address targeting (single addresses and ranges; a range must be either IPv4 or IPv6). remp/euobserver#281
 - Changed campaign cache to store IP ranges and countries once instead of duplicating them into whitelist/blacklist copies. remp/euobserver#281
 - Fixed `banner.js` being loaded and executed once for every banner displayed on the page, which inserted a full copy of all banner template styles into the page each time. `remplib.loadScript()` and `remplib.loadStyle()` now load each URL only once per document. remp/remp#1521
+- Fixed banner transition styles leaking into the page displaying the banner. remp/remp#1521
 
 ### [Mailer]
 
