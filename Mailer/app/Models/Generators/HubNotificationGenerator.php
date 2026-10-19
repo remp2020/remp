@@ -48,6 +48,7 @@ class HubNotificationGenerator implements IGenerator
             (new PostInputParam('author_json')),
             (new PostInputParam('tag_json')),
             (new PostInputParam('category_json')),
+            (new PostInputParam('articles_json')),
         ];
     }
 
@@ -61,6 +62,7 @@ class HubNotificationGenerator implements IGenerator
             'author' => Json::decode($input['author_json'] ?? 'null'),
             'tag' => Json::decode($input['tag_json'] ?? 'null'),
             'category' => Json::decode($input['category_json'] ?? 'null'),
+            'articles' => Json::decode($input['articles_json'] ?? 'null'),
         ]);
 
         return [
@@ -83,6 +85,9 @@ class HubNotificationGenerator implements IGenerator
         }
         if (isset($data->category)) {
             $output->category_json = Json::encode($data->category);
+        }
+        if (isset($data->articles)) {
+            $output->articles_json = Json::encode($data->articles);
         }
 
         return $output;
