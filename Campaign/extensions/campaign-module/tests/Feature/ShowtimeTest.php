@@ -7,6 +7,7 @@ use Remp\CampaignModule\Database\Seeders\CountrySeeder;
 use Remp\CampaignModule\Http\Showtime\DeviceRulesEvaluator;
 use Remp\CampaignModule\Http\Showtime\LazyDeviceDetector;
 use Remp\CampaignModule\Http\Showtime\ShowtimeConfig;
+use Remp\CampaignModule\Http\Showtime\ShowtimeResponse;
 use Remp\CampaignModule\Http\Showtime\ShowtimeTestable;
 use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\Campaign;
@@ -32,9 +33,11 @@ class ShowtimeTest extends TestCase
     use RefreshDatabase;
 
     protected ShowtimeTestable $showtime;
+    protected ShowtimeTestable $rendererShowtime;
     protected $segmentAggregator;
     protected Campaign $campaign;
     protected CampaignBanner $campaignBanner;
+    protected ClientInterface $redis;
 
     protected function setUp(): void
     {
@@ -42,6 +45,7 @@ class ShowtimeTest extends TestCase
 
         // Prepare showtime
         $redis = resolve(ClientInterface::class);
+        $this->redis = $redis;
 
         $this->segmentAggregator = Mockery::mock(SegmentAggregator::class);
         $geoReader = Mockery::mock(LazyGeoReader::class);
@@ -57,6 +61,9 @@ class ShowtimeTest extends TestCase
         $showtime->setColorSchemesMap(resolve(\Remp\CampaignModule\Models\ColorScheme\Map::class));
         $this->showtime = $showtime;
 
+        // maps are not set here, so they're loaded from Redis the same way as in production
+        $this->rendererShowtime = new ShowtimeTestable($redis, $this->segmentAggregator, $geoReader, $showtimeConfig, $deviceDetectionRules, $logger);
+
         // Prepare banner and campaign
         $banner = $this->prepareBanner();
 
@@ -71,6 +78,12 @@ class ShowtimeTest extends TestCase
             'weight' => 2
         ]);
         $this->campaign = $campaign;
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     private function scheduleCampaign()
@@ -1028,6 +1041,140 @@ class ShowtimeTest extends TestCase
             'campaign_public_id' => $campaign2->public_id,
             'suppressed_by_campaign_public_id' => $campaign1->public_id,
         ], array_pop($suppressedBanners));
+    }
+
+    public function testOneTimeBannerNone(): void
+    {
+        $this->assertNull($this->oneTimeBannerShowtime(Uuid::uuid(), Uuid::uuid()));
+    }
+
+    public function testOneTimeBannerSingle(): void
+    {
+        $userId = Uuid::uuid();
+        $browserId = Uuid::uuid();
+        $banner = $this->prepareOneTimeBanner();
+        $this->showtime->displayForUser($banner, $userId, 3600);
+
+        $this->assertEquals($banner->public_id, $this->oneTimeBannerShowtime($userId, $browserId));
+        // displayed only once
+        $this->assertNull($this->oneTimeBannerShowtime($userId, $browserId));
+    }
+
+    public function testOneTimeBannerMultipleInInsertionOrder(): void
+    {
+        $browserId = Uuid::uuid();
+        $banner1 = $this->prepareOneTimeBanner();
+        $banner2 = $this->prepareOneTimeBanner();
+        $banner3 = $this->prepareOneTimeBanner();
+
+        Carbon::setTestNow(Carbon::now());
+        $this->showtime->displayForBrowser($banner2, $browserId, 3600);
+        Carbon::setTestNow(Carbon::now()->addSecond());
+        $this->showtime->displayForBrowser($banner3, $browserId, 60);
+        Carbon::setTestNow(Carbon::now()->addSecond());
+        $this->showtime->displayForBrowser($banner1, $browserId, 3600);
+
+        $this->assertEquals($banner2->public_id, $this->oneTimeBannerShowtime(null, $browserId));
+        $this->assertEquals($banner3->public_id, $this->oneTimeBannerShowtime(null, $browserId));
+        $this->assertEquals($banner1->public_id, $this->oneTimeBannerShowtime(null, $browserId));
+        $this->assertNull($this->oneTimeBannerShowtime(null, $browserId));
+    }
+
+    public function testOneTimeBannerExpiredSkipped(): void
+    {
+        $userId = Uuid::uuid();
+        $browserId = Uuid::uuid();
+        $expiredBanner = $this->prepareOneTimeBanner();
+        $banner = $this->prepareOneTimeBanner();
+
+        Carbon::setTestNow(Carbon::now());
+        $this->showtime->displayForUser($expiredBanner, $userId, 60);
+        Carbon::setTestNow(Carbon::now()->addSecond());
+        $this->showtime->displayForUser($banner, $userId, 3600);
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(2));
+        $this->assertEquals($banner->public_id, $this->oneTimeBannerShowtime($userId, $browserId));
+        $this->assertNull($this->oneTimeBannerShowtime($userId, $browserId));
+    }
+
+    public function testOneTimeBannerExpiredPrunedOnWrite(): void
+    {
+        $userId = Uuid::uuid();
+        $key = "banner_onetime_user:$userId";
+        $expiredBanner = $this->prepareOneTimeBanner();
+        $banner = $this->prepareOneTimeBanner();
+
+        Carbon::setTestNow(Carbon::now());
+        $this->showtime->displayForUser($expiredBanner, $userId, 60);
+        Carbon::setTestNow(Carbon::now()->addMinutes(2));
+        $this->showtime->displayForUser($banner, $userId, 60);
+
+        $members = $this->redis->zrange($key, 0, -1);
+        $this->assertCount(1, $members);
+        $this->assertStringStartsWith("{$banner->id}:", $members[0]);
+    }
+
+    public function testOneTimeBannerKeyTtlNotShortened(): void
+    {
+        $userId = Uuid::uuid();
+        $key = "banner_onetime_user:$userId";
+
+        $this->showtime->displayForUser($this->prepareOneTimeBanner(), $userId, 60);
+        $this->assertLessThanOrEqual(60, $this->redis->ttl($key));
+
+        // longer banner extends the TTL
+        $this->showtime->displayForUser($this->prepareOneTimeBanner(), $userId, 3600);
+        $this->assertGreaterThan(3500, $this->redis->ttl($key));
+
+        // shorter banner doesn't shorten the TTL
+        $this->showtime->displayForUser($this->prepareOneTimeBanner(), $userId, 60);
+        $this->assertGreaterThan(3500, $this->redis->ttl($key));
+    }
+
+    public function testOneTimeUserBannerPrecedesBrowserBanner(): void
+    {
+        $userId = Uuid::uuid();
+        $browserId = Uuid::uuid();
+        $userBanner = $this->prepareOneTimeBanner();
+        $browserBanner = $this->prepareOneTimeBanner();
+
+        Carbon::setTestNow(Carbon::now());
+        $this->showtime->displayForBrowser($browserBanner, $browserId, 3600);
+        Carbon::setTestNow(Carbon::now()->addSecond());
+        $this->showtime->displayForUser($userBanner, $userId, 3600);
+
+        $this->assertEquals($userBanner->public_id, $this->oneTimeBannerShowtime($userId, $browserId));
+        $this->assertEquals($browserBanner->public_id, $this->oneTimeBannerShowtime($userId, $browserId));
+        $this->assertNull($this->oneTimeBannerShowtime($userId, $browserId));
+    }
+
+    private function prepareOneTimeBanner(): Banner
+    {
+        $banner = $this->prepareBanner();
+        $banner->cache();
+        return $banner;
+    }
+
+    /**
+     * Runs showtime and returns public ID of the displayed one-time banner (null if there's none).
+     */
+    private function oneTimeBannerShowtime(?string $userId, string $browserId): ?string
+    {
+        // make sure no campaign gets evaluated if there's no one-time banner
+        Campaign::refreshActiveCampaignsCache();
+
+        $showtimeResponse = Mockery::mock(ShowtimeResponse::class);
+        $showtimeResponse->shouldReceive('renderBanner')->andReturnUsing(fn (Banner $banner) => $banner->public_id);
+        $showtimeResponse->shouldReceive('success')->andReturnUsing(fn ($callback, $data) => $data);
+
+        $userData = json_encode([
+            'url' => 'test.example',
+            'userId' => $userId,
+            'browserId' => $browserId,
+            'referer' => null,
+        ]);
+        $data = $this->rendererShowtime->showtime($userData, 'callback', $showtimeResponse);
+        return $data[0] ?? null;
     }
 
     private function prepareCampaign(): Campaign

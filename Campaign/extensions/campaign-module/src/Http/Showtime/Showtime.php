@@ -769,20 +769,32 @@ class Showtime
 
     public function displayForUser(Banner $banner, string $userId, int $expiresInSeconds)
     {
-        $timestamp = Carbon::now()->getTimestamp();
-        $key = self::BANNER_ONETIME_USER_KEY . ":$userId:$timestamp";
-
-        $this->redis->rpush($key, $banner->id);
-        $this->redis->expire($key, $expiresInSeconds);
+        $this->addOneTimeBanner(self::BANNER_ONETIME_USER_KEY . ":$userId", $banner, $expiresInSeconds);
     }
 
     public function displayForBrowser(Banner $banner, string $browserId, int $expiresInSeconds)
     {
-        $timestamp = Carbon::now()->getTimestamp();
-        $key = self::BANNER_ONETIME_BROWSER_KEY . ":$browserId:$timestamp";
+        $this->addOneTimeBanner(self::BANNER_ONETIME_BROWSER_KEY . ":$browserId", $banner, $expiresInSeconds);
+    }
 
-        $this->redis->rpush($key, $banner->id);
-        $this->redis->expire($key, $expiresInSeconds);
+    private function addOneTimeBanner(string $key, Banner $banner, int $expiresInSeconds): void
+    {
+        $now = Carbon::now();
+
+        // remove already expired banners, so the set doesn't grow while its TTL keeps being extended
+        foreach ($this->redis->zrange($key, 0, -1) as $member) {
+            if ($this->isOneTimeBannerExpired($member, $now->getTimestamp())) {
+                $this->redis->zrem($key, $member);
+            }
+        }
+
+        $expiresAt = $now->getTimestamp() + $expiresInSeconds;
+        $this->redis->zadd($key, $now->getTimestampMs(), "{$banner->id}:{$expiresAt}");
+
+        // extend key expiration if necessary
+        if ($this->redis->ttl($key) < $expiresInSeconds) {
+            $this->redis->expire($key, $expiresInSeconds);
+        }
     }
 
     private function loadMaps(): void
@@ -839,24 +851,12 @@ class Showtime
 
     private function loadOneTimeUserBanner($userId): ?Banner
     {
-        $userBannerKeys = [];
-        foreach ($this->redis->keys(self::BANNER_ONETIME_USER_KEY . ":$userId:*") as $userBannerKey) {
-            $parts = explode(':', $userBannerKey, 3);
-            $userBannerKeys[$parts[2]] = $userBannerKey;
-        }
-
-        return $this->loadOneTimeBanner($userBannerKeys);
+        return $this->loadOneTimeBanner(self::BANNER_ONETIME_USER_KEY . ":$userId");
     }
 
     private function loadOneTimeBrowserBanner($browserId): ?Banner
     {
-        $browserBannerKeys = [];
-        foreach ($this->redis->keys(self::BANNER_ONETIME_BROWSER_KEY . ":$browserId:*") as $browserBannerKey) {
-            $parts = explode(':', $browserBannerKey, 3);
-            $browserBannerKeys[$parts[2]] = $browserBannerKey;
-        }
-
-        return $this->loadOneTimeBanner($browserBannerKeys);
+        return $this->loadOneTimeBanner(self::BANNER_ONETIME_BROWSER_KEY . ":$browserId");
     }
 
     private function evaluateSegmentRules(Campaign $campaign, $browserId, $userId = null)
@@ -911,23 +911,31 @@ class Showtime
         return false;
     }
 
-    private function loadOneTimeBanner(array $bannerKeys): ?Banner
+    private function loadOneTimeBanner(string $key): ?Banner
     {
-        // Banner keys have format BANNER_TAG:USER_ID/BROWSER_ID:TIMESTAMP
-        // Try to display the earliest banner first, therefore sort banner keys here (indexed by TIMESTAMP)
-        ksort($bannerKeys);
+        $now = Carbon::now()->getTimestamp();
 
-        foreach ($bannerKeys as $bannerKey) {
-            $bannerId = $this->redis->lpop($bannerKey);
-            if (!empty($bannerId)) {
-                $banner = Banner::loadCachedBanner($this->redis, $bannerId);
-                if (!$banner) {
-                    throw new \Exception("Banner with ID $bannerId is not present in cache");
-                }
-                return $banner;
+        // pop the earliest banner; expired banners are popped (removed) too, but never displayed
+        while ($popped = $this->redis->zpopmin($key)) {
+            $member = (string) array_key_first($popped);
+            if ($this->isOneTimeBannerExpired($member, $now)) {
+                continue;
             }
+
+            [$bannerId] = explode(':', $member);
+            $banner = Banner::loadCachedBanner($this->redis, $bannerId);
+            if (!$banner) {
+                throw new \Exception("Banner with ID $bannerId is not present in cache");
+            }
+            return $banner;
         }
         return null;
+    }
+
+    private function isOneTimeBannerExpired(string $member, int $now): bool
+    {
+        [, $expiresAt] = explode(':', $member);
+        return (int) $expiresAt <= $now;
     }
 
     private function checkUserInSegment(CampaignSegment $campaignSegment, $userId): bool

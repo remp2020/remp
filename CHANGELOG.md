@@ -30,6 +30,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - If your custom code reads `data-href` and appends the tracking parameters itself, remove that to avoid duplicate parameters.
 - **IMPORTANT**: Banner JS and CSS includes are loaded only once per page, even if multiple displayed banners use the same include. remp/remp#1521
   - If your include initializes something for a specific banner when it's executed, move that code to the custom JS of the banner.
+- **IMPORTANT**: One-time banners created before the deploy (via `/api/banners/{banner}/one-time-display`) are not displayed after it. remp/remp#1522
+  - If some of them still have to be displayed, create them again via the API after the deploy.
 - Added `From` option to campaign `Every N page views` display rule, allowing the banner to start displaying at a later pageview than the first one. remp/remp#1488
 - Fixed overlay banners taller than the viewport (e.g. phone in landscape) being cut off and unclosable. The backdrop now scrolls. remp/helpdesk#5008
 - Fixed banners with a publisher-defined color scheme (`config/banners.local.php`) failing to render after a deploy, because `campaigns:refresh-cache` ran without the local config and overwrote the cached schemes with the defaults. An unknown scheme now fails with an error naming the banner, the scheme and the available schemes, and saving a banner or campaign in admin re-serializes the config maps to Redis. remp/helpdesk#5008
@@ -41,6 +43,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Changed campaign cache to store IP ranges and countries once instead of duplicating them into whitelist/blacklist copies. remp/euobserver#281
 - Fixed `banner.js` being loaded and executed once for every banner displayed on the page, which inserted a full copy of all banner template styles into the page each time. `remplib.loadScript()` and `remplib.loadStyle()` now load each URL only once per document. remp/remp#1521
 - Fixed banner transition styles leaking into the page displaying the banner. remp/remp#1521
+- Changed showtime to look up one-time banners without the Redis `KEYS` command. remp/remp#1522
+- Fixed one-time banners failing to display with `Banner with ID ... is not present in cache` error since the banner cache was changed to JSON in 4.0. remp/remp#1522
 
 ### [Mailer]
 

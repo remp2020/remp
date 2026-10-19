@@ -29,7 +29,6 @@ class Banner extends Model implements Searchable
     use Notifiable;
     use IdentificationTrait;
 
-    private const BANNER_TAG = 'banner';
     private const BANNER_JSON_TAG = 'banner_json';
 
     public const POSITION_TOP_LEFT = 'top_left';
@@ -302,13 +301,16 @@ class Banner extends Model implements Searchable
         Redis::set(self::BANNER_JSON_TAG . ":{$this->id}", $bannerTemplate->toJson());
     }
 
-    public static function loadCachedBanner(ClientInterface $redis, string $bannerId): ?Banner
+    public static function loadCachedBanner(ClientInterface|\Redis $redis, string $bannerId): ?Banner
     {
-        $serializedBanner = $redis->get(Banner::BANNER_TAG . ":$bannerId");
-        if ($serializedBanner) {
-            return unserialize($serializedBanner, [__CLASS__]);
+        $cachedBanner = $redis->get(self::BANNER_JSON_TAG . ":$bannerId");
+        if (!$cachedBanner) {
+            return null;
         }
-        return null;
+
+        $banner = new Banner();
+        $banner->hydrateFromCache(json_decode($cachedBanner, true));
+        return $banner;
     }
 
     public function getDirectSnippetCodes(): array
