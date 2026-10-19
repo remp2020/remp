@@ -324,35 +324,23 @@
                 }
             }
 
-            let head = document.getElementsByTagName('head')[0]
+            let scriptsDocument = document;
             let iframe = document.getElementById("iframe-preview");
             if (iframe) {
-                head = iframe.contentDocument.head;
+                scriptsDocument = iframe.contentDocument;
             }
 
             let jsIncludes = (this.jsIncludes) ? this.jsIncludes.filter(jsInclude => jsInclude) : [];
             if (jsIncludes && jsIncludes.length > 0) {
                 let loadedScriptsCount = 0;
                 jsIncludes.forEach((jsInclude) => {
-                    let script = document.createElement('script');
-                    script.src = this.injectSnippets(jsInclude);
-                    script.async = false; // preserve include execution order; does not block HTML rendering (script-inserted scripts never block the parser)
-
-                    let callbackOnLoad = () => {
+                    // async=false preserves include execution order
+                    lib.loadScript(this.injectSnippets(jsInclude), () => {
                         loadedScriptsCount += 1;
                         if (loadedScriptsCount === jsIncludes.length) {
                             this.runCustomJavascript(this.js);
                         }
-                    };
-
-                    script.onreadystatechange = script.onload = function() {
-                        if (typeof callbackOnLoad !== 'undefined' && !callbackOnLoad.done && (!script.readyState || /loaded|complete/.test(script.readyState))) {
-                            callbackOnLoad.done = true;
-                            callbackOnLoad();
-                        }
-                    };
-
-                    head.appendChild(script);
+                    }, {document: scriptsDocument, async: false});
                 });
             } else {
                 this.runCustomJavascript(this.injectSnippets(this.js));

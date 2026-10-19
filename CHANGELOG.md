@@ -28,6 +28,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `remplib.js` no longer sends the client-side segment cache in the showtime request, which made the request URL grow with every evaluated segment rule. remp/remp#772
 - **IMPORTANT**: The `data-href` attribute of Overlay Rectangle, HTML and HTML Overlay banners now contains the tracking parameters (`rtm_*`), same as the `href` of the banner link it replaced. remp/helpdesk#5042 
   - If your custom code reads `data-href` and appends the tracking parameters itself, remove that to avoid duplicate parameters.
+- **IMPORTANT**: Banner JS and CSS includes are loaded only once per page, even if multiple displayed banners use the same include. remp/remp#1521
+  - If your include initializes something for a specific banner when it's executed, move that code to the custom JS of the banner.
 - Added `From` option to campaign `Every N page views` display rule, allowing the banner to start displaying at a later pageview than the first one. remp/remp#1488
 - Fixed overlay banners taller than the viewport (e.g. phone in landscape) being cut off and unclosable. The backdrop now scrolls. remp/helpdesk#5008
 - Fixed banners with a publisher-defined color scheme (`config/banners.local.php`) failing to render after a deploy, because `campaigns:refresh-cache` ran without the local config and overwrote the cached schemes with the defaults. An unknown scheme now fails with an error naming the banner, the scheme and the available schemes, and saving a banner or campaign in admin re-serializes the config maps to Redis. remp/helpdesk#5008
@@ -37,6 +39,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added bulk editing of IP address targeting in the campaign form. The new `Edit as list` button opens the whole list in a text area, one IP address or range per line. Adding a single address trims the input and skips duplicates; addresses are validated on save. remp/euobserver#281
 - Added IPv6 support to campaign IP address targeting (single addresses and ranges; a range must be either IPv4 or IPv6). remp/euobserver#281
 - Changed campaign cache to store IP ranges and countries once instead of duplicating them into whitelist/blacklist copies. remp/euobserver#281
+- Fixed `banner.js` being loaded and executed once for every banner displayed on the page, which inserted a full copy of all banner template styles into the page each time. `remplib.loadScript()` and `remplib.loadStyle()` now load each URL only once per document. remp/remp#1521
 
 ### [Mailer]
 

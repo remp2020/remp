@@ -1,3 +1,39 @@
+// The registry of loaded resources lives on the document, so it's shared by all bundles including this library..
+function loadOnce(doc, src, callback, createElement) {
+    let registry = doc.rempLoadedResources = doc.rempLoadedResources || {};
+    let resource = registry[src];
+
+    if (!resource) {
+        resource = registry[src] = {loaded: false, callbacks: []};
+        let el = createElement();
+        el.onreadystatechange = el.onload = function() {
+            if (resource.loaded || (el.readyState && !/loaded|complete/.test(el.readyState))) {
+                return;
+            }
+            resource.loaded = true;
+            let callbacks = resource.callbacks;
+            resource.callbacks = [];
+            for (let i = 0; i < callbacks.length; i++) {
+                callbacks[i]();
+            }
+        };
+        el.onerror = function() {
+            // forget the failed resource so it can be loaded again by the next call
+            delete registry[src];
+        };
+        doc.getElementsByTagName('head')[0].appendChild(el);
+    }
+
+    if (typeof callback === 'undefined') {
+        return;
+    }
+    if (resource.loaded) {
+        callback();
+    } else {
+        resource.callbacks.push(callback);
+    }
+}
+
 export default {
 
     beamToken: null,
@@ -471,30 +507,24 @@ export default {
         }
     },
 
-    loadScript: function (src, callback) {
-        let s = document.createElement('script');
-        s.src = src;
-        s.async = true;
-        s.onreadystatechange = s.onload = function() {
-            if (typeof callback !== 'undefined' && !callback.done && (!s.readyState || /loaded|complete/.test(s.readyState))) {
-                callback.done = true;
-                callback();
-            }
-        };
-        document.getElementsByTagName('head')[0].appendChild(s);
+    loadScript: function (src, callback, options) {
+        options = options || {};
+        let doc = options.document || document;
+        loadOnce(doc, src, callback, function () {
+            let s = doc.createElement('script');
+            s.src = src;
+            s.async = options.async !== false; // async=false never blocks HTML parsing of script-inserted scripts
+            return s;
+        });
     },
 
     loadStyle: function (src, callback) {
-        let l = document.createElement('link');
-        l.href = src;
-        l.rel = "stylesheet";
-        l.onreadystatechange = l.onload = function() {
-            if (typeof callback !== 'undefined' && !callback.done && (!l.readyState || /loaded|complete/.test(l.readyState))) {
-                callback.done = true;
-                callback();
-            }
-        };
-        document.getElementsByTagName('head')[0].appendChild(l);
+        loadOnce(document, src, callback, function () {
+            let l = document.createElement('link');
+            l.href = src;
+            l.rel = "stylesheet";
+            return l;
+        });
     },
 
     isBot: function(userAgent) {
