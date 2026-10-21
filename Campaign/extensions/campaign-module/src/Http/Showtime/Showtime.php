@@ -7,7 +7,12 @@ use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;
 use Remp\CampaignModule\CampaignSegment;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
+use Remp\CampaignModule\Models\Alignment\Map as AlignmentMap;
+use Remp\CampaignModule\Models\ColorScheme\Map as ColorSchemeMap;
+use Remp\CampaignModule\Models\Dimension\Map as DimensionMap;
+use Remp\CampaignModule\Models\Position\Map as PositionMap;
 use Remp\CampaignModule\Models\Targeting\TargetingMatchEnum;
+use Remp\CampaignModule\Snippet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -22,11 +27,6 @@ class Showtime
     private const PAGEVIEW_ATTRIBUTE_OPERATOR_IS_NOT = '!=';
 
     private $request;
-    private $positionMap;
-    private $dimensionMap;
-    private $alignmentsMap;
-    private $colorSchemesMap;
-    private array $snippets = [];
     private array $localCache = [];
 
     public function __construct(
@@ -52,29 +52,9 @@ class Showtime
         return $this->request;
     }
 
-    public function setPositionMap(\Remp\CampaignModule\Models\Position\Map $positions)
-    {
-        $this->positionMap = $positions->positions();
-    }
-
     public function getShowtimeConfig(): ShowtimeConfig
     {
         return $this->showtimeConfig;
-    }
-
-    public function setDimensionMap(\Remp\CampaignModule\Models\Dimension\Map $dimensions)
-    {
-        $this->dimensionMap = $dimensions->dimensions();
-    }
-
-    public function setAlignmentsMap(\Remp\CampaignModule\Models\Alignment\Map $alignments)
-    {
-        $this->alignmentsMap = $alignments->alignments();
-    }
-
-    public function setColorSchemesMap(\Remp\CampaignModule\Models\ColorScheme\Map $colorSchemes)
-    {
-        $this->colorSchemesMap = $colorSchemes->colorSchemes();
     }
 
     public function flushLocalCache(): self
@@ -144,25 +124,48 @@ class Showtime
             }
         }
 
-        $this->loadMaps();
+        $oneTimeBannerKeys = [];
+        if ($this->showtimeConfig->isOneTimeBannerEnabled()) {
+            // user's one-time banners have precedence over browser's one-time banners
+            if ($userId) {
+                $oneTimeBannerKeys[] = self::BANNER_ONETIME_USER_KEY . ":$userId";
+            }
+            $oneTimeBannerKeys[] = self::BANNER_ONETIME_BROWSER_KEY . ":$browserId";
+        }
 
-        $positions = $this->positionMap;
-        $dimensions = $this->dimensionMap;
-        $alignments = $this->alignmentsMap;
-        $colorSchemes = $this->colorSchemesMap;
-        $snippets = $this->snippets;
+        // fetch everything needed upfront in a single round trip to Redis
+        $results = $this->pipeline(function ($pipe) use ($oneTimeBannerKeys) {
+            $pipe->get(Campaign::ACTIVE_CAMPAIGN_IDS);
+            $pipe->mget([
+                PositionMap::POSITIONS_MAP_REDIS_KEY,
+                DimensionMap::DIMENSIONS_MAP_REDIS_KEY,
+                AlignmentMap::ALIGNMENTS_MAP_REDIS_KEY,
+                ColorSchemeMap::COLOR_SCHEMES_MAP_REDIS_KEY,
+                Snippet::REDIS_CACHE_KEY,
+            ]);
+            foreach ($oneTimeBannerKeys as $key) {
+                $pipe->exists($key);
+            }
+        });
+
+        [$campaignIdsJson, $mapsJson] = $results;
+        $oneTimeBannerKeysExist = array_slice($results, 2); // EXISTS result of each $oneTimeBannerKeys item
+
+        [$positionsJson, $dimensionsJson, $alignmentsJson, $colorSchemesJson, $snippetsJson] = $mapsJson;
+        $positions = json_decode($positionsJson ?? '[]', true);
+        $dimensions = json_decode($dimensionsJson ?? '[]', true);
+        $alignments = json_decode($alignmentsJson ?? '[]', true);
+        $colorSchemes = json_decode($colorSchemesJson ?? '[]', true);
+        $snippets = json_decode($snippetsJson ?? '[]', true);
 
         $displayData = [];
 
-        if ($this->showtimeConfig->isOneTimeBannerEnabled()) {
-            // Try to load one-time banners (having precedence over campaigns)
-            $banner = null;
-            if ($userId) {
-                $banner = $this->loadOneTimeUserBanner($userId);
+        // Try to load one-time banners (having precedence over campaigns)
+        foreach ($oneTimeBannerKeys as $i => $key) {
+            if (!$oneTimeBannerKeysExist[$i]) {
+                continue;
             }
-            if (!$banner) {
-                $banner = $this->loadOneTimeBrowserBanner($browserId);
-            }
+            $banner = $this->loadOneTimeBanner($key);
             if ($banner) {
                 $displayData[] = $showtimeResponse->renderBanner(
                     banner: $banner,
@@ -182,7 +185,7 @@ class Showtime
             }
         }
 
-        $campaignIds = json_decode($this->redis->get(Campaign::ACTIVE_CAMPAIGN_IDS) ?? '[]') ?? [];
+        $campaignIds = json_decode($campaignIdsJson ?? '[]');
         if (count($campaignIds) === 0) {
             return $showtimeResponse->success(
                 callback: $callback,
@@ -201,11 +204,13 @@ class Showtime
             $cachedCampaignSnippetCodesKeys[] = Campaign::CAMPAIGN_SNIPPET_CODES_JSON_TAG . ":{$campaignId}";
         }
 
-        // fetch all running campaigns at once
-        $fetchedCampaigns = $this->redis->mget($cachedCampaignKeys);
-
-        // fetch all possibly active snippets
-        $fetchedCampaignSnippets = $this->redis->mget($cachedCampaignSnippetCodesKeys);
+        // fetch all running campaigns and their possibly active snippets at once
+        [$fetchedCampaigns, $fetchedCampaignSnippets] = $this->pipeline(
+            function ($pipe) use ($cachedCampaignKeys, $cachedCampaignSnippetCodesKeys) {
+                $pipe->mget($cachedCampaignKeys);
+                $pipe->mget($cachedCampaignSnippetCodesKeys);
+            }
+        );
         $campaignBannerSnippets = [];
         foreach ($fetchedCampaignSnippets as $fetchedCampaignSnippet) {
             $campaignBannerSnippets = array_merge(
@@ -259,7 +264,7 @@ class Showtime
                 continue;
             }
             $matchedSnippets = array_intersect_key(
-                $this->snippets,
+                $snippets,
                 array_flip($campaignBannerSnippets[$campaignBanner->public_id]),
             );
 
@@ -624,12 +629,6 @@ class Showtime
             }
         }
 
-        // segment
-        $segmentRulesOk = $this->evaluateSegmentRules($campaign, $browserId, $userId);
-        if (!$segmentRulesOk) {
-            return "Campaign not executed because it does not pass the segment rules (userId: [$userId], browserId: [$browserId])";
-        }
-
         // pageview attributes - check if sent pageview attributes match conditions
         if (!empty($campaign->pageview_attributes)) {
             if (empty($userData->pageviewAttributes)) {
@@ -668,6 +667,12 @@ class Showtime
                     }
                 }
             }
+        }
+
+        // segment rules are evaluated as the last targeting rule, checking them might require HTTP requests
+        $segmentRulesOk = $this->evaluateSegmentRules($campaign, $browserId, $userId);
+        if (!$segmentRulesOk) {
+            return "Campaign not executed because it does not pass the segment rules (userId: [$userId], browserId: [$browserId])";
         }
 
         // Active campaign is campaign that targets selected user (previous rules were passed),
@@ -797,72 +802,6 @@ class Showtime
         }
     }
 
-    private function loadMaps(): void
-    {
-        $keys = [];
-        if (!$this->positionMap) {
-            $keys[] = \Remp\CampaignModule\Models\Position\Map::POSITIONS_MAP_REDIS_KEY;
-        }
-
-        if (!$this->dimensionMap) {
-            $keys[] = \Remp\CampaignModule\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY;
-        }
-
-        if (!$this->alignmentsMap) {
-            $keys[] = \Remp\CampaignModule\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY;
-        }
-
-        if (!$this->colorSchemesMap) {
-            $keys[] = \Remp\CampaignModule\Models\ColorScheme\Map::COLOR_SCHEMES_MAP_REDIS_KEY;
-        }
-
-        if (!$this->snippets) {
-            $keys[] = \Remp\CampaignModule\Snippet::REDIS_CACHE_KEY;
-        }
-
-        if (!$keys) {
-            return;
-        }
-
-        $maps = $this->redis->mget($keys);
-        reset($keys);
-        foreach ($maps as $map) {
-            $key = current($keys);
-
-            switch ($key) {
-                case \Remp\CampaignModule\Models\Position\Map::POSITIONS_MAP_REDIS_KEY:
-                    $this->positionMap = json_decode($map, true) ?? [];
-                    break;
-                case \Remp\CampaignModule\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY:
-                    $this->dimensionMap = json_decode($map, true) ?? [];
-                    break;
-                case \Remp\CampaignModule\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY:
-                    $this->alignmentsMap = json_decode($map, true) ?? [];
-                    break;
-                case \Remp\CampaignModule\Models\ColorScheme\Map::COLOR_SCHEMES_MAP_REDIS_KEY:
-                    $this->colorSchemesMap = json_decode($map, true) ?? [];
-                    break;
-                case \Remp\CampaignModule\Snippet::REDIS_CACHE_KEY:
-                    $snippets = json_decode($map, true) ?? [];
-                    foreach ($snippets as $code => $snippet) {
-                        $this->snippets[$code] = $snippet;
-                    }
-                    break;
-            }
-            next($keys);
-        }
-    }
-
-    private function loadOneTimeUserBanner($userId): ?Banner
-    {
-        return $this->loadOneTimeBanner(self::BANNER_ONETIME_USER_KEY . ":$userId");
-    }
-
-    private function loadOneTimeBrowserBanner($browserId): ?Banner
-    {
-        return $this->loadOneTimeBanner(self::BANNER_ONETIME_BROWSER_KEY . ":$browserId");
-    }
-
     private function evaluateSegmentRules(Campaign $campaign, $browserId, $userId = null)
     {
         if ($campaign->segments->isEmpty()) {
@@ -913,6 +852,17 @@ class Showtime
         }
 
         return false;
+    }
+
+    private function pipeline(callable $commands): array
+    {
+        if ($this->redis instanceof \Redis) {
+            $pipe = $this->redis->pipeline();
+            $commands($pipe);
+            return $pipe->exec();
+        }
+
+        return $this->redis->pipeline($commands);
     }
 
     private function loadOneTimeBanner(string $key): ?Banner

@@ -25,9 +25,11 @@ class DeviceRulesEvaluator
 
     public function isAcceptedByDeviceRules(string $userAgent, Campaign $campaign): bool
     {
-        if (!in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)
-            && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)
-        ) {
+        $targetsMobile = in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true);
+        $targetsDesktop = in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true);
+
+        // return early if none or all options are selected
+        if ($targetsMobile === $targetsDesktop) {
             return true;
         }
 

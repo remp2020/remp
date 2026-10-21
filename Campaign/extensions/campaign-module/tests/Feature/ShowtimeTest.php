@@ -34,7 +34,6 @@ class ShowtimeTest extends TestCase
     use RefreshDatabase;
 
     protected ShowtimeTestable $showtime;
-    protected ShowtimeTestable $rendererShowtime;
     protected $segmentAggregator;
     protected Campaign $campaign;
     protected CampaignBanner $campaignBanner;
@@ -56,14 +55,7 @@ class ShowtimeTest extends TestCase
         $showtimeConfig = new ShowtimeConfig();
         $deviceDetectionRules = new DeviceRulesEvaluator($redis, resolve(LazyDeviceDetector::class));
         $showtime = new ShowtimeTestable($redis, $this->segmentAggregator, $geoReader, $showtimeConfig, $deviceDetectionRules, $logger);
-        $showtime->setDimensionMap(resolve(\Remp\CampaignModule\Models\Dimension\Map::class));
-        $showtime->setAlignmentsMap(resolve(\Remp\CampaignModule\Models\Alignment\Map::class));
-        $showtime->setPositionMap(resolve(\Remp\CampaignModule\Models\Position\Map::class));
-        $showtime->setColorSchemesMap(resolve(\Remp\CampaignModule\Models\ColorScheme\Map::class));
         $this->showtime = $showtime;
-
-        // maps are not set here, so they're loaded from Redis the same way as in production
-        $this->rendererShowtime = new ShowtimeTestable($redis, $this->segmentAggregator, $geoReader, $showtimeConfig, $deviceDetectionRules, $logger);
 
         // Prepare banner and campaign
         $banner = $this->prepareBanner();
@@ -410,6 +402,20 @@ class ShowtimeTest extends TestCase
 
         $userData = $this->getUserData(null, null, null, false);
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
+    }
+
+    public function testDeviceRulesSkipDetectionWhenAllDevicesTargeted()
+    {
+        $deviceDetector = Mockery::mock(LazyDeviceDetector::class);
+        $deviceDetector->shouldNotReceive('get');
+        $deviceRulesEvaluator = new DeviceRulesEvaluator($this->redis, $deviceDetector);
+
+        $this->campaign->update([
+            'devices' => [Campaign::DEVICE_DESKTOP, Campaign::DEVICE_MOBILE],
+        ]);
+
+        $userAgent = 'not-yet-detected-user-agent-' . Str::uuid();
+        $this->assertTrue($deviceRulesEvaluator->isAcceptedByDeviceRules($userAgent, $this->campaign));
     }
 
     public static function operatingSystemsDataProvider()
@@ -1174,7 +1180,7 @@ class ShowtimeTest extends TestCase
             'browserId' => $browserId,
             'referer' => null,
         ]);
-        $data = $this->rendererShowtime->showtime($userData, 'callback', $showtimeResponse);
+        $data = $this->showtime->showtime($userData, 'callback', $showtimeResponse);
         return $data[0] ?? null;
     }
 

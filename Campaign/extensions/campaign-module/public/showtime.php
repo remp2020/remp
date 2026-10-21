@@ -1,6 +1,8 @@
 <?php
 
 use Monolog\Formatter\NormalizerFormatter;
+use Monolog\Handler\FingersCrossedHandler;
+use Monolog\Level;
 use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;
@@ -397,9 +399,14 @@ try {
             $logger->warning("invalid SENTRY_SHOWTIME_SAMPLERATE='{$sampleRate}' configured, defaulting to '1'.");
         }
 
-        $client = \Sentry\ClientBuilder::create($sentryClientOptions)->getClient();
-        $handler = new \Sentry\Monolog\Handler(new \Sentry\State\Hub($client));
-        $logger->pushHandler($handler);
+        // validate DSN eagerly, the client itself is expensive to build, and it's built only when something is logged
+        \Sentry\Dsn::createFromString($sentryDSN);
+        $logger->pushHandler(new FingersCrossedHandler(
+            fn () => new \Sentry\Monolog\LogToSentryIssueHandler(
+                new \Sentry\State\Hub(\Sentry\ClientBuilder::create($sentryClientOptions)->getClient())
+            ),
+            Level::Debug,
+        ));
     }
 } catch (\Exception $e) {
     $logger->warning('unable to register sentry notifier: ' . $e->getMessage());
