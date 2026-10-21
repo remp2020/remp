@@ -6,11 +6,12 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Searchable\Searchable;
-use Spatie\Searchable\SearchResult;
+use Remp\CampaignModule\Concerns\HasCacheableRelation;
 
 class Schedule extends Model
 {
+    use HasCacheableRelation;
+
     const STATUS_READY = 'ready';
     const STATUS_EXECUTED = 'executed';
     const STATUS_PAUSED = 'paused';
@@ -37,6 +38,8 @@ class Schedule extends Model
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s';
+
+    protected $cacheableRelations = [];
 
     /**
      * @return BelongsTo<Campaign, $this>

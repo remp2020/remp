@@ -31,9 +31,8 @@ class CampaignBanner extends Model
         'weight',
     ];
 
-    protected $cacheableRelations = [
-        'banner' => Banner::class,
-    ];
+    // banners are cached on their own, see Banner::cache()
+    protected $cacheableRelations = [];
 
     protected static function newFactory(): CampaignBannerFactory
     {

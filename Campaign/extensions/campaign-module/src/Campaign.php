@@ -111,7 +111,6 @@ class Campaign extends Model implements Searchable
         'ipRanges' => CampaignIpRange::class,
         'schedules' => Schedule::class,
         'campaignBanners' => CampaignBanner::class,
-        'campaignBanners.banner' => Banner::class,
     ];
 
     public function getSearchResult(): SearchResult
@@ -435,11 +434,7 @@ class Campaign extends Model implements Searchable
             ->with(array_keys($this->cacheableRelations))
             ->first();
 
-        foreach ($campaign->campaignBanners as $variant) {
-            optional($variant->banner)->loadTemplate();
-        }
-
-        Redis::set(self::CAMPAIGN_JSON_TAG . ":{$this->id}", $campaign->toJson());
+        Redis::set(self::CAMPAIGN_JSON_TAG . ":{$this->id}", json_encode($campaign->toCacheArray()));
         Redis::set(self::CAMPAIGN_SNIPPET_CODES_JSON_TAG . ":{$this->id}", json_encode($campaign->getUsedSnippetCodes()));
     }
 

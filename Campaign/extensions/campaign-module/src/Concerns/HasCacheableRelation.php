@@ -10,6 +10,41 @@ use Illuminate\Support\Str;
  */
 trait HasCacheableRelation
 {
+    /**
+     * Counterpart of hydrateFromCache(). Same as toArray(), except it includes only the cacheable relations and keeps
+     * dates in the model's format, so the hydrated model reads them without guessing their format.
+     */
+    public function toCacheArray(): array
+    {
+        $data = $this->attributesToArray();
+        foreach ($data as $key => $value) {
+            if ($value !== null && $this->isDateAttribute($key)) {
+                $data[$key] = $this->fromDateTime($this->getAttribute($key));
+            }
+        }
+
+        foreach ($this->cacheableRelations as $relationName => $relatedModelClass) {
+            if (!$this->relationLoaded($relationName)) {
+                continue;
+            }
+
+            $key = Str::snake($relationName);
+            $related = $this->getRelation($relationName);
+            if ($related instanceof Collection) {
+                $data[$key] = $related->map(fn ($model) => self::relatedToCacheArray($model))->all();
+            } elseif ($related !== null) {
+                $data[$key] = self::relatedToCacheArray($related);
+            }
+        }
+
+        return $data;
+    }
+
+    private static function relatedToCacheArray($model): array
+    {
+        return method_exists($model, 'toCacheArray') ? $model->toCacheArray() : $model->toArray();
+    }
+
     public function hydrateFromCache(array $cachedData): void
     {
         $this->setRawAttributes($cachedData);

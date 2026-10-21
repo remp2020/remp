@@ -298,19 +298,39 @@ class Banner extends Model implements Searchable
     public function cache(): void
     {
         $bannerTemplate = $this->loadTemplate();
-        Redis::set(self::BANNER_JSON_TAG . ":{$this->id}", $bannerTemplate->toJson());
+        Redis::set(self::BANNER_JSON_TAG . ":{$this->id}", json_encode($bannerTemplate->toCacheArray()));
     }
 
     public static function loadCachedBanner(ClientInterface|\Redis $redis, string $bannerId): ?Banner
     {
-        $cachedBanner = $redis->get(self::BANNER_JSON_TAG . ":$bannerId");
-        if (!$cachedBanner) {
-            return null;
+        return self::loadCachedBanners($redis, [$bannerId])[$bannerId] ?? null;
+    }
+
+    /**
+     * @param list<int|string> $bannerIds
+     * @return array<int, Banner> Banners keyed by their ID. Banners missing in the cache are left out.
+     */
+    public static function loadCachedBanners(ClientInterface|\Redis $redis, array $bannerIds): array
+    {
+        if (!$bannerIds) {
+            return [];
         }
 
-        $banner = new Banner();
-        $banner->hydrateFromCache(json_decode($cachedBanner, true));
-        return $banner;
+        $keys = [];
+        foreach ($bannerIds as $bannerId) {
+            $keys[] = self::BANNER_JSON_TAG . ":$bannerId";
+        }
+        $cachedBanners = $redis->mget($keys);
+
+        $banners = [];
+        foreach ($bannerIds as $i => $bannerId) {
+            if ($cachedBanners[$i]) {
+                $banner = new Banner();
+                $banner->hydrateFromCache(json_decode($cachedBanners[$i], true));
+                $banners[$bannerId] = $banner;
+            }
+        }
+        return $banners;
     }
 
     public function getDirectSnippetCodes(): array

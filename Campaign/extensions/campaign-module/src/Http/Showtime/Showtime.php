@@ -248,7 +248,11 @@ class Showtime
             }
         }
 
-        $campaignBanners = array_filter($campaignBanners);
+        $this->loadBannerRelations($campaignBanners);
+        foreach ($campaignBanners as $campaignBanner) {
+            $activeCampaigns[$campaignBanner->campaign_id]->banner_public_id = $campaignBanner->banner?->public_id;
+        }
+
         if ($this->showtimeConfig->isPrioritizeBannerOnSamePosition()) {
             $campaignBanners = $this->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns, $suppressedBanners);
         }
@@ -287,6 +291,33 @@ class Showtime
             $suppressedBanners,
             $evaluationMessages
         );
+    }
+
+    /**
+     * @param CampaignBanner[] $campaignBanners
+     */
+    private function loadBannerRelations(array $campaignBanners): void
+    {
+        $bannerIds = [];
+        foreach ($campaignBanners as $campaignBanner) {
+            if ($campaignBanner->banner_id !== null) {
+                $bannerIds[] = $campaignBanner->banner_id;
+            }
+        }
+        $banners = Banner::loadCachedBanners($this->redis, $bannerIds);
+
+        foreach ($campaignBanners as $campaignBanner) {
+            // control group variants have no banner
+            if ($campaignBanner->banner_id === null) {
+                $campaignBanner->setRelation('banner', null);
+                continue;
+            }
+
+            if (!isset($banners[$campaignBanner->banner_id])) {
+                throw new \Exception("Banner with ID {$campaignBanner->banner_id} is not present in cache");
+            }
+            $campaignBanner->setRelation('banner', $banners[$campaignBanner->banner_id]);
+        }
     }
 
     public function prioritizeCampaignBannerOnPosition(array $campaigns, array $campaignBanners, array &$activeCampaigns, array &$suppressedBanners): array
@@ -397,35 +428,21 @@ class Showtime
             return "Campaign not shown because it has no banner set";
         }
 
-        $bannerUuid = null;
         $variantUuid = null;
 
         // find variant previously displayed to user
         $seenCampaigns = $userData->campaigns ?? false;
         if ($seenCampaigns) {
             if (isset($seenCampaigns->{$campaign->uuid})) {
-                $bannerUuid = $seenCampaigns->{$campaign->uuid}->bannerId ?? null;
                 $variantUuid = $seenCampaigns->{$campaign->uuid}->variantId ?? null;
             }
 
             if (isset($seenCampaigns->{$campaign->public_id}->variantId)) {
                 foreach ($campaign->campaignBanners as $campaignBanner) {
                     if ($campaignBanner->public_id === $seenCampaigns->{$campaign->public_id}->variantId) {
-                        $bannerUuid = $campaignBanner->banner->uuid ?? null;
                         $variantUuid = $campaignBanner->uuid ?? null;
                         break;
                     }
-                }
-            }
-        }
-
-        // fallback for older version of campaigns local storage data
-        // where decision was based on bannerUuid and not variantUuid (which was not present at all)
-        if ($bannerUuid && !$variantUuid) {
-            foreach ($campaignBanners as $campaignBanner) {
-                if (optional($campaignBanner->banner)->uuid === $bannerUuid) {
-                    $variantUuid = $campaignBanner->uuid;
-                    break;
                 }
             }
         }
@@ -768,7 +785,6 @@ class Showtime
             }
         }
 
-        $activeCampaigns[$campaign->id]->banner_public_id = $variant->banner->public_id;
         return $variant;
     }
 

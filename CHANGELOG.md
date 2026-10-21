@@ -32,7 +32,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Renamed `SegmentAggregator::serializeToRedis()` to `cacheConfig()` and `unserializeFromRedis()` to `fromCachedConfig()`. The banner config maps (dimensions, positions, alignments, color schemes) are cached by `campaigns:refresh-cache` directly.
   - Removed the `SerializeSegmentAggregator` middleware. It wasn't registered since the upgrade to Laravel 12.
 - **BREAKING**: Removed `Showtime::setPositionMap()`, `setDimensionMap()`, `setAlignmentsMap()` and `setColorSchemesMap()`. Showtime always loaded the maps cached by `campaigns:refresh-cache` from Redis, the setters were used only in tests. If you call them, remove the calls. remp/remp#1527
-- **IMPORTANT**: Showtime doesn't display any campaign after the deploy until `campaigns:refresh-cache` caches the segment aggregator config under the new `segment_aggregator_config` Redis key.
+- **IMPORTANT**: Showtime doesn't display any campaign after the deploy until `campaigns:refresh-cache` caches the segment aggregator config under the new `segment_aggregator_config` Redis key and re-caches the campaigns, which don't contain their banners anymore.
   - Run `php artisan campaigns:refresh-cache` right after the deploy.
   - The old `segment_aggregator` key is not used anymore; you can delete it from Redis.
 - **IMPORTANT**: The `data-href` attribute of Overlay Rectangle, HTML and HTML Overlay banners now contains the tracking parameters (`rtm_*`), same as the `href` of the banner link it replaced. remp/helpdesk#5042 
@@ -45,6 +45,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Showtime evaluates segment rules after pageview attribute rules, so it doesn't check segments (possibly via HTTP request to the segment provider) of campaigns not matching the pageview attributes. remp/remp#1527
 - Showtime reads its data from Redis in fewer round trips and creates the Sentry client only when something is logged. remp/remp#1527
 - Showtime doesn't detect the device of campaigns targeting both desktop and mobile devices, as the detected device can't reject such campaigns. remp/remp#1527
+- Cached campaigns don't contain their banners anymore, showtime loads banners from their own cache only for the variants to display. remp/remp#1528
 - Added `From` option to campaign `Every N page views` display rule, allowing the banner to start displaying at a later pageview than the first one. remp/remp#1488
 - Fixed overlay banners taller than the viewport (e.g. phone in landscape) being cut off and unclosable. The backdrop now scrolls. remp/helpdesk#5008
 - Fixed banners with a publisher-defined color scheme (`config/banners.local.php`) failing to render after a deploy, because `campaigns:refresh-cache` ran without the local config and overwrote the cached schemes with the defaults. An unknown scheme now fails with an error naming the banner, the scheme and the available schemes, and saving a banner or campaign in admin re-serializes the config maps to Redis. remp/helpdesk#5008
