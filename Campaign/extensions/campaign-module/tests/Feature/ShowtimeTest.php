@@ -22,6 +22,7 @@ use Faker\Provider\Base;
 use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Mockery;
 use Monolog\Logger;
 use Predis\ClientInterface;
@@ -1045,13 +1046,13 @@ class ShowtimeTest extends TestCase
 
     public function testOneTimeBannerNone(): void
     {
-        $this->assertNull($this->oneTimeBannerShowtime(Uuid::uuid(), Uuid::uuid()));
+        $this->assertNull($this->oneTimeBannerShowtime((string) Str::uuid(), (string) Str::uuid()));
     }
 
     public function testOneTimeBannerSingle(): void
     {
-        $userId = Uuid::uuid();
-        $browserId = Uuid::uuid();
+        $userId = (string) Str::uuid();
+        $browserId = (string) Str::uuid();
         $banner = $this->prepareOneTimeBanner();
         $this->showtime->displayForUser($banner, $userId, 3600);
 
@@ -1062,7 +1063,7 @@ class ShowtimeTest extends TestCase
 
     public function testOneTimeBannerMultipleInInsertionOrder(): void
     {
-        $browserId = Uuid::uuid();
+        $browserId = (string) Str::uuid();
         $banner1 = $this->prepareOneTimeBanner();
         $banner2 = $this->prepareOneTimeBanner();
         $banner3 = $this->prepareOneTimeBanner();
@@ -1082,8 +1083,8 @@ class ShowtimeTest extends TestCase
 
     public function testOneTimeBannerExpiredSkipped(): void
     {
-        $userId = Uuid::uuid();
-        $browserId = Uuid::uuid();
+        $userId = (string) Str::uuid();
+        $browserId = (string) Str::uuid();
         $expiredBanner = $this->prepareOneTimeBanner();
         $banner = $this->prepareOneTimeBanner();
 
@@ -1099,7 +1100,7 @@ class ShowtimeTest extends TestCase
 
     public function testOneTimeBannerExpiredPrunedOnWrite(): void
     {
-        $userId = Uuid::uuid();
+        $userId = (string) Str::uuid();
         $key = "banner_onetime_user:$userId";
         $expiredBanner = $this->prepareOneTimeBanner();
         $banner = $this->prepareOneTimeBanner();
@@ -1116,7 +1117,7 @@ class ShowtimeTest extends TestCase
 
     public function testOneTimeBannerKeyTtlNotShortened(): void
     {
-        $userId = Uuid::uuid();
+        $userId = (string) Str::uuid();
         $key = "banner_onetime_user:$userId";
 
         $this->showtime->displayForUser($this->prepareOneTimeBanner(), $userId, 60);
@@ -1133,8 +1134,8 @@ class ShowtimeTest extends TestCase
 
     public function testOneTimeUserBannerPrecedesBrowserBanner(): void
     {
-        $userId = Uuid::uuid();
-        $browserId = Uuid::uuid();
+        $userId = (string) Str::uuid();
+        $browserId = (string) Str::uuid();
         $userBanner = $this->prepareOneTimeBanner();
         $browserBanner = $this->prepareOneTimeBanner();
 

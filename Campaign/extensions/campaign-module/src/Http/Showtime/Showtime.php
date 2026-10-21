@@ -820,6 +820,10 @@ class Showtime
             $keys[] = \Remp\CampaignModule\Snippet::REDIS_CACHE_KEY;
         }
 
+        if (!$keys) {
+            return;
+        }
+
         $maps = $this->redis->mget($keys);
         reset($keys);
         foreach ($maps as $map) {
