@@ -137,7 +137,7 @@ class CampaignServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(SegmentAggregator::class, function (Application $app) {
-            return new SegmentAggregator($app->tagged(SegmentAggregator::TAG));
+            return SegmentAggregator::fromFactories($app->tagged(SegmentAggregator::TAG), Redis::connection()->client());
         });
 
         $this->app->bind(LazyDeviceDetector::class, function () {

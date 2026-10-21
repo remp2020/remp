@@ -153,7 +153,7 @@ of user/browser IDs which should see a banner. You can register as many segment 
 the only condition is that the providers should work with the same user-base (one user ID has to always
 point to the) same user.
 
-The implementation is required to implement [`App\Contracts\SegmentContract`](app/Contracts/SegmentContract.php)
+The implementation is required to implement [`Remp\CampaignModule\Contracts\SegmentContract`](src/Contracts/SegmentContract.php)
 interface.
 
 All registered implementations are hidden behind facade of `SegmentAggregator`. This facade is then used
@@ -212,9 +212,43 @@ If you want to link the Campaign to your own system, these are the methods to im
   by the application or not. If `true`, Campaign will every hour request `users()` for each active Campaign
   and stores the collection of user IDs to the application cache.
 
-When implemented, create a segment provider providing the instance of your implementation. The provider
-should set `\App\Contracts\SegmentAggregator::TAG` to the class so your implementation would get also
-registered to the `SegmentAggregator`.
+Campaign evaluates segments in a lightweight endpoint (`showtime.php`) running without Laravel, so your implementation
+is created by a factory implementing [`Remp\CampaignModule\Contracts\SegmentContractFactory`](src/Contracts/SegmentContractFactory.php).
+The factory is instantiated without any arguments and implements two methods:
+
+* `config(): array`: Reads the configuration of your implementation (URLs, tokens, timeouts) within Laravel.
+  The result is cached as JSON, so it has to be JSON-serializable.
+
+* `create(array $config, ClientInterface|\Redis $redis): SegmentContract`: Creates your implementation from the result
+  of `config()`. It's also called outside of Laravel, so `config()`, `app()` and facades are not available; use the
+  provided Redis client if you need Redis.
+
+```php
+class MySegmentFactory implements SegmentContractFactory
+{
+    public function config(): array
+    {
+        return [
+            'base_url' => config('services.my_segments.base_url'),
+            'token' => config('services.my_segments.token'),
+        ];
+    }
+
+    public function create(array $config, ClientInterface|\Redis $redis): SegmentContract
+    {
+        return new MySegment($config['base_url'], $config['token']);
+    }
+}
+```
+
+When implemented, register the factory in your service provider with `\Remp\CampaignModule\Contracts\SegmentAggregator::TAG`
+tag, so your implementation would get also registered to the `SegmentAggregator`:
+
+```php
+$this->app->tag(MySegmentFactory::class, [SegmentAggregator::TAG]);
+```
+
+After you add, remove or reconfigure a segment provider, run `php artisan campaigns:refresh-cache`.
 
 #### Banner custom styles
 

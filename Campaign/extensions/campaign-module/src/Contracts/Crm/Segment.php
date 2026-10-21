@@ -3,15 +3,15 @@
 namespace Remp\CampaignModule\Contracts\Crm;
 
 use Remp\CampaignModule\CampaignSegment;
-use Remp\CampaignModule\Contracts\RedisAwareInterface;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
 use Remp\CampaignModule\Contracts\SegmentContract;
 use Remp\CampaignModule\Contracts\SegmentException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
+use Predis\ClientInterface;
 
-class Segment implements SegmentContract, RedisAwareInterface
+class Segment implements SegmentContract
 {
     const PROVIDER_ALIAS = 'crm_segment';
 
@@ -25,17 +25,10 @@ class Segment implements SegmentContract, RedisAwareInterface
 
     private $redis;
 
-    public function __construct(Client $client, \Predis\Client|\Redis $redis)
+    public function __construct(Client $client, ClientInterface|\Redis $redis)
     {
         $this->client = $client;
         $this->redis = $redis;
-    }
-
-    public function setRedisClient(\Predis\Client|\Redis $redis): self
-    {
-        $this->redis = $redis;
-
-        return $this;
     }
 
     public function provider(): string

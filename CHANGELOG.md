@@ -25,13 +25,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Remove any of your code calling these methods on `SegmentAggregator`.
 - **BREAKING**: Removed the `$providerData` parameter from `ShowtimeResponse::success()`. Custom `ShowtimeResponse` implementations have to drop the parameter from their `success()` method. remp/remp#772
 - **BREAKING**: Removed `providerData` from the showtime response and the deprecated `campaign_showtime` browser event, which only carried `providerData`. If you listen to `campaign_showtime`, switch to `campaign_showtime_response`. remp/remp#772
-- `remplib.js` no longer sends the client-side segment cache in the showtime request, which made the request URL grow with every evaluated segment rule. remp/remp#772
+- **BREAKING**: Segment providers are registered to `SegmentAggregator` via a factory implementing the new `SegmentContractFactory` instead of the `SegmentContract` implementation itself. Showtime now creates the segment providers from the factories' plain config instead of unserializing the whole `SegmentAggregator` (stored as a serialized closure) on every request. remp/remp#1527
+  - If you have a custom segment provider, create a factory for it: `config()` reads the configuration within Laravel, `create()` creates the provider from it without Laravel. Tag the factory with `SegmentAggregator::TAG` instead of the provider. See the [Segment integration](Campaign/extensions/campaign-module/README.md#segment-integration) docs for an example.
+  - Removed `RedisAwareInterface` and `SegmentAggregator::refreshRedisClient()`. If your provider implemented the interface, remove it and use the Redis client passed to the factory's `create()`.
+  - `SegmentAggregator` constructor now takes the config of the factories. If you create it yourself, use `SegmentAggregator::fromFactories()`.
+  - Renamed `SegmentAggregator::serializeToRedis()` to `cacheConfig()` and `unserializeFromRedis()` to `fromCachedConfig()`. The banner config maps (dimensions, positions, alignments, color schemes) are cached by `campaigns:refresh-cache` directly.
+  - Removed the `SerializeSegmentAggregator` middleware. It wasn't registered since the upgrade to Laravel 12.
+- **IMPORTANT**: Showtime doesn't display any campaign after the deploy until `campaigns:refresh-cache` caches the segment aggregator config under the new `segment_aggregator_config` Redis key.
+  - Run `php artisan campaigns:refresh-cache` right after the deploy.
+  - The old `segment_aggregator` key is not used anymore; you can delete it from Redis.
 - **IMPORTANT**: The `data-href` attribute of Overlay Rectangle, HTML and HTML Overlay banners now contains the tracking parameters (`rtm_*`), same as the `href` of the banner link it replaced. remp/helpdesk#5042 
   - If your custom code reads `data-href` and appends the tracking parameters itself, remove that to avoid duplicate parameters.
 - **IMPORTANT**: Banner JS and CSS includes are loaded only once per page, even if multiple displayed banners use the same include. remp/remp#1521
   - If your include initializes something for a specific banner when it's executed, move that code to the custom JS of the banner.
 - **IMPORTANT**: One-time banners created before the deploy (via `/api/banners/{banner}/one-time-display`) are not displayed after it. remp/remp#1522
   - If some of them still have to be displayed, create them again via the API after the deploy.
+- `remplib.js` no longer sends the client-side segment cache in the showtime request, which made the request URL grow with every evaluated segment rule. remp/remp#772
 - Added `From` option to campaign `Every N page views` display rule, allowing the banner to start displaying at a later pageview than the first one. remp/remp#1488
 - Fixed overlay banners taller than the viewport (e.g. phone in landscape) being cut off and unclosable. The backdrop now scrolls. remp/helpdesk#5008
 - Fixed banners with a publisher-defined color scheme (`config/banners.local.php`) failing to render after a deploy, because `campaigns:refresh-cache` ran without the local config and overwrote the cached schemes with the defaults. An unknown scheme now fails with an error naming the banner, the scheme and the available schemes, and saving a banner or campaign in admin re-serializes the config maps to Redis. remp/helpdesk#5008

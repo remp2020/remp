@@ -6,6 +6,7 @@ use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
 use Remp\CampaignModule\Snippet;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Redis;
 use Remp\CampaignModule\Campaign;
 
 class CampaignsRefreshCache extends Command
@@ -47,8 +48,9 @@ class CampaignsRefreshCache extends Command
      */
     public function handle()
     {
-        // serialize segment aggregator (for showtime.php)
-        $this->segmentAggregator->serializeToRedis();
+        // segment aggregator config and banner config maps for showtime.php
+        $this->segmentAggregator->cacheConfig();
+        $this->cacheMaps();
 
         $activeCampaignIds = Campaign::refreshActiveCampaignsCache();
 
@@ -66,5 +68,18 @@ class CampaignsRefreshCache extends Command
 
         $this->line('Campaigns cache refreshed.');
         return 0;
+    }
+
+    private function cacheMaps(): void
+    {
+        $dimensionMap = app(\Remp\CampaignModule\Models\Dimension\Map::class);
+        $positionsMap = app(\Remp\CampaignModule\Models\Position\Map::class);
+        $alignmentsMap = app(\Remp\CampaignModule\Models\Alignment\Map::class);
+        $colorSchemesMap = app(\Remp\CampaignModule\Models\ColorScheme\Map::class);
+
+        Redis::set(\Remp\CampaignModule\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY, $dimensionMap->dimensions()->toJson());
+        Redis::set(\Remp\CampaignModule\Models\Position\Map::POSITIONS_MAP_REDIS_KEY, $positionsMap->positions()->toJson());
+        Redis::set(\Remp\CampaignModule\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY, $alignmentsMap->alignments()->toJson());
+        Redis::set(\Remp\CampaignModule\Models\ColorScheme\Map::COLOR_SCHEMES_MAP_REDIS_KEY, $colorSchemesMap->colorSchemes()->toJson());
     }
 }

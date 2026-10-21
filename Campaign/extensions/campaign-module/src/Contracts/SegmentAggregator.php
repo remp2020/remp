@@ -4,27 +4,66 @@ namespace Remp\CampaignModule\Contracts;
 
 use Remp\CampaignModule\CampaignSegment;
 use Illuminate\Support\Collection;
-use Laravel\SerializableClosure\SerializableClosure;
-use Predis\Client;
+use Predis\ClientInterface;
 use Illuminate\Support\Facades\Redis;
 
 class SegmentAggregator implements SegmentContract
 {
     const TAG = 'segments';
 
-    private const SEGMENT_AGGREGATOR_REDIS_KEY = 'segment_aggregator';
+    private const SEGMENT_AGGREGATOR_CONFIG_REDIS_KEY = 'segment_aggregator_config';
 
-    /** @var SegmentContract[] */
-    private $contracts = [];
+    /** @var ?SegmentContract[] created on first use, see contracts() */
+    private ?array $contracts = null;
 
     private $errors = [];
 
-    public function __construct($segmentContracts)
-    {
-        /** @var SegmentContract $contract */
-        foreach ($segmentContracts as $contract) {
-            $this->contracts[$contract->provider()] = $contract;
+    /**
+     * @param array $config Config of each segment contract keyed by its factory class (see fromFactories()).
+     */
+    public function __construct(
+        private array $config,
+        private ClientInterface|\Redis $redis,
+    ) {
+        foreach (array_keys($config) as $factoryClass) {
+            if (!is_subclass_of($factoryClass, SegmentContractFactory::class)) {
+                throw new SegmentException("Unable to create segment contract, [{$factoryClass}] doesn't implement SegmentContractFactory");
+            }
         }
+    }
+
+    /**
+     * @param iterable<SegmentContractFactory> $factories
+     */
+    public static function fromFactories(iterable $factories, ClientInterface|\Redis $redis): self
+    {
+        $config = [];
+        foreach ($factories as $factory) {
+            $config[$factory::class] = $factory->config();
+        }
+        return new self($config, $redis);
+    }
+
+    /**
+     * Contracts are created on first use, so showtime doesn't create them for campaigns without segment rules.
+     *
+     * @return SegmentContract[]
+     */
+    private function contracts(): array
+    {
+        if ($this->contracts === null) {
+            $this->contracts = [];
+            foreach ($this->config as $factoryClass => $factoryConfig) {
+                $contract = (new $factoryClass())->create($factoryConfig, $this->redis);
+                $this->contracts[$contract->provider()] = $contract;
+            }
+        }
+        return $this->contracts;
+    }
+
+    private function contract(CampaignSegment $campaignSegment): ?SegmentContract
+    {
+        return $this->contracts()[$campaignSegment->provider] ?? null;
     }
 
     public function provider(): string
@@ -35,7 +74,7 @@ class SegmentAggregator implements SegmentContract
     public function list(): Collection
     {
         $collection = collect([]);
-        foreach ($this->contracts as $contract) {
+        foreach ($this->contracts() as $contract) {
             try {
                 $list = $contract->list();
                 $collection = $collection->merge($list);
@@ -48,38 +87,37 @@ class SegmentAggregator implements SegmentContract
 
     public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
-        if (!isset($this->contracts[$campaignSegment->provider])) {
+        $contract = $this->contract($campaignSegment);
+        if (!$contract) {
             return false;
         }
 
-        return $this->contracts[$campaignSegment->provider]
-            ->checkUser($campaignSegment, $userId);
+        return $contract->checkUser($campaignSegment, $userId);
     }
 
     public function checkBrowser(CampaignSegment $campaignSegment, string $browserId): bool
     {
-        if (!isset($this->contracts[$campaignSegment->provider])) {
+        $contract = $this->contract($campaignSegment);
+        if (!$contract) {
             return false;
         }
 
-        return $this->contracts[$campaignSegment->provider]
-            ->checkBrowser($campaignSegment, $browserId);
+        return $contract->checkBrowser($campaignSegment, $browserId);
     }
 
     public function users(CampaignSegment $campaignSegment): Collection
     {
-        return $this->contracts[$campaignSegment->provider]
-            ->users($campaignSegment);
+        return $this->contract($campaignSegment)->users($campaignSegment);
     }
 
     public function cacheEnabled(CampaignSegment $campaignSegment): bool
     {
-        if (!isset($this->contracts[$campaignSegment->provider])) {
+        $contract = $this->contract($campaignSegment);
+        if (!$contract) {
             return false;
         }
 
-        return $this->contracts[$campaignSegment->provider]
-            ->cacheEnabled($campaignSegment);
+        return $contract->cacheEnabled($campaignSegment);
     }
 
     /**
@@ -91,8 +129,7 @@ class SegmentAggregator implements SegmentContract
             throw new SegmentCacheException("Unable to add user to segment's cache. Cache is disabled for this segment provider.");
         }
 
-        return $this->contracts[$campaignSegment->provider]
-            ->addUserToCache($campaignSegment, $userId);
+        return $this->contract($campaignSegment)->addUserToCache($campaignSegment, $userId);
     }
 
     /**
@@ -104,8 +141,7 @@ class SegmentAggregator implements SegmentContract
             throw new SegmentCacheException("Unable to remove user from segment's cache. Cache is disabled for this segment provider.");
         }
 
-        return $this->contracts[$campaignSegment->provider]
-            ->removeUserFromCache($campaignSegment, $userId);
+        return $this->contract($campaignSegment)->removeUserFromCache($campaignSegment, $userId);
     }
 
     /**
@@ -128,49 +164,22 @@ class SegmentAggregator implements SegmentContract
         return $this->errors;
     }
 
-    public function refreshRedisClient(Client|\Redis $redisClient): void
-    {
-        foreach ($this->contracts as $contract) {
-            if ($contract instanceof RedisAwareInterface) {
-                $contract->setRedisClient($redisClient);
-            }
-        }
-    }
-
     /**
-     * SegmentAggregator contains Guzzle clients which have properties defined as closures.
-     * It's not possible to serialize closures in plain PHP, but Laravel provides a workaround.
-     * This will store a function returning segmentAggregator into the redis which can be later
-     * used in plain PHP to bypass Laravel initialization just to get the aggregator.
+     * Registered factories are known only within Laravel (tagged in service providers), so their config is cached
+     * to Redis to create the aggregator in showtime.php without Laravel.
      */
-    public function serializeToRedis()
+    public function cacheConfig(): void
     {
-        $serializableClosure = new SerializableClosure(function () {
-            return $this;
-        });
-        Redis::set(self::SEGMENT_AGGREGATOR_REDIS_KEY, serialize($serializableClosure));
-
-        $dimensionMap = app(\Remp\CampaignModule\Models\Dimension\Map::class);
-        $positionsMap = app(\Remp\CampaignModule\Models\Position\Map::class);
-        $alignmentsMap = app(\Remp\CampaignModule\Models\Alignment\Map::class);
-        $colorSchemesMap = app(\Remp\CampaignModule\Models\ColorScheme\Map::class);
-
-        Redis::set(\Remp\CampaignModule\Models\Dimension\Map::DIMENSIONS_MAP_REDIS_KEY, $dimensionMap->dimensions()->toJson());
-        Redis::set(\Remp\CampaignModule\Models\Position\Map::POSITIONS_MAP_REDIS_KEY, $positionsMap->positions()->toJson());
-        Redis::set(\Remp\CampaignModule\Models\Alignment\Map::ALIGNMENTS_MAP_REDIS_KEY, $alignmentsMap->alignments()->toJson());
-        Redis::set(\Remp\CampaignModule\Models\ColorScheme\Map::COLOR_SCHEMES_MAP_REDIS_KEY, $colorSchemesMap->colorSchemes()->toJson());
+        Redis::set(self::SEGMENT_AGGREGATOR_CONFIG_REDIS_KEY, json_encode($this->config));
     }
 
-    public static function unserializeFromRedis(Client|\Redis $redisClient): ?SegmentAggregator
+    public static function fromCachedConfig(ClientInterface|\Redis $redisClient): ?SegmentAggregator
     {
-        $serializedClosure = $redisClient->get(self::SEGMENT_AGGREGATOR_REDIS_KEY);
+        $config = $redisClient->get(self::SEGMENT_AGGREGATOR_CONFIG_REDIS_KEY);
+        if (!$config) {
+            return null;
+        }
 
-        /* @var ?SegmentAggregator $segmentAggregator */
-        $segmentAggregator = $serializedClosure ? unserialize($serializedClosure)() : null;
-
-        // set the redis to avoid duplicated connection
-        $segmentAggregator?->refreshRedisClient($redisClient);
-
-        return $segmentAggregator;
+        return new self(json_decode($config, true), $redisClient);
     }
 }
