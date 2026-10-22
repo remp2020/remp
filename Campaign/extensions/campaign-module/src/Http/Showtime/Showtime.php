@@ -239,17 +239,25 @@ class Showtime
         $suppressedBanners = [];
         $this->flushLocalCache();
 
+        $this->timer->start('hydrate');
         foreach ($fetchedCampaigns as $fetchedCampaign) {
-            $this->timer->start('hydrate');
             /** @var Campaign $campaign */
             $campaign = new Campaign();
             $campaign->hydrateFromCache(json_decode($fetchedCampaign, true));
-            $this->timer->stop('hydrate');
             $campaigns[$campaign->id] = $campaign;
             if ($campaign->public_id === $debugCampaignPublicId) {
                 $debugCampaignId = $campaign->id;
             }
+        }
+        $this->timer->stop('hydrate');
 
+        if ($userId) {
+            $this->timer->start('segments_prefetch');
+            $this->prefetchUserSegments($campaigns, (string) $userId);
+            $this->timer->stop('segments_prefetch');
+        }
+
+        foreach ($campaigns as $campaign) {
             // includes the 'devices' and 'segments' phases
             $this->timer->start('evaluate');
             $result = $this->campaignBannerToDisplay(
@@ -888,17 +896,52 @@ class Showtime
 
         $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|timestamp';
         if (isset($this->localCache[$cacheKey])) {
-            return true;
+            return $this->localCache[$cacheKey];
         }
 
         $this->timer->increment('segment_cache_checks');
-        $cacheKeyTimeStamp = $this->redis->get($cacheKey);
-        if ($cacheKeyTimeStamp) {
-            $this->localCache[$cacheKey] = true;
-            return true;
+        $this->localCache[$cacheKey] = (bool) $this->redis->get($cacheKey);
+        return $this->localCache[$cacheKey];
+    }
+
+    /**
+     * @param Campaign[] $campaigns
+     */
+    private function prefetchUserSegments(array $campaigns, string $userId): void
+    {
+        $campaignSegments = [];
+        foreach ($campaigns as $campaign) {
+            foreach ($campaign->segments as $campaignSegment) {
+                $campaignSegments[SegmentAggregator::cacheKey($campaignSegment)] = $campaignSegment;
+            }
         }
 
-        return false;
+        $cacheTimestampKeys = [];
+        foreach ($campaignSegments as $cacheKey => $campaignSegment) {
+            if ($this->segmentAggregator->cacheEnabled($campaignSegment)) {
+                $cacheTimestampKeys[$cacheKey] = $cacheKey . '|timestamp';
+            }
+        }
+
+        if (count($cacheTimestampKeys) > 0) {
+            $cacheTimestamps = $this->redis->mget(array_values($cacheTimestampKeys));
+            $i = 0;
+            foreach ($cacheTimestampKeys as $cacheKey => $cacheTimestampKey) {
+                $isCacheValid = (bool) $cacheTimestamps[$i++];
+                $this->localCache[$cacheTimestampKey] = $isCacheValid;
+                if (!$isCacheValid) {
+                    // segment is not cached yet, campaigns using it are rejected without checking the membership
+                    unset($campaignSegments[$cacheKey]);
+                }
+            }
+        }
+
+        $belongsToSegments = $this->segmentAggregator->batchCheckUserInCache($campaignSegments, $userId);
+        foreach ($belongsToSegments as $cacheKey => $belongsToSegment) {
+            $this->localCache[$cacheKey . '|user|' . $userId] = $belongsToSegment;
+        }
+
+        $this->timer->increment('segments_prefetched', count($belongsToSegments));
     }
 
     private function pipeline(callable $commands): array

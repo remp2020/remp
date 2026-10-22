@@ -680,6 +680,85 @@ class ShowtimeTest extends TestCase
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
     }
 
+    public function testSegmentRulesPrefetchedForUser()
+    {
+        $this->scheduleCampaign();
+        $includedSegment = CampaignSegment::create([
+            'campaign_id' => $this->campaign->id,
+            'code' => 'included_segment',
+            'provider' => 'crm_segment',
+            'inclusive' => 1,
+        ]);
+        $excludedSegment = CampaignSegment::create([
+            'campaign_id' => $this->campaign->id,
+            'code' => 'excluded_segment',
+            'provider' => 'crm_segment',
+            'inclusive' => 0,
+        ]);
+        $this->campaign->cache();
+        Campaign::refreshActiveCampaignsCache();
+
+        $timestampKeys = [
+            SegmentAggregator::cacheKey($includedSegment) . '|timestamp',
+            SegmentAggregator::cacheKey($excludedSegment) . '|timestamp',
+        ];
+        $this->redis->mset(array_fill_keys($timestampKeys, time()));
+
+        // membership is checked once for all segments, never one by one
+        $this->segmentAggregator->shouldReceive('cacheEnabled')->andReturn(true);
+        $this->segmentAggregator->shouldReceive('batchCheckUserInCache')->once()->andReturn([
+            SegmentAggregator::cacheKey($includedSegment) => true,
+            SegmentAggregator::cacheKey($excludedSegment) => false,
+        ]);
+        $this->segmentAggregator->shouldNotReceive('checkUser');
+
+        $showtimeResponse = Mockery::mock(ShowtimeResponse::class);
+        $showtimeResponse->shouldReceive('renderCampaign')->andReturnUsing(fn (CampaignBanner $variant) => $variant->public_id);
+        $showtimeResponse->shouldReceive('success')->andReturnUsing(fn ($callback, $data) => $data);
+
+        $data = $this->showtime->showtime(json_encode([
+            'url' => 'test.example',
+            'userId' => '123',
+            'browserId' => (string) Str::uuid(),
+            'referer' => null,
+            'userAgent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+        ]), 'callback', $showtimeResponse);
+
+        $this->redis->del($timestampKeys);
+        $this->assertSame([$this->campaignBanner->public_id], $data);
+    }
+
+    public function testSegmentRulesRejectNotCachedSegmentForUser()
+    {
+        $this->scheduleCampaign();
+        CampaignSegment::create([
+            'campaign_id' => $this->campaign->id,
+            'code' => 'not_cached_segment',
+            'provider' => 'crm_segment',
+            'inclusive' => 0,
+        ]);
+        $this->campaign->cache();
+        Campaign::refreshActiveCampaignsCache();
+
+        // segment without cache timestamp is not checked at all, the campaign is rejected
+        $this->segmentAggregator->shouldReceive('cacheEnabled')->andReturn(true);
+        $this->segmentAggregator->shouldReceive('batchCheckUserInCache')->once()->with([], '123')->andReturn([]);
+        $this->segmentAggregator->shouldNotReceive('checkUser');
+
+        $showtimeResponse = Mockery::mock(ShowtimeResponse::class);
+        $showtimeResponse->shouldReceive('success')->andReturnUsing(fn ($callback, $data) => $data);
+
+        $data = $this->showtime->showtime(json_encode([
+            'url' => 'test.example',
+            'userId' => '123',
+            'browserId' => (string) Str::uuid(),
+            'referer' => null,
+            'userAgent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+        ]), 'callback', $showtimeResponse);
+
+        $this->assertSame([], $data);
+    }
+
     public function testPageviewRules()
     {
         $this->scheduleCampaign();

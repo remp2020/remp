@@ -105,6 +105,34 @@ class SegmentAggregator implements SegmentContract
         return $contract->checkBrowser($campaignSegment, $browserId);
     }
 
+    /**
+     * Checks user's membership in cached segments, all segments of each provider at once. Only segments with cache
+     * enabled, whose provider implements SegmentCacheBatchContract, are checked. Other segments are left out of the
+     * result; check them one by one with checkUser().
+     *
+     * @param CampaignSegment[] $campaignSegments
+     * @return array<string, bool> membership keyed by cacheKey() of the segment
+     */
+    public function batchCheckUserInCache(array $campaignSegments, string $userId): array
+    {
+        $batchContracts = [];
+        $segmentsByProvider = [];
+        foreach ($campaignSegments as $campaignSegment) {
+            $contract = $this->contract($campaignSegment);
+            if ($contract instanceof SegmentCacheBatchContract && $contract->cacheEnabled($campaignSegment)) {
+                $batchContracts[$campaignSegment->provider] = $contract;
+                $segmentsByProvider[$campaignSegment->provider][self::cacheKey($campaignSegment)] = $campaignSegment;
+            }
+        }
+
+        $results = [];
+        foreach ($segmentsByProvider as $provider => $providerSegments) {
+            $results += $batchContracts[$provider]->batchCheckUserInCache($providerSegments, $userId);
+        }
+
+        return $results;
+    }
+
     public function users(CampaignSegment $campaignSegment): Collection
     {
         return $this->contract($campaignSegment)->users($campaignSegment);

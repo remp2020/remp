@@ -58,6 +58,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed `banner.js` being loaded and executed once for every banner displayed on the page, which inserted a full copy of all banner template styles into the page each time. `remplib.loadScript()` and `remplib.loadStyle()` now load each URL only once per document. remp/remp#1521
 - Fixed banner transition styles leaking into the page displaying the banner. remp/remp#1521
 - Changed showtime to look up one-time banners without the Redis `KEYS` command. remp/remp#1522
+- Showtime checks logged-in user's membership in CRM segments of all active campaigns in a single Redis round trip, instead of two round trips for each evaluated segment. remp/remp#1530
+  - Custom segment providers with cached segments can support it by implementing the new `SegmentCacheBatchContract`.
 - Fixed showtime accepting an empty debug key when `CAMPAIGN_DEBUG_KEY` was configured but empty, which let anyone enable the campaign debugger.
 - Fixed one-time banners failing to display with `Banner with ID ... is not present in cache` error since the banner cache was changed to JSON in 4.0. remp/remp#1522
 

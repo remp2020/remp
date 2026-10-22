@@ -4,6 +4,7 @@ namespace Remp\CampaignModule\Contracts\Crm;
 
 use Remp\CampaignModule\CampaignSegment;
 use Remp\CampaignModule\Contracts\SegmentAggregator;
+use Remp\CampaignModule\Contracts\SegmentCacheBatchContract;
 use Remp\CampaignModule\Contracts\SegmentContract;
 use Remp\CampaignModule\Contracts\SegmentException;
 use GuzzleHttp\Client;
@@ -11,7 +12,7 @@ use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Collection;
 use Predis\ClientInterface;
 
-class Segment implements SegmentContract
+class Segment implements SegmentContract, SegmentCacheBatchContract
 {
     const PROVIDER_ALIAS = 'crm_segment';
 
@@ -70,6 +71,35 @@ class Segment implements SegmentContract
     public function checkUser(CampaignSegment $campaignSegment, string $userId): bool
     {
         return $this->redis->sismember(SegmentAggregator::cacheKey($campaignSegment), $userId);
+    }
+
+    public function batchCheckUserInCache(array $campaignSegments, string $userId): array
+    {
+        if (!$campaignSegments) {
+            return [];
+        }
+
+        $commands = function ($pipe) use ($campaignSegments, $userId) {
+            foreach ($campaignSegments as $campaignSegment) {
+                $pipe->sismember(SegmentAggregator::cacheKey($campaignSegment), $userId);
+            }
+        };
+
+        if ($this->redis instanceof \Redis) {
+            $pipe = $this->redis->pipeline();
+            $commands($pipe);
+            $results = $pipe->exec();
+        } else {
+            $results = $this->redis->pipeline($commands);
+        }
+
+        // pipeline results are in the same order as $campaignSegments
+        $belongsToSegments = [];
+        $i = 0;
+        foreach ($campaignSegments as $key => $campaignSegment) {
+            $belongsToSegments[$key] = (bool) $results[$i++];
+        }
+        return $belongsToSegments;
     }
 
     /**
