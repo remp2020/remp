@@ -1162,6 +1162,44 @@ class ShowtimeTest extends TestCase
         return $banner;
     }
 
+    public static function debugKeyDataProvider(): array
+    {
+        return [
+            'matching key' => ['secret', 'secret', true],
+            'different key' => ['secret', 'other', false],
+            'empty configured key' => ['', '', false],
+            'missing configured key' => [null, '', false],
+        ];
+    }
+
+    #[DataProvider('debugKeyDataProvider')]
+    public function testDebugKey(?string $configuredKey, string $sentKey, bool $debugEnabled): void
+    {
+        $showtime = new ShowtimeTestable(
+            $this->redis,
+            $this->segmentAggregator,
+            Mockery::mock(LazyGeoReader::class),
+            new ShowtimeConfig(debugKey: $configuredKey),
+            new DeviceRulesEvaluator($this->redis, resolve(LazyDeviceDetector::class)),
+            Mockery::mock(Logger::class),
+        );
+        Campaign::refreshActiveCampaignsCache();
+
+        $showtimeResponse = Mockery::mock(ShowtimeResponse::class);
+        $showtimeResponse->shouldReceive('success')->andReturnUsing(
+            fn ($callback, $data, $activeCampaigns, $suppressedBanners, $evaluationMessages) => $evaluationMessages
+        );
+
+        $evaluationMessages = $showtime->showtime(json_encode([
+            'url' => 'test.example',
+            'browserId' => (string) Str::uuid(),
+            'referer' => null,
+            'debug' => ['key' => $sentKey],
+        ]), 'callback', $showtimeResponse);
+
+        $this->assertSame($debugEnabled ? [] : ['Invalid debug key'], $evaluationMessages);
+    }
+
     /**
      * Runs showtime and returns public ID of the displayed one-time banner (null if there's none).
      */

@@ -28,6 +28,7 @@ class Showtime
 
     private $request;
     private array $localCache = [];
+    private ShowtimeTimer $timer;
 
     public function __construct(
         private ClientInterface|\Redis $redis,
@@ -35,8 +36,10 @@ class Showtime
         private LazyGeoReader $geoReader,
         private ShowtimeConfig $showtimeConfig,
         private DeviceRulesEvaluator $deviceRulesEvaluator,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        ?ShowtimeTimer $timer = null,
     ) {
+        $this->timer = $timer ?? new ShowtimeTimer(microtime(true));
     }
 
     public function setRequest(Request $request): void
@@ -105,7 +108,10 @@ class Showtime
         $evaluationMessages = [];
         $debugCampaignPublicId = null;
         if (isset($data->debug->key)) {
-            if ($data->debug->key === $this->showtimeConfig->getDebugKey()) {
+            // empty key would let anyone debug if CAMPAIGN_DEBUG_KEY is configured but empty
+            $debugKey = $this->showtimeConfig->getDebugKey();
+            if ($debugKey !== null && $debugKey !== '' && $data->debug->key === $debugKey) {
+                $this->timer->enableReport();
                 $debugCampaignPublicId = $data->debug->campaignPublicId ?? null;
 
                 if (isset($data->debug->userId)) {
@@ -134,6 +140,7 @@ class Showtime
         }
 
         // fetch everything needed upfront in a single round trip to Redis
+        $this->timer->start('fetch');
         $results = $this->pipeline(function ($pipe) use ($oneTimeBannerKeys) {
             $pipe->get(Campaign::ACTIVE_CAMPAIGN_IDS);
             $pipe->mget([
@@ -147,6 +154,8 @@ class Showtime
                 $pipe->exists($key);
             }
         });
+
+        $this->timer->stop('fetch');
 
         [$campaignIdsJson, $mapsJson] = $results;
         $oneTimeBannerKeysExist = array_slice($results, 2); // EXISTS result of each $oneTimeBannerKeys item
@@ -205,12 +214,16 @@ class Showtime
         }
 
         // fetch all running campaigns and their possibly active snippets at once
+        $this->timer->start('fetch');
         [$fetchedCampaigns, $fetchedCampaignSnippets] = $this->pipeline(
             function ($pipe) use ($cachedCampaignKeys, $cachedCampaignSnippetCodesKeys) {
                 $pipe->mget($cachedCampaignKeys);
                 $pipe->mget($cachedCampaignSnippetCodesKeys);
             }
         );
+        $this->timer->stop('fetch');
+        $this->timer->increment('campaigns', count($fetchedCampaigns));
+
         $campaignBannerSnippets = [];
         foreach ($fetchedCampaignSnippets as $fetchedCampaignSnippet) {
             $campaignBannerSnippets = array_merge(
@@ -227,19 +240,24 @@ class Showtime
         $this->flushLocalCache();
 
         foreach ($fetchedCampaigns as $fetchedCampaign) {
+            $this->timer->start('hydrate');
             /** @var Campaign $campaign */
             $campaign = new Campaign();
             $campaign->hydrateFromCache(json_decode($fetchedCampaign, true));
+            $this->timer->stop('hydrate');
             $campaigns[$campaign->id] = $campaign;
             if ($campaign->public_id === $debugCampaignPublicId) {
                 $debugCampaignId = $campaign->id;
             }
 
+            // includes the 'devices' and 'segments' phases
+            $this->timer->start('evaluate');
             $result = $this->campaignBannerToDisplay(
                 campaign: $campaign,
                 userData: $data,
                 activeCampaigns: $activeCampaigns,
             );
+            $this->timer->stop('evaluate');
             if ($result instanceof CampaignBanner) {
                 $campaignBanners[] = $result;
             } else if ($debugCampaignPublicId && $campaign->public_id === $debugCampaignPublicId) {
@@ -248,7 +266,9 @@ class Showtime
             }
         }
 
+        $this->timer->start('banners');
         $this->loadBannerRelations($campaignBanners);
+        $this->timer->stop('banners');
         foreach ($campaignBanners as $campaignBanner) {
             $activeCampaigns[$campaignBanner->campaign_id]->banner_public_id = $campaignBanner->banner?->public_id;
         }
@@ -262,6 +282,7 @@ class Showtime
             $activeCampaigns = array_filter($activeCampaigns, static fn($c) => $debugCampaignPublicId === $c->public_id);
         }
 
+        $this->timer->start('render');
         foreach ($campaignBanners as $campaignBanner) {
             if ($debugCampaignPublicId && $campaignBanner->campaign_id !== $debugCampaignId) {
                 // when debugging specific campaign, do not render other campaigns
@@ -283,6 +304,7 @@ class Showtime
                 userData: $data,
             );
         }
+        $this->timer->stop('render');
 
         return $showtimeResponse->success(
             $callback,
@@ -582,12 +604,18 @@ class Showtime
         // user agent specific rules
         if (isset($userData->userAgent)) {
             // device rules
-            if ($this->deviceRulesEvaluator->isAcceptedByDeviceRules($userData->userAgent, $campaign) === false) {
+            $this->timer->start('devices');
+            $acceptedByDevice = $this->deviceRulesEvaluator->isAcceptedByDeviceRules($userData->userAgent, $campaign);
+            $this->timer->stop('devices');
+            if ($acceptedByDevice === false) {
                 return "Campaign not executed because it's not accepted according to device rules";
             }
 
             // operating system rules
-            if ($this->deviceRulesEvaluator->isAcceptedByOperatingSystemRules($userData->userAgent, $campaign) === false) {
+            $this->timer->start('devices');
+            $acceptedByOperatingSystem = $this->deviceRulesEvaluator->isAcceptedByOperatingSystemRules($userData->userAgent, $campaign);
+            $this->timer->stop('devices');
+            if ($acceptedByOperatingSystem === false) {
                 return "Campaign not executed because it's not accepted according to operating system rules";
             }
         } else {
@@ -687,7 +715,9 @@ class Showtime
         }
 
         // segment rules are evaluated as the last targeting rule, checking them might require HTTP requests
+        $this->timer->start('segments');
         $segmentRulesOk = $this->evaluateSegmentRules($campaign, $browserId, $userId);
+        $this->timer->stop('segments');
         if (!$segmentRulesOk) {
             return "Campaign not executed because it does not pass the segment rules (userId: [$userId], browserId: [$browserId])";
         }
@@ -861,6 +891,7 @@ class Showtime
             return true;
         }
 
+        $this->timer->increment('segment_cache_checks');
         $cacheKeyTimeStamp = $this->redis->get($cacheKey);
         if ($cacheKeyTimeStamp) {
             $this->localCache[$cacheKey] = true;
@@ -915,6 +946,7 @@ class Showtime
             return $this->localCache[$cacheKey];
         }
 
+        $this->timer->increment('segment_checks');
         $belongsToSegment = $this->segmentAggregator->checkUser($campaignSegment, (string) $userId);
         $this->localCache[$cacheKey] = $belongsToSegment;
 
@@ -928,6 +960,7 @@ class Showtime
             return $this->localCache[$cacheKey];
         }
 
+        $this->timer->increment('segment_checks');
         $belongsToSegment = $this->segmentAggregator->checkBrowser($campaignSegment, (string)$browserId);
         $this->localCache[$cacheKey] = $belongsToSegment;
 

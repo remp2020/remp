@@ -13,11 +13,20 @@ use Remp\CampaignModule\Http\Showtime\LazyGeoReader;
 use Remp\CampaignModule\Http\Showtime\Showtime;
 use Remp\CampaignModule\Http\Showtime\ShowtimeResponse;
 use Remp\CampaignModule\Http\Showtime\ShowtimeConfig;
+use Remp\CampaignModule\Http\Showtime\ShowtimeTimer;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Monolog\Logger;
 
+$requestStart = $_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true);
+$scriptStart = microtime(true);
+
 require_once __DIR__ . '/../../../vendor/autoload.php';
+
+$timer = new ShowtimeTimer($requestStart);
+$timer->addDuration('startup', $requestStart, $scriptStart);
+$timer->addDuration('autoload', $scriptStart);
+$timer->start('bootstrap');
 
 /**
  * asset overrides Laravel's helper function to prevent usage of Laravel's app()
@@ -116,6 +125,10 @@ function mix($path, $manifestDirectory = '')
 
 class PlainPhpShowtimeResponse implements ShowtimeResponse
 {
+    public function __construct(private ShowtimeTimer $timer)
+    {
+    }
+
     public function jsonResponse($response, $statusCode = 400) {
         header('Content-Type: application/json');
         http_response_code($statusCode);
@@ -156,6 +169,12 @@ class PlainPhpShowtimeResponse implements ShowtimeResponse
 
         if ($evaluationMessages) {
             $responseData['evaluationMessages'] = $evaluationMessages;
+        }
+
+        if ($this->timer->isReported()) {
+            $report = $this->timer->report();
+            $responseData['timings'] = $report;
+            header(ShowtimeTimer::serverTimingHeader($report));
         }
 
         $this->jsonpResponse($callback, $responseData);
@@ -412,7 +431,7 @@ try {
     $logger->warning('unable to register sentry notifier: ' . $e->getMessage());
 }
 
-$showtimeResponse = new PlainPhpShowtimeResponse();
+$showtimeResponse = new PlainPhpShowtimeResponse($timer);
 $data = filter_input(INPUT_GET, 'data');
 $callback = filter_input(INPUT_GET, 'callback');
 
@@ -429,8 +448,11 @@ if ($data === null || $callback === null) {
 
 header('Content-Type: application/javascript');
 
+$timer->stop('bootstrap');
+
 try {
     // dependencies initialization
+    $timer->start('init');
     if (env('REDIS_CLIENT', 'predis') === 'phpredis') {
         $redis = new \Redis();
         if (env('REDIS_PERSISTENT', false)) {
@@ -496,7 +518,8 @@ try {
     $showtimeConfig->setPrioritizeBannerOnSamePosition($prioritizeBannerOnSamePosition);
     $showtimeConfig->setOneTimeBannerEnabled(env('ONE_TIME_BANNER_ENABLED', true));
 
-    $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $showtimeConfig, $deviceRulesEvaluator, $logger);
+    $showtime = new Showtime($redis, $segmentAggregator, $geoReader, $showtimeConfig, $deviceRulesEvaluator, $logger, $timer);
+    $timer->stop('init');
     $showtime->showtime($data, $callback, $showtimeResponse);
 } catch (\Exception $exception) {
     $logger->error($exception);
