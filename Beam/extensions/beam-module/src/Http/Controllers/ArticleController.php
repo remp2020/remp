@@ -29,7 +29,12 @@ class ArticleController extends Controller
     public function index(ArticlesListRequest $request)
     {
         $articles = null;
-        $articlesBuilder = Article::with(['authors:id,external_id', 'sections:id,external_id', 'tags:id,external_id']);
+        $articlesBuilder = Article::with([
+            'authors:id,external_id,name',
+            'sections:id,external_id,name',
+            'tags:id,external_id,name',
+            'tags.tagCategories:id,external_id,name',
+        ]);
 
         $externalIds = $request->input('external_ids', []);
         if (count($externalIds)) {
@@ -405,7 +410,7 @@ class ArticleController extends Controller
         }
         $article->authors()->sync($authorIds);
 
-        $article->load(['authors', 'sections', 'tags']);
+        $article->load(['authors', 'sections', 'tags', 'tags.tagCategories']);
 
         return response()->format([
             'html' => redirect(route('articles.pageviews'))->with('success', 'Article created'),

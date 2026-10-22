@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Segments] Fixed newly tracked Elasticsearch fields being ignored until Segments API restart. remp/remp#1533
 - Fixed newsletter edit form ignoring the stored recurrence and always showing "Repeat every 1 day". remp/remp#1515 
 - Fixed possibility of `newsletters:send` crashing on newsletters with personalized content.
+- Fixed `/api/articles` running a query for each tag and returning `null` names of authors, sections and tags. [remp2020/remp#238](https://github.com/remp2020/remp/pull/238)
 
 ### [Campaign]
 
