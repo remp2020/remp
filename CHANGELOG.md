@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## Archive
 
-- [v5.1](./changelogs/CHANGELOG-v5.2.md)
+- [v5.2](./changelogs/CHANGELOG-v5.2.md)
 - [v5.1](./changelogs/CHANGELOG-v5.1.md)
 - [v5.0](./changelogs/CHANGELOG-v5.0.md)
 - [v4.3](./changelogs/CHANGELOG-v4.3.md)

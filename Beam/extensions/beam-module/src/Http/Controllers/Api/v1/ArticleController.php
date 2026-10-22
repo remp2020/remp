@@ -118,7 +118,7 @@ class ArticleController
                 }
             }
 
-            $article->load(['authors', 'sections', 'tags']);
+            $article->load(['authors', 'sections', 'tags', 'tags.tagCategories']);
             $articles[] = $article;
         }
 

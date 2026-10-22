@@ -1,5 +1,7 @@
 ## [5.2.0] - 2026-09-10
 
+- [5.2.2]: Fixed `/api/articles` running a query for each tag and returning `null` names of authors, sections and tags. [remp2020/remp#238](https://github.com/remp2020/remp/pull/238)
+
 ### [Beam]
 
 - [Segments] Enabled Elasticsearch query logging when Debug mode is enabled.
