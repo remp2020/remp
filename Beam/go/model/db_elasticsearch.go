@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v8"
@@ -68,7 +69,8 @@ type ElasticsearchDB struct {
 	IndexPrefix string
 	BatchSize   int // Configurable batch size for search_after operations
 
-	fieldsCache map[string]map[string]string // fields cache represents list of all index (map key) fields (map values)
+	fieldsCache   map[string]map[string]string // fields cache represents list of all index (map key) fields (map values)
+	fieldsCacheMu sync.RWMutex
 }
 
 // NewElasticsearchDB returns new instance of Elasticsearch DB using TypedAPI
@@ -141,20 +143,45 @@ func (eDB *ElasticsearchDB) cacheFieldMappingTyped(index string) (map[string]str
 			}
 		}
 	}
+	eDB.fieldsCacheMu.Lock()
 	eDB.fieldsCache[index] = fields
+	eDB.fieldsCacheMu.Unlock()
 	return fields, nil
+}
+
+// indexFields returns fields (with their types) of specified index, downloading and caching them on first use
+func (eDB *ElasticsearchDB) indexFields(index string) (map[string]string, error) {
+	eDB.fieldsCacheMu.RLock()
+	fields, ok := eDB.fieldsCache[eDB.resolveIndex(index)]
+	eDB.fieldsCacheMu.RUnlock()
+	if ok {
+		return fields, nil
+	}
+	return eDB.cacheFieldMappingTyped(index)
+}
+
+// CacheFieldMappings re-downloads field mappings of all already cached indices, so newly tracked fields are picked up
+func (eDB *ElasticsearchDB) CacheFieldMappings() error {
+	eDB.fieldsCacheMu.RLock()
+	indices := make([]string, 0, len(eDB.fieldsCache))
+	for index := range eDB.fieldsCache {
+		indices = append(indices, index)
+	}
+	eDB.fieldsCacheMu.RUnlock()
+
+	for _, index := range indices {
+		if _, err := eDB.cacheFieldMappingTyped(index); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // resolveKeyword resolves field name to keyword field if available
 func (eDB *ElasticsearchDB) resolveKeyword(index, field string) (string, error) {
-	fieldsMap, ok := eDB.fieldsCache[index]
-	if !ok {
-		var err error
-		fieldsMap, err = eDB.cacheFieldMappingTyped(index)
-		if err != nil {
-			return "", err
-		}
-		eDB.fieldsCache[index] = fieldsMap
+	fieldsMap, err := eDB.indexFields(index)
+	if err != nil {
+		return "", err
 	}
 
 	// Check if keyword field exists (same behavior as old ElasticDB)
@@ -168,16 +195,9 @@ func (eDB *ElasticsearchDB) resolveKeyword(index, field string) (string, error) 
 
 // resolveZeroValue returns zero value for a field based on its type (for missing values in aggregations)
 func (eDB *ElasticsearchDB) resolveZeroValue(index, field string) (interface{}, error) {
-	fields, ok := eDB.fieldsCache[index]
-	var err error
-
-	// populate cache for given index if it's empty
-	if !ok {
-		fields, err = eDB.cacheFieldMappingTyped(index)
-		if err != nil {
-			return "", err
-		}
-		eDB.fieldsCache[index] = fields
+	fields, err := eDB.indexFields(index)
+	if err != nil {
+		return "", err
 	}
 
 	// check field's data type

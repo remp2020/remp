@@ -74,12 +74,7 @@ func main() {
 		logger.Fatalln(errors.Wrap(err, "unable to connect to MySQL"))
 	}
 
-	var eventStorage model.EventStorage
-	var pageviewStorage model.PageviewStorage
-	var commerceStorage model.CommerceStorage
-	var concurrentsStorage model.ConcurrentsStorage
-
-	eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err = initGoElasticsearchStorages(ctx, c, logger)
+	esDB, eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, err := initGoElasticsearchStorages(ctx, c, logger)
 	if err != nil {
 		logger.Fatalln(err)
 	}
@@ -130,6 +125,11 @@ func main() {
 			logger.Fatalln("unable to cache events", "err", err)
 		}
 	}
+	cacheFieldMappings := func() {
+		if err := esDB.CacheFieldMappings(); err != nil {
+			logger.Println("unable to cache field mappings", "err", err)
+		}
+	}
 
 	wg.Add(1)
 	cacheSegmentDB()
@@ -142,6 +142,7 @@ func main() {
 		logger.Println("starting explicit segment caching")
 		logger.Println("starting events caching")
 		logger.Println("starting segment counts caching")
+		logger.Println("starting field mappings caching")
 		for {
 			select {
 			case <-ticker10s.C:
@@ -149,6 +150,7 @@ func main() {
 			case <-ticker1m.C:
 				cacheExplicitSegments()
 				cacheSegmentsCount()
+				cacheFieldMappings()
 			case <-ticker1h.C:
 				cacheEventDB()
 			case <-ctx.Done():
@@ -156,6 +158,7 @@ func main() {
 				logger.Println("explicit segment caching stopped")
 				logger.Println("events caching stopped")
 				logger.Println("segment counts caching stopped")
+				logger.Println("field mappings caching stopped")
 				return
 			}
 		}
@@ -212,7 +215,7 @@ func main() {
 }
 
 
-func initGoElasticsearchStorages(ctx context.Context, c Config, logger *log.Logger) (model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {
+func initGoElasticsearchStorages(ctx context.Context, c Config, logger *log.Logger) (*model.ElasticsearchDB, model.EventStorage, model.PageviewStorage, model.CommerceStorage, model.ConcurrentsStorage, error) {
 	elasticAddrs := strings.Split(c.ElasticAddrs, ",")
 
 	cfg := elasticsearch.Config{
@@ -236,7 +239,7 @@ func initGoElasticsearchStorages(ctx context.Context, c Config, logger *log.Logg
 
 	ec, err := elasticsearch.NewClient(cfg)
 	if err != nil {
-		return nil, nil, nil, nil, errors.Wrap(err, "unable to initialize go-elasticsearch client")
+		return nil, nil, nil, nil, nil, errors.Wrap(err, "unable to initialize go-elasticsearch client")
 	}
 
 	esDB := model.NewElasticsearchDB(ctx, ec, c.IndexPrefix, c.Debug)
@@ -271,17 +274,17 @@ func initGoElasticsearchStorages(ctx context.Context, c Config, logger *log.Logg
 
 		exists, err := esDB.IndexOrAliasExists(ctx, index)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, nil, err
 		}
 
 		if exists && mapping != "" {
 			err = esDB.PushMapping(ctx, index, mapping)
 			if err != nil {
-				return nil, nil, nil, nil, err
+				return nil, nil, nil, nil, nil, err
 			}
 		}
 	}
 
 	logger.Println("go-elasticsearch/v8 storages initialized successfully")
-	return eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, nil
+	return esDB, eventStorage, pageviewStorage, commerceStorage, concurrentsStorage, nil
 }
