@@ -177,6 +177,7 @@ class Showtime
             }
             $banner = $this->loadOneTimeBanner($key);
             if ($banner) {
+                $this->hideTimestamps($banner);
                 $displayData[] = $showtimeResponse->renderBanner(
                     banner: $banner,
                     alignments: $alignments,
@@ -302,6 +303,7 @@ class Showtime
                 array_flip($campaignBannerSnippets[$campaignBanner->public_id]),
             );
 
+            $this->hideTimestamps($campaignBanner->banner);
             $displayData[] = $showtimeResponse->renderCampaign(
                 variant: $campaignBanner,
                 campaign: $campaigns[$campaignBanner->campaign_id],
@@ -900,6 +902,25 @@ class Showtime
         }
 
         $this->timer->increment('segments_prefetched', count($belongsToSegments));
+    }
+
+    /**
+     * Banners are rendered without timestamps, banner.js doesn't use them and converting them to Carbon and back
+     * takes about half of the rendering time.
+     */
+    private function hideTimestamps(?Banner $banner): void
+    {
+        // control group variants have no banner
+        if (!$banner) {
+            return;
+        }
+
+        $timestamps = ['created_at', 'updated_at'];
+        $banner->makeHidden($timestamps);
+
+        foreach ($banner->getRelations() as $relation) {
+            $relation->makeHidden($timestamps);
+        }
     }
 
     private function pipeline(callable $commands): array

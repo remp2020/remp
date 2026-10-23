@@ -51,7 +51,6 @@ trait HasCacheableRelation
         $this->setRawAttributes($cachedData);
         $this->exists = true;
         $this->wasRecentlyCreated = false;
-        self::hideTimestamps($this);
 
         foreach ($this->cacheableRelations as $relationName => $relatedModelClass) {
             $key = Str::snake($relationName);
@@ -89,18 +88,8 @@ trait HasCacheableRelation
             $relatedModel->setRawAttributes($cachedData);
             $relatedModel->exists = true;
             $relatedModel->wasRecentlyCreated = false;
-            self::hideTimestamps($relatedModel);
         }
 
         return $relatedModel;
-    }
-
-    /**
-     * Converting timestamps to Carbon and back is the most expensive part of serialization. Hidden timestamps are still
-     * readable as attributes.
-     */
-    private static function hideTimestamps(Model $model): void
-    {
-        $model->makeHidden([$model->getCreatedAtColumn(), $model->getUpdatedAtColumn()]);
     }
 }

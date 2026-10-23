@@ -1270,6 +1270,28 @@ class ShowtimeTest extends TestCase
         $this->assertNull($this->oneTimeBannerShowtime($userId, $browserId));
     }
 
+    public function testBannersAreRenderedWithoutTimestamps()
+    {
+        $this->scheduleCampaign();
+        $this->campaignBanner->banner->cache(); // with its template
+        $this->campaign->cache();
+
+        $showtimeResponse = Mockery::mock(ShowtimeResponse::class);
+        $showtimeResponse->shouldReceive('renderCampaign')->andReturnUsing(fn (CampaignBanner $variant) => $variant->banner->toJson());
+        $showtimeResponse->shouldReceive('success')->andReturnUsing(fn ($callback, $data) => $data);
+
+        $userData = $this->getUserData();
+        $userData->userId = null;
+        $userData->referer = null;
+        $data = $this->showtime->showtime(json_encode($userData), 'callback', $showtimeResponse);
+
+        $banner = json_decode($data[0], true);
+        $this->assertArrayNotHasKey('created_at', $banner);
+        $this->assertArrayNotHasKey('updated_at', $banner);
+        $this->assertArrayNotHasKey('created_at', $banner['short_message_template']);
+        $this->assertArrayNotHasKey('updated_at', $banner['short_message_template']);
+    }
+
     private function prepareOneTimeBanner(): Banner
     {
         $banner = $this->prepareBanner();
