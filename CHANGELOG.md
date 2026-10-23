@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - [Segments] Fixed unnecessary warnings logging when aggregation did not match any records. remp/remp#1514  
 - Fixed newsletter edit form ignoring the stored recurrence and always showing "Repeat every 1 day". remp/remp#1515 
 - Fixed possibility of `newsletters:send` crashing on newsletters with personalized content.
+- Fixed `/api/articles` running a query for each tag and returning `null` names of authors, sections and tags. Article store and v1 upsert responses now eager load tag categories too.
 
 ### [Campaign]
 
