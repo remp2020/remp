@@ -15,7 +15,7 @@ interface SegmentCacheBatchContract
      * Checks user's membership in the cache of each segment.
      *
      * @param CampaignSegment[] $campaignSegments
-     * @return bool[] membership in each segment, keys of $campaignSegments are preserved
+     * @return bool[] membership in each segment with populated cache, keys of $campaignSegments are preserved
      */
     public function batchCheckUserInCache(array $campaignSegments, string $userId): array;
 }

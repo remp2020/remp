@@ -27,7 +27,12 @@ class SegmentAggregatorTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->redis->del([self::REDIS_KEY, 'crm_segment|test_segment', 'crm_segment|other_segment']);
+        $this->redis->del([
+            self::REDIS_KEY,
+            'crm_segment|test_segment',
+            'crm_segment|test_segment|timestamp',
+            'crm_segment|other_segment|timestamp',
+        ]);
         parent::tearDown();
     }
 
@@ -98,21 +103,33 @@ class SegmentAggregatorTest extends TestCase
         $crmSegment = new CampaignSegment();
         $crmSegment->provider = CrmSegment::PROVIDER_ALIAS;
         $crmSegment->code = 'test_segment';
+        $this->redis->set(SegmentAggregator::timestampCacheKey($crmSegment), time());
         $this->redis->sadd(SegmentAggregator::cacheKey($crmSegment), ['123']);
 
         $otherCrmSegment = new CampaignSegment();
         $otherCrmSegment->provider = CrmSegment::PROVIDER_ALIAS;
         $otherCrmSegment->code = 'other_segment';
+        $this->redis->set(SegmentAggregator::timestampCacheKey($otherCrmSegment), time());
+
+        $notCachedCrmSegment = new CampaignSegment();
+        $notCachedCrmSegment->provider = CrmSegment::PROVIDER_ALIAS;
+        $notCachedCrmSegment->code = 'not_cached_segment';
 
         $beamSegment = new CampaignSegment();
         $beamSegment->provider = 'remp_segment';
         $beamSegment->code = 'beam_segment';
 
-        // Beam segments are not cached (checking them means HTTP request for each of them), they're left out
+        // Beam segments are not cached (checking them means HTTP request for each of them) and segments without
+        // populated cache can't be checked, they're left out
         $this->assertSame([
-            'crm_segment|test_segment' => true,
-            'crm_segment|other_segment' => false,
-        ], $aggregator->batchCheckUserInCache([$crmSegment, $beamSegment, $otherCrmSegment], '123'));
+            'crm' => true,
+            'other_crm' => false,
+        ], $aggregator->batchCheckUserInCache([
+            'crm' => $crmSegment,
+            'beam' => $beamSegment,
+            'other_crm' => $otherCrmSegment,
+            'not_cached_crm' => $notCachedCrmSegment,
+        ], '123'));
 
         $this->assertSame([], $aggregator->batchCheckUserInCache([], '123'));
     }

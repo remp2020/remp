@@ -107,21 +107,21 @@ class SegmentAggregator implements SegmentContract
 
     /**
      * Checks user's membership in cached segments, all segments of each provider at once. Only segments with cache
-     * enabled, whose provider implements SegmentCacheBatchContract, are checked. Other segments are left out of the
-     * result; check them one by one with checkUser().
+     * enabled and populated, whose provider implements SegmentCacheBatchContract, are checked. Other segments are left
+     * out of the result; check them one by one with checkUser().
      *
      * @param CampaignSegment[] $campaignSegments
-     * @return array<string, bool> membership keyed by cacheKey() of the segment
+     * @return bool[] membership in each checked segment, keys of $campaignSegments are preserved
      */
     public function batchCheckUserInCache(array $campaignSegments, string $userId): array
     {
         $batchContracts = [];
         $segmentsByProvider = [];
-        foreach ($campaignSegments as $campaignSegment) {
+        foreach ($campaignSegments as $key => $campaignSegment) {
             $contract = $this->contract($campaignSegment);
             if ($contract instanceof SegmentCacheBatchContract && $contract->cacheEnabled($campaignSegment)) {
                 $batchContracts[$campaignSegment->provider] = $contract;
-                $segmentsByProvider[$campaignSegment->provider][self::cacheKey($campaignSegment)] = $campaignSegment;
+                $segmentsByProvider[$campaignSegment->provider][$key] = $campaignSegment;
             }
         }
 
@@ -180,6 +180,14 @@ class SegmentAggregator implements SegmentContract
     public static function cacheKey(CampaignSegment $campaignSegment): string
     {
         return "{$campaignSegment->provider}|{$campaignSegment->code}";
+    }
+
+    /**
+     * Key of the time when the segment was cached. The cache is populated only if it exists.
+     */
+    public static function timestampCacheKey(CampaignSegment $campaignSegment): string
+    {
+        return self::cacheKey($campaignSegment) . '|timestamp';
     }
 
     public function hasErrors()

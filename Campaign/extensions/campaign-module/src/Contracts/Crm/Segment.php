@@ -93,6 +93,7 @@ class Segment implements SegmentContract, SegmentCacheBatchContract
 
         $commands = function ($pipe) use ($campaignSegments, $userId) {
             foreach ($campaignSegments as $campaignSegment) {
+                $pipe->exists(SegmentAggregator::timestampCacheKey($campaignSegment));
                 $pipe->sismember(SegmentAggregator::cacheKey($campaignSegment), $userId);
             }
         };
@@ -105,11 +106,15 @@ class Segment implements SegmentContract, SegmentCacheBatchContract
             $results = $this->redis->pipeline($commands);
         }
 
-        // pipeline results are in the same order as $campaignSegments
+        // pipeline results are in the same order as $campaignSegments, two for each segment
         $belongsToSegments = [];
         $i = 0;
         foreach ($campaignSegments as $key => $campaignSegment) {
-            $belongsToSegments[$key] = (bool) $results[$i++];
+            $isCached = (bool) $results[$i++];
+            $belongsToSegment = (bool) $results[$i++];
+            if ($isCached) {
+                $belongsToSegments[$key] = $belongsToSegment;
+            }
         }
         return $belongsToSegments;
     }

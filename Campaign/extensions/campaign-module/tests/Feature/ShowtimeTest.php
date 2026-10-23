@@ -698,12 +698,6 @@ class ShowtimeTest extends TestCase
         $this->campaign->cache();
         Campaign::refreshActiveCampaignsCache();
 
-        $timestampKeys = [
-            SegmentAggregator::cacheKey($includedSegment) . '|timestamp',
-            SegmentAggregator::cacheKey($excludedSegment) . '|timestamp',
-        ];
-        $this->redis->mset(array_fill_keys($timestampKeys, time()));
-
         // membership is checked once for all segments, never one by one
         $this->segmentAggregator->shouldReceive('cacheEnabled')->andReturn(true);
         $this->segmentAggregator->shouldReceive('batchCheckUserInCache')->once()->andReturn([
@@ -724,7 +718,6 @@ class ShowtimeTest extends TestCase
             'userAgent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
         ]), 'callback', $showtimeResponse);
 
-        $this->redis->del($timestampKeys);
         $this->assertSame([$this->campaignBanner->public_id], $data);
     }
 
@@ -740,9 +733,9 @@ class ShowtimeTest extends TestCase
         $this->campaign->cache();
         Campaign::refreshActiveCampaignsCache();
 
-        // segment without cache timestamp is not checked at all, the campaign is rejected
+        // segment without populated cache is left out of the batch check, the campaign is rejected without checking it
         $this->segmentAggregator->shouldReceive('cacheEnabled')->andReturn(true);
-        $this->segmentAggregator->shouldReceive('batchCheckUserInCache')->once()->with([], '123')->andReturn([]);
+        $this->segmentAggregator->shouldReceive('batchCheckUserInCache')->once()->andReturn([]);
         $this->segmentAggregator->shouldNotReceive('checkUser');
 
         $showtimeResponse = Mockery::mock(ShowtimeResponse::class);

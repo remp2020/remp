@@ -854,7 +854,7 @@ class Showtime
             return true;
         }
 
-        $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|timestamp';
+        $cacheKey = SegmentAggregator::timestampCacheKey($campaignSegment);
         if (isset($this->localCache[$cacheKey])) {
             return $this->localCache[$cacheKey];
         }
@@ -876,28 +876,9 @@ class Showtime
             }
         }
 
-        $cacheTimestampKeys = [];
-        foreach ($campaignSegments as $cacheKey => $campaignSegment) {
-            if ($this->segmentAggregator->cacheEnabled($campaignSegment)) {
-                $cacheTimestampKeys[$cacheKey] = $cacheKey . '|timestamp';
-            }
-        }
-
-        if (count($cacheTimestampKeys) > 0) {
-            $cacheTimestamps = $this->redis->mget(array_values($cacheTimestampKeys));
-            $i = 0;
-            foreach ($cacheTimestampKeys as $cacheKey => $cacheTimestampKey) {
-                $isCacheValid = (bool) $cacheTimestamps[$i++];
-                $this->localCache[$cacheTimestampKey] = $isCacheValid;
-                if (!$isCacheValid) {
-                    // segment is not cached yet, campaigns using it are rejected without checking the membership
-                    unset($campaignSegments[$cacheKey]);
-                }
-            }
-        }
-
         $belongsToSegments = $this->segmentAggregator->batchCheckUserInCache($campaignSegments, $userId);
         foreach ($belongsToSegments as $cacheKey => $belongsToSegment) {
+            $this->localCache[SegmentAggregator::timestampCacheKey($campaignSegments[$cacheKey])] = true;
             $this->localCache[$cacheKey . '|user|' . $userId] = $belongsToSegment;
         }
 

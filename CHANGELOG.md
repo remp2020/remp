@@ -60,7 +60,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed banner transition styles leaking into the page displaying the banner. remp/remp#1521
 - Changed showtime to look up one-time banners without the Redis `KEYS` command. remp/remp#1522
 - Showtime checks logged-in user's membership in CRM segments of all active campaigns in a single Redis round trip, instead of two round trips for each evaluated segment. remp/remp#1530
-  - Custom segment providers with cached segments can support it by implementing the new `SegmentCacheBatchContract`.
+  - Custom segment providers with cached segments can support it by implementing the new `SegmentCacheBatchContract`. 
 - Showtime selects the campaign variant only after the campaign passes the targeting rules, instead of selecting it for every running campaign. remp/remp#1532
 - Fixed showtime occasionally (~1 % of new users) selecting campaign variant with 0 % proportion. remp/remp#1532
 - CRM and REMP segment providers create their HTTP client only when they make the first HTTP request.
