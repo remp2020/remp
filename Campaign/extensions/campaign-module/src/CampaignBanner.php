@@ -7,13 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Remp\CampaignModule\Concerns\HasCacheableRelation;
 
 class CampaignBanner extends Model
 {
     /** @use HasFactory<CampaignBannerFactory> */
     use HasFactory;
-    use HasCacheableRelation;
 
     use SoftDeletes;
     use IdentificationTrait;
@@ -30,9 +28,6 @@ class CampaignBanner extends Model
         'proportion',
         'weight',
     ];
-
-    // banners are cached on their own, see Banner::cache()
-    protected $cacheableRelations = [];
 
     protected static function newFactory(): CampaignBannerFactory
     {

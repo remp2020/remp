@@ -34,7 +34,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Renamed `SegmentAggregator::serializeToRedis()` to `cacheConfig()` and `unserializeFromRedis()` to `fromCachedConfig()`. The banner config maps (dimensions, positions, alignments, color schemes) are cached by `campaigns:refresh-cache` directly.
   - Removed the `SerializeSegmentAggregator` middleware. It wasn't registered since the upgrade to Laravel 12.
 - **BREAKING**: Removed `Showtime::setPositionMap()`, `setDimensionMap()`, `setAlignmentsMap()` and `setColorSchemesMap()`. Showtime always loaded the maps cached by `campaigns:refresh-cache` from Redis, the setters were used only in tests. If you call them, remove the calls. remp/remp#1527
-- **IMPORTANT**: Showtime doesn't display any campaign after the deploy until `campaigns:refresh-cache` caches the segment aggregator config under the new `segment_aggregator_config` Redis key and re-caches the campaigns, which don't contain their banners anymore.
+- **BREAKING**: `DeviceRulesEvaluator::isAcceptedByDeviceRules()` and `isAcceptedByOperatingSystemRules()` take the new `CampaignView` (campaign read from cache) instead of the `Campaign` model. remp/remp#1536
+  - If you call them, pass `CampaignView::fromModel($campaign)`.
+- **BREAKING**: `Showtime::campaignBannerToDisplay()` (protected) takes `CampaignView` instead of the `Campaign` model and returns `CampaignBannerView` instead of `CampaignBanner`. remp/remp#1536
+  - If you extend `Showtime` and override or call it, update the types; read the attributes from the view's camelCase properties (e.g. `$campaign->publicId`).
+- **BREAKING**: Removed `Campaign::getOperatingSystemsMapping()`, it was used only by `DeviceRulesEvaluator`. remp/remp#1536
+  - If you call it, copy the mapping to your code.
+- **BREAKING**: Removed `CampaignIpRange::containsIp()`. remp/remp#1536
+  - If you call it, use `CampaignIpRangeView::matches()` instead.
+- **BREAKING**: Removed `Campaign::countriesWhitelist()`, `countriesBlacklist()`, `ipRangesWhitelist()` and `ipRangesBlacklist()` relations. remp/euobserver#281
+  - If you use them, use the `countries` relation filtered by the pivot's `blacklisted` (e.g. `countries()->wherePivot('blacklisted', true)`) and the `ipRanges` relation filtered by `blacklisted`.
+- **BREAKING**: Removed `Campaign::getVariantsProportionMapping()`, it was used only by showtime. remp/remp#1536
+  - If you call it, map `proportion` of the campaign's `campaignBanners` by their `uuid`.
+- **BREAKING**: Removed the unused `Campaign::CAMPAIGN_TAG`, `PAGEVIEW_RULE_EVERY`, `PAGEVIEW_RULE_SINCE` and `PAGEVIEW_RULE_BEFORE` constants. remp/remp#1536
+  - If you use them, define the values (`campaign`, `every`, `since`, `before`) in your code.
+- **BREAKING**: Removed the `HasCacheableRelation` trait (`hydrateFromCache()`) and `Banner::loadCachedBanner()`. Campaigns and banners are cached and read by the new `CampaignView` and `BannerView`. remp/remp#1536
+  - If you call `hydrateFromCache()`, use `CampaignView::fromCache($data)` or `BannerView::fromCache($data)->toModel()` instead.
+  - If you call `Banner::loadCachedBanner()`, read the `banner_json:<id>` Redis key (`Banner::BANNER_JSON_TAG`) and use `BannerView::fromCache($data)->toModel()`.
+  - The banner create API (`BannerController::store`) responds with the banner's template instead of `null` in the template field.
+- **BREAKING**: In showtime, `ShowtimeResponse::renderCampaign()` receives `Campaign` holding only `id`, `uuid`, `public_id`, `updated_at` and its `campaignBanners` (holding `id`, `campaign_id`, `uuid`, `public_id`, `banner_id` and `control_group`). The same campaign model is passed to segment providers. remp/remp#1536
+  - If your custom `ShowtimeResponse` or segment provider reads other attributes or relations, add them to `CampaignView` and its `toModel()`.
+- **BREAKING**: In showtime, segment providers receive `CampaignSegment` holding only `provider` and `code`, and its `campaign` relation is set only for segments without cache. remp/remp#1536
+  - If your custom segment provider reads other attributes of the segment (e.g. `inclusive`), or the campaign when checking cached segments, it has to get them elsewhere.
+- **IMPORTANT**: Showtime doesn't display any campaign after the deploy until `campaigns:refresh-cache` caches the segment aggregator config under the new `segment_aggregator_config` Redis key and re-caches the campaigns and banners in the new format. remp/remp#1536
   - Run `php artisan campaigns:refresh-cache` right after the deploy.
   - The old `segment_aggregator` key is not used anymore; you can delete it from Redis.
 - **IMPORTANT**: The `data-href` attribute of Overlay Rectangle, HTML and HTML Overlay banners now contains the tracking parameters (`rtm_*`), same as the `href` of the banner link it replaced. remp/helpdesk#5042 
@@ -66,6 +88,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed showtime occasionally (~1 % of new users) selecting campaign variant with 0 % proportion. remp/remp#1532
 - CRM and REMP segment providers create their HTTP client only when they make the first HTTP request.
 - Showtime renders banners without the unused `created_at` and `updated_at` timestamps, which took about half of the rendering time. remp/remp#1535
+- Showtime evaluates the cached campaigns without creating Eloquent models for all of them. Models are created only for the campaigns it displays and for checks of segments without cache (e.g. Beam segments). remp/remp#1536
 - Fixed showtime accepting an empty debug key when `CAMPAIGN_DEBUG_KEY` was configured but empty, which let anyone enable the campaign debugger.
 - Fixed one-time banners failing to display with `Banner with ID ... is not present in cache` error since the banner cache was changed to JSON in 4.0. remp/remp#1522
 - Showtime checks segments with cache (e.g. CRM segments) before segments without cache (e.g. Beam segments, checked via HTTP request). remp/remp#1531

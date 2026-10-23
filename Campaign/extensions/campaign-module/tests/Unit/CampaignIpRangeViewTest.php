@@ -4,16 +4,16 @@ namespace Remp\CampaignModule\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Remp\CampaignModule\CampaignIpRange;
+use Remp\CampaignModule\Models\Campaign\CampaignIpRangeView;
 
-class CampaignIpRangeTest extends TestCase
+class CampaignIpRangeViewTest extends TestCase
 {
     #[DataProvider('provideIps')]
-    public function testContainsIp(string $visitorIp, string $ipFrom, ?string $ipTo, bool $expected): void
+    public function testMatches(string $visitorIp, string $ipFrom, ?string $ipTo, bool $expected): void
     {
-        $range = new CampaignIpRange(['ip_from' => $ipFrom, 'ip_to' => $ipTo]);
+        $range = new CampaignIpRangeView(ipFrom: $ipFrom, ipTo: $ipTo, blacklisted: false);
 
-        $this->assertSame($expected, $range->containsIp($visitorIp));
+        $this->assertSame($expected, $range->matches($visitorIp));
     }
 
     public static function provideIps(): array
@@ -127,9 +127,9 @@ class CampaignIpRangeTest extends TestCase
 
     public function testPackIp(): void
     {
-        $this->assertSame(4, strlen(CampaignIpRange::packIp('192.168.1.1')));
-        $this->assertSame(16, strlen(CampaignIpRange::packIp('2001:db8::1')));
-        $this->assertNull(CampaignIpRange::packIp('not-an-ip'));
-        $this->assertNull(CampaignIpRange::packIp(''));
+        $this->assertSame(4, strlen(CampaignIpRangeView::packIp('192.168.1.1')));
+        $this->assertSame(16, strlen(CampaignIpRangeView::packIp('2001:db8::1')));
+        $this->assertNull(CampaignIpRangeView::packIp('not-an-ip'));
+        $this->assertNull(CampaignIpRangeView::packIp(''));
     }
 }

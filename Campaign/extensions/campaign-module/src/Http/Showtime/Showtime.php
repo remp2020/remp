@@ -11,6 +11,10 @@ use Remp\CampaignModule\Models\Alignment\Map as AlignmentMap;
 use Remp\CampaignModule\Models\ColorScheme\Map as ColorSchemeMap;
 use Remp\CampaignModule\Models\Dimension\Map as DimensionMap;
 use Remp\CampaignModule\Models\Position\Map as PositionMap;
+use Remp\CampaignModule\Models\Banner\BannerView;
+use Remp\CampaignModule\Models\Campaign\CampaignBannerView;
+use Remp\CampaignModule\Models\Campaign\CampaignSegmentView;
+use Remp\CampaignModule\Models\Campaign\CampaignView;
 use Remp\CampaignModule\Models\Targeting\TargetingMatchEnum;
 use Remp\CampaignModule\Snippet;
 use Carbon\Carbon;
@@ -27,6 +31,10 @@ class Showtime
 
     private $request;
     private array $localCache = [];
+    /** @var CampaignSegment[][] keyed by provider and code */
+    private array $campaignSegments = [];
+    /** @var Campaign[] keyed by ID */
+    private array $campaignModelCache = [];
     private ShowtimeTimer $timer;
     private VariantSelector $variantSelector;
 
@@ -64,6 +72,8 @@ class Showtime
     public function flushLocalCache(): self
     {
         $this->localCache = [];
+        $this->campaignSegments = [];
+        $this->campaignModelCache = [];
         $this->deviceRulesEvaluator->flushLocalCache();
         return $this;
     }
@@ -177,7 +187,6 @@ class Showtime
             }
             $banner = $this->loadOneTimeBanner($key);
             if ($banner) {
-                $this->hideTimestamps($banner);
                 $displayData[] = $showtimeResponse->renderBanner(
                     banner: $banner,
                     alignments: $alignments,
@@ -241,17 +250,15 @@ class Showtime
         $suppressedBanners = [];
         $this->flushLocalCache();
 
-        $this->timer->start('hydrate');
+        $this->timer->start('decode');
         foreach ($fetchedCampaigns as $fetchedCampaign) {
-            /** @var Campaign $campaign */
-            $campaign = new Campaign();
-            $campaign->hydrateFromCache(json_decode($fetchedCampaign, true));
+            $campaign = CampaignView::fromCache(json_decode($fetchedCampaign, true));
             $campaigns[$campaign->id] = $campaign;
-            if ($campaign->public_id === $debugCampaignPublicId) {
+            if ($campaign->publicId === $debugCampaignPublicId) {
                 $debugCampaignId = $campaign->id;
             }
         }
-        $this->timer->stop('hydrate');
+        $this->timer->stop('decode');
 
         if ($userId) {
             $this->timer->start('segments_prefetch');
@@ -268,9 +275,11 @@ class Showtime
                 activeCampaigns: $activeCampaigns,
             );
             $this->timer->stop('evaluate');
-            if ($result instanceof CampaignBanner) {
-                $campaignBanners[] = $result;
-            } else if ($debugCampaignPublicId && $campaign->public_id === $debugCampaignPublicId) {
+            if ($result instanceof CampaignBannerView) {
+                $this->timer->start('hydrate');
+                $campaignBanners[] = $this->campaignModel($campaign)->campaignBanners->firstWhere('uuid', $result->uuid);
+                $this->timer->stop('hydrate');
+            } else if ($debugCampaignPublicId && $campaign->publicId === $debugCampaignPublicId) {
                 // only add evaluation message for debugged campaign
                 $evaluationMessages[] = $result;
             }
@@ -284,7 +293,7 @@ class Showtime
         }
 
         if ($this->showtimeConfig->isPrioritizeBannerOnSamePosition()) {
-            $campaignBanners = $this->prioritizeCampaignBannerOnPosition($campaigns, $campaignBanners, $activeCampaigns, $suppressedBanners);
+            $campaignBanners = $this->prioritizeCampaignBannerOnPosition($this->campaignModelCache, $campaignBanners, $activeCampaigns, $suppressedBanners);
         }
 
         // If $debugCampaignPublicId is set, filter out everything else (after prioritization has been done)
@@ -303,10 +312,9 @@ class Showtime
                 array_flip($campaignBannerSnippets[$campaignBanner->public_id]),
             );
 
-            $this->hideTimestamps($campaignBanner->banner);
             $displayData[] = $showtimeResponse->renderCampaign(
                 variant: $campaignBanner,
-                campaign: $campaigns[$campaignBanner->campaign_id],
+                campaign: $this->campaignModelCache[$campaignBanner->campaign_id],
                 alignments: $alignments,
                 dimensions: $dimensions,
                 positions: $positions,
@@ -337,7 +345,19 @@ class Showtime
                 $bannerIds[] = $campaignBanner->banner_id;
             }
         }
-        $banners = Banner::loadCachedBanners($this->redis, $bannerIds);
+        $banners = [];
+        if ($bannerIds) {
+            $keys = [];
+            foreach ($bannerIds as $bannerId) {
+                $keys[] = Banner::BANNER_JSON_TAG . ":{$bannerId}";
+            }
+            $cachedBanners = $this->redis->mget($keys);
+            foreach ($bannerIds as $i => $bannerId) {
+                if ($cachedBanners[$i]) {
+                    $banners[$bannerId] = BannerView::fromCache(json_decode($cachedBanners[$i], true))->toModel();
+                }
+            }
+        }
 
         foreach ($campaignBanners as $campaignBanner) {
             // control group variants have no banner
@@ -426,35 +446,21 @@ class Showtime
     /**
      * Determines what campaign banner should be displayed for user/browser
      * Returns either campaign banner or string message saying why no campaign banner will be display.
-     *
-     * @param Campaign    $campaign
-     * @param             $userData
-     * @param array       $activeCampaigns
-     *
-     * @return CampaignBanner|string
      */
     protected function campaignBannerToDisplay(
-        Campaign $campaign,
+        CampaignView $campaign,
         $userData,
         array &$activeCampaigns,
-    ): CampaignBanner|string {
+    ): CampaignBannerView|string {
         $userId = $userData->userId ?? null;
         $browserId = $userData->browserId;
-        $running = false;
-
-        foreach ($campaign->schedules as $schedule) {
-            if ($schedule->isRunning()) {
-                $running = true;
-                break;
-            }
-        }
-        if (!$running) {
+        if (!$campaign->isRunning()) {
             return "Campaign is not running";
         }
 
         // check if campaign is set to be seen only once per session
         $campaignsSeenInSession = $userData->campaignsSession ?? [];
-        if ($campaign->once_per_session && $campaignsSeenInSession) {
+        if ($campaign->oncePerSession && $campaignsSeenInSession) {
             $seen = isset($campaignsSeenInSession->{$campaign->uuid});
             if ($seen) {
                 return "Campaign not executed because it can be displayed only once per session";
@@ -462,36 +468,35 @@ class Showtime
         }
 
         // signed in state
-        if (isset($campaign->signed_in) && $campaign->signed_in !== (bool) $userId) {
-            $requireSignedUser = (bool)$campaign->signed_in;
-            return "Campaign not executed because it requires " . ($requireSignedUser ? "signed user" : "anonymous user");
+        if ($campaign->signedIn !== null && $campaign->signedIn !== (bool) $userId) {
+            return "Campaign not executed because it requires " . ($campaign->signedIn ? "signed user" : "anonymous user");
         }
 
         // using adblock?
-        if ($campaign->using_adblock !== null) {
+        if ($campaign->usingAdblock !== null) {
             if (!isset($userData->usingAdblock)) {
                 $this->logger->error("Unable to load if user with ID [{$userId}] & browserId [{$browserId}] is using AdBlock");
                 return "Campaign not executed because system was unable to check if user with ID [{$userId}] & browserId [{$browserId}] is using AdBlock";
             }
-            if (($campaign->using_adblock && !$userData->usingAdblock)) {
+            if (($campaign->usingAdblock && !$userData->usingAdblock)) {
                 return "Campaign not executed because user with ID [{$userId}] is not using AdBlock";
             }
-            if ($campaign->using_adblock === false && $userData->usingAdblock) {
+            if ($campaign->usingAdblock === false && $userData->usingAdblock) {
                 return "Campaign not executed because user with ID [{$userId}] is using AdBlock";
             }
         }
 
         // url filters
-        if ($campaign->url_filter === Campaign::URL_FILTER_EXCEPT_AT) {
-            foreach ($campaign->url_patterns as $urlPattern) {
+        if ($campaign->urlFilter === Campaign::URL_FILTER_EXCEPT_AT) {
+            foreach ($campaign->urlPatterns as $urlPattern) {
                 if (strpos($userData->url, $urlPattern) !== false) {
                     return "Campaign not executed because of the URL filter [{$urlPattern}] (matched URL [{$userData->url}])";
                 }
             }
         }
-        if ($campaign->url_filter === Campaign::URL_FILTER_ONLY_AT) {
+        if ($campaign->urlFilter === Campaign::URL_FILTER_ONLY_AT) {
             $matched = false;
-            foreach ($campaign->url_patterns as $urlPattern) {
+            foreach ($campaign->urlPatterns as $urlPattern) {
                 if (strpos($userData->url, $urlPattern) !== false) {
                     $matched = true;
                 }
@@ -502,19 +507,19 @@ class Showtime
         }
 
         // source referer filters
-        if ($campaign->source_filter === Campaign::SOURCE_FILTER_REFERER_EXCEPT_AT && $userData->referer) {
-            foreach ($campaign->source_patterns as $sourcePattern) {
+        if ($campaign->sourceFilter === Campaign::SOURCE_FILTER_REFERER_EXCEPT_AT && $userData->referer) {
+            foreach ($campaign->sourcePatterns as $sourcePattern) {
                 if (strpos($userData->referer, $sourcePattern) !== false) {
                     return "Campaign not executed because of the referer source filter [{$sourcePattern}] (provided referer [{$userData->referer}])";
                 }
             }
         }
-        if ($campaign->source_filter === Campaign::SOURCE_FILTER_REFERER_ONLY_AT) {
+        if ($campaign->sourceFilter === Campaign::SOURCE_FILTER_REFERER_ONLY_AT) {
             if (!isset($userData->referer) || $userData->referer === '') {
                 return "Campaign not executed because user didn't provide a referer and campaign has filter on it";
             }
             $matched = false;
-            foreach ($campaign->source_patterns as $sourcePattern) {
+            foreach ($campaign->sourcePatterns as $sourcePattern) {
                 if (strpos($userData->referer, $sourcePattern) !== false) {
                     $matched = true;
                     break;
@@ -526,19 +531,19 @@ class Showtime
         }
 
         // session referer filters
-        if ($campaign->source_filter === Campaign::SOURCE_FILTER_SESSION_EXCEPT_AT && $userData->sessionReferer) {
-            foreach ($campaign->source_patterns as $sourcePattern) {
+        if ($campaign->sourceFilter === Campaign::SOURCE_FILTER_SESSION_EXCEPT_AT && $userData->sessionReferer) {
+            foreach ($campaign->sourcePatterns as $sourcePattern) {
                 if (strpos($userData->sessionReferer, $sourcePattern) !== false) {
                     return "Campaign not executed because of the session source filter [{$sourcePattern}] (provided session source [{$userData->sessionReferer}])";
                 }
             }
         }
-        if ($campaign->source_filter === Campaign::SOURCE_FILTER_SESSION_ONLY_AT) {
+        if ($campaign->sourceFilter === Campaign::SOURCE_FILTER_SESSION_ONLY_AT) {
             if (!isset($userData->sessionReferer) || $userData->sessionReferer === '') {
                 return "Campaign not executed because user didn't provide a session source and campaign has filter on it";
             }
             $matched = false;
-            foreach ($campaign->source_patterns as $sourcePattern) {
+            foreach ($campaign->sourcePatterns as $sourcePattern) {
                 if (strpos($userData->sessionReferer, $sourcePattern) !== false) {
                     $matched = true;
                     break;
@@ -571,7 +576,7 @@ class Showtime
         }
 
         // IP range rules
-        if (!$campaign->ipRanges->isEmpty()) {
+        if (!empty($campaign->ipRanges)) {
             $visitorIp = $this->getRequest()->ip();
             $ipRangesMatch = $campaign->matchIpRanges($visitorIp);
 
@@ -584,7 +589,7 @@ class Showtime
         }
 
         // country rules
-        if (!$campaign->countries->isEmpty()) {
+        if (!empty($campaign->countries)) {
             // load country ISO code based on IP
             try {
                 $countryCode = $this->geoReader->countryCode($this->getRequest()->ip());
@@ -623,12 +628,12 @@ class Showtime
         }
 
         // pageview attributes - check if sent pageview attributes match conditions
-        if (!empty($campaign->pageview_attributes)) {
+        if (!empty($campaign->pageviewAttributes)) {
             if (empty($userData->pageviewAttributes)) {
                 return "Campaign not executed because user sent no pageview attributes";
             }
 
-            foreach ($campaign->pageview_attributes as $attribute) {
+            foreach ($campaign->pageviewAttributes as $attribute) {
                 $attrName = $attribute['name'];
                 $attrValue = $attribute['value'];
                 $attrOperator = $attribute['operator'];
@@ -684,13 +689,13 @@ class Showtime
         // We need to track such campaigns on the client-side too.
         $activeCampaigns[$campaign->id] = (object) [
             'uuid' => $campaign->uuid,
-            'public_id' => $campaign->public_id,
+            'public_id' => $campaign->publicId,
         ];
 
-        $seenCampaign = $seenCampaigns->{$campaign->uuid} ?? $seenCampaigns->{$campaign->public_id} ?? null;
+        $seenCampaign = $seenCampaigns->{$campaign->uuid} ?? $seenCampaigns->{$campaign->publicId} ?? null;
 
         // pageview rules - check display banner every n-th request
-        if ($campaign->pageview_rules !== null) {
+        if ($campaign->pageviewRules !== null) {
             $pageviewCount = $seenCampaign === null ? 0 : ($seenCampaign->count ?? null);
 
             if ($pageviewCount === null) {
@@ -700,9 +705,9 @@ class Showtime
                 return "Campaign not executed because user has no pageview count (probably old version of remplib)";
             }
 
-            if (($campaign->pageview_rules['display_banner'] ?? null) === 'every') {
-                $displayBannerEvery = $campaign->pageview_rules['display_banner_every'] ?? 1;
-                $firstDisplayCount = ($campaign->pageview_rules['display_banner_from'] ?? 1) - 1;
+            if (($campaign->pageviewRules['display_banner'] ?? null) === 'every') {
+                $displayBannerEvery = $campaign->pageviewRules['display_banner_every'] ?? 1;
+                $firstDisplayCount = ($campaign->pageviewRules['display_banner_from'] ?? 1) - 1;
 
                 if ($pageviewCount < $firstDisplayCount) {
                     return "Campaign not executed because of 'display-banner-from' pageview rule (pageview count [$pageviewCount])";
@@ -714,12 +719,12 @@ class Showtime
         }
 
         // pageview rules - check rules after banner was closed or clicked
-        if ($seenCampaign !== null && $campaign->pageview_rules !== null) {
-            $sessionCampaign = $campaignsSeenInSession->{$campaign->uuid} ?? $campaignsSeenInSession->{$campaign->public_id} ?? null;
+        if ($seenCampaign !== null && $campaign->pageviewRules !== null) {
+            $sessionCampaign = $campaignsSeenInSession->{$campaign->uuid} ?? $campaignsSeenInSession->{$campaign->publicId} ?? null;
 
             if (property_exists($seenCampaign, 'closedAt')) {
-                $afterClosedRule = $campaign->pageview_rules['after_banner_closed_display'] ?? null;
-                $afterClosedHours = $campaign->pageview_rules['after_closed_hours'] ?? 0;
+                $afterClosedRule = $campaign->pageviewRules['after_banner_closed_display'] ?? null;
+                $afterClosedHours = $campaign->pageviewRules['after_closed_hours'] ?? 0;
                 if ($afterClosedRule === 'never') {
                     return "Campaign not executed because of 'after-close-rule=never' pageview rule";
                 }
@@ -737,8 +742,8 @@ class Showtime
             }
 
             if (property_exists($seenCampaign, 'clickedAt')) {
-                $afterClickedRule = $campaign->pageview_rules['after_banner_clicked_display'] ?? null;
-                $afterClickedHours = $campaign->pageview_rules['after_clicked_hours'] ?? 0;
+                $afterClickedRule = $campaign->pageviewRules['after_banner_clicked_display'] ?? null;
+                $afterClickedHours = $campaign->pageviewRules['after_clicked_hours'] ?? 0;
                 if ($afterClickedRule === 'never') {
                     return "Campaign not executed because of 'after-click-rule=never' pageview rule";
                 }
@@ -756,7 +761,7 @@ class Showtime
         }
 
         // seen count rules
-        if ($seenCampaign !== null && $campaign->pageview_rules !== null) {
+        if ($seenCampaign !== null && $campaign->pageviewRules !== null) {
             $seenCount = $seenCampaign->seen ?? null;
 
             if ($seenCount === null) {
@@ -766,9 +771,9 @@ class Showtime
                 return "Campaign not executed because of missing seenCount value (probably old version of remplib)";
             }
 
-            $displayTimes = $campaign->pageview_rules['display_times'] ?? null;
-            if ($displayTimes && $seenCount >= $campaign->pageview_rules['display_n_times']) {
-                return "Campaign not executed because it was already seen more than [{$campaign->pageview_rules['display_n_times']} times (specifically [$displayTimes] times)]";
+            $displayTimes = $campaign->pageviewRules['display_times'] ?? null;
+            if ($displayTimes && $seenCount >= $campaign->pageviewRules['display_n_times']) {
+                return "Campaign not executed because it was already seen more than [{$campaign->pageviewRules['display_n_times']} times (specifically [$displayTimes] times)]";
             }
         }
 
@@ -805,42 +810,42 @@ class Showtime
         }
     }
 
-    private function evaluateSegmentRules(Campaign $campaign, $browserId, $userId = null)
+    private function evaluateSegmentRules(CampaignView $campaign, $browserId, $userId = null)
     {
-        if ($campaign->segments->isEmpty()) {
+        if (empty($campaign->segments)) {
             return true;
         }
 
         $cachedSegments = [];
         $notCachedSegments = [];
-        foreach ($campaign->segments as $campaignSegment) {
-            if ($this->segmentAggregator->cacheEnabled($campaignSegment)) {
-                $cachedSegments[] = $campaignSegment;
+        foreach ($campaign->segments as $segment) {
+            if ($this->segmentAggregator->cacheEnabled($this->campaignSegment($segment))) {
+                $cachedSegments[] = $segment;
             } else {
-                $notCachedSegments[] = $campaignSegment;
+                $notCachedSegments[] = $segment;
             }
         }
 
         // Check cached segments first so that we can halt early and avoid expensive non-cached segments check.
-        foreach ([...$cachedSegments, ...$notCachedSegments] as $campaignSegment) {
-            $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
+        foreach ([...$cachedSegments, ...$notCachedSegments] as $segment) {
+            $campaignSegment = $this->campaignSegment($segment);
 
             if ($userId) {
                 if (!$this->isCacheValid($campaignSegment)) {
                     return false;
                 }
 
-                $belongsToSegment = $this->checkUserInSegment($campaignSegment, $userId);
+                $belongsToSegment = $this->checkUserInSegment($campaignSegment, $campaign, $userId);
             } else {
-                $belongsToSegment = $this->checkBrowserInSegment($campaignSegment, $browserId);
+                $belongsToSegment = $this->checkBrowserInSegment($campaignSegment, $campaign, $browserId);
             }
 
             // user is member of segment, that's excluded from campaign; halt execution
-            if ($belongsToSegment && !$campaignSegment->inclusive) {
+            if ($belongsToSegment && !$segment->inclusive) {
                 return false;
             }
             // user is NOT member of segment, that's required for campaign; halt execution
-            if (!$belongsToSegment && $campaignSegment->inclusive) {
+            if (!$belongsToSegment && $segment->inclusive) {
                 return false;
             }
         }
@@ -865,13 +870,14 @@ class Showtime
     }
 
     /**
-     * @param Campaign[] $campaigns
+     * @param CampaignView[] $campaigns
      */
     private function prefetchUserSegments(array $campaigns, string $userId): void
     {
         $campaignSegments = [];
         foreach ($campaigns as $campaign) {
-            foreach ($campaign->segments as $campaignSegment) {
+            foreach ($campaign->segments as $segment) {
+                $campaignSegment = $this->campaignSegment($segment);
                 $campaignSegments[SegmentAggregator::cacheKey($campaignSegment)] = $campaignSegment;
             }
         }
@@ -886,22 +892,23 @@ class Showtime
     }
 
     /**
-     * Banners are rendered without timestamps, banner.js doesn't use them and converting them to Carbon and back
-     * takes about half of the rendering time.
+     * Segment providers take the model. It's shared by all campaigns using the segment, so it holds only provider and code.
      */
-    private function hideTimestamps(?Banner $banner): void
+    private function campaignSegment(CampaignSegmentView $segment): CampaignSegment
     {
-        // control group variants have no banner
-        if (!$banner) {
-            return;
-        }
+        return $this->campaignSegments[$segment->provider][$segment->code] ??= (new CampaignSegment())
+            ->setRawAttributes(['provider' => $segment->provider, 'code' => $segment->code]);
+    }
 
-        $timestamps = ['created_at', 'updated_at'];
-        $banner->makeHidden($timestamps);
-
-        foreach ($banner->getRelations() as $relation) {
-            $relation->makeHidden($timestamps);
+    /**
+     * campaignModel utilizes cache to provide Campaign models to avoid expensive repeated hydration of Laravel models.
+     */
+    private function campaignModel(CampaignView $campaign): Campaign
+    {
+        if (!isset($this->campaignModelCache[$campaign->id])) {
+            $this->campaignModelCache[$campaign->id] = $campaign->toModel();
         }
+        return $this->campaignModelCache[$campaign->id];
     }
 
     private function pipeline(callable $commands): array
@@ -927,11 +934,11 @@ class Showtime
             }
 
             [$bannerId] = explode(':', $member);
-            $banner = Banner::loadCachedBanner($this->redis, $bannerId);
-            if (!$banner) {
+            $cachedBanner = $this->redis->get(Banner::BANNER_JSON_TAG . ":{$bannerId}");
+            if (!$cachedBanner) {
                 throw new \Exception("Banner with ID $bannerId is not present in cache");
             }
-            return $banner;
+            return BannerView::fromCache(json_decode($cachedBanner, true))->toModel();
         }
         return null;
     }
@@ -942,11 +949,16 @@ class Showtime
         return (int) $expiresAt <= $now;
     }
 
-    private function checkUserInSegment(CampaignSegment $campaignSegment, $userId): bool
+    private function checkUserInSegment(CampaignSegment $campaignSegment, CampaignView $campaign, $userId): bool
     {
         $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|user|'.$userId;
         if (isset($this->localCache[$cacheKey])) {
             return $this->localCache[$cacheKey];
+        }
+
+        // segments without cache are checked via provider's API, which may need the campaign (e.g. Beam for the overrides)
+        if (!$this->segmentAggregator->cacheEnabled($campaignSegment)) {
+            $campaignSegment->setRelation('campaign', $this->campaignModel($campaign));
         }
 
         $this->timer->increment('segment_checks');
@@ -956,11 +968,16 @@ class Showtime
         return $belongsToSegment;
     }
 
-    private function checkBrowserInSegment(CampaignSegment $campaignSegment, $browserId): bool
+    private function checkBrowserInSegment(CampaignSegment $campaignSegment, CampaignView $campaign, $browserId): bool
     {
         $cacheKey = SegmentAggregator::cacheKey($campaignSegment). '|browser|'.$browserId;
         if (isset($this->localCache[$cacheKey])) {
             return $this->localCache[$cacheKey];
+        }
+
+        // segments without cache are checked via provider's API, which may need the campaign (e.g. Beam for the overrides)
+        if (!$this->segmentAggregator->cacheEnabled($campaignSegment)) {
+            $campaignSegment->setRelation('campaign', $this->campaignModel($campaign));
         }
 
         $this->timer->increment('segment_checks');

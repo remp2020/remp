@@ -2,17 +2,14 @@
 
 namespace Remp\CampaignModule;
 
-use Closure;
 use Database\Factories\CampaignFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
-use Remp\CampaignModule\Concerns\HasCacheableRelation;
-use Remp\CampaignModule\Models\Targeting\TargetingMatchEnum;
+use Remp\CampaignModule\Models\Campaign\CampaignView;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
@@ -20,18 +17,12 @@ class Campaign extends Model implements Searchable
 {
     /** @use HasFactory<CampaignFactory> */
     use HasFactory;
-    use HasCacheableRelation;
     use PivotEventTrait;
     use IdentificationTrait;
 
     const ACTIVE_CAMPAIGN_IDS = 'active_campaign_ids';
-    const CAMPAIGN_TAG = 'campaign';
     const CAMPAIGN_JSON_TAG = 'campaign_json';
     const CAMPAIGN_SNIPPET_CODES_JSON_TAG = 'campaign_snippet_codes_json';
-
-    const PAGEVIEW_RULE_EVERY = 'every';
-    const PAGEVIEW_RULE_SINCE = 'since';
-    const PAGEVIEW_RULE_BEFORE = 'before';
 
     const DEVICE_MOBILE = 'mobile';
     const DEVICE_DESKTOP = 'desktop';
@@ -104,14 +95,6 @@ class Campaign extends Model implements Searchable
     protected $appends = ['active'];
 
     protected $dateFormat = 'Y-m-d H:i:s';
-
-    protected $cacheableRelations = [
-        'segments' => CampaignSegment::class,
-        'countries' => Country::class,
-        'ipRanges' => CampaignIpRange::class,
-        'schedules' => Schedule::class,
-        'campaignBanners' => CampaignBanner::class,
-    ];
 
     public function getSearchResult(): SearchResult
     {
@@ -235,49 +218,6 @@ class Campaign extends Model implements Searchable
         return $this->ipRanges->contains(fn (CampaignIpRange $range) => $range->isBlacklisted());
     }
 
-    public function matchIpRanges(?string $ip): TargetingMatchEnum
-    {
-        $packedIp = $ip === null ? null : CampaignIpRange::packIp($ip);
-
-        return $this->matchTargeting(
-            $this->ipRanges,
-            fn (CampaignIpRange $range) => $packedIp !== null && $range->containsPackedIp($packedIp),
-        );
-    }
-
-    public function matchCountry(string $countryCode): TargetingMatchEnum
-    {
-        return $this->matchTargeting(
-            $this->countries,
-            fn (Country $country) => $country->iso_code === $countryCode,
-        );
-    }
-
-    /**
-     * @param Collection<int, CampaignIpRange|Country> $items
-     */
-    private function matchTargeting(Collection $items, Closure $matches): TargetingMatchEnum
-    {
-        foreach ($items as $item) {
-            if ($item->isBlacklisted() && $matches($item)) {
-                return TargetingMatchEnum::Blacklisted;
-            }
-        }
-
-        $hasWhitelist = false;
-        foreach ($items as $item) {
-            if ($item->isBlacklisted()) {
-                continue;
-            }
-            if ($matches($item)) {
-                return TargetingMatchEnum::Allowed;
-            }
-            $hasWhitelist = true;
-        }
-
-        return $hasWhitelist ? TargetingMatchEnum::NotWhitelisted : TargetingMatchEnum::Allowed;
-    }
-
     /**
      * @return HasMany<CampaignSegment, $this>
      */
@@ -338,17 +278,6 @@ class Campaign extends Model implements Searchable
         ];
     }
 
-    public function getOperatingSystemsMapping(): array
-    {
-        return [
-            self::OPERATING_SYSTEM_ANDROID => ['AND'],
-            self::OPERATING_SYSTEM_IOS => ['IOS'],
-            self::OPERATING_SYSTEM_LINUX => ['LIN'],
-            self::OPERATING_SYSTEM_WINDOWS => ['WIN'],
-            self::OPERATING_SYSTEM_MAC => ['MAC'],
-        ];
-    }
-
     public function supportsDevice($device)
     {
         if (in_array($device, $this->devices)) {
@@ -356,18 +285,6 @@ class Campaign extends Model implements Searchable
         }
 
         return false;
-    }
-
-    public function getVariantsProportionMapping()
-    {
-        $mapping = [];
-        $campaignBanners = $this->campaignBanners;
-
-        foreach ($campaignBanners as $campaignBanner) {
-            $mapping[$campaignBanner->uuid] = $campaignBanner->proportion;
-        }
-
-        return $mapping;
     }
 
     public function getAllUrlFilterTypes()
@@ -429,12 +346,9 @@ class Campaign extends Model implements Searchable
 
         self::refreshActiveCampaignsCache();
 
-        /** @var Campaign $campaign */
-        $campaign = $this->where(['id' => $this->id])
-            ->with(array_keys($this->cacheableRelations))
-            ->first();
+        $campaign = $this->fresh();
 
-        Redis::set(self::CAMPAIGN_JSON_TAG . ":{$this->id}", json_encode($campaign->toCacheArray()));
+        Redis::set(self::CAMPAIGN_JSON_TAG . ":{$this->id}", json_encode(CampaignView::fromModel($campaign)->toCache()));
         Redis::set(self::CAMPAIGN_SNIPPET_CODES_JSON_TAG . ":{$this->id}", json_encode($campaign->getUsedSnippetCodes()));
     }
 

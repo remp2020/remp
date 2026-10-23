@@ -2,14 +2,15 @@
 
 namespace Remp\CampaignModule\Tests\Unit;
 
-use Remp\CampaignModule\Campaign;
-use Remp\CampaignModule\CampaignBanner;
+use PHPUnit\Framework\TestCase;
 use Remp\CampaignModule\Http\Showtime\VariantSelectionException;
 use Remp\CampaignModule\Http\Showtime\VariantSelector;
-use Remp\CampaignModule\Tests\TestCase;
+use Remp\CampaignModule\Models\Campaign\CampaignBannerView;
 
 class VariantSelectorTest extends TestCase
 {
+    use CreatesCampaignView;
+
     private VariantSelector $variantSelector;
 
     protected function setUp(): void
@@ -20,7 +21,7 @@ class VariantSelectorTest extends TestCase
 
     public function testCampaignWithoutVariants()
     {
-        $campaign = $this->campaign([]);
+        $campaign = $this->campaignView([]);
 
         $this->expectException(VariantSelectionException::class);
         $this->expectExceptionMessage('Campaign not shown because it has no banner set');
@@ -29,7 +30,7 @@ class VariantSelectorTest extends TestCase
 
     public function testRandomVariantForNewUser()
     {
-        $campaign = $this->campaign([
+        $campaign = $this->campaignView([
             $this->variant('variant-a', 0),
             $this->variant('variant-b', 100),
         ]);
@@ -40,13 +41,13 @@ class VariantSelectorTest extends TestCase
 
     public function testSeenVariantByCampaignPublicId()
     {
-        $campaign = $this->campaign([
+        $campaign = $this->campaignView([
             $this->variant('variant-a', 50),
             $this->variant('variant-b', 50),
         ]);
 
         $seenCampaigns = (object) [
-            $campaign->public_id => (object) ['variantId' => 'variant-b-public'],
+            $campaign->publicId => (object) ['variantId' => 'variant-b-public'],
         ];
 
         $result = $this->variantSelector->selectVariant($campaign, $seenCampaigns);
@@ -55,7 +56,7 @@ class VariantSelectorTest extends TestCase
 
     public function testSeenVariantByCampaignUuid()
     {
-        $campaign = $this->campaign([
+        $campaign = $this->campaignView([
             $this->variant('variant-a', 50),
             $this->variant('variant-b', 50),
         ]);
@@ -70,12 +71,12 @@ class VariantSelectorTest extends TestCase
 
     public function testDeletedSeenVariantIsReselected()
     {
-        $campaign = $this->campaign([
+        $campaign = $this->campaignView([
             $this->variant('variant-a', 100),
         ]);
 
         $seenCampaigns = (object) [
-            $campaign->public_id => (object) ['variantId' => 'deleted-variant-public'],
+            $campaign->publicId => (object) ['variantId' => 'deleted-variant-public'],
         ];
 
         $result = $this->variantSelector->selectVariant($campaign, $seenCampaigns);
@@ -84,34 +85,21 @@ class VariantSelectorTest extends TestCase
 
     public function testSeenVariantWithZeroProportionIsReselected()
     {
-        $campaign = $this->campaign([
+        $campaign = $this->campaignView([
             $this->variant('variant-a', 0),
             $this->variant('variant-b', 100),
         ]);
 
         $seenCampaigns = (object) [
-            $campaign->public_id => (object) ['variantId' => 'variant-a-public'],
+            $campaign->publicId => (object) ['variantId' => 'variant-a-public'],
         ];
 
         $result = $this->variantSelector->selectVariant($campaign, $seenCampaigns);
         $this->assertSame('variant-b', $result->uuid);
     }
 
-    private function campaign(array $variants): Campaign
+    private function variant(string $uuid, int $proportion): CampaignBannerView
     {
-        $campaign = new Campaign();
-        $campaign->uuid = 'campaign-uuid';
-        $campaign->public_id = 'campaign-public';
-        $campaign->setRelation('campaignBanners', collect($variants));
-        return $campaign;
-    }
-
-    private function variant(string $uuid, int $proportion): CampaignBanner
-    {
-        $variant = new CampaignBanner();
-        $variant->uuid = $uuid;
-        $variant->public_id = "{$uuid}-public";
-        $variant->proportion = $proportion;
-        return $variant;
+        return new CampaignBannerView(id: 1, uuid: $uuid, publicId: "{$uuid}-public", proportion: $proportion, bannerId: 1, controlGroup: false);
     }
 }

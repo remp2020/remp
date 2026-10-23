@@ -3,9 +3,12 @@
 namespace Remp\CampaignModule\Tests\Unit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Redis;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\HtmlTemplate;
+use Remp\CampaignModule\NewsletterRectangleTemplate;
+use Remp\CampaignModule\Models\Banner\BannerView;
 use Remp\CampaignModule\BarTemplate;
 use Remp\CampaignModule\Snippet;
 use Remp\CampaignModule\Tests\TestCase;
@@ -308,5 +311,34 @@ class BannerTest extends TestCase
         $this->assertContains('cdn_domain', $snippets);
         $this->assertContains('theme', $snippets);
         $this->assertContains('protocol', $snippets);
+    }
+
+    public function testBannerViewCacheRoundTrip()
+    {
+        $banner = Banner::factory()->create([
+            'template' => Banner::TEMPLATE_NEWSLETTER_RECTANGLE,
+            'js_includes' => ['https://example.com/script.js'],
+        ]);
+        $template = new NewsletterRectangleTemplate([
+            'newsletter_id' => 'test-newsletter',
+            'btn_submit' => 'Subscribe',
+            'terms' => 'Terms',
+            'color_scheme' => 'grey',
+        ]);
+        $template->banner_id = $banner->id;
+        $template->save();
+
+        $banner->cache();
+        $cached = json_decode(Redis::get(Banner::BANNER_JSON_TAG . ":{$banner->id}"), true);
+        // appended attributes are cached, showtime can't evaluate them without Laravel's config
+        $this->assertArrayHasKey('endpoint', $cached['template']);
+
+        $expected = $banner->fresh()->loadTemplate();
+        $expected->makeHidden(['created_at', 'updated_at']);
+        $expected->newsletterRectangleTemplate->makeHidden(['created_at', 'updated_at']);
+        $this->assertSame(
+            json_decode($expected->toJson(), true),
+            json_decode(BannerView::fromCache($cached)->toModel()->toJson(), true),
+        );
     }
 }

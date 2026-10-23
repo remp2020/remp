@@ -5,12 +5,22 @@ namespace Remp\CampaignModule\Http\Showtime;
 use DeviceDetector\DeviceDetector;
 use Predis\ClientInterface;
 use Remp\CampaignModule\Campaign;
+use Remp\CampaignModule\Models\Campaign\CampaignView;
 
 class DeviceRulesEvaluator
 {
     private const DEVICE_DETECTION_KEY = 'device_detection';
     private const OPERATING_SYSTEM_DETECTION_KEY = 'operating_system_detection';
     private const DEVICE_DETECTION_TTL = 86400;
+
+    /** Campaign operating systems mapped to DeviceDetector OS short names */
+    private const OPERATING_SYSTEMS_MAPPING = [
+        Campaign::OPERATING_SYSTEM_ANDROID => ['AND'],
+        Campaign::OPERATING_SYSTEM_IOS => ['IOS'],
+        Campaign::OPERATING_SYSTEM_LINUX => ['LIN'],
+        Campaign::OPERATING_SYSTEM_WINDOWS => ['WIN'],
+        Campaign::OPERATING_SYSTEM_MAC => ['MAC'],
+    ];
 
     private array $localCache = [];
 
@@ -23,7 +33,7 @@ class DeviceRulesEvaluator
     ) {
     }
 
-    public function isAcceptedByDeviceRules(string $userAgent, Campaign $campaign): bool
+    public function isAcceptedByDeviceRules(string $userAgent, CampaignView $campaign): bool
     {
         $targetsMobile = in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true);
         $targetsDesktop = in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true);
@@ -38,10 +48,10 @@ class DeviceRulesEvaluator
         $deviceDetection = $this->resolveCachedValue($deviceKey);
 
         if ($deviceDetection) {
-            if ($deviceDetection === Campaign::DEVICE_MOBILE && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)) {
+            if ($deviceDetection === Campaign::DEVICE_MOBILE && !$targetsMobile) {
                 return false;
             }
-            if ($deviceDetection === Campaign::DEVICE_DESKTOP && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)) {
+            if ($deviceDetection === Campaign::DEVICE_DESKTOP && !$targetsDesktop) {
                 return false;
             }
 
@@ -65,20 +75,20 @@ class DeviceRulesEvaluator
         $this->localCache[$deviceKey] = $deviceDetectionValue;
         $this->redis->setex($deviceKey, self::DEVICE_DETECTION_TTL, $deviceDetectionValue);
 
-        if ($isMobile && !in_array(Campaign::DEVICE_MOBILE, $campaign->devices, true)) {
+        if ($isMobile && !$targetsMobile) {
             return false;
         }
 
-        if ($isDesktop && !in_array(Campaign::DEVICE_DESKTOP, $campaign->devices, true)) {
+        if ($isDesktop && !$targetsDesktop) {
             return false;
         }
 
         return true;
     }
 
-    public function isAcceptedByOperatingSystemRules(string $userAgent, Campaign $campaign): bool
+    public function isAcceptedByOperatingSystemRules(string $userAgent, CampaignView $campaign): bool
     {
-        $allowedOperatingSystems = $campaign->operating_systems;
+        $allowedOperatingSystems = $campaign->operatingSystems;
         if (empty($allowedOperatingSystems)) {
             return true;
         }
@@ -99,8 +109,7 @@ class DeviceRulesEvaluator
         $deviceDetectorResult = $this->resolveDevice($userAgent);
         $detectedOs = $deviceDetectorResult->getOs('short_name');
 
-        $osMapping = $campaign->getOperatingSystemsMapping();
-        foreach ($osMapping as $osValue => $osShortCodes) {
+        foreach (self::OPERATING_SYSTEMS_MAPPING as $osValue => $osShortCodes) {
             if (in_array($detectedOs, $osShortCodes, true)) {
                 $osDetection = $osValue;
             }

@@ -4,7 +4,7 @@ namespace Remp\CampaignModule\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Remp\CampaignModule\CampaignIpRange;
+use Remp\CampaignModule\Models\Campaign\CampaignIpRangeView;
 
 class ValidIpRange implements ValidationRule
 {
@@ -47,7 +47,7 @@ class ValidIpRange implements ValidationRule
     private function pack(string $bound, mixed $ip, Closure $fail): ?string
     {
         $packed = is_string($ip) && filter_var($ip, FILTER_VALIDATE_IP) !== false
-            ? CampaignIpRange::packIp($ip)
+            ? CampaignIpRangeView::packIp($ip)
             : null;
 
         if ($packed === null) {

@@ -6,12 +6,10 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Remp\CampaignModule\Concerns\HasCacheableRelation;
+use Remp\CampaignModule\Models\Schedule\ScheduleState;
 
 class Schedule extends Model
 {
-    use HasCacheableRelation;
-
     const STATUS_READY = 'ready';
     const STATUS_EXECUTED = 'executed';
     const STATUS_PAUSED = 'paused';
@@ -38,8 +36,6 @@ class Schedule extends Model
     ];
 
     protected $dateFormat = 'Y-m-d H:i:s';
-
-    protected $cacheableRelations = [];
 
     /**
      * @return BelongsTo<Campaign, $this>
@@ -68,16 +64,7 @@ class Schedule extends Model
 
     public function isRunning()
     {
-        if ($this->status === self::STATUS_EXECUTED && $this->endsInFuture()) {
-            return true;
-        }
-        if ($this->start_time < Carbon::now() &&
-            $this->endsInFuture() &&
-            $this->status === self::STATUS_READY
-        ) {
-            return true;
-        }
-        return false;
+        return ScheduleState::isRunning($this->status, $this->start_time, $this->end_time);
     }
 
     public function isRunnable()
@@ -114,7 +101,7 @@ class Schedule extends Model
 
     public function endsInFuture()
     {
-        return !$this->end_time || $this->end_time > Carbon::now();
+        return ScheduleState::endsInFuture($this->end_time);
     }
 
     /** Scopes */

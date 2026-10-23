@@ -10,8 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Redis;
-use Predis\ClientInterface;
-use Remp\CampaignModule\Concerns\HasCacheableRelation;
+use Remp\CampaignModule\Models\Banner\BannerView;
 use Remp\CampaignModule\Models\Snippet\SnippetUsages;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
@@ -24,12 +23,11 @@ class Banner extends Model implements Searchable
 {
     /** @use HasFactory<BannerFactory> */
     use HasFactory;
-    use HasCacheableRelation;
 
     use Notifiable;
     use IdentificationTrait;
 
-    private const BANNER_JSON_TAG = 'banner_json';
+    public const BANNER_JSON_TAG = 'banner_json';
 
     public const POSITION_TOP_LEFT = 'top_left';
     public const POSITION_TOP_RIGHT = 'top_right';
@@ -78,7 +76,7 @@ class Banner extends Model implements Searchable
 
     protected $dateFormat = 'Y-m-d H:i:s';
     
-    protected $cacheableRelations = [
+    public const TEMPLATE_RELATIONS = [
         'htmlTemplate' => HtmlTemplate::class,
         'mediumRectangleTemplate' => MediumRectangleTemplate::class,
         'barTemplate' => BarTemplate::class,
@@ -95,7 +93,7 @@ class Banner extends Model implements Searchable
      */
     public static function templateClasses(): array
     {
-        return array_values((new self)->cacheableRelations);
+        return array_values(self::TEMPLATE_RELATIONS);
     }
 
     protected static function newFactory(): BannerFactory
@@ -297,40 +295,7 @@ class Banner extends Model implements Searchable
 
     public function cache(): void
     {
-        $bannerTemplate = $this->loadTemplate();
-        Redis::set(self::BANNER_JSON_TAG . ":{$this->id}", json_encode($bannerTemplate->toCacheArray()));
-    }
-
-    public static function loadCachedBanner(ClientInterface|\Redis $redis, string $bannerId): ?Banner
-    {
-        return self::loadCachedBanners($redis, [$bannerId])[$bannerId] ?? null;
-    }
-
-    /**
-     * @param list<int|string> $bannerIds
-     * @return array<int, Banner> Banners keyed by their ID. Banners missing in the cache are left out.
-     */
-    public static function loadCachedBanners(ClientInterface|\Redis $redis, array $bannerIds): array
-    {
-        if (!$bannerIds) {
-            return [];
-        }
-
-        $keys = [];
-        foreach ($bannerIds as $bannerId) {
-            $keys[] = self::BANNER_JSON_TAG . ":$bannerId";
-        }
-        $cachedBanners = $redis->mget($keys);
-
-        $banners = [];
-        foreach ($bannerIds as $i => $bannerId) {
-            if ($cachedBanners[$i]) {
-                $banner = new Banner();
-                $banner->hydrateFromCache(json_decode($cachedBanners[$i], true));
-                $banners[$bannerId] = $banner;
-            }
-        }
-        return $banners;
+        Redis::set(self::BANNER_JSON_TAG . ":{$this->id}", json_encode(BannerView::fromModel($this->fresh())->toCache()));
     }
 
     public function getDirectSnippetCodes(): array

@@ -9,6 +9,7 @@ use Remp\CampaignModule\Http\Showtime\LazyDeviceDetector;
 use Remp\CampaignModule\Http\Showtime\ShowtimeConfig;
 use Remp\CampaignModule\Http\Showtime\ShowtimeResponse;
 use Remp\CampaignModule\Http\Showtime\ShowtimeTestable;
+use Remp\CampaignModule\Models\Campaign\CampaignView;
 use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\Campaign;
 use Remp\CampaignModule\CampaignBanner;
@@ -249,7 +250,7 @@ class ShowtimeTest extends TestCase
         $userData = $this->getUserData();
         $bannerVariant = $this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaigns);
         $this->assertNotNull($bannerVariant);
-        $this->assertEquals($this->campaignBanner->id, $bannerVariant->id);
+        $this->assertEquals($this->campaignBanner->uuid, $bannerVariant->uuid);
         $this->assertCount(1, $activeCampaigns);
         $this->assertEquals($this->campaign->uuid, $activeCampaigns[$this->campaign->id]->uuid);
 
@@ -415,7 +416,7 @@ class ShowtimeTest extends TestCase
         ]);
 
         $userAgent = 'not-yet-detected-user-agent-' . Str::uuid();
-        $this->assertTrue($deviceRulesEvaluator->isAcceptedByDeviceRules($userAgent, $this->campaign));
+        $this->assertTrue($deviceRulesEvaluator->isAcceptedByDeviceRules($userAgent, ShowtimeTestable::cachedCampaign($this->campaign)));
     }
 
     public static function operatingSystemsDataProvider()
@@ -660,8 +661,12 @@ class ShowtimeTest extends TestCase
 
         $userData = $this->getUserData();
 
+        // segment without cache is checked via provider's API, which gets the campaign for the overrides
+        $withCampaignOverrides = Mockery::on(
+            fn (CampaignSegment $segment) => $segment->getOverrides() === ['rtm_campaign' => $this->campaign->uuid]
+        );
         $this->segmentAggregator->shouldReceive('cacheEnabled')->andReturn(false, false);
-        $this->segmentAggregator->shouldReceive('checkUser')->andReturn(false, true);
+        $this->segmentAggregator->shouldReceive('checkUser')->with($withCampaignOverrides, Mockery::any())->andReturn(false, true);
 
         $this->assertNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
         $this->assertCount(0, $activeCampaignUuids);
@@ -673,7 +678,7 @@ class ShowtimeTest extends TestCase
         $this->campaign->load('segments');
         $userData->userId = null;
 
-        $this->segmentAggregator->shouldReceive('checkBrowser')->andReturn(false, true);
+        $this->segmentAggregator->shouldReceive('checkBrowser')->with($withCampaignOverrides, Mockery::any())->andReturn(false, true);
 
         $this->assertNotNull($this->showtime->shouldDisplay($this->campaign, $userData, $activeCampaignUuids));
         $this->showtime->flushLocalCache();
@@ -1283,6 +1288,30 @@ class ShowtimeTest extends TestCase
         $this->assertArrayNotHasKey('updated_at', $banner);
         $this->assertArrayNotHasKey('created_at', $banner['short_message_template']);
         $this->assertArrayNotHasKey('updated_at', $banner['short_message_template']);
+    }
+
+    public function testCampaignViewCacheRoundTrip()
+    {
+        $this->seed(CountrySeeder::class);
+        $this->scheduleCampaign();
+        CampaignSegment::create([
+            'campaign_id' => $this->campaign->id,
+            'code' => 'test_segment',
+            'provider' => 'crm_segment',
+            'inclusive' => 0,
+        ]);
+        $this->campaign->ipRanges()->create(['ip_from' => '192.168.1.0', 'ip_to' => '192.168.1.255', 'blacklisted' => true]);
+        $this->campaign->countries()->sync(['SK' => ['blacklisted' => 1]]);
+
+        $campaign = CampaignView::fromModel($this->campaign->fresh());
+        $cachedCampaign = CampaignView::fromCache(json_decode(json_encode($campaign->toCache()), true));
+
+        $this->assertSame($campaign->toCache(), $cachedCampaign->toCache());
+        $this->assertFalse($cachedCampaign->segments[0]->inclusive);
+        $this->assertTrue($cachedCampaign->ipRanges[0]->blacklisted);
+        $this->assertTrue($cachedCampaign->countries[0]->blacklisted);
+        $this->assertTrue($cachedCampaign->isRunning());
+        $this->assertCount(2, $cachedCampaign->toModel()->campaignBanners);
     }
 
     private function prepareOneTimeBanner(): Banner

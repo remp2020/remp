@@ -2,9 +2,8 @@
 
 namespace Remp\CampaignModule\Http\Showtime;
 
-use Illuminate\Support\Collection;
-use Remp\CampaignModule\Campaign;
-use Remp\CampaignModule\CampaignBanner;
+use Remp\CampaignModule\Models\Campaign\CampaignBannerView;
+use Remp\CampaignModule\Models\Campaign\CampaignView;
 
 class VariantSelector
 {
@@ -15,12 +14,14 @@ class VariantSelector
      * @param ?object $seenCampaigns campaigns seen by the user, as sent in the showtime request
      * @throws VariantSelectionException if no variant can be selected, message says why
      */
-    public function selectVariant(Campaign $campaign, $seenCampaigns): CampaignBanner
+    public function selectVariant(CampaignView $campaign, $seenCampaigns): CampaignBannerView
     {
-        /** @var Collection $campaignBanners */
-        $campaignBanners = $campaign->campaignBanners->keyBy('uuid');
+        $variants = [];
+        foreach ($campaign->campaignBanners as $campaignBanner) {
+            $variants[$campaignBanner->uuid] = $campaignBanner;
+        }
 
-        if ($campaignBanners->count() == 0) {
+        if (!$variants) {
             throw new VariantSelectionException("Campaign not shown because it has no banner set");
         }
 
@@ -32,10 +33,10 @@ class VariantSelector
                 $variantUuid = $seenCampaigns->{$campaign->uuid}->variantId ?? null;
             }
 
-            if (isset($seenCampaigns->{$campaign->public_id}->variantId)) {
-                foreach ($campaign->campaignBanners as $campaignBanner) {
-                    if ($campaignBanner->public_id === $seenCampaigns->{$campaign->public_id}->variantId) {
-                        $variantUuid = $campaignBanner->uuid ?? null;
+            if (isset($seenCampaigns->{$campaign->publicId}->variantId)) {
+                foreach ($variants as $variant) {
+                    if ($variant->publicId === $seenCampaigns->{$campaign->publicId}->variantId) {
+                        $variantUuid = $variant->uuid;
                         break;
                     }
                 }
@@ -43,8 +44,7 @@ class VariantSelector
         }
 
         // unset seen variant if it was deleted
-        /** @var CampaignBanner $seenVariant */
-        $seenVariant = $campaignBanners->get($variantUuid);
+        $seenVariant = $variants[$variantUuid] ?? null;
         if (!$seenVariant) {
             $variantUuid = null;
         }
@@ -56,13 +56,11 @@ class VariantSelector
 
         // variant still not set, choose random variant
         if ($variantUuid === null) {
-            $variantsMapping = $campaign->getVariantsProportionMapping();
-
             $randVal = mt_rand(1, 100);
             $currPercent = 0;
 
-            foreach ($variantsMapping as $uuid => $proportion) {
-                $currPercent = $currPercent + $proportion;
+            foreach ($variants as $uuid => $variant) {
+                $currPercent = $currPercent + $variant->proportion;
                 if ($currPercent >= $randVal) {
                     $variantUuid = $uuid;
                     break;
@@ -70,8 +68,7 @@ class VariantSelector
             }
         }
 
-        /** @var CampaignBanner $variant */
-        $variant = $campaignBanners->get($variantUuid);
+        $variant = $variants[$variantUuid] ?? null;
         if (!$variant) {
             throw new VariantSelectionException("Campaign not executed because there is no CampaignBanner with UUID [{$variantUuid}]");
         }
