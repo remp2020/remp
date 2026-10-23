@@ -15,7 +15,6 @@ use Remp\CampaignModule\Models\Targeting\TargetingMatchEnum;
 use Remp\CampaignModule\Snippet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 
@@ -29,6 +28,7 @@ class Showtime
     private $request;
     private array $localCache = [];
     private ShowtimeTimer $timer;
+    private VariantSelector $variantSelector;
 
     public function __construct(
         private ClientInterface|\Redis $redis,
@@ -40,6 +40,7 @@ class Showtime
         ?ShowtimeTimer $timer = null,
     ) {
         $this->timer = $timer ?? new ShowtimeTimer(microtime(true));
+        $this->variantSelector = new VariantSelector();
     }
 
     public function setRequest(Request $request): void
@@ -449,69 +450,6 @@ class Showtime
             return "Campaign is not running";
         }
 
-        /** @var Collection $campaignBanners */
-        $campaignBanners = $campaign->campaignBanners->keyBy('uuid');
-
-        // banner
-        if ($campaignBanners->count() == 0) {
-            $this->logger->error("Active campaign [{$campaign->uuid}] has no banner set");
-            return "Campaign not shown because it has no banner set";
-        }
-
-        $variantUuid = null;
-
-        // find variant previously displayed to user
-        $seenCampaigns = $userData->campaigns ?? false;
-        if ($seenCampaigns) {
-            if (isset($seenCampaigns->{$campaign->uuid})) {
-                $variantUuid = $seenCampaigns->{$campaign->uuid}->variantId ?? null;
-            }
-
-            if (isset($seenCampaigns->{$campaign->public_id}->variantId)) {
-                foreach ($campaign->campaignBanners as $campaignBanner) {
-                    if ($campaignBanner->public_id === $seenCampaigns->{$campaign->public_id}->variantId) {
-                        $variantUuid = $campaignBanner->uuid ?? null;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // unset seen variant if it was deleted
-        /** @var CampaignBanner $seenVariant */
-        $seenVariant = $campaignBanners->get($variantUuid);
-        if (!$seenVariant) {
-            $variantUuid = null;
-        }
-
-        // unset seen variant if its proportion is 0%
-        if ($seenVariant && $seenVariant->proportion === 0) {
-            $variantUuid = null;
-        }
-
-        // variant still not set, choose random variant
-        if ($variantUuid === null) {
-            $variantsMapping = $campaign->getVariantsProportionMapping();
-
-            $randVal = mt_rand(0, 100);
-            $currPercent = 0;
-
-            foreach ($variantsMapping as $uuid => $proportion) {
-                $currPercent = $currPercent + $proportion;
-                if ($currPercent >= $randVal) {
-                    $variantUuid = $uuid;
-                    break;
-                }
-            }
-        }
-
-        /** @var CampaignBanner $variant */
-        $variant = $campaignBanners->get($variantUuid);
-        if (!$variant) {
-            $this->logger->error("Unable to get CampaignBanner [{$variantUuid}] for campaign [{$campaign->uuid}]");
-            return "Campaign not executed because there is no CampaignBanner with UUID [{$variantUuid}]";
-        }
-
         // check if campaign is set to be seen only once per session
         $campaignsSeenInSession = $userData->campaignsSession ?? [];
         if ($campaign->once_per_session && $campaignsSeenInSession) {
@@ -722,12 +660,21 @@ class Showtime
             }
         }
 
-        // segment rules are evaluated as the last targeting rule, checking them might require HTTP requests
+        // segment rules evaluation is expensive, keep it last
         $this->timer->start('segments');
         $segmentRulesOk = $this->evaluateSegmentRules($campaign, $browserId, $userId);
         $this->timer->stop('segments');
         if (!$segmentRulesOk) {
             return "Campaign not executed because it does not pass the segment rules (userId: [$userId], browserId: [$browserId])";
+        }
+
+        // select variant, or return early
+        $seenCampaigns = $userData->campaigns ?? null;
+        try {
+            $variant = $this->variantSelector->selectVariant($campaign, $seenCampaigns);
+        } catch (VariantSelectionException $e) {
+            $this->logger->error("Unable to select variant of active campaign [{$campaign->uuid}]: {$e->getMessage()}");
+            return $e->getMessage();
         }
 
         // Active campaign is campaign that targets selected user (previous rules were passed),
