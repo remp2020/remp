@@ -759,6 +759,42 @@ class ShowtimeTest extends TestCase
         $this->assertSame([], $data);
     }
 
+    public function testSegmentRulesCheckCachedSegmentsFirst()
+    {
+        $this->scheduleCampaign();
+        $activeCampaignUuids = [];
+
+        // segment without cache precedes the cached one, which rejects the user
+        CampaignSegment::create([
+            'campaign_id' => $this->campaign->id,
+            'code' => 'not_cached_segment',
+            'provider' => 'remp_segment',
+            'inclusive' => 1,
+        ]);
+        $cachedSegment = CampaignSegment::create([
+            'campaign_id' => $this->campaign->id,
+            'code' => 'cached_segment',
+            'provider' => 'crm_segment',
+            'inclusive' => 0,
+        ]);
+        $timestampKey = SegmentAggregator::cacheKey($cachedSegment) . '|timestamp';
+        $this->redis->set($timestampKey, time());
+
+        $this->segmentAggregator->shouldReceive('cacheEnabled')->andReturnUsing(
+            fn (CampaignSegment $campaignSegment) => $campaignSegment->provider === 'crm_segment'
+        );
+        // segment without cache is never checked, the campaign is already rejected by the cached one
+        $this->segmentAggregator->shouldReceive('checkUser')
+            ->once()
+            ->with(Mockery::on(fn (CampaignSegment $campaignSegment) => $campaignSegment->provider === 'crm_segment'), Mockery::any())
+            ->andReturn(true);
+
+        $shouldDisplay = $this->showtime->shouldDisplay($this->campaign, $this->getUserData(), $activeCampaignUuids);
+        $this->redis->del([$timestampKey]);
+
+        $this->assertNull($shouldDisplay);
+    }
+
     public function testPageviewRules()
     {
         $this->scheduleCampaign();

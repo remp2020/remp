@@ -862,7 +862,18 @@ class Showtime
             return true;
         }
 
+        $cachedSegments = [];
+        $notCachedSegments = [];
         foreach ($campaign->segments as $campaignSegment) {
+            if ($this->segmentAggregator->cacheEnabled($campaignSegment)) {
+                $cachedSegments[] = $campaignSegment;
+            } else {
+                $notCachedSegments[] = $campaignSegment;
+            }
+        }
+
+        // Check cached segments first so that we can halt early and avoid expensive non-cached segments check.
+        foreach ([...$cachedSegments, ...$notCachedSegments] as $campaignSegment) {
             $campaignSegment->setRelation('campaign', $campaign); // setting this manually to avoid DB query
 
             if ($userId) {
