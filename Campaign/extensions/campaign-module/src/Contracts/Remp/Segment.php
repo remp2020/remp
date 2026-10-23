@@ -21,11 +21,24 @@ class Segment implements SegmentContract
 
     const ENDPOINT_USERS = 'segments/%s/users';
 
-    private $client;
+    private ?Client $client = null;
 
-    public function __construct(Client $client)
+    public function __construct(
+        private readonly string $baseUrl,
+        private readonly int $timeout,
+    ) {
+    }
+
+    /**
+     * Client is created on the first HTTP request. Showtime often doesn't evaluate any segment of this provider.
+     */
+    private function client(): Client
     {
-        $this->client = $client;
+        return $this->client ??= new Client([
+            'base_uri' => $this->baseUrl,
+            'timeout' => $this->timeout,
+            'connect_timeout' => 1,
+        ]);
     }
 
     public function provider(): string
@@ -40,7 +53,7 @@ class Segment implements SegmentContract
     public function list(): Collection
     {
         try {
-            $response = $this->client->get(self::ENDPOINT_LIST);
+            $response = $this->client()->get(self::ENDPOINT_LIST);
         } catch (ConnectException $e) {
             throw new SegmentException("Could not connect to Segment:List endpoint: {$e->getMessage()}");
         }
@@ -97,7 +110,7 @@ class Segment implements SegmentContract
             if ($cso) {
                 $params['fields'] = json_encode($cso);
             }
-            $response = $this->client->get(sprintf($endpoint, $campaignSegment->code, $checkedId), [
+            $response = $this->client()->get(sprintf($endpoint, $campaignSegment->code, $checkedId), [
                 'query' => $params,
             ]);
         } catch (ConnectException $e) {
@@ -117,7 +130,7 @@ class Segment implements SegmentContract
     public function users(CampaignSegment $campaignSegment): Collection
     {
         try {
-            $response = $this->client->get(sprintf(self::ENDPOINT_USERS, $campaignSegment->code), [
+            $response = $this->client()->get(sprintf(self::ENDPOINT_USERS, $campaignSegment->code), [
                 'query' => [
                     'fields' => json_encode($campaignSegment->getOverrides())
                 ],

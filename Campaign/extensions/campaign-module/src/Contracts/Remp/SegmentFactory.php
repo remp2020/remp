@@ -2,7 +2,6 @@
 
 namespace Remp\CampaignModule\Contracts\Remp;
 
-use GuzzleHttp\Client;
 use Predis\ClientInterface;
 use Remp\CampaignModule\Contracts\SegmentContract;
 use Remp\CampaignModule\Contracts\SegmentContractFactory;
@@ -19,10 +18,9 @@ class SegmentFactory implements SegmentContractFactory
 
     public function create(array $config, ClientInterface|\Redis $redis): SegmentContract
     {
-        return new Segment(new Client([
-            'base_uri' => $config['base_url'],
-            'timeout' => $config['timeout'],
-            'connect_timeout' => 1,
-        ]));
+        return new Segment(
+            baseUrl: $config['base_url'],
+            timeout: $config['timeout'],
+        );
     }
 }

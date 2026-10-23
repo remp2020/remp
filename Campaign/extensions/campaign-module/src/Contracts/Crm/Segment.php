@@ -22,14 +22,26 @@ class Segment implements SegmentContract, SegmentCacheBatchContract
 
     const ENDPOINT_USERS = 'user-segments/users';
 
-    private $client;
+    private ?Client $client = null;
 
-    private $redis;
+    public function __construct(
+        private readonly string $baseUrl,
+        private readonly ?string $token,
+        private readonly ClientInterface|\Redis $redis,
+    ) {
+    }
 
-    public function __construct(Client $client, ClientInterface|\Redis $redis)
+    /**
+     * Client is created on the first HTTP request. Showtime checks only the cached segments, it doesn't need it.
+     */
+    private function client(): Client
     {
-        $this->client = $client;
-        $this->redis = $redis;
+        return $this->client ??= new Client([
+            'base_uri' => $this->baseUrl,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token,
+            ],
+        ]);
     }
 
     public function provider(): string
@@ -44,7 +56,7 @@ class Segment implements SegmentContract, SegmentCacheBatchContract
     public function list(): Collection
     {
         try {
-            $response = $this->client->get(self::ENDPOINT_LIST);
+            $response = $this->client()->get(self::ENDPOINT_LIST);
         } catch (ConnectException $e) {
             throw new SegmentException("Could not connect to Segment:List endpoint: {$e->getMessage()}");
         }
@@ -121,7 +133,7 @@ class Segment implements SegmentContract, SegmentCacheBatchContract
     public function users(CampaignSegment $campaignSegment): Collection
     {
         try {
-            $response = $this->client->get(self::ENDPOINT_USERS, [
+            $response = $this->client()->get(self::ENDPOINT_USERS, [
                 'query' => [
                     'code' => $campaignSegment->code,
                 ],

@@ -63,6 +63,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Custom segment providers with cached segments can support it by implementing the new `SegmentCacheBatchContract`.
 - Showtime selects the campaign variant only after the campaign passes the targeting rules, instead of selecting it for every running campaign. remp/remp#1532
 - Fixed showtime occasionally (~1 % of new users) selecting campaign variant with 0 % proportion. remp/remp#1532
+- CRM and REMP segment providers create their HTTP client only when they make the first HTTP request.
 - Fixed showtime accepting an empty debug key when `CAMPAIGN_DEBUG_KEY` was configured but empty, which let anyone enable the campaign debugger.
 - Fixed one-time banners failing to display with `Banner with ID ... is not present in cache` error since the banner cache was changed to JSON in 4.0. remp/remp#1522
 - Showtime checks segments with cache (e.g. CRM segments) before segments without cache (e.g. Beam segments, checked via HTTP request). remp/remp#1531

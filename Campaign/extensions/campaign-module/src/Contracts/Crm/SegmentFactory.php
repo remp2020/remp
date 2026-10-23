@@ -2,7 +2,6 @@
 
 namespace Remp\CampaignModule\Contracts\Crm;
 
-use GuzzleHttp\Client;
 use Predis\ClientInterface;
 use Remp\CampaignModule\Contracts\SegmentContract;
 use Remp\CampaignModule\Contracts\SegmentContractFactory;
@@ -19,11 +18,10 @@ class SegmentFactory implements SegmentContractFactory
 
     public function create(array $config, ClientInterface|\Redis $redis): SegmentContract
     {
-        return new Segment(new Client([
-            'base_uri' => $config['base_url'],
-            'headers' => [
-                'Authorization' => 'Bearer ' . $config['token'],
-            ],
-        ]), $redis);
+        return new Segment(
+            baseUrl: $config['base_url'],
+            token: $config['token'],
+            redis: $redis,
+        );
     }
 }

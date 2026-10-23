@@ -12,7 +12,6 @@ use Remp\CampaignModule\Contracts\SegmentContract;
 use Remp\CampaignModule\Contracts\SegmentContractFactory;
 use Remp\CampaignModule\Contracts\SegmentException;
 use Remp\CampaignModule\Tests\TestCase;
-use GuzzleHttp\Client;
 
 class SegmentAggregatorTest extends TestCase
 {
@@ -138,6 +137,10 @@ class CountingSegmentFactory implements SegmentContractFactory
     public function create(array $config, ClientInterface|\Redis $redis): SegmentContract
     {
         self::$created++;
-        return new CrmSegment(new Client(), $redis);
+        return new CrmSegment(
+            baseUrl: 'http://crm.example.com',
+            token: 'token',
+            redis: $redis,
+        );
     }
 }
