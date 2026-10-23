@@ -4,6 +4,7 @@ namespace Remp\CampaignModule\Tests\Unit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Predis\ClientInterface;
 use Remp\CampaignModule\Banner;
 use Remp\CampaignModule\HtmlTemplate;
 use Remp\CampaignModule\BarTemplate;
@@ -308,5 +309,22 @@ class BannerTest extends TestCase
         $this->assertContains('cdn_domain', $snippets);
         $this->assertContains('theme', $snippets);
         $this->assertContains('protocol', $snippets);
+    }
+
+    public function testCachedBannerJsonLeavesOutTimestamps()
+    {
+        $banner = Banner::factory()->create(['template' => Banner::TEMPLATE_HTML]);
+        $banner->cache();
+
+        $cachedBanner = Banner::loadCachedBanner(resolve(ClientInterface::class), $banner->id);
+        $json = json_decode($cachedBanner->toJson(), true);
+
+        $this->assertArrayNotHasKey('created_at', $json);
+        $this->assertArrayNotHasKey('updated_at', $json);
+        $this->assertArrayNotHasKey('created_at', $json['html_template']);
+        $this->assertArrayNotHasKey('updated_at', $json['html_template']);
+
+        // hidden only in JSON, still readable as attribute
+        $this->assertEquals($banner->updated_at, $cachedBanner->updated_at);
     }
 }

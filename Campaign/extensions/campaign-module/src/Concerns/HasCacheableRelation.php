@@ -2,6 +2,7 @@
 
 namespace Remp\CampaignModule\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -50,6 +51,7 @@ trait HasCacheableRelation
         $this->setRawAttributes($cachedData);
         $this->exists = true;
         $this->wasRecentlyCreated = false;
+        self::hideTimestamps($this);
 
         foreach ($this->cacheableRelations as $relationName => $relatedModelClass) {
             $key = Str::snake($relationName);
@@ -61,39 +63,44 @@ trait HasCacheableRelation
             if (is_array($cachedRecord) && !isset($cachedRecord['id'])) {
                 $relationRecords = new Collection();
                 foreach ($cachedRecord as $relationRecord) {
-                    $relatedModel = new $relatedModelClass();
-
-                    if (method_exists($relatedModel, 'hydrateFromCache')) {
-                        $relatedModel->hydrateFromCache($relationRecord);
-                    } else {
-                        $relatedModel->setRawAttributes($relationRecord);
-                        $relatedModel->exists = true;
-                        $relatedModel->wasRecentlyCreated = false;
-                    }
-
-                    $relationRecords->push($relatedModel);
+                    $relationRecords->push(self::relatedFromCache($relatedModelClass, $relationRecord));
                 }
 
                 unset($this->$relationName);
                 $this->setRelation($relationName, $relationRecords);
             } else {
-                $relatedModel = new $relatedModelClass();
-
-                if (method_exists($relatedModel, 'hydrateFromCache')) {
-                    $relatedModel->hydrateFromCache($cachedRecord);
-                } else {
-                    $relatedModel->setRawAttributes($cachedRecord);
-                    $relatedModel->exists = true;
-                    $relatedModel->wasRecentlyCreated = false;
-                }
-
                 unset($this->$relationName);
-                $this->setRelation($relationName, $relatedModel);
+                $this->setRelation($relationName, self::relatedFromCache($relatedModelClass, $cachedRecord));
             }
         }
 
         // Arrays and json are already casted in the cached data, we want to avoid double casting. It would cause
         // issues and throw errors.
         $this->casts = array_filter($this->casts, fn ($value) => $value !== 'json' && $value !== 'array');
+    }
+
+    private static function relatedFromCache(string $relatedModelClass, array $cachedData): Model
+    {
+        $relatedModel = new $relatedModelClass();
+
+        if (method_exists($relatedModel, 'hydrateFromCache')) {
+            $relatedModel->hydrateFromCache($cachedData);
+        } else {
+            $relatedModel->setRawAttributes($cachedData);
+            $relatedModel->exists = true;
+            $relatedModel->wasRecentlyCreated = false;
+            self::hideTimestamps($relatedModel);
+        }
+
+        return $relatedModel;
+    }
+
+    /**
+     * Converting timestamps to Carbon and back is the most expensive part of serialization. Hidden timestamps are still
+     * readable as attributes.
+     */
+    private static function hideTimestamps(Model $model): void
+    {
+        $model->makeHidden([$model->getCreatedAtColumn(), $model->getUpdatedAtColumn()]);
     }
 }
