@@ -39,6 +39,10 @@ services:
 			- add('user-subscribed-variant', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())
 			- add('user-unsubscribed', Remp\MailerModule\Hermes\TrackSubscribeUnsubscribeHandler())
 
+	twigEngine:
+		setup:
+			- addExtension(Remp\Mailer\Models\ContentGenerator\SettingsTwigExtension())
+
 	generator:
 		setup:
 			- registerGenerator('hub_notification', 'Hub notification generator', Remp\Mailer\Models\Generators\HubNotificationGenerator())

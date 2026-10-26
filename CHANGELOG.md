@@ -84,6 +84,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Fixed external newsletter lists getting a subscription record for every user from the user base. remp/web#3108
 - Added signing of image URLs, so Mailer can add its own parameters (resizing, `rtm_*` tracking) to images served through a signing image proxy. remp/remp#1516
 - Added mail type and template's public preview URL to the `/api/v1/users/logs` API response. remp/crm#3904
+- Added support for custom Twig extensions (filters, functions, tests) in mail templates. Register them with `addExtension()` in the `setup` of the new `twigEngine` service, see [README](Mailer/extensions/mailer-module/README.md#emails-and-layouts).
 
 ### [Sso]
 

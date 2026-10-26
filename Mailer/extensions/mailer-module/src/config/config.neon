@@ -35,10 +35,12 @@ services:
 		setup:
 			- setShutdownInterface(@hermesShutdown)
 
+	twigEngine: Remp\MailerModule\Models\ContentGenerator\Engine\TwigEngine
+
 	templateEngine:
 		factory: Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory
 		setup:
-			- register('twig', Remp\MailerModule\Models\ContentGenerator\Engine\TwigEngine())
+			- register('twig', @twigEngine)
 			- defaultEngine('twig')
 
 	redisClientFactory: Remp\MailerModule\Models\RedisClientFactory(%redis.host%, %redis.port%, %redis.db%, %redis.password%, %redis_client_factory.prefix%)

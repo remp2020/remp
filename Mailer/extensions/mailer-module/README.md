@@ -216,6 +216,16 @@ originate from different sources:
 *Note: Mailer doesn't verify presence of the variable nor does it currently provide fallback value. If you use the
 custom variable and it won't be present in the `IUser` response, empty string will be injected into your email body.*
 
+You can add your own Twig filters, functions or tests by registering a [Twig extension](https://twig.symfony.com/doc/3.x/advanced.html#creating-an-extension)
+in your application config:
+
+```neon
+services:
+	twigEngine:
+		setup:
+			- addExtension(App\Twig\MyExtension())
+```
+
 Saving the *email* doesn't trigger any sending. It creates an instance of *email* that might be sent manually (or by 3rd
 parties) via API or as a *batch* within a Mailer's *job*.
 
