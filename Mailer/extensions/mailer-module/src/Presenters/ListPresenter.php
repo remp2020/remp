@@ -19,6 +19,7 @@ use Remp\MailerModule\Forms\ListSubscribersImportFormFactory;
 use Remp\MailerModule\Hermes\HermesMessage;
 use Remp\MailerModule\Hermes\RedisDriver;
 use Remp\MailerModule\Models\ChartTrait;
+use Remp\MailerModule\Models\Sender\MailerFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\ListsRepository;
 use Remp\MailerModule\Repositories\ListVariantsRepository;
@@ -47,6 +48,7 @@ final class ListPresenter extends BasePresenter
         private readonly DataTableFactory $dataTableFactory,
         private readonly ListSubscribersImportFormFactory $listSubscribersImportFormFactory,
         private readonly Request $httpRequest,
+        private readonly MailerFactory $mailerFactory,
     ) {
         parent::__construct();
     }
@@ -191,6 +193,11 @@ final class ListPresenter extends BasePresenter
         ];
 
         $this->template->list = $list;
+
+        $mailer = $this->mailerFactory->getMailer($list->mailer_alias);
+        $this->template->sendingMailer = $list->mailer_alias === null
+            ? $sendingMailer = "Default mailer ({$mailer->getIdentifier()})"
+            : $mailer->getIdentifier();
 
         $this->prepareDetailSubscribersGraphData($id);
     }
