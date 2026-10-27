@@ -8,6 +8,11 @@
 <div class="card">
     <div class="card-header">
         <h2 n:block="title">Edit newsletter list <small></small></h2>
+        <div class="actions">
+            <a n:href="Show $list->id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-eye"></i> View</button>
+            </a>
+        </div>
     </div>
     <div class="card-body card-padding">
         {snippetArea wrapper}

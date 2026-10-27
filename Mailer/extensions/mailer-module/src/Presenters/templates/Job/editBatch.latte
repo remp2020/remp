@@ -8,6 +8,11 @@
 <div class="card">
     <div class="card-header">
         <h2>Edit batch <small>#{$batch->id}</small></h2>
+        <div class="actions">
+            <a n:href="Show $batch->mail_job_id">
+                <button type="button" class="btn palette-Cyan bg waves-effect"><i class="zmdi zmdi-eye"></i> View job</button>
+            </a>
+        </div>
     </div>
     <div class="card-body card-padding">
         {include '@form_edit_batch.latte'}
