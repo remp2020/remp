@@ -89,7 +89,7 @@ class ArticleController extends Controller
                 'conversionFrom' => $request->input('conversion_from', 'today - 30 days'),
                 'conversionTo' => $request->input('conversion_to', 'now'),
             ]),
-            'json' => ArticleResource::collection(Article::paginate()),
+            'json' => ArticleResource::collection(Article::with(['authors', 'sections', 'tags.tagCategories'])->paginate()),
         ]);
     }
 
@@ -278,7 +278,7 @@ class ArticleController extends Controller
                 'publishedFrom' => $request->input('published_from', 'today - 30 days'),
                 'publishedTo' => $request->input('published_to', 'now'),
             ]),
-            'json' => ArticleResource::collection(Article::paginate()),
+            'json' => ArticleResource::collection(Article::with(['authors', 'sections', 'tags.tagCategories'])->paginate()),
         ]);
     }
 

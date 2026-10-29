@@ -5,6 +5,7 @@ namespace Remp\BeamModule\Tests\Feature\API;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Remp\BeamModule\Model\Article;
 use Remp\BeamModule\Model\Author;
 use Remp\BeamModule\Model\Property;
@@ -12,6 +13,7 @@ use Remp\BeamModule\Model\Section;
 use Remp\BeamModule\Model\Tag;
 use Remp\BeamModule\Model\TagCategory;
 use Remp\BeamModule\Tests\TestCase;
+use Remp\LaravelSso\Http\Middleware\VerifyJwtToken;
 
 class ArticlesListApiTest extends TestCase
 {
@@ -25,6 +27,7 @@ class ArticlesListApiTest extends TestCase
 
         $this->withoutMiddleware([
             Authenticate::class,
+            VerifyJwtToken::class,
         ]);
 
         Property::factory()->create(['uuid' => 'test_property_uuid']);
@@ -58,6 +61,27 @@ class ArticlesListApiTest extends TestCase
         $this->assertSame($singleArticleQueries, $multipleArticlesQueries);
     }
 
+    #[DataProvider('paginatedJsonRoutes')]
+    public function testPaginatedJsonQueryCountDoesNotGrowWithArticlesAndTags(string $route): void
+    {
+        $this->createArticleWithRelations('article_1', tagsCount: 1);
+        $singleArticleQueries = $this->countQueries([], $route);
+
+        $this->createArticleWithRelations('article_2', tagsCount: 3);
+        $this->createArticleWithRelations('article_3', tagsCount: 3);
+        $multipleArticlesQueries = $this->countQueries([], $route);
+
+        $this->assertSame($singleArticleQueries, $multipleArticlesQueries);
+    }
+
+    public static function paginatedJsonRoutes(): array
+    {
+        return [
+            'pageviews' => ['articles.pageviews'],
+            'conversions' => ['articles.conversions'],
+        ];
+    }
+
     private function createArticleWithRelations(string $externalId, int $tagsCount): Article
     {
         $article = Article::factory()->create([
@@ -77,12 +101,12 @@ class ArticlesListApiTest extends TestCase
         return $article;
     }
 
-    private function countQueries(array $parameters): int
+    private function countQueries(array $parameters, string $route = 'api.articles.index'): int
     {
         DB::flushQueryLog();
         DB::enableQueryLog();
 
-        $this->getJson(route('api.articles.index', $parameters))->assertSuccessful();
+        $this->getJson(route($route, $parameters))->assertSuccessful();
 
         DB::disableQueryLog();
 
