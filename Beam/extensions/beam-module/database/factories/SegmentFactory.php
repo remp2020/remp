@@ -12,7 +12,7 @@ class SegmentFactory extends Factory
 
     public function definition()
     {
-        $segmentName = $this->faker->domainWord;
+        $segmentName = $this->faker->unique()->domainWord;
         return [
             'name' => $segmentName,
             'code' => "$segmentName-segment",
