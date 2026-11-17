@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Sso]
+
+- **BREAKING**: `/auth/login` and `/auth/google` reject an untrusted `successUrl` or `errorUrl` with `400` and don't issue the token.
+  - If your application isn't one of the `REMP_*_ADDR` (e.g. a custom application using REMP SSO), add its origin to `SSO_ALLOWED_REDIRECT_ORIGINS`.
+- **BREAKING**: `/auth/google` requires `successUrl` and `errorUrl`; it no longer falls back to `/`.
+  - If you link to `/auth/google` directly, link to `/auth/login?successUrl=...&errorUrl=...` instead, or pass both parameters.
+- **BREAKING**: `/auth/logout` redirects back only to a trusted previous page (the `Referer`, or the last visited SSO page if there's none); otherwise it redirects to the SSO error page.
+  - If your application sets `Referrer-Policy: no-referrer`, use a policy sending at least the origin (e.g. `strict-origin-when-cross-origin`), so the user gets back to the application after logout.
+- **IMPORTANT**: SSO redirects only to trusted origins, because the login success redirect carries a JWT. Trusted origins are read from the new `SSO_ALLOWED_REDIRECT_ORIGINS` (comma-separated `scheme://host[:port]`). If it's empty, `REMP_BEAM_ADDR`, `REMP_CAMPAIGN_ADDR`, `REMP_MAILER_ADDR` and `REMP_SSO_ADDR` are used. Invalid entries are ignored and logged; if none of them is valid, all redirects are rejected.
+  - Before upgrading, set `SSO_ALLOWED_REDIRECT_ORIGINS` to the addresses of your REMP applications exactly as browsers see them (scheme, host and port), or make sure `REMP_*_ADDR` match them. Otherwise login to the unlisted application fails.
+- Logout from SSO administration (`/auth/logout-web`) always continues to the SSO dashboard, where the JWT is invalidated, instead of going back to the `Referer`.
+
 ## Archive
 
 - [v5.3](./changelogs/CHANGELOG-v5.3.md)

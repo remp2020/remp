@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApiToken;
+use App\RedirectUrlValidator;
 use App\UrlHelper;
 use App\Models\User;
 use Carbon\Carbon;
@@ -17,7 +18,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function login(Request $request, UrlHelper $urlHelper, \Tymon\JWTAuth\JWTAuth $auth)
+    public function login(Request $request, UrlHelper $urlHelper, \Tymon\JWTAuth\JWTAuth $auth, RedirectUrlValidator $redirectUrlValidator)
     {
         $successUrl = $request->input('successUrl');
         if (!$successUrl) {
@@ -27,6 +28,10 @@ class AuthController extends Controller
         if (!$errorUrl) {
             throw new BadRequestHttpException('missing errorUrl query param');
         }
+
+        // the success redirect carries a JWT - never redirect outside of the trusted REMP applications
+        $successUrl = $redirectUrlValidator->ensureAllowed($successUrl, 'successUrl');
+        $errorUrl = $redirectUrlValidator->ensureAllowed($errorUrl, 'errorUrl');
 
         if ($user = session()->get(User::USER_SUBJECT_SESSION_KEY)) {
             // Old class (kept for compatibility reasons)
@@ -93,20 +98,27 @@ class AuthController extends Controller
         return view('auth.login', ['providerRedirects' => $providerRedirects]);
     }
 
-    public function logout(\Tymon\JWTAuth\JWTAuth $auth)
+    public function logout(\Tymon\JWTAuth\JWTAuth $auth, RedirectUrlValidator $redirectUrlValidator)
     {
         $user = session()->remove(User::USER_SUBJECT_SESSION_KEY);
         if ($user) {
             $user->last_logout_at = Carbon::now();
             $user->save();
         }
-        return redirect()->back();
+
+        // "back" is taken from the Referer - don't send the user to an untrusted site after logout
+        $previous = url()->previous();
+
+        return $redirectUrlValidator->isAllowed($previous) ? redirect($previous) : redirect()->route('sso.error');
     }
 
     public function logoutWeb()
     {
         Auth::logout();
-        return redirect()->back();
+
+        // don't go back to the Referer - continue to an SSO page protected by VerifyJwtToken, which invalidates
+        // the JWT left in the session (so the session must not be invalidated here)
+        return redirect('/');
     }
 
     public function refresh(\Tymon\JWTAuth\JWTAuth $auth, Request $request)

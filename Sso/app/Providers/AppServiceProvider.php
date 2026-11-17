@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\RedirectUrlValidator;
 use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
@@ -31,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton(RedirectUrlValidator::class, fn () => RedirectUrlValidator::fromConfig());
+
         Connection::resolverFor('mysql', function ($connection, $database, $prefix, $config) {
             // Use local resolver to control DateTimeInterface bindings.
             return new MySqlConnection($connection, $database, $prefix, $config);

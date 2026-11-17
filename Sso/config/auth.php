@@ -134,6 +134,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Allowed Redirect Origins
+    |--------------------------------------------------------------------------
+    |
+    | Origins (scheme://host[:port]) SSO may redirect to after login/logout
+    | (successUrl, errorUrl). The success redirect carries a JWT, so it must
+    | never point outside of the trusted REMP applications. Comma-separated.
+    | If empty, addresses of REMP applications (REMP_*_ADDR) are used.
+    |
+    */
+
+    'allowed_redirect_origins' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env('SSO_ALLOWED_REDIRECT_ORIGINS', '')),
+    ))),
+
+    /*
+    |--------------------------------------------------------------------------
     | Password Confirmation Timeout
     |--------------------------------------------------------------------------
     |

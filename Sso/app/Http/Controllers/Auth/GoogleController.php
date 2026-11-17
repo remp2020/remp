@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\EmailWhitelist;
 use App\Models\GoogleUser;
 use App\Http\Controllers\Controller;
+use App\RedirectUrlValidator;
 use App\UrlHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -30,10 +31,10 @@ class GoogleController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function redirect(Request $request)
+    public function redirect(Request $request, RedirectUrlValidator $redirectUrlValidator)
     {
-        Session::put(self::SUCCESS_URL_KEY, $request->input(self::SUCCESS_URL_QUERY_PARAM, '/'));
-        Session::put(self::ERROR_URL_KEY, $request->input(self::ERROR_URL_QUERY_PARAM, '/'));
+        Session::put(self::SUCCESS_URL_KEY, $redirectUrlValidator->ensureAllowed($request->input(self::SUCCESS_URL_QUERY_PARAM), self::SUCCESS_URL_QUERY_PARAM));
+        Session::put(self::ERROR_URL_KEY, $redirectUrlValidator->ensureAllowed($request->input(self::ERROR_URL_QUERY_PARAM), self::ERROR_URL_QUERY_PARAM));
 
         /** @var GoogleProvider $driver */
         $driver = Socialite::driver(User::PROVIDER_GOOGLE);
@@ -49,12 +50,11 @@ class GoogleController extends Controller
      *
      * @return Response
      */
-    public function callback(JWT $jwt, EmailWhitelist $whitelist, UrlHelper $urlHelper)
+    public function callback(JWT $jwt, EmailWhitelist $whitelist, UrlHelper $urlHelper, RedirectUrlValidator $redirectUrlValidator)
     {
-        $backUrl = Session::get(self::SUCCESS_URL_KEY);
-        Session::forget(self::SUCCESS_URL_KEY);
-        $errorUrl = Session::get(self::ERROR_URL_KEY);
-        Session::forget(self::ERROR_URL_KEY);
+        // validated again when used, not only when stored (defense in depth)
+        $backUrl = $redirectUrlValidator->ensureAllowed(Session::pull(self::SUCCESS_URL_KEY), self::SUCCESS_URL_QUERY_PARAM);
+        $errorUrl = $redirectUrlValidator->ensureAllowed(Session::pull(self::ERROR_URL_KEY), self::ERROR_URL_QUERY_PARAM);
 
         /** @var GoogleProvider $driver */
         $driver = Socialite::driver(User::PROVIDER_GOOGLE);
