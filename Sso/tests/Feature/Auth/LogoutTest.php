@@ -25,6 +25,17 @@ class LogoutTest extends TestCase
             ->assertRedirect(route('sso.error'));
     }
 
+    public function testLogoutInvalidatesSession(): void
+    {
+        $this->withSession(['other' => 'value']);
+        $sessionId = session()->getId();
+
+        $this->withHeader('Referer', 'https://beam.test/articles')->get('/auth/logout');
+
+        $this->assertNotSame($sessionId, session()->getId());
+        $this->assertFalse(session()->has('other'));
+    }
+
     /**
      * @return array<string, array{?string}>
      */

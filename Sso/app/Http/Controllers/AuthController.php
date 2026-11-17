@@ -106,10 +106,13 @@ class AuthController extends Controller
             $user->save();
         }
 
-        // "back" is taken from the Referer - don't send the user to an untrusted site after logout
+        // "back" is taken from the Referer - don't send the user to an untrusted site after logout;
+        // resolve it before the session (which may hold the previous URL) is invalidated
         $previous = url()->previous();
+        $response = $redirectUrlValidator->isAllowed($previous) ? redirect($previous) : redirect()->route('sso.error');
+        session()->invalidate();
 
-        return $redirectUrlValidator->isAllowed($previous) ? redirect($previous) : redirect()->route('sso.error');
+        return $response;
     }
 
     public function logoutWeb()

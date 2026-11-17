@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - **IMPORTANT**: SSO redirects only to trusted origins, because the login success redirect carries a JWT. Trusted origins are read from the new `SSO_ALLOWED_REDIRECT_ORIGINS` (comma-separated `scheme://host[:port]`). If it's empty, `REMP_BEAM_ADDR`, `REMP_CAMPAIGN_ADDR`, `REMP_MAILER_ADDR` and `REMP_SSO_ADDR` are used. Invalid entries are ignored and logged; if none of them is valid, all redirects are rejected.
   - Before upgrading, set `SSO_ALLOWED_REDIRECT_ORIGINS` to the addresses of your REMP applications exactly as browsers see them (scheme, host and port), or make sure `REMP_*_ADDR` match them. Otherwise login to the unlisted application fails.
 - Logout from SSO administration (`/auth/logout-web`) always continues to the SSO dashboard, where the JWT is invalidated, instead of going back to the `Referer`.
+- Google login verifies the OAuth `state` parameter and redirects to `errorUrl` if the verification fails or Google rejects the authorization code, or to the SSO error page if the login session expired. The session ID is regenerated after login and the session is invalidated on logout (`/auth/logout`).
 
 ## Archive
 

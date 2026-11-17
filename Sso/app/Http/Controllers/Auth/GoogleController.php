@@ -8,8 +8,11 @@ use App\Http\Controllers\Controller;
 use App\RedirectUrlValidator;
 use App\UrlHelper;
 use App\Models\User;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Two\GoogleProvider;
+use Laravel\Socialite\Two\InvalidStateException;
 use Symfony\Component\HttpFoundation\Response;
 use Socialite;
 use Session;
@@ -36,9 +39,10 @@ class GoogleController extends Controller
         Session::put(self::SUCCESS_URL_KEY, $redirectUrlValidator->ensureAllowed($request->input(self::SUCCESS_URL_QUERY_PARAM), self::SUCCESS_URL_QUERY_PARAM));
         Session::put(self::ERROR_URL_KEY, $redirectUrlValidator->ensureAllowed($request->input(self::ERROR_URL_QUERY_PARAM), self::ERROR_URL_QUERY_PARAM));
 
+        // not stateless - the OAuth "state" stored in the session is verified in callback() (login CSRF)
         /** @var GoogleProvider $driver */
         $driver = Socialite::driver(User::PROVIDER_GOOGLE);
-        return $driver->stateless()->redirect();
+        return $driver->redirect();
     }
 
     /**
@@ -52,14 +56,36 @@ class GoogleController extends Controller
      */
     public function callback(JWT $jwt, EmailWhitelist $whitelist, UrlHelper $urlHelper, RedirectUrlValidator $redirectUrlValidator)
     {
-        // validated again when used, not only when stored (defense in depth)
-        $backUrl = $redirectUrlValidator->ensureAllowed(Session::pull(self::SUCCESS_URL_KEY), self::SUCCESS_URL_QUERY_PARAM);
-        $errorUrl = $redirectUrlValidator->ensureAllowed(Session::pull(self::ERROR_URL_KEY), self::ERROR_URL_QUERY_PARAM);
+        $backUrl = Session::pull(self::SUCCESS_URL_KEY);
+        $errorUrl = Session::pull(self::ERROR_URL_KEY);
+        if ($backUrl === null || $errorUrl === null) {
+            // the session expired (or was lost) since redirect() - there's no URL to return to
+            return redirect()->route('sso.error', [
+                'error' => 'Login session expired, please try again.',
+            ]);
+        }
 
-        /** @var GoogleProvider $driver */
-        $driver = Socialite::driver(User::PROVIDER_GOOGLE);
-        /** @var \Laravel\Socialite\Two\User $factoryUser */
-        $factoryUser = $driver->stateless()->user();
+        // validated again when used, not only when stored (defense in depth)
+        $backUrl = $redirectUrlValidator->ensureAllowed($backUrl, self::SUCCESS_URL_QUERY_PARAM);
+        $errorUrl = $redirectUrlValidator->ensureAllowed($errorUrl, self::ERROR_URL_QUERY_PARAM);
+
+        try {
+            /** @var GoogleProvider $driver */
+            $driver = Socialite::driver(User::PROVIDER_GOOGLE);
+            /** @var \Laravel\Socialite\Two\User $factoryUser */
+            $factoryUser = $driver->user();
+        } catch (InvalidStateException|ClientException $e) {
+            // OAuth state doesn't match the session (login CSRF, login restarted in another tab) or Google rejected
+            // the authorization code (e.g. reloaded callback URL) - let the user start the login again
+            Log::notice('Google SSO login failed', [
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ]);
+
+            return redirect($urlHelper->appendQueryParams($errorUrl, [
+                'error' => 'Login to Google failed, please try again.',
+            ]));
+        }
 
         if (!$whitelist->validate($factoryUser->getEmail())) {
             $errorUrl = $urlHelper->appendQueryParams($errorUrl, [
@@ -94,6 +120,8 @@ class GoogleController extends Controller
         $user->latestProvider = User::PROVIDER_GOOGLE;
         $token = $jwt->fromSubject($user);
 
+        // new session ID for the logged in user (session fixation)
+        session()->regenerate();
         session()->put(User::USER_SUBJECT_SESSION_KEY, $user);
 
         $redirectUrl = $urlHelper->appendQueryParams($backUrl, [
