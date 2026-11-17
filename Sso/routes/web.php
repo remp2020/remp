@@ -34,5 +34,9 @@ Route::middleware(VerifyJwtToken::class)->group(function () {
 
 Route::get('auth/login', [AuthController::class, 'login'])->name('auth.login');
 Route::get('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
-Route::get('auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
-Route::get('auth/google/callback', [GoogleController::class, 'callback']);
+// Google login is available only when enabled in auth.sso_providers - otherwise it would be a login path
+// the application doesn't expect (e.g. bypassing checks done by its own provider)
+if (config()->has('auth.sso_providers.google')) {
+    Route::get('auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+    Route::get('auth/google/callback', [GoogleController::class, 'callback']);
+}

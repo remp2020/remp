@@ -3,6 +3,8 @@
 namespace Tests\Feature\Auth;
 
 use App\Http\Controllers\Auth\GoogleController;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -61,5 +63,19 @@ class GoogleLoginTest extends TestCase
 
         $response->assertStatus(400);
         $this->assertFalse($response->headers->has('Location'), 'Rejected request must not redirect anywhere');
+    }
+
+    public function testGoogleRoutesAreNotRegisteredWhenGoogleProviderIsDisabled(): void
+    {
+        config(['auth.sso_providers' => ['other' => 'Other']]);
+
+        // reload the web routes with the changed configuration
+        Route::setRoutes(new RouteCollection());
+        Route::middleware('web')->group(base_path('routes/web.php'));
+        Route::getRoutes()->refreshNameLookups();
+
+        $this->assertFalse(Route::has('auth.google'));
+        $this->get($this->authUrl('/auth/google'))->assertNotFound();
+        $this->get('/auth/google/callback?code=authorization-code')->assertNotFound();
     }
 }
