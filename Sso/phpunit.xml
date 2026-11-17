@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          backupGlobals="false"
-         backupStaticAttributes="false"
-         bootstrap="bootstrap/autoload.php"
+         bootstrap="vendor/autoload.php"
          colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false">
+         stopOnFailure="false"
+         cacheDirectory=".phpunit.cache">
 
-  <coverage processUncoveredFiles="true">
+  <source>
     <include>
       <directory suffix=".php">./app</directory>
     </include>
-  </coverage>
+  </source>
 
   <testsuites>
     <testsuite name="Feature">
@@ -28,6 +25,8 @@
 
   <php>
     <env name="APP_ENV" value="testing"/>
+    <env name="APP_KEY" value="base64:Zmlyc3QtdGVzdGluZy1rZXktMzItYnl0ZXMtbG9uZyE="/>
+    <env name="JWT_SECRET" value="testing-jwt-secret-testing-jwt-secret"/>
     <env name="CACHE_DRIVER" value="array"/>
     <env name="SESSION_DRIVER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
