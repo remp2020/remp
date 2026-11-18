@@ -1,4 +1,4 @@
-FROM remp/telegraf:1.35.3
+FROM remp/telegraf:1.40.3-1-slim
 
 RUN apk update
 RUN apk add ca-certificates
