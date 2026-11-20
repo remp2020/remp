@@ -7,6 +7,8 @@ use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Remp\Mailer\Models\PageMeta\RespektMeta;
 use Remp\Mailer\Models\PageMeta\Transport\RespektApiTransport;
+use Remp\MailerModule\Models\PageMeta\Audio;
+use Remp\MailerModule\Models\PageMeta\AudioOriginEnum;
 use Remp\MailerModule\Models\PageMeta\Content\ContentInterface;
 use Remp\MailerModule\Models\PageMeta\Content\InvalidUrlException;
 use Remp\MailerModule\Models\PageMeta\Meta;
@@ -134,6 +136,20 @@ class RespektContent implements ContentInterface
             unlockedContent: $unLockedContent,
             imageTitle: $imageTitle,
             subject: $subject,
+            audio: $this->getAudio($article),
+        );
+    }
+
+    private function getAudio(array $article): ?Audio
+    {
+        $audio = $article['audio']['audio'] ?? null;
+        if (!$audio) {
+            return null;
+        }
+
+        return new Audio(
+            durationInSeconds: (int) round($audio['duration']),
+            origin: $audio['isAiAudio'] ? AudioOriginEnum::AiGenerated : AudioOriginEnum::Native,
         );
     }
 

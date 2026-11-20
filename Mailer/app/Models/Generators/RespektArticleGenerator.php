@@ -4,6 +4,7 @@ namespace Remp\Mailer\Models\Generators;
 
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Json;
 use Remp\Mailer\Components\GeneratorWidgets\Widgets\RespektArticleParserWidget\RespektArticleParserWidget;
 use Remp\Mailer\Models\PageMeta\Content\RespektContent;
 use Remp\Mailer\Models\PageMeta\RespektMeta;
@@ -85,6 +86,8 @@ class RespektArticleGenerator implements IGenerator
         return [
             (new PostInputParam('article'))->setRequired(),
             (new PostInputParam('author_name')),
+            (new PostInputParam('authors_json')),
+            (new PostInputParam('categories_json')),
         ];
     }
 
@@ -109,6 +112,8 @@ class RespektArticleGenerator implements IGenerator
             'article' => $article ?? null,
             'url' => $url,
             'author_name' => $values['author_name'] ?? null,
+            'authors' => Json::decode($values['authors_json'] ?? '[]'),
+            'categories' => Json::decode($values['categories_json'] ?? '[]'),
         ];
 
         $lockedParams = $params;
@@ -127,6 +132,7 @@ class RespektArticleGenerator implements IGenerator
                 fullContent:$unlockedContent,
                 imageTitle: $article->imageTitle,
                 subject: $article->subject,
+                audio: $article->getAudio(),
             );
 
             $lockedParams['article'] = $lockedArticle;

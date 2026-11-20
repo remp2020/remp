@@ -37,6 +37,7 @@ query GetArticleForMailer($articleUrl: String) {
     publishAt
     subtitle {parts {json order}}
     newsletterSubject
+    audio {audio {duration isAiAudio}}
     content {
       parts {
         json

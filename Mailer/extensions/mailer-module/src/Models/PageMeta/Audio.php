@@ -13,6 +13,7 @@ class Audio
         private readonly ?int $size = null,
         private readonly ?int $durationInSeconds = null,
         private readonly ?string $thumbnailUrl = null,
+        private readonly ?AudioOriginEnum $origin = null,
     ) {
     }
 
@@ -37,5 +38,10 @@ class Audio
     public function getThumbnailUrl(): ?string
     {
         return $this->thumbnailUrl;
+    }
+
+    public function getOrigin(): ?string
+    {
+        return $this->origin?->value;
     }
 }

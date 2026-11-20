@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### [Mailer]
+
+- Added audio origin (`origin`) to page meta `audio` attribute stating if the audio is `native` or `ai_generated`. remp/respekt#524
+
 ### [Sso]
 
 - **BREAKING**: `/auth/login` and `/auth/google` reject an untrusted `successUrl` or `errorUrl` with `400` and don't issue the token.

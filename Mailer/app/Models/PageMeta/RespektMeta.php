@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Remp\Mailer\Models\PageMeta;
 
+use Remp\MailerModule\Models\PageMeta\Audio;
 use Remp\MailerModule\Models\PageMeta\Meta;
 
 class RespektMeta extends Meta
@@ -19,11 +20,13 @@ class RespektMeta extends Meta
         public readonly ?string $unlockedContent = null,
         public readonly ?string $imageTitle = null,
         public readonly ?string $subject = null,
+        ?Audio $audio = null,
     ) {
         parent::__construct(
             title: $title,
             image: $image,
             authors: $authors,
+            audio: $audio,
         );
     }
 }
