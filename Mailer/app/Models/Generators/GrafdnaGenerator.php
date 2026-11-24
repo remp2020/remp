@@ -170,7 +170,7 @@ class GrafdnaGenerator implements IGenerator
         $economyPostsResponse = $this->webClient->getEconomyPostsLast24Hours();
         $excerpt = $economyPostsResponse['meta']['excerpt'];
 
-        $economyPosts = $this->filterPosts($economyPostsResponse['posts']);
+        $economyPosts = $this->filterPosts($economyPostsResponse['posts'], $this->getCurrentArticleId($values));
         $economyPosts = array_slice($economyPosts, 0, 5);
         foreach ($economyPosts as &$economyPost) {
             $economyPost['image_url'] = $this->getImageUrlForPost($economyPost);
@@ -415,18 +415,32 @@ HTML;
         }, $post);
     }
 
-    private function filterPosts($posts): array
+    private function filterPosts($posts, ?int $currentArticleId = null): array
     {
         $tagsToFilter = ['graf-dna', 'ekonomicky-newsfilter'];
 
-        return array_filter($posts, function ($post) use ($tagsToFilter) {
+        return array_filter($posts, function ($post) use ($tagsToFilter, $currentArticleId) {
+            if ($currentArticleId !== null && (int) $post['id'] === $currentArticleId) {
+                return false;
+            }
             foreach ($post['tags'] as $tag) {
                 if (in_array($tag['slug'], $tagsToFilter, true)) {
                     return false;
                 }
             }
             return true;
-        }, ARRAY_FILTER_USE_BOTH);
+        });
+    }
+
+    private function getCurrentArticleId(array $values): ?int
+    {
+        if (!empty($values['article_id'])) {
+            return (int) $values['article_id'];
+        }
+        if (!empty($values['url']) && preg_match('~^https?://[^/]+/(\d+)/~', $values['url'], $matches)) {
+            return (int) $matches[1];
+        }
+        return null;
     }
 
     private function getImageUrlForPost($post)
