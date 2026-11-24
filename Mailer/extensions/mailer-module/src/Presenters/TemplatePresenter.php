@@ -19,6 +19,7 @@ use Remp\MailerModule\Repositories\ActiveRow;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableRequest;
 use Remp\MailerModule\Components\SendingStats\ISendingStatsFactory;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\Engine\EngineFactory;
@@ -114,20 +115,17 @@ final class TemplatePresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($this->httpRequest->getQuery());
 
-        $mailTypeIds = $this->getColumnValue('type', $params['columns']);
-        $mailLayoutIds = $this->getColumnValue('layout', $params['columns']);
+        $mailTypeIds = $dataTableRequest->columnSearch('type');
+        $mailLayoutIds = $dataTableRequest->columnSearch('layout');
 
-        $query = $params['search']['value'];
-        $order = $params['columns'][$params['order'][0]['column']]['name'];
-        $orderDir = $params['order'][0]['dir'];
         $templatesCount = $this->templatesRepository
-            ->tableFilter($query, $order, $orderDir, $mailTypeIds, $mailLayoutIds)
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, $mailTypeIds, $mailLayoutIds)
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($query, $order, $orderDir, $mailTypeIds, $mailLayoutIds, (int)$params['length'], (int)$params['start'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, $mailTypeIds, $mailLayoutIds, $dataTableRequest->length, $dataTableRequest->start)
             ->fetchAll();
 
         $result = [
@@ -162,21 +160,6 @@ final class TemplatePresenter extends BasePresenter
             ];
         }
         $this->getPresenter()->sendJson($result);
-    }
-
-    private function getColumnValue($columnName, $columns)
-    {
-        foreach ($columns as $column) {
-            if ($column['name'] !== $columnName) {
-                continue;
-            }
-            if (!empty($column['search']['value'])) {
-                return explode(',', $column['search']['value']);
-            }
-            break;
-        }
-
-        return null;
     }
 
     public function renderShow($id): void
@@ -232,13 +215,14 @@ final class TemplatePresenter extends BasePresenter
     public function renderLogJsonData(): void
     {
         $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($params);
 
         $logsCount = $this->logsRepository
-            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], null, null, (int)$params['templateId'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, null, null, (int)$params['templateId'])
             ->count('*');
 
         $logs = $this->logsRepository
-            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], (int)$params['length'], (int)$params['start'], (int)$params['templateId'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, $dataTableRequest->length, $dataTableRequest->start, (int)$params['templateId'])
             ->fetchAll();
 
         $result = [

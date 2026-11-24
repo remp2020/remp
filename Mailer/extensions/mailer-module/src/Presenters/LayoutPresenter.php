@@ -8,6 +8,7 @@ use Nette\Application\UI\Form;
 use Nette\Http\Request;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableRequest;
 use Remp\MailerModule\Forms\LayoutFormFactory;
 use Remp\MailerModule\Repositories\LayoutsRepository;
 
@@ -60,14 +61,14 @@ final class LayoutPresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($this->httpRequest->getQuery());
 
         $layoutsCount = $this->layoutsRepository
-                ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'])
+                ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir)
                 ->count('*');
 
         $layouts = $this->layoutsRepository
-            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], (int)$params['length'], (int)$params['start'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, $dataTableRequest->length, $dataTableRequest->start)
             ->fetchAll();
 
         $result = [

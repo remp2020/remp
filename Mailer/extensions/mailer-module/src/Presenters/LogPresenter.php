@@ -10,6 +10,7 @@ use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableRequest;
 use Remp\MailerModule\Repositories\LogsRepository;
 use Remp\MailerModule\Repositories\TemplatesRepository;
 use Tomaj\Form\Renderer\BootstrapInlineRenderer;
@@ -120,7 +121,7 @@ final class LogPresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($this->httpRequest->getQuery());
 
         $mailTemplateId = null;
         if ($this->mail_template_code) {
@@ -138,8 +139,8 @@ final class LogPresenter extends BasePresenter
             $logsCount = $this->logsRepository
                 ->tableFilter(
                     $this->email ?? '',
-                    $params['columns'][$params['order'][0]['column']]['name'],
-                    $params['order'][0]['dir'],
+                    $dataTableRequest->orderColumn,
+                    $dataTableRequest->orderDir,
                     null,
                     null,
                     $mailTemplateId,
@@ -149,10 +150,10 @@ final class LogPresenter extends BasePresenter
             $logs = $this->logsRepository
                 ->tableFilter(
                     $this->email ?? '',
-                    $params['columns'][$params['order'][0]['column']]['name'],
-                    $params['order'][0]['dir'],
-                    (int)$params['length'],
-                    (int)$params['start'],
+                    $dataTableRequest->orderColumn,
+                    $dataTableRequest->orderDir,
+                    $dataTableRequest->length,
+                    $dataTableRequest->start,
                     $mailTemplateId,
                     $this->created_at_from ? DateTime::createFromFormat('m/d/Y H:i A', $this->created_at_from) : null,
                     $this->created_at_to ? DateTime::createFromFormat('m/d/Y H:i A', $this->created_at_to) : null,

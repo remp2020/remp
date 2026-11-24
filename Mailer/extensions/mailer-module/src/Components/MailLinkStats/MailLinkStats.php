@@ -5,6 +5,7 @@ namespace Remp\MailerModule\Components\MailLinkStats;
 use Nette\Application\UI\Control;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableRequest;
 use Remp\MailerModule\Models\ContentGenerator\ContentGenerator;
 use Remp\MailerModule\Models\ContentGenerator\GeneratorInputFactory;
 use Remp\MailerModule\Models\ContentGenerator\Replace\RtmClickReplace;
@@ -68,9 +69,12 @@ class MailLinkStats extends Control
 
     public function handleMailLinkStatsJsonData(): void
     {
-        $request = $this->getPresenter()->getRequest()->getParameters();
-        $length = (int)$request['length'];
-        $offset = (int)$request['start'];
+        $dataTableRequest = DataTableRequest::fromQuery(
+            $this->getPresenter()->getRequest()->getParameters(),
+            requireOrder: false,
+        );
+        $length = $dataTableRequest->length;
+        $offset = $dataTableRequest->start;
 
         $template = $this->templatesRepository->findBy('code', $this->templateCode);
         $mailContent = $this->contentGenerator->render($this->generatorInputFactory->create($template));

@@ -8,7 +8,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### [Mailer]
 
+- **BREAKING**: Removed `DataTableFactory::getOrderFromRequest()`. remp/remp#1545
+  - If you call it, read DataTables request parameters with `DataTableRequest::fromQuery()` instead.
 - Added audio origin (`origin`) to page meta `audio` attribute stating if the audio is `native` or `ai_generated`. remp/respekt#524
+- Fixed PHP warnings when DataTables JSON endpoints are opened directly. remp/remp#1545
 
 ### [Sso]
 

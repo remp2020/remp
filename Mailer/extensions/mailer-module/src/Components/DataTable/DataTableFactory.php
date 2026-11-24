@@ -9,16 +9,4 @@ class DataTableFactory
     {
         return new DataTable();
     }
-
-    public function getOrderFromRequest(array $params): array
-    {
-        if (!isset($params['order'])) {
-            return [null, null];
-        }
-
-        return [
-            $params['columns'][$params['order'][0]['column']]['name'],
-            $params['order'][0]['dir'],
-        ];
-    }
 }

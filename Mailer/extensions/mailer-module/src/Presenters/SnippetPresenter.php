@@ -8,6 +8,7 @@ use Nette\Application\UI\Form;
 use Nette\Http\Request;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableRequest;
 use Remp\MailerModule\Forms\SnippetFormFactory;
 use Remp\MailerModule\Repositories\SnippetsRepository;
 use Remp\MailerModule\Repositories\SnippetTranslationsRepository;
@@ -69,17 +70,14 @@ final class SnippetPresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($this->httpRequest->getQuery());
 
-        $query = $params['search']['value'];
-        $order = $params['columns'][$params['order'][0]['column']]['name'];
-        $orderDir = $params['order'][0]['dir'];
         $snippetsCount = $this->snippetsRepository
-                ->tableFilter($query, $order, $orderDir)
+                ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir)
                 ->count('*');
 
         $snippets = $this->snippetsRepository
-            ->tableFilter($query, $order, $orderDir, (int)$params['length'], (int)$params['start'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, $dataTableRequest->length, $dataTableRequest->start)
             ->fetchAll();
 
         $result = [

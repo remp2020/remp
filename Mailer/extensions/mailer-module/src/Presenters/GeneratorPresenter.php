@@ -9,6 +9,7 @@ use Nette\Forms\Controls\BaseControl;
 use Nette\Http\Request;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableRequest;
 use Remp\MailerModule\Forms\SourceTemplateFormFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
 use Remp\MailerModule\Repositories\SourceTemplatesRepository;
@@ -62,15 +63,14 @@ final class GeneratorPresenter extends BasePresenter
 
     public function renderDefaultJsonData(): void
     {
-        $params = $this->httpRequest->getQuery();
-        [$orderColumn, $orderDir] = $this->dataTableFactory->getOrderFromRequest($params);
+        $dataTableRequest = DataTableRequest::fromQuery($this->httpRequest->getQuery(), requireOrder: false);
 
         $sourceTemplatesCount = $this->sourceTemplatesRepository
-            ->tableFilter($params['search']['value'], $orderColumn, $orderDir)
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir)
             ->count('*');
 
         $sourceTemplates = $this->sourceTemplatesRepository
-            ->tableFilter($params['search']['value'], $orderColumn, $orderDir, (int)$params['length'], (int)$params['start'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, $dataTableRequest->length, $dataTableRequest->start)
             ->fetchAll();
 
         $result = [

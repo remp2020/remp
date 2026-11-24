@@ -13,6 +13,7 @@ use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableRequest;
 use Remp\MailerModule\Forms\DuplicateListFormFactory;
 use Remp\MailerModule\Forms\ListFormFactory;
 use Remp\MailerModule\Forms\ListSubscribersImportFormFactory;
@@ -301,13 +302,14 @@ final class ListPresenter extends BasePresenter
     public function renderTemplateJsonData(): void
     {
         $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($params);
 
         $templatesCount = $this->templatesRepository
-            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], [$params['listId']])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, [$params['listId']])
             ->count('*');
 
         $templates = $this->templatesRepository
-            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], [$params['listId']], null, (int)$params['length'], (int)$params['start'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, [$params['listId']], null, $dataTableRequest->length, $dataTableRequest->start)
             ->fetchAll();
 
         $result = [
@@ -375,25 +377,26 @@ final class ListPresenter extends BasePresenter
     public function renderVariantsJsonData(): void
     {
         $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($params);
 
         $listId = $params['listId'] ? (int)$params['listId'] : null;
-        $length = $params['length'] ? (int)$params['length'] : null;
-        $start = $params['start'] ? (int)$params['start'] : null;
+        $length = $dataTableRequest->length ?: null;
+        $start = $dataTableRequest->start ?: null;
 
         $variantsCount = $this->listVariantsRepository
             ->tableFilter(
-                $params['search']['value'],
-                $params['columns'][$params['order'][0]['column']]['name'],
-                $params['order'][0]['dir'],
+                $dataTableRequest->search,
+                $dataTableRequest->orderColumn,
+                $dataTableRequest->orderDir,
                 [$listId]
             )
             ->count('*');
 
         $variants = $this->listVariantsRepository
             ->tableFilter(
-                $params['search']['value'],
-                $params['columns'][$params['order'][0]['column']]['name'],
-                $params['order'][0]['dir'],
+                $dataTableRequest->search,
+                $dataTableRequest->orderColumn,
+                $dataTableRequest->orderDir,
                 [$listId],
                 $length,
                 $start
@@ -746,13 +749,14 @@ final class ListPresenter extends BasePresenter
     public function renderSubscriberEmailsJsonData(): void
     {
         $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($params);
 
         $subscriberEmailsCount = $this->userSubscriptionsRepository
-            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], (int)$params['listId'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, (int)$params['listId'])
             ->count('*');
 
         $subscriberEmails = $this->userSubscriptionsRepository
-            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], (int)$params['listId'], (int)$params['length'], (int)$params['start'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, (int)$params['listId'], $dataTableRequest->length, $dataTableRequest->start)
             ->fetchAll();
 
         $result = [

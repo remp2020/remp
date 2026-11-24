@@ -10,6 +10,7 @@ use Nette\Http\Request;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\DataTable\DataTable;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableRequest;
 use Remp\MailerModule\Forms\ListVariantFormFactory;
 use Remp\MailerModule\Forms\VariantSubscribersImportFormFactory;
 use Remp\MailerModule\Repositories\ActiveRow;
@@ -118,26 +119,27 @@ final class ListVariantPresenter extends BasePresenter
     public function renderSubscribersJsonData(): void
     {
         $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($params);
 
         $variantId = (int)$params['variantId'];
 
         $subscribersCount = $this->userSubscriptionVariantsRepository
             ->tableFilter(
-                $params['search']['value'],
-                $params['columns'][$params['order'][0]['column']]['name'],
-                $params['order'][0]['dir'],
+                $dataTableRequest->search,
+                $dataTableRequest->orderColumn,
+                $dataTableRequest->orderDir,
                 $variantId
             )
             ->count('*');
 
         $subscribers = $this->userSubscriptionVariantsRepository
             ->tableFilter(
-                $params['search']['value'],
-                $params['columns'][$params['order'][0]['column']]['name'],
-                $params['order'][0]['dir'],
+                $dataTableRequest->search,
+                $dataTableRequest->orderColumn,
+                $dataTableRequest->orderDir,
                 $variantId,
-                (int)$params['length'],
-                (int)$params['start']
+                $dataTableRequest->length,
+                $dataTableRequest->start
             )
             ->fetchAll();
 

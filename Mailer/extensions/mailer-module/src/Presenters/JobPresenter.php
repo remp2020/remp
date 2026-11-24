@@ -14,6 +14,7 @@ use Nette\Http\Request;
 use Nette\Utils\Json;
 use Remp\MailerModule\Components\BatchExperimentEvaluation\IBatchExperimentEvaluationFactory;
 use Remp\MailerModule\Components\DataTable\DataTableFactory;
+use Remp\MailerModule\Components\DataTable\DataTableRequest;
 use Remp\MailerModule\Components\SendingStats\ISendingStatsFactory;
 use Remp\MailerModule\Forms\EditBatchFormFactory;
 use Remp\MailerModule\Forms\IFormFactory;
@@ -121,25 +122,16 @@ final class JobPresenter extends BasePresenter
 
     public function renderDefaultJsonData()
     {
-        $params = $this->httpRequest->getQuery();
+        $dataTableRequest = DataTableRequest::fromQuery($this->httpRequest->getQuery());
 
-        $listIds = [];
-        foreach ($params['columns'] as $column) {
-            if ($column['name'] !== 'batches') {
-                continue;
-            }
-            if (!empty($column['search']['value'])) {
-                $listIds = explode(',', $column['search']['value']);
-            }
-            break;
-        }
+        $listIds = $dataTableRequest->columnSearch('batches') ?? [];
 
         $jobsCount = $this->jobsRepository
-            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], $listIds)
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, $listIds)
             ->count('*');
 
         $jobs = $this->jobsRepository
-            ->tableFilter($params['search']['value'], $params['columns'][$params['order'][0]['column']]['name'], $params['order'][0]['dir'], $listIds, (int)$params['length'], (int)$params['start'])
+            ->tableFilter($dataTableRequest->search, $dataTableRequest->orderColumn, $dataTableRequest->orderDir, $listIds, $dataTableRequest->length, $dataTableRequest->start)
             ->fetchAll();
 
         $result = [
